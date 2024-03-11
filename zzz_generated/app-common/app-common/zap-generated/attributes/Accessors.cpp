@@ -71,7 +71,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Identify::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace IdentifyTime
@@ -109,7 +117,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Identify::IdentifyTypeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Identify::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace IdentifyType
@@ -146,7 +162,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Identify::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -183,7 +207,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Identify::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -229,7 +261,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Groups::NameSu
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Groups::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace NameSupport
@@ -266,7 +306,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Groups::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -303,7 +351,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Groups::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -346,7 +402,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace OnOff
@@ -383,7 +447,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace GlobalSceneControl
@@ -420,7 +492,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace OnTime
@@ -457,7 +537,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace OffWaitTime
@@ -499,7 +587,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::OnOff::StartUpOnOffEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OnOff::StartUpOnOffEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -513,7 +609,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OnOff::StartUpOnOffEnum>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -531,7 +631,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace StartUpOnOff
@@ -568,7 +673,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -605,7 +718,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -650,7 +771,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace SwitchType
@@ -689,7 +818,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace SwitchActions
@@ -728,7 +865,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -767,7 +912,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OnOffSwitchConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -814,7 +967,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -828,7 +989,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -844,7 +1009,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace CurrentLevel
@@ -882,7 +1052,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RemainingTime
@@ -920,7 +1098,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinLevel
@@ -958,7 +1144,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxLevel
@@ -996,7 +1190,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentFrequency
@@ -1034,7 +1236,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinFrequency
@@ -1072,7 +1282,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxFrequency
@@ -1113,7 +1331,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::LevelControl::
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Options
@@ -1151,7 +1377,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace OnOffTransitionTime
@@ -1192,7 +1426,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1206,7 +1448,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -1222,7 +1468,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OnLevel
@@ -1263,7 +1514,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1277,7 +1536,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -1293,7 +1556,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OnTransitionTime
@@ -1334,7 +1602,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1348,7 +1624,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -1364,7 +1644,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OffTransitionTime
@@ -1405,7 +1690,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1419,7 +1712,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -1435,7 +1732,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace DefaultMoveRate
@@ -1476,7 +1778,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -1490,7 +1800,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -1506,7 +1820,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace StartUpCurrentLevel
@@ -1544,7 +1863,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -1582,7 +1909,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -1615,6 +1950,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -1627,7 +1963,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActiveText
@@ -1654,6 +1997,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -1666,7 +2010,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace Description
@@ -1693,6 +2044,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -1705,7 +2057,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace InactiveText
@@ -1743,7 +2102,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace OutOfService
@@ -1781,7 +2148,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Polarity
@@ -1819,7 +2194,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace PresentValue
@@ -1857,7 +2240,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Reliability
@@ -1895,7 +2286,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace StatusFlags
@@ -1933,7 +2332,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApplicationType
@@ -1971,7 +2378,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2009,7 +2424,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BinaryInputBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -2054,7 +2477,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PulseWidthModulation::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2092,7 +2523,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PulseWidthModulation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -2139,7 +2578,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Binding::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2176,7 +2623,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Binding::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -2220,7 +2675,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AccessControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2253,6 +2716,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(512 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 512, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[512 + 2];
@@ -2264,7 +2728,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(512 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 512, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[512 + 2];
+    auto length = static_cast<uint16_t>(value.size());
+    Encoding::LittleEndian::Put16(zclString, length);
+    memcpy(&zclString[2], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::Actions::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace SetupURL
@@ -2301,7 +2772,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Actions::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2338,7 +2817,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Actions::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -2371,6 +2858,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -2383,7 +2871,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace NodeLabel
@@ -2421,7 +2916,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace LocalConfigDisabled
@@ -2459,7 +2962,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Reachable
@@ -2497,7 +3008,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2535,7 +3054,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -2580,7 +3107,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2619,7 +3154,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateProvider::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -2664,7 +3207,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace UpdatePossible
@@ -2706,7 +3257,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace UpdateState
@@ -2748,7 +3307,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -2763,7 +3330,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -2779,7 +3350,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace UpdateStateProgress
@@ -2818,7 +3394,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2857,7 +3441,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -2890,6 +3482,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(35 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 35, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[35 + 1];
@@ -2902,7 +3495,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(35 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 35, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[35 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActiveLocale
@@ -2941,7 +3541,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2980,7 +3588,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -3027,7 +3643,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::Hour
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::TimeFormatLocalization::HourFormatEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace HourFormat
@@ -3068,7 +3692,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::Cale
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActiveCalendarType
@@ -3107,7 +3739,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -3146,7 +3786,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -3191,7 +3839,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::UnitLocalization::TempUnitEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitLocalization::TempUnitEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitLocalization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace TemperatureUnit
@@ -3229,7 +3885,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitLocalization::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -3267,7 +3931,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitLocalization::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -3312,7 +3984,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSourceConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -3351,7 +4031,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSourceConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -3396,7 +4084,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Status
@@ -3434,7 +4130,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Order
@@ -3461,6 +4165,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(60 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 60, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[60 + 1];
@@ -3472,7 +4177,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(60 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 60, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[60 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace Description
@@ -3513,7 +4225,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3527,7 +4247,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -3543,7 +4267,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace WiredAssessedInputVoltage
@@ -3584,7 +4313,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3598,7 +4335,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -3614,7 +4355,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace WiredAssessedInputFrequency
@@ -3653,7 +4399,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace WiredCurrentType
@@ -3694,7 +4448,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3708,7 +4470,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -3724,7 +4490,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace WiredAssessedCurrent
@@ -3762,7 +4533,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WiredNominalVoltage
@@ -3800,7 +4579,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WiredMaximumCurrent
@@ -3838,7 +4625,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace WiredPresent
@@ -3879,7 +4674,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3893,7 +4696,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -3909,7 +4716,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace BatVoltage
@@ -3950,7 +4762,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -3964,7 +4784,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -3980,7 +4804,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace BatPercentRemaining
@@ -4021,7 +4850,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -4035,7 +4872,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -4051,7 +4892,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace BatTimeRemaining
@@ -4090,7 +4936,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeLevelEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatChargeLevel
@@ -4128,7 +4982,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatReplacementNeeded
@@ -4167,7 +5029,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatReplaceability
@@ -4205,7 +5075,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatPresent
@@ -4232,6 +5110,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(60 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 60, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[60 + 1];
@@ -4243,7 +5122,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(60 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 60, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[60 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatReplacementDescription
@@ -4283,7 +5169,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatCommonDesignation
@@ -4310,6 +5204,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(20 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 20, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[20 + 1];
@@ -4321,7 +5216,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(20 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 20, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[20 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatANSIDesignation
@@ -4348,6 +5250,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(20 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 20, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[20 + 1];
@@ -4359,7 +5262,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(20 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 20, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[20 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatIECDesignation
@@ -4399,7 +5309,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatApprovedChemistry
@@ -4437,7 +5355,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatCapacity
@@ -4475,7 +5401,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatQuantity
@@ -4514,7 +5448,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatChargeState
@@ -4555,7 +5497,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -4569,7 +5519,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -4585,7 +5539,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace BatTimeToFullCharge
@@ -4623,7 +5582,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatFunctionalWhileCharging
@@ -4664,7 +5631,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -4678,7 +5653,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -4694,7 +5673,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace BatChargingCurrent
@@ -4732,7 +5716,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -4770,7 +5762,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -4814,7 +5814,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Breadcrumb
@@ -4853,7 +5861,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -4891,7 +5907,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -4935,7 +5959,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxNetworks
@@ -4973,7 +6005,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ScanMaxTimeSeconds
@@ -5011,7 +6051,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ConnectMaxTimeSeconds
@@ -5049,7 +6097,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace InterfaceEnabled
@@ -5095,7 +6151,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -5109,7 +6173,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -5129,7 +6197,12 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LastNetworkingStatus
@@ -5158,6 +6231,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -5170,7 +6244,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -5182,7 +6263,8 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -5198,7 +6280,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LastNetworkID
@@ -5239,7 +6326,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -5253,7 +6348,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value,
@@ -5269,7 +6368,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LastConnectErrorValue
@@ -5312,7 +6416,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace SupportedThreadFeatures
@@ -5350,7 +6462,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ThreadVersion
@@ -5389,7 +6509,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -5427,7 +6555,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -5471,7 +6607,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DiagnosticLogs::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -5509,7 +6653,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DiagnosticLogs::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -5553,7 +6705,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace TestEventTriggersEnabled
@@ -5597,7 +6757,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SoftwareDiagnostics::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -5642,7 +6810,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -5681,7 +6857,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ThreadNetworkDiagnostics::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -5726,7 +6910,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -5765,7 +6957,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -5810,7 +7010,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -5849,7 +7057,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -5894,7 +7110,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeSynchronization::TimeSourceEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace TimeSource
@@ -5935,7 +7159,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeZon
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace TimeZoneDatabase
@@ -5973,7 +7205,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace NTPServerAvailable
@@ -6011,7 +7251,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace SupportsDNSResolve
@@ -6049,7 +7297,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -6087,7 +7343,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TimeSynchronization::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -6120,6 +7384,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -6132,7 +7397,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorName
@@ -6171,7 +7444,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorI
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorId value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::VendorId>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorID
@@ -6198,6 +7479,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -6210,7 +7492,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductName
@@ -6237,6 +7527,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -6249,7 +7540,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace NodeLabel
@@ -6288,7 +7587,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace HardwareVersion
@@ -6315,6 +7622,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 64, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[64 + 1];
@@ -6327,7 +7635,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 64, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[64 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace HardwareVersionString
@@ -6366,7 +7682,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SoftwareVersion
@@ -6393,6 +7717,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 64, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[64 + 1];
@@ -6405,7 +7730,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 64, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[64 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace SoftwareVersionString
@@ -6432,6 +7765,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -6444,7 +7778,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ManufacturingDate
@@ -6471,6 +7813,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -6483,7 +7826,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace PartNumber
@@ -6510,6 +7861,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 256, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[256 + 2];
@@ -6522,7 +7874,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 256, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[256 + 2];
+    auto length = static_cast<uint16_t>(value.size());
+    Encoding::LittleEndian::Put16(zclString, length);
+    memcpy(&zclString[2], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductURL
@@ -6549,6 +7909,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 64, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[64 + 1];
@@ -6561,7 +7922,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 64, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[64 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductLabel
@@ -6588,6 +7957,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -6600,7 +7970,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace SerialNumber
@@ -6639,7 +8017,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Reachable
@@ -6666,6 +8052,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -6678,7 +8065,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, zclString,
+                                 ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace UniqueID
@@ -6717,7 +8112,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -6756,7 +8159,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BridgedDeviceBasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -6799,7 +8210,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfPositions
@@ -6836,7 +8255,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentPosition
@@ -6873,7 +8300,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MultiPressMax
@@ -6910,7 +8345,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -6947,7 +8390,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Switch::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -6992,7 +8443,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AdministratorCommissioning::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -7031,7 +8490,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AdministratorCommissioning::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -7076,7 +8543,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -7115,7 +8590,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OperationalCredentials::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -7163,7 +8646,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FixedLabel::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -7201,7 +8692,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FixedLabel::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -7245,7 +8744,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UserLabel::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -7283,7 +8790,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UserLabel::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -7327,7 +8842,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ProxyConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -7365,7 +8888,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ProxyConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -7409,7 +8940,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ProxyDiscovery::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -7447,7 +8986,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ProxyDiscovery::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -7491,7 +9038,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ProxyValid::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -7529,7 +9084,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ProxyValid::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -7573,7 +9136,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanState::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace StateValue
@@ -7611,7 +9182,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanState::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -7649,7 +9228,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanState::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -7697,7 +9284,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace UserActiveModeTriggerHint
@@ -7724,6 +9319,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(128 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 128, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[128 + 1];
@@ -7735,7 +9331,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(128 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 128, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[128 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace UserActiveModeTriggerInstruction
@@ -7774,7 +9377,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::IcdManagement::OperatingModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OperatingMode
@@ -7812,7 +9423,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -7850,7 +9469,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IcdManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -7893,7 +9520,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace SetTime
@@ -7930,7 +9565,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace TimeRemaining
@@ -7968,7 +9611,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Timer::TimerStatusEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Timer::TimerStatusEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace TimerState
@@ -8005,7 +9656,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -8042,7 +9701,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Timer::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -8087,7 +9754,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OvenCavityOperationalState::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -8126,7 +9801,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OvenCavityOperationalState::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -8169,7 +9852,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentMode
@@ -8209,7 +9900,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8223,7 +9922,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -8239,7 +9942,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace StartUpMode
@@ -8279,7 +9987,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8293,7 +10009,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -8309,7 +10029,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OnMode
@@ -8346,7 +10071,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -8383,7 +10116,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OvenMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -8433,7 +10174,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryDryerControls::Drynes
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8447,7 +10196,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -8467,7 +10220,12 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace SelectedDrynessLevel
@@ -8506,7 +10264,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -8544,7 +10310,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryDryerControls::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -8577,6 +10351,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 64, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[64 + 1];
@@ -8588,7 +10363,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(64 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 64, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[64 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace Description
@@ -8629,7 +10411,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8643,7 +10433,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -8659,7 +10453,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace StandardNamespace
@@ -8697,7 +10496,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentMode
@@ -8738,7 +10545,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8752,7 +10567,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -8768,7 +10587,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace StartUpMode
@@ -8809,7 +10633,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -8823,7 +10655,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -8839,7 +10675,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OnMode
@@ -8877,7 +10718,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -8915,7 +10764,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ModeSelect::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -8959,7 +10816,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -9004,7 +10869,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, Id, writable,
+                                 ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -9051,7 +10925,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -9065,7 +10947,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -9081,7 +10967,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace SpinSpeedCurrent
@@ -9122,7 +11013,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryWasherControls::Numbe
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfRinses
@@ -9161,7 +11060,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -9199,7 +11106,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LaundryWasherControls::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -9243,7 +11158,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RvcRunMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -9287,7 +11210,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RvcCleanMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -9332,7 +11263,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 } // namespace TemperatureSetpoint
@@ -9371,7 +11310,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinTemperature
@@ -9410,7 +11357,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxTemperature
@@ -9449,7 +11404,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 } // namespace Step
@@ -9487,7 +11450,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SelectedTemperatureLevel
@@ -9525,7 +11496,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -9563,7 +11542,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -9611,7 +11598,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Mask
@@ -9653,7 +11648,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace State
@@ -9695,7 +11698,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Supported
@@ -9733,7 +11744,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -9771,7 +11790,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -9815,7 +11842,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DishwasherMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -9859,7 +11894,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AirQuality::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -9904,7 +11947,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ExpressedState
@@ -9943,7 +11994,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace SmokeState
@@ -9982,7 +12041,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace COState
@@ -10021,7 +12088,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatteryAlert
@@ -10060,7 +12135,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace DeviceMuted
@@ -10098,7 +12181,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace TestInProgress
@@ -10136,7 +12227,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace HardwareFaultAlert
@@ -10175,7 +12274,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EndOfServiceAlert
@@ -10214,7 +12321,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace InterconnectSmokeAlarm
@@ -10253,7 +12368,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace InterconnectCOAlarm
@@ -10293,7 +12416,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ContaminationState
@@ -10332,7 +12463,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace SmokeSensitivityLevel
@@ -10370,7 +12509,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ExpiryDate
@@ -10408,7 +12555,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -10446,7 +12601,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SmokeCoAlarm::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -10493,7 +12656,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Mask
@@ -10534,7 +12705,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Latch
@@ -10575,7 +12754,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace State
@@ -10616,7 +12803,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlar
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Supported
@@ -10654,7 +12849,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -10692,7 +12895,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -10736,7 +12947,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MicrowaveOvenMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -10780,7 +12999,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MicrowaveOvenControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -10824,7 +13051,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OperationalState::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -10862,7 +13097,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OperationalState::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -10906,7 +13149,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RvcOperationalState::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -10944,7 +13195,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RvcOperationalState::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -10991,7 +13250,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::NodeId 
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::NodeId value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::NodeId>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_NODE_ID_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11005,7 +13272,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::NodeId>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_NODE_ID_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::NodeId> & value,
@@ -11021,7 +13292,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::NodeId> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LastConfiguredBy
@@ -11059,7 +13335,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SceneTableSize
@@ -11097,7 +13381,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -11135,7 +13427,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -11179,7 +13479,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::HepaFilterMonitoring::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -11224,7 +13532,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ActivatedCarbonFilterMonitoring::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -11269,7 +13585,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SupportedSensitivityLevels
@@ -11308,7 +13632,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DefaultSensitivityLevel
@@ -11351,7 +13683,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmsActive
@@ -11394,7 +13734,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmsSuppressed
@@ -11437,7 +13785,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmsEnabled
@@ -11480,7 +13836,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmsSupported
@@ -11523,7 +13887,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace SensorFault
@@ -11562,7 +13934,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -11601,7 +13981,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -11649,7 +14037,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11664,7 +14060,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -11680,7 +14080,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OpenDuration
@@ -11722,7 +14127,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11737,7 +14150,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -11753,7 +14170,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace DefaultOpenDuration
@@ -11795,7 +14217,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11810,7 +14240,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -11826,7 +14260,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace AutoCloseTime
@@ -11872,7 +14311,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11887,7 +14334,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -11907,7 +14358,12 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace CurrentState
@@ -11953,7 +14409,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -11968,7 +14432,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -11988,7 +14456,12 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace TargetState
@@ -12030,7 +14503,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -12045,7 +14526,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -12061,7 +14546,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace CurrentLevel
@@ -12103,7 +14593,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -12118,7 +14616,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -12134,7 +14636,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace TargetLevel
@@ -12173,7 +14680,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 } // namespace DefaultOpenLevel
@@ -12216,7 +14731,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace ValveFault
@@ -12255,7 +14778,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace LevelStep
@@ -12294,7 +14825,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -12333,7 +14872,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ValveConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -12378,7 +14925,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalPowerMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -12423,7 +14978,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -12468,7 +15031,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfLoadControlPrograms
@@ -12507,7 +15078,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfEventsPerProgram
@@ -12546,7 +15125,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfTransitions
@@ -12585,7 +15172,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DefaultRandomStart
@@ -12624,7 +15219,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DefaultRandomDuration
@@ -12663,7 +15266,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -12702,7 +15313,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DemandResponseLoadControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -12745,7 +15364,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Messages::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -12782,7 +15409,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Messages::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -12827,7 +15462,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -12871,7 +15514,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvse::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -12915,7 +15566,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyPreference::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentEnergyBalance
@@ -12953,7 +15612,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyPreference::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentLowPowerModeSensitivity
@@ -12991,7 +15658,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyPreference::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -13029,7 +15704,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyPreference::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -13073,7 +15756,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerTopology::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -13120,7 +15811,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13134,7 +15833,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -13150,7 +15853,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace StartUpMode
@@ -13191,7 +15899,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13205,7 +15921,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -13221,7 +15941,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OnMode
@@ -13259,7 +15984,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::EnergyEvseMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -13307,7 +16040,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13322,7 +16063,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -13338,7 +16083,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace StartUpMode
@@ -13380,7 +16130,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13395,7 +16153,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -13411,7 +16173,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OnMode
@@ -13450,7 +16217,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagementMode::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -13498,7 +16273,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockState value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlLockState>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13512,7 +16295,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlLockState>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -13530,7 +16317,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LockState
@@ -13568,7 +16360,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLockType value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlLockType>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace LockType
@@ -13605,7 +16405,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActuatorEnabled
@@ -13647,7 +16455,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DoorStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DoorStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -13661,7 +16477,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DoorStateEnum>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -13679,7 +16499,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace DoorState
@@ -13716,7 +16541,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DoorOpenEvents
@@ -13753,7 +16586,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DoorClosedEvents
@@ -13790,7 +16631,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace OpenPeriod
@@ -13827,7 +16676,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfTotalUsersSupported
@@ -13864,7 +16721,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfPINUsersSupported
@@ -13901,7 +16766,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfRFIDUsersSupported
@@ -13938,7 +16811,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfWeekDaySchedulesSupportedPerUser
@@ -13975,7 +16856,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfYearDaySchedulesSupportedPerUser
@@ -14012,7 +16901,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfHolidaySchedulesSupported
@@ -14049,7 +16946,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxPINCodeLength
@@ -14086,7 +16991,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinPINCodeLength
@@ -14123,7 +17036,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxRFIDCodeLength
@@ -14160,7 +17081,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinRFIDCodeLength
@@ -14201,7 +17130,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace CredentialRulesSupport
@@ -14238,7 +17175,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfCredentialsSupportedPerUser
@@ -14265,6 +17210,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(3 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 3, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[3 + 1];
@@ -14276,7 +17222,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(3 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 3, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[3 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace Language
@@ -14313,7 +17266,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace LEDSettings
@@ -14350,7 +17311,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AutoRelockTime
@@ -14387,7 +17356,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SoundVolume
@@ -14425,7 +17402,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::OperatingModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OperatingMode
@@ -14466,7 +17451,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace SupportedOperatingModes
@@ -14507,7 +17500,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace DefaultConfigurationRegister
@@ -14544,7 +17545,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace EnableLocalProgramming
@@ -14581,7 +17590,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace EnableOneTouchLocking
@@ -14618,7 +17635,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace EnableInsideStatusLED
@@ -14655,7 +17680,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace EnablePrivacyModeButton
@@ -14696,7 +17729,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace LocalProgrammingFeatures
@@ -14733,7 +17774,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WrongCodeEntryLimit
@@ -14770,7 +17819,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace UserCodeTemporaryDisableTime
@@ -14807,7 +17864,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace SendPINOverTheAir
@@ -14844,7 +17909,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace RequirePINforRemoteOperation
@@ -14881,7 +17954,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ExpiringUserTimeout
@@ -14910,6 +17991,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(65 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 65, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[65 + 1];
@@ -14921,7 +18003,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(65 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 65, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[65 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -14932,7 +18021,8 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -14948,7 +18038,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace AliroReaderVerificationKey
@@ -14977,6 +18072,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -14988,7 +18084,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -14999,7 +18102,8 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -15015,7 +18119,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace AliroReaderGroupIdentifier
@@ -15042,6 +18151,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -15053,7 +18163,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace AliroReaderGroupSubIdentifier
@@ -15082,6 +18199,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -15093,7 +18211,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15104,7 +18229,8 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -15120,7 +18246,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace AliroGroupResolvingKey
@@ -15157,7 +18288,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AliroBLEAdvertisingVersion
@@ -15194,7 +18333,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfAliroCredentialIssuerKeysSupported
@@ -15231,7 +18378,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfAliroEndpointKeysSupported
@@ -15268,7 +18423,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -15305,7 +18468,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -15350,7 +18521,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::Type value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::Type>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Type
@@ -15388,7 +18567,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhysicalClosedLimitLift
@@ -15426,7 +18613,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhysicalClosedLimitTilt
@@ -15467,7 +18662,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15481,7 +18684,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -15497,7 +18704,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace CurrentPositionLift
@@ -15538,7 +18750,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15552,7 +18772,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -15568,7 +18792,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace CurrentPositionTilt
@@ -15606,7 +18835,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfActuationsLift
@@ -15644,7 +18881,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfActuationsTilt
@@ -15685,7 +18930,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ConfigStatus
@@ -15726,7 +18979,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15740,7 +19001,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -15756,7 +19021,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace CurrentPositionLiftPercentage
@@ -15797,7 +19067,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15811,7 +19089,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -15827,7 +19109,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace CurrentPositionTiltPercentage
@@ -15869,7 +19156,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OperationalStatus
@@ -15910,7 +19205,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent100ths>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15924,7 +19227,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent100ths>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -15941,7 +19248,12 @@ Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percen
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace TargetPositionLiftPercent100ths
@@ -15982,7 +19294,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent100ths>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -15996,7 +19316,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent100ths>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -16013,7 +19337,12 @@ Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percen
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace TargetPositionTiltPercent100ths
@@ -16052,7 +19381,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::EndProductType value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::EndProductType>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EndProductType
@@ -16093,7 +19430,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent100ths>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -16107,7 +19452,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent100ths>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -16124,7 +19473,12 @@ Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percen
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace CurrentPositionLiftPercent100ths
@@ -16165,7 +19519,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent100ths value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent100ths>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -16179,7 +19541,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent100ths>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_PERCENT100THS_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -16196,7 +19562,12 @@ Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percen
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace CurrentPositionTiltPercent100ths
@@ -16234,7 +19605,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstalledOpenLimitLift
@@ -16272,7 +19651,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstalledClosedLimitLift
@@ -16310,7 +19697,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstalledOpenLimitTilt
@@ -16348,7 +19743,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstalledClosedLimitTilt
@@ -16387,7 +19790,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Mode
@@ -16428,7 +19839,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::WindowCovering
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace SafetyStatus
@@ -16466,7 +19885,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -16504,7 +19931,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -16548,7 +19983,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierMovingState
@@ -16586,7 +20029,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierSafetyStatus
@@ -16624,7 +20075,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierCapabilities
@@ -16662,7 +20121,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierOpenEvents
@@ -16700,7 +20167,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierCloseEvents
@@ -16738,7 +20213,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierCommandOpenEvents
@@ -16776,7 +20259,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierCommandCloseEvents
@@ -16814,7 +20305,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierOpenPeriod
@@ -16852,7 +20351,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierClosePeriod
@@ -16890,7 +20397,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace BarrierPosition
@@ -16928,7 +20443,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -16966,7 +20489,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BarrierControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -17014,7 +20545,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17029,7 +20568,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17045,7 +20588,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxPressure
@@ -17087,7 +20635,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17102,7 +20658,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17118,7 +20678,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxSpeed
@@ -17160,7 +20725,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17175,7 +20748,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17191,7 +20768,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxFlow
@@ -17233,7 +20815,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17248,7 +20838,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17264,7 +20858,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinConstPressure
@@ -17306,7 +20905,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17321,7 +20928,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17337,7 +20948,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxConstPressure
@@ -17379,7 +20995,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17394,7 +21018,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17410,7 +21038,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinCompPressure
@@ -17452,7 +21085,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17467,7 +21108,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17483,7 +21128,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxCompPressure
@@ -17525,7 +21175,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17540,7 +21198,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17556,7 +21218,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinConstSpeed
@@ -17598,7 +21265,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17613,7 +21288,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17629,7 +21308,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxConstSpeed
@@ -17671,7 +21355,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17686,7 +21378,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17702,7 +21398,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinConstFlow
@@ -17744,7 +21445,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17759,7 +21468,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -17775,7 +21488,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxConstFlow
@@ -17817,7 +21535,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17832,7 +21558,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17848,7 +21578,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinConstTemp
@@ -17890,7 +21625,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -17905,7 +21648,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -17921,7 +21668,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxConstTemp
@@ -17964,7 +21716,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace PumpStatus
@@ -18007,7 +21767,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EffectiveOperationMode
@@ -18050,7 +21818,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EffectiveControlMode
@@ -18092,7 +21868,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18107,7 +21891,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -18123,7 +21911,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Capacity
@@ -18165,7 +21958,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18180,7 +21981,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -18196,7 +22001,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Speed
@@ -18238,7 +22048,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18253,7 +22071,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -18269,7 +22091,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LifetimeRunningHours
@@ -18311,7 +22138,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18326,7 +22161,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -18342,7 +22181,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Power
@@ -18384,7 +22228,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18399,7 +22251,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -18415,7 +22271,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LifetimeEnergyConsumed
@@ -18458,7 +22319,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OperationMode
@@ -18501,7 +22370,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ControlMode
@@ -18540,7 +22417,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -18579,7 +22464,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -18626,7 +22519,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18640,7 +22541,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -18656,7 +22561,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LocalTemperature
@@ -18697,7 +22607,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -18711,7 +22629,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -18727,7 +22649,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OutdoorTemperature
@@ -18765,7 +22692,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Occupancy
@@ -18803,7 +22738,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 } // namespace AbsMinHeatSetpointLimit
@@ -18841,7 +22784,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 } // namespace AbsMaxHeatSetpointLimit
@@ -18879,7 +22830,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 } // namespace AbsMinCoolSetpointLimit
@@ -18917,7 +22876,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 } // namespace AbsMaxCoolSetpointLimit
@@ -18955,7 +22922,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PICoolingDemand
@@ -18993,7 +22968,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PIHeatingDemand
@@ -19031,7 +23014,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace HVACSystemTypeConfiguration
@@ -19069,7 +23060,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace LocalTemperatureCalibration
@@ -19107,7 +23106,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace OccupiedCoolingSetpoint
@@ -19145,7 +23152,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace OccupiedHeatingSetpoint
@@ -19183,7 +23198,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace UnoccupiedCoolingSetpoint
@@ -19221,7 +23244,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace UnoccupiedHeatingSetpoint
@@ -19259,7 +23290,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinHeatSetpointLimit
@@ -19297,7 +23336,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxHeatSetpointLimit
@@ -19335,7 +23382,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinCoolSetpointLimit
@@ -19373,7 +23428,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxCoolSetpointLimit
@@ -19411,7 +23474,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinSetpointDeadBand
@@ -19453,7 +23524,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace RemoteSensing
@@ -19494,7 +23573,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ControlSequenceO
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ControlSequenceOfOperation
@@ -19533,7 +23620,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::SystemModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::SystemModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace SystemMode
@@ -19573,7 +23668,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatRunningModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ThermostatRunningMode
@@ -19612,7 +23715,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::StartOfWeekEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::StartOfWeekEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace StartOfWeek
@@ -19650,7 +23761,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfWeeklyTransitions
@@ -19688,7 +23807,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfDailyTransitions
@@ -19729,7 +23856,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::TemperatureSetpo
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace TemperatureSetpointHold
@@ -19770,7 +23905,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -19784,7 +23927,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -19800,7 +23947,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace TemperatureSetpointHoldDuration
@@ -19842,7 +23994,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ThermostatProgrammingOperationMode
@@ -19883,7 +24043,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::Re
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace ThermostatRunningState
@@ -19923,7 +24091,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::SetpointChangeSourceEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::SetpointChangeSourceEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace SetpointChangeSource
@@ -19964,7 +24140,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -19978,7 +24162,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -19994,7 +24182,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace SetpointChangeAmount
@@ -20032,7 +24225,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace SetpointChangeSourceTimestamp
@@ -20073,7 +24274,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20087,7 +24296,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20103,7 +24316,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OccupiedSetback
@@ -20144,7 +24362,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20158,7 +24384,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20174,7 +24404,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OccupiedSetbackMin
@@ -20215,7 +24450,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20229,7 +24472,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20245,7 +24492,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OccupiedSetbackMax
@@ -20286,7 +24538,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20300,7 +24560,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20316,7 +24580,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace UnoccupiedSetback
@@ -20357,7 +24626,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20371,7 +24648,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20387,7 +24668,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace UnoccupiedSetbackMin
@@ -20428,7 +24714,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20442,7 +24736,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -20458,7 +24756,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace UnoccupiedSetbackMax
@@ -20496,7 +24799,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace EmergencyHeatDelta
@@ -20535,7 +24846,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACTypeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ACType
@@ -20573,7 +24892,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ACCapacity
@@ -20612,7 +24939,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ACRefrigerantType
@@ -20651,7 +24986,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCompressorTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACCompressorTypeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ACCompressorType
@@ -20693,7 +25036,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace ACErrorCode
@@ -20732,7 +25083,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACLouverPositionEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACLouverPositionEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ACLouverPosition
@@ -20773,7 +25132,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -20787,7 +25154,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -20803,7 +25174,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace ACCoilTemperature
@@ -20842,7 +25218,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Thermostat::ACCapacityFormatEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ACCapacityformat
@@ -20880,7 +25264,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfPresets
@@ -20918,7 +25310,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfSchedules
@@ -20956,7 +25356,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NumberOfScheduleTransitions
@@ -20997,7 +25405,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21011,7 +25427,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -21027,7 +25447,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NumberOfScheduleTransitionPerDay
@@ -21056,6 +25481,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -21067,7 +25493,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21078,7 +25511,8 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -21094,7 +25528,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace ActivePresetHandle
@@ -21123,6 +25562,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -21134,7 +25574,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21145,7 +25592,8 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -21161,7 +25609,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace ActiveScheduleHandle
@@ -21199,7 +25652,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace PresetsSchedulesEditable
@@ -21241,7 +25702,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace TemperatureSetpointHoldPolicy
@@ -21282,7 +25751,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21296,7 +25773,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -21312,7 +25793,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace SetpointHoldExpiryTimestamp
@@ -21350,7 +25836,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -21388,7 +25882,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -21433,7 +25935,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::FanModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FanControl::FanModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace FanMode
@@ -21472,7 +25982,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::FanModeSequenceEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FanControl::FanModeSequenceEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace FanModeSequence
@@ -21513,7 +26031,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21527,7 +26053,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value,
@@ -21543,7 +26073,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace PercentSetting
@@ -21581,7 +26116,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::Percent value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::Percent>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_PERCENT_ATTRIBUTE_TYPE);
 }
 
 } // namespace PercentCurrent
@@ -21619,7 +26162,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SpeedMax
@@ -21660,7 +26211,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -21674,7 +26233,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -21690,7 +26253,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace SpeedSetting
@@ -21728,7 +26296,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SpeedCurrent
@@ -21768,7 +26344,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace RockSupport
@@ -21808,7 +26392,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace RockSetting
@@ -21848,7 +26440,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace WindSupport
@@ -21888,7 +26488,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace WindSetting
@@ -21927,7 +26535,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::AirflowDirectionEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FanControl::AirflowDirectionEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AirflowDirection
@@ -21965,7 +26581,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -22003,7 +26627,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -22052,7 +26684,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
+                                 ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace TemperatureDisplayMode
@@ -22095,7 +26736,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
+                                 ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace KeypadLockout
@@ -22140,7 +26790,17 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfi
 Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits =
+        NumericAttributeTraits<chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
+                                 ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ScheduleProgrammingVisibility
@@ -22179,7 +26839,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
+                                 ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -22218,7 +26887,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, Id, writable,
+                                 ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -22262,7 +26940,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentHue
@@ -22300,7 +26986,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentSaturation
@@ -22338,7 +27032,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RemainingTime
@@ -22376,7 +27078,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentX
@@ -22414,7 +27124,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentY
@@ -22452,7 +27170,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace DriftCompensation
@@ -22479,6 +27205,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(254 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 254, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[254 + 1];
@@ -22490,7 +27217,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(254 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 254, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[254 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace CompensationText
@@ -22528,7 +27262,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorTemperatureMireds
@@ -22566,7 +27308,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorMode
@@ -22604,7 +27354,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Options
@@ -22645,7 +27403,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -22659,7 +27425,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -22675,7 +27445,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NumberOfPrimaries
@@ -22713,7 +27488,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary1X
@@ -22751,7 +27534,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary1Y
@@ -22792,7 +27583,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -22806,7 +27605,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -22822,7 +27625,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary1Intensity
@@ -22860,7 +27668,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary2X
@@ -22898,7 +27714,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary2Y
@@ -22939,7 +27763,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -22953,7 +27785,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -22969,7 +27805,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary2Intensity
@@ -23007,7 +27848,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary3X
@@ -23045,7 +27894,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary3Y
@@ -23086,7 +27943,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23100,7 +27965,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23116,7 +27985,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary3Intensity
@@ -23154,7 +28028,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary4X
@@ -23192,7 +28074,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary4Y
@@ -23233,7 +28123,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23247,7 +28145,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23263,7 +28165,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary4Intensity
@@ -23301,7 +28208,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary5X
@@ -23339,7 +28254,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary5Y
@@ -23380,7 +28303,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23394,7 +28325,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23410,7 +28345,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary5Intensity
@@ -23448,7 +28388,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary6X
@@ -23486,7 +28434,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Primary6Y
@@ -23527,7 +28483,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23541,7 +28505,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23557,7 +28525,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Primary6Intensity
@@ -23595,7 +28568,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WhitePointX
@@ -23633,7 +28614,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WhitePointY
@@ -23671,7 +28660,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointRX
@@ -23709,7 +28706,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointRY
@@ -23750,7 +28755,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23764,7 +28777,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23780,7 +28797,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace ColorPointRIntensity
@@ -23818,7 +28840,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointGX
@@ -23856,7 +28886,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointGY
@@ -23897,7 +28935,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -23911,7 +28957,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -23927,7 +28977,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace ColorPointGIntensity
@@ -23965,7 +29020,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointBX
@@ -24003,7 +29066,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorPointBY
@@ -24044,7 +29115,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -24058,7 +29137,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -24074,7 +29157,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace ColorPointBIntensity
@@ -24112,7 +29200,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace EnhancedCurrentHue
@@ -24150,7 +29246,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EnhancedColorMode
@@ -24188,7 +29292,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorLoopActive
@@ -24226,7 +29338,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorLoopDirection
@@ -24264,7 +29384,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorLoopTime
@@ -24302,7 +29430,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorLoopStartEnhancedHue
@@ -24340,7 +29476,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorLoopStoredEnhancedHue
@@ -24378,7 +29522,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorCapabilities
@@ -24416,7 +29568,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorTempPhysicalMinMireds
@@ -24454,7 +29614,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ColorTempPhysicalMaxMireds
@@ -24492,7 +29660,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CoupleColorTempToLevelMinMireds
@@ -24533,7 +29709,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -24547,7 +29731,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -24563,7 +29751,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace StartUpColorTemperatureMireds
@@ -24601,7 +29794,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -24639,7 +29840,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -24683,7 +29892,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhysicalMinLevel
@@ -24721,7 +29938,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhysicalMaxLevel
@@ -24763,7 +29988,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace BallastStatus
@@ -24801,7 +30034,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MinLevel
@@ -24839,7 +30080,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MaxLevel
@@ -24880,7 +30129,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -24894,7 +30151,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -24910,7 +30171,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace IntrinsicBallastFactor
@@ -24951,7 +30217,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -24965,7 +30239,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -24981,7 +30259,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace BallastFactorAdjustment
@@ -25019,7 +30302,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace LampQuantity
@@ -25046,6 +30337,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -25058,7 +30350,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace LampType
@@ -25085,6 +30384,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -25097,7 +30397,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace LampManufacturer
@@ -25138,7 +30445,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25152,7 +30467,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -25168,7 +30487,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LampRatedHours
@@ -25209,7 +30533,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25223,7 +30555,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -25239,7 +30575,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LampBurnHours
@@ -25281,7 +30622,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace LampAlarmMode
@@ -25322,7 +30671,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25336,7 +30693,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -25352,7 +30713,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LampBurnHoursTripPoint
@@ -25391,7 +30757,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -25429,7 +30803,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BallastConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -25477,7 +30859,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25492,7 +30882,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -25508,7 +30902,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MeasuredValue
@@ -25550,7 +30949,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25565,7 +30972,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -25581,7 +30992,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinMeasuredValue
@@ -25623,7 +31039,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25638,7 +31062,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -25654,7 +31082,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxMeasuredValue
@@ -25693,7 +31126,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Tolerance
@@ -25737,7 +31178,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::IlluminanceMeasurement::Ligh
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25751,7 +31200,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -25771,7 +31224,12 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LightSensorType
@@ -25810,7 +31268,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -25849,7 +31315,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::IlluminanceMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -25897,7 +31371,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25912,7 +31394,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -25928,7 +31414,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MeasuredValue
@@ -25970,7 +31461,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -25985,7 +31484,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26001,7 +31504,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinMeasuredValue
@@ -26043,7 +31551,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26058,7 +31574,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_TEMPERATURE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26074,7 +31594,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxMeasuredValue
@@ -26113,7 +31638,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Tolerance
@@ -26152,7 +31685,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -26191,7 +31732,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TemperatureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -26238,7 +31787,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26252,7 +31809,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26268,7 +31829,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MeasuredValue
@@ -26309,7 +31875,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26323,7 +31897,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26339,7 +31917,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinMeasuredValue
@@ -26380,7 +31963,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26394,7 +31985,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26410,7 +32005,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxMeasuredValue
@@ -26448,7 +32048,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Tolerance
@@ -26489,7 +32097,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26503,7 +32119,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26519,7 +32139,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace ScaledValue
@@ -26560,7 +32185,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26574,7 +32207,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26590,7 +32227,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinScaledValue
@@ -26631,7 +32273,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26645,7 +32295,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -26661,7 +32315,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxScaledValue
@@ -26699,7 +32358,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ScaledTolerance
@@ -26737,7 +32404,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Scale
@@ -26775,7 +32450,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -26813,7 +32496,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::PressureMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -26860,7 +32551,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26874,7 +32573,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -26890,7 +32593,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MeasuredValue
@@ -26931,7 +32639,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -26945,7 +32661,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -26961,7 +32681,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinMeasuredValue
@@ -27002,7 +32727,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -27016,7 +32749,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -27032,7 +32769,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxMeasuredValue
@@ -27070,7 +32812,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Tolerance
@@ -27108,7 +32858,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -27146,7 +32904,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FlowMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -27194,7 +32960,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -27209,7 +32983,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -27225,7 +33003,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MeasuredValue
@@ -27267,7 +33050,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -27282,7 +33073,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -27298,7 +33093,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MinMeasuredValue
@@ -27340,7 +33140,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -27355,7 +33163,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -27371,7 +33183,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace MaxMeasuredValue
@@ -27410,7 +33227,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Tolerance
@@ -27449,7 +33274,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -27488,7 +33321,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RelativeHumidityMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -27536,7 +33377,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Occupancy
@@ -27577,7 +33426,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::OccupancySensing::OccupancyS
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OccupancySensorType
@@ -27619,7 +33476,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OccupancySensorTypeBitmap
@@ -27657,7 +33522,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PIROccupiedToUnoccupiedDelay
@@ -27695,7 +33568,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PIRUnoccupiedToOccupiedDelay
@@ -27733,7 +33614,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PIRUnoccupiedToOccupiedThreshold
@@ -27771,7 +33660,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace UltrasonicOccupiedToUnoccupiedDelay
@@ -27809,7 +33706,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace UltrasonicUnoccupiedToOccupiedDelay
@@ -27847,7 +33752,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace UltrasonicUnoccupiedToOccupiedThreshold
@@ -27885,7 +33798,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhysicalContactOccupiedToUnoccupiedDelay
@@ -27923,7 +33844,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhysicalContactUnoccupiedToOccupiedDelay
@@ -27961,7 +33890,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
@@ -27999,7 +33936,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -28037,7 +33982,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OccupancySensing::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28082,7 +34035,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28127,7 +34089,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28172,7 +34143,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28217,7 +34197,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28262,7 +34250,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28307,7 +34303,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28352,7 +34357,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28397,7 +34410,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28442,7 +34463,16 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28487,7 +34517,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28520,6 +34558,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(12 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 12, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[12 + 1];
@@ -28531,7 +34570,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(12 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 12, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[12 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace MACAddress
@@ -28558,6 +34604,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[16 + 1];
@@ -28569,7 +34616,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[16 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace LinkLocalAddress
@@ -28607,7 +34661,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -28645,7 +34707,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28688,7 +34758,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Channel::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -28725,7 +34803,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::Channel::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28769,7 +34855,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TargetNavigator::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentTarget
@@ -28807,7 +34901,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TargetNavigator::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -28845,7 +34947,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::TargetNavigator::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -28890,7 +35000,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::MediaPlayback::PlaybackStateEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentState
@@ -28931,7 +35049,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -28945,7 +35071,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -28961,7 +35091,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace StartTime
@@ -29002,7 +35137,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -29016,7 +35159,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -29032,7 +35179,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace Duration
@@ -29070,7 +35222,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value, 
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<float>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace PlaybackSpeed
@@ -29111,7 +35271,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -29125,7 +35293,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -29141,7 +35313,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace SeekRangeEnd
@@ -29182,7 +35359,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -29196,7 +35381,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -29212,7 +35401,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace SeekRangeStart
@@ -29250,7 +35444,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -29288,7 +35490,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -29332,7 +35542,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaInput::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentInput
@@ -29370,7 +35588,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaInput::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -29408,7 +35634,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::MediaInput::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -29451,7 +35685,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LowPower::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -29488,7 +35730,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::LowPower::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -29532,7 +35782,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::KeypadInput::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -29570,7 +35828,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::KeypadInput::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -29618,7 +35884,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentLauncher::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace SupportedStreamingProtocols
@@ -29656,7 +35930,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentLauncher::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -29694,7 +35976,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentLauncher::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -29738,7 +36028,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AudioOutput::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentOutput
@@ -29776,7 +36074,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AudioOutput::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -29814,7 +36120,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AudioOutput::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -29858,7 +36172,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -29896,7 +36218,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -29929,6 +36259,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -29941,7 +36272,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorName
@@ -29979,7 +36317,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorI
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorId value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::VendorId>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorID
@@ -30006,6 +36352,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 256, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[256 + 2];
@@ -30018,7 +36365,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 256, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[256 + 2];
+    auto length = static_cast<uint16_t>(value.size());
+    Encoding::LittleEndian::Put16(zclString, length);
+    memcpy(&zclString[2], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApplicationName
@@ -30056,7 +36410,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductID
@@ -30097,7 +36459,15 @@ Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBasic::Applicatio
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Status
@@ -30124,6 +36494,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[32 + 1];
@@ -30136,7 +36507,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[32 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApplicationVersion
@@ -30174,7 +36552,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -30212,7 +36598,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -30256,7 +36650,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AccountLogin::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -30294,7 +36696,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AccountLogin::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -30338,7 +36748,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Enabled
@@ -30365,6 +36783,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(8 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 8, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[8 + 1];
@@ -30376,7 +36795,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(8 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 8, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[8 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace OnDemandRatingThreshold
@@ -30403,6 +36829,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(8 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 8, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[8 + 1];
@@ -30414,7 +36841,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(8 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 8, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[8 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ScheduledContentRatingThreshold
@@ -30452,7 +36886,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ScreenDailyTime
@@ -30490,7 +36932,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RemainingScreenTime
@@ -30528,7 +36978,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace BlockUnrated
@@ -30566,7 +37024,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -30604,7 +37070,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -30648,7 +37122,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentAppObserver::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -30686,7 +37168,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ContentAppObserver::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -30731,7 +37221,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasurementType
@@ -30769,7 +37267,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcVoltage
@@ -30807,7 +37313,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcVoltageMin
@@ -30845,7 +37359,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcVoltageMax
@@ -30883,7 +37405,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcCurrent
@@ -30921,7 +37451,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcCurrentMin
@@ -30959,7 +37497,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcCurrentMax
@@ -30997,7 +37543,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcPower
@@ -31035,7 +37589,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcPowerMin
@@ -31073,7 +37635,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcPowerMax
@@ -31111,7 +37681,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcVoltageMultiplier
@@ -31149,7 +37727,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcVoltageDivisor
@@ -31187,7 +37773,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcCurrentMultiplier
@@ -31225,7 +37819,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcCurrentDivisor
@@ -31263,7 +37865,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcPowerMultiplier
@@ -31301,7 +37911,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DcPowerDivisor
@@ -31339,7 +37957,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcFrequency
@@ -31377,7 +38003,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcFrequencyMin
@@ -31415,7 +38049,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcFrequencyMax
@@ -31453,7 +38095,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace NeutralCurrent
@@ -31491,7 +38141,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 } // namespace TotalActivePower
@@ -31529,7 +38187,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 } // namespace TotalReactivePower
@@ -31567,7 +38233,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace TotalApparentPower
@@ -31605,7 +38279,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured1stHarmonicCurrent
@@ -31643,7 +38325,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured3rdHarmonicCurrent
@@ -31681,7 +38371,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured5thHarmonicCurrent
@@ -31719,7 +38417,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured7thHarmonicCurrent
@@ -31757,7 +38463,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured9thHarmonicCurrent
@@ -31795,7 +38509,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Measured11thHarmonicCurrent
@@ -31833,7 +38555,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredPhase1stHarmonicCurrent
@@ -31871,7 +38601,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredPhase3rdHarmonicCurrent
@@ -31909,7 +38647,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredPhase5thHarmonicCurrent
@@ -31947,7 +38693,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredPhase7thHarmonicCurrent
@@ -31985,7 +38739,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredPhase9thHarmonicCurrent
@@ -32023,7 +38785,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeasuredPhase11thHarmonicCurrent
@@ -32061,7 +38831,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcFrequencyMultiplier
@@ -32099,7 +38877,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcFrequencyDivisor
@@ -32137,7 +38923,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PowerMultiplier
@@ -32175,7 +38969,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace PowerDivisor
@@ -32213,7 +39015,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace HarmonicCurrentMultiplier
@@ -32251,7 +39061,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PhaseHarmonicCurrentMultiplier
@@ -32289,7 +39107,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstantaneousVoltage
@@ -32327,7 +39153,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstantaneousLineCurrent
@@ -32365,7 +39199,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstantaneousActiveCurrent
@@ -32403,7 +39245,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstantaneousReactiveCurrent
@@ -32441,7 +39291,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace InstantaneousPower
@@ -32479,7 +39337,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltage
@@ -32517,7 +39383,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMin
@@ -32555,7 +39429,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMax
@@ -32593,7 +39475,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrent
@@ -32631,7 +39521,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMin
@@ -32669,7 +39567,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMax
@@ -32707,7 +39613,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePower
@@ -32745,7 +39659,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMin
@@ -32783,7 +39705,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMax
@@ -32821,7 +39751,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ReactivePower
@@ -32859,7 +39797,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApparentPower
@@ -32897,7 +39843,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PowerFactor
@@ -32935,7 +39889,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsVoltageMeasurementPeriod
@@ -32973,7 +39935,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsUnderVoltageCounter
@@ -33011,7 +39981,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeOverVoltagePeriod
@@ -33049,7 +40027,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeUnderVoltagePeriod
@@ -33087,7 +40073,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSagPeriod
@@ -33125,7 +40119,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSwellPeriod
@@ -33163,7 +40165,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcVoltageMultiplier
@@ -33201,7 +40211,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcVoltageDivisor
@@ -33239,7 +40257,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcCurrentMultiplier
@@ -33277,7 +40303,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcCurrentDivisor
@@ -33315,7 +40349,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcPowerMultiplier
@@ -33353,7 +40395,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcPowerDivisor
@@ -33392,7 +40442,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OverloadAlarmsMask
@@ -33430,7 +40488,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace VoltageOverload
@@ -33468,7 +40534,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentOverload
@@ -33507,7 +40581,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcOverloadAlarmsMask
@@ -33545,7 +40627,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcVoltageOverload
@@ -33583,7 +40673,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcCurrentOverload
@@ -33621,7 +40719,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcActivePowerOverload
@@ -33659,7 +40765,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AcReactivePowerOverload
@@ -33697,7 +40811,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsOverVoltage
@@ -33735,7 +40857,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsUnderVoltage
@@ -33773,7 +40903,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeOverVoltage
@@ -33811,7 +40949,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeUnderVoltage
@@ -33849,7 +40995,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSag
@@ -33887,7 +41041,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSwell
@@ -33925,7 +41087,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace LineCurrentPhaseB
@@ -33963,7 +41133,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActiveCurrentPhaseB
@@ -34001,7 +41179,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ReactiveCurrentPhaseB
@@ -34039,7 +41225,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltagePhaseB
@@ -34077,7 +41271,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMinPhaseB
@@ -34115,7 +41317,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMaxPhaseB
@@ -34153,7 +41363,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentPhaseB
@@ -34191,7 +41409,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMinPhaseB
@@ -34229,7 +41455,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMaxPhaseB
@@ -34267,7 +41501,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerPhaseB
@@ -34305,7 +41547,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMinPhaseB
@@ -34343,7 +41593,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMaxPhaseB
@@ -34381,7 +41639,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ReactivePowerPhaseB
@@ -34419,7 +41685,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApparentPowerPhaseB
@@ -34457,7 +41731,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PowerFactorPhaseB
@@ -34495,7 +41777,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsVoltageMeasurementPeriodPhaseB
@@ -34533,7 +41823,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsOverVoltageCounterPhaseB
@@ -34571,7 +41869,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsUnderVoltageCounterPhaseB
@@ -34609,7 +41915,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeOverVoltagePeriodPhaseB
@@ -34647,7 +41961,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeUnderVoltagePeriodPhaseB
@@ -34685,7 +42007,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSagPeriodPhaseB
@@ -34723,7 +42053,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSwellPeriodPhaseB
@@ -34761,7 +42099,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace LineCurrentPhaseC
@@ -34799,7 +42145,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActiveCurrentPhaseC
@@ -34837,7 +42191,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ReactiveCurrentPhaseC
@@ -34875,7 +42237,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltagePhaseC
@@ -34913,7 +42283,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMinPhaseC
@@ -34951,7 +42329,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageMaxPhaseC
@@ -34989,7 +42375,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentPhaseC
@@ -35027,7 +42421,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMinPhaseC
@@ -35065,7 +42467,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsCurrentMaxPhaseC
@@ -35103,7 +42513,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerPhaseC
@@ -35141,7 +42559,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMinPhaseC
@@ -35179,7 +42605,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActivePowerMaxPhaseC
@@ -35217,7 +42651,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace ReactivePowerPhaseC
@@ -35255,7 +42697,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApparentPowerPhaseC
@@ -35293,7 +42743,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PowerFactorPhaseC
@@ -35331,7 +42789,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsVoltageMeasurementPeriodPhaseC
@@ -35369,7 +42835,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsOverVoltageCounterPhaseC
@@ -35407,7 +42881,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageRmsUnderVoltageCounterPhaseC
@@ -35445,7 +42927,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeOverVoltagePeriodPhaseC
@@ -35483,7 +42973,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsExtremeUnderVoltagePeriodPhaseC
@@ -35521,7 +43019,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSagPeriodPhaseC
@@ -35559,7 +43065,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RmsVoltageSwellPeriodPhaseC
@@ -35598,7 +43112,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -35636,7 +43158,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -35680,7 +43210,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Boolean
@@ -35721,7 +43259,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap8
@@ -35762,7 +43308,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap16
@@ -35803,7 +43357,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap32
@@ -35844,7 +43406,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap64
@@ -35882,7 +43452,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int8u
@@ -35920,7 +43498,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int16u
@@ -35958,7 +43544,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int24u
@@ -35996,7 +43590,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int32u
@@ -36034,7 +43636,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int40u
@@ -36072,7 +43682,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int48u
@@ -36110,7 +43728,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int56u
@@ -36148,7 +43774,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int64u
@@ -36186,7 +43820,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int8s
@@ -36224,7 +43866,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int16s
@@ -36262,7 +43912,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, true>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int24s
@@ -36300,7 +43958,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int32s
@@ -36338,7 +44004,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, true>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int40s
@@ -36376,7 +44050,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, true>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int48s
@@ -36414,7 +44096,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, true>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int56s
@@ -36452,7 +44142,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int64s
@@ -36490,7 +44188,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Enum8
@@ -36528,7 +44234,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 } // namespace Enum16
@@ -36566,7 +44280,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value, 
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<float>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace FloatSingle
@@ -36604,7 +44326,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<double>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace FloatDouble
@@ -36631,6 +44361,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 10, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[10 + 1];
@@ -36642,7 +44373,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 10, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[10 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace OctetString
@@ -36669,6 +44407,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(1000 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 1000, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[1000 + 2];
@@ -36681,7 +44420,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(1000 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 1000, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[1000 + 2];
+    auto length = static_cast<uint16_t>(value.size());
+    Encoding::LittleEndian::Put16(zclString, length);
+    memcpy(&zclString[2], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace LongOctetString
@@ -36708,6 +44454,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 10, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[10 + 1];
@@ -36719,7 +44466,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 10, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[10 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace CharString
@@ -36746,6 +44500,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, chip::Mutable
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(1000 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 1000, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[1000 + 2];
@@ -36758,7 +44513,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(1000 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 1000, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[1000 + 2];
+    auto length = static_cast<uint16_t>(value.size());
+    Encoding::LittleEndian::Put16(zclString, length);
+    memcpy(&zclString[2], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace LongCharString
@@ -36796,7 +44558,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
 }
 
 } // namespace EpochUs
@@ -36834,7 +44604,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace EpochS
@@ -36872,7 +44650,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorI
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::VendorId value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::VendorId>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorId
@@ -36911,7 +44697,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EnumAttr
@@ -36949,7 +44743,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RangeRestrictedInt8u
@@ -36987,7 +44789,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RangeRestrictedInt8s
@@ -37025,7 +44835,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RangeRestrictedInt16u
@@ -37063,7 +44881,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RangeRestrictedInt16s
@@ -37101,7 +44927,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace TimedWriteBoolean
@@ -37139,7 +44973,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Unsupported
@@ -37180,7 +45022,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37194,7 +45044,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<bool> & value,
@@ -37210,7 +45064,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<bool> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableBoolean
@@ -37254,7 +45113,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37268,7 +45135,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -37288,7 +45159,12 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableBitmap8
@@ -37332,7 +45208,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37346,7 +45230,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -37366,7 +45254,12 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableBitmap16
@@ -37410,7 +45303,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37424,7 +45325,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -37444,7 +45349,12 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableBitmap32
@@ -37488,7 +45398,15 @@ Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::B
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37502,7 +45420,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status
@@ -37522,7 +45444,12 @@ Protocols::InteractionModel::Status
 Set(chip::EndpointId endpoint,
     const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableBitmap64
@@ -37563,7 +45490,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37577,7 +45512,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -37593,7 +45532,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt8u
@@ -37634,7 +45578,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37648,7 +45600,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -37664,7 +45620,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt16u
@@ -37705,7 +45666,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37719,7 +45688,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -37735,7 +45708,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt24u
@@ -37776,7 +45754,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37790,7 +45776,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
@@ -37806,7 +45796,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt32u
@@ -37847,7 +45842,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37861,7 +45864,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, false>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -37877,7 +45884,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt40u
@@ -37918,7 +45930,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -37932,7 +45952,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, false>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -37948,7 +45972,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt48u
@@ -37989,7 +46018,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, false>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38003,7 +46040,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, false>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -38019,7 +46060,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt56u
@@ -38060,7 +46106,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38074,7 +46128,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value,
@@ -38090,7 +46148,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt64u
@@ -38131,7 +46194,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38145,7 +46216,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value,
@@ -38161,7 +46236,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt8s
@@ -38202,7 +46282,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38216,7 +46304,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -38232,7 +46324,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt16s
@@ -38273,7 +46370,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, true>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38287,7 +46392,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, true>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value,
@@ -38303,7 +46412,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt24s
@@ -38344,7 +46458,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38358,7 +46480,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value,
@@ -38374,7 +46500,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt32s
@@ -38415,7 +46546,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, true>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38429,7 +46568,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, true>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value,
@@ -38445,7 +46588,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt40s
@@ -38486,7 +46634,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, true>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38500,7 +46656,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, true>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value,
@@ -38516,7 +46676,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt48s
@@ -38557,7 +46722,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, true>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38571,7 +46744,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, true>>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value,
@@ -38587,7 +46764,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt56s
@@ -38628,7 +46810,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int64_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int64_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38642,7 +46832,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int64_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value,
@@ -38658,7 +46852,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableInt64s
@@ -38699,7 +46898,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38713,7 +46920,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -38729,7 +46940,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableEnum8
@@ -38770,7 +46986,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38784,7 +47008,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -38800,7 +47028,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableEnum16
@@ -38841,7 +47074,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value, 
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, float value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<float>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38855,7 +47096,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<float>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value,
@@ -38871,7 +47116,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableFloatSingle
@@ -38912,7 +47162,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, double value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<double>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38926,7 +47184,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<double>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<double> & value,
@@ -38942,7 +47204,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<double> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableFloatDouble
@@ -38971,6 +47238,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 10, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[10 + 1];
@@ -38982,7 +47250,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 10, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[10 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -38993,7 +47268,8 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value,
@@ -39009,7 +47285,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableOctetString
@@ -39038,6 +47319,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty)
 {
+
     static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 10, Protocols::InteractionModel::Status::ConstraintError);
     uint8_t zclString[10 + 1];
@@ -39049,7 +47331,14 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpa
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+
+    static_assert(10 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 10, Protocols::InteractionModel::Status::ConstraintError);
+    uint8_t zclString[10 + 1];
+    auto length = static_cast<uint8_t>(value.size());
+    Encoding::Put8(zclString, length);
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39060,7 +47349,8 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    uint8_t zclString[1] = { 0xFF };
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value,
@@ -39076,7 +47366,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableCharString
@@ -39119,7 +47414,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Cl
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39133,7 +47436,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
@@ -39151,7 +47458,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint,
                                         const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableEnumAttr
@@ -39192,7 +47504,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39206,7 +47526,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value,
@@ -39222,7 +47546,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableRangeRestrictedInt8u
@@ -39263,7 +47592,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value,
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39277,7 +47614,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value,
@@ -39293,7 +47634,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableRangeRestrictedInt8s
@@ -39334,7 +47680,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39348,7 +47702,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
@@ -39364,7 +47722,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableRangeRestrictedInt16u
@@ -39405,7 +47768,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, int16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty)
@@ -39419,7 +47790,11 @@ Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttri
 
 Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint)
 {
-    return SetNull(endpoint, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value,
@@ -39435,7 +47810,12 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::a
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace NullableRangeRestrictedInt16s
@@ -39473,7 +47853,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WriteOnlyInt8u
@@ -39511,7 +47899,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -39549,7 +47945,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -39587,7 +47991,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint8_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace MeiInt8u
@@ -39631,7 +48043,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FaultInjection::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -39669,7 +48089,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::FaultInjection::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
@@ -39713,7 +48141,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value, M
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, bool value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<bool>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SampleMei::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace FlipFlop
@@ -39751,7 +48187,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SampleMei::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -39789,7 +48233,15 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t value)
 {
-    return Set(endpoint, value, MarkAttributeDirty::kIfChanged);
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::SampleMei::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
