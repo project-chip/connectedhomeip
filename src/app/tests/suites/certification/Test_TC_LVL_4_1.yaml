@@ -243,6 +243,64 @@ tests:
       response:
           value: 254
 
+    - label: "Step 4f: TH reads the MinLevel attribute from the DUT"
+      PICS: LVL.S.A0002 && LVL.S.F01
+      command: "readAttribute"
+      attribute: "MinLevel"
+      response:
+          value: 1
+          saveAs: MinLevelValue
+          constraints:
+              type: int8u
+
+    - label:
+          "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
+      PICS: LVL.S.C01.Rsp && LVL.S.F01
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "Level"
+                value: MinLevelValue
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "Step 4h: TH sends a Move command to the DUT with MoveMode =0x00 (up)
+          and Rate =0 (units/s), expect success"
+      PICS: LVL.S.C01.Rsp
+      command: "Move"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 0
+              - name: "Rate"
+                value: 0
+              - name: "OptionsMask"
+                value: 1
+              - name: "OptionsOverride"
+                value: 1
+
+    - label: "Wait 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label:
+          "Step 4i: After another 5 seconds, TH reads CurrentLevel attribute
+          from DUT, expects mininum level."
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: MinLevelValue
+
     - label: "Precondition send Off Command"
       cluster: "On/Off"
       PICS: OO.S.C00.Rsp
