@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #include "chef-lock-manager.h"
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
@@ -371,3 +371,4 @@ LockEndpoint * LockManager::getEndpoint(chip::EndpointId endpointId)
     }
     return nullptr;
 }
+#endif // MATTER_DM_PLUGIN_DOOR_LOCK_SERVER

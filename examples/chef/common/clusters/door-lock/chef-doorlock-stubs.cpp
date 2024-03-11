@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/af.h>
@@ -129,3 +130,4 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     DoorLockServer::Instance().InitServer(endpoint);
     LockManager::Instance().InitEndpoint(endpoint);
 }
+#endif // MATTER_DM_PLUGIN_DOOR_LOCK_SERVER

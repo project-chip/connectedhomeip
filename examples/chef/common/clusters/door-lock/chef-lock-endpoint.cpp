@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #include "chef-lock-endpoint.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
@@ -675,3 +676,4 @@ const char * LockEndpoint::lockStateToString(DlLockState lockState) const
 
     return "Unknown";
 }
+#endif // MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
