@@ -1284,7 +1284,7 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
         waitForFailsafeExtension =
             ExtendArmFailSafeInternal(mDeviceBeingCommissioned, mCommissioningStage, expiryLengthSeconds.Value(),
                                       MakeOptional(kMinimumCommissioningStepTimeout), OnArmFailSafeExtendedForDeviceAttestation,
-                                      OnFailedToExtendedArmFailSafeDeviceAttestation);
+                                      OnFailedToExtendedArmFailSafeDeviceAttestation, /* fireAndForget = */ false);
     }
     else
     {
@@ -1903,11 +1903,10 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
         failsafeTimeout = static_cast<uint16_t>(retryTimeout.count() + kDefaultFailsafeTimeout);
     }
 
-    // Treat this command as a fire-and-forget request (useContext = false).
     // A false return is fine; we don't want to make the fail-safe shorter here.
     self->ExtendArmFailSafeInternal(commissioneeDevice, CommissioningStage::kFindOperational, failsafeTimeout,
                                     MakeOptional(kMinimumCommissioningStepTimeout), OnExtendFailsafeForCASERetrySuccess,
-                                    OnExtendFailsafeForCASERetryFailure, /* useContext = */ false);
+                                    OnExtendFailsafeForCASERetryFailure, /* fireAndForget = */ true);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
@@ -2585,7 +2584,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // no matter what.
         proxy->SetFailSafeExpirationTimestamp(System::Clock::kZero);
         VerifyOrDie(ExtendArmFailSafeInternal(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout),
-                                              timeout, OnArmFailSafe, OnBasicFailure));
+                                              timeout, OnArmFailSafe, OnBasicFailure, /* fireAndForget = */ false));
     }
     break;
     case CommissioningStage::kReadCommissioningInfo: {
@@ -3229,7 +3228,7 @@ void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device,
     }
 
     if (!ExtendArmFailSafeInternal(commissioneeDevice, step, failSafeTimeoutSecs, MakeOptional(kMinimumCommissioningStepTimeout),
-                                   OnArmFailSafe, OnBasicFailure))
+                                   OnArmFailSafe, OnBasicFailure, /* fireAndForget = */ false))
     {
         // A false return is fine; we don't want to make the fail-safe shorter here.
         CommissioningStageComplete(CHIP_NO_ERROR, CommissioningDelegate::CommissioningReport());

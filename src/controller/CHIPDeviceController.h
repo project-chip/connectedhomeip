@@ -964,7 +964,7 @@ private:
 
     bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                    Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
-                                   OnExtendFailsafeFailure onFailure, bool fireAndForget = false);
+                                   OnExtendFailsafeFailure onFailure, bool fireAndForget);
 
     template <typename RequestObjectT>
     CHIP_ERROR SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
