@@ -41,7 +41,7 @@
 
 #include "ble_config.h"
 
-#if SL_ICD_ENABLED && SLI_917_SOC
+#if SL_ICD_ENABLED && SLI_SI91X_MCU_INTERFACE
 #include "rsi_rom_power_save.h"
 #include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_driver.h"
@@ -50,7 +50,7 @@
 // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
 #define BUTTON_PRESSED 1
 bool btn0_pressed = false;
-#endif // SL_ICD_ENABLED && SLI_917_SOC
+#endif // SL_ICD_ENABLED && SLI_SI91X_MCU_INTERFACE
 
 #include "dhcp_client.h"
 #include "sl_wifi.h"
@@ -63,10 +63,10 @@ bool btn0_pressed = false;
 #define ADV_MULTIPROBE 1
 #define ADV_SCAN_PERIODICITY 10
 
-#if SLI_917_SOC
+#if SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_trng.h"
 #define TRNGKEY_SIZE 4
-#endif // SLI_917_SOC
+#endif // SLI_SI91X_MCU_INTERFACE
 
 struct wfx_rsi wfx_rsi;
 
@@ -215,7 +215,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 
 #if SL_ICD_ENABLED
 
-#if SLI_917_SOC
+#if SLI_SI91X_MCU_INTERFACE
 /******************************************************************
  * @fn   sl_wfx_host_si91x_sleep_wakeup()
  * @brief
@@ -250,7 +250,7 @@ void sl_wfx_host_si91x_sleep_wakeup()
         }
     }
 }
-#endif // SLI_917_SOC
+#endif // SLI_SI91X_MCU_INTERFACE
 
 /******************************************************************
  * @fn   wfx_rsi_power_save()
