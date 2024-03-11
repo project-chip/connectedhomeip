@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "rand32.h"
+#include <zephyr/random/random.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 /**
