@@ -368,8 +368,8 @@ public final class ControllerParams {
      * Controls enabling server interactions on a controller. For ICD check-in message, this feature
      * has to be enabled.
      *
-     * @param enableServerInteractions
-     * @return
+     * @param enableServerInteractions indicates whether to enable server interactions.
+     *
      */
     public Builder setEnableServerInteractions(boolean enableServerInteractions) {
       this.enableServerInteractions = enableServerInteractions;
