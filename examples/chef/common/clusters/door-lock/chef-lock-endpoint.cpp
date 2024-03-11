@@ -257,7 +257,7 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex cre
         return false;
     }
 
-    // Assign to arrary by credentialIndex. Note: 0 is reserved for programmingPIN only 
+    // Assign to array by credentialIndex. Note: 0 is reserved for programmingPIN only 
     auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
     if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
     {
