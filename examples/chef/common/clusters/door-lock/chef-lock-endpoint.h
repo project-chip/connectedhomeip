@@ -39,7 +39,7 @@ struct YearDayScheduleInfo;
 struct HolidayScheduleInfo;
 
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
-static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES     = 6;
+static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES     = 6; // 0: ProgrammingPIN ~ 5: Face
 
 class LockEndpoint
 {

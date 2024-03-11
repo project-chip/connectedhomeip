@@ -121,13 +121,17 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     // priviledged function
     UserTypeEnum usertype = UserTypeEnum::kProgrammingUser;
     CredentialRuleEnum credentialRule = CredentialRuleEnum::kSingle;
-    uint16_t programmingPINCredentialIndex(1); // According to spec, programming PIN
-                                            // should be always indexed as 0
-    uint16_t user1CredentialIndex(2);
-    const CredentialStruct credentials[2] = {
-            {credentialType: CredentialTypeEnum::kProgrammingPIN, credentialIndex: programmingPINCredentialIndex},
-            {credentialType: CredentialTypeEnum::kPin, credentialIndex: user1CredentialIndex}};
-    size_t totalCredentials(2);
+
+    constexpr size_t totalCredentials(2);
+    // According to spec (5.2.6.26.2. CredentialIndex Field), programming PIN credential should be always indexed as 0
+    uint16_t credentialIndex0(0);
+     // 1st non ProgrammingPIN credential should be indexed as 1
+    uint16_t credentialIndex1(1);
+
+    const CredentialStruct credentials[totalCredentials] = {
+            {credentialType: CredentialTypeEnum::kProgrammingPIN, credentialIndex: credentialIndex0},
+            {credentialType: CredentialTypeEnum::kPin, credentialIndex: credentialIndex1}};
+
     if (!SetUser(endpointId, userIndex, creator, modifier, userName, uniqueId, userStatus, usertype, credentialRule, &credentials[0], totalCredentials))
     {
         ChipLogError(Zcl, "Unable to set the User [endpointId=%d]", endpointId);
@@ -135,24 +139,22 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     }
 
     DlCredentialStatus credentialStatus = DlCredentialStatus::kOccupied;
+
+    // Set the default user's ProgrammingPIN credential
     uint8_t defaultProgrammingPIN[6]  = { 0x39, 0x39, 0x39, 0x39, 0x39, 0x39 }; // 000000
-    const chip::ByteSpan programmingPINCredentialData(defaultProgrammingPIN);
-
-    if (!SetCredential(endpointId, programmingPINCredentialIndex, creator, modifier, credentialStatus, CredentialTypeEnum::kProgrammingPIN, programmingPINCredentialData))
+    if (!SetCredential(endpointId, credentialIndex0, creator, modifier, credentialStatus, CredentialTypeEnum::kProgrammingPIN, chip::ByteSpan(defaultProgrammingPIN)))
     {
         ChipLogError(Zcl, "Unable to set the credential - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
 
+    // Set the default user's non ProgrammingPIN credential
     uint8_t defaultPin[6]  = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36 }; // 123456
-    const chip::ByteSpan credentialData(defaultPin);
-
-    if (!SetCredential(endpointId, user1CredentialIndex, creator, modifier, credentialStatus, CredentialTypeEnum::kPin, credentialData))
+    if (!SetCredential(endpointId, credentialIndex1, creator, modifier, credentialStatus, CredentialTypeEnum::kPin, chip::ByteSpan(defaultPin)))
     {
         ChipLogError(Zcl, "Unable to set the credential - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-
 
     ChipLogProgress(Zcl,
                     "Initialized new lock door endpoint "

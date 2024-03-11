@@ -117,13 +117,6 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
                     mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
                     to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
                     static_cast<unsigned int>(totalCredentials));
-    printf("\033[44m Lock App: LockEndpoint::SetUser "
-                    "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
-                    ",userStatus=%u,userType=%u,"
-                    "credentialRule=%u,credentials=%p,totalCredentials=%u] \033[0m\n",
-                    mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
-                    to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
-                    static_cast<unsigned int>(totalCredentials));
 
     auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())
@@ -264,6 +257,7 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex cre
         return false;
     }
 
+    // Assign to arrary by credentialIndex. Note: 0 is reserved for programmingPIN only 
     auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
     if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
     {
@@ -284,13 +278,6 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex cre
     ChipLogProgress(Zcl, "Successfully set the credential [mEndpointId=%d,index=%d,credentialType=%u,creator=%u,modifier=%u]",
                     mEndpointId, credentialIndex, to_underlying(credentialType), credentialInStorage.createdBy,
                     credentialInStorage.modifiedBy);
-
-printf("\033[41m %s, %d \033[0m \n credential=", __func__, __LINE__);
-for (size_t i=0; i < credentialData.size(); i++)
-{
-printf("%c", credentialInStorage.credentialData[i]);
-}
-printf("\n \033[41m %s, %d \033[0m \n", __func__, __LINE__);
 
     return true;
 }
@@ -467,13 +454,6 @@ bool LockEndpoint::setLockState(const Nullable<chip::FabricIndex> & fabricIdx, c
         return false;
     }
 
-printf("\033[41m %s, %d \033[0m \n pin=", __func__, __LINE__);
-for (size_t i=0; i < pin.Value().size(); i++)
-{
-printf("%c", pin.Value()[i]);
-}
-printf("\n \033[41m %s, %d \033[0m \n", __func__, __LINE__);
-
     // Find the credential so we can make sure it is not absent right away
     auto & pinCredentials = mLockCredentials[to_underlying(CredentialTypeEnum::kPin)];
     auto credential       = std::find_if(pinCredentials.begin(), pinCredentials.end(), [&pin](const LockCredentialInfo & c) {
@@ -627,7 +607,6 @@ bool LockEndpoint::weekDayScheduleForbidsAccess(uint16_t userIndex, bool * haveS
             auto endTime   = s.schedule.endHour * chip::kSecondsPerHour + s.schedule.endMinute * chip::kSecondsPerMinute;
             bool ret = (s.status == DlScheduleStatus::kOccupied && (to_underlying(s.schedule.daysMask) & (1 << calendarTime.tm_wday)) &&
                 startTime <= currentTime && currentTime <= endTime);
-            printf("\033[44m %s, %d, s.status=%d,  ret=%d \033[0m \n", __func__, __LINE__, to_underlying(s.status), static_cast<int>(ret));
             return s.status == DlScheduleStatus::kOccupied && (to_underlying(s.schedule.daysMask) & (1 << calendarTime.tm_wday)) &&
                 startTime <= currentTime && currentTime <= endTime;
         });
