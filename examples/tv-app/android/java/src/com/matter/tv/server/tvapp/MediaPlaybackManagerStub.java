@@ -35,11 +35,11 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
   private static int playbackMaxForwardSpeed = 10;
   private static int playbackMaxRewindSpeed = -10;
 
-  private static MediaTrack activeAudioTrack = null;
   private static MediaTrack[] audioTracks = {
     new MediaTrack("activeAudioTrackId_0", "languageCode1", "displayName1"),
     new MediaTrack("activeAudioTrackId_1", "languageCode2", "displayName2")
   };
+  private static MediaTrack activeAudioTrack = audioTracks[0];
 
   private static MediaTrack activeTextTrack = null;
   private static MediaTrack[] textTracks = {

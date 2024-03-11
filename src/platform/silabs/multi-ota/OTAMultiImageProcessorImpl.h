@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,17 +19,30 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <include/platform/CHIPDeviceLayer.h>
+#include <include/platform/OTAImageProcessor.h>
 #include <lib/core/OTAImageHeader.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/OTAImageProcessor.h>
+#include <map>
+#include <platform/silabs/multi-ota/OTATlvProcessor.h>
 
-#include <fstream>
+/*
+ * This hook is called at the end of OTAMultiImageProcessorImpl::Init.
+ * It should generally register the OTATlvProcessor instances.
+ */
 
 namespace chip {
 
-class OTAImageProcessorImpl : public OTAImageProcessorInterface
+class OTAMultiImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
+    using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
+
+    CHIP_ERROR Init(OTADownloader * downloader);
+    CHIP_ERROR OtaHookInit();
+    static CHIP_ERROR ProcessDescriptor(void * descriptor);
+    void Clear();
+
     //////////// OTAImageProcessorInterface Implementation ///////////////
     CHIP_ERROR PrepareDownload() override;
     CHIP_ERROR Finalize() override;
@@ -40,8 +53,15 @@ public:
     CHIP_ERROR ConfirmCurrentImage() override;
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
-    CHIP_ERROR Init(OTADownloader * downloader);
-    static OTAImageProcessorImpl & GetDefaultInstance();
+
+    CHIP_ERROR ProcessHeader(ByteSpan & block);
+    CHIP_ERROR ProcessPayload(ByteSpan & block);
+    CHIP_ERROR ProcessFinalize();
+    CHIP_ERROR SelectProcessor(ByteSpan & block);
+    CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
+
+    static void FetchNextData(uint32_t context);
+    static OTAMultiImageProcessorImpl & GetDefaultInstance();
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -50,7 +70,8 @@ private:
     static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
-    CHIP_ERROR ProcessHeader(ByteSpan & block);
+
+    void HandleStatus(CHIP_ERROR status);
 
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
@@ -62,20 +83,17 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
-    // EFR32 platform creates a single instance of OTAImageProcessorImpl class.
-    // If that changes then the use of static members and functions must be revisited
-    static uint32_t mWriteOffset; // End of last written block
-    static uint8_t mSlotId;       // Bootloader storage slot
+    /**
+     * Call AbortAction for all processors that were used
+     */
+    void AbortAllProcessors();
+
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    static constexpr size_t kAlignmentBytes = 64;
-    // Intermediate, word-aligned buffer for writing to the bootloader storage.
-    // Bootloader storage API requires the buffer size to be a multiple of 4.
-    static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4)));
-    // Offset indicates how far the write buffer has been filled
-    static uint16_t writeBufOffset;
-    static bool mReset;
+    OTATlvProcessor * mCurrentProcessor = nullptr;
+    OTADataAccumulator mAccumulator;
+    std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
 };
 
 } // namespace chip
