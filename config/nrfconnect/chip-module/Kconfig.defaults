@@ -24,6 +24,10 @@ if CHIP
 # System configuration
 # ==============================================================================
 
+choice LIBC_IMPLEMENTATION
+    default NEWLIB_LIBC
+endchoice
+
 config ASSERT
     default y
 
