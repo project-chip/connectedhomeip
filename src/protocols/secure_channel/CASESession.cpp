@@ -1966,7 +1966,8 @@ void CASESession::OnSuccessStatusReport()
     Finish();
 }
 
-CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
+CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
+                                              Optional<uintptr_t> protocolData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (protocolCode)
@@ -1981,6 +1982,10 @@ CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
 
     case kProtocolCodeBusy:
         err = CHIP_ERROR_BUSY;
+        if (protocolData.HasValue())
+        {
+            mDelegate->OnResponderBusy(System::Clock::Milliseconds16(static_cast<uint16_t>(protocolData.Value())));
+        }
         break;
 
     default:

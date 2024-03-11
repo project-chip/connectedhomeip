@@ -104,7 +104,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
     jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds,
     bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
-    bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure)
+    bool skipAttestationCertificateValidation, jstring countryCode, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -207,11 +207,30 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
     wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
 
-    CommissioningParameters params = wrapper->mAutoCommissioner.GetCommissioningParameters();
+    CommissioningParameters params = wrapper->GetCommissioningParameters();
     params.SetFailsafeTimerSeconds(failsafeTimerSeconds);
     params.SetAttemptWiFiNetworkScan(attemptNetworkScanWiFi);
     params.SetAttemptThreadNetworkScan(attemptNetworkScanThread);
     params.SetSkipCommissioningComplete(skipCommissioningComplete);
+
+    if (countryCode != nullptr)
+    {
+        JniUtfString countryCodeJniString(env, countryCode);
+        if (countryCodeJniString.size() != kCountryCodeBufferLen)
+        {
+            *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+            return nullptr;
+        }
+
+        MutableCharSpan copiedCode(wrapper->mCountryCode);
+        if (CopyCharSpanToMutableCharSpan(countryCodeJniString.charSpan(), copiedCode) != CHIP_NO_ERROR)
+        {
+            *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+            return nullptr;
+        }
+        params.SetCountryCode(copiedCode);
+    }
+
     wrapper->UpdateCommissioningParameters(params);
 
     CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
@@ -526,6 +545,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateCommissioningParameters(const c
 {
     // this will wipe out any custom attestationNonce and csrNonce that was being used.
     // however, Android APIs don't allow these to be set to custom values today.
+    mCommissioningParameter = params;
     return mAutoCommissioner.SetCommissioningParameters(params);
 }
 
