@@ -253,8 +253,7 @@ tests:
           constraints:
               type: int8u
 
-    - label:
-          "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
+    - label: "Step 4g: TH sends a MoveToLevel to set the level to MinLevel"
       PICS: LVL.S.C01.Rsp && LVL.S.F01
       command: "MoveToLevel"
       arguments:
