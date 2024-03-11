@@ -98,6 +98,71 @@ wfx_wifi_scan_ext_t * temp_reset;
 
 volatile sl_status_t callback_status = SL_STATUS_OK;
 
+// Scan timeout timer
+static osTimerId_t sScanTimeoutTimer;
+// Scan semaphore
+static osSemaphoreId_t sScanSemaphore;
+
+/******************************************************************
+ * @fn   void ScanTimerEventHandler(void const *arg)
+ * @brief
+ *       Scan Timer Callback, called when the scan timer expires, means the scan has timed out.
+ * @param[in] arg: Timer argument
+ * @return
+ *        None
+ *********************************************************************/
+static void ScanTimerEventHandler(void * arg)
+{
+    // Post the semaphore, the scan Timed Out.
+    osSemaphoreRelease(sScanSemaphore);
+
+    // TODO: Post timeout event to the event group once event loop implemented
+}
+
+static void CancelScanTimer()
+{
+    osStatus_t status;
+
+    // Check if timer started
+    if (!osTimerIsRunning(sScanTimeoutTimer))
+    {
+        SILABS_LOG("cancelScanTimer: timer not running");
+        return;
+    }
+
+    status = osTimerStop(sScanTimeoutTimer);
+    if (status != osOK)
+    {
+        SILABS_LOG("cancelScanTimer: failed to stop timer with status: %d", status);
+    }
+    else
+    {
+        // Release the semaphore to unblock the scan thread.
+        osSemaphoreRelease(sScanSemaphore);
+    }
+}
+
+static void StartScanTimer(uint32_t timeout)
+{
+    osStatus_t status;
+
+    // Check if timer started
+    CancelScanTimer();
+
+    status = osTimerStart(sScanTimeoutTimer, timeout);
+    if (status != osOK)
+    {
+        SILABS_LOG("startScanTimer: failed to start timer with status: %d", status);
+    }
+    else
+    {
+        // Take the sempahore to block the scan thread until the timer expires or the scan is complete.
+        // TODO: This is to emulate the busy wait we used to have instead of the timer, we need to remove this
+        // once an event loop is implemented.
+        osSemaphoreAcquire(sScanSemaphore, osWaitForever);
+    }
+}
+
 /******************************************************************
  * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
  * @brief
@@ -307,7 +372,25 @@ int32_t wfx_wifi_rsi_init(void)
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("wfx_wifi_rsi_init failed %x", status);
+        return status;
     }
+
+    // Create timer for scan timeout
+    sScanTimeoutTimer = osTimerNew(ScanTimerEventHandler, osTimerOnce, NULL, NULL);
+    if (sScanTimeoutTimer == NULL)
+    {
+        SILABS_LOG("Failed to create scan timeout timer");
+        return SL_STATUS_FAIL;
+    }
+
+    // Create Sempaphore for scan
+    sScanSemaphore = osSemaphoreNew(1, 1, NULL);
+    if (sScanSemaphore == NULL)
+    {
+        SILABS_LOG("Failed to create scan semaphore");
+        return SL_STATUS_FAIL;
+    }
+
     return status;
 }
 
@@ -422,6 +505,8 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
 #else
         wfx_rsi.sec.security = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
+
+        CancelScanTimer();
         return SL_STATUS_FAIL;
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
@@ -458,6 +543,8 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
     }
     wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
     scan_results_complete = true;
+
+    CancelScanTimer();
     return SL_STATUS_OK;
 }
 sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
@@ -502,6 +589,7 @@ sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_
 {
     callback_status          = show_scan_results(result);
     bg_scan_results_complete = true;
+    CancelScanTimer();
     return SL_STATUS_OK;
 }
 /***************************************************************************************
@@ -530,12 +618,11 @@ static void wfx_rsi_save_ap_info() // translation
 #endif
     if (SL_STATUS_IN_PROGRESS == status)
     {
-        const uint32_t start = osKernelGetTickCount();
-        while (!scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT_TICK)
-        {
-            osThreadYield();
-        }
-        status = scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
+        StartScanTimer(WIFI_SCAN_TIMEOUT_TICK);
+
+        // Pending for the scan results pend until the scan results are received or the timer expires
+        // TODO: Remove busy wait once an event loop is implemented
+        osSemaphoreAcquire(sScanSemaphore, osWaitForever);
     }
 }
 
@@ -818,12 +905,11 @@ void wfx_rsi_task(void * arg)
                 status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
                 if (SL_STATUS_IN_PROGRESS == status)
                 {
-                    const uint32_t start = osKernelGetTickCount();
-                    while (!bg_scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT_TICK)
-                    {
-                        osThreadYield();
-                    }
-                    status = bg_scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
+                    StartScanTimer(WIFI_SCAN_TIMEOUT_TICK);
+
+                    // Pending for the scan results pend until the scan results are received or the timer expires
+                    // TODO: Remove busy wait once an event loop is implemented
+                    osSemaphoreAcquire(sScanSemaphore, osWaitForever);
                 }
             }
         }
