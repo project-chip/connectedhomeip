@@ -21,6 +21,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <net/if.h>
+
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
 
@@ -516,38 +518,82 @@ void ResolveContext::DispatchSuccess()
     // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
     bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
 
+#if TARGET_OS_TV
+    // On tvOS, prioritize results from en0, en1, ir0 in that order, if those
+    // interfaces are present, since those will generally have more up-to-date
+    // information.
+    static const unsigned int priorityInterfaceIndices[] = {
+        if_nametoindex("en0"),
+        if_nametoindex("en1"),
+        if_nametoindex("ir0"),
+    };
+#else
+    // Elsewhere prioritize "lo0" over other interfaces.
+    static const unsigned int priorityInterfaceIndices[] = {
+        if_nametoindex("lo0"),
+    };
+#endif // TARGET_OS_TV
+
+    for (auto interfaceIndex : priorityInterfaceIndices)
+    {
+        if (TryReportingResultsForInterfaceIndex(static_cast<uint32_t>(interfaceIndex)))
+        {
+            if (needDelete)
+            {
+                MdnsContexts::GetInstance().Delete(this);
+            }
+            return;
+        }
+    }
+
     for (auto & interface : interfaces)
     {
-        auto & ips = interface.second.addresses;
-
-        // Some interface may not have any ips, just ignore them.
-        if (ips.size() == 0)
+        if (TryReportingResultsForInterfaceIndex(interface.first))
         {
-            continue;
+            break;
         }
-
-        ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
-
-        auto & service = interface.second.service;
-        auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
-        if (nullptr == callback)
-        {
-            auto delegate = static_cast<CommissioningResolveDelegate *>(context);
-            DiscoveredNodeData nodeData;
-            service.ToDiscoveredNodeData(addresses, nodeData);
-            delegate->OnNodeDiscovered(nodeData);
-        }
-        else
-        {
-            callback(context, &service, addresses, CHIP_NO_ERROR);
-        }
-        break;
     }
 
     if (needDelete)
     {
         MdnsContexts::GetInstance().Delete(this);
     }
+}
+
+bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex)
+{
+    if (interfaceIndex == 0)
+    {
+        // Not actually an interface we have.
+        return false;
+    }
+
+    auto & interface = interfaces[interfaceIndex];
+    auto & ips       = interface.addresses;
+
+    // Some interface may not have any ips, just ignore them.
+    if (ips.size() == 0)
+    {
+        return false;
+    }
+
+    ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interfaceIndex);
+
+    auto & service = interface.service;
+    auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
+    if (nullptr == callback)
+    {
+        auto delegate = static_cast<CommissioningResolveDelegate *>(context);
+        DiscoveredNodeData nodeData;
+        service.ToDiscoveredNodeData(addresses, nodeData);
+        delegate->OnNodeDiscovered(nodeData);
+    }
+    else
+    {
+        callback(context, &service, addresses, CHIP_NO_ERROR);
+    }
+
+    return true;
 }
 
 CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)
