@@ -34,10 +34,19 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
   private final NsdManager nsdManager;
   private MulticastLock multicastLock;
   private Handler mainThreadHandler;
+  private final long timeout;
 
   private HashMap<Long, NsdManagerDiscovery> callbackMap;
 
   public NsdManagerServiceBrowser(Context context) {
+    this(context, BROWSE_SERVICE_TIMEOUT);
+  }
+
+  /**
+   * @param context application context
+   * @param timeout Timeout value in case there is no response after calling browse
+   */
+  public NsdManagerServiceBrowser(Context context, long timeout) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
     this.mainThreadHandler = new Handler(Looper.getMainLooper());
 
@@ -46,6 +55,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
             .createMulticastLock("chipBrowseMulticastLock");
     this.multicastLock.setReferenceCounted(true);
     callbackMap = new HashMap<>();
+    this.timeout = timeout;
   }
 
   @Override
@@ -62,7 +72,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
           }
         };
     startDiscover(serviceType, callbackHandle, contextHandle, chipMdnsCallback);
-    mainThreadHandler.postDelayed(timeoutRunnable, BROWSE_SERVICE_TIMEOUT);
+    mainThreadHandler.postDelayed(timeoutRunnable, timeout);
   }
 
   public void startDiscover(
