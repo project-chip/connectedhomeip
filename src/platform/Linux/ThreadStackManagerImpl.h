@@ -21,6 +21,7 @@
 #include <vector>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>

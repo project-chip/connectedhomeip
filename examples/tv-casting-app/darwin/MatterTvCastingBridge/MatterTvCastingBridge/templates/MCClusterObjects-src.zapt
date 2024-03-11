@@ -1,0 +1,53 @@
+{{> header excludeZapComment=false}}
+
+#import "MCClusterObjects.h"
+
+#import "../MCAttribute_Internal.h"
+#import "../MCCluster_Internal.h"
+#import "../MCCommand_Internal.h"
+
+#include "core/Attribute.h"
+#include "core/Command.h"
+#include <app-common/zap-generated/cluster-objects.h>
+
+#import <Foundation/Foundation.h>
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name))}}
+{{#if (isInConfigList name "MatterCastingClusters")}}
+
+// {{asUpperCamelCase name}} cluster:
+
+@implementation MC{{asUpperCamelCase name}}Cluster
+
+// {{asUpperCamelCase name}} cluster commands:
+
+{{#zcl_commands}}
+{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#if (isInConfigList name "MatterCastingImplementedCommands")}}
+
+- (id){{asMethodName name}}Command
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::{{asUpperCamelCase ../name}}::Commands::{{asUpperCamelCase name}}::Id);
+    return cppCommand != nil ? [[MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+{{/if}}
+{{/if}}
+{{/zcl_commands}}
+
+// {{asUpperCamelCase name}} cluster attributes:
+{{#zcl_attributes_server}}
+{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+
+- (id){{asMethodName name}}Attribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::Id);
+    return cppAttribute != nil ? [[MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Attribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+{{/if}}
+{{/zcl_attributes_server}}
+@end
+{{/if}}
+{{/if}}
+{{/zcl_clusters}}

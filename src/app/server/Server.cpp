@@ -313,7 +313,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .groupDataProvider = mGroupsProvider,
-            .mrpLocalConfig    = GetLocalMRPConfig(),
+            // Don't provide an MRP local config, so each CASE initiation will use
+            // the then-current value.
+            .mrpLocalConfig = NullOptional,
         },
         .clientPool            = &mCASEClientPool,
         .sessionSetupPool      = &mSessionSetupPool,

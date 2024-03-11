@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,18 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/util/attribute-metadata.h>
 
-#pragma once
+#include <app-common/zap-generated/attribute-type.h>
 
-#include <cstddef>
-#include <cstdint>
-
-namespace chip {
-
-template <class ClassType, class MemberType>
-constexpr ClassType * OwnerOf(MemberType * ptr, const MemberType ClassType::*member)
+bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
 {
-    return reinterpret_cast<ClassType *>(reinterpret_cast<uintptr_t>(ptr) - offsetof(ClassType, member));
+    return (attributeType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
-} // namespace chip
+bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType)
+{
+    return (attributeType == ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
+}

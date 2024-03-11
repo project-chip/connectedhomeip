@@ -102,7 +102,8 @@ def gen_test_certs(chip_cert_exe: str,
                    generate_cd: bool = False,
                    cd_type: int = 1,
                    paa_cert_path: str = None,
-                   paa_key_path: str = None):
+                   paa_key_path: str = None,
+                   generate_all_certs: bool = False):
     """
     Generate Matter certificates according to given Vendor ID and Product ID using the chip-cert executable.
     To use own Product Attestation Authority certificate provide paa_cert_path and paa_key_path arguments.
@@ -120,6 +121,7 @@ def gen_test_certs(chip_cert_exe: str,
         /credentials/test/attestation directory.
         paa_key_path (str, optional): provide PAA key path. Defaults to None - a path will be set to
         /credentials/test/attestation directory.
+        generate_all_certs: Generate the new DAC and PAI certificates
 
     Returns:
         dictionary: ["PAI_CERT": (str)<path to PAI cert .der file>,
@@ -136,9 +138,10 @@ def gen_test_certs(chip_cert_exe: str,
 
     attestation_certs = namedtuple("attestation_certs", ["dac_cert", "dac_key", "pai_cert"])
 
-    log.info("Generating new certificates using chip-cert...")
-
     if generate_cd:
+
+        log.info("Generating new Certification Declaration using chip-cert...")
+
         # generate Certification Declaration
         cmd = [chip_cert_exe, "gen-cd",
                "--key", CD_KEY_PATH,
@@ -162,47 +165,52 @@ def gen_test_certs(chip_cert_exe: str,
                         "DAC_KEY": output + "/DAC_key"
                         }
 
-    # generate PAI
-    cmd = [chip_cert_exe, "gen-att-cert",
-           "-t", "i",
-           "-c", device_name,
-           "-V", hex(vendor_id),
-           "-C", PAA_PATH,
-           "-K", PAA_KEY_PATH,
-           "-o", new_certificates["PAI_CERT"] + ".pem",
-           "-O", new_certificates["PAI_KEY"] + ".pem",
-           "-l", str(10000),
-           ]
-    subprocess.run(cmd)
+    if generate_all_certs:
+        log.info("Generating new PAI and DAC certificates using chip-cert...")
 
-    # generate DAC
-    cmd = [chip_cert_exe, "gen-att-cert",
-           "-t", "d",
-           "-c", device_name,
-           "-V", hex(vendor_id),
-           "-P", hex(product_id),
-           "-C", new_certificates["PAI_CERT"] + ".pem",
-           "-K", new_certificates["PAI_KEY"] + ".pem",
-           "-o", new_certificates["DAC_CERT"] + ".pem",
-           "-O", new_certificates["DAC_KEY"] + ".pem",
-           "-l", str(10000),
-           ]
-    subprocess.run(cmd)
-
-    # convert to .der files
-    for cert_k, cert_v in new_certificates.items():
-        action_type = "convert-cert" if cert_k.find("CERT") != -1 else "convert-key"
-        log.info(cert_v + ".der")
-        cmd = [chip_cert_exe, action_type,
-               cert_v + ".pem",
-               cert_v + ".der",
-               "--x509-der",
+        # generate PAI
+        cmd = [chip_cert_exe, "gen-att-cert",
+               "-t", "i",
+               "-c", device_name,
+               "-V", hex(vendor_id),
+               "-C", PAA_PATH,
+               "-K", PAA_KEY_PATH,
+               "-o", new_certificates["PAI_CERT"] + ".pem",
+               "-O", new_certificates["PAI_KEY"] + ".pem",
+               "-l", str(10000),
                ]
         subprocess.run(cmd)
 
-    return attestation_certs(new_certificates["DAC_CERT"] + ".der",
-                             new_certificates["DAC_KEY"] + ".der",
-                             new_certificates["PAI_CERT"] + ".der")
+        # generate DAC
+        cmd = [chip_cert_exe, "gen-att-cert",
+               "-t", "d",
+               "-c", device_name,
+               "-V", hex(vendor_id),
+               "-P", hex(product_id),
+               "-C", new_certificates["PAI_CERT"] + ".pem",
+               "-K", new_certificates["PAI_KEY"] + ".pem",
+               "-o", new_certificates["DAC_CERT"] + ".pem",
+               "-O", new_certificates["DAC_KEY"] + ".pem",
+               "-l", str(10000),
+               ]
+        subprocess.run(cmd)
+
+        # convert to .der files
+        for cert_k, cert_v in new_certificates.items():
+            action_type = "convert-cert" if cert_k.find("CERT") != -1 else "convert-key"
+            log.info(cert_v + ".der")
+            cmd = [chip_cert_exe, action_type,
+                   cert_v + ".pem",
+                   cert_v + ".der",
+                   "--x509-der",
+                   ]
+            subprocess.run(cmd)
+
+        return attestation_certs(new_certificates["DAC_CERT"] + ".der",
+                                 new_certificates["DAC_KEY"] + ".der",
+                                 new_certificates["PAI_CERT"] + ".der")
+
+    return attestation_certs(None, None, None)
 
 
 class FactoryDataGenerator:
@@ -234,8 +242,8 @@ class FactoryDataGenerator:
                 raise AssertionError("Provided wrong user data, this is not a JSON format! {}".format(e))
         assert self._args.spake2_verifier or self._args.passcode, \
             "Cannot find Spake2+ verifier, to generate a new one please provide passcode (--passcode)"
-        assert (self._args.chip_cert_path or (self._args.dac_cert and self._args.pai_cert and self._args.dac_key)), \
-            "Cannot find paths to DAC or PAI certificates .der files. To generate a new ones please provide a path to chip-cert executable (--chip_cert_path)"
+        assert ((self._args.gen_certs and self._args.chip_cert_path) or (self._args.dac_cert and self._args.pai_cert and self._args.dac_key)), \
+            "Cannot find paths to DAC or PAI certificates .der files. To generate a new ones please provide a path to chip-cert executable (--chip_cert_path) and add --gen_certs argument"
         assert self._args.output.endswith(".json"), \
             "Output path doesn't contain .json file path. ({})".format(self._args.output)
         assert not (self._args.passcode in INVALID_PASSCODES), \
@@ -273,23 +281,27 @@ class FactoryDataGenerator:
         # convert salt to bytestring to be coherent with Spake2+ verifier type
         spake_2_salt = self._args.spake2_salt
 
-        if self._args.chip_cert_path:
-            certs = gen_test_certs(self._args.chip_cert_path,
-                                   self._args.output[:self._args.output.rfind("/")],
-                                   self._args.vendor_id,
-                                   self._args.product_id,
-                                   self._args.vendor_name + "_" + self._args.product_name,
-                                   self._args.gen_cd,
-                                   self._args.cd_type,
-                                   self._args.paa_cert,
-                                   self._args.paa_key)
-            dac_cert = certs.dac_cert
-            pai_cert = certs.pai_cert
-            dac_key = certs.dac_key
-        else:
+        certs = gen_test_certs(self._args.chip_cert_path,
+                               self._args.output[:self._args.output.rfind("/")],
+                               self._args.vendor_id,
+                               self._args.product_id,
+                               self._args.vendor_name + "_" + self._args.product_name,
+                               self._args.gen_cd,
+                               self._args.cd_type,
+                               self._args.paa_cert,
+                               self._args.paa_key,
+                               self._args.gen_certs)
+
+        dac_cert = certs.dac_cert
+        pai_cert = certs.pai_cert
+        dac_key = certs.dac_key
+
+        if not dac_cert:
             dac_cert = self._args.dac_cert
-            dac_key = self._args.dac_key
+        if not pai_cert:
             pai_cert = self._args.pai_cert
+        if not dac_key:
+            dac_key = self._args.dac_key
 
         # try to read DAC public and private keys
         dac_priv_key = get_raw_private_key_der(dac_key, self._args.dac_key_password)
@@ -364,6 +376,7 @@ class FactoryDataGenerator:
 
     def _generate_spake2_verifier(self):
         """ If verifier has not been provided in arguments list it should be generated via external script """
+        log.info("Generating SPAKE2+ Verifier...")
         return generate_verifier(self._args.passcode, self._args.spake2_salt, self._args.spake2_it)
 
     def _generate_rotating_device_uid(self):
@@ -479,6 +492,8 @@ def main():
                                           "This option requires a path to chip-cert executable."
                                           "By default you can find chip-cert in connectedhomeip/src/tools/chip-cert directory "
                                           "and build it there."))
+    optional_arguments.add_argument("--gen_certs", action="store_true",
+                                    help="Generate a new DAC nad PAI certificates")
     optional_arguments.add_argument("--dac_cert", type=str,
                                     help="[.der] Provide the path to .der file containing DAC certificate.")
     optional_arguments.add_argument("--dac_key", type=str,

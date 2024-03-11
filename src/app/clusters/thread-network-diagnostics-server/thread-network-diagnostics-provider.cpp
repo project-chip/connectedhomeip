@@ -670,16 +670,9 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     break;
 
     case Attributes::ActiveNetworkFaultsList::Id: {
-        err = encoder.EncodeList([](const auto & aEncoder) -> CHIP_ERROR {
-            // TODO activeNetworkFaultsList isn't tracked. Encode the list of 4 entries at 0 none the less
-            NetworkFaultEnum activeNetworkFaultsList[4] = { NetworkFaultEnum(0) };
-            for (auto fault : activeNetworkFaultsList)
-            {
-                ReturnErrorOnFailure(aEncoder.Encode(fault));
-            }
-
-            return CHIP_NO_ERROR;
-        });
+        // activeNetworkFaults are not tracked by the thread stack nor the ThreadStackManager.
+        // Encode an emptyList to indicate there are currently no active faults.
+        err = encoder.EncodeEmptyList();
     }
     break;
 

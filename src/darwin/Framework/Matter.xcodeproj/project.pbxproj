@@ -154,8 +154,6 @@
 		514C79F42B62ED5500DD6D7B /* attribute-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */; };
 		514C79F62B62F0B900DD6D7B /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79F52B62F0B900DD6D7B /* util.cpp */; };
 		514C79F72B62F0B900DD6D7B /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79F52B62F0B900DD6D7B /* util.cpp */; };
-		514C79F92B62F60100DD6D7B /* message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79F82B62F60100DD6D7B /* message.cpp */; };
-		514C79FA2B62F60100DD6D7B /* message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79F82B62F60100DD6D7B /* message.cpp */; };
 		514C79FC2B62F94C00DD6D7B /* ota-provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79FB2B62F94C00DD6D7B /* ota-provider.cpp */; };
 		514C79FD2B62F94C00DD6D7B /* ota-provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 514C79FB2B62F94C00DD6D7B /* ota-provider.cpp */; };
 		514C7A012B64223400DD6D7B /* MTRServerAttribute_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 514C79FF2B64223400DD6D7B /* MTRServerAttribute_Internal.h */; };
@@ -549,7 +547,6 @@
 		514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = descriptor.cpp; path = clusters/descriptor/descriptor.cpp; sourceTree = "<group>"; };
 		514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-storage.cpp"; path = "util/attribute-storage.cpp"; sourceTree = "<group>"; };
 		514C79F52B62F0B900DD6D7B /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = util/util.cpp; sourceTree = "<group>"; };
-		514C79F82B62F60100DD6D7B /* message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = message.cpp; path = util/message.cpp; sourceTree = "<group>"; };
 		514C79FB2B62F94C00DD6D7B /* ota-provider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ota-provider.cpp"; path = "clusters/ota-provider/ota-provider.cpp"; sourceTree = "<group>"; };
 		514C79FF2B64223400DD6D7B /* MTRServerAttribute_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRServerAttribute_Internal.h; sourceTree = "<group>"; };
 		514C7A002B64223400DD6D7B /* MTRServerEndpoint_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRServerEndpoint_Internal.h; sourceTree = "<group>"; };
@@ -1003,7 +1000,6 @@
 				514C79EC2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp */,
 				516415FE2B6B132200D5CE11 /* DataModelHandler.cpp */,
 				514C79F52B62F0B900DD6D7B /* util.cpp */,
-				514C79F82B62F60100DD6D7B /* message.cpp */,
 				514C79FB2B62F94C00DD6D7B /* ota-provider.cpp */,
 			);
 			name = app;
@@ -1811,7 +1807,6 @@
 				037C3DCF2991BD5200B7EEE2 /* MTRError.mm in Sources */,
 				037C3DC72991BD5100B7EEE2 /* CHIPToolKeypair.mm in Sources */,
 				B45373E52A9FEBA400807602 /* date.c in Sources */,
-				514C79FA2B62F60100DD6D7B /* message.cpp in Sources */,
 				514C79F72B62F0B900DD6D7B /* util.cpp in Sources */,
 				B45373DC2A9FEB5300807602 /* sha-1.c in Sources */,
 				B45373D12A9FEB0C00807602 /* alloc.c in Sources */,
@@ -1833,7 +1828,6 @@
 			files = (
 				2C8C8FC2253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.mm in Sources */,
 				99AECC802798A57F00B6355B /* MTRCommissioningParameters.mm in Sources */,
-				514C79F92B62F60100DD6D7B /* message.cpp in Sources */,
 				2CB7163C252E8A7C0026E2BB /* MTRDeviceControllerDelegateBridge.mm in Sources */,
 				997DED162695343400975E97 /* MTRThreadOperationalDataset.mm in Sources */,
 				515C1C6F284F9FFB00A48F0C /* MTRFramework.mm in Sources */,
