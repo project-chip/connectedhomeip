@@ -540,7 +540,22 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
 void CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                const char * context)
 {
-    VerifyOrDie(FallibleAddStatus(aCommandPath, aStatus, context) == CHIP_NO_ERROR);
+<<<<<<< HEAD
+=======
+
+    CHIP_ERROR error = FallibleAddStatus(aCommandPath, aStatus, context);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to add command status: %" CHIP_ERROR_FORMAT, error.Format());
+        // TODO we could call mpResponder->ResponseDropped() if err == CHIP_ERROR_NO_MEMORY. This should
+        // bhe done as a follow up so that it can be evaluated as a standalone change.
+
+        // Do not crash if the status has not been added due to running out of packet buffers or other resources.
+        // It is better to drop a single response than to go offline and lose all sessions and subscriptions.
+        VerifyOrDie(error == CHIP_ERROR_NO_MEMORY);
+    }
+>>>>>>> master
 }
 
 CHIP_ERROR CommandHandler::FallibleAddStatus(const ConcreteCommandPath & path, const Protocols::InteractionModel::Status status,

@@ -17,6 +17,7 @@
  */
 
 #include "OTAConfig.h"
+#include "silabs_utils.h"
 #include <app/server/Server.h>
 
 #ifndef SIWX_917
@@ -81,7 +82,6 @@ chip::DefaultOTARequestor gRequestorCore;
 chip::DefaultOTARequestorStorage gRequestorStorage;
 chip::DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 chip::BDXDownloader gDownloader;
-chip::OTAImageProcessorImpl gImageProcessor;
 
 void OTAConfig::Init()
 {
@@ -93,12 +93,23 @@ void OTAConfig::Init()
 
     // Periodic query timeout must be set prior to requestor being initialized
     gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
-    gImageProcessor.SetOTAImageFile("test.txt");
-    gImageProcessor.SetOTADownloader(&gDownloader);
+#if CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR
+    auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
+#else
+    auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
+#endif
+
+    gRequestorUser.Init(&gRequestorCore, &imageProcessor);
+
+    CHIP_ERROR err = imageProcessor.Init(&gDownloader);
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("Image processor init failed");
+        assert(err == CHIP_NO_ERROR);
+    }
 
     // Connect the Downloader and Image Processor objects
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gDownloader.SetImageProcessorDelegate(&imageProcessor);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }

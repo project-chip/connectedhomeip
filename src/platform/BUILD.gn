@@ -80,6 +80,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     # Define the default number of ip addresses to discover
     chip_max_discovered_ip_addresses = 5
+
+    # Allows enabling dynamic setting of the local MRP configuration, for
+    # devices with multiple radios that have different sleep behavior for
+    # different radios.
+    chip_device_config_enable_dynamic_mrp_config = false
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -131,6 +136,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DISABLE_PLATFORM_KVS=${chip_disable_platform_kvs}",
       "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=${chip_use_transitional_commissionable_data_provider}",
       "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=${chip_use_transitional_device_instance_info_provider}",
+      "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
     ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
