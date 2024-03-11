@@ -23,7 +23,7 @@
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
 
-class ClusterCommand : public InteractionModelCommands, public ModelCommand, public chip::app::CommandSender::Callback
+class ClusterCommand : public InteractionModelCommands, public ModelCommand, public chip::app::CommandSender::ExtendableCallback
 {
 public:
     ClusterCommand(CredentialIssuerCommands * credsIssuerConfig) :
@@ -83,25 +83,25 @@ public:
         return InteractionModelCommands::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, value);
     }
 
-    /////////// CommandSender Callback Interface /////////
-    virtual void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
-                            const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    /////////// CommandSender ExtendableCallback Interface /////////
+    virtual void OnResponse(chip::app::CommandSender * client, const chip::app::CommandSender::ResponseData & responseData) override
     {
-        CHIP_ERROR error = status.ToChipError();
+        CHIP_ERROR error = responseData.statusIB.ToChipError();
         if (CHIP_NO_ERROR != error)
         {
-            LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(path, status));
+            LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(responseData.path, responseData.statusIB));
 
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
+            // TODO should we be overriding this error on the success case if we had an error previously
             mError = error;
             return;
         }
 
-        if (data != nullptr)
+        if (responseData.data != nullptr)
         {
-            LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
+            LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(responseData.path, responseData.data));
 
-            error = DataModelLogger::LogCommand(path, data);
+            error = DataModelLogger::LogCommand(responseData.path, responseData.data);
             if (CHIP_NO_ERROR != error)
             {
                 ChipLogError(chipTool, "Response Failure: Can not decode Data");
@@ -111,12 +111,12 @@ public:
         }
     }
 
-    virtual void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override
+    virtual void OnError(const chip::app::CommandSender * client, const chip::app::CommandSender::ErrorData & errorData) override
     {
-        LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(error));
+        LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(errorData.error));
 
-        ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
-        mError = error;
+        ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(errorData.error));
+        mError = errorData.error;
     }
 
     virtual void OnDone(chip::app::CommandSender * client) override
@@ -199,6 +199,8 @@ protected:
                     "the Matter specification.");
         AddArgument("busyWaitForMs", 0, UINT16_MAX, &mBusyWaitForMs,
                     "If provided, block the main thread processing for the given time right after sending a command.");
+        AddArgument("hackedBatchCommand", 0, 1, &mHackedBatchCommand,
+                    "Hacks sending a batch command. Second command added by duplicating the provided command but adding 1 to the provided endpoint.");
         AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
         AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);
