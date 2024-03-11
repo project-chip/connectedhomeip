@@ -32,6 +32,7 @@ extern "C" {
 #include "sl_event_handler.h"
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
+#include "sl_si91x_button.h"
 void soc_pll_config(void);
 }
 
@@ -44,7 +45,9 @@ namespace DeviceLayer {
 namespace Silabs {
 namespace {
     uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
-
+#if SL_ICD_ENABLED
+    bool btn0_pressed = false;
+#endif /* SL_ICD_ENABLED */
 }
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
@@ -106,6 +109,21 @@ void SilabsPlatform::StartScheduler()
 extern "C" {
 void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
+#if SL_ICD_ENABLED
+    // This is to make sure we get a one-press and one-release event for the button
+    // Hardware modification will be required for this to work permanently
+    // Currently the btn0 is pull-up resistor due to which is sends a release event on every wakeup
+    if(btn == SL_BUTTON_BTN0_NUMBER) {
+        if(btnAction == BUTTON_PRESSED) {
+            btn0_pressed = true;
+        } else if((btnAction == BUTTON_RELEASED) && (btn0_pressed == false)) {
+            // if the btn was not pressed and only a release event came, ignore it
+            return;
+        } else if((btnAction == BUTTON_RELEASED) && (btn0_pressed == true)) {
+            btn0_pressed = false;
+        }
+    }
+#endif /* SL_ICD_ENABLED */
     if (Silabs::GetPlatform().mButtonCallback == nullptr)
     {
         return;
