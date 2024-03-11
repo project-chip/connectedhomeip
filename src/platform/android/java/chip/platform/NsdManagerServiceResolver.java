@@ -22,19 +22,17 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.MulticastLock;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class NsdManagerServiceResolver implements ServiceResolver {
   private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
@@ -53,7 +51,9 @@ public class NsdManagerServiceResolver implements ServiceResolver {
    * @param timeout Timeout value in case there is no response after calling resolve
    */
   public NsdManagerServiceResolver(
-      Context context, @Nullable NsdManagerResolverAvailState nsdManagerResolverAvailState, long timeout) {
+      Context context,
+      @Nullable NsdManagerResolverAvailState nsdManagerResolverAvailState,
+      long timeout) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
 
     this.multicastLock =
@@ -69,8 +69,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
   }
 
   public NsdManagerServiceResolver(
-    Context context, @Nullable NsdManagerResolverAvailState nsdManagerResolverAvailState) {
-      this(context, nsdManagerResolverAvailState, RESOLVE_SERVICE_TIMEOUT);
+      Context context, @Nullable NsdManagerResolverAvailState nsdManagerResolverAvailState) {
+    this(context, nsdManagerResolverAvailState, RESOLVE_SERVICE_TIMEOUT);
   }
 
   @Override
@@ -114,11 +114,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
         };
 
     ScheduledFuture<?> resolveTimeoutExecutor =
-      Executors.newSingleThreadScheduledExecutor()
-        .schedule(
-            timeoutRunnable,
-            timeout,
-            TimeUnit.MILLISECONDS);
+        Executors.newSingleThreadScheduledExecutor()
+            .schedule(timeoutRunnable, timeout, TimeUnit.MILLISECONDS);
 
     NsdServiceFinderAndResolver serviceFinderResolver =
         new NsdServiceFinderAndResolver(

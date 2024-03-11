@@ -21,7 +21,6 @@ package chip.platform;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager.MulticastLock;
-import android.os.Handler;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import java.util.concurrent.Executors;
