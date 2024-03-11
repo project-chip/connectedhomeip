@@ -366,7 +366,7 @@ public final class ControllerParams {
 
     /**
      * Controls enabling server interactions on a controller. For ICD check-in message, this feature
-     * has to enable.
+     * has to be enabled.
      *
      * @param enableServerInteractions
      * @return
