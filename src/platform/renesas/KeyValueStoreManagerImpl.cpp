@@ -26,7 +26,7 @@ namespace PersistedStorage {
 
 //#define STUBBED_KVS
 
-constexpr size_t MAX_DATA_LENGTH = 256;
+constexpr size_t MAX_DATA_LENGTH = 400;
 
 /** Singleton instance of the KeyValueStoreManager implementation object.
  */
