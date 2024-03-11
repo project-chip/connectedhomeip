@@ -23,10 +23,6 @@
  *      mechanisms for manipulating packets of octet-serialized
  *      data.
  */
-// Include standard C library limit macros
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 
 // Include module header
 #include <system/SystemPacketBuffer.h>
@@ -614,7 +610,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
             chip::Platform::MemoryFree(aPacket);
 #endif
-            aPacket       = lNextPacket;
+            aPacket = lNextPacket;
         }
         else
         {
