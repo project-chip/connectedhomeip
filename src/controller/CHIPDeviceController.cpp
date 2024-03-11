@@ -1230,9 +1230,10 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
-bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
-                                           Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
-                                           OnExtendFailsafeFailure onFailure)
+bool DeviceCommissioner::ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
+                                                   Optional<System::Clock::Timeout> commandTimeout,
+                                                   OnExtendFailsafeSuccess onSuccess, OnExtendFailsafeFailure onFailure,
+                                                   bool useContext)
 {
     using namespace System;
     using namespace System::Clock;
@@ -1251,17 +1252,15 @@ bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningSta
     request.expiryLengthSeconds = armFailSafeTimeout;
     request.breadcrumb          = breadcrumb;
     ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
-    CHIP_ERROR err = SendCommissioningCommand(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
+    CHIP_ERROR err = SendCommissioningCommand(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout, useContext);
     if (err != CHIP_NO_ERROR)
     {
-        onFailure(this, err);
+        onFailure((useContext) ? this : nullptr, err);
+        return true; // we have called onFailure already
     }
-    else
-    {
-        // TODO: Handle the situation when our command ends up erroring out
-        // asynchronously?
-        proxy->SetFailSafeExpirationTimestamp(newFailSafeTimeout);
-    }
+
+    // Note: The stored timestamp may become invalid if we fail asynchronously
+    proxy->SetFailSafeExpirationTimestamp(newFailSafeTimeout);
     return true;
 }
 
@@ -1283,9 +1282,9 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
         // Per spec, anything we do with the fail-safe armed must not time out
         // in less than kMinimumCommissioningStepTimeout.
         waitForFailsafeExtension =
-            ExtendArmFailSafe(mDeviceBeingCommissioned, mCommissioningStage, expiryLengthSeconds.Value(),
-                              MakeOptional(kMinimumCommissioningStepTimeout), OnArmFailSafeExtendedForDeviceAttestation,
-                              OnFailedToExtendedArmFailSafeDeviceAttestation);
+            ExtendArmFailSafeInternal(mDeviceBeingCommissioned, mCommissioningStage, expiryLengthSeconds.Value(),
+                                      MakeOptional(kMinimumCommissioningStepTimeout), OnArmFailSafeExtendedForDeviceAttestation,
+                                      OnFailedToExtendedArmFailSafeDeviceAttestation);
     }
     else
     {
@@ -1914,11 +1913,12 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
     {
         failsafeTimeout = static_cast<uint16_t>(retryTimeout.count() + kDefaultFailsafeTimeout);
     }
-    // A false return from ExtendArmFailSafe is fine; we don't want to make the
-    // fail-safe shorter here.
-    self->ExtendArmFailSafe(commissioneeDevice, CommissioningStage::kFindOperational, failsafeTimeout,
-                            MakeOptional(kMinimumCommissioningStepTimeout), OnExtendFailsafeForCASERetrySuccess,
-                            OnExtendFailsafeForCASERetryFailure);
+
+    // Treat this command as a fire-and-forget request (useContext = false).
+    // A false return is fine; we don't want to make the fail-safe shorter here.
+    self->ExtendArmFailSafeInternal(commissioneeDevice, CommissioningStage::kFindOperational, failsafeTimeout,
+                                    MakeOptional(kMinimumCommissioningStepTimeout), OnExtendFailsafeForCASERetrySuccess,
+                                    OnExtendFailsafeForCASERetryFailure, /* useContext = */ false);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
@@ -2516,19 +2516,20 @@ CHIP_ERROR
 DeviceCommissioner::SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
                                              CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                                              CommandResponseFailureCallback failureCb, EndpointId endpoint,
-                                             Optional<System::Clock::Timeout> timeout)
+                                             Optional<System::Clock::Timeout> timeout, bool useContext)
 
 {
-    VerifyOrDie(!mInvokeCancelFn); // we don't make parallel calls
+    VerifyOrDie(!(useContext && mInvokeCancelFn)); // we don't make parallel calls that we track with context
 
-    auto onSuccessCb = [context = this, successCb](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                                                   const typename RequestObjectT::ResponseType & responseData) {
+    void * context   = (useContext) ? this : nullptr;
+    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+                                            const typename RequestObjectT::ResponseType & responseData) {
         successCb(context, responseData);
     };
-    auto onFailureCb = [context = this, failureCb](CHIP_ERROR aError) { failureCb(context, aError); };
+    auto onFailureCb = [context, failureCb](CHIP_ERROR aError) { failureCb(context, aError); };
 
     return InvokeCommandRequest(device->GetExchangeManager(), device->GetSecureSession().Value(), endpoint, request, onSuccessCb,
-                                onFailureCb, NullOptional, timeout, &mInvokeCancelFn);
+                                onFailureCb, NullOptional, timeout, (useContext) ? &mInvokeCancelFn : nullptr);
 }
 
 void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
@@ -2592,8 +2593,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // Make sure the fail-safe value we set here actually ends up being used
         // no matter what.
         proxy->SetFailSafeExpirationTimestamp(System::Clock::kZero);
-        VerifyOrDie(ExtendArmFailSafe(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout), timeout,
-                                      OnArmFailSafe, OnBasicFailure));
+        VerifyOrDie(ExtendArmFailSafeInternal(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout),
+                                              timeout, OnArmFailSafe, OnBasicFailure));
     }
     break;
     case CommissioningStage::kReadCommissioningInfo: {
@@ -3236,12 +3237,10 @@ void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device,
         failSafeTimeoutSecs = static_cast<uint16_t>(failSafeTimeoutSecs + sigma1TimeoutSecs);
     }
 
-    // A false return from ExtendArmFailSafe is fine; we don't want to make the
-    // fail-safe shorter here.
-    if (!ExtendArmFailSafe(commissioneeDevice, step, failSafeTimeoutSecs, MakeOptional(kMinimumCommissioningStepTimeout),
-                           OnArmFailSafe, OnBasicFailure))
+    if (!ExtendArmFailSafeInternal(commissioneeDevice, step, failSafeTimeoutSecs, MakeOptional(kMinimumCommissioningStepTimeout),
+                                   OnArmFailSafe, OnBasicFailure))
     {
-        // Just move on to the next step.
+        // A false return is fine; we don't want to make the fail-safe shorter here.
         CommissioningStageComplete(CHIP_NO_ERROR, CommissioningDelegate::CommissioningReport());
     }
 }
