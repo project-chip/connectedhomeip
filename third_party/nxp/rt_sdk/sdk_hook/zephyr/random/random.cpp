@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <zephyr/random/random.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <zephyr/random/random.h>
 
 /**
  * Fill the buffer given as an arg with random values
