@@ -1233,7 +1233,7 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
 bool DeviceCommissioner::ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                                    Optional<System::Clock::Timeout> commandTimeout,
                                                    OnExtendFailsafeSuccess onSuccess, OnExtendFailsafeFailure onFailure,
-                                                   bool useContext)
+                                                   bool fireAndForget)
 {
     using namespace System;
     using namespace System::Clock;
@@ -1252,10 +1252,10 @@ bool DeviceCommissioner::ExtendArmFailSafeInternal(DeviceProxy * proxy, Commissi
     request.expiryLengthSeconds = armFailSafeTimeout;
     request.breadcrumb          = breadcrumb;
     ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
-    CHIP_ERROR err = SendCommissioningCommand(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout, useContext);
+    CHIP_ERROR err = SendCommissioningCommand(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout, fireAndForget);
     if (err != CHIP_NO_ERROR)
     {
-        onFailure((useContext) ? this : nullptr, err);
+        onFailure((!fireAndForget) ? this : nullptr, err);
         return true; // we have called onFailure already
     }
 
@@ -1846,21 +1846,10 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const Scope
     else
     {
         // Ensure that commissioning stage advancement is done based on seeing an error.
-        // Ensure that commissioning stage advancement is done based on seeing an error.
-        if (error == CHIP_NO_ERROR)
-        {
-            // Ensure that commissioning stage advancement is done based on seeing an error.
-            if (error == CHIP_NO_ERROR)
-            {
-                ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
-                error = CHIP_ERROR_INTERNAL;
-            }
-
-            commissioner->CommissioningStageComplete(error);
-            commissioner->CommissioningStageComplete(error);
-        }
-        commissioner->CommissioningStageComplete(error);
+        ChipLogError(Controller, "Device connection failed without a valid error code.");
+        error = CHIP_ERROR_INTERNAL;
     }
+    commissioner->CommissioningStageComplete(error);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -2516,12 +2505,14 @@ CHIP_ERROR
 DeviceCommissioner::SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
                                              CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                                              CommandResponseFailureCallback failureCb, EndpointId endpoint,
-                                             Optional<System::Clock::Timeout> timeout, bool useContext)
+                                             Optional<System::Clock::Timeout> timeout, bool fireAndForget)
 
 {
-    VerifyOrDie(!(useContext && mInvokeCancelFn)); // we don't make parallel calls that we track with context
+    // Default behavior is to make sequential, cancellable calls tracked via mInvokeCancelFn.
+    // Fire-and-forget calls are not cancellable and don't receive `this` as context in callbacks.
+    VerifyOrDie(fireAndForget || !mInvokeCancelFn); // we don't make parallel (cancellable) calls
 
-    void * context   = (useContext) ? this : nullptr;
+    void * context   = (!fireAndForget) ? this : nullptr;
     auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                                             const typename RequestObjectT::ResponseType & responseData) {
         successCb(context, responseData);
@@ -2529,7 +2520,7 @@ DeviceCommissioner::SendCommissioningCommand(DeviceProxy * device, const Request
     auto onFailureCb = [context, failureCb](CHIP_ERROR aError) { failureCb(context, aError); };
 
     return InvokeCommandRequest(device->GetExchangeManager(), device->GetSecureSession().Value(), endpoint, request, onSuccessCb,
-                                onFailureCb, NullOptional, timeout, (useContext) ? &mInvokeCancelFn : nullptr);
+                                onFailureCb, NullOptional, timeout, (!fireAndForget) ? &mInvokeCancelFn : nullptr);
 }
 
 void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,

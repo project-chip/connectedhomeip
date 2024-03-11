@@ -767,9 +767,9 @@ public:
                            Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                            OnExtendFailsafeFailure onFailure)
     {
-        // If this method is called directly by a client, assume it's not tracked as a commissioning stage
+        // If this method is called directly by a client, assume it's fire-and-forget (not a commissioning stage)
         return ExtendArmFailSafeInternal(proxy, step, armFailSafeTimeout, commandTimeout, onSuccess, onFailure,
-                                         /* useContext = */ false);
+                                         /* fireAndForget = */ true);
     }
 
 private:
@@ -964,13 +964,13 @@ private:
 
     bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                    Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
-                                   OnExtendFailsafeFailure onFailure, bool useContext = true);
+                                   OnExtendFailsafeFailure onFailure, bool fireAndForget = false);
 
     template <typename RequestObjectT>
     CHIP_ERROR SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
                                         CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                                         CommandResponseFailureCallback failureCb, EndpointId endpoint,
-                                        Optional<System::Clock::Timeout> timeout, bool useContext = true);
+                                        Optional<System::Clock::Timeout> timeout, bool fireAndForget = false);
     void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
                                       app::AttributePathParams * readPaths, size_t readPathsSize);
     void CancelCommissioningInteractions();
