@@ -106,9 +106,9 @@ public:
     void CloseSession();
 
     /**
-     *  Releases the underlying session (if any) from this proxy, without expiring it.
+     *  Detaches the underlying session (if any) from this proxy and returns it.
      */
-    chip::Optional<SessionHandle> ReleaseSecureSession();
+    chip::Optional<SessionHandle> DetachSecureSession();
 
     void Disconnect() override { CloseSession(); }
 

@@ -908,7 +908,7 @@ private:
     static void OnDisarmFailsafe(void * context,
                                  const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnDisarmFailsafeFailure(void * context, CHIP_ERROR error);
-    void CleanupAfterErrorDone();
+    void CleanupDoneAfterError();
     static void OnArmFailSafeExtendedForDeviceAttestation(
         void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error);

@@ -66,7 +66,7 @@ void CommissioneeDeviceProxy::CloseSession()
     mPairing.Clear();
 }
 
-chip::Optional<SessionHandle> CommissioneeDeviceProxy::ReleaseSecureSession()
+chip::Optional<SessionHandle> CommissioneeDeviceProxy::DetachSecureSession()
 {
     auto session = mSecureSession.Get();
     mSecureSession.Release();

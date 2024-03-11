@@ -1676,7 +1676,7 @@ static void MarkForEviction(const Optional<SessionHandle> & session)
 
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
-    // proxy == mDeviceBeingCommissioned, nodeId == mDeviceBeingCommissioned->GetDeviceId()
+    // At this point, proxy == mDeviceBeingCommissioned, nodeId == mDeviceBeingCommissioned->GetDeviceId()
 
     mCommissioningCompletionStatus = completionStatus;
 
@@ -1696,7 +1696,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         // If we're cleaning up because cancellation has been requested via StopPairing(), expire the failsafe
         // in the background and reset our state synchronously, so a new commissioning attempt can be started.
         CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
-        SessionHolder session((commissionee == proxy) ? commissionee->ReleaseSecureSession().Value()
+        SessionHolder session((commissionee == proxy) ? commissionee->DetachSecureSession().Value()
                                                       : proxy->GetSecureSession().Value());
 
         auto request     = DisarmFailsafeRequest();
@@ -1718,7 +1718,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
             ChipLogError(Controller, "Failed to send command to disarm fail-safe: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
-        CleanupAfterErrorDone();
+        CleanupDoneAfterError();
     }
     else if (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup)
     {
@@ -1740,7 +1740,7 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         {
             // We won't get any async callbacks here, so just pretend like the command errored out async.
             ChipLogError(Controller, "Failed to send command to disarm fail-safe: %" CHIP_ERROR_FORMAT, err.Format());
-            CleanupAfterErrorDone();
+            CleanupDoneAfterError();
         }
     }
 }
@@ -1750,17 +1750,17 @@ void DeviceCommissioner::OnDisarmFailsafe(void * context,
 {
     ChipLogProgress(Controller, "Failsafe disarmed");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->CleanupAfterErrorDone();
+    commissioner->CleanupDoneAfterError();
 }
 
 void DeviceCommissioner::OnDisarmFailsafeFailure(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "Ignoring failure to disarm failsafe: %" CHIP_ERROR_FORMAT, error.Format());
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->CleanupAfterErrorDone();
+    commissioner->CleanupDoneAfterError();
 }
 
-void DeviceCommissioner::CleanupAfterErrorDone()
+void DeviceCommissioner::CleanupDoneAfterError()
 {
     // If someone nulled out our mDeviceBeingCommissioned, there's nothing else
     // to do here.
@@ -1779,6 +1779,7 @@ void DeviceCommissioner::CleanupAfterErrorDone()
         ReleaseCommissioneeDevice(commissionee);
     }
 
+    // Invoke callbacks last, after we have cleared up all state.
     SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
 }
 
