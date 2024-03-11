@@ -83,6 +83,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
     rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
 
+    # TODO: Extract this to a helper function
     if use_rest:
         revocation_point_list = requests.get(f"{rest_node_url}/dcl/pki/revocation-points").json()["PkiRevocationDistributionPoint"]
     else:
@@ -110,21 +111,23 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         is_paa = revocation_point["isPAA"]
 
         # 3. && 4. Validate VID/PID
+        # TODO: Need to support alternate representation of VID/PID (see spec "6.2.2.2. Encoding of Vendor ID and Product ID in subject and issuer fields")
         crl_vid = extract_single_integer_attribute(crl_signer_certificate.subject, OID_VENDOR_ID)
         crl_pid = extract_single_integer_attribute(crl_signer_certificate.subject, OID_PRODUCT_ID)
 
-        if is_paa == True:
-            if crl_vid != None:
+        if is_paa:
+            if crl_vid is not None:
                 if vid != crl_vid:
+                    # TODO: Need to log all situations where a continue is called
                     continue
         else:
-            if vid == None or vid != crl_vid:
+            if crl_vid is None or vid != crl_vid:
                 continue
-            if crl_pid != None:
+            if crl_pid is not None:
                 if pid != crl_pid:
                     continue
 
-        # 5.
+        # 5. Validate the certification path containing CRLSignerCertificate.
         crl_signer_issuer_name = base64.b64encode(crl_signer_certificate.issuer.public_bytes()).decode('utf-8')
 
         crl_signer_authority_key_id = crl_signer_certificate.extensions.get_extension_for_oid(
@@ -132,6 +135,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
         paa_certificate = None
 
+        # TODO: Extract this to a helper function
         if use_rest:
             response = requests.get(
                 f"{rest_node_url}/dcl/pki/certificates/{crl_signer_issuer_name}/{crl_signer_authority_key_id}").json()["approvedCertificates"]["certs"][0]
@@ -141,7 +145,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
             cmdpipe = subprocess.Popen(use_dcld(dcld, production, cmdlist), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             paa_certificate = json.loads(cmdpipe.stdout.read())["approvedCertificates"]["certs"][0]["pemCert"]
 
-        if paa_certificate == None:
+        if paa_certificate is None:
             continue
 
         paa_certificate_object = x509.load_pem_x509_certificate(paa_certificate)
@@ -166,6 +170,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
         same_issuer_points = None
 
+        # TODO: Extract this to a helper function
         if use_rest:
             response = requests.get(
                 f"{rest_node_url}/dcl/pki/revocation-points/{issuer_subject_key_id}").json()["pkiRevocationDistributionPointsByIssuerSubjectKeyID"]
@@ -206,7 +211,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
                 revoked_cert_issuer = revoked_cert.extensions.get_extension_for_oid(
                     x509.CRLEntryExtensionOID.CERTIFICATE_ISSUER).value.get_values_for_type(x509.DirectoryName).value
 
-                if revoked_cert_issuer != None:
+                if revoked_cert_issuer is not None:
                     if revoked_cert_issuer != certificate_authority_name:
                         continue
             except Exception:
@@ -217,7 +222,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
                 revoked_cert_authority_key_id = revoked_cert.extensions.get_extension_for_oid(
                     x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
 
-                if revoked_cert_authority_key_id == None or revoked_cert_authority_key_id != crl_signer_subject_key_id:
+                if revoked_cert_authority_key_id is None or revoked_cert_authority_key_id != crl_signer_subject_key_id:
                     continue
             except Exception:
                 continue
