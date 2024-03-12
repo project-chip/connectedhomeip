@@ -309,7 +309,6 @@ int32_t wfx_wifi_rsi_init(void)
     status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
     if (status != SL_STATUS_OK)
     {
-        SILABS_LOG("wfx_wifi_rsi_init failed %x", status);
         return status;
     }
 
@@ -317,8 +316,7 @@ int32_t wfx_wifi_rsi_init(void)
     sScanSemaphore = osSemaphoreNew(1, 0, NULL);
     if (sScanSemaphore == NULL)
     {
-        SILABS_LOG("Failed to create scan semaphore");
-        return SL_STATUS_FAIL;
+        return SL_STATUS_ALLOCATION_FAILED;
     }
 
     return status;
