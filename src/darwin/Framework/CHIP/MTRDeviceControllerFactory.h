@@ -186,7 +186,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Setting all arguments to nil will reset to the MRP parameters to their
  * default values.
  *
- * Setting some argumetns to non-nil will change just those values, keeping
+ * Setting some arguments to non-nil will change just those values, keeping
  * current values for any arguments that are nil (not resetting them to
  * defaults).
  *
