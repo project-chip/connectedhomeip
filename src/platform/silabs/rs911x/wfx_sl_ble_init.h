@@ -42,7 +42,7 @@
 #include <rsi_ble.h>
 #include <rsi_ble_apis.h>
 #include <rsi_ble_common_config.h>
-#if !(SIWX_917 | EXP_BOARD)
+#if !(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include <rsi_bootup_config.h>
 #include <rsi_driver.h>
 #include <rsi_wlan_apis.h>
