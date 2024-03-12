@@ -408,7 +408,6 @@ void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioning
     ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
                     info.basic.productId);
 
-    VerifyOrReturn(info.icd.isICD);
     // The string in CharSpan received from the device is not null-terminated, we use std::string here for coping and
     // appending a numm-terminator at the end of the string.
     std::string userActiveModeTriggerInstruction;
