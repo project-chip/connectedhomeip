@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 
 assert(chip_device_platform == "renesas")
 
