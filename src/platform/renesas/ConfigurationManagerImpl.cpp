@@ -187,7 +187,7 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    /// Implement factory reset
+    // Implement factory reset
 }
 
 ConfigurationManager & ConfigurationMgrImpl()
@@ -199,7 +199,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     if (m_netif != nullptr && buf != nullptr)
     {
-        memcpy(buf, m_netif->hwaddr, m_netif->hwaddrlen);
+        memcpy(buf, m_netif->hwaddr, m_netif->hwaddr_len);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NOT_IMPLEMENTED;
