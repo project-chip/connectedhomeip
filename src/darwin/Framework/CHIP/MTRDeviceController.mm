@@ -39,6 +39,7 @@
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
@@ -602,11 +603,28 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return nodeID;
 }
 
+static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
+{
+    MATTER_LOG_METRIC(kMetricDarwinFrameworkDeviceVendorID, [payload.vendorID unsignedIntValue]);
+    MATTER_LOG_METRIC(kMetricDarwinFrameworkDeviceProductID, [payload.productID unsignedIntValue]);
+}
+
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
+    // Track overall commissioning
+    MATTER_LOG_METRIC_BEGIN(kMetricDarwinFrameworkDeviceCommissioning);
+    emitMetricForSetupPayload(payload);
+
+    // Capture in a block variable to avoid losing granularity for metrics,
+    // when translating CHIP_ERROR to NSError
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+
     auto block = ^BOOL {
+        // Track just this portion of overall PASE setup
+        MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkSetupWithPayload, errorCode);
+
         // Try to get a QR code if possible (because it has a better
         // discriminator, etc), then fall back to manual code if that fails.
         NSString * pairingCode = [payload qrCodeString:nil];
@@ -619,11 +637,15 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(nodeId);
-        auto errorCode = self->_cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
+        errorCode = self->_cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    if (!success) {
+        MATTER_LOG_METRIC_END(kMetricDarwinFrameworkDeviceCommissioning, errorCode);
+    }
+    return success;
 }
 
 - (BOOL)setupCommissioningSessionWithDiscoveredDevice:(MTRCommissionableBrowserResult *)discoveredDevice
@@ -631,11 +653,22 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                                             newNodeID:(NSNumber *)newNodeID
                                                 error:(NSError * __autoreleasing *)error
 {
+    // Track overall commissioning
+    MATTER_LOG_METRIC_BEGIN(kMetricDarwinFrameworkDeviceCommissioning);
+    emitMetricForSetupPayload(payload);
+
+    // Capture in a block variable to avoid losing granularity for metrics,
+    // when translating CHIP_ERROR to NSError
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+
     auto block = ^BOOL {
+        // Track just this portion of overall PASE setup
+        MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkSetupWithDiscovered, errorCode);
+
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(nodeId);
 
-        auto errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+        errorCode = CHIP_ERROR_INVALID_ARGUMENT;
         chip::Optional<chip::Controller::SetUpCodePairerParameters> params = discoveredDevice.params;
         if (params.HasValue()) {
             auto pinCode = static_cast<uint32_t>(payload.setupPasscode.unsignedLongValue);
@@ -670,7 +703,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    if (!success) {
+        MATTER_LOG_METRIC_END(kMetricDarwinFrameworkDeviceCommissioning, errorCode);
+    }
+    return success;
 }
 
 - (BOOL)commissionNodeWithID:(NSNumber *)nodeID
@@ -678,6 +715,10 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                        error:(NSError * __autoreleasing *)error
 {
     auto block = ^BOOL {
+        // Capture metrics on overall status of this stage
+        CHIP_ERROR errorCode = CHIP_NO_ERROR;
+        MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkCommissionNode, errorCode);
+
         chip::Controller::CommissioningParameters params;
         if (commissioningParams.csrNonce) {
             params.SetCSRNonce(AsByteSpan(commissioningParams.csrNonce));
@@ -774,7 +815,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(deviceId);
-        auto errorCode = self->_cppCommissioner->Commission(deviceId, params);
+        errorCode = self->_cppCommissioner->Commission(deviceId, params);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
@@ -793,7 +834,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         auto deviceProxy = static_cast<chip::DeviceProxy *>(device);
         auto errorCode = self->_cppCommissioner->ContinueCommissioningAfterDeviceAttestation(deviceProxy,
             ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+        auto failed = [MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+
+        // Emit metric on stage after continuing post attestation
+        MATTER_LOG_METRIC(kMetricDarwinFrameworkContinueCommissioningAfterAttestation, errorCode);
+        return !failed;
     };
 
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -804,7 +849,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     auto block = ^BOOL {
         self->_operationalCredentialsDelegate->ResetDeviceID();
         auto errorCode = self->_cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
+        auto failed = [MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
+
+        // Emit metric on status of cancel
+        MATTER_LOG_METRIC(kMetricDarwinFrameworkCancelCommissioning, errorCode);
+
+        return !failed;
     };
 
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
@@ -813,10 +863,10 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (BOOL)startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     auto block = ^BOOL {
-        VerifyOrReturnValue(self->_commissionableBrowser == nil, NO);
+        VerifyOrReturnValueWithMetric(kMetricDarwinFrameworkStartBrowseForCommissionables, self->_commissionableBrowser == nil, NO);
 
         auto commissionableBrowser = [[MTRCommissionableBrowser alloc] initWithDelegate:delegate controller:self queue:queue];
-        VerifyOrReturnValue([commissionableBrowser start], NO);
+        VerifyOrReturnValueWithMetric(kMetricDarwinFrameworkStartBrowseForCommissionables, [commissionableBrowser start], NO);
 
         self->_commissionableBrowser = commissionableBrowser;
         return YES;
@@ -828,10 +878,10 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (BOOL)stopBrowseForCommissionables
 {
     auto block = ^BOOL {
-        VerifyOrReturnValue(self->_commissionableBrowser != nil, NO);
+        VerifyOrReturnValueWithMetric(kMetricDarwinFrameworkStopBrowseForCommissionables, self->_commissionableBrowser != nil, NO);
 
         auto commissionableBrowser = self->_commissionableBrowser;
-        VerifyOrReturnValue([commissionableBrowser stop], NO);
+        VerifyOrReturnValueWithMetric(kMetricDarwinFrameworkStopBrowseForCommissionables, [commissionableBrowser stop], NO);
 
         self->_commissionableBrowser = nil;
         return YES;
@@ -843,7 +893,10 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (void)preWarmCommissioningSession
 {
     auto block = ^{
-        auto errorCode = chip::DeviceLayer::PlatformMgrImpl().PrepareCommissioning();
+        CHIP_ERROR errorCode = CHIP_NO_ERROR;
+        MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkPreWarmCommissioning, errorCode);
+
+        errorCode = chip::DeviceLayer::PlatformMgrImpl().PrepareCommissioning();
         // The checkForError is just so it logs
         [MTRDeviceController checkForError:errorCode logMsg:kErrorPreWarmCommissioning error:nil];
     };
@@ -858,6 +911,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
+        MATTER_LOG_METRIC(kMetricDarwinFrameworkDeviceBeingCommissioned, errorCode);
+
         VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:error], nil);
 
         return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
@@ -953,6 +1008,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 {
     chip::Spake2pVerifier verifier;
     CHIP_ERROR err = verifier.Generate(iterations.unsignedIntValue, AsByteSpan(salt), setupPasscode.unsignedIntValue);
+
+    MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkPASEVerifierForSetupCode, err);
+
     if ([MTRDeviceController checkForError:err logMsg:kErrorSpake2pVerifierGenerationFailed error:error]) {
         return nil;
     }
@@ -972,7 +1030,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     auto block = ^NSData *
     {
         chip::CommissioneeDeviceProxy * deviceProxy;
-        auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
+
+        auto errorCode = CHIP_NO_ERROR;
+        MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkPASEVerifierForSetupCode, errorCode);
+
+        errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
         VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil], nil);
 
         uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
@@ -1562,13 +1624,23 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
+    // Track overall commissioning
+    MATTER_LOG_METRIC_BEGIN(kMetricDarwinFrameworkDeviceCommissioning);
+
+    // Capture in a block variable to avoid losing granularity for metrics,
+    // when translating CHIP_ERROR to NSError
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+
     auto block = ^BOOL {
+        // Track just this portion of overall PASE setup
+        MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkPairDevice, errorCode);
+
         std::string manualPairingCode;
         chip::SetupPayload payload;
         payload.discriminator.SetLongValue(discriminator);
         payload.setUpPINCode = setupPINCode;
 
-        auto errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
+        errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
         VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error], NO);
 
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
@@ -1576,7 +1648,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    if (!success) {
+        MATTER_LOG_METRIC_END(kMetricDarwinFrameworkDeviceCommissioning, errorCode);
+    }
+    return success;
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -1585,7 +1661,17 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
+    // Track overall commissioning
+    MATTER_LOG_METRIC_BEGIN(kMetricDarwinFrameworkDeviceCommissioning);
+
+    // Capture in a block variable to avoid losing granularity for metrics,
+    // when translating CHIP_ERROR to NSError
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+
     auto block = ^BOOL {
+        // Track just this portion of overall PASE setup
+        MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkPairDevice, errorCode);
+
         chip::Inet::IPAddress addr;
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
         chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
@@ -1593,22 +1679,41 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
 
         auto params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
-        auto errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, params);
+        errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, params);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    if (!success) {
+        MATTER_LOG_METRIC_END(kMetricDarwinFrameworkDeviceCommissioning, errorCode);
+    }
+    return success;
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
+    // Track overall commissioning
+    MATTER_LOG_METRIC_BEGIN(kMetricDarwinFrameworkDeviceCommissioning);
+    emitMetricForSetupPayload([MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:nil]);
+
+    // Capture in a block variable to avoid losing granularity for metrics,
+    // when translating CHIP_ERROR to NSError
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+
     auto block = ^BOOL {
+        // Track just this portion of overall PASE setup
+        MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkPairDevice, errorCode);
+
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
-        auto errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
+        errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    auto success = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    if (!success) {
+        MATTER_LOG_METRIC_END(kMetricDarwinFrameworkDeviceCommissioning, errorCode);
+    }
+    return success;
 }
 
 - (BOOL)commissionDevice:(uint64_t)deviceID
@@ -1638,8 +1743,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         return NO;
     }
 
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+    MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkOpenPairingWindow, errorCode);
+
     auto block = ^BOOL {
-        auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
+        errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
             self->_cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
     };
@@ -1669,10 +1777,14 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         return nil;
     }
 
+    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+    MATTER_LOG_METRIC_SCOPE(kMetricDarwinFrameworkOpenPairingWindow, errorCode);
+
     if (!chip::CanCastTo<uint32_t>(setupPIN) || !chip::SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(setupPIN))) {
         MTR_LOG_ERROR("Error: Setup pin %lu is not valid", static_cast<unsigned long>(setupPIN));
+        errorCode = CHIP_ERROR_INVALID_INTEGER_VALUE;
         if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+            *error = [MTRError errorForCHIPErrorCode:errorCode];
         }
         return nil;
     }
@@ -1680,7 +1792,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     auto block = ^NSString *
     {
         chip::SetupPayload setupPayload;
-        auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self->_cppCommissioner, deviceID,
+        errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self->_cppCommissioner, deviceID,
             chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
             static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
             setupPayload);
@@ -1690,7 +1802,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         chip::ManualSetupPayloadGenerator generator(setupPayload);
         std::string outCode;
 
-        if (CHIP_NO_ERROR != generator.payloadDecimalStringRepresentation(outCode)) {
+        if (CHIP_NO_ERROR != (errorCode = generator.payloadDecimalStringRepresentation(outCode))) {
             MTR_LOG_ERROR("Failed to get decimal setup code");
             return nil;
         }
