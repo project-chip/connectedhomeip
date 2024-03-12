@@ -52,7 +52,7 @@ struct TestTLVContext
 void InitAndFinalizeWithNoData(nlTestSuite * inSuite, void * inContext)
 {
     std::vector<uint8_t> buffer;
-    TlvVectorWriter writer(&buffer);
+    TlvVectorWriter writer(buffer);
 
     // Init and finalize but write not data.
     NL_TEST_ASSERT(inSuite, writer.Finalize() == CHIP_NO_ERROR);
@@ -62,7 +62,7 @@ void InitAndFinalizeWithNoData(nlTestSuite * inSuite, void * inContext)
 void SingleSmallDataFitsInOriginalBuffer(nlTestSuite * inSuite, void * inContext)
 {
     std::vector<uint8_t> buffer;
-    TlvVectorWriter writer(&buffer);
+    TlvVectorWriter writer(buffer);
     TLVReader reader;
 
     NL_TEST_ASSERT(inSuite, writer.Put(AnonymousTag(), true) == CHIP_NO_ERROR);
@@ -80,7 +80,7 @@ void SingleSmallDataFitsInOriginalBuffer(nlTestSuite * inSuite, void * inContext
 void SingleLargeDataRequiresNewBufferAllocation(nlTestSuite * inSuite, void * inContext)
 {
     std::vector<uint8_t> buffer;
-    TlvVectorWriter writer(&buffer);
+    TlvVectorWriter writer(buffer);
     TLVReader reader;
     static constexpr size_t kStringSize = 10000;
 
@@ -102,7 +102,7 @@ void SingleLargeDataRequiresNewBufferAllocation(nlTestSuite * inSuite, void * in
 void ManySmallDataRequiresNewBufferAllocation(nlTestSuite * inSuite, void * inContext)
 {
     std::vector<uint8_t> buffer;
-    TlvVectorWriter writer(&buffer);
+    TlvVectorWriter writer(buffer);
     TLVReader reader;
 
     for (int i = 0; i < 10000; i++)

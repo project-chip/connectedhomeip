@@ -32,20 +32,20 @@ constexpr uint32_t kIpv6MtuSize = 1280;
 
 } // namespace
 
-TlvVectorWriter::TlvVectorWriter(std::vector<uint8_t> * buffer) : buffer_(buffer)
+TlvVectorWriter::TlvVectorWriter(std::vector<uint8_t> & buffer) : mVectorBuffer(buffer)
 {
-    Init(buffer_);
+    Init(mVectorBuffer);
 }
 
 TlvVectorWriter::~TlvVectorWriter() = default;
 
-TlvVectorWriter::TlvVectorBuffer::TlvVectorBuffer(std::vector<uint8_t> * buffer) : final_buffer_(*buffer) {}
+TlvVectorWriter::TlvVectorBuffer::TlvVectorBuffer(std::vector<uint8_t> & buffer) : mFinalBuffer(buffer) {}
 
 TlvVectorWriter::TlvVectorBuffer::~TlvVectorBuffer() {}
 
 CHIP_ERROR TlvVectorWriter::TlvVectorBuffer::OnInit(TLVWriter & /*writer*/, uint8_t *& bufStart, uint32_t & bufLen)
 {
-    VerifyOrReturnError(final_buffer_.empty(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFinalBuffer.empty(), CHIP_ERROR_INCORRECT_STATE);
 
     ResizeWriteBuffer(bufStart, bufLen);
 
@@ -54,8 +54,8 @@ CHIP_ERROR TlvVectorWriter::TlvVectorBuffer::OnInit(TLVWriter & /*writer*/, uint
 
 CHIP_ERROR TlvVectorWriter::TlvVectorBuffer::GetNewBuffer(TLVWriter & /*writer*/, uint8_t *& bufStart, uint32_t & bufLen)
 {
-    VerifyOrReturnError(!final_buffer_.empty(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(writing_buffer_.data() == bufStart, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mFinalBuffer.empty(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mWritingBuffer.data() == bufStart, CHIP_ERROR_INCORRECT_STATE);
 
     ResizeWriteBuffer(bufStart, bufLen);
 
@@ -64,27 +64,27 @@ CHIP_ERROR TlvVectorWriter::TlvVectorBuffer::GetNewBuffer(TLVWriter & /*writer*/
 
 CHIP_ERROR TlvVectorWriter::TlvVectorBuffer::FinalizeBuffer(TLVWriter & /*writer*/, uint8_t * bufStart, uint32_t bufLen)
 {
-    VerifyOrReturnError(writing_buffer_.data() == bufStart, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(bufLen <= writing_buffer_.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(mWritingBuffer.data() == bufStart, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(bufLen <= mWritingBuffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    writing_buffer_.resize(bufLen);
+    mWritingBuffer.resize(bufLen);
 
-    final_buffer_.insert(final_buffer_.end(), writing_buffer_.begin(), writing_buffer_.end());
-    writing_buffer_.resize(0);
+    mFinalBuffer.insert(mFinalBuffer.end(), mWritingBuffer.begin(), mWritingBuffer.end());
+    mWritingBuffer.resize(0);
 
-    final_buffer_.shrink_to_fit();
+    mFinalBuffer.shrink_to_fit();
 
     return CHIP_NO_ERROR;
 }
 
 void TlvVectorWriter::TlvVectorBuffer::ResizeWriteBuffer(uint8_t *& bufStart, uint32_t & bufLen)
 {
-    VerifyOrReturn(writing_buffer_.empty());
+    VerifyOrReturn(mWritingBuffer.empty());
 
-    writing_buffer_.resize(kIpv6MtuSize);
-    bufStart = writing_buffer_.data();
+    mWritingBuffer.resize(kIpv6MtuSize);
+    bufStart = mWritingBuffer.data();
 
-    auto size = writing_buffer_.size();
+    auto size = mWritingBuffer.size();
     VerifyOrReturn(size <= std::numeric_limits<uint32_t>::max());
     bufLen = static_cast<uint32_t>(size);
 }

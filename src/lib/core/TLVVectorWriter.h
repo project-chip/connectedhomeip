@@ -37,7 +37,7 @@ class TlvVectorWriter : public TLVWriter
 public:
     // All data will be written to and read from the provided buffer, which must
     // outlive this object.
-    TlvVectorWriter(std::vector<uint8_t> * buffer);
+    TlvVectorWriter(std::vector<uint8_t> & buffer);
     TlvVectorWriter(const TlvVectorWriter &)             = delete;
     TlvVectorWriter & operator=(const TlvVectorWriter &) = delete;
     ~TlvVectorWriter();
@@ -46,7 +46,7 @@ private:
     class TlvVectorBuffer : public TLVBackingStore
     {
     public:
-        TlvVectorBuffer(std::vector<uint8_t> * buffer);
+        TlvVectorBuffer(std::vector<uint8_t> & buffer);
         TlvVectorBuffer(const TlvVectorBuffer &)             = delete;
         TlvVectorBuffer & operator=(const TlvVectorBuffer &) = delete;
         ~TlvVectorBuffer() override;
@@ -67,16 +67,16 @@ private:
     private:
         void ResizeWriteBuffer(uint8_t *& bufStart, uint32_t & bufLen);
 
-        // writing_buffer_ is the mutable buffer exposed via the TLVBackingStore
-        // interface. When FinalizeBuffer is called the contents of writing_buffer_
-        // are appended to final_buffer_ and writing_buffer_ is cleared. This allows
+        // mWritingBuffer is the mutable buffer exposed via the TLVBackingStore
+        // interface. When FinalizeBuffer is called the contents of mWritingBuffer
+        // are appended to mFinalBuffer and mWritingBuffer is cleared. This allows
         // for reading all written data from a single, contiguous buffer
-        // (final_buffer_).
-        std::vector<uint8_t> writing_buffer_;
-        std::vector<uint8_t> & final_buffer_;
+        // (mFinalBuffer).
+        std::vector<uint8_t> mWritingBuffer;
+        std::vector<uint8_t> & mFinalBuffer;
     };
 
-    TlvVectorBuffer buffer_;
+    TlvVectorBuffer mVectorBuffer;
 };
 
 } // namespace TLV

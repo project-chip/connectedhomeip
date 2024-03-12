@@ -190,6 +190,7 @@ static_library("core") {
 
 static_library("vectortlv") {
   output_name = "libVectorTlv"
+  output_dir = "${root_out_dir}/lib"
 
   sources = [
     "TLVVectorWriter.cpp",
@@ -198,9 +199,5 @@ static_library("vectortlv") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [
-    ":core",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/system",
-  ]
+  public_deps = [ ":core" ]
 }
