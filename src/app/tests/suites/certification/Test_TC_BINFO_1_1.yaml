@@ -193,19 +193,8 @@ tests:
               type: list
               contains: [20]
 
-    - label: "Step 5a: TH reads EventList from DUT"
-      PICS:
-          " !BINFO.S.E00 && !BINFO.S.E01 && !BINFO.S.E02 && !BINFO.S.A0011 &&
-          PICS_EVENT_LIST_ENABLED"
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Step 5b: TH reads BINFO.S.E00(StartUp) event in EventList"
-      PICS: BINFO.S.E00 && PICS_EVENT_LIST_ENABLED
+    - label: "Step 5a: TH reads from the DUT the EventList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -213,7 +202,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 5c: TH reads BINFO.S.E01(ShutDown) event in EventList"
+    - label: "Step 5b: TH reads optional event(ShutDown) in EventList"
       PICS: BINFO.S.E01 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -222,7 +211,7 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Step 5d: TH reads BINFO.S.E02(Leave) event in EventList"
+    - label: "Step 5c: TH reads optional event(Leave) in EventList"
       PICS: BINFO.S.E02 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -231,7 +220,7 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Step 5e: TH reads (ReachableChanged) event in EventList"
+    - label: "Step 5d: TH reads optional event(ReachableChanged) in EventList"
       PICS: BINFO.S.A0011 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
