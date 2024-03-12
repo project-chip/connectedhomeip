@@ -610,7 +610,7 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
             chip::Platform::MemoryFree(aPacket);
 #endif
-            aPacket = lNextPacket;
+            aPacket       = lNextPacket;
         }
         else
         {
