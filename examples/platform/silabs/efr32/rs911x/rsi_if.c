@@ -88,7 +88,7 @@ extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
  * This file implements the interface to the RSI SAPIs
  */
 static uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
-static wfx_wifi_scan_ext_t * temp_reset;
+static wfx_wifi_scan_ext_t temp_reset;
 
 /******************************************************************
  * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
@@ -133,13 +133,13 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
     else
     {
         rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
-        extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset->beacon_lost_count;
-        extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset->beacon_rx_count;
-        extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset->mcast_rx_count;
-        extra_info->mcast_tx_count    = test->mcast_tx_count - temp_reset->mcast_tx_count;
-        extra_info->ucast_rx_count    = test->ucast_rx_count - temp_reset->ucast_rx_count;
-        extra_info->ucast_tx_count    = test->ucast_tx_count - temp_reset->ucast_tx_count;
-        extra_info->overrun_count     = test->overrun_count - temp_reset->overrun_count;
+        extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset.beacon_lost_count;
+        extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset.beacon_rx_count;
+        extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset.mcast_rx_count;
+        extra_info->mcast_tx_count    = test->mcast_tx_count - temp_reset.mcast_tx_count;
+        extra_info->ucast_rx_count    = test->ucast_rx_count - temp_reset.ucast_rx_count;
+        extra_info->ucast_tx_count    = test->ucast_tx_count - temp_reset.ucast_tx_count;
+        extra_info->overrun_count     = test->overrun_count - temp_reset.overrun_count;
     }
     return status;
 }
@@ -163,14 +163,14 @@ int32_t wfx_rsi_reset_count()
     }
     else
     {
-        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
-        temp_reset->beacon_lost_count = test->beacon_lost_count;
-        temp_reset->beacon_rx_count   = test->beacon_rx_count;
-        temp_reset->mcast_rx_count    = test->mcast_rx_count;
-        temp_reset->mcast_tx_count    = test->mcast_tx_count;
-        temp_reset->ucast_rx_count    = test->ucast_rx_count;
-        temp_reset->ucast_tx_count    = test->ucast_tx_count;
-        temp_reset->overrun_count     = test->overrun_count;
+        rsi_wlan_ext_stats_t * test  = (rsi_wlan_ext_stats_t *) buff;
+        temp_reset.beacon_lost_count = test->beacon_lost_count;
+        temp_reset.beacon_rx_count   = test->beacon_rx_count;
+        temp_reset.mcast_rx_count    = test->mcast_rx_count;
+        temp_reset.mcast_tx_count    = test->mcast_tx_count;
+        temp_reset.ucast_rx_count    = test->ucast_rx_count;
+        temp_reset.ucast_tx_count    = test->ucast_tx_count;
+        temp_reset.overrun_count     = test->overrun_count;
     }
     return status;
 }
@@ -236,8 +236,6 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
 {
     SILABS_LOG("%s: status: %02x", __func__, status);
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
-    temp_reset = (wfx_wifi_scan_ext_t *) malloc(sizeof(wfx_wifi_scan_ext_t));
-    memset(temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
     if (status != RSI_SUCCESS)
     {
         /*
@@ -253,6 +251,7 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
         /*
          * Join was complete - Do the DHCP
          */
+        memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
         SILABS_LOG("%s: join completed.", __func__);
         xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
         wfx_rsi.join_retries = 0;
