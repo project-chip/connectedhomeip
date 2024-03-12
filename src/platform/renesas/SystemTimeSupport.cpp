@@ -23,12 +23,10 @@
  *          time/clock functions based on the FreeRTOS tick counter.
  */
 /* this file behaves like a config.h, comes first */
+#include <time.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <lib/support/TimeUtils.h>
-#include <time.h>
 #include "time_zone.h"
-
 #include "FreeRTOS.h"
 #include "task.h"
 

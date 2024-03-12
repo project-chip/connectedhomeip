@@ -19,8 +19,6 @@ import("${chip_root}/src/platform/renesas/args.gni")
 
 renesas_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-cflags = [ "-fno-exceptions" ]
-
 chip_openthread_ftd = false
 
 chip_enable_ota_requestor = false
@@ -31,7 +29,6 @@ chip_progress_logging = true
 chip_detail_logging = true
 chip_automation_logging = false
 treat_warnings_as_errors = false
-use_exceptions = false
 chip_project_config_include_dirs =
 [
     "//include",

@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
-
 #include <queue>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <platform/PlatformManager.h>
+
 
 namespace chip {
 namespace DeviceLayer {

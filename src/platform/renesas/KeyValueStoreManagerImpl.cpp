@@ -15,10 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <platform/KeyValueStoreManager.h>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
+#include <platform/KeyValueStoreManager.h>
 
 namespace chip {
 namespace DeviceLayer {

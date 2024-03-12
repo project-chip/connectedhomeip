@@ -33,21 +33,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 
-// -------------------- BLE/CHIPoBLE Configuration --------------------
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
-#endif
-#define CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION 1
-#define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 1
-#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL 60  // 60*0.625ms=37.5ms
-#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL 600 // 600*0.625ms=375
-
-// -------------------- Time Sync Configuration --------------------
-
-// -------------------- Service Provisioning Configuration --------------------
-
-// -------------------- Just-In-Time Provisioning Configuration --------------------
-
 // -------------------- Service Discovery Configuration -----------------------
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 1
 
@@ -58,20 +43,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 1
 #endif
 
-// -------------------- Trait Manager Configuration --------------------
-
-// -------------------- Network Telemetry Configuration --------------------
-
 // -------------------- Event Logging Configuration --------------------
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE 256
 
-// -------------------- Software Update Manager Configuration --------------------
-
-#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
-#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT 1000
-#endif
-
-#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
-#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT "U1BBS0UyUCBLZXkgU2FsdA=="
-#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT_DEFAULT
-#endif

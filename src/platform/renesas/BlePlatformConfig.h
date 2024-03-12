@@ -23,11 +23,3 @@
  *
  */
 
-
-// ==================== Platform Adaptations ====================
-
-// TODO
-
-// ========== Platform-specific Configuration Overrides =========
-
-// TODO
