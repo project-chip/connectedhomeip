@@ -268,9 +268,8 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 #define ChipLogValueMEI(aValue) static_cast<uint16_t>(aValue >> 16), static_cast<uint16_t>(aValue)
 
 /**
- * Logging helpers for exchanges.  For now just log the exchange id and whether
- * it's an initiator or responder, but eventually we may want to log the peer
- * node id as well (especially for the responder case).  Some callsites only
+ * Logging helpers for exchanges.  Log the exchange id, whether
+ * it's an initiator or responder and the peer node id.  Some callsites only
  * have the exchange id and initiator/responder boolean, not an actual exchange,
  * so we want to have a helper for that case too.
  */
