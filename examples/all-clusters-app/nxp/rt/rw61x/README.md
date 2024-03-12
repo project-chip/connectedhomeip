@@ -25,8 +25,7 @@ commissioning and different cluster control.
 
 The RW61x all-cluster application provides a working demonstration of the
 RW610/RW612 board integration, built using the Project CHIP codebase and the NXP
-RW612 SDK. The example supports basic ZCL commands and acts as a thermostat
-device-type.
+RW612 SDK.
 
 The example supports:
 
@@ -76,14 +75,6 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     component can be omitted.)
 
     Please refer to Matter release notes for getting the latest released SDK.
-
-    > **_NOTE:_** When using the SDK version 2.13.2 to build and run the
-    > OpenThread RW612 OTBR examples the LWIP component must be downloaded from
-    > the
-    > [LWIP NXP GitHub](https://github.com/nxp-mcuxpresso/lwip/tree/mcux_release_2.13.3_rw610_rfp2).
-    > Take the latest commit from the indicated branch and copy to SDK location
-    > `.../middleware/lwip` . The lwip folder in `.../middleware/` must be
-    > completely overwritten by the contents downloaded from GitHub.
 
 -   Start building the application.
 
@@ -137,8 +128,6 @@ Optional GN options that can be added when building an application:
     [matter CLI](README.md#testing-the-all-clusters-application-with-matter-cli-enabled),
     the argument `chip_enable_matter_cli=true` must be added to the _gn gen_
     command.
--   To switch the device type to thermostat `nxp_device_type=\"thermostat\"`
-    must be added to the _gn gen_ command.
 -   To switch the SDK type used, the argument `is_<sdk_type>=true` must be added
     to the _gn gen_ command (with <sdk_type> being either sdk_package or
     sdk_internal).
