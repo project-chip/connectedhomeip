@@ -16,10 +16,9 @@
  *    limitations under the License.
  */
 
-
-#include <cstring>
-#include <app/util/af.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/af.h>
+#include <cstring>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -149,14 +148,14 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         return false;
     }
 
-    userInStorage.userName                  = chip::MutableCharSpan(userInStorage.userNameBuf, DOOR_LOCK_USER_NAME_BUFFER_SIZE);
+    userInStorage.userName = chip::MutableCharSpan(userInStorage.userNameBuf, DOOR_LOCK_USER_NAME_BUFFER_SIZE);
     CopyCharSpanToMutableCharSpan(userName, userInStorage.userName);
-    userInStorage.userUniqueId              = uniqueId;
-    userInStorage.userStatus                = userStatus;
-    userInStorage.userType                  = usertype;
-    userInStorage.credentialRule            = credentialRule;
-    userInStorage.lastModifiedBy            = modifier;
-    userInStorage.createdBy                 = creator;
+    userInStorage.userUniqueId   = uniqueId;
+    userInStorage.userStatus     = userStatus;
+    userInStorage.userType       = usertype;
+    userInStorage.credentialRule = credentialRule;
+    userInStorage.lastModifiedBy = modifier;
+    userInStorage.createdBy      = creator;
 
     userInStorage.credentials.clear();
     for (size_t i = 0; i < totalCredentials; ++i)

@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
-#include <app/util/af.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/af.h>
 #include <lib/core/DataModelTypes.h>
 
 #ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
-#include <app/clusters/door-lock-server/door-lock-server.h>
 #include "chef-lock-manager.h"
+#include <app/clusters/door-lock-server/door-lock-server.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
