@@ -765,7 +765,12 @@ public:
     // onSuccess nor onFailure will be called.
     bool ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                            Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
-                           OnExtendFailsafeFailure onFailure);
+                           OnExtendFailsafeFailure onFailure)
+    {
+        // If this method is called directly by a client, assume it's fire-and-forget (not a commissioning stage)
+        return ExtendArmFailSafeInternal(proxy, step, armFailSafeTimeout, commandTimeout, onSuccess, onFailure,
+                                         /* fireAndForget = */ true);
+    }
 
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
@@ -957,14 +962,19 @@ private:
     CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
+    bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
+                                   Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
+                                   OnExtendFailsafeFailure onFailure, bool fireAndForget);
+
     template <typename RequestObjectT>
     CHIP_ERROR SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
                                         CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                                         CommandResponseFailureCallback failureCb, EndpointId endpoint,
-                                        Optional<System::Clock::Timeout> timeout = NullOptional);
+                                        Optional<System::Clock::Timeout> timeout = NullOptional, bool fireAndForget = false);
     void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
                                       app::AttributePathParams * readPaths, size_t readPathsSize);
     void CancelCommissioningInteractions();
+    void CancelCASECallbacks();
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     void ParseCommissioningInfo();
