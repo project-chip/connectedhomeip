@@ -220,7 +220,7 @@ public:
      * set this before actually bringing up the stack and having access to a
      * ReliableMessageMgr.
      */
-    static void SetAdditionaMRPBackoffTime(const Optional<System::Clock::Milliseconds64> & additionalTime)
+    static void SetAdditionalMRPBackoffTime(const Optional<System::Clock::Milliseconds64> & additionalTime)
     {
         sAdditionalMRPBackoffTime = additionalTime;
     }
