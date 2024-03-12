@@ -44,6 +44,7 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
 #import "MTRSetupPayload.h"
+#import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
@@ -607,6 +608,13 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                                        error:(NSError * __autoreleasing *)error
 {
     auto block = ^BOOL {
+        // First reset previous information about this new nodeID
+        os_unfair_lock_lock(&_deviceMapLock);
+        [self _removeDeviceWithNodeID:newNodeID device:nil];
+        os_unfair_lock_unlock(&_deviceMapLock);
+        [_controllerDataStore clearResumptionInfoForNodeID:newNodeID];
+        [_controllerDataStore clearStoredAttributesForNodeID:newNodeID];
+
         // Try to get a QR code if possible (because it has a better
         // discriminator, etc), then fall back to manual code if that fails.
         NSString * pairingCode = [payload qrCodeString:nil];
@@ -632,6 +640,13 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                                                 error:(NSError * __autoreleasing *)error
 {
     auto block = ^BOOL {
+        // First reset previous information about this new nodeID
+        os_unfair_lock_lock(&_deviceMapLock);
+        [self _removeDeviceWithNodeID:newNodeID device:nil];
+        os_unfair_lock_unlock(&_deviceMapLock);
+        [_controllerDataStore clearResumptionInfoForNodeID:newNodeID];
+        [_controllerDataStore clearStoredAttributesForNodeID:newNodeID];
+
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(nodeId);
 
@@ -897,18 +912,30 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return deviceToReturn;
 }
 
+// Remove a device from the device map, optionally with a specific object
+- (void)_removeDeviceWithNodeID:(NSNumber *)nodeID device:(MTRDevice * _Nullable)deviceToRemove
+{
+    os_unfair_lock_assert_owner(&_deviceMapLock);
+
+    MTRDevice * device = _nodeIDToDeviceMap[nodeID];
+    if (!device) {
+        MTR_LOG_INFO("No device to remove with nodeID %llu", nodeID.unsignedLongLongValue);
+        return;
+    }
+
+    if (deviceToRemove && (device != deviceToRemove)) {
+        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", deviceToRemove, nodeID.unsignedLongLongValue);
+        return;
+    }
+
+    [deviceToRemove invalidate];
+    _nodeIDToDeviceMap[nodeID] = nil;
+}
+
 - (void)removeDevice:(MTRDevice *)device
 {
-    os_unfair_lock_lock(&_deviceMapLock);
-    auto * nodeID = device.nodeID;
-    MTRDevice * deviceToRemove = _nodeIDToDeviceMap[nodeID];
-    if (deviceToRemove == device) {
-        [deviceToRemove invalidate];
-        _nodeIDToDeviceMap[nodeID] = nil;
-    } else {
-        MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, nodeID.unsignedLongLongValue);
-    }
-    os_unfair_lock_unlock(&_deviceMapLock);
+    std::lock_guard lock(_deviceMapLock);
+    [self _removeDeviceWithNodeID:device.nodeID device:device];
 }
 
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
