@@ -15,12 +15,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
-#include "chef-lock-endpoint.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
+
+
 #include <cstring>
+#include <app/util/af.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
+#include "chef-lock-endpoint.h"
 
 using chip::to_underlying;
 using chip::app::DataModel::MakeNullable;
@@ -83,7 +87,7 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
         return true;
     }
 
-    user.userName       = chip::CharSpan(userInDb.userName, strlen(userInDb.userName));
+    user.userName       = userInDb.userName;
     user.credentials    = chip::Span<const CredentialStruct>(userInDb.credentials.data(), userInDb.credentials.size());
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
@@ -145,8 +149,8 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         return false;
     }
 
-    chip::Platform::CopyString(userInStorage.userName, userName);
-    userInStorage.userName[userName.size()] = 0;
+    userInStorage.userName                  = chip::MutableCharSpan(userInStorage.userNameBuf, DOOR_LOCK_USER_NAME_BUFFER_SIZE);
+    CopyCharSpanToMutableCharSpan(userName, userInStorage.userName);
     userInStorage.userUniqueId              = uniqueId;
     userInStorage.userStatus                = userStatus;
     userInStorage.userType                  = usertype;
@@ -606,9 +610,7 @@ bool LockEndpoint::weekDayScheduleForbidsAccess(uint16_t userIndex, bool * haveS
         [currentTime, calendarTime](const WeekDaysScheduleInfo & s) {
             auto startTime = s.schedule.startHour * chip::kSecondsPerHour + s.schedule.startMinute * chip::kSecondsPerMinute;
             auto endTime   = s.schedule.endHour * chip::kSecondsPerHour + s.schedule.endMinute * chip::kSecondsPerMinute;
-            bool ret =
-                (s.status == DlScheduleStatus::kOccupied && (to_underlying(s.schedule.daysMask) & (1 << calendarTime.tm_wday)) &&
-                 startTime <= currentTime && currentTime <= endTime);
+
             return s.status == DlScheduleStatus::kOccupied && (to_underlying(s.schedule.daysMask) & (1 << calendarTime.tm_wday)) &&
                 startTime <= currentTime && currentTime <= endTime;
         });

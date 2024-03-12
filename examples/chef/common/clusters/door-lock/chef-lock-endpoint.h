@@ -23,7 +23,8 @@
 
 struct LockUserInfo
 {
-    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
+    char userNameBuf[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
+    chip::MutableCharSpan userName;
     uint32_t userUniqueId;
     UserStatusEnum userStatus;
     UserTypeEnum userType;
