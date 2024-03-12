@@ -14,7 +14,7 @@
 #   limitations under the License.
 #
 
-# The purpose of this file is to define new default values of settings used when building hci_rpmsg child image for Matter samples.
+# The purpose of this file is to define new default values of settings used when building hci_ipc child image for Matter samples.
 
 config LOG
     default n
