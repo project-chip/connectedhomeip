@@ -1234,7 +1234,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValues.count;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
 
-    // Now
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
 
     XCTestExpectation * newDeviceSubscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up for new device"];

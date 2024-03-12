@@ -370,7 +370,7 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
  *
  *                The data-value dictionary also contains this key:
  *
- *                MTRDataVersionKey : NSNumber-wrapped uin32_t. Monotonically increaseing data version for the cluster.
+ *                MTRDataVersionKey : NSNumber-wrapped uin32_t.
  */
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 

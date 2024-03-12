@@ -30,7 +30,9 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
 + (BOOL)localTestStorageEnabled
 {
     NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
-    return [defaults boolForKey:kLocalTestUserDefaultEnabledKey];
+    BOOL localTestStorageEnabled = [defaults boolForKey:kLocalTestUserDefaultEnabledKey];
+    MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage setLocalTestStorageEnabled %d", localTestStorageEnabled);
+    return localTestStorageEnabled;
 }
 
 + (void)setLocalTestStorageEnabled:(BOOL)localTestStorageEnabled

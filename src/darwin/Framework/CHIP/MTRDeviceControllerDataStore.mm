@@ -609,7 +609,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             }
             if (storeFailed) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed for endpointIndex");
+                MTR_LOG_INFO("Store failed for endpointIndex 0x%016llX", nodeID.unsignedLongLongValue);
                 continue;
             }
 
@@ -623,7 +623,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             }
             if (storeFailed) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed for clusterIndex");
+                MTR_LOG_INFO("Store failed for clusterIndex 0x%016llX:0x%04X", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue);
                 continue;
             }
 
@@ -640,15 +640,15 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             }
             if (storeFailed) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed for attributeIndex");
+                MTR_LOG_INFO("Store failed for attributeIndex 0x%016llX:0x%04X:0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue);
                 continue;
             }
 
             // Store value
-            storeFailed = [self _storeAttributeValue:value forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute];
+            storeFailed = ![self _storeAttributeValue:value forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute];
             if (storeFailed) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed for attribute value");
+                MTR_LOG_INFO("Store failed for attribute value 0x%016llX:0x%04X:0x%08lX:0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue, path.attribute.unsignedLongValue);
             }
         }
 
