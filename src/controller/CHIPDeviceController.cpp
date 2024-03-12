@@ -25,13 +25,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
 // module header, comes first
 #include <controller/CHIPDeviceController.h>
 
@@ -953,6 +946,20 @@ void DeviceCommissioner::CancelCommissioningInteractions()
         mInvokeCancelFn();
         mInvokeCancelFn = nullptr;
     }
+    if (mOnDeviceConnectedCallback.IsRegistered())
+    {
+        ChipLogDetail(Controller, "Cancelling CASE setup for step '%s'", StageToString(mCommissioningStage));
+        CancelCASECallbacks();
+    }
+}
+
+void DeviceCommissioner::CancelCASECallbacks()
+{
+    mOnDeviceConnectedCallback.Cancel();
+    mOnDeviceConnectionFailureCallback.Cancel();
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    mOnDeviceConnectionRetryCallback.Cancel();
+#endif
 }
 
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
@@ -1216,9 +1223,10 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
-bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
-                                           Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
-                                           OnExtendFailsafeFailure onFailure)
+bool DeviceCommissioner::ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
+                                                   Optional<System::Clock::Timeout> commandTimeout,
+                                                   OnExtendFailsafeSuccess onSuccess, OnExtendFailsafeFailure onFailure,
+                                                   bool fireAndForget)
 {
     using namespace System;
     using namespace System::Clock;
@@ -1237,17 +1245,15 @@ bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningSta
     request.expiryLengthSeconds = armFailSafeTimeout;
     request.breadcrumb          = breadcrumb;
     ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
-    CHIP_ERROR err = SendCommissioningCommand(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
+    CHIP_ERROR err = SendCommissioningCommand(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout, fireAndForget);
     if (err != CHIP_NO_ERROR)
     {
-        onFailure(this, err);
+        onFailure((!fireAndForget) ? this : nullptr, err);
+        return true; // we have called onFailure already
     }
-    else
-    {
-        // TODO: Handle the situation when our command ends up erroring out
-        // asynchronously?
-        proxy->SetFailSafeExpirationTimestamp(newFailSafeTimeout);
-    }
+
+    // Note: The stored timestamp may become invalid if we fail asynchronously
+    proxy->SetFailSafeExpirationTimestamp(newFailSafeTimeout);
     return true;
 }
 
@@ -1269,9 +1275,9 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
         // Per spec, anything we do with the fail-safe armed must not time out
         // in less than kMinimumCommissioningStepTimeout.
         waitForFailsafeExtension =
-            ExtendArmFailSafe(mDeviceBeingCommissioned, mCommissioningStage, expiryLengthSeconds.Value(),
-                              MakeOptional(kMinimumCommissioningStepTimeout), OnArmFailSafeExtendedForDeviceAttestation,
-                              OnFailedToExtendedArmFailSafeDeviceAttestation);
+            ExtendArmFailSafeInternal(mDeviceBeingCommissioned, mCommissioningStage, expiryLengthSeconds.Value(),
+                                      MakeOptional(kMinimumCommissioningStepTimeout), OnArmFailSafeExtendedForDeviceAttestation,
+                                      OnFailedToExtendedArmFailSafeDeviceAttestation, /* fireAndForget = */ false);
     }
     else
     {
@@ -1658,13 +1664,30 @@ void DeviceCommissioner::OnBasicFailure(void * context, CHIP_ERROR error)
     commissioner->CommissioningStageComplete(error);
 }
 
+static GeneralCommissioning::Commands::ArmFailSafe::Type DisarmFailsafeRequest()
+{
+    GeneralCommissioning::Commands::ArmFailSafe::Type request;
+    request.expiryLengthSeconds = 0; // Expire immediately.
+    request.breadcrumb          = 0;
+    return request;
+}
+
+static void MarkForEviction(const Optional<SessionHandle> & session)
+{
+    if (session.HasValue())
+    {
+        session.Value()->AsSecureSession()->MarkForEviction();
+    }
+}
+
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
+    // At this point, proxy == mDeviceBeingCommissioned, nodeId == mDeviceBeingCommissioned->GetDeviceId()
+
     mCommissioningCompletionStatus = completionStatus;
 
     if (completionStatus.err == CHIP_NO_ERROR)
     {
-
         CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
         if (commissionee != nullptr)
         {
@@ -1674,13 +1697,40 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         CommissioningStageComplete(CHIP_NO_ERROR);
         SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
     }
-    else if (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup &&
-             completionStatus.err != CHIP_ERROR_CANCELLED)
+    else if (completionStatus.err == CHIP_ERROR_CANCELLED)
+    {
+        // If we're cleaning up because cancellation has been requested via StopPairing(), expire the failsafe
+        // in the background and reset our state synchronously, so a new commissioning attempt can be started.
+        CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
+        SessionHolder session((commissionee == proxy) ? commissionee->DetachSecureSession().Value()
+                                                      : proxy->GetSecureSession().Value());
+
+        auto request     = DisarmFailsafeRequest();
+        auto onSuccessCb = [session](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+                                     const decltype(request)::ResponseType & responseData) {
+            ChipLogProgress(Controller, "Failsafe disarmed");
+            MarkForEviction(session.Get());
+        };
+        auto onFailureCb = [session](CHIP_ERROR aError) {
+            ChipLogProgress(Controller, "Ignoring failure to disarm failsafe: %" CHIP_ERROR_FORMAT, aError.Format());
+            MarkForEviction(session.Get());
+        };
+
+        ChipLogProgress(Controller, "Disarming failsafe on device %p in background", proxy);
+        CHIP_ERROR err = InvokeCommandRequest(proxy->GetExchangeManager(), session.Get().Value(), kRootEndpointId, request,
+                                              onSuccessCb, onFailureCb);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to send command to disarm fail-safe: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        CleanupDoneAfterError();
+    }
+    else if (completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup)
     {
         // If we were already doing network setup, we need to retain the pase session and start again from network setup stage.
         // We do not need to reset the failsafe here because we want to keep everything on the device up to this point, so just
-        // send the completion callbacks (see "Commissioning Flows Error Handling" in the spec). This does not apply if
-        // we're cleaning up because cancellation has been requested via StopPairing().
+        // send the completion callbacks (see "Commissioning Flows Error Handling" in the spec).
         CommissioningStageComplete(CHIP_NO_ERROR);
         SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
     }
@@ -1689,21 +1739,14 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         // If we've failed somewhere in the early stages (or we don't have a failedStage specified), we need to start from the
         // beginning. However, because some of the commands can only be sent once per arm-failsafe, we also need to force a reset on
         // the failsafe so we can start fresh on the next attempt.
-        GeneralCommissioning::Commands::ArmFailSafe::Type request;
-        request.expiryLengthSeconds = 0; // Expire immediately.
-        request.breadcrumb          = 0;
-        ChipLogProgress(Controller, "Expiring failsafe on proxy %p", proxy);
-        mDeviceBeingCommissioned = proxy;
-        // We actually want to do the same thing on success or failure because we're already in a failure state
-        CHIP_ERROR err = SendCommissioningCommand(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure, kRootEndpointId,
-                                                  /* timeout = */ NullOptional);
+        ChipLogProgress(Controller, "Disarming failsafe on device %p", proxy);
+        auto request   = DisarmFailsafeRequest();
+        CHIP_ERROR err = SendCommissioningCommand(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure, kRootEndpointId);
         if (err != CHIP_NO_ERROR)
         {
-            // We won't get any async callbacks here, so just pretend like the
-            // command errored out async.
+            // We won't get any async callbacks here, so just pretend like the command errored out async.
             ChipLogError(Controller, "Failed to send command to disarm fail-safe: %" CHIP_ERROR_FORMAT, err.Format());
-            DisarmDone();
-            return;
+            CleanupDoneAfterError();
         }
     }
 }
@@ -1713,17 +1756,17 @@ void DeviceCommissioner::OnDisarmFailsafe(void * context,
 {
     ChipLogProgress(Controller, "Failsafe disarmed");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->DisarmDone();
+    commissioner->CleanupDoneAfterError();
 }
 
 void DeviceCommissioner::OnDisarmFailsafeFailure(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "Ignoring failure to disarm failsafe: %" CHIP_ERROR_FORMAT, error.Format());
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    commissioner->DisarmDone();
+    commissioner->CleanupDoneAfterError();
 }
 
-void DeviceCommissioner::DisarmDone()
+void DeviceCommissioner::CleanupDoneAfterError()
 {
     // If someone nulled out our mDeviceBeingCommissioned, there's nothing else
     // to do here.
@@ -1735,13 +1778,15 @@ void DeviceCommissioner::DisarmDone()
 
     // Signal completion - this will reset mDeviceBeingCommissioned.
     CommissioningStageComplete(CHIP_NO_ERROR);
-    SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
 
     // If we've disarmed the failsafe, it's because we're starting again, so kill the pase connection.
     if (commissionee != nullptr)
     {
         ReleaseCommissioneeDevice(commissionee);
     }
+
+    // Invoke callbacks last, after we have cleared up all state.
+    SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
 }
 
 void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus)
@@ -1809,58 +1854,34 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::Exchange
 {
     // CASE session established.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(commissioner->mDeviceBeingCommissioned->GetDeviceId() == sessionHandle->GetPeer().GetNodeId());
+    commissioner->CancelCASECallbacks(); // ensure all CASE callbacks are unregistered
 
-    if (commissioner->mCommissioningStage != CommissioningStage::kFindOperational)
-    {
-        // This call is definitely not us finding our commissionee device.
-        // This is presumably us trying to re-establish CASE on MRP failure.
-        return;
-    }
-
-    if (commissioner->mDeviceBeingCommissioned == nullptr ||
-        commissioner->mDeviceBeingCommissioned->GetDeviceId() != sessionHandle->GetPeer().GetNodeId())
-    {
-        // Not the device we are trying to commission.
-        return;
-    }
-
-    if (commissioner->mCommissioningDelegate != nullptr)
-    {
-        CommissioningDelegate::CommissioningReport report;
-        report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(OperationalDeviceProxy(&exchangeMgr, sessionHandle)));
-        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-    }
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(OperationalDeviceProxy(&exchangeMgr, sessionHandle)));
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
 void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(commissioner->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
+    commissioner->CancelCASECallbacks(); // ensure all CASE callbacks are unregistered
 
-    ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
-    VerifyOrReturn(commissioner != nullptr,
-                   ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
-
-    // Ensure that commissioning stage advancement is done based on seeing an error.
-    if (error == CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Device connection failed without a valid error code. Making one up.");
+        ChipLogProgress(Controller, "Device connection failed. Error %" CHIP_ERROR_FORMAT, error.Format());
+    }
+    else
+    {
+        // Ensure that commissioning stage advancement is done based on seeing an error.
+        ChipLogError(Controller, "Device connection failed without a valid error code.");
         error = CHIP_ERROR_INTERNAL;
     }
-
-    if (commissioner->mDeviceBeingCommissioned == nullptr ||
-        commissioner->mDeviceBeingCommissioned->GetDeviceId() != peerId.GetNodeId())
-    {
-        // Not the device we are trying to commission.
-        return;
-    }
-
-    if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational &&
-        commissioner->mCommissioningDelegate != nullptr)
-    {
-        commissioner->CommissioningStageComplete(error);
-    }
+    commissioner->CommissioningStageComplete(error);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -1887,6 +1908,8 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
                  ChipLogValueScopedNodeId(peerId), error.Format(), retryTimeout.count());
 
     auto self = static_cast<DeviceCommissioner *>(context);
+    VerifyOrDie(self->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(self->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
 
     // We need to do the fail-safe arming over the PASE session.
     auto * commissioneeDevice = self->FindCommissioneeDevice(peerId.GetNodeId());
@@ -1911,11 +1934,11 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
     {
         failsafeTimeout = static_cast<uint16_t>(retryTimeout.count() + kDefaultFailsafeTimeout);
     }
-    // A false return from ExtendArmFailSafe is fine; we don't want to make the
-    // fail-safe shorter here.
-    self->ExtendArmFailSafe(commissioneeDevice, CommissioningStage::kFindOperational, failsafeTimeout,
-                            MakeOptional(kMinimumCommissioningStepTimeout), OnExtendFailsafeForCASERetrySuccess,
-                            OnExtendFailsafeForCASERetryFailure);
+
+    // A false return is fine; we don't want to make the fail-safe shorter here.
+    self->ExtendArmFailSafeInternal(commissioneeDevice, CommissioningStage::kFindOperational, failsafeTimeout,
+                                    MakeOptional(kMinimumCommissioningStepTimeout), OnExtendFailsafeForCASERetrySuccess,
+                                    OnExtendFailsafeForCASERetryFailure, /* fireAndForget = */ true);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
@@ -2513,19 +2536,22 @@ CHIP_ERROR
 DeviceCommissioner::SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
                                              CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                                              CommandResponseFailureCallback failureCb, EndpointId endpoint,
-                                             Optional<System::Clock::Timeout> timeout)
+                                             Optional<System::Clock::Timeout> timeout, bool fireAndForget)
 
 {
-    VerifyOrDie(!mInvokeCancelFn); // we don't make parallel calls
+    // Default behavior is to make sequential, cancellable calls tracked via mInvokeCancelFn.
+    // Fire-and-forget calls are not cancellable and don't receive `this` as context in callbacks.
+    VerifyOrDie(fireAndForget || !mInvokeCancelFn); // we don't make parallel (cancellable) calls
 
-    auto onSuccessCb = [context = this, successCb](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                                                   const typename RequestObjectT::ResponseType & responseData) {
+    void * context   = (!fireAndForget) ? this : nullptr;
+    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+                                            const typename RequestObjectT::ResponseType & responseData) {
         successCb(context, responseData);
     };
-    auto onFailureCb = [context = this, failureCb](CHIP_ERROR aError) { failureCb(context, aError); };
+    auto onFailureCb = [context, failureCb](CHIP_ERROR aError) { failureCb(context, aError); };
 
     return InvokeCommandRequest(device->GetExchangeManager(), device->GetSecureSession().Value(), endpoint, request, onSuccessCb,
-                                onFailureCb, NullOptional, timeout, &mInvokeCancelFn);
+                                onFailureCb, NullOptional, timeout, (!fireAndForget) ? &mInvokeCancelFn : nullptr);
 }
 
 void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
@@ -2572,13 +2598,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                         params.GetCompletionStatus().err.AsString());
     }
 
-    // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
-    // side.
     mCommissioningStage      = step;
     mCommissioningDelegate   = delegate;
     mDeviceBeingCommissioned = proxy;
-    // TODO: Extend timeouts to the DAC and Opcert requests.
 
+    // TODO: Extend timeouts to the DAC and Opcert requests.
     // TODO(cecille): We probably want something better than this for breadcrumbs.
     uint64_t breadcrumb = static_cast<uint64_t>(step);
 
@@ -2589,8 +2613,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // Make sure the fail-safe value we set here actually ends up being used
         // no matter what.
         proxy->SetFailSafeExpirationTimestamp(System::Clock::kZero);
-        VerifyOrDie(ExtendArmFailSafe(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout), timeout,
-                                      OnArmFailSafe, OnBasicFailure));
+        VerifyOrDie(ExtendArmFailSafeInternal(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout),
+                                              timeout, OnArmFailSafe, OnBasicFailure, /* fireAndForget = */ false));
     }
     break;
     case CommissioningStage::kReadCommissioningInfo: {
@@ -3233,12 +3257,10 @@ void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device,
         failSafeTimeoutSecs = static_cast<uint16_t>(failSafeTimeoutSecs + sigma1TimeoutSecs);
     }
 
-    // A false return from ExtendArmFailSafe is fine; we don't want to make the
-    // fail-safe shorter here.
-    if (!ExtendArmFailSafe(commissioneeDevice, step, failSafeTimeoutSecs, MakeOptional(kMinimumCommissioningStepTimeout),
-                           OnArmFailSafe, OnBasicFailure))
+    if (!ExtendArmFailSafeInternal(commissioneeDevice, step, failSafeTimeoutSecs, MakeOptional(kMinimumCommissioningStepTimeout),
+                                   OnArmFailSafe, OnBasicFailure, /* fireAndForget = */ false))
     {
-        // Just move on to the next step.
+        // A false return is fine; we don't want to make the fail-safe shorter here.
         CommissioningStageComplete(CHIP_NO_ERROR, CommissioningDelegate::CommissioningReport());
     }
 }

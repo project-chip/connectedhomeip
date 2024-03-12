@@ -98,7 +98,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 
 #include "wfx_msgs.h"
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "sl_si91x_types.h"
 #include "sl_status.h"
 #include "sl_wifi_constants.h"
@@ -361,7 +361,7 @@ void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 void wfx_ipv6_notify(int got_ip);
 
-#if !(SIWX_917 | EXP_BOARD)
+#if !(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 void * wfx_rsi_alloc_pkt(void);
 #endif
 
@@ -386,7 +386,7 @@ void sl_wfx_host_gpio_init(void);
 sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 #endif
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
 sl_status_t sl_si91x_driver_send_data_packet(sl_si91x_queue_type_t queue_type, sl_wifi_buffer_t * buffer, uint32_t wait_time);
 sl_status_t sl_si91x_allocate_command_buffer(sl_wifi_buffer_t ** host_buffer, void ** buffer, uint32_t requested_buffer_size,

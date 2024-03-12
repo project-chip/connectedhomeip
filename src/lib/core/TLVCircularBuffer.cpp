@@ -28,10 +28,6 @@
  */
 #include <lib/core/TLVCircularBuffer.h>
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVTags.h>
