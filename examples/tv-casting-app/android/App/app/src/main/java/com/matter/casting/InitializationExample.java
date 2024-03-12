@@ -19,7 +19,6 @@ package com.matter.casting;
 import android.content.Context;
 import android.util.Log;
 import chip.platform.ConfigurationManager;
-import com.chip.casting.util.PreferencesConfigurationManager;
 import com.matter.casting.core.CastingApp;
 import com.matter.casting.support.AppParameters;
 import com.matter.casting.support.CommissionableData;
@@ -49,7 +48,7 @@ public class InitializationExample {
    * DataProvider implementation for the Commissioning Data used by the SDK when the CastingApp goes
    * through commissioning
    */
-  private static final DataProvider<CommissionableData> commissionableDataProvider =
+  static final DataProvider<CommissionableData> commissionableDataProvider =
       new DataProvider<CommissionableData>() {
         @Override
         public CommissionableData get() {

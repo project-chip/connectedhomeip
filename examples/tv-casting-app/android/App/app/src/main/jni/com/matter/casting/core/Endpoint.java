@@ -14,24 +14,20 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.matter.casting.support;
 
+package com.matter.casting.core;
+
+import com.matter.casting.support.DeviceTypeStruct;
 import java.util.List;
 
-/** Describes an Endpoint that the client wants to connect to. */
-public class EndpointFilter {
-  // Value of null means unspecified
-  public Integer productId;
-  // Value of null means unspecified
-  public Integer vendorId;
-  public List<DeviceTypeStruct> requiredDeviceTypes;
+public interface Endpoint {
+  int getId();
 
-  public EndpointFilter() {}
+  int getVendorId();
 
-  public EndpointFilter(
-      Integer productId, Integer vendorId, List<DeviceTypeStruct> requiredDeviceTypes) {
-    this.productId = productId;
-    this.vendorId = vendorId;
-    this.requiredDeviceTypes = requiredDeviceTypes;
-  }
+  int getProductId();
+
+  List<DeviceTypeStruct> getDeviceTypeList();
+
+  CastingPlayer getCastingPlayer();
 }

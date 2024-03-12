@@ -13,25 +13,22 @@
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
+ *
  */
 package com.matter.casting.support;
 
-import java.util.List;
+import android.util.Log;
 
-/** Describes an Endpoint that the client wants to connect to. */
-public class EndpointFilter {
-  // Value of null means unspecified
-  public Integer productId;
-  // Value of null means unspecified
-  public Integer vendorId;
-  public List<DeviceTypeStruct> requiredDeviceTypes;
+public abstract class MatterCallback<R> {
+  private static final String TAG = MatterCallback.class.getSimpleName();
 
-  public EndpointFilter() {}
+  public abstract void handle(R response);
 
-  public EndpointFilter(
-      Integer productId, Integer vendorId, List<DeviceTypeStruct> requiredDeviceTypes) {
-    this.productId = productId;
-    this.vendorId = vendorId;
-    this.requiredDeviceTypes = requiredDeviceTypes;
+  protected final void handleInternal(R response) {
+    try {
+      handle(response);
+    } catch (Throwable t) {
+      Log.e(TAG, "MatterCallback::Caught an unhandled Throwable from the client: " + t);
+    }
   }
 }
