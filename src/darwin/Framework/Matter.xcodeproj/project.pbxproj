@@ -133,6 +133,11 @@
 		5117DD3929A931AE00FFA1AA /* MTROperationalBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */; };
 		511913FB28C100EF009235E9 /* MTRBaseSubscriptionCallback.mm in Sources */ = {isa = PBXBuildFile; fileRef = 511913F928C100EF009235E9 /* MTRBaseSubscriptionCallback.mm */; };
 		511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 511913FA28C100EF009235E9 /* MTRBaseSubscriptionCallback.h */; };
+		512431252BA0C8B7000BC136 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 512431182BA0C09A000BC136 /* Commands.h */; };
+		512431262BA0C8BA000BC136 /* ResetMRPParametersCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 512431192BA0C09A000BC136 /* ResetMRPParametersCommand.h */; };
+		512431272BA0C8BF000BC136 /* SetMRPParametersCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 5124311B2BA0C09A000BC136 /* SetMRPParametersCommand.h */; };
+		512431282BA0C8BF000BC136 /* SetMRPParametersCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5124311C2BA0C09A000BC136 /* SetMRPParametersCommand.mm */; };
+		512431292BA0C8BF000BC136 /* ResetMRPParametersCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5124311A2BA0C09A000BC136 /* ResetMRPParametersCommand.mm */; };
 		5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */ = {isa = PBXBuildFile; fileRef = 5129BCFC26A9EE3300122DDF /* MTRError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51339B1F2A0DA64D00C798C1 /* MTRCertificateValidityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */; };
 		5136661328067D550025EDAE /* MTRDeviceController_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136660F28067D540025EDAE /* MTRDeviceController_Internal.h */; };
@@ -529,6 +534,11 @@
 		5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTROperationalBrowser.h; sourceTree = "<group>"; };
 		511913F928C100EF009235E9 /* MTRBaseSubscriptionCallback.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRBaseSubscriptionCallback.mm; sourceTree = "<group>"; };
 		511913FA28C100EF009235E9 /* MTRBaseSubscriptionCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRBaseSubscriptionCallback.h; sourceTree = "<group>"; };
+		512431182BA0C09A000BC136 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
+		512431192BA0C09A000BC136 /* ResetMRPParametersCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResetMRPParametersCommand.h; sourceTree = "<group>"; };
+		5124311A2BA0C09A000BC136 /* ResetMRPParametersCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ResetMRPParametersCommand.mm; sourceTree = "<group>"; };
+		5124311B2BA0C09A000BC136 /* SetMRPParametersCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetMRPParametersCommand.h; sourceTree = "<group>"; };
+		5124311C2BA0C09A000BC136 /* SetMRPParametersCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SetMRPParametersCommand.mm; sourceTree = "<group>"; };
 		5129BCFC26A9EE3300122DDF /* MTRError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRError.h; sourceTree = "<group>"; };
 		51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRCertificateValidityTests.m; sourceTree = "<group>"; };
 		5136660F28067D540025EDAE /* MTRDeviceController_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_Internal.h; sourceTree = "<group>"; };
@@ -814,6 +824,7 @@
 		037C3D7B2991BD4F00B7EEE2 /* commands */ = {
 			isa = PBXGroup;
 			children = (
+				5124311D2BA0C09A000BC136 /* configuration */,
 				B4FCD56C2B603A6300832859 /* bdx */,
 				B4E262182AA0CFFE00DBA5BC /* delay */,
 				03FB93DA2A46200A0048CB35 /* discover */,
@@ -1110,6 +1121,18 @@
 				75139A6C2B7FE19100E3A919 /* MTRTestDeclarations.h */,
 			);
 			path = TestHelpers;
+			sourceTree = "<group>";
+		};
+		5124311D2BA0C09A000BC136 /* configuration */ = {
+			isa = PBXGroup;
+			children = (
+				512431182BA0C09A000BC136 /* Commands.h */,
+				512431192BA0C09A000BC136 /* ResetMRPParametersCommand.h */,
+				5124311A2BA0C09A000BC136 /* ResetMRPParametersCommand.mm */,
+				5124311B2BA0C09A000BC136 /* SetMRPParametersCommand.h */,
+				5124311C2BA0C09A000BC136 /* SetMRPParametersCommand.mm */,
+			);
+			path = configuration;
 			sourceTree = "<group>";
 		};
 		51D0B1312B618C4F006E3511 /* ServerEndpoint */ = {
@@ -1447,6 +1470,7 @@
 				037C3DB12991BD5000B7EEE2 /* OpenCommissioningWindowCommand.h in Headers */,
 				039145E92993179300257B3E /* GetCommissionerNodeIdCommand.h in Headers */,
 				037C3DCE2991BD5100B7EEE2 /* CHIPCommandBridge.h in Headers */,
+				512431272BA0C8BF000BC136 /* SetMRPParametersCommand.h in Headers */,
 				037C3DD22991BD5200B7EEE2 /* InteractiveCommands.h in Headers */,
 				037C3DAF2991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.h in Headers */,
 				B4FCD5712B603A6300832859 /* DownloadLogCommand.h in Headers */,
@@ -1473,7 +1497,9 @@
 				037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */,
 				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
 				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
+				512431262BA0C8BA000BC136 /* ResetMRPParametersCommand.h in Headers */,
 				03FB93DF2A46200A0048CB35 /* Commands.h in Headers */,
+				512431252BA0C8B7000BC136 /* Commands.h in Headers */,
 				037C3DB22991BD5000B7EEE2 /* PreWarmCommissioningCommand.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1797,6 +1823,8 @@
 				037C3DD42991BD5200B7EEE2 /* logging.mm in Sources */,
 				B45374012A9FEC4F00807602 /* unix-sockets.c in Sources */,
 				03F430A82994112B00166449 /* editline.c in Sources */,
+				512431282BA0C8BF000BC136 /* SetMRPParametersCommand.mm in Sources */,
+				512431292BA0C8BF000BC136 /* ResetMRPParametersCommand.mm in Sources */,
 				B45373E92A9FEBC100807602 /* server.c in Sources */,
 				037C3DB32991BD5000B7EEE2 /* OpenCommissioningWindowCommand.mm in Sources */,
 				037C3DAE2991BD4F00B7EEE2 /* PairingCommandBridge.mm in Sources */,
