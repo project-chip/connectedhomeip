@@ -41,6 +41,9 @@ public:
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
+    void RegisterNetif(struct netif* netif);
+
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
 
 private:
 
@@ -65,6 +68,8 @@ private:
 
 
     static void DoFactoryReset(intptr_t arg);
+
+    struct netif* m_netif;
 };
 
 /**

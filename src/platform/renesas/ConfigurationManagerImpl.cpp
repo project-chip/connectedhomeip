@@ -27,6 +27,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/KeyValueStoreManager.h>
+#include "lwip/netif.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -90,6 +91,11 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
     return WriteConfigValue(RenesasConfig::kConfigKey_BootReason, bootReason);
+}
+
+void ConfigurationManagerImpl::RegisterNetif(struct netif* netif)
+{
+        m_netif = netif;
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset(void)
@@ -187,6 +193,16 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 ConfigurationManager & ConfigurationMgrImpl()
 {
     return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
+{
+    if (m_netif != nullptr && buf != nullptr)
+    {
+        memcpy(buf, m_netif->hwaddr, m_netif->hwaddrlen);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace DeviceLayer
