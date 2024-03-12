@@ -37,6 +37,13 @@
 #include <lwip/tcp.h>
 #include <lwip/tcpip.h>
 
+static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
+
+#if !(CHIP_DEVICE_LAYER_TARGET_BL602 || CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L)
+// TODO: Update to use RunOnTCPIP.
+static_assert(LWIP_TCPIP_CORE_LOCKING, "CHIP requires config LWIP_TCPIP_CORE_LOCKING enabled");
+#endif
+
 namespace chip {
 namespace Inet {
 
