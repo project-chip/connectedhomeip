@@ -26,6 +26,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
 #include "RenesasConfig.h"
+struct netif;
 
 namespace chip {
 namespace DeviceLayer {
