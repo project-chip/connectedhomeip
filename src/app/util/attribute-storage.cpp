@@ -130,11 +130,13 @@ constexpr const EmberAfCluster generatedClusters[] = GENERATED_CLUSTERS;
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 #endif
 
+#if FIXED_ENDPOINT_COUNT > 0
 constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
 constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVICE_TYPES;
 
 // Not const, because these need to mutate.
 DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
+#endif // FIXED_ENDPOINT_COUNT > 0
 
 AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 AttributeAccessInterfaceCache gAttributeAccessInterfaceCache;
@@ -183,10 +185,15 @@ void emberAfEndpointConfigure()
     static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
                   "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
 
-    uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
-    uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
-    uint16_t fixedDeviceTypeListOffsets[] = FIXED_DEVICE_TYPE_OFFSETS;
-    uint8_t fixedEmberAfEndpointTypes[]   = FIXED_ENDPOINT_TYPES;
+    emberEndpointCount = FIXED_ENDPOINT_COUNT;
+
+#if FIXED_ENDPOINT_COUNT > 0
+
+    constexpr uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
+    constexpr uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
+    constexpr uint16_t fixedDeviceTypeListOffsets[] = FIXED_DEVICE_TYPE_OFFSETS;
+    constexpr uint8_t fixedEmberAfEndpointTypes[]   = FIXED_ENDPOINT_TYPES;
+    constexpr EndpointId fixedParentEndpoints[]     = FIXED_PARENT_ENDPOINTS;
 
 #if ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
     // Initialize our data version storage.  If
@@ -201,7 +208,6 @@ void emberAfEndpointConfigure()
     }
 #endif // ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
 
-    emberEndpointCount                = FIXED_ENDPOINT_COUNT;
     DataVersion * currentDataVersions = fixedEndpointDataVersions;
     for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)
     {
@@ -210,6 +216,14 @@ void emberAfEndpointConfigure()
             Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[ep]], fixedDeviceTypeListLengths[ep]);
         emAfEndpoints[ep].endpointType = &generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[ep]];
         emAfEndpoints[ep].dataVersions = currentDataVersions;
+        if (fixedParentEndpoints[ep] == 0)
+        {
+            emAfEndpoints[ep].parentEndpointId = kInvalidEndpointId;
+        }
+        else
+        {
+            emAfEndpoints[ep].parentEndpointId = fixedParentEndpoints[ep];
+        }
 
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
@@ -218,6 +232,8 @@ void emberAfEndpointConfigure()
         // this endpoint has.
         currentDataVersions += emberAfClusterCountByIndex(ep, /* server = */ true);
     }
+
+#endif // FIXED_ENDPOINT_COUNT > 0
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
