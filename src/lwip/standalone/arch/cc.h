@@ -56,6 +56,10 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#if CHIP_HAVE_CONFIG_H
+#include <lwip/lwip_buildconfig.h>
+#endif
+
 /* Include some files for defining library routines */
 #include <inttypes.h>
 #include <limits.h>

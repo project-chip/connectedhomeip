@@ -324,3 +324,7 @@
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip-network-interface-integration
 	url = https://github.com/Infineon/lwip-network-interface-integration.git
 	platforms = infineon
+[submodule "third_party/lwip/repo"]
+	path = third_party/lwip/repo
+	url = https://github.com/lwip-tcpip/lwip.git
+	branch = master
