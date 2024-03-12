@@ -15,13 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ROOT_DIR=$(realpath $(dirname "$0")/../..)
-cd $ROOT_DIR
+ROOT_DIR=$(realpath "$(dirname "$0")"/../..)
+cd "$ROOT_DIR"
 
-SPEC_VERSION=$(head -n 1 $ROOT_DIR/SPECIFICATION_VERSION)
-SPEC_SHA=$(head -n 1 $ROOT_DIR/data_model/spec_sha)
-SCRAPPER_VERSION=$(head -n 1 $ROOT_DIR/data_model/scraper_version)
+SPEC_VERSION=$(head -n 1 "$ROOT_DIR"/SPECIFICATION_VERSION)
+SPEC_SHA=$(head -n 1 "$ROOT_DIR"/data_model/spec_sha)
+SCRAPPER_VERSION=$(head -n 1 "$ROOT_DIR"/data_model/scraper_version)
 
-echo 'SPEC VERSION:' $SPEC_VERSION
-echo 'SPEC SHA:' $SPEC_SHA
-echo 'SCRAPER VERSION:' $SCRAPPER_VERSION
+echo 'SPEC VERSION:' "$SPEC_VERSION"
+echo 'SPEC SHA:' "$SPEC_SHA"
+echo 'SCRAPER VERSION:' "$SCRAPPER_VERSION"

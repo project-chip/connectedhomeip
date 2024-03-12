@@ -54,9 +54,9 @@
     echo "$date_string"
     echo
 
-    ROOT_DIR=$(realpath $(dirname "$0")/../..)
+    ROOT_DIR=$(realpath "$(dirname "$0")"/../..)
     TH_DEV_SCRIPTS_DIR=$ROOT_DIR/scripts/sdk-doctor
-    cd $ROOT_DIR
+    cd "$ROOT_DIR"
 
     # Check for arguments
     if [ "$#" -gt 1 ]; then
@@ -79,7 +79,7 @@
         max_line_length=$((width - 6)) # Maximum characters in a line before wrapping
 
         # Word-wrap the input text
-        input_text_wrapped=$(echo -e "$input_text" | fold -w $max_line_length -s)
+        input_text_wrapped=$(echo -e "$input_text" | fold -w "$max_line_length" -s)
 
         # Calculate height based on the number of lines in the input text
         height=$(echo -e "$input_text_wrapped" | wc -l)
@@ -88,26 +88,26 @@
         # Print the top border with title
         title_with_padding=" $title "
         title_padding_left=$(((width - 2 - ${#title_with_padding}) / 2))
-        [ $title_padding_left -lt 0 ] && title_padding_left=0
+        [ "$title_padding_left" -lt 0 ] && title_padding_left=0
         title_padding_right=$((width - 2 - ${#title_with_padding} - title_padding_left))
-        [ $title_padding_right -lt 0 ] && title_padding_right=0
-        echo '+'$(printf "%0.s-" $(seq 1 $title_padding_left))"$title_with_padding"$(printf "%0.s-" $(seq 1 $title_padding_right))'+'
+        [ "$title_padding_right" -lt 0 ] && title_padding_right=0
+        echo '+'"$(printf "%0.s-" "$(seq 1 "$title_padding_left")")$title_with_padding""$(printf "%0.s-" "$(seq 1 "$title_padding_right")")"'+'
 
         # Inner top padding
-        echo "|$(printf ' %.0s' $(seq 1 $((width - 2))))|"
+        echo "|$(printf ' %.0s' "$(seq 1 $((width - 2)))")|"
 
         # Print each line of wrapped input text with frame borders and padding
         echo -e "$input_text_wrapped" | while IFS= read -r line; do
             padding_right=$((width - 4 - ${#line} - 2)) # Subtract 4 for the borders and 2 for the left padding
-            [ $padding_right -lt 0 ] && padding_right=0
-            echo "|  $line$(printf ' %.0s' $(seq 1 $padding_right))  |"
+            [ "$padding_right" -lt 0 ] && padding_right=0
+            echo "|  $line$(printf ' %.0s' "$(seq 1 "$padding_right")")  |"
         done
 
         # Inner bottom padding
-        echo "|$(printf ' %.0s' $(seq 1 $((width - 2))))|"
+        echo "|$(printf ' %.0s' "$(seq 1 $((width - 2)))")|"
 
         # Print the bottom border
-        echo '+'$(printf "%0.s-" $(seq 1 $((width - 2))))'+'
+        echo '+'"$(printf "%0.s-" "$(seq 1 $((width - 2)))")"'+'
         echo
     }
 
@@ -136,18 +136,18 @@
 
     # Handle arguments
     case "$1" in
-    --system)
-        show_system
-        usage
-        ;;
-    --complete)
-        show_system
-        usage
-        ;;
-    *)
-        usage
-        exit 1
-        ;;
+		--system)
+			show_system
+			usage
+			;;
+		--complete)
+			show_system
+			usage
+			;;
+		*)
+			usage
+			exit 1
+			;;
     esac
 
 } 2>&1 | tee sdk-doctor.txt

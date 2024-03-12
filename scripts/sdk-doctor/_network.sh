@@ -52,7 +52,7 @@ display_interface_info() {
 interfaces=$(ip link show | grep -oP '(?<=^\d: )[e-w]+[0-9a-zA-Z-]+')
 
 # Iterate over each interface and display relevant information
-for intf in $interfaces; do
+for intf in "$interfaces"; do
     display_interface_info "$intf"
     echo ""
 done

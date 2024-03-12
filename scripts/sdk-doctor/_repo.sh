@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ROOT_DIR=$(realpath $(dirname "$0")/../..)
-cd $ROOT_DIR
+ROOT_DIR=$(realpath "$(dirname "$0")"/../..)
+cd "$ROOT_DIR"
 
 get_repo_and_branch_info() {
     # Input validation
@@ -39,7 +39,7 @@ get_repo_and_branch_info() {
         return 1
     fi
 
-    cd $path
+    cd "$path"
 
     # Get the URL of the remote origin
     remote_url=$(git config --get remote.origin.url)
@@ -54,7 +54,7 @@ get_repo_and_branch_info() {
         padding_length=$((total_length - text_length))
 
         echo '+-----------------------------------------------------------------------------------------------+'
-        printf "|  %s: %s%*s|\n" "$repo_friendly_name" "$repo_name" $padding_length ""
+        printf "|  %s: %s%*s|\n" "$repo_friendly_name" "$repo_name" "$padding_length" ""
         echo '+-----------------------------------------------------------------------------------------------+'
     else
         # Print error message if there is no remote URL
@@ -91,7 +91,7 @@ get_repo_and_branch_info() {
     echo "Commit Date: $commit_datetime"
 
     # Attempt to find branches that contain this commit
-    branches=$(git branch --contains $commit_sha | sed 's/^/    /')
+    branches=$(git branch --contains "$commit_sha" | sed 's/^/    /')
 
     if [ -n "$branches" ]; then
         echo "Contained in branches:"
@@ -105,7 +105,7 @@ get_repo_and_branch_info() {
     echo
 
     # Navigate back to the original directory
-    cd $ROOT_DIR
+    cd "$ROOT_DIR"
 }
 
 trim_commit_message() {
@@ -114,7 +114,7 @@ trim_commit_message() {
     # Check if the commit message contains a newline character
     if [[ "$commit_message" == *$'\n'* ]]; then
         # Extract the first line of the commit message
-        local first_line=${commit_message%%$'\n'*}
+        local first_line="${commit_message%%$'\n'*}"
     else
         # If there's no newline, use the entire commit message
         local first_line="$commit_message"
@@ -129,24 +129,24 @@ get_repo_and_branch_info "."
 
 # Handle arguments
 case "$1" in
---git-sub)
-    # Initialize an array to hold the directories
-    declare -a repo_dirs
+	--git-sub)
+		# Initialize an array to hold the directories
+		declare -a repo_dirs
 
-    cd $ROOT_DIR
+		cd "$ROOT_DIR"
 
-    # Find directories containing a .github folder and store them in the array, excluding the current directory
-    while IFS= read -r dir; do
-        # Check if the directory is not the current directory
-        if [[ "$dir" != "." ]]; then
-            repo_dirs+=("$dir")
-        fi
-    done < <(find . -type d -name .github | awk -F'/[^/]*$' '{print $1}')
+		# Find directories containing a .github folder and store them in the array, excluding the current directory
+		while IFS= read -r dir; do
+			# Check if the directory is not the current directory
+			if [[ "$dir" != "." ]]; then
+				repo_dirs+=("$dir")
+			fi
+		done < <(find . -type d -name .github | awk -F'/[^/]*$' '{print $1}')
 
-    # Iterate through the directories and call the function for each
-    for dir in "${repo_dirs[@]}"; do
-        get_repo_and_branch_info "$dir"
-    done
-    ;;
-*) ;;
+		# Iterate through the directories and call the function for each
+		for dir in "${repo_dirs[@]}"; do
+			get_repo_and_branch_info "$dir"
+		done
+		;;
+	*) ;;
 esac

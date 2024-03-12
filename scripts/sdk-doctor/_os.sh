@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ROOT_DIR=$(realpath $(dirname "$0")/../..)
-cd $ROOT_DIR
+ROOT_DIR=$(realpath "$(dirname "$0")"/../..)
+cd "$ROOT_DIR"
 
 # Function to display OS information
 get_os_info() {
