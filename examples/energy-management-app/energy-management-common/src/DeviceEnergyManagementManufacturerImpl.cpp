@@ -24,6 +24,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include "utils.h"
 
 
 using chip::Protocols::InteractionModel::Status;
@@ -115,9 +116,14 @@ void SetTestEventTrigger_StartTimeAdjustment()
 #endif
     }
 #endif
-    // ForecastTestSetup_TP3b(sForecast);
+    ForecastTestSetup_TP3b(sForecast);
 
-    Status s = dg->StartTimeAdjustRequest(1, AdjustmentCauseEnum::kLocalOptimization);
+    uint32_t chipEpoch = 0;
+    CHIP_ERROR ce = UtilsGetEpochTS(chipEpoch);
+    ChipLogProgress(Support, "ce=%s  epoch = %d", (ce != CHIP_NO_ERROR)? "Err":"Good", chipEpoch);
+
+
+    Status s = dg->StartTimeAdjustRequest(chipEpoch + 100000, AdjustmentCauseEnum::kLocalOptimization);
     if (s != Status::Success)
     {
         ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d StartTimeAdjustRequest() Failed", __LINE__ );
@@ -125,8 +131,6 @@ void SetTestEventTrigger_StartTimeAdjustment()
 
     // DataModel::Nullable<Structs::ForecastStruct::Type>  newForecast = dg->GetForecast();
     // TODO: compare new/old forcasts? No that's done at the python level.
-
-
 
 }
 
