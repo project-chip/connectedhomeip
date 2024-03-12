@@ -866,4 +866,4 @@ int32_t wfx_rsi_send_data(void * p, uint16_t len)
     return status;
 }
 
-wfx_rsi_t wfx_rsi;
+WfxRsi_t wfx_rsi;

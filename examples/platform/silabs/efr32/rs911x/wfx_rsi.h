@@ -76,9 +76,9 @@ typedef struct wfx_rsi_s
     sl_wfx_mac_address_t ap_bssid; /* To which our STA is connected */
     uint16_t join_retries;
     uint8_t ip4_addr[4]; /* Not sure if this is enough */
-} wfx_rsi_t;
+} WfxRsi_t;
 
-extern wfx_rsi_t wfx_rsi;
+extern WfxRsi_t wfx_rsi;
 #ifdef __cplusplus
 extern "C" {
 #endif
