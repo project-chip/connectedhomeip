@@ -474,7 +474,7 @@ config UPDATEABLE_IMAGE_NUMBER
 # Generate random numbers using Xoroshiro algorithm instead of direct calls
 # to the cryptocell library to workaround firmware hangs.
 choice RNG_GENERATOR_CHOICE
-    default XOROSHIRO_RANDOM_GENERATOR
+    default XOSHIRO_RANDOM_GENERATOR if SOC_SERIES_NRF53X
 endchoice
 
 endif # SOC_SERIES_NRF53X
