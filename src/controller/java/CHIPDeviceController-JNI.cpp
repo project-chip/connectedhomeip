@@ -350,6 +350,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
     SuccessOrExit(err);
 
+    jmethodID getEnableServerInteractions;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getEnableServerInteractions", "()Z",
+                                                        &getEnableServerInteractions);
+    SuccessOrExit(err);
+
     {
         uint64_t fabricId                  = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getFabricId));
         uint16_t listenPort                = static_cast<uint16_t>(env->CallIntMethod(controllerParams, getUdpListenPort));
@@ -370,6 +375,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         uint64_t adminSubject              = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getAdminSubject));
         jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
         jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
+        bool enableServerInteractions      = env->CallBooleanMethod(controllerParams, getEnableServerInteractions) == JNI_TRUE;
 
         jobject countryCode;
         err = chip::JniReferences::GetInstance().GetOptionalValue(countryCodeOptional, countryCode);
@@ -387,7 +393,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
             rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
             failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete,
-            skipAttestationCertificateValidation, static_cast<jstring>(countryCode), &err);
+            skipAttestationCertificateValidation, static_cast<jstring>(countryCode), enableServerInteractions, &err);
         SuccessOrExit(err);
 
         if (caseFailsafeTimerSeconds > 0)
