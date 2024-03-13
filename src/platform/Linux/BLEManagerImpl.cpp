@@ -746,55 +746,40 @@ void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appSta
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
 {
+    CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
+
     DriveBLEState();
 
-    if (scanType == BleScanState::kNotScanning)
-    {
-        ChipLogError(Ble, "Invalid scan type requested");
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
-
-    if (mDeviceScanner.IsScanning())
-    {
-        ChipLogError(Ble, "BLE scan already in progress");
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
-
-    if (!mFlags.Has(Flags::kBluezAdapterAvailable))
-    {
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, BLE_ERROR_ADAPTER_UNAVAILABLE);
-        return;
-    }
+    VerifyOrExit(scanType != BleScanState::kNotScanning,
+                 ChipLogError(Ble, "Invalid scan type requested: %d", to_underlying(scanType)));
+    VerifyOrExit(!mDeviceScanner.IsScanning(), ChipLogError(Ble, "BLE scan already in progress"));
+    VerifyOrExit(mFlags.Has(Flags::kBluezAdapterAvailable), err = BLE_ERROR_ADAPTER_UNAVAILABLE);
 
     mBLEScanConfig.mBleScanState = scanType;
 
-    CHIP_ERROR err = mDeviceScanner.Init(mAdapter.get(), this);
-    if (err != CHIP_NO_ERROR)
-    {
+    err = mDeviceScanner.Init(mAdapter.get(), this);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        ChipLogError(Ble, "Failed to create a BLE device scanner: %" CHIP_ERROR_FORMAT, err.Format());
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
-        return;
-    }
+        ChipLogError(Ble, "Failed to create BLE device scanner: %" CHIP_ERROR_FORMAT, err.Format())
+    });
 
     err = mDeviceScanner.StartScan();
-    if (err != CHIP_NO_ERROR)
-    {
+    VerifyOrExit(err == CHIP_NO_ERROR, {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format());
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
-        return;
-    }
+        ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format())
+    });
 
     err = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleScannerTimer, this);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        mDeviceScanner.StopScan();
+        ChipLogError(Ble, "Failed to start BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format())
+    });
+
+exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed to start BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
-        mDeviceScanner.StopScan();
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
-        return;
     }
 }
 
