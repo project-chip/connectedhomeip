@@ -2019,7 +2019,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (BOOL)deviceCachePrimed {
     BOOL isPrimed = NO;
-    
+
     os_unfair_lock_lock(&self->_lock);
 
     isPrimed = [self _isCachePrimedWithInitialConfigurationData];
