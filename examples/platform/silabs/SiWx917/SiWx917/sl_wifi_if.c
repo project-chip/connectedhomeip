@@ -98,6 +98,9 @@ static wfx_wifi_scan_ext_t temp_reset;
 
 volatile sl_status_t callback_status = SL_STATUS_OK;
 
+// Scan semaphore
+static osSemaphoreId_t sScanSemaphore;
+
 /******************************************************************
  * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
  * @brief
@@ -305,8 +308,16 @@ int32_t wfx_wifi_rsi_init(void)
     status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
     if (status != SL_STATUS_OK)
     {
-        SILABS_LOG("wfx_wifi_rsi_init failed %x", status);
+        return status;
     }
+
+    // Create Sempaphore for scan
+    sScanSemaphore = osSemaphoreNew(1, 0, NULL);
+    if (sScanSemaphore == NULL)
+    {
+        return SL_STATUS_ALLOCATION_FAILED;
+    }
+
     return status;
 }
 
@@ -421,6 +432,8 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
 #else
         wfx_rsi.sec.security = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
+
+        osSemaphoreRelease(sScanSemaphore);
         return SL_STATUS_FAIL;
     }
     wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
@@ -457,6 +470,8 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
     }
     wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
     scan_results_complete = true;
+
+    osSemaphoreRelease(sScanSemaphore);
     return SL_STATUS_OK;
 }
 sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
@@ -501,6 +516,7 @@ sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_
 {
     callback_status          = show_scan_results(result);
     bg_scan_results_complete = true;
+    osSemaphoreRelease(sScanSemaphore);
     return SL_STATUS_OK;
 }
 /***************************************************************************************
@@ -529,12 +545,7 @@ static void wfx_rsi_save_ap_info() // translation
 #endif
     if (SL_STATUS_IN_PROGRESS == status)
     {
-        const uint32_t start = osKernelGetTickCount();
-        while (!scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT_TICK)
-        {
-            osThreadYield();
-        }
-        status = scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
+        osSemaphoreAcquire(sScanSemaphore, WIFI_SCAN_TIMEOUT_TICK);
     }
 }
 
@@ -817,12 +828,7 @@ void wfx_rsi_task(void * arg)
                 status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
                 if (SL_STATUS_IN_PROGRESS == status)
                 {
-                    const uint32_t start = osKernelGetTickCount();
-                    while (!bg_scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT_TICK)
-                    {
-                        osThreadYield();
-                    }
-                    status = bg_scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
+                    osSemaphoreAcquire(sScanSemaphore, WIFI_SCAN_TIMEOUT_TICK);
                 }
             }
         }
