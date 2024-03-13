@@ -151,6 +151,7 @@ public class ChipDeviceController {
     finishOTAProvider(deviceControllerPtr);
   }
 
+  /** Set the delegate of ICD check in */
   public void setICDCheckInDelegate(ICDCheckInDelegate delegate) {
     setICDCheckInDelegate(deviceControllerPtr, new ICDCheckInDelegateWrapper(delegate));
   }
