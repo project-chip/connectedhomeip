@@ -30,7 +30,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
     def desc_TC_EEVSE_2_4(self) -> str:
         """Returns a description of this test"""
-        return "5.1.XXX. [TC-EEVSE-2.4] Fault test functionality with DUT as Server"
+        return "5.1.5. [TC-EEVSE-2.4] Fault test functionality with DUT as Server"
 
     def pics_TC_EEVSE_2_4(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
