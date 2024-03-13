@@ -28,12 +28,12 @@
 #import "MTRCommandTimedCheck.h"
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
-#import "MTRUnfairLock.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #include "lib/core/CHIPError.h"
