@@ -33,6 +33,7 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #include "lib/core/CHIPError.h"
@@ -2015,6 +2016,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     os_unfair_lock_unlock(&self->_lock);
+}
+
+- (BOOL)deviceCachePrimed
+{
+    std::lock_guard lock(_lock);
+    return [self _isCachePrimedWithInitialConfigurationData];
 }
 
 // If value is non-nil, associate with expectedValueID

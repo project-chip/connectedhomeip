@@ -293,6 +293,7 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
     sl_status_t status;
     if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
     {
+        SILABS_LOG("wfx_wifi_rsi_init failed with status: %x", status);
         ReturnErrorOnFailure((CHIP_ERROR) status);
     }
 #endif // SLI_SI91X_MCU_INTERFACE
