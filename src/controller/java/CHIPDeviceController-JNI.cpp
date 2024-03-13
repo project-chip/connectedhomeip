@@ -171,44 +171,54 @@ JNI_METHOD(jint, onNOCChainGeneration)
     ChipLogProgress(Controller, "setNOCChain() called");
 
     jmethodID getRootCertificate;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRootCertificate", "()[B", &getRootCertificate);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
-
     jmethodID getIntermediateCertificate;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIntermediateCertificate", "()[B",
-                                                        &getIntermediateCertificate);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
-
     jmethodID getOperationalCertificate;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getOperationalCertificate", "()[B",
-                                                        &getOperationalCertificate);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
-
     jmethodID getIpk;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
-
     jmethodID getAdminSubject;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
 
-    jbyteArray rootCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
-    VerifyOrReturnValue(rootCertificate != nullptr, static_cast<jint>(CHIP_ERROR_BAD_REQUEST.AsInteger()));
+    jbyteArray rootCertificate         = nullptr;
+    jbyteArray intermediateCertificate = nullptr;
+    jbyteArray operationalCertificate  = nullptr;
+    jbyteArray ipk                     = nullptr;
 
-    jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
-    VerifyOrReturnValue(intermediateCertificate != nullptr, static_cast<jint>(CHIP_ERROR_BAD_REQUEST.AsInteger()));
+    Optional<NodeId> adminSubjectOptional;
+    uint64_t adminSubject = chip::kUndefinedNodeId;
 
-    jbyteArray operationalCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
-    VerifyOrReturnValue(operationalCertificate != nullptr, static_cast<jint>(CHIP_ERROR_BAD_REQUEST.AsInteger()));
-
-    // use ipk and adminSubject from CommissioningParameters if not set in ControllerParams
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
 
     Optional<Crypto::IdentityProtectionKeySpan> ipkOptional;
     uint8_t ipkValue[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
     Crypto::IdentityProtectionKeySpan ipkTempSpan(ipkValue);
 
-    jbyteArray ipk = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
+    VerifyOrExit(controllerParams != nullptr, ChipLogError(Controller, "controllerParams is null!"));
+
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRootCertificate", "()[B", &getRootCertificate);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Find getRootCertificate method fail!"));
+
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIntermediateCertificate", "()[B",
+                                                        &getIntermediateCertificate);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Find getIntermediateCertificate method fail!"));
+
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getOperationalCertificate", "()[B",
+                                                        &getOperationalCertificate);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Find getOperationalCertificate method fail!"));
+
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Find getIpk method fail!"));
+
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Find getAdminSubject method fail!"));
+
+    rootCertificate = static_cast<jbyteArray>(env->CallObjectMethod(controllerParams, getRootCertificate));
+    VerifyOrExit(rootCertificate != nullptr, err = CHIP_ERROR_BAD_REQUEST);
+
+    intermediateCertificate = static_cast<jbyteArray>(env->CallObjectMethod(controllerParams, getIntermediateCertificate));
+    VerifyOrExit(intermediateCertificate != nullptr, err = CHIP_ERROR_BAD_REQUEST);
+
+    operationalCertificate = static_cast<jbyteArray>(env->CallObjectMethod(controllerParams, getOperationalCertificate));
+    VerifyOrExit(operationalCertificate != nullptr, err = CHIP_ERROR_BAD_REQUEST);
+
+    ipk = static_cast<jbyteArray>(env->CallObjectMethod(controllerParams, getIpk));
     if (ipk != nullptr)
     {
         JniByteArray jByteArrayIpk(env, ipk);
@@ -217,7 +227,7 @@ JNI_METHOD(jint, onNOCChainGeneration)
         {
             ChipLogError(Controller, "Invalid IPK size %u and expect %u", static_cast<unsigned>(jByteArrayIpk.byteSpan().size()),
                          static_cast<unsigned>(sizeof(ipkValue)));
-            return CHIP_ERROR_INVALID_IPK.AsInteger();
+            ExitNow(err = CHIP_ERROR_INVALID_IPK);
         }
         memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
 
@@ -229,8 +239,7 @@ JNI_METHOD(jint, onNOCChainGeneration)
         ipkOptional.SetValue(commissioningParams.GetIpk().Value());
     }
 
-    Optional<NodeId> adminSubjectOptional;
-    uint64_t adminSubject = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getAdminSubject));
+    adminSubject = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getAdminSubject));
     if (adminSubject == kUndefinedNodeId)
     {
         // if no value pass in ControllerParams, use value from CommissioningParameters
@@ -243,20 +252,27 @@ JNI_METHOD(jint, onNOCChainGeneration)
     // NOTE: we are allowing adminSubject to not be set since the OnNOCChainGeneration callback makes this field
     // optional and includes logic to handle the case where it is not set. It would also make sense to return
     // an error here since that use case may not be realistic.
-
-    JniByteArray jByteArrayRcac(env, rootCertificate);
-    JniByteArray jByteArrayIcac(env, intermediateCertificate);
-    JniByteArray jByteArrayNoc(env, operationalCertificate);
+    {
+        JniByteArray jByteArrayRcac(env, rootCertificate);
+        JniByteArray jByteArrayIcac(env, intermediateCertificate);
+        JniByteArray jByteArrayNoc(env, operationalCertificate);
 
 #ifndef JAVA_MATTER_CONTROLLER_TEST
-    err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(CHIP_NO_ERROR, jByteArrayNoc.byteSpan(),
-                                                                               jByteArrayIcac.byteSpan(), jByteArrayRcac.byteSpan(),
-                                                                               ipkOptional, adminSubjectOptional);
+        err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(
+            CHIP_NO_ERROR, jByteArrayNoc.byteSpan(), jByteArrayIcac.byteSpan(), jByteArrayRcac.byteSpan(), ipkOptional,
+            adminSubjectOptional);
 
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        return static_cast<jint>(err.AsInteger());
+#endif // JAVA_MATTER_CONTROLLER_TEST
     }
+exit:
+#ifndef JAVA_MATTER_CONTROLLER_TEST
+    err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(err, ByteSpan(), ByteSpan(), ByteSpan(), ipkOptional,
+                                                                               adminSubjectOptional);
 #endif // JAVA_MATTER_CONTROLLER_TEST
     return static_cast<jint>(err.AsInteger());
 }
