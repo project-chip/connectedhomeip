@@ -75,15 +75,21 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
 #ifndef STUBBED_KVS
-    /// In case the key is already there, delete it first (optimizations are possible here)
-    _Delete(key);
     value_entry valueentry;
     valueentry.data = new uint8_t[value_size];
-    valueentry.length = value_size;
-    memcpy(valueentry.data, value, value_size);
-    keyvaluestore[key] = valueentry;
-#endif
+    if (valueentry.data != nullptr)
+    {
+        /// In case the key is already there, delete it first (optimizations are possible here)
+        _Delete(key);
+        valueentry.length = value_size;
+        memcpy(valueentry.data, value, value_size);
+        keyvaluestore[key] = valueentry;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
+#else
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::Init()
