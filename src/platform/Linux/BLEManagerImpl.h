@@ -183,13 +183,6 @@ private:
         kMaxAdvertisementDataSetSize = 31  // TODO: verify this
     };
 
-    enum class ScannerTimerState
-    {
-        kCanceled,
-        kStarted,
-        kExpired,
-    };
-
     void DriveBLEState();
     BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
@@ -213,8 +206,6 @@ private:
 
     ChipDeviceScanner mDeviceScanner{ mBluezObjectManager };
     BLEScanConfig mBLEScanConfig;
-    // Used to track if timer has already expired and doesn't need to be canceled.
-    ScannerTimerState mBLEScanTimerState = ScannerTimerState::kCanceled;
 };
 
 /**

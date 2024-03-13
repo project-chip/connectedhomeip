@@ -78,6 +78,9 @@ public:
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
 
+    /// Check if the scanner is active
+    bool IsScanning() const { return mScannerState == ChipDeviceScannerState::SCANNER_SCANNING; }
+
     /// Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
     void OnDeviceAdded(BluezDevice1 & device) override;
     void OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps, const char * const * invalidatedProps) override;

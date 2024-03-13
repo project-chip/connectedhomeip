@@ -755,7 +755,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    if (mBLEScanTimerState != ScannerTimerState::kCanceled)
+    if (mDeviceScanner.IsScanning())
     {
         ChipLogError(Ble, "BLE scan already in progress");
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
@@ -796,14 +796,11 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
         return;
     }
-
-    mBLEScanTimerState = ScannerTimerState::kStarted;
 }
 
 void BLEManagerImpl::HandleScannerTimer(chip::System::Layer *, void * appState)
 {
-    auto * manager              = static_cast<BLEManagerImpl *>(appState);
-    manager->mBLEScanTimerState = ScannerTimerState::kExpired;
+    auto * manager = static_cast<BLEManagerImpl *>(appState);
     manager->mDeviceScanner.StopScan();
     manager->OnScanError(CHIP_ERROR_TIMEOUT);
 }
@@ -833,7 +830,6 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
     else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScannerTimer, this);
-        mBLEScanTimerState = ScannerTimerState::kCanceled;
         mDeviceScanner.StopScan();
     }
     return CHIP_NO_ERROR;
@@ -925,7 +921,6 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     // StopScan should also be performed in the ChipStack thread.
     // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
     DeviceLayer::SystemLayer().CancelTimer(HandleScannerTimer, this);
-    mBLEScanTimerState = ScannerTimerState::kCanceled;
     mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, &mEndpoint);
