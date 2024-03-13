@@ -45,7 +45,7 @@ private:
     ICDClientStorage * mpStorage        = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
 
-    chip::JniGlobalReference mCheckInDelegate;
+    JniGlobalReference mCheckInDelegate;
 };
 
 } // namespace app
