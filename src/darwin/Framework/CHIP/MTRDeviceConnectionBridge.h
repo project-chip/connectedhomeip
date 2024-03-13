@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceController.h"
+#import <Matter/MTRDeviceController.h>
 
 #import <Foundation/Foundation.h>
 

@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRDefines.h>
 

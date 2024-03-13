@@ -18,10 +18,6 @@
  *    limitations under the License.
  */
 
-// module headers
-#import <Matter/MTRBaseClusters.h>
-#import <Matter/MTRBaseDevice.h>
-#import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/Matter.h>
 
 #import "MTRCommandPayloadExtensions_Internal.h"

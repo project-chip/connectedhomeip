@@ -15,10 +15,11 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceController+XPC.h"
+#import <Matter/MTRDeviceController+XPC.h>
 
-#import "MTRBaseDevice.h"
-#import "MTRCluster.h"
+#import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRCluster.h>
+
 #import "MTRDeviceControllerOverXPC.h"
 
 NS_ASSUME_NONNULL_BEGIN

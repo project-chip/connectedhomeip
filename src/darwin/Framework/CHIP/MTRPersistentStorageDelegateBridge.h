@@ -15,9 +15,10 @@
  *    limitations under the License.
  */
 
-#import "MTRStorage.h"
+#import <Matter/MTRStorage.h>
 
 #import "MTRError_Internal.h"
+
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 NS_ASSUME_NONNULL_BEGIN

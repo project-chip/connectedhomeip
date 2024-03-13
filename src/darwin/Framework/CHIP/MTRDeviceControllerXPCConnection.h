@@ -16,8 +16,7 @@
  */
 
 #import <Matter/MTRDefines.h>
-
-#import "MTRDeviceController+XPC.h"
+#import <Matter/MTRDeviceController+XPC.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -19,6 +19,8 @@
  * Mostly for use from MTRDeviceController.
  */
 
+#import <Matter/MTRDeviceControllerFactory.h>
+
 #import <Foundation/Foundation.h>
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRBaseDevice.h> // for MTRClusterPath
@@ -32,8 +34,6 @@
 #else
 #import "MTRDeviceControllerParameters_Wrapper.h"
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
-
-#import "MTRDeviceControllerFactory.h"
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>

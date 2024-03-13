@@ -14,16 +14,14 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
-#import <Matter/MTRDeviceController.h>
 #import <Matter/MTRServerCluster.h>
 
 #include <lib/core/DataModelTypes.h>
-
 // TODO: These attribute-*.h and Span bits are a hack that should eventually go away.
 #include <app/util/attribute-metadata.h>
 #include <lib/support/Span.h>
+
+@class MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -1,13 +1,13 @@
 {{> header excludeZapComment=true}}
 
-#import <Foundation/Foundation.h>
+#import "MTRClusters_Internal.h"
 
-#import "MTRClusterConstants.h"
+#import <Matter/MTRClusterConstants.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRStructsObjc.h>
+
 #import "MTRDevice_Internal.h"
 #import "MTRCluster_Internal.h"
-#import "MTRClusters_Internal.h"
-#import "MTRStructsObjc.h"
-#import "MTRCommandPayloadsObjc.h"
 #import "MTRLogging_Internal.h"
 #import "MTRDefines_Internal.h"
 

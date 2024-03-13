@@ -14,26 +14,10 @@
  *    limitations under the License.
  */
 
-/**
- * Parts of MTRDeviceController that are not part of the framework API.  Mostly
- * for use from MTRDeviceControllerFactory.
- */
+#import <Matter/MTRDeviceController.h>
 
-#import <Foundation/Foundation.h>
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRBaseDevice.h> // for MTRClusterPath
-
-#import "MTRDeviceConnectionBridge.h" // For MTRInternalDeviceConnectionCallback
-#import "MTRDeviceController.h"
-
-#include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
-
-#import "MTRBaseDevice.h"
-#import "MTRDeviceController.h"
-#import "MTRDeviceControllerDataStore.h"
-
-#import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDiagnosticLogsType.h>
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
@@ -42,6 +26,12 @@
 #import "MTRDeviceControllerStorageDelegate_Wrapper.h"
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTROTAProviderDelegate.h>
+
+#import "MTRDeviceConnectionBridge.h" // For MTRInternalDeviceConnectionCallback
+#import "MTRDeviceControllerDataStore.h"
+
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;

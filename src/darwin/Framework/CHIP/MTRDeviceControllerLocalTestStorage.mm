@@ -1,4 +1,3 @@
-//
 /**
  *    Copyright (c) 2023 Project CHIP Authors
  *
@@ -16,6 +15,7 @@
  */
 
 #import "MTRDeviceControllerLocalTestStorage.h"
+
 #import "MTRLogging_Internal.h"
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED

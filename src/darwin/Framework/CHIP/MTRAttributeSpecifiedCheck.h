@@ -16,10 +16,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#import <Foundation/Foundation.h>
-
 #include <lib/core/DataModelTypes.h>
 
 BOOL MTRAttributeIsSpecified(chip::ClusterId aClusterId, chip::AttributeId aAttributeId);

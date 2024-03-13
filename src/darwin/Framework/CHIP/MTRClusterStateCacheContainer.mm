@@ -15,14 +15,13 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import "MTRClusterStateCacheContainer_Internal.h"
+
+#import <Matter/MTRCluster.h>
 
 #import "MTRBaseDevice_Internal.h"
-#import "MTRCluster.h"
-#import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRDeviceControllerXPCConnection.h"
 #import "MTRDeviceController_Internal.h"
-#import "MTRError.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 

@@ -2,7 +2,8 @@
 
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 
-#import "MTRStructsObjc.h"
+#import <Matter/MTRStructsObjc.h>
+
 #import "NSStringSpanConversion.h"
 #import "NSDataSpanConversion.h"
 

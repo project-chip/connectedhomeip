@@ -17,7 +17,7 @@
 
 #import "MTRDiagnosticLogsDownloader.h"
 
-#include <protocols/bdx/BdxTransferServerDelegate.h>
+#import <Matter/MTRClusters.h>
 
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
@@ -26,7 +26,7 @@
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
-#import "zap-generated/MTRClusters.h"
+#include <protocols/bdx/BdxTransferServerDelegate.h>
 
 typedef void (^AbortHandler)(NSError * error);
 

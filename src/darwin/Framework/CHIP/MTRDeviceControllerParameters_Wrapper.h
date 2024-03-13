@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <Matter/MTRDefines.h>
+#import <Matter/MTRDefines.h>
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #error Should be including Matter/MTRDeviceControllerParameters.h

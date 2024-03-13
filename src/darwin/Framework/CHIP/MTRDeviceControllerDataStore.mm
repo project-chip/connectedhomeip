@@ -14,10 +14,11 @@
  *    limitations under the License.
  */
 
-#include "MTRDeviceControllerDataStore.h"
+#import "MTRDeviceControllerDataStore.h"
 
 // Importing MTRBaseDevice.h for the MTRAttributePath class. Needs to change when https://github.com/project-chip/connectedhomeip/issues/31247 is fixed.
-#import "MTRBaseDevice.h"
+#import <Matter/MTRBaseDevice.h>
+
 #import "MTRLogging_Internal.h"
 
 #include <lib/core/CASEAuthTag.h>

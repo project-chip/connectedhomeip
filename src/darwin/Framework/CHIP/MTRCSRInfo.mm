@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 
-#import "MTRCSRInfo.h"
+#import <Matter/MTRCSRInfo.h>
+
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"

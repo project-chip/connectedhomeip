@@ -1,6 +1,3 @@
-//
-//  MTRControllerTests.m
-//  MTRControllerTests
 /**
  *
  *    Copyright (c) 2021 Project CHIP Authors
@@ -19,8 +16,6 @@
  */
 
 #import <Matter/Matter.h>
-
-// system dependencies
 #import <XCTest/XCTest.h>
 
 @interface MTRThreadOperationalDatasetTests : XCTestCase

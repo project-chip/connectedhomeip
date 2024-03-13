@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
 #import <Matter/MTRCommissionableBrowserDelegate.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTROperationalCertificateIssuer.h>

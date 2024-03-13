@@ -16,8 +16,7 @@
  */
 
 #import <Foundation/Foundation.h>
-
-#import "MTRClusterStateCacheContainer.h"
+#import <Matter/MTRClusterStateCacheContainer.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -16,7 +16,7 @@
  */
 
 #import "MTRDeviceControllerDelegateBridge.h"
-#import "MTRDeviceController.h"
+
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"

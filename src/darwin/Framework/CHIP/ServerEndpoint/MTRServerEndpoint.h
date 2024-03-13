@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceTypeRevision.h>

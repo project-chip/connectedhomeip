@@ -15,10 +15,11 @@
  *    limitations under the License.
  */
 
-#import "MTROnboardingPayloadParser.h"
-#import "MTRManualSetupPayloadParser.h"
-#import "MTRQRCodeSetupPayloadParser.h"
-#import "MTRSetupPayload.h"
+#import <Matter/MTROnboardingPayloadParser.h>
+
+#import <Matter/MTRManualSetupPayloadParser.h>
+#import <Matter/MTRQRCodeSetupPayloadParser.h>
+#import <Matter/MTRSetupPayload.h>
 
 @implementation MTROnboardingPayloadParser
 

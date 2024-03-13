@@ -14,7 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#import "MTRDeviceController_Internal.h"
+
+#import <Matter/MTRBaseClusters.h>
+#import <Matter/MTRCommissioningParameters.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRKeypair.h>
+#import <Matter/MTRSetupPayload.h>
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerParameters.h>
@@ -22,38 +29,26 @@
 #import "MTRDeviceControllerParameters_Wrapper.h"
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
-#import "MTRDeviceController_Internal.h"
-
 #import "MTRAttestationTrustStoreBridge.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
-#import "MTRCommissioningParameters.h"
 #import "MTRConversion.h"
+#import "MTRDeviceAttestationDelegateBridge.h"
+#import "MTRDeviceConnectionBridge.h"
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
-#import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
-#import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
-#import "MTRSetupPayload.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
-#import <setup_payload/ManualSetupPayloadGenerator.h>
-#import <setup_payload/SetupPayload.h>
-#import <zap-generated/MTRBaseClusters.h>
-
-#import "MTRDeviceAttestationDelegateBridge.h"
-#import "MTRDeviceConnectionBridge.h"
-
-#include <platform/CHIPDeviceConfig.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
@@ -67,14 +62,15 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/LockTracker.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 #include <system/SystemClock.h>
 
-#include <atomic>
-#include <dns_sd.h>
-
+#import <atomic>
+#import <dns_sd.h>
 #import <os/lock.h>
 
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";

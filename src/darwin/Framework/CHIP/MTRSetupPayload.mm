@@ -15,14 +15,16 @@
  *    limitations under the License.
  */
 
-#import "MTRError.h"
+#import "MTRSetupPayload_Internal.h"
+
+#import <Matter/MTROnboardingPayloadParser.h>
+
 #import "MTRError_Internal.h"
 #import "MTRFramework.h"
-#import "MTROnboardingPayloadParser.h"
-#import "MTRSetupPayload_Internal.h"
-#import "setup_payload/ManualSetupPayloadGenerator.h"
-#import "setup_payload/QRCodeSetupPayloadGenerator.h"
-#import <setup_payload/SetupPayload.h>
+
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 
 @implementation MTROptionalQRCodeInfo
 @end

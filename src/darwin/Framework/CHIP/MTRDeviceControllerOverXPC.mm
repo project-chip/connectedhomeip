@@ -17,10 +17,11 @@
 
 #import "MTRDeviceControllerOverXPC_Internal.h"
 
-#import "MTRDeviceController+XPC.h"
+#import <Matter/MTRDeviceController+XPC.h>
+#import <Matter/MTRError.h>
+
 #import "MTRDeviceControllerXPCConnection.h"
 #import "MTRDeviceOverXPC.h"
-#import "MTRError.h"
 #import "MTRLogging_Internal.h"
 
 #import <Foundation/Foundation.h>

@@ -15,14 +15,15 @@
  *    limitations under the License.
  */
 
-#import "MTRQRCodeSetupPayloadParser.h"
+#import <Matter/MTRQRCodeSetupPayloadParser.h>
+
 #import "MTRError_Internal.h"
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
 #import "MTRSetupPayload_Internal.h"
 
-#import <setup_payload/QRCodeSetupPayloadParser.h>
-#import <setup_payload/SetupPayload.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
+#include <setup_payload/SetupPayload.h>
 
 @implementation MTRQRCodeSetupPayloadParser {
     NSString * _base38Representation;

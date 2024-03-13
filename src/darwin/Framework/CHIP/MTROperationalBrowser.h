@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDeviceControllerFactory.h>
+
 #import <dns_sd.h>
 
 class MTROperationalBrowser

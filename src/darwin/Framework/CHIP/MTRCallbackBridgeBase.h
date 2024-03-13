@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *
@@ -15,12 +15,11 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <Matter/MTRBaseClusters.h>
 
 #import "MTRBaseDevice_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
-#import "zap-generated/MTRBaseClusters.h"
 
 #include <app/data-model/NullObject.h>
 #include <messaging/ExchangeMgr.h>

@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 
-#import "MTRCertificates.h"
+#import <Matter/MTRCertificates.h>
+
 #import "MTRError_Internal.h"
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"

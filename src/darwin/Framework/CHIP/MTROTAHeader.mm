@@ -15,9 +15,8 @@
  *    limitations under the License.
  */
 
-#import "MTROTAHeader.h"
+#import <Matter/MTROTAHeader.h>
 
-#import "MTRError.h"
 #import "MTRError_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"

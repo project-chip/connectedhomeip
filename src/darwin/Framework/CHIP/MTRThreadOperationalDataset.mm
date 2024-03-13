@@ -15,10 +15,11 @@
  *    limitations under the License.
  */
 
-#import "MTRThreadOperationalDataset.h"
+#import <Matter/MTRThreadOperationalDataset.h>
+
+#import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
 
-#include "MTRLogging_Internal.h"
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 

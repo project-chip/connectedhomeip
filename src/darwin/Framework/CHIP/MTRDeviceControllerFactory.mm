@@ -14,10 +14,12 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceControllerFactory.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 
+#import <Matter/MTRCertificates.h>
+#import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRServerCluster.h>
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerParameters.h>
@@ -25,13 +27,7 @@
 #import "MTRDeviceControllerParameters_Wrapper.h"
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
-#import <Matter/MTRClusterConstants.h>
-#import <Matter/MTRServerCluster.h>
-
-#import "MTRCertificates.h"
 #import "MTRDemuxingStorage.h"
-#import "MTRDeviceController.h"
-#import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDiagnosticLogsDownloader.h"

@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <Matter/MTRServerAttribute.h>
 
 #import <Matter/MTRDeviceController.h>
-#import <Matter/MTRServerAttribute.h>
 
 #include <app/ConcreteClusterPath.h>
 

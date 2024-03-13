@@ -14,11 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#import "MTRLogging_Internal.h"
+
 #import "MTRMetrics_Internal.h"
-#include <Foundation/Foundation.h>
-#import <Matter/MTRDefines.h>
-#include <Matter/MTRMetrics.h>
+
+#import "MTRLogging_Internal.h"
 
 @implementation MTRMetrics {
     NSMutableDictionary<NSString *, MTRMetricData *> * _metricsData;

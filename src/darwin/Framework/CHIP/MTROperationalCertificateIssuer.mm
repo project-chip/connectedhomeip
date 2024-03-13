@@ -14,9 +14,7 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
-#import "MTROperationalCertificateIssuer.h"
+#import <Matter/MTROperationalCertificateIssuer.h>
 
 @implementation MTROperationalCertificateChain
 

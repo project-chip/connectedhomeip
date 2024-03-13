@@ -15,17 +15,16 @@
  *    limitations under the License.
  */
 
-#include <algorithm>
-
 #import "MTROperationalCredentialsDelegate.h"
 
-#import <Security/Security.h>
+#import <Matter/MTRCertificates.h>
 
-#import "MTRCertificates.h"
 #import "MTRConversion.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
+
+#import <Security/Security.h>
 
 #include <controller/CommissioningDelegate.h>
 #include <credentials/CHIPCert.h>
@@ -36,6 +35,8 @@
 #include <lib/core/TLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <platform/LockTracker.h>
+
+#include <algorithm>
 
 using namespace chip;
 using namespace TLV;

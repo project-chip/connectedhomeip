@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDevice.h>
+
+#import <Matter/MTRBaseDevice.h>
 
 #import "MTRAsyncWorkQueue.h"
 
