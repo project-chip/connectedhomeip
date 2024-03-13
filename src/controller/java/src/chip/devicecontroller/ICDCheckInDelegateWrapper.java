@@ -21,7 +21,7 @@ package chip.devicecontroller;
 class ICDCheckInDelegateWrapper {
   private ICDCheckInDelegate delegate;
 
-  public ICDCheckInDelegateWrapper(ICDCheckInDelegate delegate) {
+  ICDCheckInDelegateWrapper(ICDCheckInDelegate delegate) {
     this.delegate = delegate;
   }
 
