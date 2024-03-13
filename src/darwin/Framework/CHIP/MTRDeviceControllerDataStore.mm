@@ -556,22 +556,20 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 
                 if (attributeIndex.count != attributeIndexCopy.count) {
                     BOOL success;
-                    if (!success) {
-                        if (attributeIndexCopy.count) {
-                            success = [self _storeAttributeIndex:attributeIndexCopy forNodeID:nodeID endpointID:endpointID clusterID:clusterID];
-                        } else {
-                            [clusterIndexCopy removeObject:clusterID];
-                            success = [self _deleteAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
-                        }
-                        storeFailures++;
-                        MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for attributeIndex @ 0x%016llX:0x%04X:0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
+                    if (attributeIndexCopy.count) {
+                        success = [self _storeAttributeIndex:attributeIndexCopy forNodeID:nodeID endpointID:endpointID clusterID:clusterID];
+                    } else {
+                        [clusterIndexCopy removeObject:clusterID];
+                        success = [self _deleteAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
                     }
+                    storeFailures++;
+                    MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for attributeIndex (%lu) @ 0x%016llX:0x%04X:0x%08lX", static_cast<unsigned long>(attributeIndexCopy.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
                 }
             }
 
             if (clusterIndex.count != clusterIndexCopy.count) {
                 BOOL success;
-                if (clusterIndex.count) {
+                if (clusterIndexCopy.count) {
                     success = [self _storeClusterIndex:clusterIndexCopy forNodeID:nodeID endpointID:endpointID];
                 } else {
                     [endpointIndexCopy removeObject:endpointID];
@@ -579,7 +577,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
                 }
                 if (!success) {
                     storeFailures++;
-                    MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for clusterIndex @ 0x%016llX:0x%04X", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
+                    MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for clusterIndex (%lu) @ 0x%016llX:0x%04X", static_cast<unsigned long>(clusterIndexCopy.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
                 }
             }
         }
@@ -594,21 +592,21 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             }
             if (!success) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for endpointIndex @ 0x%016llX", nodeID.unsignedLongLongValue);
+                MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for endpointIndex (%lu) @ 0x%016llX", static_cast<unsigned long>(endpointIndexCopy.count), nodeID.unsignedLongLongValue);
             }
         }
     }
 
     if (nodeIndex.count != nodeIndexCopy.count) {
         BOOL success;
-        if (!nodeIndex.count) {
+        if (nodeIndexCopy.count) {
             success = [self _storeNodeIndex:nodeIndexCopy];
         } else {
             success = [self _deleteNodeIndex];
         }
         if (!success) {
             storeFailures++;
-            MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for nodeIndex");
+            MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for nodeIndex (%lu)", static_cast<unsigned long>(nodeIndexCopy.count));
         }
     }
 
@@ -766,6 +764,20 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 {
     dispatch_async(_storageDelegateQueue, ^{
         [self _clearStoredAttributesForNodeID:nodeID];
+        NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
+        NSMutableArray<NSNumber *> * nodeIndexCopy = nodeIndex.mutableCopy;
+        [nodeIndexCopy removeObject:nodeID];
+        if (nodeIndex.count != nodeIndexCopy.count) {
+            BOOL success;
+            if (nodeIndexCopy.count) {
+                success = [self _storeNodeIndex:nodeIndexCopy];
+            } else {
+                success = [self _deleteNodeIndex];
+            }
+            if (!success) {
+                MTR_LOG_INFO("Store failed in clearStoredAttributesForNodeID for nodeIndex (%lu)", static_cast<unsigned long>(nodeIndexCopy.count));
+            }
+        }
     });
 }
 
