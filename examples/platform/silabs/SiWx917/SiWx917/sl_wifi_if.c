@@ -68,7 +68,7 @@ bool btn0_pressed = false;
 #define TRNGKEY_SIZE 4
 #endif // SLI_SI91X_MCU_INTERFACE
 
-struct wfx_rsi wfx_rsi;
+WfxRsi_t wfx_rsi;
 
 /* Declare a variable to hold the data associated with the created event group. */
 StaticEventGroup_t rsiDriverEventGroup;
