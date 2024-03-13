@@ -33,6 +33,7 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #include "lib/core/CHIPError.h"
@@ -2017,6 +2018,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     os_unfair_lock_unlock(&self->_lock);
 }
 
+- (BOOL)deviceCachePrimed
+{
+    std::lock_guard lock(_lock);
+    return [self _isCachePrimedWithInitialConfigurationData];
+}
+
 // If value is non-nil, associate with expectedValueID
 // If value is nil, remove only if expectedValueID matches
 // previousValue is an out parameter
@@ -2208,14 +2215,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     // Check if we have cached descriptor clusters for each listed endpoint
-    for (NSDictionary * endpointDataValue in partsList) {
+    for (NSDictionary * endpointDictionary in partsList) {
+        NSDictionary * endpointDataValue = endpointDictionary[MTRDataKey];
+        if (![endpointDataValue isKindOfClass:[NSDictionary class]]) {
+            MTR_LOG_ERROR("%@ unexpected parts list dictionary %@ data value class %@", self, endpointDictionary, [endpointDataValue class]);
+            continue;
+        }
         if (![MTRUnsignedIntegerValueType isEqual:endpointDataValue[MTRTypeKey]]) {
-            MTR_LOG_ERROR("%@ unexpected type for parts list item %@", self, endpointDataValue);
+            MTR_LOG_ERROR("%@ unexpected parts list data value %@ item type %@", self, endpointDataValue, endpointDataValue[MTRTypeKey]);
             continue;
         }
         NSNumber * endpoint = endpointDataValue[MTRValueKey];
         if (![endpoint isKindOfClass:[NSNumber class]]) {
-            MTR_LOG_ERROR("%@ unexpected type for parts list item %@", self, endpointDataValue);
+            MTR_LOG_ERROR("%@ unexpected parts list item value class %@", self, [endpoint class]);
             continue;
         }
         NSDictionary * descriptorDeviceTypeListDataValue = _readCache[[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)]];

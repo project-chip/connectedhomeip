@@ -23,10 +23,6 @@
  *      structure for network packet buffer management.
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>

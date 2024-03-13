@@ -104,7 +104,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
     jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds,
     bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
-    bool skipAttestationCertificateValidation, jstring countryCode, CHIP_ERROR * errInfoOnFailure)
+    bool skipAttestationCertificateValidation, jstring countryCode, bool enableServerInteractions, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -351,6 +351,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.controllerNOC  = nocSpan;
     }
 
+    initParams.enableServerInteractions  = enableServerInteractions;
+    setupParams.enableServerInteractions = enableServerInteractions;
+
     *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
@@ -392,6 +395,11 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), ipkSpan, compressedFabricIdSpan);
 
     wrapper->getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
+
+    auto engine       = chip::app::InteractionModelEngine::GetInstance();
+    *errInfoOnFailure = wrapper->mCheckInDelegate.Init(&wrapper->mICDClientStorage, engine);
+    *errInfoOnFailure = wrapper->mCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
+                                                      &wrapper->mICDClientStorage, &wrapper->mCheckInDelegate, engine);
 
     memset(ipkBuffer.data(), 0, ipkBuffer.size());
 
@@ -769,6 +777,7 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
 
     // For ICD
     mUserActiveModeTriggerHint = info.icd.userActiveModeTriggerHint;
+    memset(mUserActiveModeTriggerInstructionBuffer, 0x00, kUserActiveModeTriggerInstructionBufferLen);
     CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction, mUserActiveModeTriggerInstruction);
 
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),

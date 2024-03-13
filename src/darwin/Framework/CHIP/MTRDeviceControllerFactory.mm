@@ -48,10 +48,12 @@
 #import "MTRServerCluster_Internal.h"
 #import "MTRServerEndpoint_Internal.h"
 #import "MTRSessionResumptionStorageBridge.h"
+#import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 
 #import <os/lock.h>
 
+#include <app/server/Dnssd.h>
 #include <app/util/af.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/CHIPCert.h>
@@ -62,6 +64,8 @@
 #include <crypto/RawKeySessionKeystore.h>
 #include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <messaging/ReliableMessageMgr.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/PlatformManager.h>
 
 #include <cstdlib>
@@ -968,6 +972,33 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     return controller;
 }
 
+- (void)resetOperationalAdvertising
+{
+    if (![self checkIsRunning:nil]) {
+        // No need to reset anything; we are not running, so not
+        // advertising.
+        return;
+    }
+
+    if (!self.advertiseOperational) {
+        // No need to reset anything; we are not advertising the things that
+        // would need to get reset.
+        return;
+    }
+
+    std::lock_guard lock(_controllersLock);
+    if (_controllers.count != 0) {
+        // We have a running controller.  That means we likely need to reset
+        // operational advertising for that controller.
+        dispatch_async(_chipWorkQueue, ^{
+            // StartServer() is the only API we have for resetting DNS-SD
+            // advertising.  It sure would be nice if there were a "restart"
+            // that was a no-op if the DNS-SD server was not already
+            // running.
+            app::DnssdServer::Instance().StartServer();
+        });
+    }
+}
 @end
 
 @implementation MTRDeviceControllerFactory (InternalMethods)
@@ -1449,3 +1480,39 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 }
 
 @end
+
+void MTRSetMessageReliabilityParameters(NSNumber * _Nullable idleRetransmitMs,
+    NSNumber * _Nullable activeRetransmitMs,
+    NSNumber * _Nullable activeThresholdMs,
+    NSNumber * _Nullable additionalRetransmitDelayMs)
+{
+    bool resetAdvertising = false;
+    if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {
+        Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(NullOptional);
+        resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(NullOptional);
+    } else {
+        if (additionalRetransmitDelayMs != nil) {
+            System::Clock::Milliseconds64 additionalBackoff(additionalRetransmitDelayMs.unsignedLongLongValue);
+            Messaging::ReliableMessageMgr::SetAdditionalMRPBackoffTime(MakeOptional(additionalBackoff));
+        }
+
+        // Get current MRP parameters, then override the things we were asked to
+        // override.
+        ReliableMessageProtocolConfig mrpConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        if (idleRetransmitMs != nil) {
+            mrpConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(idleRetransmitMs.unsignedLongValue);
+        }
+        if (activeRetransmitMs != nil) {
+            mrpConfig.mActiveRetransTimeout = System::Clock::Milliseconds32(activeRetransmitMs.unsignedLongValue);
+        }
+        if (activeThresholdMs != nil) {
+            mrpConfig.mActiveThresholdTime = System::Clock::Milliseconds32(activeThresholdMs.unsignedLongValue);
+        }
+
+        resetAdvertising = ReliableMessageProtocolConfig::SetLocalMRPConfig(MakeOptional(mrpConfig));
+    }
+
+    if (resetAdvertising) {
+        [[MTRDeviceControllerFactory sharedInstance] resetOperationalAdvertising];
+    }
+}
