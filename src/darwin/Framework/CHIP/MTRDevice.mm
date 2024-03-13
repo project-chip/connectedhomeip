@@ -744,7 +744,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_handleReportBegin
 {
     std::lock_guard lock(_lock);
-    
+
     _receivingReport = YES;
     if (_state != MTRDeviceStateReachable) {
         _receivingPrimingReport = YES;
