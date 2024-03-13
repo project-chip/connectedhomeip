@@ -275,9 +275,15 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
  */
 #define ChipLogFormatExchangeId "%u%c"
 #define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
-#define ChipLogFormatExchange ChipLogFormatExchangeId " " ChipLogFormatScopedNodeId
+
+#if CHIP_EXCHANGE_NODE_ID_LOGGING
+#define ChipLogFormatExchange ChipLogFormatExchangeId " with Node: " ChipLogFormatScopedNodeId
 #define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator()),                               \
     ChipLogValueScopedNodeId((ec)->HasSessionHandle() ? (ec)->GetSessionHandle()->GetPeer() : ScopedNodeId())
+#else // CHIP_EXCHANGE_NODE_ID_LOGGING
+#define ChipLogFormatExchange ChipLogFormatExchangeId
+#define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
+#endif // CHIP_EXCHANGE_NODE_ID_LOGGING
 
 #define ChipLogValueExchangeIdFromSentHeader(payloadHeader)                                                                        \
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), (payloadHeader).IsInitiator())
