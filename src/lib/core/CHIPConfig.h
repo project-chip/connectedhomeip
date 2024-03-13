@@ -463,7 +463,7 @@
 
 /**
  *  @def CHIP_EXCHANGE_NODE_ID_LOGGING
- * 
+ *
  *  @brief
  *    If asserted (1), enable logging of node IDs in exchange context.
  */
