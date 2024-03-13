@@ -269,19 +269,15 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 
 /**
  * Logging helpers for exchanges.  Log the exchange id, whether
- * it's an initiator or responder and the peer node id.  Some callsites only
+ * it's an initiator or responder and the scoped node.  Some callsites only
  * have the exchange id and initiator/responder boolean, not an actual exchange,
  * so we want to have a helper for that case too.
  */
 #define ChipLogFormatExchangeId "%u%c"
 #define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
-#define ChipLogFormateExchangeNode "[%u:" ChipLogFormatX64 "]"
-#define ChipLogValueExchangeNode(fabric, id) fabric, ChipLogValueX64(id)
-#define ChipLogFormatExchange ChipLogFormatExchangeId " to: " ChipLogFormateExchangeNode
+#define ChipLogFormatExchange ChipLogFormatExchangeId " " ChipLogFormatScopedNodeId
 #define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator()),                               \
-    ChipLogValueExchangeNode(                                                                                                      \
-        ((ec)->HasSessionHandle() ? (ec)->GetSessionHandle()->GetSubjectDescriptor().fabricIndex : kUndefinedFabricIndex),         \
-        ((ec)->HasSessionHandle() ? (ec)->GetSessionHandle()->GetSubjectDescriptor().subject : kUndefinedNodeId))   
+    ChipLogValueScopedNodeId((ec)->HasSessionHandle() ? (ec)->GetSessionHandle()->GetPeer() : ScopedNodeId())
 
 #define ChipLogValueExchangeIdFromSentHeader(payloadHeader)                                                                        \
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), (payloadHeader).IsInitiator())
