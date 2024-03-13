@@ -68,8 +68,8 @@ void AndroidCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogProgress(ICD, "onCheckInComplete - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-    env->CallVoidMethod(mCheckInDelegate.ObjectRef(), onCheckInCompleteMethodID, peerNodeId, startCounter, offset,
-                        monitoredSubject, jniICDAesKey.jniValue(), jniICDHmacKey.jniValue());
+    env->CallVoidMethod(mCheckInDelegate.ObjectRef(), onCheckInCompleteMethodID, peerNodeId, startCounter, offset, monitoredSubject,
+                        jniICDAesKey.jniValue(), jniICDHmacKey.jniValue());
 }
 
 RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
