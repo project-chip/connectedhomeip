@@ -29,6 +29,7 @@
 // Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1 \
     --dac_provider credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json \
     --product-id 32768 --discriminator 3839
+// For manual testing, CASE retry code paths can be tested by adding --faults chip_CASEServerBusy_f1 (or similar)
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -243,6 +244,7 @@ static MTRTestKeys * sTestKeys = nil;
 - (void)doPairingAndWaitForProgress:(NSString *)trigger
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Trigger message seen"];
+    expectation.assertForOverFulfill = NO;
     MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
         if ([message containsString:trigger]) {
             [expectation fulfill];
@@ -296,6 +298,12 @@ static MTRTestKeys * sTestKeys = nil;
 - (void)test006_pairingAfterCancellation_ConfigRegulatoryCommand
 {
     [self doPairingTestAfterCancellationAtProgress:@"Performing next commissioning step 'ConfigRegulatory'"];
+}
+
+- (void)test007_pairingAfterCancellation_FindOperational
+{
+    // Ensure CASE establishment has started by waiting for 'FindOrEstablishSession'
+    [self doPairingTestAfterCancellationAtProgress:@"FindOrEstablishSession:"];
 }
 
 @end

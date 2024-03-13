@@ -272,7 +272,8 @@ private:
                                       const ByteSpan & skInfo, const ByteSpan & nonce);
 
     void OnSuccessStatusReport() override;
-    CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
+    CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
+                                     Optional<uintptr_t> protocolData) override;
 
     void AbortPendingEstablish(CHIP_ERROR err);
 

@@ -30,7 +30,7 @@ class TC_EEM_2_3(MatterBaseTest, EnergyReportingBaseTestHelper):
 
     def pics_TC_EEM_2_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["EEM.S", "EEM.S.F02(CUME)", "EEM.S.F01(EXPE)"]
+        return ["EEM.S", "EEM.S.F02", "EEM.S.F01"]
 
     def steps_TC_EEM_2_3(self) -> list[TestStep]:
         steps = [

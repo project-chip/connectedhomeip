@@ -82,7 +82,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 /**
  * Log register contents to UART when a hard fault occurs.
  */
-extern "C" void debugHardfault(uint32_t * sp)
+extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
 {
 #if SILABS_LOG_ENABLED
     uint32_t cfsr  = SCB->CFSR;

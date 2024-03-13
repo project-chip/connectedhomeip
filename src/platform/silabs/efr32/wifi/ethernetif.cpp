@@ -31,7 +31,7 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,7 +46,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif // (SIWX_917 | EXP_BOARD)
+#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #endif // WF200_WIFI
 
 #include "wfx_host_events.h"
@@ -349,7 +349,7 @@ static SemaphoreHandle_t ethout_sem;
  ******************************************************************************/
 static err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
     sl_wifi_buffer_t * buffer;
     sl_si91x_packet_t * packet;
     sl_status_t status = SL_STATUS_OK;
@@ -385,7 +385,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         return ERR_IF;
     }
     /* Confirm if packet is allocated */
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
     status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + framelength,
                                               SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS);
     VERIFY_STATUS_AND_RETURN(status);
@@ -393,18 +393,18 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 #else  // RS9116
     packet = wfx_rsi_alloc_pkt();
     if (!packet)
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
     {
         SILABS_LOG("EN-RSI:No buf");
         xSemaphoreGive(ethout_sem);
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
         return SL_STATUS_ALLOCATION_FAILED;
     }
     memset(packet->desc, 0, sizeof(packet->desc));
 #else  // RS9116
         return ERR_IF;
     }
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 #ifdef WIFI_DEBUG_ENABLED
     uint8_t * b = (uint8_t *) p->payload;
     SILABS_LOG("EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0], b[1], b[2], b[3],
@@ -428,7 +428,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     /* forward the generated packet to RSI to
      * send the data over wifi network
      */
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
     packet->length  = framelength & 0xFFF;
     packet->command = RSI_SEND_RAW_DATA;
     if (sl_si91x_driver_send_data_packet(SI91X_WLAN_CMD_QUEUE, buffer, 1000))
@@ -452,7 +452,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     return ERR_OK;
 }
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 /*****************************************************************************
  *  @fn  void sl_si91x_host_process_data_frame(uint8_t *buf, int len)
  *  @brief

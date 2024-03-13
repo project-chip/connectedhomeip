@@ -23,9 +23,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 #include <limits>
 #include <stdint.h>
 #include <type_traits>
