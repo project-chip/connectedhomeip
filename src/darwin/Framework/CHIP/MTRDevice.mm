@@ -2019,15 +2019,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (BOOL)deviceCachePrimed
 {
-    BOOL isPrimed = NO;
-
-    os_unfair_lock_lock(&self->_lock);
-
-    isPrimed = [self _isCachePrimedWithInitialConfigurationData];
-
-    os_unfair_lock_unlock(&self->_lock);
-
-    return isPrimed;
+    std::lock_guard lock(_lock);
+    return [self _isCachePrimedWithInitialConfigurationData];
 }
 
 // If value is non-nil, associate with expectedValueID
