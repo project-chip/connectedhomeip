@@ -25,15 +25,13 @@ namespace PersistedStorage {
 
 //#define STUBBED_KVS
 
-constexpr size_t MAX_DATA_LENGTH = 400;
-
 /** Singleton instance of the KeyValueStoreManager implementation object.
  */
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 struct value_entry
 {
         size_t length;
-        uint8_t data[MAX_DATA_LENGTH];
+        uint8_t* data;
 };
 std::unordered_map<std::string, value_entry> keyvaluestore;
 
@@ -68,6 +66,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     {
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
+    delete[] (kventry->second.data);
     keyvaluestore.erase(kventry);
 #endif
     return CHIP_NO_ERROR;
@@ -76,18 +75,15 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
 #ifndef STUBBED_KVS
-    if (value_size <= MAX_DATA_LENGTH)
-    {
-        value_entry valueentry;
-        valueentry.length = value_size;
-        memcpy(valueentry.data, value, value_size);
-        keyvaluestore[key] = valueentry;
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_INVALID_ARGUMENT;
-#else
-    return CHIP_NO_ERROR;
+    /// In case the key is already there, delete it first (optimizations are possible here)
+    _Delete(key);
+    value_entry valueentry;
+    valueentry.data = new uint8_t[value_size];
+    valueentry.length = value_size;
+    memcpy(valueentry.data, value, value_size);
+    keyvaluestore[key] = valueentry;
 #endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::Init()
