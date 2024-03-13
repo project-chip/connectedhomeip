@@ -25,7 +25,7 @@
 #pragma once
 
 // -------------------- General Configuration --------------------
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 0x00002000
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 0x00001600
 
 // -------------------- WiFi Station Configuration --------------------
 
