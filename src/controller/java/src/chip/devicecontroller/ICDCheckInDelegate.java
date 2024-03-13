@@ -19,9 +19,9 @@
 package chip.devicecontroller;
 
 public interface ICDCheckInDelegate {
-    void onCheckInComplete(ICDClientInfo info);
+  void onCheckInComplete(ICDClientInfo info);
 
-    byte[] onKeyRefreshNeeded(ICDClientInfo info);
+  byte[] onKeyRefreshNeeded(ICDClientInfo info);
 
-    void onKeyRefreshDone(int errorCode);
+  void onKeyRefreshDone(int errorCode);
 }

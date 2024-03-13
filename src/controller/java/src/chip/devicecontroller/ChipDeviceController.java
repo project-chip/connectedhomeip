@@ -1429,7 +1429,8 @@ public class ChipDeviceController {
 
   private native void finishOTAProvider(long deviceControllerPtr);
 
-  private native void setICDCheckInDelegate(long deviceControllerPtr, ICDCheckInDelegateWrapper delegate);
+  private native void setICDCheckInDelegate(
+      long deviceControllerPtr, ICDCheckInDelegateWrapper delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,

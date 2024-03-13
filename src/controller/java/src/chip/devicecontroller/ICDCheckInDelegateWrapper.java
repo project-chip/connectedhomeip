@@ -19,36 +19,41 @@
 package chip.devicecontroller;
 
 class ICDCheckInDelegateWrapper {
-    private ICDCheckInDelegate delegate;
-    public ICDCheckInDelegateWrapper(ICDCheckInDelegate delegate) {
-        this.delegate = delegate;
-    }
+  private ICDCheckInDelegate delegate;
 
-    // For JNI call
-    @SuppressWarnings("unused")
-    private void onCheckInComplete(
+  public ICDCheckInDelegateWrapper(ICDCheckInDelegate delegate) {
+    this.delegate = delegate;
+  }
+
+  // For JNI call
+  @SuppressWarnings("unused")
+  private void onCheckInComplete(
       long peerNodeId,
       long startCounter,
       long offset,
       long monitoredSubject,
       byte[] icdAesKey,
       byte[] icdHmacKey) {
-        delegate.onCheckInComplete(new ICDClientInfo(peerNodeId, startCounter, offset, monitoredSubject, icdAesKey, icdHmacKey));
-    }
+    delegate.onCheckInComplete(
+        new ICDClientInfo(
+            peerNodeId, startCounter, offset, monitoredSubject, icdAesKey, icdHmacKey));
+  }
 
-    @SuppressWarnings("unused")
-    private byte[] onKeyRefreshNeeded(
+  @SuppressWarnings("unused")
+  private byte[] onKeyRefreshNeeded(
       long peerNodeId,
       long startCounter,
       long offset,
       long monitoredSubject,
       byte[] icdAesKey,
       byte[] icdHmacKey) {
-        return delegate.onKeyRefreshNeeded(new ICDClientInfo(peerNodeId, startCounter, offset, monitoredSubject, icdAesKey, icdHmacKey));
-    }
+    return delegate.onKeyRefreshNeeded(
+        new ICDClientInfo(
+            peerNodeId, startCounter, offset, monitoredSubject, icdAesKey, icdHmacKey));
+  }
 
-    @SuppressWarnings("unused")
-    private void onKeyRefreshDone(int errorCode) {
-        delegate.onKeyRefreshDone(errorCode);
-    }
+  @SuppressWarnings("unused")
+  private void onKeyRefreshDone(int errorCode) {
+    delegate.onKeyRefreshDone(errorCode);
+  }
 }
