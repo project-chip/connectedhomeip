@@ -23,19 +23,21 @@ package chip.devicecontroller;
  *
  * <p>See detailed in {@link ChipDeviceController#setICDCheckInDelegate(ICDCheckInDelegate)}
  */
-
 public interface ICDCheckInDelegate {
   /**
    * Callback used to let the application know that a check-in message was received and validated.
    *
-   * @param info ICDClientInfo object representing the state associated with the node that sent the check-in message.
+   * @param info ICDClientInfo object representing the state associated with the node that sent the
+   *     check-in message.
    */
   void onCheckInComplete(ICDClientInfo info);
 
   /**
-   * Callback used to let the application know that a key refresh is needed to avoid counter rollover problems.
+   * Callback used to let the application know that a key refresh is needed to avoid counter
+   * rollover problems.
    *
-   * @param info ICDClientInfo object representing the state associated with the node that sent the check-in message.
+   * @param info ICDClientInfo object representing the state associated with the node that sent the
+   *     check-in message.
    * @return refreshed key
    */
   byte[] onKeyRefreshNeeded(ICDClientInfo info);
