@@ -1983,7 +1983,7 @@ void DeviceCommissioner::ParseCommissioningInfo()
     // return.
     auto attributeCache = std::move(mAttributeCache);
 
-    if (mPairingDelegate != nullptr)
+    if (mPairingDelegate != nullptr && err == CHIP_NO_ERROR)
     {
         mPairingDelegate->OnReadCommissioningInfo(info);
     }
