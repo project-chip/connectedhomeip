@@ -151,6 +151,10 @@ public class ChipDeviceController {
     finishOTAProvider(deviceControllerPtr);
   }
 
+  public void setICDCheckInDelegate(ICDCheckInDelegate delegate) {
+    setICDCheckInDelegate(deviceControllerPtr, new ICDCheckInDelegateWrapper(delegate));
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -1424,6 +1428,8 @@ public class ChipDeviceController {
   private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
 
   private native void finishOTAProvider(long deviceControllerPtr);
+
+  private native void setICDCheckInDelegate(long deviceControllerPtr, ICDCheckInDelegateWrapper delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,
