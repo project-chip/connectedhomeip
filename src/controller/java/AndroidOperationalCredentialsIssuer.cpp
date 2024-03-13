@@ -501,8 +501,9 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, jbyteArray challenge, jbyteArray no
     constructor = env->GetMethodID(infoClass, "<init>", "([B[B[B[B[B[B[B[BII)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outAttestationInfo = static_cast<jobject>(env->NewObject(infoClass, constructor, challenge, nonce, elements, elementsSignature, dac, pai,
-                                                  cd, firmwareInfo, static_cast<jint>(vendorId), static_cast<jint>(productId)));
+    outAttestationInfo =
+        static_cast<jobject>(env->NewObject(infoClass, constructor, challenge, nonce, elements, elementsSignature, dac, pai, cd,
+                                            firmwareInfo, static_cast<jint>(vendorId), static_cast<jint>(productId)));
 
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 exit:
