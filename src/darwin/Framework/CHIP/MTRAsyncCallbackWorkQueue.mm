@@ -23,6 +23,8 @@
 #import <os/lock.h>
 
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
+
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
 
 #pragma mark - Class extensions
@@ -72,12 +74,10 @@
 
 - (NSString *)description
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
 
     auto * desc = [NSString
         stringWithFormat:@"MTRAsyncCallbackWorkQueue context: %@ items count: %lu", self.context, (unsigned long) self.items.count];
-
-    os_unfair_lock_unlock(&_lock);
 
     return desc;
 }
@@ -203,34 +203,30 @@
 
 - (void)invalidate
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     [self _invalidate];
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)markEnqueued
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     _enqueued = YES;
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)setReadyHandler:(MTRAsyncCallbackReadyHandler)readyHandler
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     if (!_enqueued) {
         _readyHandler = readyHandler;
     }
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)setCancelHandler:(dispatch_block_t)cancelHandler
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     if (!_enqueued) {
         _cancelHandler = cancelHandler;
     }
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)endWork

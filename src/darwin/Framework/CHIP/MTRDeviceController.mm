@@ -44,6 +44,7 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
 #import "MTRSetupPayload.h"
+#import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
@@ -873,7 +874,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
 {
-    os_unfair_lock_lock(&_deviceMapLock);
+    std::lock_guard lock(_deviceMapLock);
     MTRDevice * deviceToReturn = _nodeIDToDeviceMap[nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
@@ -892,14 +893,13 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
         }
     }
-    os_unfair_lock_unlock(&_deviceMapLock);
 
     return deviceToReturn;
 }
 
 - (void)removeDevice:(MTRDevice *)device
 {
-    os_unfair_lock_lock(&_deviceMapLock);
+    std::lock_guard lock(_deviceMapLock);
     auto * nodeID = device.nodeID;
     MTRDevice * deviceToRemove = _nodeIDToDeviceMap[nodeID];
     if (deviceToRemove == device) {
@@ -908,7 +908,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     } else {
         MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, nodeID.unsignedLongLongValue);
     }
-    os_unfair_lock_unlock(&_deviceMapLock);
 }
 
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue

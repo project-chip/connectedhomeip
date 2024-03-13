@@ -18,6 +18,7 @@
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 
 #import <atomic>
 #import <os/lock.h>
@@ -273,13 +274,12 @@ MTR_DIRECT_MEMBERS
 - (void)invalidate
 {
     ContextSnapshot context(_context); // outside of lock
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     MTR_LOG_INFO("MTRAsyncWorkQueue<%@> invalidate %tu items", context.description, _items.count);
     for (MTRAsyncWorkItem * item in _items) {
         [item cancel];
     }
     [_items removeAllObjects];
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)_postProcessWorkItem:(MTRAsyncWorkItem *)workItem
@@ -376,8 +376,8 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)hasDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData
 {
+    std::lock_guard lock(_lock);
     BOOL hasDuplicate = NO;
-    os_unfair_lock_lock(&_lock);
     // Start from the last item
     for (MTRAsyncWorkItem * item in [_items reverseObjectEnumerator]) {
         auto duplicateCheckHandler = item.duplicateCheckHandler;
@@ -391,7 +391,7 @@ MTR_DIRECT_MEMBERS
             }
         }
     }
-    os_unfair_lock_unlock(&_lock);
+
     return hasDuplicate;
 }
 
