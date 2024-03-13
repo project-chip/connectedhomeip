@@ -21,9 +21,8 @@
 
 #include "AppTaskBase.h"
 
-namespace chip {
-namespace NXP {
-namespace App {
+namespace chip::NXP::App {
+
 class AppTaskFreeRTOS : public AppTaskBase
 {
 public:
@@ -72,9 +71,20 @@ public:
      */
     virtual CHIP_ERROR AppMatter_Register(void) override;
 
+    /**
+     * \brief The app event queue handle should be static such that the concrete
+     * application task can initialize it during Start() call.
+     */
+    QueueHandle_t appEventQueue;
+
+    /**
+     * \brief This value is used when xQueueReceive is called to specify
+     * the maximum amount of time the task should block waiting for an event.
+     * This can be modified according to the application needs.
+     */
+    TickType_t ticksToWait;
+
 private:
     void DispatchEvent(const AppEvent & event);
 };
-} // namespace App
-} // namespace NXP
-} // namespace chip
+} // namespace chip::NXP::App

@@ -50,8 +50,6 @@
 #endif
 #define APP_EVENT_QUEUE_SIZE 10
 
-static QueueHandle_t sAppEventQueue;
-
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -71,6 +69,7 @@ chip::DeviceLayer::NetworkCommissioning::WiFiDriver * chip::NXP::App::AppTaskFre
 CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
     /* Register Matter CLI cmds */
 #ifdef ENABLE_CHIP_SHELL
     err = chip::NXP::App::GetAppCLI().Init();
@@ -92,13 +91,15 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
     CHIP_ERROR err = CHIP_NO_ERROR;
     TaskHandle_t taskHandle;
 
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
-    if (sAppEventQueue == NULL)
+    appEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    if (appEventQueue == NULL)
     {
         err = CHIP_ERROR_NO_MEMORY;
         ChipLogError(DeviceLayer, "Failed to allocate app event queue");
         assert(err == CHIP_NO_ERROR);
     }
+
+    ticksToWait = portMAX_DELAY;
 
     /* AppTaskMain function will loss actual object instance, give it as parameter */
     if (xTaskCreate(&AppTaskFreeRTOS::AppTaskMain, "AppTaskMain", APP_TASK_STACK_SIZE, this, APP_TASK_PRIORITY, &taskHandle) !=
@@ -122,31 +123,42 @@ void chip::NXP::App::AppTaskFreeRTOS::AppTaskMain(void * pvParameter)
 
     sAppTask->PreInitMatterStack();
     err = sAppTask->Init();
+    VerifyOrDieWithMsg(err == CHIP_NO_ERROR, DeviceLayer, "AppTask.Init() failed");
     sAppTask->PostInitMatterStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "AppTask.Init() failed");
-        assert(err == CHIP_NO_ERROR);
-    }
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
+        BaseType_t eventReceived = xQueueReceive(sAppTask->appEventQueue, &event, sAppTask->ticksToWait);
         while (eventReceived == pdTRUE)
         {
             sAppTask->DispatchEvent(event);
-            eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
+            eventReceived = xQueueReceive(sAppTask->appEventQueue, &event, 0);
         }
+
+        sAppTask->PostEventsProcessedAction();
     }
 }
 
 void chip::NXP::App::AppTaskFreeRTOS::PostEvent(const AppEvent & event)
 {
-    if (sAppEventQueue != NULL)
+    if (appEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, &event, 0))
+        if (__get_IPSR())
         {
-            ChipLogError(DeviceLayer, "Failed to post event to app task event queue");
+            portBASE_TYPE taskToWake = pdFALSE;
+            if (!xQueueSendToFrontFromISR(appEventQueue, &event, &taskToWake))
+            {
+                ChipLogError(DeviceLayer, "Failed to post event to app task event queue from ISR");
+            }
+
+            portYIELD_FROM_ISR(taskToWake);
+        }
+        else
+        {
+            if (!xQueueSend(appEventQueue, &event, 0))
+            {
+                ChipLogError(DeviceLayer, "Failed to post event to app task event queue");
+            }
         }
     }
 }

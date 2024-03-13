@@ -27,9 +27,8 @@
 #include <app/server/Server.h>
 #include <platform/NetworkCommissioning.h>
 
-namespace chip {
-namespace NXP {
-namespace App {
+namespace chip::NXP::App {
+
 class AppTaskBase
 {
 public:
@@ -80,6 +79,13 @@ public:
     virtual void PostInitMatterStack(void) {};
 
     /**
+     * \brief This function is called in AppTaskMain after all events are processed in current loop iteration.
+     *
+     * Example of usage: It can be used to animate some LEDs.
+     */
+    virtual void PostEventsProcessedAction() {}
+
+    /**
      * \brief This function could be overridden in order to register features.
      *
      * Example of usage: Could be overridden in order to register matter CLI or button features.
@@ -96,6 +102,31 @@ public:
      *
      */
     virtual void AppMatter_RegisterCustomCliCommands(void) {};
+
+    /**
+     * \brief Disallow entering low power mode.
+     *
+     * This function can be overridden in order to implement a specific disallow mechanism.
+     *
+     */
+    virtual void AppMatter_DisallowDeviceToSleep(void) {}
+
+    /**
+     * \brief Allow entering low power mode.
+     *
+     * This function can be overridden in order to implement a specific allow mechanism.
+     *
+     */
+    virtual void AppMatter_AllowDeviceToSleep(void) {}
+
+    /**
+     * \brief Print onboarding information.
+     *
+     * It can be overwritten by derived classes for custom information,
+     * such as setting the commissioning flow to kUserActionRequired.
+     *
+     */
+    virtual void PrintOnboardingInfo();
 
     /**
      * \brief This function could be overridden in order to dispatch event.
@@ -142,6 +173,7 @@ public:
 
 private:
     inline static chip::CommonCaseDeviceServerInitParams initParams;
+
     /* Functions used by the public commisioning handlers */
     static void StartCommissioning(intptr_t arg);
     static void StopCommissioning(intptr_t arg);
@@ -154,6 +186,5 @@ private:
  * Applications can use this to gain access to features of the AppTaskBase.
  */
 extern AppTaskBase & GetAppTask();
-} // namespace App
-} // namespace NXP
-} // namespace chip
+
+} // namespace chip::NXP::App
