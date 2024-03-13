@@ -63,13 +63,13 @@ void AndroidCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
     PARSE_CLIENT_INFO(clientInfo, peerNodeId, startCounter, offset, monitoredSubject, jniICDAesKey, jniICDHmacKey)
 
     jmethodID onCheckInCompleteMethodID;
-    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagate.ObjectRef(), "onCheckInComplete", "(JJJJ[B[B)V",
-                                                                   &onCheckInCompleteMethodID);
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagate.ObjectRef(), "onCheckInComplete",
+                                                                   "(JJJJ[B[B)V", &onCheckInCompleteMethodID);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogProgress(ICD, "onCheckInComplete - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-    env->CallVoidMethod(mCheckInDeleagate.ObjectRef(), onCheckInCompleteMethodID, peerNodeId, startCounter, offset, monitoredSubject,
-                        jniICDAesKey.jniValue(), jniICDHmacKey.jniValue());
+    env->CallVoidMethod(mCheckInDeleagate.ObjectRef(), onCheckInCompleteMethodID, peerNodeId, startCounter, offset,
+                        monitoredSubject, jniICDAesKey.jniValue(), jniICDHmacKey.jniValue());
 }
 
 RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
@@ -90,9 +90,9 @@ RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(ICD, "onKeyRefreshNeeded - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-        jbyteArray key =
-            static_cast<jbyteArray>(env->CallObjectMethod(mCheckInDeleagate.ObjectRef(), onKeyRefreshNeededMethodID, peerNodeId, startCounter,
-                                                        offset, monitoredSubject, jniICDAesKey.jniValue(), jniICDHmacKey.jniValue()));
+        jbyteArray key = static_cast<jbyteArray>(env->CallObjectMethod(mCheckInDeleagate.ObjectRef(), onKeyRefreshNeededMethodID,
+                                                                       peerNodeId, startCounter, offset, monitoredSubject,
+                                                                       jniICDAesKey.jniValue(), jniICDHmacKey.jniValue()));
 
         if (key != nullptr)
         {
@@ -102,7 +102,9 @@ RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
             memcpy(newKey.Bytes(), jniKey.data(), newKey.Capacity());
             isSetKey = true;
         }
-    } else {
+    }
+    else
+    {
         ChipLogProgress(ICD, "check-in delegate is not implemented!");
     }
     if (!isSetKey)
