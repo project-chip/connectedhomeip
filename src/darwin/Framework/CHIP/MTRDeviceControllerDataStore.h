@@ -53,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByNodeID:(NSNumber *)nodeID;
 - (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByResumptionID:(NSData *)resumptionID;
 - (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo;
+- (void)clearResumptionInfoForNodeID:(NSNumber *)nodeID;
 - (void)clearAllResumptionInfo;
 
 /**
