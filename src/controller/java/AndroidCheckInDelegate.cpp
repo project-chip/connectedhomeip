@@ -20,18 +20,18 @@
 #include <app/icd/client/RefreshKeySender.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#define PARSE_CLIENT_INFO(_clientInfo, _peerNodeId, _startCounter, _offset, _monitoredSubject, _jniICDAesKey, _jniICDHmacKey) \
-    jlong _peerNodeId = static_cast<jlong>(_clientInfo.peer_node.GetNodeId()); \
-    jlong _startCounter = static_cast<jlong>(_clientInfo.start_icd_counter); \
-    jlong _offset = static_cast<jlong>(_clientInfo.offset); \
-    jlong _monitoredSubject = static_cast<jlong>(_clientInfo.monitored_subject); \
-    chip::ByteSpan aes_buf(_clientInfo.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>()); \
-    chip::ByteSpan hmac_buf(_clientInfo.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>()); \
-    chip::ByteArray _jniICDAesKey(env, aes_buf); \
+#define PARSE_CLIENT_INFO(_clientInfo, _peerNodeId, _startCounter, _offset, _monitoredSubject, _jniICDAesKey, _jniICDHmacKey)      \
+    jlong _peerNodeId       = static_cast<jlong>(_clientInfo.peer_node.GetNodeId());                                               \
+    jlong _startCounter     = static_cast<jlong>(_clientInfo.start_icd_counter);                                                   \
+    jlong _offset           = static_cast<jlong>(_clientInfo.offset);                                                              \
+    jlong _monitoredSubject = static_cast<jlong>(_clientInfo.monitored_subject);                                                   \
+    chip::ByteSpan aes_buf(_clientInfo.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());                                 \
+    chip::ByteSpan hmac_buf(_clientInfo.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());                               \
+    chip::ByteArray _jniICDAesKey(env, aes_buf);                                                                                   \
     chip::ByteArray _jniICDHmacKey(env, hmac_buf);
 
 namespace chip {
@@ -58,10 +58,13 @@ void AndroidCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
     PARSE_CLIENT_INFO(clientInfo, peerNodeId, startCounter, offset, monitoredSubject, jniICDAesKey, jniICDHmacKey)
 
     jmethodID onCheckInCompleteMethodID;
-    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagateObj, "onCheckInComplete", "(JJJJ[B[B)V", &onCheckInCompleteMethodID);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogProgress(ICD, "onCheckInComplete - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagateObj, "onCheckInComplete", "(JJJJ[B[B)V",
+                                                                   &onCheckInCompleteMethodID);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogProgress(ICD, "onCheckInComplete - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-    env->CallVoidMethod(mCheckInDeleagateObj, onCheckInCompleteMethodID, peerNodeId, startCounter, offset, monitoredSubject, jniICDAesKey.jniValue(), jniICDHmacKey.jniValue());
+    env->CallVoidMethod(mCheckInDeleagateObj, onCheckInCompleteMethodID, peerNodeId, startCounter, offset, monitoredSubject,
+                        jniICDAesKey.jniValue(), jniICDHmacKey.jniValue());
 }
 
 RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
@@ -76,15 +79,20 @@ RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
     PARSE_CLIENT_INFO(clientInfo, peerNodeId, startCounter, offset, monitoredSubject, jniICDAesKey, jniICDHmacKey)
 
     jmethodID onKeyRefreshNeededMethodID;
-    err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagateObj, "onKeyRefreshNeeded", "(JJJJ[B[B)V", &onKeyRefreshNeededMethodID);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(ICD, "onKeyRefreshNeeded - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
+    err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagateObj, "onKeyRefreshNeeded", "(JJJJ[B[B)V",
+                                                        &onKeyRefreshNeededMethodID);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogProgress(ICD, "onKeyRefreshNeeded - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-    jbyteArray key = static_cast<jbyteArray>(env->CallObjectMethod(mCheckInDeleagateObj, onKeyRefreshNeededMethodID, peerNodeId, startCounter, offset, monitoredSubject, jniICDAesKey.jniValue(), jniICDHmacKey.jniValue()));
+    jbyteArray key =
+        static_cast<jbyteArray>(env->CallObjectMethod(mCheckInDeleagateObj, onKeyRefreshNeededMethodID, peerNodeId, startCounter,
+                                                      offset, monitoredSubject, jniICDAesKey.jniValue(), jniICDHmacKey.jniValue()));
 
     if (key != nullptr)
     {
         chip::JniByteArray jniKey(env, key);
-        VerifyOrReturnValue(static_cast<size_t>(jniKey.size()) == newKey.Capacity(), nullptr, ChipLogProgress(ICD, "Invalid key length : %d", jniKey.size()));
+        VerifyOrReturnValue(static_cast<size_t>(jniKey.size()) == newKey.Capacity(), nullptr,
+                            ChipLogProgress(ICD, "Invalid key length : %d", jniKey.size()));
         memcpy(newKey.Bytes(), jniKey.data(), newKey.Capacity());
     }
     else
@@ -121,8 +129,10 @@ void AndroidCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySende
 
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onKeyRefreshDoneMethodID;
-    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagateObj, "onKeyRefreshDone", "(I)V", &onKeyRefreshDoneMethodID);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogProgress(ICD, "onKeyRefreshDone - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagateObj, "onKeyRefreshDone", "(I)V",
+                                                                   &onKeyRefreshDoneMethodID);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogProgress(ICD, "onKeyRefreshDone - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
     env->CallVoidMethod(mCheckInDeleagateObj, onKeyRefreshDoneMethodID, static_cast<jint>(error.AsInteger()));
 

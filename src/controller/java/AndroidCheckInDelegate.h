@@ -40,10 +40,7 @@ public:
     RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
     void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
-    void setDelegate(jobject checkInDeleagateObj)
-    {
-        mCheckInDeleagateObj = checkInDeleagateObj;
-    }
+    void setDelegate(jobject checkInDeleagateObj) { mCheckInDeleagateObj = checkInDeleagateObj; }
 
 private:
     ICDClientStorage * mpStorage        = nullptr;
