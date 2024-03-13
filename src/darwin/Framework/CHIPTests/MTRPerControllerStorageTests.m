@@ -1142,7 +1142,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // Test MTRDeviceControllerDataStore _pruneEmptyStoredAttributesBranches
     //  - Clear cache
     //  - Store an attribute
-    //  - Manually delete it from the user defaults
+    //  - Manually delete it from the test storage delegate
     //  - Call _pruneEmptyStoredAttributesBranches
     [controller.controllerDataStore clearAllStoredAttributes];
 
@@ -1150,8 +1150,12 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(1)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(111) } },
     ];
     [controller.controllerDataStore storeAttributeValues:testAttribute forNodeID:@(2001)];
-    NSString * testAttributeValueKey = [controller.controllerDataStore _attributeValueKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1) attributeID:@(1)];
-    [storageDelegate controller:controller removeValueForKey:testAttributeValueKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+
+    // store is async, so remove on the same queue to ensure order
+    dispatch_sync(_storageQueue, ^{
+        NSString * testAttributeValueKey = [controller.controllerDataStore _attributeValueKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1) attributeID:@(1)];
+        [storageDelegate controller:controller removeValueForKey:testAttributeValueKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
     [controller.controllerDataStore unitTestPruneEmptyStoredAttributesBranches];
 
     // Now check the indexes are pruned
