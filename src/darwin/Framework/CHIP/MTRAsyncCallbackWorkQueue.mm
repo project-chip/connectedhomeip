@@ -89,12 +89,11 @@
 
     [item markEnqueued];
 
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     item.workQueue = self;
     [self.items addObject:item];
 
     [self _callNextReadyWorkItem];
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)invalidate
@@ -113,12 +112,11 @@
 // called after executing a work item
 - (void)_postProcessWorkItem:(MTRAsyncCallbackQueueWorkItem *)workItem retry:(BOOL)retry
 {
-    os_unfair_lock_lock(&_lock);
+    std::lock_guard lock(_lock);
     // sanity check if running
     if (!self.runningWorkItemCount) {
         // something is wrong with state - nothing is currently running
-        os_unfair_lock_unlock(&_lock);
-        MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue endWork: no work is running on work queue");
+x        MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue endWork: no work is running on work queue");
         return;
     }
 
@@ -127,7 +125,6 @@
     MTRAsyncCallbackQueueWorkItem * firstWorkItem = self.items.firstObject;
     if (firstWorkItem != workItem) {
         // something is wrong with this work item - should not be currently running
-        os_unfair_lock_unlock(&_lock);
         MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue endWork: work item is not first on work queue");
         return;
     }
@@ -140,7 +137,6 @@
     // when "concurrency width" is implemented this will be decremented instead
     self.runningWorkItemCount = 0;
     [self _callNextReadyWorkItem];
-    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)endWork:(MTRAsyncCallbackQueueWorkItem *)workItem

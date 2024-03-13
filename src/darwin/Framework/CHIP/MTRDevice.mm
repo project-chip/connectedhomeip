@@ -496,7 +496,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 #endif
 
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
@@ -509,8 +509,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (setUpSubscription) {
         [self _setupSubscription];
     }
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)invalidate
@@ -757,7 +755,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleReportEnd
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
     _receivingReport = NO;
     _receivingPrimingReport = NO;
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
@@ -773,7 +771,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         });
     }
 #endif
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 // assume lock is held
@@ -1035,10 +1032,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            // Drop our pointer to the ReadClient immediately, since
                            // it's about to be destroyed and we don't want to be
                            // holding a dangling pointer.
-                           os_unfair_lock_lock(&self->_lock);
+                           std::lock_guard lock(_lock);
                            self->_currentReadClient = nullptr;
                            self->_currentSubscriptionCallback = nullptr;
-                           os_unfair_lock_unlock(&self->_lock);
                            dispatch_async(self.queue, ^{
                                // OnDone
                                [self _handleSubscriptionReset];
