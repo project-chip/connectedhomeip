@@ -70,8 +70,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * This will be true after the deviceCachePrimed: delegate callback has been called, false if not.
  *
  * Please note if you have a storage delegate implemented, the cache is then stored persistently, so
- * the would then only be called once, ever - and this property would basically always be true
- * if a subscription has ever been established.
+ * the delegate would then only be called once, ever - and this property would basically always be true
+ * if a subscription has ever been established at any point in the past.
  *
  */
 @property (readonly) BOOL deviceCachePrimed MTR_NEWLY_AVAILABLE;
