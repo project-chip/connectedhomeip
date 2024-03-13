@@ -701,8 +701,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     MTR_LOG_DEFAULT("%@ scheduling to reattempt subscription in %u seconds", self, _lastSubscriptionAttemptWait);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
-        std::lock_guard lock(_lock);
+        os_unfair_lock_lock(&self->_lock);
         [self _reattemptSubscriptionNowIfNeeded];
+        os_unfair_lock_unlock(&self->_lock);
     });
 }
 
