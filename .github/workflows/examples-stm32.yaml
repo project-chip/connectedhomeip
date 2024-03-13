@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:26
+            image: ghcr.io/project-chip/chip-build:35
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -62,7 +62,14 @@ jobs:
                      "./scripts/build/build_examples.py \
                        --target stm32-STM32WB5MM-DK-light build \
                      "
-        
+
+            - name: Gather size reports
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    stm32 STM32WB5MM-DK light \
+                    out/stm32-stm32wb5mm-dk-light/chip-stm32-lighting-example.elf \
+                    /tmp/bloat_reports/
+
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}

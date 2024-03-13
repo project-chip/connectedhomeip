@@ -47,6 +47,7 @@ struct ChipBLEDeviceIdentificationInfo
 {
     constexpr static uint16_t kDiscriminatorMask            = 0xfff;
     constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
+    constexpr static uint8_t kExtendedAnnouncementFlagMask  = 0x2;
     constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
     constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
 
@@ -112,6 +113,19 @@ struct ChipBLEDeviceIdentificationInfo
             AdditionalDataFlag &= static_cast<uint8_t>(~kAdditionalDataFlagMask);
         }
     }
+
+    void SetExtendedAnnouncementFlag(bool flag)
+    {
+        if (flag)
+        {
+            AdditionalDataFlag |= kExtendedAnnouncementFlagMask;
+        }
+        else
+        {
+            AdditionalDataFlag &= static_cast<uint8_t>(~kExtendedAnnouncementFlagMask);
+        }
+    }
+
 } __attribute__((packed));
 
 } /* namespace Ble */

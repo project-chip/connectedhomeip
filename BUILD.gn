@@ -16,7 +16,6 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/nlassert.gni")
-import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
 
@@ -136,7 +135,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${chip_root}/src/system",
       "${chip_root}/src/transport",
       "${nlassert_root}:nlassert",
-      "${nlio_root}:nlio",
       "${nlunit_test_root}:nlunit-test",
     ]
 
@@ -184,7 +182,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps += [
         "${chip_root}/src/app/server/java",
         "${chip_root}/src/controller/java",
+        "${chip_root}/src/controller/java:jsontlv",
         "${chip_root}/src/controller/java:onboarding_payload",
+        "${chip_root}/src/controller/java:tlv",
         "${chip_root}/src/platform/android:java",
       ]
     }
@@ -349,12 +349,24 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_linux_lighting_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux microwave oven app example.
+    enable_microwave_oven_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # Build the Linux thermostat app example.
     enable_linux_thermostat_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the Linux lock app example.
     enable_linux_lock_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux LIT ICD example.
+    enable_linux_lit_icd_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux RVC app example.
+    enable_linux_rvc_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the cc13x2x7_26x2x7 lock app example.
@@ -592,6 +604,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     extra_build_deps += [ ":linux_bridge_app" ]
   }
 
+  if (enable_microwave_oven_app_build) {
+    group("linux_microwave_oven_app") {
+      deps = [ "${chip_root}/examples/microwave-oven-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_microwave_oven_app" ]
+  }
+
   if (enable_linux_lighting_app_build) {
     group("linux_lighting_app") {
       deps = [
@@ -608,6 +628,17 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":linux_lock_app" ]
+  }
+
+  if (enable_linux_lit_icd_app_build) {
+    group("linux_lit_icd_app") {
+      lit_icd_standalone_toolchain =
+          "${chip_root}/config/standalone/toolchain:lit_icd"
+
+      deps = [ "${chip_root}/examples/lit-icd-app/linux(${lit_icd_standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_lit_icd_app" ]
   }
 
   if (enable_efr32_lock_app_build) {
@@ -717,6 +748,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":genio_shell_app" ]
+  }
+
+  if (enable_linux_rvc_app_build) {
+    group("linux_rvc_app") {
+      deps = [ "${chip_root}/examples/rvc-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_rvc_app" ]
   }
 
   group("default") {

@@ -757,6 +757,12 @@ PICS:
           "Does the device implement an Application Device Type on any endpoint"
       id: APPDEVICE.S
 
+    # Content App Observer Cluster
+    - label:
+          "Does the device implement the Content App Observer cluster as a
+          server?"
+      id: APPOBSERVER.S
+
     # Actions Cluster Test Plan
     - label: "Does the device implement the Actions cluster as a server?"
       id: ACT.S
@@ -837,6 +843,45 @@ PICS:
     - label:
           "Does the DUT support sending the DisableActionWithDuration command?"
       id: ACT.C.C0b.Tx
+
+    #
+    # server / commandsGenerated
+    #
+    - label: "Does the device implement of InstantAction command?"
+      id: ACT.S.C00.Rsp
+
+    - label: "Does the device implement of InstantActionWithTransition command?"
+      id: ACT.S.C01.Rsp
+
+    - label: "Does the device implement of StartAction command?"
+      id: ACT.S.C02.Rsp
+
+    - label: "Does the device implement of StartActionWithDuration command?"
+      id: ACT.S.C03.Rsp
+
+    - label: "Does the device implement of StopAction command?"
+      id: ACT.S.C04.Rsp
+
+    - label: "Does the device implement of PauseAction command?"
+      id: ACT.S.C05.Rsp
+
+    - label: "Does the device implement of PauseActionWithDuration command?"
+      id: ACT.S.C06.Rsp
+
+    - label: "Does the device implement of ResumeAction command?"
+      id: ACT.S.C07.Rsp
+
+    - label: "Does the device implement of EnableAction command?"
+      id: ACT.S.C08.Rsp
+
+    - label: "Does the device implement of EnableActionWithDuration command?"
+      id: ACT.S.C09.Rsp
+
+    - label: "Does the device implement of DisableAction command?"
+      id: ACT.S.C0a.Rsp
+
+    - label: "Does the device implement of DisableActionWithDuration command?"
+      id: ACT.S.C0b.Rsp
 
     #
     # client / manually
@@ -1807,8 +1852,11 @@ PICS:
     - label: "Does the device implement the DISHM cluster as a server?"
       id: DISHM.S
 
-    - label: "IDoes the DUT support testing the failed ChangeToMode command?"
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: DISHM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode changed by manually control at the device?"
+      id: DISHM.S.M.CAN_MANUALLY_CONTROLLED
 
     # PIXIT
 
@@ -1856,6 +1904,30 @@ PICS:
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: DISHM.S.C01.Tx
+
+    #
+    # Microwave Oven Mode Cluster
+    #
+    - label:
+          "Does the device implement the Microwave Oven Mode cluster as a server"
+      id: MWOM.S
+
+    #
+    # Microwave Oven Control Cluster
+    #
+    - label:
+          "Does the device implement the Microwave Oven Control cluster as a
+          server"
+      id: MWOCTRL.S
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the power as a number feature"
+      id: MWOCTRL.S.F00
+
+    - label: "Does the device support the power number limits feature"
+      id: MWOCTRL.S.F02
 
     # Descriptor Cluster TestPlan
     - label: "Does the device implement the Descriptor cluster as a server?"
@@ -2006,6 +2078,12 @@ PICS:
     - label: "Does the DUT(server) support the ProductAppearance attribute?"
       id: BINFO.S.A0014
 
+    - label: "Does the DUT(server) support the SpecificationVersion attribute?"
+      id: BINFO.S.A0015
+
+    - label: "Does the DUT(server) support the MaxPathsPerInvoke attribute?"
+      id: BINFO.S.A0016
+
     #####
     - label: "Does the DUT(server) support the NOC list attribute?"
       id: OPCREDS.S.A0000
@@ -2050,6 +2128,15 @@ PICS:
 
     - label: "Does the DUT(Server) support LastConnectErrorValue attribute?"
       id: CNET.S.A0007
+
+    - label: "Does the DUT(Server) support SupportedWiFiBands attribute?"
+      id: CNET.S.A0008
+
+    - label: "Does the DUT(Server) support SupportedThreadFeatures attribute?"
+      id: CNET.S.A0009
+
+    - label: "Does the DUT(Server) support ThreadVersion attribute?"
+      id: CNET.S.A000A
 
     #
     # server / commandsReceived
@@ -3541,6 +3628,9 @@ PICS:
     - label: "Indicates that node is configured for test event triggers."
       id: DGGEN.S.C00.Rsp
 
+    - label: "Indicates cluster supports Payload Test Request."
+      id: DGGEN.S.C03.Rsp
+
     #
     # server / Events
     #
@@ -3561,6 +3651,13 @@ PICS:
 
     - label: "Indicates the reason that caused the device to reboot start-up."
       id: DGGEN.S.E03
+
+    #
+    # server / features
+    #
+    - label:
+          "Support specific commands needed for extended Data Model features."
+      id: DGGEN.S.F00
 
     #
     # client / attributes
@@ -4263,6 +4360,20 @@ PICS:
       id: ALOGIN.C
 
     - label:
+          "Does the device implement the Content App Observer cluster as a
+          server?"
+      id: APPOBSERVER.S
+
+    - label:
+          "Does the device implement the Content App Observer cluster as a
+          client?"
+      id: APPOBSERVER.C
+
+    - label:
+          "Does the device implement the Content Control cluster as a server?"
+      id: CONCON.S
+
+    - label:
           "Does the DUT support the Content Launcher server cluster, Content
           Search feature?"
       id: CONTENTLAUNCHER.S.F00
@@ -4353,6 +4464,26 @@ PICS:
           "Does the DUT support the Media Playback server cluster,
           SeekRangeStart attribute?"
       id: MEDIAPLAYBACK.S.A0006
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActiveAudioTrack attribute?"
+      id: MEDIAPLAYBACK.S.A0007
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          AvailableAudioTrack attribute?"
+      id: MEDIAPLAYBACK.S.A0008
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActiveTextTrack attribute?"
+      id: MEDIAPLAYBACK.S.A0009
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          AvailableTextTrack attribute?"
+      id: MEDIAPLAYBACK.S.A000a
 
     - label:
           "Does the DUT support the Audio Output server cluster, OutputList
@@ -4535,6 +4666,21 @@ PICS:
       id: MEDIAPLAYBACK.S.C0b.Rsp
 
     - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActivateAudioTrack command?"
+      id: MEDIAPLAYBACK.S.C0c.Rsp
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActivateTextTrack command?"
+      id: MEDIAPLAYBACK.S.C0d.Rsp
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          DeactivateTextTrack command?"
+      id: MEDIAPLAYBACK.S.C0e.Rsp
+
+    - label:
           "Does the DUT support the Audio Output server cluster, SelectOutput
           command?"
       id: AUDIOOUTPUT.S.C00.Rsp
@@ -4572,6 +4718,11 @@ PICS:
           "Does the DUT support the Account Login server cluster, Logout
           command?"
       id: ALOGIN.S.C03.Rsp
+
+    - label:
+          "Does the DUT support the Content App Observer server cluster,
+          ContentAppMessage command?"
+      id: APPOBSERVER.S.C00.Rsp
 
     #
     # server / features
@@ -4632,6 +4783,9 @@ PICS:
           "Does the DUT support the commissioning procedure initiated by a
           commissionee using User Directed Commissioning without PIN code entry?"
       id: MC.S.M.UDCLOGIN
+
+    - label: "Does the DUT support the Content App Observer Cluster,feature?"
+      id: APPOBSERVER.S.F01
 
     #
     # client / commandsGenerated
@@ -5140,6 +5294,9 @@ PICS:
     - label: "Device has Deadfront behaviour"
       id: OO.S.F01
 
+    - label: "Device has OffOnly feature"
+      id: OO.S.F02
+
     #
     # server / manually
     #
@@ -5326,13 +5483,13 @@ PICS:
     # server / manually
     #
     - label: "Can the DUT be brought into a Wired Fault state?"
-      id: PS.M.ManualWiredFault
+      id: PS.S.M.ManualWiredFault
 
     - label: "Can the DUT be brought into a Battery Fault state?"
-      id: PS.M.ManualBatFault
+      id: PS.S.M.ManualBatFault
 
     - label: "Can the DUT be brought into a Battery Charge Fault state?"
-      id: PS.M.ManualBatChargeFault
+      id: PS.S.M.ManualBatChargeFault
 
     #
     # client / manually
@@ -5676,7 +5833,7 @@ PICS:
     - label: "Write all supported optional attributes"
       id: RH.C.AO-WRITE
 
-    # Scenes Cluster Test Plan
+    # Scenes Management Cluster Test Plan
     - label: "Does the device implement the Scenes cluster as a server?"
       id: S.S
 
@@ -5686,29 +5843,14 @@ PICS:
     #
     # server / attributes
     #
-    - label: "Does the device implement the SceneCount attribute?"
+    - label: "Does the device implement the LastConfiguredBy attribute?"
       id: S.S.A0000
 
-    - label: "Does the device implement the CurrentScene attribute?"
+    - label: "Does the device implement the SceneTableSize attribute?"
       id: S.S.A0001
 
-    - label: "Does the device implement the CurrentGroup attribute?"
-      id: S.S.A0002
-
-    - label: "Does the device implement the SceneValid attribute?"
-      id: S.S.A0003
-
-    - label: "Does the device implement the NameSupport attribute?"
-      id: S.S.A0004
-
-    - label: "Does the device implement the LastConfiguredBy attribute?"
-      id: S.S.A0005
-
-    - label: "Does the device implement the SceneTableSize attribute?"
-      id: S.S.A0006
-
     - label: "Does the device implement the FabricSceneInfo attribute?"
-      id: S.S.A0007
+      id: S.S.A0002
 
     #
     # server / commandsReceived
@@ -5735,30 +5877,14 @@ PICS:
           "Does the device implement receiving the GetSceneMembership command?"
       id: S.S.C06.Rsp
 
-    - label: "Does the device implement receiving the EnhancedAddScene command?"
-      id: S.S.C40.Rsp
-
-    - label:
-          "Does the device implement receiving the EnhancedViewScene command?"
-      id: S.S.C41.Rsp
-
     - label: "Does the device implement receiving the CopyScene command?"
-      id: S.S.C42.Rsp
+      id: S.S.C40.Rsp
 
     #
     # server / features
     #
     - label: "Does the device implement the Scene Names feature?"
       id: S.S.F00
-
-    - label: "Does the device implement the Scene Explicit feature?"
-      id: S.S.F01
-
-    - label: "Does the device implement the Scene TableSize feature?"
-      id: S.S.F02
-
-    - label: "Does the device implement the Scene FabricScenes feature?"
-      id: S.S.F03
 
     #
     # server / manually
@@ -5793,19 +5919,8 @@ PICS:
     - label: "Does the device implement sending the GetSceneMembership command?"
       id: S.C.C06.Tx
 
-    - label: "Does the device implement sending the EnhancedAddScene command?"
-      id: S.C.C40.Tx
-
-    - label: "Does the device implement sending the EnhancedViewScene command?"
-      id: S.C.C41.Tx
-
     - label: "Does the device implement sending the CopyScene command?"
-      id: S.C.C42.Tx
-
-    - label:
-          "Does the device process the TransitionTime parameter of the
-          RecallScene command?"
-      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME
+      id: S.C.C40.Tx
 
     #
     # client / manually
@@ -8573,9 +8688,21 @@ PICS:
           "Does the device implement the ClientsSupportedPerFabric attribute?"
       id: ICDM.S.A0005
 
+    - label:
+          "Does the device implement the UserActiveModeTriggerHint attribute?"
+      id: ICDM.S.A0006
+
+    - label:
+          "Does the device implement the UserActiveModeTriggerInstruction
+          attribute?"
+      id: ICDM.S.A0007
+
     #
     # Client Attribute
     #
+    - label: "Does the device implement the ICD Management cluster as a client?"
+      id: ICDM.C
+
     - label: "Does the device implement the IdleModeDuration attribute?"
       id: ICDM.C.A0000
 
@@ -8595,11 +8722,26 @@ PICS:
           "Does the device implement the ClientsSupportedPerFabric attribute?"
       id: ICDM.C.A0005
 
+    - label:
+          "Does the device implement the UserActiveModeTriggerHint attribute?"
+      id: ICDM.C.A0006
+
+    - label:
+          "Does the device implement the UserActiveModeTriggerInstruction
+          attribute?"
+      id: ICDM.C.A0007
+
     #
     # Features
     #
     - label: "Does the device support this specific cluster feature?"
       id: ICDM.S.F00
+
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F01
+
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F02
 
     #
     #Commands:
@@ -8617,8 +8759,22 @@ PICS:
     #
     #Commands generated
     #
-    - label: "Does the device implement receiving the RegisterClient command?"
+    - label:
+          "Does the device implement receiving the RegisterClientResponse
+          command?"
       id: ICDM.S.C01.Tx
+
+    - label: "Does the device implement sending the StayActiveResponse command?"
+      id: ICDM.S.C04.Tx
+
+    - label: "Does the device support sending the RegisterClient command?"
+      id: ICDM.S.C00.Tx
+
+    - label: "Does the device implement sending the UnregisterClient command?"
+      id: ICDM.S.C02.Tx
+
+    - label: "Does the device implement sending the StayActiveRequest command?"
+      id: ICDM.S.C03.Tx
 
     #
     #Commands received
@@ -8626,7 +8782,11 @@ PICS:
     - label:
           "Does the device implement receiving the RegisterClientResponse
           command?"
-      id: ICDM.C.C00.Rsp
+      id: ICDM.C.C01.Rsp
+
+    - label:
+          "Does the device implement receiving the StayActiveResponse command?"
+      id: ICDM.C.C04.Rsp
 
     #
     #Operational State
@@ -8715,6 +8875,94 @@ PICS:
           "Does the device implement generating the OperationalCommandResponse
           command?"
       id: OPSTATE.S.C04.Tx
+
+    #
+    #Oven Operational State
+    #
+    - label:
+          "Does the device implement the Operational State cluster as a server?"
+      id: OVENOPSTATE.S
+
+    - label:
+          "Does the device implement the Operational State cluster as a client?"
+      id: OVENOPSTATE.C
+
+    #ManuallyControlled
+
+    - label: "Does the DUT support testing the Stopped(0x00) operational state"
+      id: OVENOPSTATE.S.M.ST_STOPPED
+
+    - label: "Does the DUT support testing the Running(0x01) operational state"
+      id: OVENOPSTATE.S.M.ST_RUNNING
+
+    - label: "Does the DUT support testing the Paused(0x02) operational state"
+      id: OVENOPSTATE.S.M.ST_PAUSED
+
+    - label: "Does the DUT support testing the Error(0x03) operational state?"
+      id: OVENOPSTATE.S.M.ST_ERROR
+
+    - label: "Does the DUT support testing the NoError(0x00) error state?"
+      id: OVENOPSTATE.S.M.ERR_NO_ERROR
+
+    - label:
+          "Does the DUT support testing the UnableToStartOrResume(0x01) error
+          state?"
+      id: OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
+
+    - label:
+          "Does the DUT support testing the UnableToCompleteOperation(0x02)
+          error state?"
+      id: OVENOPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION
+
+    - label:
+          "Does the DUT support testing the CommandInvalidInState(0x03) error
+          state?"
+      id: OVENOPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
+
+    #Server Attributes
+    - label: "Does the device implement the PhaseList attribute?"
+      id: OVENOPSTATE.S.A0000
+
+    - label: "Does the device implement the CurrentPhase attribute?"
+      id: OVENOPSTATE.S.A0001
+
+    - label: "Does the device implement the CountdownTime attribute?"
+      id: OVENOPSTATE.S.A0002
+
+    - label: "Does the device implement the OperationalStateList attribute?"
+      id: OVENOPSTATE.S.A0003
+
+    - label: "Does the device implement the OperationalState attribute?"
+      id: OVENOPSTATE.S.A0004
+
+    - label: "Does the device implement the OperationalError attribute?"
+      id: OVENOPSTATE.S.A0005
+    #Events Generated
+
+    - label: "Does the device generate the OperationalError event?"
+      id: OVENOPSTATE.S.E00
+
+    - label: "Does the device generate the OperationCompltion event?"
+      id: OVENOPSTATE.S.E01
+
+    #Server Commands Received
+    - label: "Does the device implement receiving the Pause command?"
+      id: OVENOPSTATE.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Stop command?"
+      id: OVENOPSTATE.S.C01.Rsp
+
+    - label: "Does the device implement receiving the Start command?"
+      id: OVENOPSTATE.S.C02.Rsp
+
+    - label: "Does the device implement receiving the Resume command?"
+      id: OVENOPSTATE.S.C03.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement generating the OperationalCommandResponse
+          command?"
+      id: OVENOPSTATE.S.C04.Tx
 
     # Smoke CO Alarm Cluster Test Plan
     - label: "Does the device implement the SMOKECO cluster as a server?"
@@ -8837,6 +9085,9 @@ PICS:
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: LWM.S.M.CAN_TEST_MODE_FAILURE
 
+    - label: "Can the mode changed by manually control at the device?"
+      id: LWM.S.M.CAN_MANUALLY_CONTROLLED
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
@@ -8883,6 +9134,104 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: LWM.S.C01.Tx
 
+    #  Laundry DRYER Mode Cluster
+
+    - label: "Does the device implement the Dryer cluster as a server?"
+      id: DRYERCTRL.S
+
+    #- label: "Does the DUT support testing the failed ChangeToMode command?"
+    #  id: DRYERCTRL.S.M.CAN_TEST_MODE_FAILURE
+
+    #- label:
+    #      "Id of mode the device will fail to transition to, given its current
+    #      state"
+    #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_FAIL
+
+    #- label:
+    #      "Id of mode the device will successfully transition to, given its
+    #      current state"
+    #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_OK
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: DRYERCTRL.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: DRYERCTRL.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: DRYERCTRL.S.A0001
+
+    - label: "Can the device be controlled manually?"
+      id: DRYERCTRL.S.M.ManuallyControlled
+
+    #  Oven Mode Cluster
+
+    - label: "Does the device implement the OM cluster as a server?"
+      id: OTCCM.S
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.OTCCM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.OTCCM.MODE_CHANGE_OK
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: OTCCM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: OTCCM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: OTCCM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: OTCCM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: OTCCM.S.A0003
+
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: OTCCM.S.C00.Rsp
+
+    #
+    # server / Commands generated
+    #
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: OTCCM.S.C01.Tx
+
+    - label: "Can the device be controlled manually?"
+      id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+
     # RVC Clean Mode Cluster
 
     - label: "Does the device implement the RVCCLEANM cluster as a server?"
@@ -8904,12 +9253,6 @@ PICS:
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: RVCCLEANM.S.A0001
-
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: RVCCLEANM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: RVCCLEANM.S.A0003
 
     #
     # server / Commands received
@@ -8954,6 +9297,9 @@ PICS:
           "Id of mode the device will fail to transition to, given its current
           state"
       id: PIXIT.TCCM.MODE_CHANGE_FAIL
+
+    - label: "Can the mode changed by manually control at the device?"
+      id: TCCM.S.M.CAN_MANUALLY_CONTROLLED
 
     #Features
     - label:
@@ -9120,11 +9466,8 @@ PICS:
     - label: "Does the device implement the CurrentMode attribute?"
       id: RVCRUNM.S.A0001
 
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: RVCRUNM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: RVCRUNM.S.A0003
+    - label: "Can the mode change be manually controlled?"
+      id: RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED
 
     #Commands received
     - label: "Does the device implement receiving the ChangeToMode command?"
@@ -9292,6 +9635,9 @@ PICS:
     - label: "Does the device implement receiving the Resume command?"
       id: RVCOPSTATE.S.C03.Rsp
 
+    - label: "Does the device implement receiving the GoHome command?"
+      id: RVCOPSTATE.S.C128.Rsp
+
     #Commands generated
     - label:
           "Does the device implement generating the OperationalCommandResponse
@@ -9317,3 +9663,536 @@ PICS:
 
     - label: "Does the device implement sending the Resume command?"
       id: RVCOPSTATE.C.C04.Tx
+
+    #
+    #Boolean State Configuration
+    #
+    - label:
+          "Does the device implement the Boolean State Configuration cluster as
+          a server?"
+      id: BOOLCFG.S
+
+    #Features
+    - label: "Does the device support visual alarms?"
+      id: BOOLCFG.S.F00
+
+    - label: "Does the device support audible alarms??"
+      id: BOOLCFG.S.F01
+
+    - label:
+          "Does the device support the ability to suppress or acknowledge
+          alarms?"
+      id: BOOLCFG.S.F02
+
+    - label:
+          "Does the device support the ability to set level of threshold
+          detection sensitivity?"
+      id: BOOLCFG.S.F03
+
+    #Attributes
+    - label: "Does the device implement the CurrentSensitivityLevel attribute?"
+      id: BOOLCFG.S.A0000
+
+    - label:
+          "Does the device implement the SupportedSensitivityLevels attribute?"
+      id: BOOLCFG.S.A0001
+
+    - label: "Does the device implement the DefaultSensitivityLevel attribute?"
+      id: BOOLCFG.S.A0002
+
+    - label: "Does the device implement the AlarmsActive attribute?"
+      id: BOOLCFG.S.A0003
+
+    - label: "Does the device implement the AlarmsSuppressed attribute?"
+      id: BOOLCFG.S.A0004
+
+    - label: "Does the device implement the AlarmsEnabled attribute?"
+      id: BOOLCFG.S.A0005
+
+    - label: "Does the device implement the AlarmsSupported attribute?"
+      id: BOOLCFG.S.A0006
+
+    - label: "Does the device implement the SensorFault attribute?"
+      id: BOOLCFG.S.A0007
+
+    #Commands received
+    - label: "Does the device implement receiving the SuppressAlarm command?"
+      id: BOOLCFG.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the EnableDisableAlarm command?"
+      id: BOOLCFG.S.C01.Rsp
+
+    #Events
+    - label: "Does the device implement the AlarmsStateChanged event?"
+      id: BOOLCFG.S.E00
+
+    - label: "Does the device implement the SensorFault event?"
+      id: BOOLCFG.S.E01
+
+    #
+    #Valve Configuration and Control
+    #
+    - label:
+          "Does the device implement the Valve Configuration and Control cluster
+          as a server?"
+      id: VALCC.S
+
+    #Features
+    - label:
+          "Does the device support the ability to use UTC time is used for time
+          indications?"
+      id: VALCC.S.F00
+
+    - label:
+          "Does the device support the ability to setting the specific position
+          of the valve?"
+      id: VALCC.S.F01
+
+    #Attributes
+    - label: "Does the device implement the OpenDuration attribute?"
+      id: VALCC.S.A0000
+
+    - label: "Does the device implement the DefaultOpenDuration attribute?"
+      id: VALCC.S.A0001
+
+    - label: "Does the device implement the AutoCloseTime attribute?"
+      id: VALCC.S.A0002
+
+    - label: "Does the device implement the RemainingDuration attribute?"
+      id: VALCC.S.A0003
+
+    - label: "Does the device implement the CurrentState attribute?"
+      id: VALCC.S.A0004
+
+    - label: "Does the device implement the TargetState attribute?"
+      id: VALCC.S.A0005
+
+    - label: "Does the device implement the CurrentLevel attribute?"
+      id: VALCC.S.A0006
+
+    - label: "Does the device implement the TargetLevel attribute?"
+      id: VALCC.S.A0007
+
+    - label: "Does the device implement the DefaultOpenLevel attribute?"
+      id: VALCC.S.A0008
+
+    - label: "Does the device implement the ValveFault attribute?"
+      id: VALCC.S.A0009
+
+    - label: "Does the device implement the LevelStep attribute?"
+      id: VALCC.S.A000a
+
+    #Commands received
+    - label: "Does the device implement receiving the Open command?"
+      id: VALCC.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Close command?"
+      id: VALCC.S.C01.Rsp
+
+    #Events
+    - label: "Does the device implement the ValveStateChanged event?"
+      id: VALCC.S.E00
+
+    - label: "Does the device implement the ValveFault event?"
+      id: VALCC.S.E01
+
+    #
+    # Device Energy Management Cluster
+    # server / attributes
+
+    - label:
+          "Does the device implement the Device Energy Management cluster as a
+          server?"
+      id: DEM.S
+
+    - label: "Does the device implement the ESAType attribute?"
+      id: DEM.S.A0000
+
+    - label: "Does the device implement the ESACanGenerate attribute?"
+      id: DEM.S.A0001
+
+    - label: "Does the device implement the ESAState attribute?"
+      id: DEM.S.A0002
+
+    - label: "Does the device implement the AbsMinPower attribute?"
+      id: DEM.S.A0003
+
+    - label: "Does the device implement the AbsMaxPower attribute?"
+      id: DEM.S.A0004
+
+    - label:
+          "Does the device implement the PowerAdjustmentCapability attribute?"
+      id: DEM.S.A0005
+
+    - label: "Does the device implement the Forecast attribute?"
+      id: DEM.S.A0006
+
+    - label: "Does the device implement the OptOutState attribute?"
+      id: DEM.S.A0007
+
+    # feature
+
+    - label: "Does the device support this PowerAdjustment feature?"
+      id: DEM.S.F00
+
+    - label: "Does the device support this PowerForecastReporting feature?"
+      id: DEM.S.F01
+
+    - label: "Does the device support this StateForecastReporting feature?"
+      id: DEM.S.F02
+
+    - label: "Does the device support this StartTimeAdjustment feature?"
+      id: DEM.S.F03
+
+    - label: "Does the device support this Pausable feature?"
+      id: DEM.S.F04
+
+    - label: "Does the device support this ForecastAdjustment feature?"
+      id: DEM.S.F05
+
+    - label: "Does the device support this ConstraintBasedAdjustment feature?"
+      id: DEM.S.F06
+
+    - label:
+          "Can the ESAState attribute be changed by physical User Opt Out
+          control at the device?"
+      id: DEM.S.M.ManuallyControlledOptOut
+
+    # Commands received
+    - label:
+          "Does the device implement receiving the PowerAdjustRequest command?"
+      id: DEM.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the CancelPowerAdjustRequest
+          command?"
+      id: DEM.S.C01.Rsp
+
+    - label:
+          "Does the device implement receiving the StartTimeAdjustRequest
+          command?"
+      id: DEM.S.C02.Rsp
+
+    - label: "Does the device implement receiving the PauseRequest command?"
+      id: DEM.S.C03.Rsp
+
+    - label: "Does the device implement receiving the ResumeRequest command?"
+      id: DEM.S.C04.Rsp
+
+    - label:
+          "Does the device implement receiving the ModifyForecastRequest
+          command?"
+      id: DEM.S.C05.Rsp
+
+    - label:
+          "Does the device implement receiving the
+          RequestConstraintBasedPowerForecast command?"
+      id: DEM.S.C06.Rsp
+
+    - label: "Does the device implement receiving the CancelRequest command?"
+      id: DEM.S.C07.Rsp
+
+    #  Events
+
+    - label: "Does the device implement sending the PowerAdjustStart event?"
+      id: DEM.S.E00
+
+    - label: "Does the device implement sending the PowerAdjustEnd event?"
+      id: DEM.S.E01
+
+    - label: "Does the device implement sending the Paused event?"
+      id: DEM.S.E02
+
+    - label: "Does the device implement sending the Resumed event?"
+      id: DEM.S.E03
+
+    #
+    # Oven Mode Cluster
+    #
+    - label: "Does the device implement the OTCCM cluster as a server?"
+      id: OTCCM.S
+
+    #Server attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: OTCCM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: OTCCM.S.A0001
+
+    #Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: OTCCM.S.C00.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: OTCCM.S.C01.Tx
+
+      #Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+
+    #
+    # Energy EVSE Cluster
+    # server / attributes
+
+    - label: "Does the device implement the Energy EVSE cluster as a server?"
+      id: EEVSE.S
+
+    - label: "Does the device implement the State attribute?"
+      id: EEVSE.S.A0000
+
+    - label: "Does the device implement the SupplyState attribute?"
+      id: EEVSE.S.A0001
+
+    - label: "Does the device implement the FaultState attribute?"
+      id: EEVSE.S.A0002
+
+    - label: "Does the device implement the ChargingEnabledUntil attribute?"
+      id: EEVSE.S.A0003
+
+    - label: "Does the device implement the DischargingEnabledUntil attribute?"
+      id: EEVSE.S.A0004
+
+    - label: "Does the device implement the CircuitCapacity attribute?"
+      id: EEVSE.S.A0005
+
+    - label: "Does the device implement the MinimumChargeCurrent attribute?"
+      id: EEVSE.S.A0006
+
+    - label: "Does the device implement the MaximumChargeCurrent attribute?"
+      id: EEVSE.S.A0007
+
+    - label: "Does the device implement the MaximumDischargeCurrent attribute?"
+      id: EEVSE.S.A0008
+
+    - label: "Does the device implement the UserMaximumChargeCurrent attribute?"
+      id: EEVSE.S.A0009
+
+    - label: "Does the device implement the RandomizationDelayWindow attribute?"
+      id: EEVSE.S.A000A
+
+    - label: "Does the device implement the NextChargeStartTime attribute?"
+      id: EEVSE.S.A0023
+
+    - label: "Does the device implement the NextChargeTargetTime attribute?"
+      id: EEVSE.S.A0024
+
+    - label: "Does the device implement the NextChargeRequiredEnergy attribute?"
+      id: EEVSE.S.A0025
+
+    - label: "Does the device implement the NextChargeTargetSoC attribute?"
+      id: EEVSE.S.A0026
+
+    - label: "Does the device implement the ApproximateEVEfficiency attribute?"
+      id: EEVSE.S.A0027
+
+    - label: "Does the device implement the StateOfCharge attribute?"
+      id: EEVSE.S.A0030
+
+    - label: "Does the device implement the BatteryCapacity attribute?"
+      id: EEVSE.S.A0031
+
+    - label: "Does the device implement the VehicleID attribute?"
+      id: EEVSE.S.A0032
+
+    - label: "Does the device implement the SessionID attribute?"
+      id: EEVSE.S.A0040
+
+    - label: "Does the device implement the SessionDuration attribute?"
+      id: EEVSE.S.A0041
+
+    - label: "Does the device implement the SessionEnergyCharged attribute?"
+      id: EEVSE.S.A0042
+
+    - label: "Does the device implement the SessionEnergyDischarged attribute?"
+      id: EEVSE.S.A0043
+
+    #  Features
+
+    - label: "Does the device support this specific cluster feature?"
+      id: EEVSE.S.F00
+
+    - label:
+          "Does the DUT support the Content Control server cluster, PIN
+          Management feature?"
+      id: EEVSE.S.F01
+
+    - label: "Does the device support this specific cluster feature?"
+      id: EEVSE.S.F02
+
+    - label: "Does the device support this specific cluster feature?"
+      id: EEVSE.S.F03
+
+    - label: "Does the device support this specific cluster feature?"
+      id: EEVSE.S.F04
+
+    # Commands received
+    - label: "Does the device implement receiving the Disable command?"
+      id: EEVSE.S.C01.Rsp
+
+    - label: "Does the device implement receiving the EnableCharging command?"
+      id: EEVSE.S.C02.Rsp
+
+    - label:
+          "Does the device implement receiving the EnableDischarging command?"
+      id: EEVSE.S.C03.Rsp
+
+    - label: "Does the device implement receiving the StartDiagnostics command?"
+      id: EEVSE.S.C04.Rsp
+
+    - label: "Does the device implement receiving the SetTargets command?"
+      id: EEVSE.S.C05.Rsp
+
+    - label: "Does the device implement receiving the GetTargets command?"
+      id: EEVSE.S.C06.Rsp
+
+    - label: "Does the device implement receiving the ClearTargets command?"
+      id: EEVSE.S.C07.Rsp
+
+    #  Events
+
+    - label: "Does the device implement sending the EVConnected event?"
+      id: EEVSE.S.E00
+
+    - label: "Does the device implement sending the EVNotDetected event?"
+      id: EEVSE.S.E01
+
+    - label:
+          "Does the device implement sending the EnergyTransferStarted event?"
+      id: EEVSE.S.E02
+
+    - label:
+          "Does the device implement sending the EnergyTransferStopped event?"
+      id: EEVSE.S.E03
+
+    - label: "Does the device implement sending the Fault event?"
+      id: EEVSE.S.E04
+
+    - label: "Does the device implement sending the RFID event?"
+      id: EEVSE.S.E05
+
+    #  Manual controllable
+    - label:
+          "Can the EEVSE.S.A0000(State) attribute changed by plugging and
+          unplugging the EV?"
+      id: EEVSE.S.M.ManuallyControlledPluggedIn
+
+      #  Commands generated
+    - label: "Does the device implement sending the GetTargetsResponse command?"
+      id: EEVSE.S.C00.Tx
+
+    # Energy EVSE Mode Cluster
+    # server / attributes
+    - label: "Does the device implement the Energy EVSE cluster as a server?"
+      id: EEVSEM.S
+
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: EEVSEM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: EEVSEM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: EEVSEM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: EEVSEM.S.A0003
+
+      #  Commands received
+    - label: "Does the device implement sending the ChangeToMode command?"
+      id: EEVSEM.S.C00.Rsp
+
+      #  Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: EEVSEM.S.C01.Tx
+
+      #  Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: EEVSEM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+
+      #Feature
+    - label: "Does the DUT(server) support the Hue/Saturation feature?"
+      id: EEVSEM.S.F00
+
+    #
+    # Device Energy Management Mode Cluster
+    # server / attributes
+
+    - label: "Does the device implement the DEMM cluster as a server?"
+      id: DEMM.S
+
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: DEMM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: DEMM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: DEMM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: DEMM.S.A0003
+
+      #  Commands received
+    - label: "Does the device implement sending the ChangeToMode command?"
+      id: DEMM.S.C00.Rsp
+
+      #  Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: DEMM.S.C01.Tx
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: DEMM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: DEMM.S.M.CAN_MANUALLY_CONTROLLED
+
+      #  Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: EEVSEM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+
+    #
+    # Power Topology Cluster
+    #
+    - label: "Does the device implement the Power Topology Cluster as a server?"
+      id: PWRTL.S
+
+    #  Features
+
+    - label:
+          "Does the associated endpoint provide or consume power for the entire
+          node?"
+      id: PWRTL.S.F00
+
+    - label:
+          "Does the associated endpoint provide or consume power for itself and
+          its child endpoints?"
+      id: PWRTL.S.F01
+
+    - label:
+          "Does the associated endpoint provide or consume power for a provided
+          set of endpoints?"
+      id: PWRTL.S.F02
+
+    - label: "Can the provided set of endpoints change?"
+      id: PWRTL.S.F03
+
+    #Server attributes
+    - label: "Does the device implement the AvailableEndpoints attribute?"
+      id: PWRTL.S.A0000
+
+    - label: "Does the device implement the ActiveEndpoints attribute?"
+      id: PWRTL.S.A0001

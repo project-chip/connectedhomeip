@@ -40,6 +40,10 @@ private:
 
     static void LockActionEventHandler(AppEvent * event);
     static void LockStateChanged(LockManager::State_t state);
+    static void LockJammedEventHandler(void);
+    static void LockJammedActionHandler(AppEvent * aEvent);
+    static void LockStateEventHandler(void);
+    static void LockStateActionHandler(AppEvent * aEvent);
 
     static AppTask sAppTask;
 };

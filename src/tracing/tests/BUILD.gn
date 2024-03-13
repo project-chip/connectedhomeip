@@ -23,13 +23,16 @@ if (matter_enable_tracing_support && matter_trace_config == "multiplexed") {
   chip_test_suite_using_nltest("tests") {
     output_name = "libTracingTests"
 
-    test_sources = [ "TestTracing.cpp" ]
-    sources = []
+    test_sources = [
+      "TestMetricEvents.cpp",
+      "TestTracing.cpp",
+    ]
 
     public_deps = [
-      "${chip_root}/src/lib/support:testing",
+      "${chip_root}/src/lib/support:testing_nlunit",
       "${chip_root}/src/platform",
       "${chip_root}/src/tracing",
+      "${chip_root}/src/tracing:macros",
       "${nlunit_test_root}:nlunit-test",
     ]
   }

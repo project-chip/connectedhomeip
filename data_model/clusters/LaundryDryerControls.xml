@@ -55,22 +55,42 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x004a" name="Laundry Dryer Controls" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x004A" name="Laundry Dryer Controls" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x004A" name="Laundry Dryer Controls"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DRYERCTRL" scope="Endpoint"/>
+  <dataTypes>
+    <enum name="DrynessLevelEnum">
+      <item value="0" name="Low" summary="Provides a low dryness level for the selected mode">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Normal" summary="Provides the normal level of dryness for the selected mode">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Extra" summary="Provides an extra dryness level for the selected mode">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Max" summary="Provides the max dryness level for the selected mode">
+        <mandatoryConform/>
+      </item>
+    </enum>
+  </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SupportedDrynessLevels" type="list[&lt;&lt; semtag &gt;&gt;]">
+    <attribute id="0x0000" name="SupportedDrynessLevels" type="list">
+      <entry type="DrynessLevelEnum"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="max" value="16"/>
+      <constraint type="countBetween" from="1" to="4"/>
     </attribute>
-    <attribute id="0x0001" name="SelectedDrynessLevel" type="uint8" default="desc">
+    <attribute id="0x0001" name="SelectedDrynessLevel" type="DrynessLevelEnum" default="desc">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="15"/>
+      <constraint type="desc"/>
     </attribute>
   </attributes>
 </cluster>

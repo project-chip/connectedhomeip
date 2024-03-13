@@ -45,7 +45,7 @@ namespace chip {
  *  timeout when it sends a message to the present node and the present node is
  *  perceived by the peer as active.
  *
- *  This value is announced to the peer using SAI (Sleepy Active Interval) key
+ *  This value is announced to the peer using SAI (Session Active Interval) key
  *  in the advertised DNS Service Discovery TXT records. Additionally, it is
  *  exchanged in the initial phase of the PASE/CASE session establishment.
  *
@@ -84,7 +84,7 @@ namespace chip {
 #if CHIP_ENABLE_OPENTHREAD && !CHIP_DEVICE_LAYER_TARGET_LINUX
 #define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (800_ms32)
 #else
-#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (300_ms32)
+#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (500_ms32)
 #endif
 #endif // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL && !CHIP_DEVICE_LAYER_TARGET_LINUX
 
@@ -208,6 +208,29 @@ struct ReliableMessageProtocolConfig
         return mIdleRetransTimeout == that.mIdleRetransTimeout && mActiveRetransTimeout == that.mActiveRetransTimeout &&
             mActiveThresholdTime == that.mActiveThresholdTime;
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+    /**
+     * Set the local MRP configuration for the node.
+     *
+     * Passing a "no value" optional resets to the compiled-in settings
+     * (CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL and
+     * CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL).
+     *
+     * Otherwise the value set via this function is used instead of the
+     * compiled-in settings, but can still be overridden by ICD configuration
+     * and other things that would override the compiled-in settings.
+     *
+     * Changing the value via this function does not affect any existing
+     * sessions or exchanges, but does affect the values we communicate to our
+     * peer during future session establishments.
+     *
+     * @return whether the local MRP configuration actually changed as a result
+     *         of this call.  If it did, callers may need to reset DNS-SD
+     *         advertising to advertise the updated values.
+     */
+    static bool SetLocalMRPConfig(const Optional<ReliableMessageProtocolConfig> & localMRPConfig);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
 };
 
 /// @brief The default MRP config. The value is defined by spec, and shall be same for all implementations,

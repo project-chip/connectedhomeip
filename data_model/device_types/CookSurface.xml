@@ -62,11 +62,19 @@ Davis, CA 95616, USA
   <classification class="simple" scope="endpoint"/>
   <conditions/>
   <clusters>
+    <cluster id="0x0006" name="On/Off" side="server">
+      <optionalConform/>
+      <features>
+        <feature code="" name="OFFONLY">
+          <mandatoryConform/>
+        </feature>
+      </features>
+    </cluster>
     <cluster id="0x0056" name="Temperature Control" side="server">
-      <mandatoryConform/>
+      <optionalConform choice="a" more="true"/>
     </cluster>
     <cluster id="0x0402" name="Temperature Measurement" side="server">
-      <optionalConform/>
+      <optionalConform choice="a" more="true"/>
     </cluster>
   </clusters>
 </deviceType>

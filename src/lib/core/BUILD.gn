@@ -68,7 +68,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_BIG_ENDIAN_TARGET=${chip_target_is_big_endian}",
     "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE=${chip_tlv_validate_char_string_on_write}",
     "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ=${chip_tlv_validate_char_string_on_read}",
-    "CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED=${chip_enable_sending_batch_commands}",
+    "CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS=${chip_enable_sending_batch_commands}",
   ]
 
   visibility = [ ":chip_config_header" ]
@@ -101,6 +101,34 @@ source_set("error") {
   public_deps = [
     ":chip_config_header",
     "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:type-traits",
+  ]
+}
+
+source_set("encoding") {
+  sources = [ "CHIPEncoding.h" ]
+  public_deps = [ "${nlio_root}:nlio" ]
+}
+
+source_set("types") {
+  sources = [
+    "CHIPSafeCasts.h",
+    "CHIPVendorIdentifiers.hpp",
+    "DataModelTypes.h",
+    "Global.h",
+    "GroupId.h",
+    "InPlace.h",
+    "NodeId.h",
+    "Optional.h",
+    "PasscodeId.h",
+    "ReferenceCounted.h",
+    "Unchecked.h",
+  ]
+
+  public_deps = [
+    ":chip_config_header",
+    "${chip_root}/src/lib/support:memory",
+    "${chip_root}/src/lib/support:verifymacros",
   ]
 }
 
@@ -108,34 +136,36 @@ static_library("core") {
   output_name = "libChipCore"
 
   sources = [
-    # For now cluster enum/bitmap definitions are in zzz-generated.
-    # We should consider putting them directly in this directory
-    # instead.
-    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
+    "CASEAuthTag.h",
     "CHIPCallback.h",
     "CHIPCore.h",
-    "CHIPEncoding.h",
     "CHIPKeyIds.cpp",
     "CHIPKeyIds.h",
+    "CHIPPersistentStorageDelegate.h",
     "ClusterEnums.h",
-    "DataModelTypes.h",
-    "GroupId.h",
-    "NodeId.h",
     "OTAImageHeader.cpp",
     "OTAImageHeader.h",
-    "PasscodeId.h",
     "PeerId.h",
+    "ScopedNodeId.h",
     "TLV.h",
+    "TLVBackingStore.h",
     "TLVCircularBuffer.cpp",
     "TLVCircularBuffer.h",
+    "TLVCommon.h",
+    "TLVData.h",
     "TLVDebug.cpp",
+    "TLVDebug.h",
     "TLVReader.cpp",
+    "TLVReader.h",
     "TLVTags.cpp",
     "TLVTags.h",
     "TLVTypes.h",
     "TLVUpdater.cpp",
+    "TLVUpdater.h",
     "TLVUtilities.cpp",
+    "TLVUtilities.h",
     "TLVWriter.cpp",
+    "TLVWriter.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -143,11 +173,11 @@ static_library("core") {
   public_deps = [
     ":chip_config_header",
     ":error",
+    "${chip_root}/src/app/common:enums",
     "${chip_root}/src/ble",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/system",
-    "${nlio_root}:nlio",
   ]
 
   allow_circular_includes_from = [

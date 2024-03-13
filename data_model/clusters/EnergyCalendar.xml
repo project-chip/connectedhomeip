@@ -54,13 +54,18 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: short
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009a" name="Energy Calendar" revision="3">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009A" name="Energy Calendar" revision="3">
   <revisionHistory>
     <revision revision="1" summary="mandatory global ClusterRevision attribute added; Added from SE1.4; CCB 2068"/>
     <revision revision="2" summary="CCB 3042"/>
     <revision revision="3" summary="Initial Matter Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x009A" name="Energy Calendar"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="SECA" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PTIER" name="PricingTier" summary="Supports information about pricing tiers">
@@ -153,66 +158,62 @@ Davis, CA 95616, USA
     </bitmap>
     <struct name="CalendarPeriod">
       <field id="0" name="StartDate" type="epoch-s">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="Days" type="list">
         <entry type="DayStruct"/>
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="minCount" value="1"/>
       </field>
     </struct>
     <struct name="DayStruct">
       <field id="0" name="Date" type="epoch-s">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="DaysOfWeek" type="TransitionDayOfWeekBitmap">
-        <access read="true" write="true"/>
         <optionalConform choice="a"/>
         <constraint type="desc"/>
       </field>
       <field id="2" name="Transitions" type="list">
         <entry type="TransitionStruct"/>
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="minCount" value="1"/>
       </field>
     </struct>
     <struct name="PeakPeriodStatusStruct">
       <field id="0" name="CurrentDaySeverity" type="PeakPeriodSeverityEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="NextDaySeverity" type="PeakPeriodSeverityEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="PeakPeriod" type="uint16">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="PeakPeriodPriorNotice" type="uint16">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="TransitionStruct">
       <field id="0" name="TransitionTime" type="uint16">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="between" from="0" to="1439"/>
       </field>
       <field id="1" name="PriceTier" type="uint32">
-        <access read="true" write="true"/>
+        <optionalConform choice="a" more="true">
+          <feature name="PTIER"/>
+        </optionalConform>
       </field>
       <field id="2" name="FriendlyCredit" type="bool">
-        <access read="true" write="true"/>
+        <optionalConform choice="a" more="true">
+          <feature name="FCRED"/>
+        </optionalConform>
       </field>
       <field id="3" name="AuxiliaryLoad" type="AuxiliaryLoadBitmap">
-        <access read="true" write="true"/>
+        <optionalConform choice="a" more="true">
+          <feature name="AUXLD"/>
+        </optionalConform>
       </field>
     </struct>
   </dataTypes>
@@ -260,22 +261,22 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000a" name="CurrentDay" type="DayStruct" default="null">
+    <attribute id="0x000A" name="CurrentDay" type="DayStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000d" name="NextDay" type="DayStruct" default="null">
+    <attribute id="0x000D" name="NextDay" type="DayStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000d" name="CurrentTransition" type="TransitionStruct" default="null">
+    <attribute id="0x000D" name="CurrentTransition" type="TransitionStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000f" name="PeakPeriodStatus" type="PeakPeriodStatusStruct" default="null">
+    <attribute id="0x000F" name="PeakPeriodStatus" type="PeakPeriodStatusStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>

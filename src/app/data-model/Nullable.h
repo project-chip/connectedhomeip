@@ -48,6 +48,7 @@ struct Nullable : protected Optional<T>
     // Pull in APIs that make sense on Nullable with the same names as on
     // Optional.
     using Optional<T>::Value;
+    using Optional<T>::ValueOr;
 
     // Some consumers need an easy way to determine our underlying type.
     using UnderlyingType = T;
@@ -77,6 +78,19 @@ struct Nullable : protected Optional<T>
     constexpr bool ExistingValueInEncodableRange() const
     {
         return true;
+    }
+
+    // Set the nullable to the `other` nullable, returning true if something actually changed.
+    // This can be used to determine if changes occurred on assignment, so that reporting can be triggered
+    // only on actual changes.
+    constexpr bool Update(const Nullable<T> & other)
+    {
+        bool changed = *this != other;
+        if (changed)
+        {
+            *this = other;
+        }
+        return changed;
     }
 
     // The only fabric-scoped objects in the spec are commands, events and structs inside lists, and none of those can be nullable.

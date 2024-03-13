@@ -55,38 +55,23 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000b" name="Door Lock Controller" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000B" name="Door Lock Controller" revision="3">
   <revisionHistory>
     <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="Initial Matter release"/>
+    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditions/>
   <clusters>
-    <cluster id="0x0003" name="Identify" side="server">
-      <optionalConform>
-        <condition name="EZ-Target"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x0003" name="Identify" side="client">
-      <optionalConform>
-        <condition name="EZ-Initiator"/>
-      </optionalConform>
-    </cluster>
     <cluster id="0x0004" name="Groups" side="client">
-      <mandatoryConform>
-        <condition name="Zigbee"/>
-      </mandatoryConform>
+      <optionalConform/>
     </cluster>
-    <cluster id="0x0005" name="Scenes" side="client">
-      <otherwiseConform>
-        <mandatoryConform>
-          <condition name="Zigbee"/>
-        </mandatoryConform>
-        <provisionalConform/>
-      </otherwiseConform>
+    <cluster id="0x0005" name="Scenes Management" side="client">
+      <optionalConform/>
     </cluster>
-    <cluster id="0x0038" name="TimeSync" side="server">
+    <cluster id="0x0038" name="Time Synchronization" side="server">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>

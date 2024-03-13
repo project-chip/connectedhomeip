@@ -20,8 +20,12 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRAccessGrant.h>
+#import <Matter/MTRBaseDevice.h> // for MTRClusterPath
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDiagnosticLogsType.h>
+#import <Matter/MTRServerEndpoint.h>
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerParameters.h>
@@ -76,11 +80,53 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)operationalInstanceAdded:(chip::PeerId &)operationalID;
 
 /**
+ * Download log of the desired type from the device.
+ */
+- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
+                       controller:(MTRDeviceController *)controller
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                            queue:(dispatch_queue_t)queue
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
+
+/**
  * Initialize an MTRDeviceController with the given parameters.
  */
 - (nullable MTRDeviceController *)initializeController:(MTRDeviceController *)controller
                                         withParameters:(MTRDeviceControllerParameters *)parameters
                                                  error:(NSError * __autoreleasing *)error;
+
+/**
+ * Add a server endpoint.  This will verify that there is no existing server
+ * endpoint with the provided endpoint ID and return NO if there is one.  Can be
+ * called on any thread.
+ */
+- (BOOL)addServerEndpoint:(MTRServerEndpoint *)endpoint;
+
+/**
+ * Remove a server endpoint.  This must happen after all other teardown for the
+ * endpoint is complete.  Can be called on any thread.
+ */
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint;
+
+/**
+ * Get the access grants that apply for the given fabric index and cluster path.
+ *
+ * Only called on the Matter queue.
+ */
+- (NSArray<MTRAccessGrant *> *)accessGrantsForFabricIndex:(chip::FabricIndex)fabricIndex clusterPath:(MTRClusterPath *)clusterPath;
+
+/**
+ * Get the privilege level needed to read the given attribute.  There's no
+ * endpoint provided because the expectation is that this information is the
+ * same for all cluster instances.
+ *
+ * Returns nil if we have no such attribute defined on any endpoint, otherwise
+ * one of MTRAccessControlEntry* constants wrapped in NSNumber.
+ *
+ * Only called on the Matter queue.
+ */
+- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
 
 @property (readonly) chip::PersistentStorageDelegate * storageDelegate;
 @property (readonly) chip::Credentials::GroupDataProvider * groupData;

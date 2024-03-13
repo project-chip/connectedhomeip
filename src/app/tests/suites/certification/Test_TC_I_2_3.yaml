@@ -16,6 +16,7 @@ name: 57.2.3. [TC-I-2.3] Secondary functionality with server as DUT
 
 PICS:
     - I.S
+    - I.S.C40.Rsp
 
 config:
     nodeId: 0x12344321
@@ -23,7 +24,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,9 +35,9 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 2a: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0x00 blink and the effect variant field set to
-          0x00 default"
+          "Step 2a: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x00 (blink) and the effect variant field set
+          to 0x00 (default)"
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
@@ -56,9 +59,9 @@ tests:
                 value: "y"
 
     - label:
-          "Step 2b: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0x01 breathe and the effect variant field set
-          to 0x00 default"
+          "Step 2b: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x01 (breathe) and the effect variant field
+          set to 0x00 (default)."
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
@@ -80,9 +83,9 @@ tests:
                 value: "y"
 
     - label:
-          "Step 2c: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0x02 okay and the effect variant field set to
-          0x00 default"
+          "Step 2c: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x02 (okay) and the effect variant field set
+          to 0x00 (default)."
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
@@ -104,9 +107,9 @@ tests:
                 value: "y"
 
     - label:
-          "Step 2d: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0x0b channel change and the effect variant
-          field set to 0x00 default"
+          "Step 2d:TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x0b (channel change) and the effect variant
+          field set to 0x00 (default)."
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
@@ -128,9 +131,9 @@ tests:
                 value: "y"
 
     - label:
-          "Step 2e: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0x01 breathe and the effect variant field set
-          to 0x00 default"
+          "Step 2e: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x01 (breathe) and the effect variant field
+          set to 0x00 (default)."
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
@@ -152,9 +155,9 @@ tests:
                 value: "y"
 
     - label:
-          "Step 2f: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0xfe finish effect and the effect variant
-          field set to 0x00 default"
+          "Step 2f: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0xfe (finish effect) and the effect variant
+          field set to 0x00 (default)."
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
@@ -176,9 +179,9 @@ tests:
                 value: "y"
 
     - label:
-          "Step 2g: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0x01 breathe and the effect variant field set
-          to 0x00 default"
+          "Step 2g: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x01 (breathe) and the effect variant field
+          set to 0x00 (default)."
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
@@ -200,9 +203,9 @@ tests:
                 value: "y"
 
     - label:
-          "Step 2h: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0xff stop effect and the effect variant field
-          set to 0x00 default"
+          "Step 2h: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0xff (stop effect) and the effect variant
+          field set to 0x00 (default)."
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
@@ -224,9 +227,9 @@ tests:
                 value: "y"
 
     - label:
-          "Step 3a: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0x00 blink and the effect variant field set to
-          0x42 unknown"
+          "Step 3a: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0x00 (blink) and the effect variant field set
+          to 0x42 (unknown)."
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:
@@ -234,7 +237,7 @@ tests:
               - name: "EffectIdentifier"
                 value: 0
               - name: "EffectVariant"
-                value: 66
+                value: EffectVariantEnum.UnknownEnumValue(66)
 
     - label: "Check DUT executes a blink effect."
       cluster: "LogCommands"
@@ -248,9 +251,9 @@ tests:
                 value: "y"
 
     - label:
-          "Step 3b: TH sends TriggerEffect command to DUT with the effect
-          identifier field set to 0xff stop effect and the effect variant field
-          set to 0x00 default"
+          "Step 3b: TH sends TriggerEffect command to DUT, with the effect
+          identifier field set to 0xff (stop effect) and the effect variant
+          field set to 0x00 (default)."
       PICS: I.S.C40.Rsp
       command: "TriggerEffect"
       arguments:

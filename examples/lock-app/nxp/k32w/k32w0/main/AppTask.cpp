@@ -71,7 +71,10 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-static AppTask::FactoryDataProvider sFactoryDataProvider;
+static chip::DeviceLayer::FactoryDataProviderImpl sFactoryDataProvider;
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+static chip::DeviceLayer::CustomFactoryDataProvider sCustomFactoryDataProvider;
+#endif
 #endif
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -102,6 +105,9 @@ CHIP_ERROR AppTask::Init()
     SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
     SetCommissionableDataProvider(&sFactoryDataProvider);
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+    sCustomFactoryDataProvider.ParseFunctionExample();
+#endif
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
@@ -771,11 +777,11 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     }
 
     // write the new door lock state
-    EmberAfStatus status = Attributes::LockState::Set(1, newValue);
+    chip::Protocols::InteractionModel::Status status = Attributes::LockState::Set(1, newValue);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != chip::Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: updating door lock state %x", status);
+        ChipLogError(NotSpecified, "ERR: updating door lock state %x", chip::to_underlying(status));
     }
 }
 

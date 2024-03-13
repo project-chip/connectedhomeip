@@ -33,10 +33,16 @@ if (chip_config_resolve_peer_on_first_transmit_failure != "") {
   defines += [ "CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE=${chip_config_resolve_peer_on_first_transmit_failure}" ]
 }
 
-source_set("messaging_mrp_config") {
-  sources = [ "ReliableMessageProtocolConfig.h" ]
+source_set("configurations") {
+  sources = [
+    "ReliableMessageProtocolConfig.h",
+    "SessionParameters.h",
+  ]
 
-  public_deps = [ "${chip_root}/src/system" ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/system",
+  ]
 }
 
 static_library("messaging") {
@@ -45,6 +51,7 @@ static_library("messaging") {
   sources = [
     "ApplicationExchangeDispatch.cpp",
     "ApplicationExchangeDispatch.h",
+    "EphemeralExchangeDispatch.h",
     "ErrorCategory.cpp",
     "ErrorCategory.h",
     "ExchangeContext.cpp",
@@ -66,8 +73,8 @@ static_library("messaging") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    ":messaging_mrp_config",
-    "${chip_root}/src/app/icd:icd_config",
+    ":configurations",
+    "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
@@ -80,8 +87,8 @@ static_library("messaging") {
 
   if (chip_enable_icd_server) {
     public_deps += [
-      "${chip_root}/src/app/icd:configuration-data",
-      "${chip_root}/src/app/icd:notifier",
+      "${chip_root}/src/app/icd/server:configuration-data",
+      "${chip_root}/src/app/icd/server:notifier",
     ]
   }
 }

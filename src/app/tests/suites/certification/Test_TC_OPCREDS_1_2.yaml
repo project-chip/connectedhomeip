@@ -13,9 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    11.1.2. [TC-OPCREDS-1.2] Global Attributes for Node Operational Credentials
-    Cluster [DUT-Server]
+name: 11.1.2. [TC-OPCREDS-1.2] Global Attributes with DUT as Server
 
 PICS:
     - OPCREDS.S
@@ -26,7 +24,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads the ClusterRevision from DUT"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -42,7 +42,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3: TH reads the FeatureMap from DUT"
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -50,7 +50,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 4: TH reads AttributeList from DUT"
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -73,7 +73,7 @@ tests:
                       0x05,
                   ]
 
-    - label: "Step 4: TH reads AttributeList from DUT"
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -95,7 +95,7 @@ tests:
                       0x05,
                   ]
 
-    - label: "Step 5: TH reads EventList from DUT"
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -104,7 +104,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: TH reads AcceptedCommandList from DUT"
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -112,7 +112,7 @@ tests:
               type: list
               contains: [0x00, 0x02, 0x04, 0x06, 0x07, 0x09, 0x0a, 0x0b]
 
-    - label: "Step 7: TH reads GeneratedCommandList from DUT"
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

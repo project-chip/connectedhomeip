@@ -122,8 +122,6 @@ chip_data_model("bouffalolab-lighting") {
   } else {
     zap_file = "${example_dir}/data_model/lighting-app-ethernet.zap"
   }
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
 }
 
@@ -252,6 +250,7 @@ bouffalolab_executable("lighting_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
 

@@ -20,21 +20,14 @@
  *      This file implements the ExchangeContext class.
  *
  */
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
@@ -203,7 +196,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         else
         {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-            app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+            app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
             // Standalone acks are not application-level message sends.
@@ -329,7 +322,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     SetAutoRequestAck(session->AllowsMRP());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
+    app::ICDNotifier::GetInstance().NotifyActiveRequestNotification(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
 #endif
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
@@ -348,7 +341,7 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
+    app::ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Ideally, in this scenario, the retransmit table should
@@ -595,7 +588,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // message received
-    app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+    app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Set kFlagReceivedAtLeastOneMessage to true since we have received at least one new application level message

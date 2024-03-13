@@ -33,6 +33,7 @@ void MatterKeypadInputPluginServerInitCallback();
 void MatterLevelControlPluginServerInitCallback();
 void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterLowPowerPluginServerInitCallback();
+void MatterMatterScenesPluginServerInitCallback();
 void MatterMediaInputPluginServerInitCallback();
 void MatterMediaPlaybackPluginServerInitCallback();
 void MatterModeSelectPluginServerInitCallback();
@@ -47,7 +48,6 @@ void MatterPowerSourceConfigurationPluginServerInitCallback();
 void MatterPressureMeasurementPluginServerInitCallback();
 void MatterPumpConfigurationAndControlPluginServerInitCallback();
 void MatterRelativeHumidityMeasurementPluginServerInitCallback();
-void MatterScenesPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
 void MatterSwitchPluginServerInitCallback();
 void MatterTargetNavigatorPluginServerInitCallback();
@@ -98,6 +98,7 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterLevelControlPluginServerInitCallback(); \
     MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterLowPowerPluginServerInitCallback(); \
+    MatterMatterScenesPluginServerInitCallback(); \
     MatterMediaInputPluginServerInitCallback(); \
     MatterMediaPlaybackPluginServerInitCallback(); \
     MatterModeSelectPluginServerInitCallback(); \
@@ -112,7 +113,6 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterPressureMeasurementPluginServerInitCallback(); \
     MatterPumpConfigurationAndControlPluginServerInitCallback(); \
     MatterRelativeHumidityMeasurementPluginServerInitCallback(); \
-    MatterScenesPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback(); \
     MatterSwitchPluginServerInitCallback(); \
     MatterTargetNavigatorPluginServerInitCallback(); \

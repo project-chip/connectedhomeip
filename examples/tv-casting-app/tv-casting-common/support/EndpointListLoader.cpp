@@ -18,14 +18,14 @@
 
 #include "EndpointListLoader.h"
 
-#include "clusters/ContentLauncherCluster.h"
-#include "clusters/MediaPlaybackCluster.h"
-#include "clusters/TargetNavigatorCluster.h"
+#include "clusters/Clusters.h"
+#include "core/BaseCluster.h"
 #include "core/CastingPlayer.h"
 #include "core/Types.h"
 #include "support/CastingStore.h"
 
 #include "app/clusters/bindings/BindingManager.h"
+#include <app-common/zap-generated/cluster-objects.h>
 
 namespace matter {
 namespace casting {
@@ -53,7 +53,7 @@ void EndpointListLoader::Initialize(chip::Messaging::ExchangeManager * exchangeM
 
     for (const auto & binding : chip::BindingTable::GetInstance())
     {
-        if (binding.type == EMBER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
+        if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
         {
             // check to see if we discovered a new endpoint in the bindings
             chip::EndpointId endpointId                     = binding.remote;
@@ -86,7 +86,7 @@ CHIP_ERROR EndpointListLoader::Load()
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-        if (binding.type == EMBER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
+        if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
         {
             // if we discovered a new Endpoint from the bindings, read its EndpointAttributes
             chip::EndpointId endpointId                     = binding.remote;
@@ -121,28 +121,7 @@ void EndpointListLoader::Complete()
             EndpointAttributes endpointAttributes = mEndpointAttributesList[i];
             std::shared_ptr<Endpoint> endpoint =
                 std::make_shared<Endpoint>(CastingPlayer::GetTargetCastingPlayer(), endpointAttributes);
-            for (chip::ClusterId clusterId : mEndpointServerLists[i])
-            {
-                switch (clusterId)
-                {
-                case chip::app::Clusters::ContentLauncher::Id:
-                    endpoint->RegisterCluster<clusters::ContentLauncherCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::MediaPlayback::Id:
-                    endpoint->RegisterCluster<clusters::MediaPlaybackCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::TargetNavigator::Id:
-                    endpoint->RegisterCluster<clusters::TargetNavigatorCluster>(clusterId);
-                    break;
-
-                default:
-                    ChipLogProgress(AppServer, "Skipping registration of clusterId %d for endpointId %d", clusterId,
-                                    endpointAttributes.mId);
-                    break;
-                }
-            }
+            endpoint->RegisterClusters(mEndpointServerLists[i]);
             CastingPlayer::GetTargetCastingPlayer()->RegisterEndpoint(endpoint);
         }
 
@@ -157,8 +136,14 @@ void EndpointListLoader::Complete()
         mSessionHandle       = nullptr;
         mNewEndpointsToLoad  = 0;
 
-        // done loading endpoints, callback client OnCompleted
-        support::CastingStore::GetInstance()->AddOrUpdate(*CastingPlayer::GetTargetCastingPlayer());
+        // done loading endpoints, store TargetCastingPlayer
+        CHIP_ERROR err = support::CastingStore::GetInstance()->AddOrUpdate(*CastingPlayer::GetTargetCastingPlayer());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CastingStore::AddOrUpdate() failed. Err: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        // callback client OnCompleted
         VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
         CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_NO_ERROR, CastingPlayer::GetTargetCastingPlayer());
     }
@@ -166,7 +151,7 @@ void EndpointListLoader::Complete()
 
 CHIP_ERROR EndpointListLoader::ReadVendorId(EndpointAttributes * endpointAttributes)
 {
-    MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
+    core::MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
 
     return cluster.template ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo>(
         endpointAttributes,
@@ -186,7 +171,7 @@ CHIP_ERROR EndpointListLoader::ReadVendorId(EndpointAttributes * endpointAttribu
 
 CHIP_ERROR EndpointListLoader::ReadProductId(EndpointAttributes * endpointAttributes)
 {
-    MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
+    core::MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
 
     return cluster.template ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo>(
         endpointAttributes,
@@ -207,7 +192,7 @@ CHIP_ERROR EndpointListLoader::ReadProductId(EndpointAttributes * endpointAttrib
 
 CHIP_ERROR EndpointListLoader::ReadDeviceTypeList(EndpointAttributes * endpointAttributes)
 {
-    MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
+    core::MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
 
     return cluster.template ReadAttribute<chip::app::Clusters::Descriptor::Attributes::DeviceTypeList::TypeInfo>(
         endpointAttributes,
@@ -233,7 +218,7 @@ CHIP_ERROR EndpointListLoader::ReadDeviceTypeList(EndpointAttributes * endpointA
 
 CHIP_ERROR EndpointListLoader::ReadServerList(std::vector<chip::ClusterId> * endpointServerList, chip::EndpointId endpointId)
 {
-    MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointId);
+    core::MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointId);
 
     return cluster.template ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(
         endpointServerList,

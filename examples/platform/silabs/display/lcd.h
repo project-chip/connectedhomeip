@@ -71,6 +71,7 @@ public:
     void SetScreen(Screen_e screen);
     void CycleScreens(void);
     void SetStatus(DisplayStatus_t & status);
+    void WriteStatus();
 
 #ifdef QR_CODE_ENABLED
     void SetQRCode(uint8_t * str, uint32_t size);
@@ -85,7 +86,6 @@ private:
     } DemoState_t;
 
     void WriteDemoUI();
-    void WriteStatus();
 
 #ifdef QR_CODE_ENABLED
     void WriteQRCode();

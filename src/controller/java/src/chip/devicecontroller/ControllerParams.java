@@ -14,6 +14,7 @@ public final class ControllerParams {
   private final boolean attemptNetworkScanWiFi;
   private final boolean attemptNetworkScanThread;
   private final boolean skipCommissioningComplete;
+  private final boolean skipAttestationCertificateValidation;
   private final Optional<String> countryCode;
   private final Optional<Integer> regulatoryLocationType;
   @Nullable private final KeypairDelegate keypairDelegate;
@@ -22,6 +23,7 @@ public final class ControllerParams {
   @Nullable private final byte[] operationalCertificate;
   @Nullable private final byte[] ipk;
   private final long adminSubject;
+  private final boolean enableServerInteractions;
 
   /** @param udpListenPort the UDP listening port, or 0 to pick any available port. */
   private ControllerParams(Builder builder) {
@@ -33,6 +35,7 @@ public final class ControllerParams {
     this.attemptNetworkScanWiFi = builder.attemptNetworkScanWiFi;
     this.attemptNetworkScanThread = builder.attemptNetworkScanThread;
     this.skipCommissioningComplete = builder.skipCommissioningComplete;
+    this.skipAttestationCertificateValidation = builder.skipAttestationCertificateValidation;
     this.countryCode = builder.countryCode;
     this.regulatoryLocationType = builder.regulatoryLocationType;
     this.keypairDelegate = builder.keypairDelegate;
@@ -41,6 +44,7 @@ public final class ControllerParams {
     this.operationalCertificate = builder.operationalCertificate;
     this.ipk = builder.ipk;
     this.adminSubject = builder.adminSubject;
+    this.enableServerInteractions = builder.enableServerInteractions;
   }
 
   public long getFabricId() {
@@ -76,6 +80,10 @@ public final class ControllerParams {
     return skipCommissioningComplete;
   }
 
+  public boolean getSkipAttestationCertificateValidation() {
+    return skipAttestationCertificateValidation;
+  }
+
   public Optional<String> getCountryCode() {
     return countryCode;
   }
@@ -108,6 +116,10 @@ public final class ControllerParams {
     return adminSubject;
   }
 
+  public boolean getEnableServerInteractions() {
+    return enableServerInteractions;
+  }
+
   /** Returns parameters with ephemerally generated operational credentials */
   public static Builder newBuilder() {
     return new Builder();
@@ -137,6 +149,7 @@ public final class ControllerParams {
     private boolean attemptNetworkScanWiFi = false;
     private boolean attemptNetworkScanThread = false;
     private boolean skipCommissioningComplete = false;
+    private boolean skipAttestationCertificateValidation = false;
     private Optional<String> countryCode = Optional.empty();
     private Optional<Integer> regulatoryLocationType = Optional.empty();
     @Nullable private KeypairDelegate keypairDelegate = null;
@@ -145,6 +158,7 @@ public final class ControllerParams {
     @Nullable private byte[] operationalCertificate = null;
     @Nullable private byte[] ipk = null;
     private long adminSubject = 0;
+    private boolean enableServerInteractions = false;
 
     private Builder() {}
 
@@ -258,6 +272,21 @@ public final class ControllerParams {
     }
 
     /**
+     * Used when the Commissioner disables Attestation Certificate Validation.
+     *
+     * <p>Specifically, this sets SkipAttestationCertificateValidation in the
+     * CommissioningParameters passed to the CommissioningDelegate.
+     *
+     * @param skipAttestationCertificateValidation
+     * @return
+     */
+    public Builder setSkipAttestationCertificateValidation(
+        boolean skipAttestationCertificateValidation) {
+      this.skipAttestationCertificateValidation = skipAttestationCertificateValidation;
+      return this;
+    }
+
+    /**
      * Sets the Regulatory Location country code passed to ChipDeviceCommissioner's
      * CommissioningParameters.
      *
@@ -332,6 +361,17 @@ public final class ControllerParams {
      */
     public Builder setAdminSubject(long adminSubject) {
       this.adminSubject = adminSubject;
+      return this;
+    }
+
+    /**
+     * Controls enabling server interactions on a controller. For ICD check-in message, this feature
+     * has to be enabled.
+     *
+     * @param enableServerInteractions indicates whether to enable server interactions.
+     */
+    public Builder setEnableServerInteractions(boolean enableServerInteractions) {
+      this.enableServerInteractions = enableServerInteractions;
       return this;
     }
 

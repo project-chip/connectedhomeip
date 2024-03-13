@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001e" name="Binding" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001E" name="Binding" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x001E" name="Binding"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="BIND" scope="Endpoint"/>
   <dataTypes>
     <struct name="TargetStruct">
@@ -73,6 +78,7 @@ Davis, CA 95616, USA
             <attribute name="Endpoint"/>
           </notTerm>
         </mandatoryConform>
+        <constraint type="min" value="1"/>
       </field>
       <field id="3" name="Endpoint" type="endpoint-no">
         <mandatoryConform>
@@ -84,11 +90,13 @@ Davis, CA 95616, USA
       <field id="4" name="Cluster" type="cluster-id">
         <optionalConform/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Binding" type="list[TargetStruct Type]" default="[]">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+    <attribute id="0x0000" name="Binding" type="list" default="[]">
+      <entry type="TargetStruct"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage" fabricScoped="true"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>

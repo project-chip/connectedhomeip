@@ -54,11 +54,17 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0506" name="Media Playback" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0506" name="Media Playback" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Added Text/Audio tracks support, Audio-while-advancing (AA) feature, StateChanged event"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0506" name="Media Playback"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MEDIAPLAYBACK" scope="Endpoint"/>
   <features>
     <feature bit="0" code="AS" name="AdvancedSeek" summary="Advanced media seeking">
@@ -67,87 +73,17 @@ Davis, CA 95616, USA
     <feature bit="1" code="VS" name="VariableSpeed" summary="Variable speed playback">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="TT" name="TextTracks" summary="Device or app supports Text Tracks.">
+    <feature bit="2" code="TT" name="TextTracks" summary="Text Tracks">
       <optionalConform/>
     </feature>
-    <feature bit="3" code="AT" name="AudioTracks" summary="Device or app supports Audio Tracks.">
+    <feature bit="3" code="AT" name="AudioTracks" summary="Audio Tracks">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="AA" name="AudioAdvance" summary="Can play audio during fast and slow playback speeds">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
-    <enum name="PlaybackStateEnum">
-      <item value="0" name="Playing" summary="Media is currently playing (includes FF and REW)">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Paused" summary="Media is currently paused">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="NotPlaying" summary="Media is not currently playing">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Buffering" summary="Media is not currently buffering and playback will start when buffer has been filled">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="StatusEnum">
-      <item value="0" name="Success" summary="Succeeded">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="InvalidStateForCommand" summary="Requested playback command is invalid in the current playback state.">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="NotAllowed" summary="Requested playback command is not allowed in the current playback state.
-                                    For example, attempting to fast-forward during a commercial might return NotAllowed.">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="NotActive" summary="This endpoint is not active for playback.">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="SpeedOutOfRange" summary="The FastForward or Rewind Command was issued but the media is already playing
-                                    back at the fastest speed supported by the server in the respective direction.">
-        <mandatoryConform>
-          <feature name="VS"/>
-        </mandatoryConform>
-      </item>
-      <item value="5" name="SeekOutOfRange" summary="The Seek Command was issued with a value of position outside of the allowed seek range of the media.">
-        <mandatoryConform>
-          <feature name="AS"/>
-        </mandatoryConform>
-      </item>
-    </enum>
-    <struct name="PlaybackPositionStruct">
-      <field id="0" name="UpdatedAt" type="epoch-us">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Position" type="uint64">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-    </struct>
-    <struct name="TrackStruct">
-      <field id="0" name="ID" type="string">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
-      </field>
-      <field id="1" name="TrackAttributes" type="TrackAttributesStruct">
-        <mandatoryConform/>
-      </field>
-    </struct>
-    <struct name="TrackAttributesStruct">
-      <field id="0" name="LanguageCode" type="string">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
-      </field>
-      <field id="1" name="Characteristics" type="list[CharacteristicEnum Type]" default="null">
-        <quality nullable="true"/>
-        <optionalConform/>
-      </field>
-      <field id="2" name="DisplayName" type="string" default="null">
-        <quality nullable="true"/>
-        <optionalConform/>
-      </field>
-    </struct>
-
     <enum name="CharacteristicEnum">
       <item value="0" name="ForcedSubtitles" summary="Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio.">
         <mandatoryConform/>
@@ -204,6 +140,80 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="PlaybackStateEnum">
+      <item value="0" name="Playing" summary="Media is currently playing (includes FF and REW)">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Paused" summary="Media is currently paused">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="NotPlaying" summary="Media is not currently playing">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Buffering" summary="Media is not currently buffering and playback will start when buffer has been filled">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StatusEnum">
+      <item value="0" name="Success" summary="Succeeded">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="InvalidStateForCommand" summary="Requested playback command is invalid in the current playback state.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="NotAllowed" summary="Requested playback command is not allowed in the current playback state.
+                                    For example, attempting to fast-forward during a commercial might return NotAllowed.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="NotActive" summary="This endpoint is not active for playback.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="SpeedOutOfRange" summary="The FastForward or Rewind Command was issued but the media is already playing
+                                    back at the fastest speed supported by the server in the respective direction.">
+        <mandatoryConform>
+          <feature name="VS"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="SeekOutOfRange" summary="The Seek Command was issued with a value of position outside of the allowed seek range of the media.">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <struct name="PlaybackPositionStruct">
+      <field id="0" name="UpdatedAt" type="epoch-us">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Position" type="uint64">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="TrackAttributesStruct">
+      <field id="0" name="LanguageCode" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="32"/>
+      </field>
+      <field id="1" name="Characteristics" type="list" default="null">
+        <entry type="CharacteristicEnum"/>
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="2" name="DisplayName" type="string" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint type="maxLength" value="256"/>
+      </field>
+    </struct>
+    <struct name="TrackStruct">
+      <field id="0" name="ID" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="32"/>
+      </field>
+      <field id="1" name="TrackAttributes" type="TrackAttributesStruct">
+        <mandatoryConform/>
+      </field>
+    </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="CurrentState" type="PlaybackStateEnum">
@@ -266,7 +276,8 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0008" name="AvailableAudioTracks" type="list[TrackStruct Type]" default="null">
+    <attribute id="0x0008" name="AvailableAudioTracks" type="list" default="null">
+      <entry type="TrackStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -282,7 +293,8 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000A" name="AvailableTextTracks" type="list[TrackStruct Type]" default="null">
+    <attribute id="0x000A" name="AvailableTextTracks" type="list" default="null">
+      <entry type="TrackStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -292,31 +304,31 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Play" response="PlaybackResponse">
+    <command id="0x00" name="Play" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x01" name="Pause" response="PlaybackResponse">
+    <command id="0x01" name="Pause" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x02" name="Stop" response="PlaybackResponse">
+    <command id="0x02" name="Stop" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x03" name="StartOver" response="PlaybackResponse">
+    <command id="0x03" name="StartOver" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>
-    <command id="0x04" name="Previous" response="PlaybackResponse">
+    <command id="0x04" name="Previous" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>
-    <command id="0x05" name="Next" response="PlaybackResponse">
+    <command id="0x05" name="Next" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>
-    <command id="0x06" name="Rewind" response="PlaybackResponse">
+    <command id="0x06" name="Rewind" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="VS"/>
@@ -327,7 +339,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
     </command>
-    <command id="0x07" name="FastForward" response="PlaybackResponse">
+    <command id="0x07" name="FastForward" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="VS"/>
@@ -338,22 +350,21 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
     </command>
-    <command id="0x08" name="SkipForward" response="PlaybackResponse">
+    <command id="0x08" name="SkipForward" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
       <field id="0" name="DeltaPositionMilliseconds" type="uint64">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x09" name="SkipBackward" response="PlaybackResponse">
+    <command id="0x09" name="SkipBackward" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
       <field id="0" name="DeltaPositionMilliseconds" type="uint64">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0a" name="PlaybackResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+    <command id="0x0A" name="PlaybackResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>
@@ -363,7 +374,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x0b" name="Seek" response="PlaybackResponse">
+    <command id="0x0B" name="Seek" direction="commandToServer" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="AS"/>
@@ -372,31 +383,33 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0c" name="ActivateAudioTrack" response="Y">
+    <command id="0x0C" name="ActivateAudioTrack" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="AT"/>
       </mandatoryConform>
       <field id="0" name="TrackID" type="string">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint type="maxLength" value="32"/>
       </field>
       <field id="1" name="AudioOutputIndex" type="uint8">
-        <mandatoryConform/>
         <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="AT"/>
+        </mandatoryConform>
       </field>
     </command>
-    <command id="0x0D" name="ActivateTextTrack" response="Y">
+    <command id="0x0D" name="ActivateTextTrack" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="TT"/>
       </mandatoryConform>
       <field id="0" name="TrackID" type="string">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint type="maxLength" value="32"/>
       </field>
     </command>
-    <command id="0x0D" name="DeactivateTextTrack" response="Y">
+    <command id="0x0E" name="DeactivateTextTrack" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="TT"/>
@@ -407,52 +420,55 @@ Davis, CA 95616, USA
     <event id="0x00" name="StateChanged" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0x0000" name="CurrentState" type="PlaybackStateEnum">
+      <field id="0" name="CurrentState" type="PlaybackStateEnum">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="0x0001" name="StartTime" type="epoch-us">
+      <field id="1" name="StartTime" type="epoch-us">
         <mandatoryConform>
           <feature name="AS"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
-      <field id="0x0002" name="Duration" type="uint64">
+      <field id="2" name="Duration" type="uint64">
         <mandatoryConform>
           <feature name="AS"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
-      <field id="0x0003" name="SampledPosition" type="PlaybackPositionStruct">
+      <field id="3" name="SampledPosition" type="PlaybackPositionStruct">
         <mandatoryConform>
           <feature name="AS"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
-      <field id="0x0004" name="PlaybackSpeed" type="single">
+      <field id="4" name="PlaybackSpeed" type="single">
         <mandatoryConform>
           <feature name="AS"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
-      <field id="0x0005" name="SeekRangeEnd" type="uint64">
+      <field id="5" name="SeekRangeEnd" type="uint64">
         <mandatoryConform>
           <feature name="AS"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
-      <field id="0x0006" name="SeekRangeStart" type="uint64">
+      <field id="6" name="SeekRangeStart" type="uint64">
         <mandatoryConform>
           <feature name="AS"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
-      <field id="0x0007" name="Data" type="octets">
+      <field id="7" name="Data" type="octstr">
         <optionalConform/>
         <constraint type="maxLength" value="900"/>
       </field>
-      <field id="0x0008" name="AudioAdvanceUnmuted" type="bool" default="false">
-        <optionalConform/>
+      <field id="8" name="AudioAdvanceUnmuted" type="bool" default="false">
+        <mandatoryConform>
+          <feature name="AA"/>
+        </mandatoryConform>
+        <constraint type="desc"/>
       </field>
     </event>
   </events>

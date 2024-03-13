@@ -65,25 +65,27 @@ Davis, CA 95616, USA
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x005e" name="Microwave Oven Mode" side="server">
+    <cluster id="0x005E" name="Microwave Oven Mode" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x005f" name="Microwave Oven Control" side="server">
+    <cluster id="0x005F" name="Microwave Oven Control" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0060" name="Operational State" side="server">
       <mandatoryConform/>
+      <attributes>
+        <attribute code="" name="CountdownTime">
+          <mandatoryConform/>
+        </attribute>
+      </attributes>
     </cluster>
     <cluster id="0x0202" name="Fan Control" side="server">
       <optionalConform/>
       <features>
-        <feature code="" name="Rocking">
-          <disallowConform/>
-        </feature>
         <feature code="" name="Wind">
           <disallowConform/>
         </feature>
-        <feature code="" name="Airflow Direction">
+        <feature code="" name="AirflowDirection">
           <disallowConform/>
         </feature>
       </features>

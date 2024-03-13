@@ -34,9 +34,10 @@ tests:
     # Issue 13029
     #this step implicitly validating the attribute(CatalogList)constraints, as long as the payload is being parsed successfully
     - label:
-          "Step 1: TH reads CatalogList attribute from the DUT and where each
-          entry in the list is a CSA-issued Vendor Id of type unsigned 16 bit
-          integer ranging between 0-65536 for the catalog"
+          "Step 1: TH reads CatalogList attribute from the DUT for the list of
+          supported application catalogs and where each entry in the list is a
+          CSA-issued Vendor Id of type unsigned 16 bit integer ranging between
+          0-65536 for the catalog"
       PICS: APPLAUNCHER.S.A0000
       command: "readAttribute"
       attribute: "CatalogList"

@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the global attribute: ClusterRevision"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,8 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3: Read the global attribute: FeatureMap"
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      PICS: "!DGGEN.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -47,7 +48,16 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 4a: Read the global attribute: AttributeList"
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      PICS: DGGEN.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: bitmap32
+
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -56,7 +66,7 @@ tests:
               type: list
               contains: [0, 1, 8, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 4a: Read the global attribute: AttributeList"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -68,6 +78,7 @@ tests:
     - label:
           "Step 4b: Validate presence of mandatory attribute(UpTime) in
           AttributeList"
+      PICS: DGGEN.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -76,7 +87,7 @@ tests:
               contains: [2]
 
     - label:
-          "Step 4c: Read optional attribute(TotalOperationalHours) in
+          "Step 4c: TH reads optional attribute(TotalOperationalHours) in
           AttributeList"
       PICS: DGGEN.S.A0003
       command: "readAttribute"
@@ -86,7 +97,7 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Step 4d: Read optional attribute(BootReason) in AttributeList"
+    - label: "Step 4d: TH reads optional attribute(BootReason) in AttributeList"
       PICS: DGGEN.S.A0004
       command: "readAttribute"
       attribute: "AttributeList"
@@ -96,7 +107,7 @@ tests:
               contains: [4]
 
     - label:
-          "Step 4e: Read optional attribute(ActiveHardwareFaults) in
+          "Step 4e: TH reads optional attribute(ActiveHardwareFaults) in
           AttributeList"
       PICS: DGGEN.S.A0005
       command: "readAttribute"
@@ -107,7 +118,8 @@ tests:
               contains: [5]
 
     - label:
-          "Step 4f: Read optional attribute(ActiveRadioFaults) in AttributeList"
+          "Step 4f: TH reads optional attribute(ActiveRadioFaults) in
+          AttributeList"
       PICS: DGGEN.S.A0006
       command: "readAttribute"
       attribute: "AttributeList"
@@ -117,7 +129,7 @@ tests:
               contains: [6]
 
     - label:
-          "Step 4g: Read optional attribute(ActiveNetworkFaults) in
+          "Step 4g: TH reads optional attribute(ActiveNetworkFaults) in
           AttributeList"
       PICS: DGGEN.S.A0007
       command: "readAttribute"
@@ -127,7 +139,7 @@ tests:
               type: list
               contains: [7]
 
-    - label: "Step 5a: Read the global attribute: EventList"
+    - label: "Step 5a: TH reads from the DUT the EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -136,7 +148,8 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Step 5b: Read optional event(HardwareFaultChange) in EventList"
+    - label:
+          "Step 5b: TH reads optional event(HardwareFaultChange) in EventList"
       PICS: DGGEN.S.E00 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -145,7 +158,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 5c: Read optional event(RadioFaultChange) in EventList"
+    - label: "Step 5c: TH reads optional event(RadioFaultChange) in EventList"
       PICS: DGGEN.S.E01 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -154,7 +167,7 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Step 5d: Read optional event(NetworkFaultChange) in EventList"
+    - label: "Step 5d: TH reads optional event(NetworkFaultChange) in EventList"
       PICS: DGGEN.S.E02 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -163,7 +176,7 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Step 6: Read the global attribute: AcceptedCommandList"
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -171,10 +184,10 @@ tests:
               type: list
               contains: [0, 1]
 
-    - label: "Step 7: TH reads GeneratedCommandList from DUT"
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [2]
           constraints:
               type: list
+              contains: [2]

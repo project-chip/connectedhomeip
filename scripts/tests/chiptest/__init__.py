@@ -160,6 +160,66 @@ def _GetInDevelopmentTests() -> Set[str]:
     }
 
 
+def _GetChipToolUnsupportedTests() -> Set[str]:
+    """Tests that fail in chip-tool for some reason"""
+    return {
+        "TestDiagnosticLogsDownloadCommand",  # chip-tool does not implement a bdx download command.
+    }
+
+
+def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
+    """Tests that fail in darwin-framework-tool for some reason"""
+    return {
+        "DL_LockUnlock",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_AddNewFabricFromExistingFabric",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
+        # The name of the arguments once converted differs for chip-tool and darwin-framework-tool (attribute-ids vs attribute-id. See #31934)
+        "TestAttributesById",
+        "TestBasicInformation",  # darwin-framework-tool does not support writing readonly attributes by name
+        "TestClusterComplexTypes",  # Darwin framework has no way to represent a present but null optional nullable field.
+        # When reading TestFabricScoped in TestClusterMultiFabric, the result differs because of missing fields that have been declared in the YAML step with null value to workaround some limitation of the test harness (#29110)
+        "TestClusterMultiFabric",
+        "TestCommandsById",  # darwin-framework-tool does not support writing readonly attributes by name
+        "TestDiagnosticLogs",  # darwin-framework-tool does not implement a BDXTransferServerDelegate
+        "TestDiscovery",  # darwin-framework-tool does not support dns-sd commands.
+        "TestEvents",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "TestEventsById",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "TestGroupMessaging",  # darwin-framework-tool does not support group commands.
+        "TestIcdManagementCluster",  # darwin-framework-tool does not support ICD registration
+        "TestUnitTestingClusterMei",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "TestReadNoneSubscribeNone",  # darwin-framework-tool does not supports those commands.
+
+        "Test_TC_ACE_1_6",  # darwin-framework-tool does not support group commands.
+        "Test_TC_ACL_2_5",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_ACL_2_6",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_ACL_2_7",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_ACL_2_8",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_ACL_2_9",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_ACL_2_10",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_BINFO_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
+        "Test_TC_BINFO_2_2",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        # The name of the arguments once converted differs for chip-tool and darwin-framework-tool (attribute-ids vs attribute-id. See #31934)
+        "Test_TC_BRBINFO_2_1",
+        "Test_TC_DGGEN_2_3",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_DRLK_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
+        "Test_TC_DGTHREAD_2_1",  # Thread Network Diagnostics is not implemented under darwin.
+        "Test_TC_DGTHREAD_2_2",  # Thread Network Diagnostics is not implemented under darwin.
+        "Test_TC_DGTHREAD_2_3",  # Thread Network Diagnostics is not implemented under darwin.
+        "Test_TC_DGTHREAD_2_4",  # Thread Network Diagnostics is not implemented under darwin.
+        "Test_TC_FLABEL_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
+        "Test_TC_GRPKEY_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
+        "Test_TC_LCFG_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
+        "Test_TC_OPCREDS_3_7",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
+        "Test_TC_SMOKECO_2_2",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_SMOKECO_2_3",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_SMOKECO_2_4",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_SMOKECO_2_5",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_SMOKECO_2_6",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_SC_4_1",  # darwin-framework-tool does not support dns-sd commands.
+        "Test_TC_SC_5_2",  # darwin-framework-tool does not support group commands.
+        "Test_TC_S_2_3",  # darwin-framework-tool does not support group commands.
+    }
+
+
 def _GetChipReplUnsupportedTests() -> Set[str]:
     """Tests that fail in chip-repl for some reason"""
     return {
@@ -176,6 +236,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "TestGroupKeyManagementCluster.yaml",  # chip-repl does not support EqualityCommands (2023-08-04)
         "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in chip-repl
+        "Test_TC_ICDM_3_4.yaml",           # chip-repl does not support ICD registration
         "Test_TC_S_2_2.yaml",              # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
@@ -187,6 +248,9 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_LWM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_LWM_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_LWM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_OTCCM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_OTCCM_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_OTCCM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_G_2_4.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCRUNM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCCLEANM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
@@ -199,6 +263,13 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_ACL_2_5.yaml",            # chip-repl does not support LastReceivedEventNumber : https://github.com/project-chip/connectedhomeip/issues/28884
         "Test_TC_ACL_2_6.yaml",            # chip-repl does not support LastReceivedEventNumber : https://github.com/project-chip/connectedhomeip/issues/28884
         "Test_TC_RVCCLEANM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_BINFO_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "TestDiagnosticLogs.yaml",          # chip-repl does not implement a BDXTransferServerDelegate
+        "Test_TC_EEVSEM_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_EEVSEM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_EEVSEM_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_EEVSEM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "TestDiagnosticLogsDownloadCommand.yaml",  # chip-repl does not implement the bdx download command
     }
 
 
@@ -240,6 +311,10 @@ def target_for_name(name: str):
         return TestTarget.BRIDGE
     if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
         return TestTarget.LIT_ICD
+    if name.startswith("Test_TC_MWOCTRL_") or name.startswith("Test_TC_MWOM_"):
+        return TestTarget.MWO
+    if name.startswith("Test_TC_RVCRUNM_") or name.startswith("Test_TC_RVCCLEANM_") or name.startswith("Test_TC_RVCOPSTATE_"):
+        return TestTarget.RVC
     return TestTarget.ALL_CLUSTERS
 
 
@@ -279,7 +354,7 @@ def tests_with_command(chip_tool: str, is_manual: bool):
         )
 
 
-def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, use_short_run_name: bool):
+def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft_unsupported_as_in_development: bool, treat_chip_tool_unsupported_as_in_development: bool, use_short_run_name: bool):
     """
     use_short_run_name should be true if we want the run_name to be "Test_ABC" instead of "some/path/Test_ABC.yaml"
     """
@@ -289,6 +364,8 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, use_short
     extra_slow_tests = _GetExtraSlowTests()
     in_development_tests = _GetInDevelopmentTests()
     chip_repl_unsupported_tests = _GetChipReplUnsupportedTests()
+    dft_unsupported_as_in_development_tests = _GetDarwinFrameworkToolUnsupportedTests()
+    chip_tool_unsupported_as_in_development_tests = _GetChipToolUnsupportedTests()
     purposeful_failure_tests = _GetPurposefulFailureTests()
 
     for path in _AllYamlTests():
@@ -322,6 +399,12 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, use_short
         else:
             run_name = str(path)
 
+        if treat_dft_unsupported_as_in_development and run_name in dft_unsupported_as_in_development_tests:
+            tags.add(TestTag.IN_DEVELOPMENT)
+
+        if treat_chip_tool_unsupported_as_in_development and run_name in chip_tool_unsupported_as_in_development_tests:
+            tags.add(TestTag.IN_DEVELOPMENT)
+
         yield TestDefinition(
             run_name=run_name,
             name=path.stem,  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
@@ -331,12 +414,17 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, use_short
 
 
 def AllReplYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, use_short_run_name=False):
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=False):
         yield test
 
 
 def AllChipToolYamlTests():
-    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, use_short_run_name=True):
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=True):
+        yield test
+
+
+def AllDarwinFrameworkToolYamlTests():
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=True):
         yield test
 
 

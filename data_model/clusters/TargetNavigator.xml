@@ -54,11 +54,17 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0505" name="Target Navigator" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0505" name="Target Navigator" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Add TargetUpdated event"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0505" name="Target Navigator"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="TGTNAV" scope="Endpoint"/>
   <dataTypes>
     <enum name="StatusEnum">
@@ -83,7 +89,8 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="TargetList" type="list[TargetInfoStruct Type]">
+    <attribute id="0x0000" name="TargetList" type="list">
+      <entry type="TargetInfoStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
@@ -94,7 +101,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="NavigateTarget" response="NavigateTargetResponse">
+    <command id="0x00" name="NavigateTarget" direction="commandToServer" response="NavigateTargetResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Target" type="uint8">
@@ -105,7 +112,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="NavigateTargetResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>
@@ -116,19 +122,20 @@ Davis, CA 95616, USA
     </command>
   </commands>
   <events>
-    <event id="0x00" name="TargetUpdated" priority="critical">
+    <event id="0x00" name="TargetUpdated" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform/>
-      <field id="0x0000" name="TargetList" type="list[TargetInfoStruct Type]">
+      <optionalConform/>
+      <field id="0" name="TargetList" type="list">
+        <entry type="TargetInfoStruct"/>
         <optionalConform/>
       </field>
-      <field id="0x0001" name="CurrentTarget" type="uint8" default="0xFF">
+      <field id="1" name="CurrentTarget" type="uint8" default="0xFF">
         <optionalConform/>
         <constraint type="desc"/>
       </field>
-      <field id="0x0002" name="Data" type="octets">
-        <constraint type="maxLength" value="900"/>
+      <field id="2" name="Data" type="octstr">
         <optionalConform/>
+        <constraint type="maxLength" value="900"/>
       </field>
     </event>
   </events>

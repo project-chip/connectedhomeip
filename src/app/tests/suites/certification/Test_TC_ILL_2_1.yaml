@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +33,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads MinMeasuredValue attribute from DUT"
+    - label:
+          "Step 2: Test Harness Client reads MinMeasuredValue attribute from
+          DUT."
       PICS: ILL.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
@@ -41,7 +45,9 @@ tests:
               minValue: 1
               maxValue: 65533
 
-    - label: "Step 3: TH reads MaxMeasuredValue attribute from DUT"
+    - label:
+          "Step 3: Test Harness Client reads MaxMeasuredValue attribute from
+          DUT."
       PICS: ILL.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
@@ -51,7 +57,8 @@ tests:
               minValue: 2
               maxValue: 65534
 
-    - label: "Step 4: TH reads MeasuredValue attribute from DUT"
+    - label:
+          "Step 4: Test Harness Client reads MeasuredValue attribute from DUT."
       PICS: ILL.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -61,7 +68,7 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "Step 5: TH reads Tolerance attribute from DUT"
+    - label: "Step 5: TH reads the Tolerance attribute from the DUT."
       PICS: ILL.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
@@ -71,7 +78,7 @@ tests:
               minValue: 0
               maxValue: 2048
 
-    - label: "Step 6: TH reads LightSensorType attribute from DUT"
+    - label: "Step 6: TH reads the LightSensorType attribute from the DUT"
       PICS: ILL.S.A0004
       command: "readAttribute"
       attribute: "LightSensorType"
@@ -79,4 +86,4 @@ tests:
           constraints:
               type: enum8
               minValue: 0
-              maxValue: 254
+              maxValue: LightSensorTypeEnum.UnknownEnumValue(254)

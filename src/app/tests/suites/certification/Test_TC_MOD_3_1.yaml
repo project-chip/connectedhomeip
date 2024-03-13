@@ -31,7 +31,9 @@ config:
         defaultValue: 5000
 
 tests:
-    - label: "Step 0:Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -39,14 +41,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: TH reads the OnMode attribute from the DUT"
+    - label: "Step 1: TH reads from the DUT the OnMode attribute."
       PICS: MOD.S.A0005 && MOD.S.F00
       command: "readAttribute"
       attribute: "OnMode"
       response:
           saveAs: on_mode_dut
 
-    - label: "Step 2a: TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 2a: TH reads from the DUT the CurrentMode attribute."
       PICS: MOD.S.A0003 && MOD.S.F00
       command: "readAttribute"
       attribute: "CurrentMode"

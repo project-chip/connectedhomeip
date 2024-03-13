@@ -51,22 +51,25 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
                                                  const chip::Optional<PlaybackPreferencesType> playbackPreferences,
                                                  bool useCurrentContext)
 {
+    DeviceLayer::StackUnlock unlock;
     Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
-    VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mLaunchContentMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
+    env->ExceptionClear();
     {
         UtfString jData(env, data);
 
         // Todo: make parameterList java
         jobjectArray parameterArray = nullptr;
 
-        jobject resp = env->CallObjectMethod(mContentLauncherManagerObject, mLaunchContentMethod, parameterArray,
+        jobject resp = env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mLaunchContentMethod, parameterArray,
                                              static_cast<jboolean>(autoplay), jData.jniValue());
         if (env->ExceptionCheck())
         {
@@ -105,14 +108,18 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
                                              const chip::CharSpan & displayString,
                                              const BrandingInformationType & brandingInformation)
 {
+    DeviceLayer::StackUnlock unlock;
     Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContentUrl");
-    VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mLaunchUrlMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    env->ExceptionClear();
 
     {
         UtfString jContentUrl(env, contentUrl);
@@ -121,7 +128,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
         // Todo: make brandingInformation java
         jobjectArray branding = nullptr;
 
-        jobject resp = env->CallObjectMethod(mContentLauncherManagerObject, mLaunchUrlMethod, jContentUrl.jniValue(),
+        jobject resp = env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mLaunchUrlMethod, jContentUrl.jniValue(),
                                              jDisplayString.jniValue(), branding);
         if (env->ExceptionCheck())
         {
@@ -158,18 +165,22 @@ exit:
 
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::list<std::string> acceptedHeadersList;
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::GetAcceptHeader");
-    VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAcceptHeaderMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    env->ExceptionClear();
 
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray acceptedHeadersArray =
-            (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptHeaderMethod);
+            (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject.ObjectRef(), mGetAcceptHeaderMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptHeader");
@@ -200,18 +211,22 @@ exit:
 
 uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err                       = CHIP_NO_ERROR;
     JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
     uint32_t supportedStreamingProtocols = 0;
+    VerifyOrReturnValue(env != nullptr, 0, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::GetSupportedStreamingProtocols");
-    VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mContentLauncherManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetSupportedStreamingProtocolsMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    env->ExceptionClear();
 
     {
         jlong jSupportedStreamingProtocols =
-            env->CallLongMethod(mContentLauncherManagerObject, mGetSupportedStreamingProtocolsMethod);
+            env->CallLongMethod(mContentLauncherManagerObject.ObjectRef(), mGetSupportedStreamingProtocolsMethod);
         supportedStreamingProtocols = (uint32_t) jSupportedStreamingProtocols;
         if (env->ExceptionCheck())
         {
@@ -237,8 +252,8 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentLauncherManager"));
 
-    mContentLauncherManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturn(mContentLauncherManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef ContentLauncherManager"));
+    VerifyOrReturn(mContentLauncherManagerObject.Init(managerObject) == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Failed to init mContentLauncherManagerObject"));
 
     jclass ContentLauncherClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(ContentLauncherClass != nullptr, ChipLogError(Zcl, "Failed to get ContentLauncherManager Java class"));
@@ -281,4 +296,21 @@ uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
+}
+
+uint16_t ContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    if (!success)
+    {
+        ChipLogError(Zcl, "ContentLauncherManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }

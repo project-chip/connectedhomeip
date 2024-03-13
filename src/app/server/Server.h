@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/AppConfig.h>
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
@@ -70,7 +70,7 @@
 #include <transport/raw/UDP.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h> // nogncheck
+#include <app/icd/server/ICDManager.h> // nogncheck
 #endif
 
 namespace chip {
@@ -314,7 +314,14 @@ public:
     CHIP_ERROR Init(const ServerInitParams & initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
+    CHIP_ERROR
+    SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner,
+                                         Protocols::UserDirectedCommissioning::IdentificationDeclaration & id);
+
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * GetUserDirectedCommissioningClient()
+    {
+        return gUDCClient;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     /**
@@ -602,7 +609,7 @@ private:
     FabricTable mFabrics;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     // specifically, the commissioner declaration message (sent by commissioner to commissionee)
     UdcTransportMgr * mUdcTransportMgr = nullptr;

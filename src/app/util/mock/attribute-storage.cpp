@@ -33,8 +33,8 @@
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/att-storage.h>
 #include <app/util/af.h>
+#include <app/util/att-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
 
@@ -232,35 +232,6 @@ uint8_t emberAfClusterIndex(chip::EndpointId endpointId, chip::ClusterId cluster
 bool emberAfEndpointIndexIsEnabled(uint16_t index)
 {
     return index < GetMockNodeConfig().endpoints.size();
-}
-
-// This duplication of basic utilities is really unfortunate, but we can't link
-// to the normal attribute-storage.cpp because we redefine some of its symbols
-// above.
-bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
-{
-    return (attributeType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-}
-
-bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType)
-{
-    return (attributeType == ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
-}
-
-// And we don't have a good way to link to message.cpp either.
-uint8_t emberAfStringLength(const uint8_t * buffer)
-{
-    // The first byte specifies the length of the string.  A length of 0xFF means
-    // the string is invalid and there is no character data.
-    return (buffer[0] == 0xFF ? 0 : buffer[0]);
-}
-
-uint16_t emberAfLongStringLength(const uint8_t * buffer)
-{
-    // The first two bytes specify the length of the long string.  A length of
-    // 0xFFFF means the string is invalid and there is no character data.
-    uint16_t length = Encoding::LittleEndian::Get16(buffer);
-    return (length == 0xFFFF ? 0 : length);
 }
 
 // This will find the first server that has the clusterId given from the index of endpoint.

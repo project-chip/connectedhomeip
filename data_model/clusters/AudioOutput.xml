@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050b" name="Audio Output" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050B" name="Audio Output" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x050B" name="Audio Output"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="AUDIOOUTPUT" scope="Endpoint"/>
   <features>
     <feature bit="0" code="NU" name="NameUpdates" summary="Supports updates to output names">
@@ -88,22 +93,20 @@ Davis, CA 95616, USA
     </enum>
     <struct name="OutputInfoStruct">
       <field id="0" name="Index" type="uint8">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="OutputType" type="OutputTypeEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="2" name="Name" type="string">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="OutputList" type="list[OutputInfoStruct Type]">
+    <attribute id="0x0000" name="OutputList" type="list">
+      <entry type="OutputInfoStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
@@ -113,14 +116,14 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="SelectOutput" response="Y">
+    <command id="0x00" name="SelectOutput" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Index" type="uint8">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="RenameOutput" response="Y">
+    <command id="0x01" name="RenameOutput" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="NU"/>

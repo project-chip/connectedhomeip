@@ -49,6 +49,16 @@ jobs:
             - name: Validate zap-cli is NOT available
               # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
               run: scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
+            - name: Run watchOS Build Debug
+              working-directory: src/darwin/Framework
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk watchos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+            - name: Run tvOS Build Debug
+              working-directory: src/darwin/Framework
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk appletvos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Run iOS Build Debug
               working-directory: src/darwin/Framework
               # Disable availability annotations, since we are not building a system
@@ -105,26 +115,26 @@ jobs:
                   mkdir -p /tmp/darwin/framework-tests
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 --dac_provider ../../../credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json --product-id 32768 --discriminator 3839 --secured-device-port 5539 --KVS /tmp/chip-all-clusters-app-kvs2 > >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid-err.log >&2) &
-                  # Disable BLE because the app does not have the permission to use
-                  # it and that may crash the CI.
-                  #
-                  # -enableUndefinedBehaviorSanitizer instruments the code in Matter.framework,
-                  # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_UBSAN=YES
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'> >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
+                  # Disable BLE (CHIP_IS_BLE=NO) because the app does not have the permission to use it and that may crash the CI.
+
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'> >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
                   # And the same thing, but with MTR_PER_CONTROLLER_STORAGE_ENABLED turned off, so we test that it does not break for now.
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1 MTR_PER_CONTROLLER_STORAGE_ENABLED=0' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-controller-storage.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-controller-storage-err.log >&2)
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1 MTR_PER_CONTROLLER_STORAGE_ENABLED=0' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-controller-storage.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-controller-storage-err.log >&2)
                   # And the same thing, but with MTR_NO_AVAILABILITY not turned on.  This requires -Wno-unguarded-availability-new to avoid availability errors.
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited}' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations-err.log >&2)
-                  # -enableThreadSanitizer instruments the code in Matter.framework,
-                  # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_TSAN=YES
-                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_TSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1' > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited}' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations-err.log >&2)
+
+                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1' > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Build Matter TV Casting Bridge
               run: |
                   xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
               working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
+            - name: Collect crash logs
+              run: |
+                  mkdir -p /tmp/darwin/framework-tests
+                  find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: darwin-framework-test-logs

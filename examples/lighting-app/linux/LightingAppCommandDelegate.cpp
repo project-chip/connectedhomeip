@@ -19,11 +19,11 @@
 #include "LightingAppCommandDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/att-storage.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
+#include <app/util/att-storage.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -259,8 +259,9 @@ void LightingAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 0;
 
-    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);
 
     Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
@@ -270,8 +271,9 @@ void LightingAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPositio
 {
     EndpointId endpoint = 0;
 
-    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
 
     Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
@@ -281,8 +283,9 @@ void LightingAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 0;
 
-    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
 
     Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
@@ -292,8 +295,9 @@ void LightingAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPos
 {
     EndpointId endpoint = 0;
 
-    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The the previous value of the CurrentPosition when the momentary switch has been released:%d",
                   previousPosition);
 
@@ -304,8 +308,9 @@ void LightingAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousPosi
 {
     EndpointId endpoint = 0;
 
-    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
     ChipLogDetail(NotSpecified,
                   "The the previous value of the CurrentPosition when the momentary switch has been released after having been "
                   "pressed for a long time:%d",
@@ -318,8 +323,9 @@ void LightingAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newPosi
 {
     EndpointId endpoint = 0;
 
-    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed in a multi-press sequence:%d",
                   newPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
@@ -331,8 +337,9 @@ void LightingAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t previo
 {
     EndpointId endpoint = 0;
 
-    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
+    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
+                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The previous position when the momentary switch has been pressed in a multi-press sequence:%d",
                   previousPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);

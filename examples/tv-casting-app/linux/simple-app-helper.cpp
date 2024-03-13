@@ -16,7 +16,7 @@
  */
 #include "simple-app-helper.h"
 
-#include "clusters/ContentLauncherCluster.h"
+#include "clusters/Clusters.h"
 
 #include "app/clusters/bindings/BindingManager.h"
 #include <inttypes.h>
@@ -61,9 +61,143 @@ void DiscoveryDelegateImpl::HandleOnUpdated(matter::casting::memory::Strong<matt
     ChipLogProgress(AppServer, "Updated CastingPlayer with ID: %s", player->GetId());
 }
 
+void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get contentLauncherCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::content_launcher::ContentLauncherCluster> contentLauncherCluster =
+        endpoint->GetCluster<matter::casting::clusters::content_launcher::ContentLauncherCluster>();
+    VerifyOrReturn(contentLauncherCluster != nullptr);
+
+    // get the launchURLCommand from the contentLauncherCluster
+    matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type> * launchURLCommand =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type> *>(
+            contentLauncherCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Id));
+    VerifyOrReturn(launchURLCommand != nullptr, ChipLogError(AppServer, "LaunchURL command not found on ContentLauncherCluster"));
+
+    // create the LaunchURL request
+    chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type request;
+    request.contentURL    = chip::CharSpan::fromCharString(kContentURL);
+    request.displayString = chip::Optional<chip::CharSpan>(chip::CharSpan::fromCharString(kContentDisplayStr));
+    request.brandingInformation =
+        chip::MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type());
+
+    // call Invoke on launchURLCommand while passing in success/failure callbacks
+    launchURLCommand->Invoke(
+        request, nullptr,
+        [](void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType & response) {
+            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %.*s", static_cast<int>(response.data.Value().size()),
+                            response.data.Value().data());
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "LaunchURL Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs)); // time out after kTimedInvokeCommandTimeoutMs
+}
+
+void ReadApplicationBasicVendorID(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get applicationBasicCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::application_basic::ApplicationBasicCluster> applicationBasicCluster =
+        endpoint->GetCluster<matter::casting::clusters::application_basic::ApplicationBasicCluster>();
+    VerifyOrReturn(applicationBasicCluster != nullptr);
+
+    // get the vendorIDAttribute from the applicationBasicCluster
+    matter::casting::core::Attribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo> * vendorIDAttribute =
+        static_cast<matter::casting::core::Attribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo> *>(
+            applicationBasicCluster->GetAttribute(chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id));
+    VerifyOrReturn(vendorIDAttribute != nullptr,
+                   ChipLogError(AppServer, "VendorID attribute not found on ApplicationBasicCluster"));
+
+    // call Read on vendorIDAttribute while passing in success/failure callbacks
+    vendorIDAttribute->Read(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType after) {
+            if (before.HasValue())
+            {
+                ChipLogProgress(AppServer, "Read VendorID value: %d [Before reading value: %d]", after, before.Value());
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "Read VendorID value: %d", after);
+            }
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "VendorID Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        });
+}
+
+void SubscribeToMediaPlaybackCurrentState(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get mediaPlaybackCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::media_playback::MediaPlaybackCluster> mediaPlaybackCluster =
+        endpoint->GetCluster<matter::casting::clusters::media_playback::MediaPlaybackCluster>();
+    VerifyOrReturn(mediaPlaybackCluster != nullptr);
+
+    // get the currentStateAttribute from the applicationBasicCluster
+    matter::casting::core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo> *
+        currentStateAttribute =
+            static_cast<matter::casting::core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo> *>(
+                mediaPlaybackCluster->GetAttribute(chip::app::Clusters::MediaPlayback::Attributes::CurrentState::Id));
+    VerifyOrReturn(currentStateAttribute != nullptr,
+                   ChipLogError(AppServer, "CurrentState attribute not found on MediaPlaybackCluster"));
+
+    // call Subscribe on currentStateAttribute while passing in success/failure callbacks
+    currentStateAttribute->Subscribe(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType after) {
+            if (before.HasValue())
+            {
+                ChipLogProgress(AppServer, "Read CurrentState value: %d [Before reading value: %d]", static_cast<int>(after),
+                                static_cast<int>(before.Value()));
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "Read CurrentState value: %d", static_cast<int>(after));
+            }
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "CurrentState Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        kMinIntervalFloorSeconds, kMaxIntervalCeilingSeconds);
+}
+
 void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
 {
-    ChipLogProgress(AppServer, "ConnectionHandler called with %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogProgress(AppServer,
+                                   "ConnectionHandler: Failed to connect to CastingPlayer(ID: %s) with err %" CHIP_ERROR_FORMAT,
+                                   castingPlayer->GetId(), err.Format()));
+
+    ChipLogProgress(AppServer, "ConnectionHandler: Successfully connected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+
+    std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
+    // Find the desired Endpoint and auto-trigger some Matter Casting demo interactions
+    auto it = std::find_if(endpoints.begin(), endpoints.end(),
+                           [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
+                               return endpoint->GetVendorId() == 65521;
+                           });
+    if (it != endpoints.end())
+    {
+        // The desired endpoint is endpoints[index]
+        unsigned index = (unsigned int) std::distance(endpoints.begin(), it);
+
+        // demonstrate invoking a command
+        InvokeContentLauncherLaunchURL(endpoints[index]);
+
+        // demonstrate reading an attribute
+        ReadApplicationBasicVendorID(endpoints[index]);
+
+        // demonstrate subscribing to an attribute
+        SubscribeToMediaPlaybackCurrentState(endpoints[index]);
+    }
+    else
+    {
+        ChipLogError(AppServer, "Desired Endpoint not found on the CastingPlayer(ID: %s)", castingPlayer->GetId());
+    }
 }
 
 #if defined(ENABLE_CHIP_SHELL)

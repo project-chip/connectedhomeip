@@ -13,15 +13,26 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w1_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-import("${k32w1_sdk_build_root}/k32w1_executable.gni")
-import("${k32w1_sdk_build_root}/k32w1_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+  import("${chip_root}/examples/platform/nxp/pw_rpc_server.gni")
+}
 
 declare_args() {
   chip_software_version = 0
@@ -65,12 +76,30 @@ k32w1_sdk("sdk") {
       "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
     ]
   }
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "STREAMER_UART_FLUSH_DELAY_MS=0",
+      "STREAMER_UART_SERIAL_MANAGER_RING_BUFFER_SIZE=512",
+      "BOARD_APP_UART_CLK_FREQ=96000000",
+    ]
+  }
 }
 
 k32w1_executable("light_app") {
   output_name = "chip-k32w1-light-example"
 
-  sources = [
+  sources = []
+  deps = []
+
+  if (chip_enable_pw_rpc) {
+    forward_variables_from(pw_rpc_server, "*")
+  } else {
+    cflags = [ "-Wconversion" ]
+  }
+
+  sources += [
     "${k32w1_platform_dir}/util/LEDWidget.cpp",
     "${k32w1_platform_dir}/util/include/LEDWidget.h",
     "main/AppTask.cpp",
@@ -82,7 +111,9 @@ k32w1_executable("light_app") {
     "main/main.cpp",
   ]
 
-  deps = [
+  public = [ "${chip_root}/src/platform/nxp/k32w/k32w1/DefaultTestEventTriggerDelegate.h" ]
+
+  deps += [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lighting-app/nxp/zap/",
@@ -105,9 +136,7 @@ k32w1_executable("light_app") {
     ]
   }
 
-  cflags = [ "-Wconversion" ]
-
-  if (use_smu2_as_system_memory) {
+  if (use_smu2_static) {
     ldscript = "${k32w1_platform_dir}/app/ldscripts/k32w1_app.ld"
     base_ldscript_dir = "${k32w1_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc"
   } else {
@@ -119,13 +148,17 @@ k32w1_executable("light_app") {
   ldflags = [
     "-Wl,--defsym=__heap_size__=0",
     "-Wl,--defsym=__stack_size__=0x480",
-    "-Wl,--defsym=gNvmSectors=8",
+    "-Wl,--defsym=gUseFactoryData_d=1",
     "-Wl,-print-memory-usage",
     "-Wl,--no-warn-rwx-segments",
     "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
-  if (use_smu2_as_system_memory) {
+  if (chip_with_factory_data == 1) {
+    ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
+  }
+
+  if (use_smu2_static) {
     ldflags += [ "-L" + rebase_path(base_ldscript_dir, root_build_dir) ]
   }
 

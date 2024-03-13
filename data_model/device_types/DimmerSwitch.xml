@@ -55,11 +55,12 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0104" name="Dimmer Switch" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0104" name="Dimmer Switch" revision="3">
   <revisionHistory>
     <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="New data model format and notation"/>
+    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification superset="On/Off Light Switch" class="simple" scope="endpoint"/>
   <conditions/>
@@ -73,17 +74,14 @@ Davis, CA 95616, USA
     <cluster id="0x0004" name="Groups" side="client">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0005" name="Scenes" side="client">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
     <cluster id="0x0006" name="On/Off" side="client">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0008" name="Level Control" side="client">
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0062" name="Scenes Management" side="client">
+      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

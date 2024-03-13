@@ -59,12 +59,17 @@ target_sources(${APP_TARGET}
         ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
         ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
         ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
+        ${ALL_CLUSTERS_COMMON}/src/oven-modes.cpp
+        ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp        
         ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
         ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
         ${ALL_CLUSTERS_COMMON}/src/binding-handler.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/ElectricalPowerMeasurementDelegate.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
         ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
+        ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp        
 )
 
 target_link_libraries(${APP_TARGET}

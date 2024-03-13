@@ -54,13 +54,32 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0054" name="RVC Run Mode" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Add constraint about switching from non-Idle to non-Idle modes. ChangeToModeResponse command: StatusText must be provided for InvalidInMode status"/>
+    <revision revision="2" summary="Add constraint about switching from non-Idle to non-Idle modes. ChangeToModeResponse command: StatusText must be provided for InvalidInMode status. Deprecate the OnMode attribute and the related feature map bit. Add the Mapping mode tag."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0054" name="RVC Run Mode"/>
+  </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="RVCRUNM" scope="Endpoint"/>
+  <attributes>
+    <attribute id="0x0000" name="SupportedModes">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="CurrentMode">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="StartUpMode">
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0003" name="OnMode">
+      <deprecateConform/>
+    </attribute>
+  </attributes>
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
@@ -75,5 +94,4 @@ Davis, CA 95616, USA
       </field>
     </struct>
   </dataTypes>
-  <attributes/>
 </cluster>

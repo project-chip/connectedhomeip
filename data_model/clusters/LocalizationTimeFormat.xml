@@ -55,10 +55,13 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002c" name="Time Format Localization" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002C" name="Time Format Localization" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x002C" name="Time Format Localization"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="LTIME" scope="Node"/>
   <features>
     <feature bit="0" code="CALFMT" name="CalendarFormat" summary="The Node can be configured to use different calendar formats when conveying values to a user.">
@@ -132,7 +135,8 @@ Davis, CA 95616, USA
         <feature name="CALFMT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="SupportedCalendarTypes" type="&lt;&lt;ref_DataTypeList&gt;&gt;[CalendarTypeEnum Type]" default="N/A">
+    <attribute id="0x0002" name="SupportedCalendarTypes" type="list" default="N/A">
+      <entry type="CalendarTypeEnum"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>

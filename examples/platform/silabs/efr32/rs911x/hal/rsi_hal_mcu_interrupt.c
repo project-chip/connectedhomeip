@@ -38,9 +38,10 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "sl_board_configuration.h"
 
+#include "sl_rsi_utility.h"
 #include "sl_si91x_host_interface.h"
 
 void gpio_interrupt(uint8_t interrupt_number);
@@ -60,7 +61,7 @@ void rsi_gpio_irq_cb(uint8_t irqnum)
 {
     if (irqnum != SL_WFX_HOST_PINOUT_SPI_IRQ)
         return;
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
     sl_si91x_host_set_bus_event(NCP_HOST_BUS_RX_EVENT);
 #else
     GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);

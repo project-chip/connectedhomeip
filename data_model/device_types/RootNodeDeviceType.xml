@@ -63,7 +63,7 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="node" scope="node"/>
   <clusters>
-    <cluster id="0x001f" name="Access Control" side="server">
+    <cluster id="0x001F" name="Access Control" side="server">
       <quality singleton="true"/>
       <mandatoryConform/>
     </cluster>
@@ -71,25 +71,25 @@ Davis, CA 95616, USA
       <quality singleton="true"/>
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x002b" name="Localization Configuration" side="server">
+    <cluster id="0x002B" name="Localization Configuration" side="server">
       <quality singleton="true"/>
       <mandatoryConform>
         <condition name="LanguageLocale"/>
       </mandatoryConform>
     </cluster>
-    <cluster id="0x002c" name="Time Format Localization" side="server">
+    <cluster id="0x002C" name="Time Format Localization" side="server">
       <quality singleton="true"/>
       <mandatoryConform>
         <condition name="TimeLocale"/>
       </mandatoryConform>
     </cluster>
-    <cluster id="0x002d" name="Unit Localization" side="server">
+    <cluster id="0x002D" name="Unit Localization" side="server">
       <quality singleton="true"/>
       <mandatoryConform>
         <condition name="UnitLocale"/>
       </mandatoryConform>
     </cluster>
-    <cluster id="0x002e" name="Power Source Configuration" side="server">
+    <cluster id="0x002E" name="Power Source Configuration" side="server">
       <quality singleton="true"/>
       <otherwiseConform>
         <optionalConform/>
@@ -125,7 +125,7 @@ Davis, CA 95616, USA
         <condition name="Thread"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x0036" name="Wi-Fi Network Diagnostics" side="server">
+    <cluster id="0x0036" name="Wi" side="server">
       <quality singleton="true"/>
       <optionalConform>
         <condition name="Wi-Fi"/>
@@ -139,26 +139,41 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0038" name="Time Synchronization" side="server">
       <quality singleton="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
-    <cluster id="0x0038" name="Time Synchronization" side="server">
-      <quality singleton="true"/>
       <optionalConform/>
     </cluster>
-    <cluster id="0x003c" name="Administrator Commissioning" side="server">
+    <cluster id="0x003C" name="Administrator Commissioning" side="server">
       <quality singleton="true"/>
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x003e" name="Node Operational Credentials" side="server">
+    <cluster id="0x003E" name="Node Operational Credentials" side="server">
       <quality singleton="true"/>
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x003f" name="Group Key Management" side="server">
+    <cluster id="0x003F" name="Group Key Management" side="server">
       <quality singleton="true"/>
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0046" name="ICD Management" side="server">
+      <quality singleton="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <orTerm>
+            <feature name="SIT"/>
+            <feature name="LIT"/>
+          </orTerm>
+        </mandatoryConform>
+      </otherwiseConform>
+      <features>
+        <feature code="" name="LITS">
+          <otherwiseConform>
+            <provisionalConform/>
+            <mandatoryConform>
+              <feature name="LIT"/>
+            </mandatoryConform>
+          </otherwiseConform>
+        </feature>
+      </features>
     </cluster>
   </clusters>
 </deviceType>

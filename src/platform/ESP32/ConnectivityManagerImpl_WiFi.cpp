@@ -26,6 +26,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/ESP32/ESP32EndpointQueueFilter.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/route_hook/ESP32RouteHook.h>
@@ -1107,6 +1108,35 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
     PlatformMgr().PostEventOrDie(&event);
+
+#if CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
+    uint8_t station_mac[6];
+    if (esp_wifi_get_mac(WIFI_IF_STA, station_mac) == ESP_OK)
+    {
+        static chip::Inet::ESP32EndpointQueueFilter sEndpointQueueFilter;
+        char station_mac_str[12];
+        for (size_t i = 0; i < 6; ++i)
+        {
+            uint8_t dig1               = (station_mac[i] & 0xF0) >> 4;
+            uint8_t dig2               = station_mac[i] & 0x0F;
+            station_mac_str[2 * i]     = static_cast<char>(dig1 > 9 ? ('A' + dig1 - 0xA) : ('0' + dig1));
+            station_mac_str[2 * i + 1] = static_cast<char>(dig2 > 9 ? ('A' + dig2 - 0xA) : ('0' + dig2));
+        }
+        if (sEndpointQueueFilter.SetMdnsHostName(chip::CharSpan(station_mac_str)) == CHIP_NO_ERROR)
+        {
+            chip::Inet::UDPEndPointImpl::SetQueueFilter(&sEndpointQueueFilter);
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to set mDNS hostname for endpoint queue filter");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get the MAC address of station netif");
+    }
+#endif // CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
+
 #if CONFIG_ENABLE_ROUTE_HOOK
     esp_route_hook_init(esp_netif_get_handle_from_ifkey(ESP32Utils::kDefaultWiFiStationNetifKey));
 #endif

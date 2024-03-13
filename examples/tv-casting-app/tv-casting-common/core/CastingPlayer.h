@@ -121,7 +121,7 @@ public:
      * @param onCompleted for success - called back with CHIP_NO_ERROR and CastingPlayer *.
      * For failure - called back with an error and nullptr.
      * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
-     * required. Defaults to kCommissioningWindowTimeoutSec.
+     * required. Needs to be >= kCommissioningWindowTimeoutSec.
      * @param desiredEndpointFilter (Optional) Attributes (such as VendorId) describing an Endpoint that the client wants to
      * interact with after commissioning. If this value is passed in, the VerifyOrEstablishConnection will force User Directed
      * Commissioning, in case the desired Endpoint is not found in the on device CastingStore.
@@ -129,6 +129,28 @@ public:
     void VerifyOrEstablishConnection(ConnectCallback onCompleted,
                                      unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec,
                                      EndpointFilter desiredEndpointFilter                 = EndpointFilter());
+
+    /**
+     * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
+     */
+    void Disconnect();
+
+    /**
+     * @brief Find an existing session for this CastingPlayer, or trigger a new session
+     * request.
+     *
+     * The caller can optionally provide `onDeviceConnected` and `onDeviceConnectionFailure` callback
+     * objects. If provided, these will be used to inform the caller about
+     * successful or failed connection establishment.
+     *
+     * If the connection is already established, the `onDeviceConnected` callback
+     * will be immediately called, before FindOrEstablishSession returns.
+     *
+     * The `onDeviceConnectionFailure` callback may be called before the FindOrEstablishSession
+     * call returns, for error cases that are detected synchronously.
+     */
+    void FindOrEstablishSession(void * clientContext, chip::OnDeviceConnected onDeviceConnected,
+                                chip::OnDeviceConnectionFailure onDeviceConnectionFailure);
 
     /**
      * @brief Register an endpoint on this CastingPlayer. If the provided endpoint was already registered, its information will be
@@ -190,23 +212,6 @@ private:
      */
     chip::Inet::IPAddress * GetIpAddressForUDCRequest();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-    /**
-     * @brief Find an existing session for this CastingPlayer, or trigger a new session
-     * request.
-     *
-     * The caller can optionally provide `onDeviceConnected` and `onDeviceConnectionFailure` callback
-     * objects. If provided, these will be used to inform the caller about
-     * successful or failed connection establishment.
-     *
-     * If the connection is already established, the `onDeviceConnected` callback
-     * will be immediately called, before FindOrEstablishSession returns.
-     *
-     * The `onDeviceConnectionFailure` callback may be called before the FindOrEstablishSession
-     * call returns, for error cases that are detected synchronously.
-     */
-    void FindOrEstablishSession(void * clientContext, chip::OnDeviceConnected onDeviceConnected,
-                                chip::OnDeviceConnectionFailure onDeviceConnectionFailure);
 
     /**
      * @brief Checks if the cachedCastingPlayer contains an Endpoint that matches the description of the desiredEndpointFilter

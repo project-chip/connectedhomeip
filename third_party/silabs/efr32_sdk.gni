@@ -46,18 +46,27 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
+  # Enable the BLE extended advertisement
+  sl_matter_ble_extended_adv = false
+
   # ICD Openthread Configuration flags
   sl_ot_idle_interval_ms = 15000  # 15s Idle Intervals
   sl_ot_active_interval_ms = 200  # 200ms Active Intervals
 
+  # SSED Specific configurations
+  sl_ot_csl_timeout_sec = 30  # 30s CSL timeout
+
   # ICD Matter Configuration flags
-  sl_idle_mode_interval_s = 600  # 10min Idle Mode Interval
-  sl_active_mode_interval_ms = 1000  # 1s Active Mode Interval
+  sl_idle_mode_duration_s = 600  # 10min Idle Mode Duration
+  sl_active_mode_duration_ms = 1000  # 1s Active Mode Duration
   sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
   sl_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
   sl_use_subscription_synching = false
 
   silabs_log_enabled = true
+
+  # Enable Synchronized Sleepy End Device
+  enable_synchronized_sed = false
 
   # Argument to enable IPv4 for wifi
   # aligning to match chip_inet_config_enable_ipv4 default configuration
@@ -68,6 +77,9 @@ declare_args() {
 
   # Use SLC generated files
   slc_reuse_files = false
+
+  # Multi-chip OTA
+  chip_enable_multi_ota_requestor = false
 }
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 silabs_plat_efr32_wifi_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
@@ -130,6 +142,9 @@ template("efr32_sdk") {
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
       "${efr32_sdk_root}",
+
+      #TODO: Added this as include files because of spi_multiplexing.h file. we will remove it after the cleanup.
+      "${examples_plat_dir}",
       "${efr32_sdk_root}/util/plugin/security_manager/",
       "${efr32_sdk_root}/hardware/kit/common/bsp",
       "${efr32_sdk_root}/hardware/board/inc",
@@ -157,7 +172,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ieee802154",
       "${efr32_sdk_root}/platform/radio/rail_lib/protocol/ble",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions",
-      "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init",
       "${efr32_sdk_root}/platform/service/device_init/inc",
@@ -204,11 +218,22 @@ template("efr32_sdk") {
       "${sl_ot_efr32_root}",
     ]
 
+    if (silabs_family == "efr32mg24") {
+      _include_dirs +=
+          [ "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include" ]
+    }
+
     if (use_SiWx917) {
       _include_dirs += [
-        "${wifi_sdk_root}/components/si91x/inc",
+        # si91x component
         "${wifi_sdk_root}/components/si91x/memory",
-        "${wifi_sdk_root}/components/si91x/sl_net/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/rom_driver/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/inc",
+        "${wifi_sdk_root}/components/common/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
@@ -223,9 +248,13 @@ template("efr32_sdk") {
 
         # network_manager component
         "${wifi_sdk_root}/components/service/network_manager/inc",
+
+        "${wifi_sdk_root}/components/protocol/wifi/si91x",
       ]
     }
-
+    if (use_rs9116 || use_SiWx917) {
+      _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
+    }
     if (silabs_family != "mgm24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
@@ -237,9 +266,10 @@ template("efr32_sdk") {
       if (use_rs9116) {
         _include_dirs += [ "${wiseconnect_sdk_root}/sapi/include" ]
       } else {
-        _include_dirs += [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
+        _include_dirs += [
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+        ]
       }
-      _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -273,16 +303,10 @@ template("efr32_sdk") {
       "SL_RAIL_LIB_MULTIPROTOCOL_SUPPORT=1",
       "SL_RAIL_UTIL_PA_CONFIG_HEADER=<sl_rail_util_pa_config.h>",
       "RADIO_CONFIG_DMP_SUPPORT=1",
+      "SL_MATTER_BLE_EXTENDED_ADV=${sl_matter_ble_extended_adv}",
 
       #"__STACK_SIZE=0",
     ]
-
-    if (!(use_silabs_thread_lib || use_silabs_thread_lib)) {
-      #Enabling this config temporarly to fix a build issue until
-      #official fix is pushed
-
-      defines += [ "OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE=1" ]
-    }
 
     # Temporary configuration to enable COAP specific configurations
     if (use_thread_coap_lib) {
@@ -301,6 +325,8 @@ template("efr32_sdk") {
         "RSI_BLE_ENABLE=1",
         "BLE_ENABLE=1",
         "RSI_LITTLE_ENDIAN=1",
+        "SLI_SI91X_ENABLE_BLE=1",
+        "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
       ]
     }
 
@@ -331,6 +357,8 @@ template("efr32_sdk") {
         defines += [
           "EXP_BOARD=1",
           "CHIP_917",
+          "SLI_SI917=1",
+          "SL_WFX_CONFIG_SCAN=1",
           "CHIP_9117",
           "SL_WIFI_COMPONENT_INCLUDED",
         ]
@@ -380,7 +408,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
       ]
 
-      defines += [ "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT=1" ]
+      defines += [ "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT" ]
     }
 
     defines += board_defines
@@ -399,8 +427,8 @@ template("efr32_sdk") {
       defines += [
         "SL_ICD_ENABLED=1",
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
-        "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
-        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_s}",
+        "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
+        "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
       ]
 
@@ -410,6 +438,14 @@ template("efr32_sdk") {
           "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
           "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
         ]
+
+        if (enable_synchronized_sed) {
+          defines += [
+            "CHIP_DEVICE_CONFIG_THREAD_SSED=1",
+            "SL_CSL_ENABLE=1",
+            "SL_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
+          ]
+        }
       }
 
       if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
@@ -465,10 +501,11 @@ template("efr32_sdk") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg1x",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg1x/config",
         "${efr32_sdk_root}/platform/service/device_init/config/s1/",
         "${efr32_sdk_root}/platform/emdrv/spidrv/inc",
+        "${efr32_sdk_root}/protocol/bluetooth/bgcommon/inc",
+        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F",
       ]
 
       if (silabs_board == "BRD4304A") {
@@ -483,13 +520,16 @@ template("efr32_sdk") {
       ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [ "${sdk_support_root}/protocol/bluetooth/lib/EFR32XG12/GCC/libbluetooth.a" ]
+        libs += [
+          "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg12_gcc_release.a",
+          "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg12_gcc_release.a",
+          "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg12_gcc_release.a",
+        ]
       }
 
       defines += [ "EFR32MG12" ]
     } else if (silabs_family == "efr32mg24") {
       _include_dirs += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24",
@@ -505,7 +545,11 @@ template("efr32_sdk") {
       ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [ "${sdk_support_root}/protocol/bluetooth/lib/EFR32XG24/GCC/libbluetooth.a" ]
+        libs += [
+          "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg24_gcc_release.a",
+          "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a",
+          "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg24_gcc_release.a",
+        ]
       }
 
       defines += [
@@ -526,7 +570,9 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/lib/EFR32XG24/GCC/libbluetooth.a",
+        "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg24_gcc_release.a",
+        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a",
+        "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
         "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
@@ -650,7 +696,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_hal_s2.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
-      "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay.c",
@@ -672,6 +717,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/asn1write.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/base64.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/bignum.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/bignum_core.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ccm.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher_wrap.c",
@@ -697,7 +743,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_aead.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_cipher.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_client.c",
-      "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_driver_wrappers.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_driver_wrappers_no_static.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_ecp.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_hash.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_mac.c",
@@ -705,6 +751,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_se.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_slot_management.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_storage.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_util.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/sha256.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cache.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_ciphersuites.c",
@@ -764,18 +811,17 @@ template("efr32_sdk") {
         ]
       } else {
         sources += [
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gap_apis.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gatt_apis.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_ble.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_common_apis.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_common_apis.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_utils.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/sl_si91x_ble.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
         ]
       }
     } else {
       sources += [
-        "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_rtos_adaptation.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
@@ -877,15 +923,16 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/crypto_aes.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_protocol_crypto/src/sli_protocol_crypto_crypto.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/crypto_management.c",
+        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_driver_trng.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_aead.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_cipher.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_hash.c",
         "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_transparent_driver_mac.c",
-        "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_crypto_trng_driver.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s1.c",
+        "${efr32_sdk_root}/protocol/bluetooth/bgcommon/src/sl_bt_mbedtls_context.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F/port.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy.c",
@@ -948,6 +995,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
+        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       ]

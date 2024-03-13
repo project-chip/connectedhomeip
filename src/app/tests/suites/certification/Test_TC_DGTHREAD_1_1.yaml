@@ -35,7 +35,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 1
+          value: 2
           constraints:
               type: int16u
 
@@ -231,7 +231,7 @@ tests:
                   ]
 
     - label:
-          "Step 4e: Read the optional attribute (ActiveTimestamp) in
+          "Step 4e: TH reads the optional attribute (ActiveTimestamp) in
           AttributeList"
       PICS: DGTHREAD.S.A0038
       command: "readAttribute"
@@ -242,7 +242,7 @@ tests:
               contains: [56]
 
     - label:
-          "Step 4f: Read the optional attribute (PendingTimestamp) in
+          "Step 4f: TH reads the optional attribute (PendingTimestamp) in
           AttributeList"
       PICS: DGTHREAD.S.A0039
       command: "readAttribute"
@@ -252,7 +252,7 @@ tests:
               type: list
               contains: [57]
 
-    - label: "Step 4g: Read the optional attribute (Delay) in AttributeList"
+    - label: "Step 4g: TH reads the optional attribute (Delay) in AttributeList"
       PICS: DGTHREAD.S.A003a
       command: "readAttribute"
       attribute: "AttributeList"

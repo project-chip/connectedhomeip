@@ -15,23 +15,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/core/ErrorStr.h>
 
-/**
- *    @file
- *      This file implements functions to translate error codes used
- *      throughout the CHIP package into human-readable strings.
- *
- */
-
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/DLLUtil.h>
 
 #include <inttypes.h>
 #include <stdio.h>
-
-#include <lib/core/CHIPConfig.h>
-#include <lib/core/ErrorStr.h>
 
 namespace chip {
 

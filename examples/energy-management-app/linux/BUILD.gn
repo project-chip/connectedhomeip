@@ -36,10 +36,16 @@ config("includes") {
 
 executable("chip-energy-management-app") {
   sources = [
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseMain.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/PowerTopologyDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -82,7 +88,7 @@ executable("chip-energy-management-app") {
     ]
 
     deps += [
-      "$dir_pw_hdlc:pw_rpc",
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_log",
       "$dir_pw_rpc:server",

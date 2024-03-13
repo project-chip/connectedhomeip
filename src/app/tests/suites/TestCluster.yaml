@@ -1066,7 +1066,7 @@ tests:
               - name: "arg1"
                 value: 20003
               - name: "arg2"
-                value: 101
+                value: SimpleEnum.UnknownEnumValue
       response:
           # Attempting to echo back the invalid enum value should fail.
           error: FAILURE
@@ -1316,6 +1316,17 @@ tests:
                         g: 0.1,
                         h: 0.1,
                     }
+
+    - label: "Send MEI command in cluster"
+      command: "TestDifferentVendorMeiRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 76
+      response:
+          values:
+              - name: "arg1"
+                value: 76
 
     # Tests for List
 
@@ -2803,7 +2814,7 @@ tests:
       command: "writeAttribute"
       attribute: "nullable_enum_attr"
       arguments:
-          value: 255
+          value: SimpleEnum.UnknownEnumValue(255)
       response:
           error: CONSTRAINT_ERROR
 
@@ -3850,18 +3861,59 @@ tests:
           # here yet.
           error: FAILURE
 
-    - label: "read AcceptedCommandList attribute"
+    - label: "Write different vendor MEI attribute"
+      command: "writeAttribute"
+      attribute: "mei_int8u"
+      arguments:
+          value: 201
+
+    - label: "Verify different vendor MEI attribute"
+      command: "readAttribute"
+      attribute: "mei_int8u"
+      response:
+          value: 201
+
+    - label: "Validate AcceptedCommandList attribute"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           value:
-              [0, 1, 2, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21]
+              [
+                  0,
+                  1,
+                  2,
+                  4,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  4294049962,
+              ]
 
-    - label: "read GeneratedCommandList attribute"
+    - label: "Validate GeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [0, 1, 4, 5, 6, 8, 9, 10, 11]
+          value: [0, 1, 4, 5, 6, 8, 9, 10, 11, 12, 4294049979]
+
+    - label: "Validate presence of MEI attribute"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains: [4294070017]
 
     # Struct-typed attribute
     - label: "Write struct-typed attribute"

@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control" revision="5">
   <revisionHistory>
@@ -65,7 +67,8 @@ Davis, CA 95616, USA
     <revision revision="5" summary="New data model format and notation"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x001c" name="Pulse Width Modulation"/>
+    <clusterId id="0x0008" name="Level Control"/>
+    <clusterId id="0x001C" name="Pulse Width Modulation"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="LVL" scope="Endpoint"/>
   <features>
@@ -75,9 +78,10 @@ Davis, CA 95616, USA
     <feature bit="1" code="LT" name="Lighting" default="0" summary="Behavior that supports lighting applications">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="FQ" name="Frequency" default="0" summary="Supports frequency attributes and behavior. The
-                                  Pulse Width Modulation cluster was created for frequency control.">
-      <optionalConform/>
+    <feature bit="2" code="FQ" name="Frequency" default="0" summary="Supports frequency attributes and behavior.
+                                      The Pulse Width Modulation cluster was created
+                                      for frequency control.">
+      <provisionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -86,6 +90,14 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="1" name="Down" summary="Decrease the level">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StepModeEnum">
+      <item value="0" name="Up" summary="Step upwards">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Down" summary="Step downwards">
         <mandatoryConform/>
       </item>
     </enum>
@@ -114,6 +126,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
@@ -161,7 +174,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="min" value="MinFrequency"/>
     </attribute>
-    <attribute id="0x000f" name="Options" type="OptionsBitmap" default="0">
+    <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
       <constraint type="desc"/>
@@ -201,7 +214,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="MoveToLevel" response="Y">
+    <command id="0x00" name="MoveToLevel" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Level" type="uint8">
@@ -212,7 +225,7 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="OptionsMask" type="map8" default="0">
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -221,7 +234,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x01" name="Move" response="Y">
+    <command id="0x01" name="Move" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="MoveMode" type="MoveModeEnum">
@@ -232,7 +245,7 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="OptionsMask" type="map8" default="0">
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -241,10 +254,10 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x02" name="Step" response="Y">
+    <command id="0x02" name="Step" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="StepMode" type="MoveModeEnum">
+      <field id="0" name="StepMode" type="StepModeEnum">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -255,7 +268,7 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="3" name="OptionsMask" type="map8" default="0">
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -264,10 +277,10 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x03" name="Stop" response="Y">
+    <command id="0x03" name="Stop" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="OptionsMask" type="map8" default="0">
+      <field id="0" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -276,23 +289,23 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x04" name="MoveToLevelWithOnOff" response="Y">
+    <command id="0x04" name="MoveToLevelWithOnOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x05" name="MoveWithOnOff" response="Y">
+    <command id="0x05" name="MoveWithOnOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x06" name="StepWithOnOff" response="Y">
+    <command id="0x06" name="StepWithOnOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x07" name="StopWithOnOff" response="Y">
+    <command id="0x07" name="StopWithOnOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x08" name="MoveToClosestFrequency" response="Y">
+    <command id="0x08" name="MoveToClosestFrequency" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="FQ"/>

@@ -27,6 +27,7 @@
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "MessagesManager.h"
 #include "MyUserPrompter-JNI.h"
 #include "OnOffManager.h"
 #include "WakeOnLanManager.h"
@@ -34,6 +35,7 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Dnssd.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <controller/CHIPCluster.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <jni.h>
@@ -41,7 +43,6 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <zap-generated/CHIPClusters.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,10 +59,9 @@ void TvAppJNI::InitializeWithObjects(jobject app)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for TvAppJNI"));
 
-    mTvAppObject = env->NewGlobalRef(app);
-    VerifyOrReturn(mTvAppObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef TvAppJNI"));
+    VerifyOrReturn(mTvAppObject.Init(app) == CHIP_NO_ERROR, ChipLogError(Zcl, "Failed to init mTvAppObject"));
 
-    jclass managerClass = env->GetObjectClass(mTvAppObject);
+    jclass managerClass = env->GetObjectClass(app);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get TvAppJNI Java class"));
 
     mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(JI)V");
@@ -76,10 +76,11 @@ void TvAppJNI::PostClusterInit(int clusterId, int endpoint)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for TvAppJNI::PostClusterInit"));
-    VerifyOrReturn(mTvAppObject != nullptr, ChipLogError(Zcl, "TvAppJNI::mTvAppObject null"));
+    VerifyOrReturn(mTvAppObject.HasValidObjectRef(), ChipLogError(Zcl, "TvAppJNI::mTvAppObject is not valid"));
     VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(Zcl, "TvAppJNI::mPostClusterInitMethod null"));
 
-    env->CallVoidMethod(mTvAppObject, mPostClusterInitMethod, static_cast<jlong>(clusterId), static_cast<jint>(endpoint));
+    env->CallVoidMethod(mTvAppObject.ObjectRef(), mPostClusterInitMethod, static_cast<jlong>(clusterId),
+                        static_cast<jint>(endpoint));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call TvAppJNI 'postClusterInit' method");
@@ -137,6 +138,11 @@ JNI_METHOD(void, setMediaPlaybackManager)(JNIEnv *, jobject, jint endpoint, jobj
     MediaPlaybackManager::NewManager(endpoint, manager);
 }
 
+JNI_METHOD(void, setMessagesManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    MessagesManager::NewManager(endpoint, manager);
+}
+
 JNI_METHOD(void, setChannelManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
 {
     ChannelManager::NewManager(endpoint, manager);
@@ -189,11 +195,23 @@ JNI_METHOD(void, setChipDeviceEventProvider)(JNIEnv *, jobject, jobject provider
 }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-class MyPincodeService : public PincodeService
+class MyPincodeService : public PasscodeService
 {
-    uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode) override
     {
-        return ContentAppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
+        return ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
+    }
+
+    uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
+    {
+        // TODO: randomly generate this value
+        return 12345678;
+    }
+
+    uint32_t FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    {
+        return ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
     }
 };
 MyPincodeService gMyPincodeService;
@@ -204,7 +222,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
                                 const SessionHandle & sessionHandle) override
     {
         // read current binding list
-        chip::Controller::BindingCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+        chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
         cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
 
@@ -329,7 +347,7 @@ void TvAppJNI::InitializeCommissioner(JNIMyUserPrompter * userPrompter)
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
     if (cdc != nullptr && userPrompter != nullptr)
     {
-        cdc->SetPincodeService(&gMyPincodeService);
+        cdc->SetPasscodeService(&gMyPincodeService);
         cdc->SetUserPrompter(userPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

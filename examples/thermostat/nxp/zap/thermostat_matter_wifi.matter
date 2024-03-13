@@ -178,199 +178,6 @@ cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-/** Attributes and commands for scene configuration and manipulation. */
-provisional cluster Scenes = 5 {
-  revision 5;
-
-  bitmap CopyModeBitmap : bitmap8 {
-    kCopyAllScenes = 0x1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kSceneNames = 0x1;
-    kExplicit = 0x2;
-    kTableSize = 0x4;
-    kFabricScenes = 0x8;
-  }
-
-  bitmap NameSupportBitmap : bitmap8 {
-    kSceneNames = 0x80;
-  }
-
-  struct AttributeValuePair {
-    attrib_id attributeID = 0;
-    int32u attributeValue = 1;
-  }
-
-  struct ExtensionFieldSet {
-    cluster_id clusterID = 0;
-    AttributeValuePair attributeValueList[] = 1;
-  }
-
-  fabric_scoped struct SceneInfoStruct {
-    int8u sceneCount = 0;
-    fabric_sensitive int8u currentScene = 1;
-    fabric_sensitive group_id currentGroup = 2;
-    fabric_sensitive boolean sceneValid = 3;
-    int8u remainingCapacity = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  readonly attribute optional int8u sceneCount = 0;
-  readonly attribute optional int8u currentScene = 1;
-  readonly attribute optional group_id currentGroup = 2;
-  readonly attribute optional boolean sceneValid = 3;
-  readonly attribute NameSupportBitmap nameSupport = 4;
-  readonly attribute optional nullable node_id lastConfiguredBy = 5;
-  readonly attribute int16u sceneTableSize = 6;
-  readonly attribute SceneInfoStruct fabricSceneInfo[] = 7;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int16u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  response struct AddSceneResponse = 0 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct ViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct ViewSceneResponse = 1 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int16u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  request struct RemoveSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct RemoveSceneResponse = 2 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RemoveAllScenesRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveAllScenesResponse = 3 {
-    status status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct StoreSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct StoreSceneResponse = 4 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RecallSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    optional nullable int16u transitionTime = 2;
-  }
-
-  request struct GetSceneMembershipRequest {
-    group_id groupID = 0;
-  }
-
-  response struct GetSceneMembershipResponse = 6 {
-    status status = 0;
-    nullable int8u capacity = 1;
-    group_id groupID = 2;
-    optional int8u sceneList[] = 3;
-  }
-
-  request struct EnhancedAddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int16u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  response struct EnhancedAddSceneResponse = 64 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct EnhancedViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct EnhancedViewSceneResponse = 65 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int16u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  request struct CopySceneRequest {
-    CopyModeBitmap mode = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-    group_id groupIdentifierTo = 3;
-    int8u sceneIdentifierTo = 4;
-  }
-
-  response struct CopySceneResponse = 66 {
-    status status = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-  }
-
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
-  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  /** Retrieves the requested scene entry from its Scene table. */
-  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
-  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
-  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
-  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** Allows a scene to be added using a finer scene transition time than the AddScene command. */
-  fabric command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
-  /** Allows a scene to be retrieved using a finer scene transition time than the ViewScene command */
-  fabric command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
-  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 2;
@@ -1399,6 +1206,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -1455,10 +1266,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1829,6 +1652,155 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for scene configuration and manipulation. */
+provisional cluster ScenesManagement = 98 {
+  revision 1;
+
+  bitmap CopyModeBitmap : bitmap8 {
+    kCopyAllScenes = 0x1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kSceneNames = 0x1;
+  }
+
+  struct AttributeValuePair {
+    attrib_id attributeID = 0;
+    int32u attributeValue = 1;
+  }
+
+  struct ExtensionFieldSet {
+    cluster_id clusterID = 0;
+    AttributeValuePair attributeValueList[] = 1;
+  }
+
+  fabric_scoped struct SceneInfoStruct {
+    int8u sceneCount = 0;
+    fabric_sensitive int8u currentScene = 1;
+    fabric_sensitive group_id currentGroup = 2;
+    fabric_sensitive boolean sceneValid = 3;
+    int8u remainingCapacity = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute optional nullable node_id lastConfiguredBy = 0;
+  readonly attribute int16u sceneTableSize = 1;
+  readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+    int32u transitionTime = 2;
+    char_string sceneName = 3;
+    ExtensionFieldSet extensionFieldSets[] = 4;
+  }
+
+  response struct AddSceneResponse = 0 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+  }
+
+  request struct ViewSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+  }
+
+  response struct ViewSceneResponse = 1 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+    optional int32u transitionTime = 3;
+    optional char_string sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
+  }
+
+  request struct RemoveSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+  }
+
+  response struct RemoveSceneResponse = 2 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+  }
+
+  request struct RemoveAllScenesRequest {
+    group_id groupID = 0;
+  }
+
+  response struct RemoveAllScenesResponse = 3 {
+    status status = 0;
+    group_id groupID = 1;
+  }
+
+  request struct StoreSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+  }
+
+  response struct StoreSceneResponse = 4 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+  }
+
+  request struct RecallSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+    optional nullable int32u transitionTime = 2;
+  }
+
+  request struct GetSceneMembershipRequest {
+    group_id groupID = 0;
+  }
+
+  response struct GetSceneMembershipResponse = 6 {
+    status status = 0;
+    nullable int8u capacity = 1;
+    group_id groupID = 2;
+    optional int8u sceneList[] = 3;
+  }
+
+  request struct CopySceneRequest {
+    CopyModeBitmap mode = 0;
+    group_id groupIdentifierFrom = 1;
+    int8u sceneIdentifierFrom = 2;
+    group_id groupIdentifierTo = 3;
+    int8u sceneIdentifierTo = 4;
+  }
+
+  response struct CopySceneResponse = 64 {
+    status status = 0;
+    group_id groupIdentifierFrom = 1;
+    int8u sceneIdentifierFrom = 2;
+  }
+
+  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
+  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
+  /** Retrieves the requested scene entry from its Scene table. */
+  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
+  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
+  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
+  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
+  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
+  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
+  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
+  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
+  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 64;
+}
+
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
   revision 6;
@@ -1874,6 +1846,16 @@ cluster Thermostat = 513 {
     kHeatingWithReheat = 3;
     kCoolingAndHeating = 4;
     kCoolingAndHeatingWithReheat = 5;
+  }
+
+  enum PresetScenarioEnum : enum8 {
+    kUnspecified = 0;
+    kOccupied = 1;
+    kUnoccupied = 2;
+    kSleep = 3;
+    kWake = 4;
+    kVacation = 5;
+    kUserDefined = 6;
   }
 
   enum SetpointChangeSourceEnum : enum8 {
@@ -1937,6 +1919,10 @@ cluster Thermostat = 513 {
     kSetback = 0x10;
     kAutoMode = 0x20;
     kLocalTemperatureNotExposed = 0x40;
+    kMatterScheduleConfiguration = 0x80;
+    kPresets = 0x100;
+    kSetpoints = 0x200;
+    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -1944,6 +1930,11 @@ cluster Thermostat = 513 {
     kHeatingStage = 0xC;
     kHeatingIsHeatPump = 0x10;
     kHeatingUsesFuel = 0x20;
+  }
+
+  bitmap PresetTypeFeaturesBitmap : bitmap16 {
+    kAutomatic = 0x1;
+    kSupportsNames = 0x2;
   }
 
   bitmap ProgrammingOperationModeBitmap : bitmap8 {
@@ -1982,6 +1973,62 @@ cluster Thermostat = 513 {
   bitmap ScheduleModeBitmap : bitmap8 {
     kHeatSetpointPresent = 0x1;
     kCoolSetpointPresent = 0x2;
+  }
+
+  bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
+    kSupportsPresets = 0x1;
+    kSupportsSetpoints = 0x2;
+    kSupportsNames = 0x4;
+    kSupportsOff = 0x8;
+  }
+
+  bitmap TemperatureSetpointHoldPolicyBitmap : bitmap8 {
+    kHoldDurationElapsed = 0x1;
+    kHoldDurationElapsedOrPresetChanged = 0x2;
+  }
+
+  struct ScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    optional octet_string<16> presetHandle = 2;
+    optional SystemModeEnum systemMode = 3;
+    optional temperature coolingSetpoint = 4;
+    optional temperature heatingSetpoint = 5;
+  }
+
+  struct ScheduleStruct {
+    nullable octet_string<16> scheduleHandle = 0;
+    SystemModeEnum systemMode = 1;
+    optional char_string<64> name = 2;
+    optional octet_string<16> presetHandle = 3;
+    ScheduleTransitionStruct transitions[] = 4;
+    optional nullable boolean builtIn = 5;
+  }
+
+  struct PresetStruct {
+    nullable octet_string<16> presetHandle = 0;
+    PresetScenarioEnum presetScenario = 1;
+    optional nullable char_string<64> name = 2;
+    optional temperature coolingSetpoint = 3;
+    optional temperature heatingSetpoint = 4;
+    nullable boolean builtIn = 5;
+  }
+
+  struct PresetTypeStruct {
+    PresetScenarioEnum presetScenario = 0;
+    int8u numberOfPresets = 1;
+    PresetTypeFeaturesBitmap presetTypeFeatures = 2;
+  }
+
+  struct QueuedPresetStruct {
+    nullable octet_string<16> presetHandle = 0;
+    nullable epoch_s transitionTimestamp = 1;
+  }
+
+  struct ScheduleTypeStruct {
+    SystemModeEnum systemMode = 0;
+    int8u numberOfSchedules = 1;
+    ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
   }
 
   struct WeeklyScheduleTransitionStruct {
@@ -2039,6 +2086,20 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional ACLouverPositionEnum ACLouverPosition = 69;
   readonly attribute optional nullable temperature ACCoilTemperature = 70;
   attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityformat = 71;
+  readonly attribute optional PresetTypeStruct presetTypes[] = 72;
+  readonly attribute optional ScheduleTypeStruct scheduleTypes[] = 73;
+  readonly attribute optional int8u numberOfPresets = 74;
+  readonly attribute optional int8u numberOfSchedules = 75;
+  readonly attribute optional int8u numberOfScheduleTransitions = 76;
+  readonly attribute optional nullable int8u numberOfScheduleTransitionPerDay = 77;
+  readonly attribute optional nullable octet_string<16> activePresetHandle = 78;
+  readonly attribute optional nullable octet_string<16> activeScheduleHandle = 79;
+  attribute access(write: manage) optional PresetStruct presets[] = 80;
+  attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
+  readonly attribute optional boolean presetsSchedulesEditable = 82;
+  readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
+  readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
+  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2070,14 +2131,45 @@ cluster Thermostat = 513 {
     ScheduleModeBitmap modeToReturn = 1;
   }
 
+  request struct SetActiveScheduleRequestRequest {
+    octet_string<16> scheduleHandle = 0;
+  }
+
+  request struct SetActivePresetRequestRequest {
+    octet_string<16> presetHandle = 0;
+    optional int16u delayMinutes = 1;
+  }
+
+  request struct StartPresetsSchedulesEditRequestRequest {
+    int16u timeoutSeconds = 0;
+  }
+
+  request struct SetTemperatureSetpointHoldPolicyRequest {
+    TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 0;
+  }
+
   /** Command description for SetpointRaiseLower */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** Command description for SetWeeklySchedule */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
   /** Command description for GetWeeklySchedule */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
-  /** The Clear Weekly Schedule command is used to clear the weekly schedule. */
+  /** This command is used to clear the weekly schedule. The ClearWeeklySchedule command has no payload. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
+  /** This command is used to set the active schedule. */
+  command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
+  /** This command is used to set the active preset. */
+  command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** This command is used to start editing the presets and schedules. */
+  command access(invoke: manage) StartPresetsSchedulesEditRequest(StartPresetsSchedulesEditRequestRequest): DefaultSuccess = 7;
+  /** This command is used to cancel editing presets and schedules. */
+  command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
+  /** This command is used to notify the server that all edits are done and should be committed. */
+  command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
+  /** This command is sent to cancel a queued preset. */
+  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
+  /** This command sets the set point hold policy. */
+  command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
 
 endpoint 0 {
@@ -2099,7 +2191,7 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -2229,8 +2321,8 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -2338,34 +2430,12 @@ endpoint 1 {
     handle command AddGroupIfIdentifying;
   }
 
-  server cluster Scenes {
-    ram      attribute nameSupport;
-    ram      attribute sceneTableSize;
-    callback attribute fabricSceneInfo;
-    ram      attribute featureMap default = 15;
-    ram      attribute clusterRevision default = 4;
-
-    handle command AddScene;
-    handle command AddSceneResponse;
-    handle command ViewScene;
-    handle command ViewSceneResponse;
-    handle command RemoveScene;
-    handle command RemoveSceneResponse;
-    handle command RemoveAllScenes;
-    handle command RemoveAllScenesResponse;
-    handle command StoreScene;
-    handle command StoreSceneResponse;
-    handle command RecallScene;
-    handle command GetSceneMembership;
-    handle command GetSceneMembershipResponse;
-  }
-
   server cluster Descriptor {
     callback attribute deviceTypeList;
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -2407,6 +2477,27 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ScenesManagement {
+    ram      attribute sceneTableSize;
+    callback attribute fabricSceneInfo;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+
+    handle command AddScene;
+    handle command AddSceneResponse;
+    handle command ViewScene;
+    handle command ViewSceneResponse;
+    handle command RemoveScene;
+    handle command RemoveSceneResponse;
+    handle command RemoveAllScenes;
+    handle command RemoveAllScenesResponse;
+    handle command StoreScene;
+    handle command StoreSceneResponse;
+    handle command RecallScene;
+    handle command GetSceneMembership;
+    handle command GetSceneMembershipResponse;
   }
 
   server cluster Thermostat {

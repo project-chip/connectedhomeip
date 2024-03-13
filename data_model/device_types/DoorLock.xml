@@ -55,11 +55,12 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000a" name="Door Lock" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000A" name="Door Lock" revision="3">
   <revisionHistory>
     <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="Initial Matter release"/>
+    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -68,51 +69,15 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0004" name="Groups" side="server">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
+      <disallowConform/>
     </cluster>
-    <cluster id="0x0005" name="Scenes" side="server">
-      <otherwiseConform>
-        <optionalConform>
-          <condition name="Zigbee"/>
-        </optionalConform>
-        <provisionalConform/>
-      </otherwiseConform>
-    </cluster>
-    <cluster id="0x0009" name="Alarms" side="server">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x000a" name="Time" side="client">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x0020" name="Poll Control" side="server">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
+    <cluster id="0x0005" name="Scenes Management" side="server">
+      <disallowConform/>
     </cluster>
     <cluster id="0x0101" name="Door Lock" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="RID (RFID Credential)">
-          <otherwiseConform>
-            <optionalConform>
-              <condition name="Zigbee"/>
-            </optionalConform>
-            <provisionalConform/>
-            <optionalConform/>
-          </otherwiseConform>
-        </feature>
-        <feature code="" name="LOG (Logging)">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </feature>
-        <feature code="" name="USR (User)">
+        <feature code="" name="USR">
           <mandatoryConform>
             <andTerm>
               <condition name="Matter"/>
@@ -125,10 +90,11 @@ Davis, CA 95616, USA
             </andTerm>
           </mandatoryConform>
         </feature>
-        <feature code="" name="NOT (Notification)">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
+        <feature code="" name="RID">
+          <otherwiseConform>
+            <provisionalConform/>
+            <optionalConform/>
+          </otherwiseConform>
         </feature>
       </features>
       <attributes>
@@ -137,54 +103,7 @@ Davis, CA 95616, USA
             <attribute name="Alarms"/>
           </optionalConform>
         </attribute>
-        <attribute code="" name="KeypadOperationEventMask">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </attribute>
-        <attribute code="" name="RemoteOperationEventMask">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </attribute>
-        <attribute code="" name="ManualOperationEventMask">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </attribute>
-        <attribute code="" name="RFIDOperationEventMask">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </attribute>
-        <attribute code="" name="KeypadProgrammingEventMask">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </attribute>
-        <attribute code="" name="RemoteProgrammingEventMask">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </attribute>
-        <attribute code="" name="RFIDProgrammingEventMask">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </attribute>
       </attributes>
-      <commands>
-        <command id="" name="Operating Event Notification">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </command>
-        <command id="" name="Programming Event Notification">
-          <optionalConform>
-            <condition name="Zigbee"/>
-          </optionalConform>
-        </command>
-      </commands>
     </cluster>
   </clusters>
 </deviceType>

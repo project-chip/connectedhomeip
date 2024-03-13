@@ -35,6 +35,18 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
   private static int playbackMaxForwardSpeed = 10;
   private static int playbackMaxRewindSpeed = -10;
 
+  private static MediaTrack[] audioTracks = {
+    new MediaTrack("activeAudioTrackId_0", "languageCode1", "displayName1"),
+    new MediaTrack("activeAudioTrackId_1", "languageCode2", "displayName2")
+  };
+  private static MediaTrack activeAudioTrack = audioTracks[0];
+
+  private static MediaTrack activeTextTrack = null;
+  private static MediaTrack[] textTracks = {
+    new MediaTrack("activeTextTrackId_0", "languageCode1", "displayName1"),
+    new MediaTrack("activeTextTrackId_1", "languageCode2", "displayName2")
+  };
+
   public MediaPlaybackManagerStub(int endpoint) {
     this.endpoint = endpoint;
   }
@@ -69,6 +81,8 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
       case ATTRIBUTE_PLAYBACK_SEEK_RANGE_START:
         Log.d(TAG, "getAttributes SampledPosition SeekRangeStart " + startTime + " at " + endpoint);
         return startTime;
+
+        // TODO: add audio/text track available/active attributes
     }
 
     return -1;
@@ -182,5 +196,42 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
   public MediaPlaybackPosition getPosition() {
     Log.d(TAG, "getPosition " + playbackPosition);
     return new MediaPlaybackPosition(playbackPosition);
+  }
+
+  @Override
+  public MediaTrack[] getAvailableTracks(boolean audio) {
+    return (audio ? audioTracks : textTracks);
+  }
+
+  @Override
+  public int activateTrack(boolean audio, String id) {
+    if (audio) {
+      for (MediaTrack track : audioTracks) {
+        if (track.id.equalsIgnoreCase(id)) {
+          activeAudioTrack = track;
+          return RESPONSE_STATUS_SUCCESS;
+        }
+      }
+      return RESPONSE_STATUS_NOT_ALLOWED; // TODO
+    } else {
+      for (MediaTrack track : textTracks) {
+        if (track.id.equalsIgnoreCase(id)) {
+          activeTextTrack = track;
+          return RESPONSE_STATUS_SUCCESS;
+        }
+      }
+      return RESPONSE_STATUS_NOT_ALLOWED; // TODO
+    }
+  }
+
+  @Override
+  public int deactivateTextTrack() {
+    activeTextTrack = null;
+    return RESPONSE_STATUS_SUCCESS;
+  }
+
+  @Override
+  public MediaTrack getActiveTrack(boolean audio) {
+    return (audio ? activeAudioTrack : activeTextTrack);
   }
 }

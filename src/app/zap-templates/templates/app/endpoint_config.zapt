@@ -95,7 +95,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 // Array of endpoint types supported on each endpoint
 #define FIXED_ENDPOINT_TYPES {{endpoint_fixed_endpoint_type_array}}
 
-// Array of networks supported on each endpoint
-#define FIXED_NETWORKS {{endpoint_fixed_network_array}}
+// Array of parent endpoints for each endpoint
+#define FIXED_PARENT_ENDPOINTS {{endpoint_fixed_parent_id_array}}
 
 {{/endpoint_config}}

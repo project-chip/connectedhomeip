@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0509" name="Keypad Input" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0509" name="Keypad Input"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="KEYPADINPUT" scope="Endpoint"/>
   <features>
     <feature bit="0" code="NV" name="NavigationKeyCodes" summary="Supports UP, DOWN, LEFT, RIGHT, SELECT, BACK, EXIT, MENU">
@@ -73,262 +78,262 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="CecKeyCodeEnum">
-      <item value="0" name="Select">
+      <item value="0x00" name="Select">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Up">
+      <item value="0x0A" name="SetupMenu">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Down">
+      <item value="0x0B" name="ContentsMenu">
         <mandatoryConform/>
       </item>
-      <item value="3" name="Left">
+      <item value="0x0C" name="FavoriteMenu">
         <mandatoryConform/>
       </item>
-      <item value="4" name="Right">
+      <item value="0x0D" name="Exit">
         <mandatoryConform/>
       </item>
-      <item value="5" name="RightUp">
+      <item value="0x01" name="Up">
         <mandatoryConform/>
       </item>
-      <item value="6" name="RightDown">
+      <item value="0x1D" name="NumberEntryMode">
         <mandatoryConform/>
       </item>
-      <item value="7" name="LeftUp">
+      <item value="0x1E" name="Number11">
         <mandatoryConform/>
       </item>
-      <item value="8" name="LeftDown">
+      <item value="0x1F" name="Number12">
         <mandatoryConform/>
       </item>
-      <item value="9" name="RootMenu">
+      <item value="0x02" name="Down">
         <mandatoryConform/>
       </item>
-      <item value="10" name="SetupMenu">
+      <item value="0x2A" name="Dot">
         <mandatoryConform/>
       </item>
-      <item value="11" name="ContentsMenu">
+      <item value="0x2B" name="Enter">
         <mandatoryConform/>
       </item>
-      <item value="12" name="FavoriteMenu">
+      <item value="0x2C" name="Clear">
         <mandatoryConform/>
       </item>
-      <item value="13" name="Exit">
+      <item value="0x2F" name="NextFavorite">
         <mandatoryConform/>
       </item>
-      <item value="16" name="MediaTopMenu">
+      <item value="0x03" name="Left">
         <mandatoryConform/>
       </item>
-      <item value="17" name="MediaContextSensitiveMenu">
+      <item value="0x04" name="Right">
         <mandatoryConform/>
       </item>
-      <item value="29" name="NumberEntryMode">
+      <item value="0x4A" name="Eject">
         <mandatoryConform/>
       </item>
-      <item value="30" name="Number11">
+      <item value="0x4B" name="Forward">
         <mandatoryConform/>
       </item>
-      <item value="31" name="Number12">
+      <item value="0x4C" name="Backward">
         <mandatoryConform/>
       </item>
-      <item value="32" name="Number0OrNumber10">
+      <item value="0x4D" name="StopRecord">
         <mandatoryConform/>
       </item>
-      <item value="33" name="Numbers1">
+      <item value="0x4E" name="PauseRecord">
         <mandatoryConform/>
       </item>
-      <item value="34" name="Numbers2">
+      <item value="0x4F" name="Reserved">
         <mandatoryConform/>
       </item>
-      <item value="35" name="Numbers3">
+      <item value="0x05" name="RightUp">
         <mandatoryConform/>
       </item>
-      <item value="36" name="Numbers4">
+      <item value="0x06" name="RightDown">
         <mandatoryConform/>
       </item>
-      <item value="37" name="Numbers5">
+      <item value="0x6A" name="SelectAudioInputFunction">
         <mandatoryConform/>
       </item>
-      <item value="38" name="Numbers6">
+      <item value="0x6B" name="PowerToggleFunction">
         <mandatoryConform/>
       </item>
-      <item value="39" name="Numbers7">
+      <item value="0x6C" name="PowerOffFunction">
         <mandatoryConform/>
       </item>
-      <item value="40" name="Numbers8">
+      <item value="0x6D" name="PowerOnFunction">
         <mandatoryConform/>
       </item>
-      <item value="41" name="Numbers9">
+      <item value="0x07" name="LeftUp">
         <mandatoryConform/>
       </item>
-      <item value="42" name="Dot">
+      <item value="0x08" name="LeftDown">
         <mandatoryConform/>
       </item>
-      <item value="43" name="Enter">
+      <item value="0x09" name="RootMenu">
         <mandatoryConform/>
       </item>
-      <item value="44" name="Clear">
+      <item value="0x10" name="MediaTopMenu">
         <mandatoryConform/>
       </item>
-      <item value="47" name="NextFavorite">
+      <item value="0x11" name="MediaContextSensitiveMenu">
         <mandatoryConform/>
       </item>
-      <item value="48" name="ChannelUp">
+      <item value="0x20" name="Number0OrNumber10">
         <mandatoryConform/>
       </item>
-      <item value="49" name="ChannelDown">
+      <item value="0x21" name="Numbers1">
         <mandatoryConform/>
       </item>
-      <item value="50" name="PreviousChannel">
+      <item value="0x22" name="Numbers2">
         <mandatoryConform/>
       </item>
-      <item value="51" name="SoundSelect">
+      <item value="0x23" name="Numbers3">
         <mandatoryConform/>
       </item>
-      <item value="52" name="InputSelect">
+      <item value="0x24" name="Numbers4">
         <mandatoryConform/>
       </item>
-      <item value="53" name="DisplayInformation">
+      <item value="0x25" name="Numbers5">
         <mandatoryConform/>
       </item>
-      <item value="54" name="Help">
+      <item value="0x26" name="Numbers6">
         <mandatoryConform/>
       </item>
-      <item value="55" name="PageUp">
+      <item value="0x27" name="Numbers7">
         <mandatoryConform/>
       </item>
-      <item value="56" name="PageDown">
+      <item value="0x28" name="Numbers8">
         <mandatoryConform/>
       </item>
-      <item value="64" name="Power">
+      <item value="0x29" name="Numbers9">
         <mandatoryConform/>
       </item>
-      <item value="65" name="VolumeUp">
+      <item value="0x30" name="ChannelUp">
         <mandatoryConform/>
       </item>
-      <item value="66" name="VolumeDown">
+      <item value="0x31" name="ChannelDown">
         <mandatoryConform/>
       </item>
-      <item value="67" name="Mute">
+      <item value="0x32" name="PreviousChannel">
         <mandatoryConform/>
       </item>
-      <item value="68" name="Play">
+      <item value="0x33" name="SoundSelect">
         <mandatoryConform/>
       </item>
-      <item value="69" name="Stop">
+      <item value="0x34" name="InputSelect">
         <mandatoryConform/>
       </item>
-      <item value="70" name="Pause">
+      <item value="0x35" name="DisplayInformation">
         <mandatoryConform/>
       </item>
-      <item value="71" name="Record">
+      <item value="0x36" name="Help">
         <mandatoryConform/>
       </item>
-      <item value="72" name="Rewind">
+      <item value="0x37" name="PageUp">
         <mandatoryConform/>
       </item>
-      <item value="73" name="FastForward">
+      <item value="0x38" name="PageDown">
         <mandatoryConform/>
       </item>
-      <item value="74" name="Eject">
+      <item value="0x40" name="Power">
         <mandatoryConform/>
       </item>
-      <item value="75" name="Forward">
+      <item value="0x41" name="VolumeUp">
         <mandatoryConform/>
       </item>
-      <item value="76" name="Backward">
+      <item value="0x42" name="VolumeDown">
         <mandatoryConform/>
       </item>
-      <item value="77" name="StopRecord">
+      <item value="0x43" name="Mute">
         <mandatoryConform/>
       </item>
-      <item value="78" name="PauseRecord">
+      <item value="0x44" name="Play">
         <mandatoryConform/>
       </item>
-      <item value="79" name="Reserved">
+      <item value="0x45" name="Stop">
         <mandatoryConform/>
       </item>
-      <item value="80" name="Angle">
+      <item value="0x46" name="Pause">
         <mandatoryConform/>
       </item>
-      <item value="81" name="SubPicture">
+      <item value="0x47" name="Record">
         <mandatoryConform/>
       </item>
-      <item value="82" name="VideoOnDemand">
+      <item value="0x48" name="Rewind">
         <mandatoryConform/>
       </item>
-      <item value="83" name="ElectronicProgramGuide">
+      <item value="0x49" name="FastForward">
         <mandatoryConform/>
       </item>
-      <item value="84" name="TimerProgramming">
+      <item value="0x50" name="Angle">
         <mandatoryConform/>
       </item>
-      <item value="85" name="InitialConfiguration">
+      <item value="0x51" name="SubPicture">
         <mandatoryConform/>
       </item>
-      <item value="86" name="SelectBroadcastType">
+      <item value="0x52" name="VideoOnDemand">
         <mandatoryConform/>
       </item>
-      <item value="87" name="SelectSoundPresentation">
+      <item value="0x53" name="ElectronicProgramGuide">
         <mandatoryConform/>
       </item>
-      <item value="96" name="PlayFunction">
+      <item value="0x54" name="TimerProgramming">
         <mandatoryConform/>
       </item>
-      <item value="97" name="PausePlayFunction">
+      <item value="0x55" name="InitialConfiguration">
         <mandatoryConform/>
       </item>
-      <item value="98" name="RecordFunction">
+      <item value="0x56" name="SelectBroadcastType">
         <mandatoryConform/>
       </item>
-      <item value="99" name="PauseRecordFunction">
+      <item value="0x57" name="SelectSoundPresentation">
         <mandatoryConform/>
       </item>
-      <item value="100" name="StopFunction">
+      <item value="0x60" name="PlayFunction">
         <mandatoryConform/>
       </item>
-      <item value="101" name="MuteFunction">
+      <item value="0x61" name="PausePlayFunction">
         <mandatoryConform/>
       </item>
-      <item value="102" name="RestoreVolumeFunction">
+      <item value="0x62" name="RecordFunction">
         <mandatoryConform/>
       </item>
-      <item value="103" name="TuneFunction">
+      <item value="0x63" name="PauseRecordFunction">
         <mandatoryConform/>
       </item>
-      <item value="104" name="SelectMediaFunction">
+      <item value="0x64" name="StopFunction">
         <mandatoryConform/>
       </item>
-      <item value="105" name="SelectAvInputFunction">
+      <item value="0x65" name="MuteFunction">
         <mandatoryConform/>
       </item>
-      <item value="106" name="SelectAudioInputFunction">
+      <item value="0x66" name="RestoreVolumeFunction">
         <mandatoryConform/>
       </item>
-      <item value="107" name="PowerToggleFunction">
+      <item value="0x67" name="TuneFunction">
         <mandatoryConform/>
       </item>
-      <item value="108" name="PowerOffFunction">
+      <item value="0x68" name="SelectMediaFunction">
         <mandatoryConform/>
       </item>
-      <item value="109" name="PowerOnFunction">
+      <item value="0x69" name="SelectAvInputFunction">
         <mandatoryConform/>
       </item>
-      <item value="113" name="F1Blue">
+      <item value="0x71" name="F1Blue">
         <mandatoryConform/>
       </item>
-      <item value="114" name="F2Red">
+      <item value="0x72" name="F2Red">
         <mandatoryConform/>
       </item>
-      <item value="115" name="F3Green">
+      <item value="0x73" name="F3Green">
         <mandatoryConform/>
       </item>
-      <item value="116" name="F4Yellow">
+      <item value="0x74" name="F4Yellow">
         <mandatoryConform/>
       </item>
-      <item value="117" name="F5">
+      <item value="0x75" name="F5">
         <mandatoryConform/>
       </item>
-      <item value="118" name="Data">
+      <item value="0x76" name="Data">
         <mandatoryConform/>
       </item>
     </enum>
@@ -345,7 +350,7 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <commands>
-    <command id="0x00" name="SendKey" response="SendKeyResponse">
+    <command id="0x00" name="SendKey" direction="commandToServer" response="SendKeyResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="KeyCode" type="CecKeyCodeEnum">
@@ -353,7 +358,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="SendKeyResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>

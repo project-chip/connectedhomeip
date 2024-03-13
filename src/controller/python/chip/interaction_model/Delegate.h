@@ -23,8 +23,61 @@
 
 namespace chip {
 namespace python {
+
 static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
-}
+
+// This needs to match the python definition that uses the same name.
+struct PyCommandPath
+{
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    chip::CommandId commandId;
+};
+
+// This needs to match the python definition that uses the same name.
+struct PyInvokeRequestData
+{
+    PyCommandPath commandPath;
+    void * tlvData;
+    size_t tlvLength;
+};
+
+// This needs to match the python definition that uses the same name.
+struct PyAttributePath
+{
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    chip::AttributeId attributeId;
+    chip::DataVersion dataVersion;
+    uint8_t hasDataVersion;
+};
+
+// This needs to match the python definition that uses the same name.
+struct PyWriteAttributeData
+{
+    PyAttributePath attributePath;
+    void * tlvData;
+    size_t tlvLength;
+};
+
+struct TestOnlyPyBatchCommandsOverrides
+{
+    // When max paths per invoke override value is set to 0, we will not use
+    // it as an override. Otherwise, this value will be provided to the
+    // CommandSender as the remote node's maximum paths.
+    uint16_t overrideRemoteMaxPathsPerInvoke;
+    bool suppressTimedRequestMessage;
+    uint16_t * overrideCommandRefsList;
+    size_t overrideCommandRefsListLength;
+};
+
+struct TestOnlyPyOnDoneInfo
+{
+    size_t responseMessageCount;
+};
+
+} // namespace python
+
 namespace Controller {
 
 // The command status will be used for python script.

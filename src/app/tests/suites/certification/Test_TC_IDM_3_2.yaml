@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.2. [TC-IDM-3.2] Write Response Action from DUT to TH. [{DUT_Server}]
+name: 3.3.2. [TC-IDM-3.2] Write Response Action from DUT to TH. [DUT as Server]
 
 PICS:
     - MCORE.IDM.S

@@ -15,7 +15,6 @@
 declare_args() {
   # EFR32 board used
   silabs_board = ""
-  silabs_board_lower = ""
 
   # LCD is enabled by default
   # Boards BRD4166A, BRD2601B, BRD2703A and BRD4319A do not have a LCD so they disable it explicitly
@@ -35,10 +34,8 @@ declare_args() {
   use_wf200 = false
   use_rs9116 = false
   use_SiWx917 = false
-  chip_enable_ble_rs911x = false
 
   wifi_soc = false
-  wifi_soc_common_flash = false
 
   #Disable MQTT by default
   enable_dic = false
@@ -51,14 +48,14 @@ declare_args() {
 
   # Self-provision enabled
   use_provision_channel = false
-
-  # Board required .rps file to flash instead of .s37
-  use_rps_extension = false
 }
 
 declare_args() {
   # Enables LCD Qr Code on supported devices
   show_qr_code = !disable_lcd
+
+  # Enabling BLE on 9116/917 NCP by default
+  chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
 }
 
 if (silabs_board == "") {
@@ -84,6 +81,9 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P432F1024GM48"
   enable_fem = true
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
   board_defines += [ "PAL_RTCC_CLOCK_LFRCO" ]
 } else if (silabs_board == "BRD4161A") {
   silabs_family = "efr32mg12"
@@ -107,41 +107,10 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4170A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P433F1024GM68"
-} else if (silabs_board == "BRD4325B") {
-  silabs_family = "SiWx917-dual"
-  silabs_mcu = "SiWG917M111MGTBA"
-  disable_lcd = true
-  show_qr_code = false
-  wifi_soc = true
-  silabs_board_lower = "brd4325b"
-  use_rps_extension = true
-} else if (silabs_board == "BRD4325C") {
-  silabs_family = "SiWx917-common"
-  silabs_mcu = "SiWG917M111MGTBA"
-  disable_lcd = true
-  show_qr_code = false
-  wifi_soc = true
-  wifi_soc_common_flash = true
-  silabs_board_lower = "brd4325c"
-  use_rps_extension = true
-} else if (silabs_board == "BRD4325G") {
-  silabs_family = "SiWx917-common"
-  silabs_mcu = "SiWG917M111MGTBA"
-  disable_lcd = true
-  show_qr_code = false
-  wifi_soc = true
-  wifi_soc_common_flash = true
-  silabs_board_lower = "brd4325g"
-  use_rps_extension = true
 } else if (silabs_board == "BRD4338A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
-  disable_lcd = false
-  show_qr_code = true
   wifi_soc = true
-  wifi_soc_common_flash = true
-  silabs_board_lower = "brd4338a"
-  use_rps_extension = true
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,
@@ -214,6 +183,14 @@ if (silabs_board == "BRD4304A") {
   assert(
       false,
       "The board ${silabs_board} is unsupported. A list of supported board can be found here https://t.ly/_b3SK")
+}
+
+declare_args() {
+  # Wifi SoC Board require a .rps file to be flashed to the device to run
+  # this rps file is created from the built binary but it requires Silabs Commander tool
+  # User can set this arg to false to skip the rps creation for WiFi SoCs.
+  # e.g. for CI
+  use_rps_extension = wifi_soc
 }
 
 # qr code cannot be true if lcd is disabled

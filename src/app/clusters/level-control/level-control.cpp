@@ -18,6 +18,8 @@
 // clusters specific header
 #include "level-control.h"
 
+#include <algorithm>
+
 // this file contains all the common includes for clusters in the util
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -25,7 +27,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <app/util/util.h>
 
 #include <app/reporting/reporting.h>
@@ -33,18 +34,19 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
+#include <tracing/macros.h>
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
-#ifdef EMBER_AF_PLUGIN_ON_OFF
+#ifdef MATTER_DM_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h>
-#endif // EMBER_AF_PLUGIN_ON_OFF
+#endif // MATTER_DM_PLUGIN_ON_OFF
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 #include <app/clusters/color-control-server/color-control-server.h>
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 #include <assert.h>
 
@@ -57,11 +59,11 @@ using chip::Protocols::InteractionModel::Status;
 static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint);
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 
-#if (EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE == 0)
+#if (MATTER_DM_PLUGIN_LEVEL_CONTROL_RATE == 0)
 #define FASTEST_TRANSITION_TIME_MS 0
 #else
-#define FASTEST_TRANSITION_TIME_MS (MILLISECOND_TICKS_PER_SECOND / EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE)
-#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE
+#define FASTEST_TRANSITION_TIME_MS (MILLISECOND_TICKS_PER_SECOND / MATTER_DM_PLUGIN_LEVEL_CONTROL_RATE)
+#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_RATE
 
 #define LEVEL_CONTROL_LIGHTING_MIN_LEVEL 0x01
 #define LEVEL_CONTROL_LIGHTING_MAX_LEVEL 0xFE
@@ -72,7 +74,7 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 #define STARTUP_CURRENT_LEVEL_USE_PREVIOUS_LEVEL 0xFF
 
 static constexpr size_t kLevelControlStateTableSize =
-    EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kLevelControlStateTableSize <= kEmberInvalidEndpointIndex, "LevelControl state table size error");
 
 struct CallbackScheduleState
@@ -120,7 +122,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
                                chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride);
 
-#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultLevelControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
@@ -158,15 +160,15 @@ public:
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
-        using AttributeValuePair = Scenes::Structs::AttributeValuePair::Type;
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
 
         app::DataModel::Nullable<uint8_t> level;
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentLevel::Get(endpoint, level), CHIP_ERROR_READ_FAILED);
+        VerifyOrReturnError(Status::Success == Attributes::CurrentLevel::Get(endpoint, level), CHIP_ERROR_READ_FAILED);
 
         AttributeValuePair pairs[kLevelMaxScenableAttributes];
 
         uint8_t maxLevel;
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::MaxLevel::Get(endpoint, &maxLevel), CHIP_ERROR_READ_FAILED);
+        VerifyOrReturnError(Status::Success == Attributes::MaxLevel::Get(endpoint, &maxLevel), CHIP_ERROR_READ_FAILED);
 
         pairs[0].attributeID = Attributes::CurrentLevel::Id;
         if (!level.IsNull())
@@ -181,8 +183,7 @@ public:
         if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
         {
             uint16_t frequency;
-            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::CurrentFrequency::Get(endpoint, &frequency),
-                                CHIP_ERROR_READ_FAILED);
+            VerifyOrReturnError(Status::Success == Attributes::CurrentFrequency::Get(endpoint, &frequency), CHIP_ERROR_READ_FAILED);
             pairs[attributeCount].attributeID    = Attributes::CurrentFrequency::Id;
             pairs[attributeCount].attributeValue = frequency;
             attributeCount++;
@@ -202,7 +203,7 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
-        app::DataModel::DecodableList<Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePair::DecodableType> attributeValueList;
 
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
@@ -254,14 +255,14 @@ public:
 };
 static DefaultLevelControlSceneHandler sLevelControlSceneHandler;
 
-#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
-#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
+#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 #define updateCoupledColorTemp(endpoint) reallyUpdateCoupledColorTemp(endpoint)
 #else
 #define updateCoupledColorTemp(endpoint)
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint);
 
@@ -329,18 +330,18 @@ static void cancelEndpointTimerCallback(EndpointId endpoint)
 static EmberAfLevelControlState * getState(EndpointId endpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, LevelControl::Id, EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, LevelControl::Id, MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kLevelControlStateTableSize ? nullptr : &stateTable[ep]);
 }
 
-#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
+#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 {
     LevelControl::Attributes::Options::TypeInfo::Type options;
-    EmberAfStatus status = Attributes::Options::Get(endpoint, &options);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Status status = Attributes::Options::Get(endpoint, &options);
+    if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "Unable to read Options attribute: 0x%X", status);
+        ChipLogProgress(Zcl, "Unable to read Options attribute: 0x%X", to_underlying(status));
         return;
     }
 
@@ -352,12 +353,12 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
         }
     }
 }
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 {
     EmberAfLevelControlState * state = getState(endpoint);
-    EmberAfStatus status;
+    Status status;
     app::DataModel::Nullable<uint8_t> currentLevel;
     const auto callbackStartTimestamp = System::SystemClock().GetMonotonicTimestamp();
 
@@ -371,9 +372,9 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     // Read the attribute; print error message and return if it can't be read
     status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS || currentLevel.IsNull())
+    if (status != Status::Success || currentLevel.IsNull())
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", status);
+        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
         state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
@@ -404,9 +405,9 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     ChipLogDetail(Zcl, "(diff %c1)", state->increasing ? '+' : '-');
 
     status = Attributes::CurrentLevel::Set(endpoint, currentLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: writing current level %x", status);
+        ChipLogProgress(Zcl, "ERR: writing current level %x", to_underlying(status));
         state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
         writeRemainingTime(endpoint, 0);
         return;
@@ -427,9 +428,9 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
         {
             uint8_t storedLevel8u = (uint8_t) state->storedLevel;
             status                = Attributes::CurrentLevel::Set(endpoint, storedLevel8u);
-            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            if (status != Status::Success)
             {
-                ChipLogProgress(Zcl, "ERR: writing current level %x", status);
+                ChipLogProgress(Zcl, "ERR: writing current level %x", to_underlying(status));
             }
             else
             {
@@ -469,10 +470,10 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
         // This is done to ensure that the attribute, in tenths of a second, only
         // goes to zero when the remaining time in milliseconds is actually zero.
         uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
-        EmberStatus status       = LevelControl::Attributes::RemainingTime::Set(endpoint, remainingTimeDs);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        Status status            = LevelControl::Attributes::RemainingTime::Set(endpoint, remainingTimeDs);
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: writing remaining time %x", status);
+            ChipLogProgress(Zcl, "ERR: writing remaining time %x", to_underlying(status));
         }
     }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
@@ -480,13 +481,13 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
 
 static void setOnOffValue(EndpointId endpoint, bool onOff)
 {
-#ifdef EMBER_AF_PLUGIN_ON_OFF
+#ifdef MATTER_DM_PLUGIN_ON_OFF
     if (emberAfContainsServer(endpoint, OnOff::Id))
     {
         ChipLogProgress(Zcl, "Setting on/off to %s due to level change", onOff ? "ON" : "OFF");
         OnOffServer::Instance().setOnOffValue(endpoint, (onOff ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id), true);
     }
-#endif // EMBER_AF_PLUGIN_ON_OFF
+#endif // MATTER_DM_PLUGIN_ON_OFF
 }
 
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
@@ -515,19 +516,19 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::O
         }
 
         LevelControl::Attributes::Options::TypeInfo::Type options;
-        EmberAfStatus status = Attributes::Options::Get(endpoint, &options);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        Status status = Attributes::Options::Get(endpoint, &options);
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "Unable to read Options attribute: 0x%X", status);
+            ChipLogProgress(Zcl, "Unable to read Options attribute: 0x%X", to_underlying(status));
             // If we can't read the attribute, then we should just assume that it has its
             // default value.
         }
 
         bool on;
         status = OnOff::Attributes::OnOff::Get(endpoint, &on);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "Unable to read OnOff attribute: 0x%X", status);
+            ChipLogProgress(Zcl, "Unable to read OnOff attribute: 0x%X", to_underlying(status));
             return true;
         }
         // The device is on - hence ExecuteIfOff does not matter
@@ -577,6 +578,7 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::O
 bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                    const Commands::MoveToLevel::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("MoveToLevel", "LevelControl");
     commandObj->AddStatus(commandPath, LevelControlServer::MoveToLevel(commandPath.mEndpointId, commandData));
     return true;
 }
@@ -608,11 +610,11 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
 
 chip::scenes::SceneHandler * GetSceneHandler()
 {
-#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sLevelControlSceneHandler;
 #else
     return nullptr;
-#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 } // namespace LevelControlServer
@@ -621,6 +623,7 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::MoveToLevelWithOnOff::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("MoveToLevelWithOnOff", "LevelControl");
     auto & level           = commandData.level;
     auto & transitionTime  = commandData.transitionTime;
     auto & optionsMask     = commandData.optionsMask;
@@ -650,6 +653,7 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
 bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::Move::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("Move", "LevelControl");
     auto & moveMode        = commandData.moveMode;
     auto & rate            = commandData.rate;
     auto & optionsMask     = commandData.optionsMask;
@@ -674,6 +678,7 @@ bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, co
 bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::MoveWithOnOff::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("MoveWithOnOff", "LevelControl");
     auto & moveMode        = commandData.moveMode;
     auto & rate            = commandData.rate;
     auto & optionsMask     = commandData.optionsMask;
@@ -698,6 +703,7 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * comma
 bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::Step::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("Step", "LevelControl");
     auto & stepMode        = commandData.stepMode;
     auto & stepSize        = commandData.stepSize;
     auto & transitionTime  = commandData.transitionTime;
@@ -723,6 +729,7 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
 bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::StepWithOnOff::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("StepWithOnOff", "LevelControl");
     auto & stepMode        = commandData.stepMode;
     auto & stepSize        = commandData.stepSize;
     auto & transitionTime  = commandData.transitionTime;
@@ -748,6 +755,7 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * comma
 bool emberAfLevelControlClusterStopCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::Stop::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("Stop", "LevelControl");
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
 
@@ -760,6 +768,7 @@ bool emberAfLevelControlClusterStopCallback(app::CommandHandler * commandObj, co
 bool emberAfLevelControlClusterStopWithOnOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::StopWithOnOff::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("StopWithOnOff", "LevelControl");
     auto & optionsMask     = commandData.optionsMask;
     auto & optionsOverride = commandData.optionsOverride;
     ChipLogProgress(Zcl, "%s STOP_WITH_ON_OFF", "RX level-control:");
@@ -782,7 +791,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
         return Status::Failure;
     }
 
-    if (level > EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL)
+    if (level > MATTER_DM_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL)
     {
         return Status::InvalidCommand;
     }
@@ -795,11 +804,11 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    EmberAfStatus status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    Status status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
+    if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", status);
-        return app::ToInteractionModelStatus(status);
+        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
+        return status;
     }
 
     if (currentLevel.IsNull())
@@ -861,10 +870,10 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
         {
             uint16_t onOffTransitionTime = 0;
             status                       = Attributes::OnOffTransitionTime::Get(endpoint, &onOffTransitionTime);
-            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            if (status != Status::Success)
             {
-                ChipLogProgress(Zcl, "ERR: reading on/off transition time %x", status);
-                return app::ToInteractionModelStatus(status);
+                ChipLogProgress(Zcl, "ERR: reading on/off transition time %x", to_underlying(status));
+                return status;
             }
 
             // Transition time comes in (or is stored, in the case of On/Off Transition
@@ -897,32 +906,32 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
-    state->eventDurationMs = state->transitionTimeMs / actualStepSize;
+    state->eventDurationMs = state->transitionTimeMs / std::max(static_cast<uint8_t>(1u), actualStepSize);
     state->elapsedTimeMs   = 0;
 
     state->storedLevel = storedLevel;
 
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     // The level has changed, the scene is no longer valid.
-    if (emberAfContainsServer(endpoint, Scenes::Id))
+    if (emberAfContainsServer(endpoint, ScenesManagement::Id))
     {
-        Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
+        ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
     }
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
     // The setup was successful, so mark the new state as active and return.
     scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
 
-#ifdef EMBER_AF_PLUGIN_ON_OFF
+#ifdef MATTER_DM_PLUGIN_ON_OFF
     // Check that the received MoveToLevelWithOnOff produces a On action and that the onoff support the lighting featuremap
     if (commandId == Commands::MoveToLevelWithOnOff::Id && state->moveToLevel != state->minLevel &&
         OnOffServer::Instance().SupportsLightingApplications(endpoint))
     {
         OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
     }
-#endif // EMBER_AF_PLUGIN_ON_OFF
+#endif // MATTER_DM_PLUGIN_ON_OFF
 
     return Status::Success;
 }
@@ -951,10 +960,18 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
         goto send_default_response;
     }
 
+    if (!rate.IsNull() && (rate.Value() == 0))
+    {
+        // Move at a rate of zero is no move at all. Immediately succeed without touching anything.
+        ChipLogProgress(Zcl, "Immediate success due to move rate of 0 (would move at no rate).");
+        status = Status::Success;
+        goto send_default_response;
+    }
+
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
         ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
@@ -1013,7 +1030,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     if (rate.IsNull())
     {
         app::DataModel::Nullable<uint8_t> defaultMoveRate;
-        status = app::ToInteractionModelStatus(Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate));
+        status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
         if (status != Status::Success || defaultMoveRate.IsNull())
         {
             ChipLogProgress(Zcl, "ERR: reading default move rate %x", to_underlying(status));
@@ -1027,12 +1044,13 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
                 status = Status::Success;
                 goto send_default_response;
             }
+            // Already checked that defaultMoveRate.Value() != 0.
             state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / defaultMoveRate.Value();
         }
     }
     else
     {
-        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / rate.Value();
+        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / std::max(static_cast<uint8_t>(1u), rate.Value());
     }
 #else
     // Transition/rate is not supported so always use fastest transition time and ignore
@@ -1084,7 +1102,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    status = app::ToInteractionModelStatus(Attributes::CurrentLevel::Get(endpoint, currentLevel));
+    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
         ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
@@ -1168,7 +1186,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
         // milliseconds to reduce rounding errors in integer division.
         if (stepSize != actualStepSize)
         {
-            state->transitionTimeMs = (state->transitionTimeMs * actualStepSize / stepSize);
+            state->transitionTimeMs = (state->transitionTimeMs * actualStepSize / std::max(static_cast<uint8_t>(1u), stepSize));
         }
     }
 #else
@@ -1180,7 +1198,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
-    state->eventDurationMs = state->transitionTimeMs / actualStepSize;
+    state->eventDurationMs = state->transitionTimeMs / std::max(static_cast<uint8_t>(1u), actualStepSize);
     state->elapsedTimeMs   = 0;
 
     // storedLevel is not used for Step commands
@@ -1235,7 +1253,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     app::DataModel::Nullable<uint16_t> transitionTime;
 
     uint16_t currentOnOffTransitionTime;
-    EmberAfStatus status;
+    Status status;
     bool useOnLevel = false;
 
     EmberAfLevelControlState * state = getState(endpoint);
@@ -1249,9 +1267,9 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
     // "Temporarily store CurrentLevel."
     status = Attributes::CurrentLevel::Get(endpoint, temporaryCurrentLevelCache);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "ERR: reading current level %x", status);
+        ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
         return;
     }
 
@@ -1265,9 +1283,9 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnLevel::Id))
     {
         status = Attributes::OnLevel::Get(endpoint, resolvedLevel);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: reading on level %x", status);
+            ChipLogProgress(Zcl, "ERR: reading on level %x", to_underlying(status));
             return;
         }
 
@@ -1294,9 +1312,9 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id))
     {
         status = Attributes::OnOffTransitionTime::Get(endpoint, &currentOnOffTransitionTime);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: reading current level %x", status);
+            ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
             return;
         }
         transitionTime.SetNonNull(currentOnOffTransitionTime);
@@ -1314,9 +1332,9 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         // If newValue is OnOff::Commands::On::Id...
         // "Set CurrentLevel to minimum level allowed for the device."
         status = Attributes::CurrentLevel::Set(endpoint, minimumLevelAllowedForTheDevice);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "ERR: reading current level %x", status);
+            ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
             return;
         }
 
@@ -1356,8 +1374,8 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         return;
     }
 
-    state->minLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
-    state->maxLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
+    state->minLevel = MATTER_DM_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
+    state->maxLevel = MATTER_DM_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
 
     // If these read only attributes are enabled we use those values as our set minLevel and maxLevel
     // if get isn't possible, value stays at default
@@ -1378,8 +1396,8 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
     }
 
     app::DataModel::Nullable<uint8_t> currentLevel;
-    EmberAfStatus status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    Status status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
+    if (status == Status::Success)
     {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
         // StartUp behavior relies StartUpCurrentLevel attributes being Non Volatile.
@@ -1400,7 +1418,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 
             app::DataModel::Nullable<uint8_t> startUpCurrentLevel;
             status = Attributes::StartUpCurrentLevel::Get(endpoint, startUpCurrentLevel);
-            if (status == EMBER_ZCL_STATUS_SUCCESS)
+            if (status == Status::Success)
             {
                 if (!startUpCurrentLevel.IsNull())
                 {
@@ -1444,10 +1462,10 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         }
     }
 
-#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     // Registers Scene handlers for the level control cluster on the server
-    app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint, LevelControlServer::GetSceneHandler());
-#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+    app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint, LevelControlServer::GetSceneHandler());
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
     emberAfPluginLevelControlClusterServerPostInitCallback(endpoint);
 }
@@ -1472,7 +1490,7 @@ bool LevelControlHasFeature(EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;
-    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == Status::Success);
 
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }

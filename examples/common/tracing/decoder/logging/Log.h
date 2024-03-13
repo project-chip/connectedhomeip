@@ -60,6 +60,8 @@ void Log(const char * name);
 
 void Log(const char * name, const char * value);
 
+void LogAsHex(const char * name, uint8_t value);
+
 void LogAsHex(const char * name, uint16_t value);
 
 void LogAsHex(const char * name, uint64_t value);

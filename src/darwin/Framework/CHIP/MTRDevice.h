@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,6 +32,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 @protocol MTRDeviceDelegate;
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDevice : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -63,6 +65,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 @property (nonatomic, readonly) MTRDeviceState state;
 
 /**
+ * Is the device cache primed for this device?
+ *
+ * This will be true after the deviceCachePrimed: delegate callback has been called, false if not.
+ *
+ * Please note if you have a storage delegate implemented, the cache is then stored persistently, so
+ * the would then only be called once, ever - and this property would basically always be true
+ * if a subscription has ever been established.
+ *
+ */
+@property (readonly) BOOL deviceCachePrimed MTR_NEWLY_AVAILABLE;
+
+/**
  * The estimated device system start time.
  *
  * A device can report its events with either calendar time or time since system start time. When events are reported with time
@@ -81,12 +95,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * The controller this device was created for.  May return nil if that
  * controller has been shut down.
  */
-@property (nonatomic, readonly, nullable) MTRDeviceController * deviceController MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable) MTRDeviceController * deviceController MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 /**
  * The node ID of the node this device corresponds to.
  */
-@property (nonatomic, readonly, copy) NSNumber * nodeID NS_REFINED_FOR_SWIFT MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, copy) NSNumber * nodeID NS_REFINED_FOR_SWIFT MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.
@@ -189,7 +203,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                               queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+                         completion:(MTRDeviceResponseHandler)completion MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
@@ -255,14 +269,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * List of all client data types supported
  *
  */
-- (NSArray *)supportedClientDataClasses MTR_NEWLY_AVAILABLE;
+- (NSArray *)supportedClientDataClasses MTR_UNSTABLE_API;
 
 /**
  *
  * List of all client data keys stored
  *
  */
-- (NSArray * _Nullable)clientDataKeys MTR_NEWLY_AVAILABLE;
+- (NSArray * _Nullable)clientDataKeys MTR_UNSTABLE_API;
 
 /**
  *
@@ -270,7 +284,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *
  * @param key           NSString * for the key to store the value as
  */
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key MTR_NEWLY_AVAILABLE;
+- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key MTR_UNSTABLE_API;
 
 /**
  *
@@ -279,7 +293,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param key           NSString * for the key to store the value as
  * @param value         id <NSSecureCoding> for the value to store
  */
-- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value MTR_NEWLY_AVAILABLE;
+- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value MTR_UNSTABLE_API;
 
 /**
  *
@@ -287,14 +301,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *
  * @param key           NSString * for the key to store the value as
  */
-- (void)removeClientDataForKey:(NSString *)key MTR_NEWLY_AVAILABLE;
+- (void)removeClientDataForKey:(NSString *)key MTR_UNSTABLE_API;
 
 /**
  *
  * List of all client data keys stored
  *
  */
-- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
+- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
 /**
  *
@@ -303,7 +317,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param key           NSString * for the key to store the value as
  * @param endpointID    NSNumber * for the endpoint to associate the metadata with
  */
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
+- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
 /**
  *
@@ -313,7 +327,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param endpointID    NSNumber * for the endpoint to associate the metadata with
  * @param value         id <NSSecureCoding> for the value to store
  */
-- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value MTR_NEWLY_AVAILABLE;
+- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value MTR_UNSTABLE_API;
 
 /**
  *
@@ -322,9 +336,33 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param key           NSString * for the key to store the value as
  * @param endpointID    NSNumber * for the endpoint to associate the metadata with
  */
-- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
+- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
+/**
+ * Download log of the desired type from the device.
+ *
+ * Note: The consumer of this API should move the file that the url points to or open it for reading before the
+ * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ *
+ * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
+ * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
+ *                   has been retrieved by that point (which might be none or a partial log).
+ *                   If the timeout is set to 0, the request will not expire and completion will not be called until
+ *                   the log is fully retrieved or an error occurs.
+ * @param queue      The queue on which completion will be called.
+ * @param completion The completion handler that is called after attempting to retrieve the requested log.
+ *                     - In case of success, the completion handler is called with a non-nil URL and a nil error.
+ *                     - If there is an error, a non-nil error is used and the url can be non-nil too if some logs have already been downloaded.
+ */
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
 @end
+
+MTR_EXTERN NSString * const MTRPreviousDataKey MTR_NEWLY_AVAILABLE;
+MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
 
 @protocol MTRDeviceDelegate <NSObject>
 @required
@@ -337,6 +375,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * Notifies delegate of attribute reports from the MTRDevice
  *
  * @param attributeReport  An array of response-value objects as described in MTRDeviceResponseHandler
+ *
+ *                In addition to MTRDataKey, each response-value dictionary in the array may also have this key:
+ *
+ *                MTRPreviousDataKey : Same data-value dictionary format as the object for MTRDataKey. This is included when the previous value is known for an attribute.
+ *
+ *                The data-value dictionary also contains this key:
+ *
+ *                MTRDataVersionKey : NSNumber-wrapped uin32_t. Monotonically increaseing data version for the cluster.
  */
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 
@@ -368,6 +414,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * device, especially if the device is sleepy and might not be active very often.
  */
 - (void)deviceBecameActive:(MTRDevice *)device MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Notifies delegate when the device attribute cache has been primed with initial configuration data of the device
+ *
+ * This is called when the MTRDevice object goes from not knowing the device to having cached the first attribute reports that include basic mandatory information, e.g. Descriptor clusters.
+ *
+ * The intention is that after this is called, the client should be able to call read for mandatory attributes and likely expect non-nil values.
+ */
+- (void)deviceCachePrimed:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
 @end
 

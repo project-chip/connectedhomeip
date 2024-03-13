@@ -55,10 +55,13 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002d" name="Unit Localization" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002D" name="Unit Localization" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x002D" name="Unit Localization"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="LUNIT" scope="Node"/>
   <features>
     <feature bit="0" code="TEMP" name="TemperatureUnit" summary="The Node can be configured to use different units of temperature when conveying values to a user.">
@@ -79,9 +82,9 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="TemperatureUnit" type="TempUnitEnum" default="null">
+    <attribute id="0x0000" name="TemperatureUnit" type="TempUnitEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform>
         <feature name="TEMP"/>
       </mandatoryConform>

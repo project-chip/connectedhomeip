@@ -25,6 +25,11 @@
 #include "glib.h"
 #include "lcd.h"
 
+#if SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
+// Only needed for wifi NCP devices
+#include "spi_multiplex.h"
+#endif // SL_WIFI
+
 // LCD line define
 constexpr uint8_t kTempLcdInitialX = 30;
 
@@ -65,7 +70,13 @@ void ThermostatUI::DrawUI(GLIB_Context_t * glibContext)
     DrawCurrentTemp(glibContext, mCurrentTempCelsius);
     DrawFooter(glibContext, false);
 
+#if SL_LCDCTRL_MUX
+    sl_wfx_host_pre_lcd_spi_transfer();
+#endif // SL_LCDCTRL_MUX
     DMD_updateDisplay();
+#if SL_LCDCTRL_MUX
+    sl_wfx_host_post_lcd_spi_transfer();
+#endif // SL_LCDCTRL_MUX
 }
 
 void ThermostatUI::SetHeatingSetPoint(int8_t temp)
@@ -98,7 +109,13 @@ void ThermostatUI::DrawHeader(GLIB_Context_t * glibContext)
                     WIFI_BITMAP_HEIGHT, (UI_WIFI) ? wifiLogo : threadLogo);
     // Draw Matter Icon
     GLIB_drawBitmap(glibContext, MATTER_ICON_POSITION_X, STATUS_ICON_LINE, MATTER_LOGO_WIDTH, MATTER_LOGO_HEIGHT, matterLogoBitmap);
+#if SL_LCDCTRL_MUX
+    sl_wfx_host_pre_lcd_spi_transfer();
+#endif // SL_LCDCTRL_MUX
     DMD_updateDisplay();
+#if SL_LCDCTRL_MUX
+    sl_wfx_host_post_lcd_spi_transfer();
+#endif // SL_LCDCTRL_MUX
 }
 
 void ThermostatUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
@@ -129,7 +146,13 @@ void ThermostatUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
         break;
     }
 
+#if SL_LCDCTRL_MUX
+    sl_wfx_host_pre_lcd_spi_transfer();
+#endif // SL_LCDCTRL_MUX
     DMD_updateDisplay();
+#if SL_LCDCTRL_MUX
+    sl_wfx_host_post_lcd_spi_transfer();
+#endif // SL_LCDCTRL_MUX
 }
 
 /**

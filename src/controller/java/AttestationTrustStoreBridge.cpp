@@ -25,17 +25,6 @@
 
 using namespace chip;
 
-AttestationTrustStoreBridge::~AttestationTrustStoreBridge()
-{
-    if (mAttestationTrustStoreDelegate != nullptr)
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-        env->DeleteGlobalRef(mAttestationTrustStoreDelegate);
-        mAttestationTrustStoreDelegate = nullptr;
-    }
-}
-
 CHIP_ERROR AttestationTrustStoreBridge::GetProductAttestationAuthorityCert(const chip::ByteSpan & skid,
                                                                            chip::MutableByteSpan & outPaaDerBuffer) const
 {
@@ -65,25 +54,28 @@ CHIP_ERROR AttestationTrustStoreBridge::GetProductAttestationAuthorityCert(const
 CHIP_ERROR AttestationTrustStoreBridge::GetPaaCertFromJava(const chip::ByteSpan & skid,
                                                            chip::MutableByteSpan & outPaaDerBuffer) const
 {
-    JNIEnv * env                                       = JniReferences::GetInstance().GetEnvForCurrentThread();
     jclass attestationTrustStoreDelegateCls            = nullptr;
     jbyteArray javaSkid                                = nullptr;
     jmethodID getProductAttestationAuthorityCertMethod = nullptr;
 
-    JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/AttestationTrustStoreDelegate",
-                                             attestationTrustStoreDelegateCls);
-    VerifyOrReturnError(attestationTrustStoreDelegateCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-    JniClass attestationTrustStoreDelegateJniCls(attestationTrustStoreDelegateCls);
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    JniLocalReferenceScope scope(env);
 
-    JniReferences::GetInstance().FindMethod(env, mAttestationTrustStoreDelegate, "getProductAttestationAuthorityCert", "([B)[B",
-                                            &getProductAttestationAuthorityCertMethod);
+    VerifyOrReturnError(mAttestationTrustStoreDelegate.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/AttestationTrustStoreDelegate",
+                                                  attestationTrustStoreDelegateCls);
+    VerifyOrReturnError(attestationTrustStoreDelegateCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
+    JniReferences::GetInstance().FindMethod(env, mAttestationTrustStoreDelegate.ObjectRef(), "getProductAttestationAuthorityCert",
+                                            "([B)[B", &getProductAttestationAuthorityCertMethod);
     VerifyOrReturnError(getProductAttestationAuthorityCertMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     JniReferences::GetInstance().N2J_ByteArray(env, skid.data(), static_cast<jsize>(skid.size()), javaSkid);
     VerifyOrReturnError(javaSkid != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    jbyteArray javaPaaCert =
-        (jbyteArray) env->CallObjectMethod(mAttestationTrustStoreDelegate, getProductAttestationAuthorityCertMethod, javaSkid);
+    jbyteArray javaPaaCert = (jbyteArray) env->CallObjectMethod(mAttestationTrustStoreDelegate.ObjectRef(),
+                                                                getProductAttestationAuthorityCertMethod, javaSkid);
     VerifyOrReturnError(javaPaaCert != nullptr, CHIP_ERROR_CA_CERT_NOT_FOUND);
 
     JniByteArray paaCertBytes(env, javaPaaCert);

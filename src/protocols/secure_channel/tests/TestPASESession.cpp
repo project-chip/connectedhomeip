@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
@@ -36,7 +37,7 @@
 #include <stdarg.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDConfigurationData.h> // nogncheck
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
 // This test suite pushes multiple PASESession objects onto the stack for the

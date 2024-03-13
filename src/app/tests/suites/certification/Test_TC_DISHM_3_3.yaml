@@ -13,10 +13,15 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 189.3.3.[TC-DISHM-3.3] OnMode overwriting StartUpMode with DUT as Server
+name:
+    189.3.3.[TC-DISHM-3.3] On Mode and Startup Mode functionality with DUT as
+    Server
 
 PICS:
-    - DISHM.S
+    - DISHM.S.A0002
+    - DISHM.S.A0003
+    - MOD.S.F00
+    - OO.S.A4003
 
 config:
     nodeId: 0x12344321
@@ -216,7 +221,7 @@ tests:
       disabled: true
 
     - label: "Step 8: TH reads from the DUT the OnMode attribute."
-      PICS: DISHM.S.A0003 && DISHM.S.F00
+      PICS: DISHM.S.A0003 && MOD.S.F00
       verification: |
           ./chip-tool dishwashermode read on-mode 1 1
 

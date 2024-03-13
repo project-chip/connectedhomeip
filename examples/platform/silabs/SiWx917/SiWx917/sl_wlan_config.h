@@ -28,8 +28,6 @@
 //! Disable feature
 #define RSI_DISABLE 0
 
-#define SI91X_LISTEN_INTERVAL 0
-
 static const sl_wifi_device_configuration_t config = {
     .boot_option = LOAD_NWP_FW,
     .mac_address = NULL,
@@ -38,7 +36,7 @@ static const sl_wifi_device_configuration_t config = {
     .boot_config = { .oper_mode = SL_SI91X_CLIENT_MODE,
                      .coex_mode = SL_SI91X_WLAN_BLE_MODE,
                      .feature_bit_map =
-#ifdef RSI_M4_INTERFACE
+#ifdef SLI_SI91X_MCU_INTERFACE
                          (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_WPS_DISABLE),
 #else
                          (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION),
@@ -49,22 +47,12 @@ static const sl_wifi_device_configuration_t config = {
                                                 | SL_SI91X_TCP_IP_FEAT_DHCPV6_CLIENT | SL_SI91X_TCP_IP_FEAT_IPV6
 #endif
                                                 | SL_SI91X_TCP_IP_FEAT_ICMP | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
-                     .custom_feature_bit_map     = (SL_SI91X_FEAT_CUSTOM_FEAT_EXTENTION_VALID | RSI_CUSTOM_FEATURE_BIT_MAP),
-                     .ext_custom_feature_bit_map = (
-#ifdef CHIP_917
-                         (RSI_EXT_CUSTOM_FEATURE_BIT_MAP)
-#else // defaults
-#ifdef RSI_M4_INTERFACE
-                         (SL_SI91X_EXT_FEAT_256K_MODE | RSI_EXT_CUSTOM_FEATURE_BIT_MAP)
-#else
-                         (SL_SI91X_EXT_FEAT_384K_MODE | RSI_EXT_CUSTOM_FEATURE_BIT_MAP)
-#endif
-#endif
-                         | (SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE)
+                     .custom_feature_bit_map     = (SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID | RSI_CUSTOM_FEATURE_BIT_MAP),
+                     .ext_custom_feature_bit_map = (RSI_EXT_CUSTOM_FEATURE_BIT_MAP | (SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE)
 #if (defined A2DP_POWER_SAVE_ENABLE)
-                         | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2)
+                                                    | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2)
 #endif
-                             ),
+                                                        ),
                      .bt_feature_bit_map = (RSI_BT_FEATURE_BITMAP
 #if (RSI_BT_GATT_ON_CLASSIC)
                                             | SL_SI91X_BT_ATT_OVER_CLASSIC_ACL /* to support att over classic acl link */

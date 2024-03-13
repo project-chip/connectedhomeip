@@ -54,26 +54,33 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0081" name="Valve Configuration and Control" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0081" name="Valve Configuration and Control"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="VALCC" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="TS" name="TimeSync" summary="UTC time is used for time indications">
-      <optionalConform/>
-    </feature>
+    <feature bit="0" code="TS" name="TimeSync" summary="UTC time is used for time indications"/>
     <feature bit="1" code="LVL" name="Level" summary="Device supports setting the specific position of the valve">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
+    <enum name="Status Codes" type="status"/>
     <enum name="ValveStateEnum">
-      <item value="0" name="Open" summary="Valve is in open position">
+      <item value="0" name="Closed" summary="Valve is in closed position">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Closed" summary="Valve is in closed position">
+      <item value="1" name="Open" summary="Valve is in open position">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Transitioning" summary="Valve is transitioning between closed and open positions or between levels">
         <mandatoryConform/>
       </item>
     </enum>
@@ -87,41 +94,51 @@ Davis, CA 95616, USA
       <bitfield name="Leaking" bit="2" summary="Valve has detected a leak">
         <mandatoryConform/>
       </bitfield>
+      <bitfield name="NotConnected" bit="3" summary="No valve is connected to controller">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ShortCircuit" bit="4" summary="Short circuit is detected">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="CurrentExceeded" bit="5" summary="The available current has been exceeded">
+        <mandatoryConform/>
+      </bitfield>
     </bitmap>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="OpenDuration" type="elapsed-s" default="null">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="min" value="1"/>
+    </attribute>
+    <attribute id="0x0001" name="DefaultOpenDuration" type="elapsed-s" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="min" value="1"/>
     </attribute>
-    <attribute id="0x0001" name="AutoCloseTime" type="epoch-us" default="null">
+    <attribute id="0x0002" name="AutoCloseTime" type="epoch-us" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <optionalConform>
+      <mandatoryConform>
         <feature name="TS"/>
-      </optionalConform>
+      </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="RemainingDuration" type="elapsed-s" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0003" name="CurrentState" type="ValveStateEnum" default="null">
+    <attribute id="0x0003" name="RemainingDuration" type="elapsed-s" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0004" name="TargetState" type="ValveStateEnum" default="null">
+    <attribute id="0x0004" name="CurrentState" type="ValveStateEnum" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0005" name="StartUpState" type="ValveStateEnum" default="MS">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
-      <optionalConform/>
+    <attribute id="0x0005" name="TargetState" type="ValveStateEnum" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0006" name="CurrentLevel" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
@@ -137,9 +154,9 @@ Davis, CA 95616, USA
         <feature name="LVL"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0008" name="OpenLevel" type="percent" default="100">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+    <attribute id="0x0008" name="DefaultOpenLevel" type="percent" default="100">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <optionalConform>
         <feature name="LVL"/>
       </optionalConform>
@@ -149,32 +166,34 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
+    <attribute id="0x000A" name="LevelStep" type="uint8" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <optionalConform>
+        <feature name="LVL"/>
+      </optionalConform>
+      <constraint type="between" from="1" to="50"/>
+    </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Open" response="Y">
+    <command id="0x00" name="Open" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="OpenDuration" type="elapsed-s">
+        <quality nullable="true"/>
         <optionalConform/>
         <constraint type="min" value="1"/>
       </field>
+      <field id="1" name="TargetLevel" type="percent">
+        <optionalConform>
+          <feature name="LVL"/>
+        </optionalConform>
+        <constraint type="min" value="1"/>
+      </field>
     </command>
-    <command id="0x01" name="Close" response="Y">
+    <command id="0x01" name="Close" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-    </command>
-    <command id="0x02" name="SetLevel" response="Y">
-      <access invokePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="LVL"/>
-      </mandatoryConform>
-      <field id="0" name="Level" type="percent">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="OpenDuration" type="elapsed-s">
-        <optionalConform/>
-        <constraint type="min" value="1"/>
-      </field>
     </command>
   </commands>
   <events>
@@ -183,6 +202,11 @@ Davis, CA 95616, USA
       <optionalConform/>
       <field id="0" name="ValveState" type="ValveStateEnum">
         <mandatoryConform/>
+      </field>
+      <field id="1" name="ValveLevel" type="percent">
+        <mandatoryConform>
+          <feature name="LVL"/>
+        </mandatoryConform>
       </field>
     </event>
     <event id="0x01" name="ValveFault" priority="info">

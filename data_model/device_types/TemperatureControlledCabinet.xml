@@ -55,9 +55,10 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0071" name="Temperature Controlled Cabinet" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0071" name="Temperature Controlled Cabinet" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="Extension to heating cabinets"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
@@ -65,6 +66,14 @@ Davis, CA 95616, USA
       <optionalConform>
         <attribute name="Heater"/>
       </optionalConform>
+      <commands>
+        <command id="" name="Pause">
+          <disallowConform/>
+        </command>
+        <command id="" name="Resume">
+          <disallowConform/>
+        </command>
+      </commands>
     </cluster>
     <cluster id="0x0049" name="Oven Mode" side="server">
       <optionalConform>

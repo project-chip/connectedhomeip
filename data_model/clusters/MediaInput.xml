@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0507" name="Media Input" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0507" name="Media Input"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MEDIAINPUT" scope="Endpoint"/>
   <features>
     <feature bit="0" code="NU" name="NameUpdates" summary="Supports updates to the input names">
@@ -121,7 +126,8 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="InputList" type="list[InputInfoStruct Type]">
+    <attribute id="0x0000" name="InputList" type="list">
+      <entry type="InputInfoStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
@@ -131,22 +137,22 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="SelectInput" response="Y">
+    <command id="0x00" name="SelectInput" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Index" type="uint8">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="ShowInputStatus" response="Y">
+    <command id="0x01" name="ShowInputStatus" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x02" name="HideInputStatus" response="Y">
+    <command id="0x02" name="HideInputStatus" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x03" name="RenameInput" response="Y">
+    <command id="0x03" name="RenameInput" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="NU"/>

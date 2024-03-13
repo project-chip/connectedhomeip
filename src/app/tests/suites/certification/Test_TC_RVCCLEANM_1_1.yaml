@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 78.1.1. [TC-RVCCLEANM-1.1] Global attributes with server as DUT
+name: 78.1.1. [TC-RVCCLEANM-1.1] Global attributes with DUT as Server
 
 PICS:
     - RVCCLEANM.S
@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads the ClusterRevision attribute from the DUT"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,8 +41,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3: TH reads the FeatureMap attribute from the DUT"
-      PICS: " !RVCCLEANM.S.F00 "
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -48,18 +49,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label:
-          "Step 3: Given RVCCLEANM.S.F00(DEPONOFF) ensure featuremap has the
-          correct bit set"
-      PICS: RVCCLEANM.S.F00
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksSet: [0x1]
-
-    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -68,7 +58,7 @@ tests:
               type: list
               contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 4a: TH reads the AttributeList attribute from the DUT"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -77,40 +67,7 @@ tests:
               type: list
               contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
-    - label:
-          "Step 4b: TH reads the optional attribute(StartUpMode) in
-          AttributeList from the DUT"
-      PICS: RVCCLEANM.S.A0002
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [2]
-
-    - label:
-          "Step 4c: Read the Feature dependent(RVCCLEANM.S.F00 - DEPONOFF) and
-          optional attribute(OnMode) is in AttributeList from the DUT"
-      PICS: RVCCLEANM.S.F00
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [3]
-
-    - label:
-          "Step 4c: Read the Feature dependent(RVCCLEANM.S.F00 - DEPONOFF) and
-          optional attribute(OnMode) is not in AttributeList from the DUT"
-      PICS: " !RVCCLEANM.S.F00 "
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              excludes: [3]
-
-    - label: "Step 5: Read the global attribute: EventList from the DUT"
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -120,8 +77,8 @@ tests:
               type: list
 
     - label:
-          "Step 6: Read the global attribute AcceptedCommandList. Check if it
-          contains id 0x0 (ChangeToMode)"
+          "Step 6: TH reads from the DUT the AcceptedCommandList attribute.
+          Check if it contains id 0x0 (ChangeToMode)"
       PICS: RVCCLEANM.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -131,8 +88,8 @@ tests:
               type: list
 
     - label:
-          "Step 7: Read the global attribute: GeneratedCommandList. Check if it
-          contains id 0x1 (ChangeToModeResponse)"
+          "Step 7: TH reads from the DUT the GeneratedCommandList attribute.
+          Check if it contains id 0x1 (ChangeToModeResponse)"
       PICS: RVCCLEANM.S.C01.Tx
       command: "readAttribute"
       attribute: "GeneratedCommandList"

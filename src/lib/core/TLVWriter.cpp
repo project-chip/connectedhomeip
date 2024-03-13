@@ -15,29 +15,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file implements an encoder for the CHIP TLV (Tag-Length-Value) encoding format.
- *
- */
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-#include <lib/core/TLV.h>
-
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPEncoding.h>
-
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/utf8.h>
+#include <lib/core/TLVWriter.h>
 
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
+
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/TLVBackingStore.h>
+#include <lib/core/TLVCommon.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/Constants.h>
+#include <lib/support/logging/TextOnlyLogging.h>
+#include <lib/support/utf8.h>
+#include <system/SystemConfig.h>
 
 // Doxygen is confused by the __attribute__ annotation
 #ifndef DOXYGEN
@@ -101,6 +102,7 @@ CHIP_ERROR TLVWriter::Init(TLVBackingStore & backingStore, uint32_t maxLen /* = 
     if (err != CHIP_NO_ERROR)
         return err;
 
+    VerifyOrReturnError(mBufStart != nullptr, CHIP_ERROR_INTERNAL);
     mWritePoint           = mBufStart;
     mInitializationCookie = kExpectedInitializationCookie;
     return CHIP_NO_ERROR;
@@ -363,11 +365,7 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
     size_t dataLen;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVFieldSize lenFieldSize;
-#if CONFIG_HAVE_VSNPRINTF_EX
-    size_t skipLen;
-    size_t writtenBytes;
-#elif CONFIG_HAVE_VCBPRINTF
-#else
+#if !CONFIG_HAVE_VCBPRINTF
     char * tmpBuf;
 #endif
     va_copy(aq, ap);
@@ -396,47 +394,14 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
     VerifyOrExit((mLenWritten + dataLen) <= mMaxLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // write data
-#if CONFIG_HAVE_VSNPRINTF_EX
-
-    skipLen = 0;
-
-    do
-    {
-        va_copy(aq, ap);
-
-        vsnprintf_ex(reinterpret_cast<char *>(mWritePoint), mRemainingLen, skipLen, fmt, aq);
-
-        va_end(aq);
-
-        writtenBytes = (mRemainingLen >= (dataLen - skipLen)) ? dataLen - skipLen : mRemainingLen;
-        skipLen += writtenBytes;
-        mWritePoint += writtenBytes;
-        mRemainingLen -= writtenBytes;
-        mLenWritten += writtenBytes;
-        if (skipLen < dataLen)
-        {
-            VerifyOrExit(mBackingStore != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-            err = mBackingStore->FinalizeBuffer(*this, mBufHandle, mBufStart, mWritePoint - mBufStart);
-            SuccessOrExit(err);
-
-            err = mBackingStore->GetNewBuffer(*this, mBufHandle, mBufStart, mRemainingLen);
-            SuccessOrExit(err);
-
-            mWritePoint = mBufStart;
-        }
-
-    } while (skipLen < dataLen);
-
-#elif CONFIG_HAVE_VCBPRINTF
+#if CONFIG_HAVE_VCBPRINTF
 
     va_copy(aq, ap);
 
     vcbprintf(TLVWriterPutcharCB, this, dataLen, fmt, aq);
 
     va_end(aq);
-
-#else // CONFIG_HAVE_VSNPRINTF_EX
+#else // CONFIG_HAVE_VCBPRINTF
 
     tmpBuf = static_cast<char *>(chip::Platform::MemoryAlloc(dataLen + 1));
     VerifyOrExit(tmpBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -450,7 +415,7 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
     err = WriteData(reinterpret_cast<uint8_t *>(tmpBuf), static_cast<uint32_t>(dataLen));
     chip::Platform::MemoryFree(tmpBuf);
 
-#endif // CONFIG_HAVE_VSNPRINTF_EX
+#endif // CONFIG_HAVE_VCBPRINTF
 
 exit:
 
@@ -694,18 +659,12 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
     ABORT_ON_UNINITIALIZED_IF_ENABLED();
 
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    uint8_t * p;
-    uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
-
     if (IsContainerOpen())
         return CHIP_ERROR_TLV_CONTAINER_OPEN;
 
+    uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
+    uint8_t * p     = stagingBuf;
     uint32_t tagNum = TagNumFromTag(tag);
-
-    if ((mRemainingLen >= sizeof(stagingBuf)) && (mMaxLen >= sizeof(stagingBuf)))
-        p = mWritePoint;
-    else
-        p = stagingBuf;
 
     if (IsSpecialTag(tag))
     {
@@ -799,15 +758,9 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
         break;
     }
 
-    if ((mRemainingLen >= sizeof(stagingBuf)) && (mMaxLen >= sizeof(stagingBuf)))
-    {
-        uint32_t len = static_cast<uint32_t>(p - mWritePoint);
-        mWritePoint  = p;
-        mRemainingLen -= len;
-        mLenWritten += len;
-        return CHIP_NO_ERROR;
-    }
-    return WriteData(stagingBuf, static_cast<uint32_t>(p - stagingBuf));
+    uint32_t bytesStaged = static_cast<uint32_t>(p - stagingBuf);
+    VerifyOrDie(bytesStaged <= sizeof(stagingBuf));
+    return WriteData(stagingBuf, bytesStaged);
 }
 
 CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, Tag tag, const uint8_t * data, uint32_t dataLen)
@@ -855,6 +808,7 @@ CHIP_ERROR TLVWriter::WriteData(const uint8_t * p, uint32_t len)
             ReturnErrorOnFailure(mBackingStore->FinalizeBuffer(*this, mBufStart, static_cast<uint32_t>(mWritePoint - mBufStart)));
 
             ReturnErrorOnFailure(mBackingStore->GetNewBuffer(*this, mBufStart, mRemainingLen));
+            VerifyOrReturnError(mRemainingLen > 0, CHIP_ERROR_NO_MEMORY);
 
             mWritePoint = mBufStart;
 

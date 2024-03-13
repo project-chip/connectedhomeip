@@ -19,8 +19,8 @@
 
 #include "LightingManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/att-storage.h>
 #include <app/util/af.h>
+#include <app/util/att-storage.h>
 #include <stdio.h>
 
 using namespace chip;
@@ -49,12 +49,12 @@ bool LightingManager::IsActionInProgress()
 
 bool LightingManager::IsLightOn(void)
 {
-    bool on                    = true;
-    const EmberAfStatus status = OnOff::Attributes::OnOff::Get(1, &on);
+    bool on                                          = true;
+    const Protocols::InteractionModel::Status status = OnOff::Attributes::OnOff::Get(1, &on);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        printf("Error ReadServerAttribute 0x%02x\n", status);
+        printf("Error ReadServerAttribute 0x%02x\n", to_underlying(status));
     }
 
     return on != false;
@@ -99,20 +99,20 @@ bool LightingManager::InitiateAction(Actor_t aActor, Action_t aAction, uint8_t v
 
 void LightingManager::WriteClusterState(uint8_t value)
 {
-    const EmberAfStatus status = OnOff::Attributes::OnOff::Set(1, value);
+    const Protocols::InteractionModel::Status status = OnOff::Attributes::OnOff::Set(1, value);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        printf("Error WriteServerAttribute 0x%02x\n", status);
+        printf("Error WriteServerAttribute 0x%02x\n", to_underlying(status));
     }
 }
 
 void LightingManager::WriteClusterLevel(uint8_t value)
 {
-    const EmberAfStatus status = LevelControl::Attributes::CurrentLevel::Set(1, value);
+    const Protocols::InteractionModel::Status status = LevelControl::Attributes::CurrentLevel::Set(1, value);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        printf("Error WriteServerAttribute 0x%02x\n", status);
+        printf("Error WriteServerAttribute 0x%02x\n", to_underlying(status));
     }
 }

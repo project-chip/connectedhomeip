@@ -22,25 +22,24 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 
-static EnergyEvseDelegate * gDelegate = nullptr;
-static EnergyEvseManager * gInstance  = nullptr;
+static std::unique_ptr<EnergyEvseDelegate> gDelegate;
+static std::unique_ptr<EnergyEvseManager> gInstance;
 
 void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gInstance == nullptr);
-    gDelegate = new EnergyEvseDelegate();
-    if (gDelegate != nullptr)
+    VerifyOrDie(!gInstance);
+
+    gDelegate = std::make_unique<EnergyEvseDelegate>();
+    if (gDelegate)
     {
-        gInstance =
-            new EnergyEvseManager(endpointId, *gDelegate,
-                                  BitMask<EnergyEvse::Feature, uint32_t>(
-                                      EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kPlugAndCharge,
-                                      EnergyEvse::Feature::kRfid, EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kV2x),
-                                  BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
-                                                                        OptionalAttributes::kSupportsRandomizationWindow,
-                                                                        OptionalAttributes::kSupportsApproximateEvEfficiency),
-                                  BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
+        gInstance = std::make_unique<EnergyEvseManager>(
+            endpointId, *gDelegate,
+            BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kRfid),
+            BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
+                                                  OptionalAttributes::kSupportsRandomizationWindow,
+                                                  OptionalAttributes::kSupportsApproximateEvEfficiency),
+            BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
 
         gInstance->Init(); /* Register Attribute & Command handlers */
     }

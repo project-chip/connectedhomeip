@@ -71,7 +71,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ScopedBuffer.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <system/SystemClock.h>
@@ -137,7 +136,7 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
-                                                    chip::NodeId nodeid, bool networkOnly);
+                                                    chip::NodeId nodeid, uint8_t discoveryType);
 PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId remoteDeviceId,
                                                  DeviceUnpairingCompleteFunct callback);
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
@@ -153,6 +152,8 @@ PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::Dev
                                                            uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port);
 PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
                                                             uint16_t discriminator, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::DeviceCommissioner * devCtrl, const char * setUpCode,
+                                                         chip::NodeId nodeid);
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
 PyChipError pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
@@ -199,9 +200,6 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
 
 // BLE
 PyChipError pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
-
-uint8_t pychip_DeviceController_GetLogFilter();
-void pychip_DeviceController_SetLogFilter(uint8_t category);
 
 const char * pychip_Stack_ErrorToString(ChipError::StorageType err);
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
@@ -353,22 +351,6 @@ const char * pychip_DeviceController_StatusReportToString(uint32_t profileId, ui
     return nullptr;
 }
 
-uint8_t pychip_DeviceController_GetLogFilter()
-{
-#if _CHIP_USE_LOGGING
-    return chip::Logging::GetLogFilter();
-#else
-    return chip::Logging::kLogCategory_None;
-#endif
-}
-
-void pychip_DeviceController_SetLogFilter(uint8_t category)
-{
-#if _CHIP_USE_LOGGING
-    chip::Logging::SetLogFilter(category);
-#endif
-}
-
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                                uint32_t setupPINCode, chip::NodeId nodeid)
 {
@@ -385,13 +367,15 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
                                               uint32_t setupPINCode, chip::NodeId nodeid)
 {
     chip::Inet::IPAddress peerAddr;
+    chip::Inet::InterfaceId ifaceOutput;
     chip::Transport::PeerAddress addr;
     chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
 
-    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr, ifaceOutput),
+                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
     // TODO: IP rendezvous should use TCP connection.
-    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
+    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr).SetInterface(ifaceOutput);
     params.SetPeerAddress(addr).SetDiscriminator(0);
 
     sPairingDelegate.SetExpectingPairingComplete(true);
@@ -399,13 +383,11 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
 }
 
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
-                                                    chip::NodeId nodeid, bool networkOnly)
+                                                    chip::NodeId nodeid, uint8_t discoveryType)
 {
-    chip::Controller::DiscoveryType discoveryType = chip::Controller::DiscoveryType::kAll;
     sPairingDelegate.SetExpectingPairingComplete(true);
-    if (networkOnly)
-        discoveryType = chip::Controller::DiscoveryType::kDiscoveryNetworkOnly;
-    return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters, discoveryType));
+    return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters,
+                                             static_cast<chip::Controller::DiscoveryType>(discoveryType)));
 }
 
 namespace {
@@ -594,10 +576,12 @@ PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::Dev
                                                            uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port)
 {
     chip::Inet::IPAddress peerAddr;
+    chip::Inet::InterfaceId ifaceOutput;
     chip::Transport::PeerAddress addr;
     RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
-    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
-    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr, ifaceOutput),
+                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr).SetInterface(ifaceOutput);
     if (port != 0)
     {
         addr.SetPort(port);
@@ -616,6 +600,13 @@ PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::De
     params.SetPeerAddress(addr).SetDiscriminator(discriminator);
     sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
+}
+
+PyChipError pychip_DeviceController_EstablishPASESession(chip::Controller::DeviceCommissioner * devCtrl, const char * setUpCode,
+                                                         chip::NodeId nodeid)
+{
+    sPairingDelegate.SetExpectingPairingComplete(true);
+    return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, setUpCode));
 }
 
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)

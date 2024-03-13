@@ -55,11 +55,13 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010d" name="Extended Color Light" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010D" name="Extended Color Light" revision="4">
   <revisionHistory>
     <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="New data model format and notation; integrate DM CCB 3501"/>
+    <revision revision="3" summary="Added optional occupancy sensing"/>
+    <revision revision="4" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification superset="Color Temperature Light" class="simple" scope="endpoint"/>
   <conditions/>
@@ -74,32 +76,6 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0004" name="Groups" side="server">
       <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0005" name="Scenes" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
-      <commands>
-        <command id="" name="EnhancedAddScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-        <command id="" name="EnhancedViewScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-        <command id="" name="CopyScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-      </commands>
     </cluster>
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
@@ -131,6 +107,14 @@ Davis, CA 95616, USA
         </attribute>
       </attributes>
     </cluster>
+    <cluster id="0x0062" name="Scenes Management" side="server">
+      <mandatoryConform/>
+      <commands>
+        <command id="" name="CopyScene">
+          <mandatoryConform/>
+        </command>
+      </commands>
+    </cluster>
     <cluster id="0x0300" name="Color Control" side="server">
       <mandatoryConform/>
       <features>
@@ -155,6 +139,9 @@ Davis, CA 95616, USA
           <mandatoryConform/>
         </attribute>
       </attributes>
+    </cluster>
+    <cluster id="0x0406" name="Occupancy Sensing" side="client">
+      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

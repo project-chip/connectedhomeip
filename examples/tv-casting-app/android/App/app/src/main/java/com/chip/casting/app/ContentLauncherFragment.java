@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.R;
 import com.chip.casting.ContentApp;
 import com.chip.casting.MatterCallbackHandler;
 import com.chip.casting.MatterError;

@@ -123,6 +123,7 @@ tests:
     - label: "Step 3: TH reads NetworkInterfaces structure attribute from DUT."
       verification: |
           ./chip-tool generaldiagnostics read network-interfaces 1 0
+
           On TH(chip-tool), Verify that The NetworkInterfaces attribute SHALL be a list of NetworkInterface structs, i.e The read data type( NetworkInterface struct) must match the value listed below
               • Name(interface name)
               • IsOperational (indicates the node is operational in the fabric)
@@ -134,47 +135,139 @@ tests:
 
           Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
 
-
-          [1685950177.429619][36103:36105] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0000 DataVersion: 234312508
-          [1685950177.429734][36103:36105] CHIP:TOO:   NetworkInterfaces: 3 entries
-          [1685950177.430061][36103:36105] CHIP:TOO:     [1]: {
-          [1685950177.430075][36103:36105] CHIP:TOO:       Name: docker0
-          [1685950177.430084][36103:36105] CHIP:TOO:       IsOperational: FALSE
-          [1685950177.430105][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
-          [1685950177.430114][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
-          [1685950177.430124][36103:36105] CHIP:TOO:       HardwareAddress: 024238D9D191
-          [1685950177.430145][36103:36105] CHIP:TOO:       IPv4Addresses: 1 entries
-          [1685950177.430158][36103:36105] CHIP:TOO:         [1]: AC110001
-          [1685950177.430168][36103:36105] CHIP:TOO:       IPv6Addresses: 1 entries
-          [1685950177.430177][36103:36105] CHIP:TOO:         [1]:
-          [1685950177.430186][36103:36105] CHIP:TOO:       Type: 0
-          [1685950177.430194][36103:36105] CHIP:TOO:      }
-          [1685950177.430221][36103:36105] CHIP:TOO:     [2]: {
-          [1685950177.430229][36103:36105] CHIP:TOO:       Name: wlp0s20f3
-          [1685950177.430236][36103:36105] CHIP:TOO:       IsOperational: TRUE
-          [1685950177.430244][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
-          [1685950177.430251][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
-          [1685950177.430260][36103:36105] CHIP:TOO:       HardwareAddress: 8C1D96786A13
-          [1685950177.430269][36103:36105] CHIP:TOO:       IPv4Addresses: 1 entries
-          [1685950177.430280][36103:36105] CHIP:TOO:         [1]: C0A80065
-          [1685950177.430290][36103:36105] CHIP:TOO:       IPv6Addresses: 1 entries
-          [1685950177.430300][36103:36105] CHIP:TOO:         [1]: FE80000000000000E9F62C082794357D
-          [1685950177.430309][36103:36105] CHIP:TOO:       Type: 1
-          [1685950177.430316][36103:36105] CHIP:TOO:      }
-          [1685950177.430337][36103:36105] CHIP:TOO:     [3]: {
-          [1685950177.430345][36103:36105] CHIP:TOO:       Name: lo
-          [1685950177.430352][36103:36105] CHIP:TOO:       IsOperational: TRUE
-          [1685950177.430360][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
-          [1685950177.430368][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
-          [1685950177.430376][36103:36105] CHIP:TOO:       HardwareAddress: 000000000000
-          [1685950177.430385][36103:36105] CHIP:TOO:       IPv4Addresses: 1 entries
-          [1685950177.430395][36103:36105] CHIP:TOO:         [1]: 7F000001
-          [1685950177.430405][36103:36105] CHIP:TOO:       IPv6Addresses: 1 entries
-          [1685950177.430415][36103:36105] CHIP:TOO:         [1]: 00000000000000000000000000000001
-          [1685950177.430424][36103:36105] CHIP:TOO:       Type: 0
-          [1685950177.430431][36103:36105] CHIP:TOO:      }
-          [1685950177.430535][36103:36105] CHIP:EM: <<< [E:29275i S:57421 M:236457298 (Ack:61012080)] (S) Msg TX to 1:0000000000000001 [6ADE] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1685950177.430558][36103:36105] CHIP:IN: (S) Sending msg 236457298 on secure session with LSID: 57421
+          [1692949910.768802][3792:3794] CHIP:DMG: }
+          [1692949910.769530][3792:3794] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0000 DataVersion: 131147943
+          [1692949910.769722][3792:3794] CHIP:TOO:   NetworkInterfaces: 11 entries
+          [1692949910.769815][3792:3794] CHIP:TOO:     [1]: {
+          [1692949910.769837][3792:3794] CHIP:TOO:       Name: veth6419a29
+          [1692949910.769856][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.769875][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.769894][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.770166][3792:3794] CHIP:TOO:       HardwareAddress: 2209DC9A5648
+          [1692949910.770207][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.770233][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.770258][3792:3794] CHIP:TOO:         [1]: FE800000000000002009DCFFFE9A5648
+          [1692949910.770290][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.770309][3792:3794] CHIP:TOO:      }
+          [1692949910.770343][3792:3794] CHIP:TOO:     [2]: {
+          [1692949910.770362][3792:3794] CHIP:TOO:       Name: vethdd2acfa
+          [1692949910.770380][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.770398][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.770416][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.770435][3792:3794] CHIP:TOO:       HardwareAddress: 4ED603419EAE
+          [1692949910.770454][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.770474][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.770497][3792:3794] CHIP:TOO:         [1]: FE800000000000004CD603FFFE419EAE
+          [1692949910.770517][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.770535][3792:3794] CHIP:TOO:      }
+          [1692949910.770564][3792:3794] CHIP:TOO:     [3]: {
+          [1692949910.770583][3792:3794] CHIP:TOO:       Name: vethdf8d5bd
+          [1692949910.770601][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.770618][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.770636][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.770655][3792:3794] CHIP:TOO:       HardwareAddress: 5E39DB1257D2
+          [1692949910.770673][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.770694][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.770717][3792:3794] CHIP:TOO:         [1]: FE800000000000005C39DBFFFE1257D2
+          [1692949910.770737][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.770755][3792:3794] CHIP:TOO:      }
+          [1692949910.770784][3792:3794] CHIP:TOO:     [4]: {
+          [1692949910.770820][3792:3794] CHIP:TOO:       Name: veth0c1b827
+          [1692949910.770838][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.770856][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.770874][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.770893][3792:3794] CHIP:TOO:       HardwareAddress: 5200F618FE06
+          [1692949910.770913][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.770934][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.770957][3792:3794] CHIP:TOO:         [1]: FE800000000000005000F6FFFE18FE06
+          [1692949910.770979][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.771001][3792:3794] CHIP:TOO:      }
+          [1692949910.771047][3792:3794] CHIP:TOO:     [5]: {
+          [1692949910.771079][3792:3794] CHIP:TOO:       Name: veth95d2688
+          [1692949910.771099][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.771119][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.771140][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.771161][3792:3794] CHIP:TOO:       HardwareAddress: EE70AD9213F7
+          [1692949910.771182][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.771206][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.771231][3792:3794] CHIP:TOO:         [1]: FE80000000000000EC70ADFFFE9213F7
+          [1692949910.771254][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.771274][3792:3794] CHIP:TOO:      }
+          [1692949910.771308][3792:3794] CHIP:TOO:     [6]: {
+          [1692949910.771329][3792:3794] CHIP:TOO:       Name: br-78aec9e78929
+          [1692949910.771348][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.771368][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.771388][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.771409][3792:3794] CHIP:TOO:       HardwareAddress: 024209ABE784
+          [1692949910.771431][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.771455][3792:3794] CHIP:TOO:         [1]: AC130001
+          [1692949910.771478][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.771503][3792:3794] CHIP:TOO:         [1]: FE80000000000000004209FFFEABE784
+          [1692949910.771526][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.771546][3792:3794] CHIP:TOO:      }
+          [1692949910.771579][3792:3794] CHIP:TOO:     [7]: {
+          [1692949910.771600][3792:3794] CHIP:TOO:       Name: docker0
+          [1692949910.771620][3792:3794] CHIP:TOO:       IsOperational: FALSE
+          [1692949910.771639][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.771659][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.771680][3792:3794] CHIP:TOO:       HardwareAddress: 0242AB987D7E
+          [1692949910.771702][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.771726][3792:3794] CHIP:TOO:         [1]: AC110001
+          [1692949910.771750][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.771774][3792:3794] CHIP:TOO:         [1]:
+          [1692949910.771796][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.771816][3792:3794] CHIP:TOO:      }
+          [1692949910.771973][3792:3794] CHIP:TOO:     [8]: {
+          [1692949910.771999][3792:3794] CHIP:TOO:       Name: br-33eb65c97608
+          [1692949910.772020][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.772041][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.772062][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.772083][3792:3794] CHIP:TOO:       HardwareAddress: 02426545C6AD
+          [1692949910.772106][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.772130][3792:3794] CHIP:TOO:         [1]: AC120001
+          [1692949910.772154][3792:3794] CHIP:TOO:       IPv6Addresses: 3 entries
+          [1692949910.772179][3792:3794] CHIP:TOO:         [1]: FD006D61747465720000000000000001
+          [1692949910.772204][3792:3794] CHIP:TOO:         [2]: FE80000000000000004265FFFE45C6AD
+          [1692949910.772229][3792:3794] CHIP:TOO:         [3]: FE800000000000000000000000000001
+          [1692949910.772251][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.772271][3792:3794] CHIP:TOO:      }
+          [1692949910.772304][3792:3794] CHIP:TOO:     [9]: {
+          [1692949910.772325][3792:3794] CHIP:TOO:       Name: wlan0
+          [1692949910.772345][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.772365][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.772385][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.772405][3792:3794] CHIP:TOO:       HardwareAddress: E45F010F1A01
+          [1692949910.772426][3792:3794] CHIP:TOO:       IPv4Addresses: 0 entries
+          [1692949910.772450][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.772475][3792:3794] CHIP:TOO:         [1]: FE80000000000000E65F01FFFE0F1A01
+          [1692949910.772498][3792:3794] CHIP:TOO:       Type: 1
+          [1692949910.772518][3792:3794] CHIP:TOO:      }
+          [1692949910.772552][3792:3794] CHIP:TOO:     [10]: {
+          [1692949910.772572][3792:3794] CHIP:TOO:       Name: eth0
+          [1692949910.772592][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.772612][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.772632][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.772653][3792:3794] CHIP:TOO:       HardwareAddress: E45F010F19FF
+          [1692949910.772675][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.772698][3792:3794] CHIP:TOO:         [1]: C0A80864
+          [1692949910.772721][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.772746][3792:3794] CHIP:TOO:         [1]: FE80000000000000E65F01FFFE0F19FF
+          [1692949910.772769][3792:3794] CHIP:TOO:       Type: 2
+          [1692949910.772789][3792:3794] CHIP:TOO:      }
+          [1692949910.772821][3792:3794] CHIP:TOO:     [11]: {
+          [1692949910.772842][3792:3794] CHIP:TOO:       Name: lo
+          [1692949910.772862][3792:3794] CHIP:TOO:       IsOperational: TRUE
+          [1692949910.772882][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1692949910.772901][3792:3794] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1692949910.772922][3792:3794] CHIP:TOO:       HardwareAddress: 000000000000
+          [1692949910.772944][3792:3794] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1692949910.772968][3792:3794] CHIP:TOO:         [1]: 7F000001
+          [1692949910.772991][3792:3794] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1692949910.773016][3792:3794] CHIP:TOO:         [1]: 00000000000000000000000000000001
+          [1692949910.773039][3792:3794] CHIP:TOO:       Type: 0
+          [1692949910.773059][3792:3794] CHIP:TOO:      }
+          [1692949910.773294][3792:3794] CHIP:EM: <<< [E:2323i S:55592 M:93290487 (Ack:187838562)] (S) Msg TX to 1:0000000000000001 [3E67] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1692949910.773342][3792:3794] CHIP:IN: (S) Sending msg 93290487 on secure session with LSID: 55592
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DGGEN.S.A0000

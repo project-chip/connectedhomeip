@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRKeypair;
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRCertificates : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;

@@ -32,11 +32,11 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Sends ResetCounts command"
+    - label: "Step 2: TH Sends ResetCounts command"
       command: "ResetCounts"
       PICS: DGTHREAD.S.C00.Rsp
 
-    - label: "Step 3: Read the Overruncount attribute"
+    - label: "Step 3: TH reads the Overruncount attribute"
       PICS: DGTHREAD.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"

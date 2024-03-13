@@ -28,15 +28,14 @@
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
-#include <app/att-storage.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
+#include <app/util/att-storage.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPCore.h>
@@ -52,6 +51,8 @@
 #include <zap-generated/endpoint_config.h>
 
 #include <limits>
+
+using chip::Protocols::InteractionModel::Status;
 
 using namespace chip;
 using namespace chip::app;
@@ -503,6 +504,28 @@ Protocols::InteractionModel::Status UnsupportedAttributeStatus(const ConcreteAtt
     return Status::UnsupportedAttribute;
 }
 
+// Will set at most one of the out-params (aAttributeCluster or
+// aAttributeMetadata) to non-null.  Both null means attribute not supported,
+// aAttributeCluster non-null means this is a supported global attribute that
+// does not have metadata.
+void FindAttributeMetadata(const ConcreteAttributePath & aPath, const EmberAfCluster ** aAttributeCluster,
+                           const EmberAfAttributeMetadata ** aAttributeMetadata)
+{
+    *aAttributeCluster  = nullptr;
+    *aAttributeMetadata = nullptr;
+
+    for (auto & attr : GlobalAttributesNotInMetadata)
+    {
+        if (attr == aPath.mAttributeId)
+        {
+            *aAttributeCluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
+            return;
+        }
+    }
+
+    *aAttributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+}
+
 } // anonymous namespace
 
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
@@ -530,22 +553,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     const EmberAfCluster * attributeCluster            = nullptr;
     const EmberAfAttributeMetadata * attributeMetadata = nullptr;
-
-    bool isGlobalAttributeNotInMetadata = false;
-    for (auto & attr : GlobalAttributesNotInMetadata)
-    {
-        if (attr == aPath.mAttributeId)
-        {
-            isGlobalAttributeNotInMetadata = true;
-            attributeCluster               = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-            break;
-        }
-    }
-
-    if (!isGlobalAttributeNotInMetadata)
-    {
-        attributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    }
+    FindAttributeMetadata(aPath, &attributeCluster, &attributeMetadata);
 
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
@@ -612,13 +620,13 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     ReturnErrorOnFailure(err);
 
     EmberAfAttributeSearchRecord record;
-    record.endpoint           = aPath.mEndpointId;
-    record.clusterId          = aPath.mClusterId;
-    record.attributeId        = aPath.mAttributeId;
-    EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
-                                                         /* write = */ false);
+    record.endpoint    = aPath.mEndpointId;
+    record.clusterId   = aPath.mClusterId;
+    record.attributeId = aPath.mAttributeId;
+    Status status      = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
+                                                  /* write = */ false);
 
-    if (emberStatus == EMBER_ZCL_STATUS_SUCCESS)
+    if (status == Status::Success)
     {
         EmberAfAttributeType attributeType = attributeMetadata->attributeType;
         bool isNullable                    = attributeMetadata->IsNullable();
@@ -815,17 +823,16 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         }
         default:
             ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
-            emberStatus = EMBER_ZCL_STATUS_UNSUPPORTED_READ;
+            status = Status::UnsupportedRead;
         }
     }
 
-    Protocols::InteractionModel::Status imStatus = ToInteractionModelStatus(emberStatus);
-    if (imStatus == Protocols::InteractionModel::Status::Success)
+    if (status == Protocols::InteractionModel::Status::Success)
     {
         return SendSuccessStatus(attributeReport, attributeDataIBBuilder);
     }
 
-    return SendFailureStatus(aPath, aAttributeReports, imStatus, &backup);
+    return SendFailureStatus(aPath, aAttributeReports, status, &backup);
 }
 
 namespace {
@@ -972,14 +979,19 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    const EmberAfAttributeMetadata * attributeMetadata = GetAttributeMetadata(aPath);
+    // Check attribute existence. This includes attributes with registered metadata, but also specially handled
+    // mandatory global attributes (which just check for cluster on endpoint).
+    const EmberAfCluster * attributeCluster            = nullptr;
+    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
+    FindAttributeMetadata(aPath, &attributeCluster, &attributeMetadata);
 
-    if (attributeMetadata == nullptr)
+    if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
         return apWriteHandler->AddStatus(aPath, UnsupportedAttributeStatus(aPath));
     }
 
-    if (attributeMetadata->IsReadOnly())
+    // All the global attributes we don't have metadata for are readonly.
+    if (attributeMetadata == nullptr || attributeMetadata->IsReadOnly())
     {
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedWrite);
     }
@@ -1039,8 +1051,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::InvalidValue);
     }
 
-    auto status = ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                                                                         attributeData, attributeMetadata->attributeType));
+    auto status = emAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, attributeData,
+                                             attributeMetadata->attributeType);
     return apWriteHandler->AddStatus(aPath, status);
 }
 

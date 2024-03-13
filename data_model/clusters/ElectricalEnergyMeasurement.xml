@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0091" name="Electrical Energy Measurement" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0091" name="Electrical Energy Measurement"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="EEM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="IMPE" name="ImportedEnergy" summary="Measurement of energy imported by the server">
@@ -67,40 +72,73 @@ Davis, CA 95616, USA
     <feature bit="1" code="EXPE" name="ExportedEnergy" summary="Measurement of energy provided by the server">
       <optionalConform choice="a" more="true"/>
     </feature>
-    <feature bit="2" code="CUME" name="CumulativeEnergy" summary="Measurements are accumulative">
-      <optionalConform choice="b" more="true">
-        <notTerm>
-          <feature name="EPHE"/>
-        </notTerm>
-      </optionalConform>
+    <feature bit="2" code="CUME" name="CumulativeEnergy" summary="Measurements are cumulative">
+      <optionalConform choice="b" more="true"/>
     </feature>
     <feature bit="3" code="PERE" name="PeriodicEnergy" summary="Measurements are periodic">
-      <optionalConform choice="b" more="true">
-        <notTerm>
-          <feature name="EPHE"/>
-        </notTerm>
-      </optionalConform>
-    </feature>
-    <feature bit="4" code="EPHE" name="EphemeralEnergy" summary="Measurements are ephemeral">
-      <mandatoryConform>
-        <andTerm>
-          <notTerm>
-            <feature name="CUME"/>
-          </notTerm>
-          <notTerm>
-            <feature name="PERE"/>
-          </notTerm>
-        </andTerm>
-      </mandatoryConform>
+      <optionalConform choice="b" more="true"/>
     </feature>
   </features>
+  <dataTypes>
+    <struct name="CumulativeEnergyResetStruct">
+      <field id="0" name="ImportedResetTimestamp" type="epoch-s" default="null">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <optionalConform>
+          <feature name="IMPE"/>
+        </optionalConform>
+      </field>
+      <field id="1" name="ExportedResetTimestamp" type="epoch-s" default="null">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <optionalConform>
+          <feature name="EXPE"/>
+        </optionalConform>
+      </field>
+      <field id="2" name="ImportedResetSystime" type="systime-ms" default="null">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <optionalConform>
+          <feature name="IMPE"/>
+        </optionalConform>
+      </field>
+      <field id="3" name="ExportedResetSystime" type="systime-ms" default="null">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <optionalConform>
+          <feature name="EXPE"/>
+        </optionalConform>
+      </field>
+    </struct>
+    <struct name="EnergyMeasurementStruct">
+      <field id="0" name="Energy" type="energy-mWh">
+        <access read="true"/>
+        <mandatoryConform/>
+        <constraint type="between" from="0" to="2"/>
+      </field>
+      <field id="1" name="StartTimestamp" type="epoch-s">
+        <access read="true"/>
+      </field>
+      <field id="2" name="EndTimestamp" type="epoch-s">
+        <access read="true"/>
+        <constraint type="min" value="StartTimestamp+1"/>
+      </field>
+      <field id="3" name="StartSystime" type="systime-ms">
+        <access read="true"/>
+      </field>
+      <field id="4" name="EndSystime" type="systime-ms">
+        <access read="true"/>
+        <constraint type="min" value="StartSystime+1"/>
+      </field>
+    </struct>
+  </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Measured" type="bool" default="false">
+    <attribute id="0x0000" name="Accuracy" type="ref_MeasurementAccuracyStruct">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="CumulativeEnergyImportedTime" type="epoch-s" default="null">
+    <attribute id="0x0001" name="CumulativeEnergyImported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -110,17 +148,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="CumulativeEnergyImported" type="uint64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="IMPE"/>
-          <feature name="CUME"/>
-        </andTerm>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0003" name="CumulativeEnergyExportedTime" type="epoch-s" default="null">
+    <attribute id="0x0002" name="CumulativeEnergyExported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -130,17 +158,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0004" name="CumulativeEnergyExported" type="uint64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="EXPE"/>
-          <feature name="CUME"/>
-        </andTerm>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0005" name="PeriodicEnergyImportedStartTime" type="epoch-s" default="null">
+    <attribute id="0x0003" name="PeriodicEnergyImported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -150,27 +168,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0006" name="PeriodicEnergyImportedEndTime" type="epoch-s" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="IMPE"/>
-          <feature name="PERE"/>
-        </andTerm>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0007" name="PeriodicEnergyImported" type="uint64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="IMPE"/>
-          <feature name="PERE"/>
-        </andTerm>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0008" name="PeriodicEnergyExportedStartTime" type="epoch-s" default="null">
+    <attribute id="0x0004" name="PeriodicEnergyExported" type="EnergyMeasurementStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
@@ -180,142 +178,57 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0009" name="PeriodicEnergyExportedEndTime" type="epoch-s" default="null">
+    <attribute id="0x0005" name="CumulativeEnergyReset" type="CumulativeEnergyResetStruct" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="EXPE"/>
-          <feature name="PERE"/>
-        </andTerm>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x000a" name="PeriodicEnergyExported" type="uint64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="EXPE"/>
-          <feature name="PERE"/>
-        </andTerm>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x000b" name="EphemeralEnergyImported" type="uint64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="IMPE"/>
-          <feature name="EPHE"/>
-        </andTerm>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x000c" name="EphemeralEnergyImported" type="uint64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="EXPE"/>
-          <feature name="EPHE"/>
-        </andTerm>
-      </mandatoryConform>
+      <optionalConform>
+        <feature name="CUME"/>
+      </optionalConform>
     </attribute>
   </attributes>
   <events>
-    <event id="0x00" name="CumulativeEnergyImported" priority="info">
+    <event id="0x00" name="CumulativeEnergyMeasured" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform>
-        <andTerm>
-          <feature name="CUME"/>
-          <feature name="IMPE"/>
-        </andTerm>
+        <feature name="CUME"/>
       </mandatoryConform>
-      <field id="0" name="ImportedTimestamp" type="epoch-s">
-        <mandatoryConform/>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="CUME"/>
+            <feature name="IMPE"/>
+          </andTerm>
+        </mandatoryConform>
       </field>
-      <field id="1" name="EnergyImported" type="uint64">
-        <mandatoryConform/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="CUME"/>
+            <feature name="EXPE"/>
+          </andTerm>
+        </mandatoryConform>
       </field>
     </event>
-    <event id="0x01" name="CumulativeEnergyExported" priority="info">
+    <event id="0x01" name="PeriodicEnergyMeasured" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform>
-        <andTerm>
-          <feature name="CUME"/>
-          <feature name="EXPE"/>
-        </andTerm>
+        <feature name="PERE"/>
       </mandatoryConform>
-      <field id="0" name="ExportedTimestamp" type="epoch-s">
-        <mandatoryConform/>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="PERE"/>
+            <feature name="IMPE"/>
+          </andTerm>
+        </mandatoryConform>
       </field>
-      <field id="1" name="EnergyExported" type="uint64">
-        <mandatoryConform/>
-      </field>
-    </event>
-    <event id="0x03" name="PeriodicEnergyImported" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="PERE"/>
-          <feature name="IMPE"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="PeriodStart" type="epoch-s">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="PeriodEnd" type="epoch-s">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="EnergyImported" type="uint64">
-        <mandatoryConform/>
-      </field>
-    </event>
-    <event id="0x04" name="PeriodicEnergyExported" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform>
-        <andTerm>
-          <feature name="PERE"/>
-          <feature name="EXPE"/>
-        </andTerm>
-      </mandatoryConform>
-      <field id="0" name="PeriodStart" type="epoch-s">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="PeriodEnd" type="epoch-s">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="EnergyExported" type="uint64">
-        <mandatoryConform/>
-      </field>
-    </event>
-    <event id="0x05" name="EphemeralEnergyImported" priority="info">
-      <access readPrivilege="view"/>
-      <optionalConform>
-        <feature name="EPHE"/>
-      </optionalConform>
-      <field id="0" name="PeriodStart" type="systime-ms">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="PeriodEnd" type="systime-ms">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="EnergyImported" type="uint64">
-        <mandatoryConform/>
-      </field>
-    </event>
-    <event id="0x06" name="EphemeralEnergyExported" priority="info">
-      <access readPrivilege="view"/>
-      <optionalConform>
-        <feature name="EPHE"/>
-      </optionalConform>
-      <field id="0" name="PeriodStart" type="systime-ms">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="PeriodEnd" type="systime-ms">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="EnergyExported" type="uint64">
-        <mandatoryConform/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="PERE"/>
+            <feature name="EXPE"/>
+          </andTerm>
+        </mandatoryConform>
       </field>
     </event>
   </events>

@@ -54,17 +54,22 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009b" name="Energy Preference" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009B" name="Energy Preference" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x009B" name="Energy Preference"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="EPREF" scope="Endpoint"/>
   <features>
     <feature bit="0" code="BALA" name="EnergyBalance" summary="Device can balance energy consumption vs. another priority">
       <optionalConform choice="a" more="true"/>
     </feature>
-    <feature bit="0" code="LPMS" name="LowPowerModeSensitivity" summary="Device can adjust the conditions for entering a low power mode">
+    <feature bit="1" code="LPMS" name="LowPowerModeSensitivity" summary="Device can adjust the conditions for entering a low power mode">
       <optionalConform choice="a" more="true"/>
     </feature>
   </features>
@@ -84,26 +89,24 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="BalanceStruct">
-      <field id="0" name="Step" type="uint8" default="MS">
-        <access read="true"/>
+      <field id="0" name="Step" type="percent" default="MS">
         <mandatoryConform/>
-        <constraint type="allowed" value="percent"/>
       </field>
       <field id="1" name="Label" type="string">
-        <access read="true"/>
         <optionalConform/>
         <constraint type="maxLength" value="64"/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="EnergyBalances" type="list[BalanceStruct Type]">
+    <attribute id="0x0000" name="EnergyBalances" type="list">
+      <entry type="BalanceStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
-      <constraint type="between" from="2" to="10"/>
+      <constraint type="countBetween" from="2" to="10"/>
     </attribute>
     <attribute id="0x0001" name="CurrentEnergyBalance" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -111,17 +114,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
-      <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0001" name="CurrentLowPowerModeSensitivity" type="uint8">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="LPMS"/>
-      </mandatoryConform>
-      <constraint type="desc"/>
-    </attribute>
-    <attribute id="0x0002" name="EnergyPriorities" type="list[EnergyPriorityEnum Type]">
+    <attribute id="0x0002" name="EnergyPriorities" type="list">
+      <entry type="EnergyPriorityEnum"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
@@ -129,13 +124,21 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="allowed" value="2"/>
     </attribute>
-    <attribute id="0x0003" name="LowPowerModeSensitivities" type="list[BalanceStruct Type]">
+    <attribute id="0x0003" name="LowPowerModeSensitivities" type="list">
+      <entry type="BalanceStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="LPMS"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint type="countBetween" from="2" to="10"/>
+    </attribute>
+    <attribute id="0x0004" name="CurrentLowPowerModeSensitivity" type="uint8">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="LPMS"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
 </cluster>

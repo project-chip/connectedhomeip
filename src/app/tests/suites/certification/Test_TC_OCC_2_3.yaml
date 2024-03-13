@@ -26,7 +26,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Reads mandatory attribute constrains: OccupancySensorType"
+    - label: "Step 2: TH reads OccupancySensorType attribute from DUT"
       PICS: OCC.S.A0001
       command: "readAttribute"
       attribute: "OccupancySensorType"
@@ -44,9 +44,7 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label:
-          "Step 3: Reads mandatory attribute constrains:
-          OccupancySensorTypeBitmap"
+    - label: "Step 3: TH reads OccupancySensorTypeBitmap attribute from DUT"
       PICS: OCC.S.A0002
       command: "readAttribute"
       attribute: "OccupancySensorTypeBitmap"

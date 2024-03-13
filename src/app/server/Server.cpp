@@ -313,7 +313,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .groupDataProvider = mGroupsProvider,
-            .mrpLocalConfig    = GetLocalMRPConfig(),
+            // Don't provide an MRP local config, so each CASE initiation will use
+            // the then-current value.
+            .mrpLocalConfig = NullOptional,
         },
         .clientPool            = &mCASEClientPool,
         .sessionSetupPool      = &mSessionSetupPool,
@@ -339,7 +341,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mICDManager.RegisterObserver(mReportScheduler);
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr);
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
+                     chip::app::InteractionModelEngine::GetInstance());
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -435,6 +438,16 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         }
         break;
     case DeviceEventType::kServerReady:
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
+        // Only Trigger Check-In messages if we are not in the middle of a commissioning.
+        // This check is only necessary for the first commissioiner since the kServerReady event
+        // is triggered once we join the network.
+        // We trigger Check-In messages before resuming subscriptions to avoid doing both.
+        if (!mFailSafeContext.IsFailSafeArmed())
+        {
+            mICDManager.TriggerCheckInMessages();
+        }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         ResumeSubscriptions();
 #endif
@@ -567,65 +580,84 @@ void Server::Shutdown()
 // NOTE: UDC client is located in Server.cpp because it really only makes sense
 // to send UDC from a Matter device. The UDC message payload needs to include the device's
 // randomly generated service name.
-CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner)
+CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner,
+                                                        Protocols::UserDirectedCommissioning::IdentificationDeclaration & id)
 {
     ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
 
     CHIP_ERROR err;
-    char nameBuffer[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
-    err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-    ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
 
-    Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
-    id.SetInstanceName(nameBuffer);
+    // only populate fields left blank by the client
+    if (strlen(id.GetInstanceName()) == 0)
+    {
+        char nameBuffer[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
+        err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
+        }
+        id.SetInstanceName(nameBuffer);
+    }
+    ChipLogDetail(AppServer, "instanceName=%s", id.GetInstanceName());
 
-    uint16_t vendorId = 0;
-    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
+    if (id.GetVendorId() == 0)
     {
-        ChipLogDetail(Discovery, "Vendor ID not known");
-    }
-    else
-    {
-        id.SetVendorId(vendorId);
-    }
-
-    uint16_t productId = 0;
-    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Discovery, "Product ID not known");
-    }
-    else
-    {
-        id.SetProductId(productId);
+        uint16_t vendorId = 0;
+        if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(Discovery, "Vendor ID not known");
+        }
+        else
+        {
+            id.SetVendorId(vendorId);
+        }
     }
 
-    char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 1] = {};
-    if (!chip::DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() ||
-        chip::DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
+    if (id.GetProductId() == 0)
     {
-        ChipLogDetail(Discovery, "Device Name not known");
+        uint16_t productId = 0;
+        if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(Discovery, "Product ID not known");
+        }
+        else
+        {
+            id.SetProductId(productId);
+        }
     }
-    else
+
+    if (strlen(id.GetDeviceName()) == 0)
     {
-        id.SetDeviceName(deviceName);
+        char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 1] = {};
+        if (!chip::DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() ||
+            chip::DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(Discovery, "Device Name not known");
+        }
+        else
+        {
+            id.SetDeviceName(deviceName);
+        }
     }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
-    ReturnErrorOnFailure(
-        app::DnssdServer::Instance().GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
+    if (id.GetRotatingIdLength() == 0)
+    {
+        char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+        ReturnErrorOnFailure(
+            app::DnssdServer::Instance().GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
 
-    uint8_t * rotatingId = reinterpret_cast<uint8_t *>(rotatingDeviceIdHexBuffer);
-    size_t rotatingIdLen = strlen(rotatingDeviceIdHexBuffer);
-    id.SetRotatingId(rotatingId, rotatingIdLen);
+        uint8_t * rotatingId = reinterpret_cast<uint8_t *>(rotatingDeviceIdHexBuffer);
+        size_t rotatingIdLen = strlen(rotatingDeviceIdHexBuffer);
+        id.SetRotatingId(rotatingId, rotatingIdLen);
+    }
 #endif
 
-    id.SetCdPort(mCdcListenPort);
+    if (id.GetCdPort() == 0)
+    {
+        id.SetCdPort(mCdcListenPort);
+    }
 
     err = gUDCClient->SendUDCMessage(&mTransports, id, commissioner);
 

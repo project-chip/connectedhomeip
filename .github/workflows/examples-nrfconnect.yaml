@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:26
+            image: ghcr.io/project-chip/chip-build-nrf-platform:35
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -49,7 +49,7 @@ jobs:
               with:
                 platform: nrfconnect
             - name: Detect changed paths
-              uses: dorny/paths-filter@v2
+              uses: dorny/paths-filter@v3
               id: changed_paths
               with:
                   filters: |
@@ -195,7 +195,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target nrf-native-posix-64-tests build"
             - name: Uploading Failed Test Logs
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: test-log

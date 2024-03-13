@@ -33,29 +33,37 @@
  * Various events fielded by the wfx_rsi task
  * Make sure that we only use 8 bits (otherwise freeRTOS - may need some changes)
  */
-#define WFX_EVT_STA_CONN (0x01)
-#define WFX_EVT_STA_DISCONN (0x02)
-#define WFX_EVT_AP_START (0x04)
-#define WFX_EVT_AP_STOP (0x08)
-#define WFX_EVT_SCAN (0x10) /* This is used as scan result and start */
-#define WFX_EVT_STA_START_JOIN (0x20)
-#define WFX_EVT_STA_DO_DHCP (0x40)
-#define WFX_EVT_STA_DHCP_DONE (0x80)
-
-#define WFX_RSI_ST_DEV_READY (0x01)
-#define WFX_RSI_ST_AP_READY (0x02)
-#define WFX_RSI_ST_STA_PROVISIONED (0x04)
-#define WFX_RSI_ST_STA_CONNECTING (0x08)
-#define WFX_RSI_ST_STA_CONNECTED (0x10)
-#define WFX_RSI_ST_STA_DHCP_DONE (0x40) /* Requested to do DHCP after conn	*/
-#define WFX_RSI_ST_STA_MODE (0x80)      /* Enable Station Mode			*/
-#define WFX_RSI_ST_AP_MODE (0x100)      /* Enable AP Mode			*/
-#define WFX_RSI_ST_STA_READY (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE)
-#define WFX_RSI_ST_STARTED (0x200)     /* RSI task started			*/
-#define WFX_RSI_ST_SCANSTARTED (0x400) /* Scan Started				*/
-
-struct wfx_rsi
+typedef enum
 {
+    WFX_EVT_STA_CONN       = (1 << 0),
+    WFX_EVT_STA_DISCONN    = (1 << 1),
+    WFX_EVT_AP_START       = (1 << 2),
+    WFX_EVT_AP_STOP        = (1 << 3),
+    WFX_EVT_SCAN           = (1 << 4), /* This is used as scan result and start */
+    WFX_EVT_STA_START_JOIN = (1 << 5),
+    WFX_EVT_STA_DO_DHCP    = (1 << 6),
+    WFX_EVT_STA_DHCP_DONE  = (1 << 7)
+} WfxEventType_e;
+
+typedef enum
+{
+    WFX_RSI_ST_DEV_READY       = (1 << 0),
+    WFX_RSI_ST_AP_READY        = (1 << 1),
+    WFX_RSI_ST_STA_PROVISIONED = (1 << 2),
+    WFX_RSI_ST_STA_CONNECTING  = (1 << 3),
+    WFX_RSI_ST_STA_CONNECTED   = (1 << 4),
+    WFX_RSI_ST_STA_DHCP_DONE   = (1 << 6), /* Requested to do DHCP after conn	*/
+    WFX_RSI_ST_STA_MODE        = (1 << 7), /* Enable Station Mode			*/
+    WFX_RSI_ST_AP_MODE         = (1 << 8), /* Enable AP Mode			*/
+    WFX_RSI_ST_STA_READY       = (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE),
+    WFX_RSI_ST_STARTED         = (1 << 9),  /* RSI task started			*/
+    WFX_RSI_ST_SCANSTARTED     = (1 << 10), /* Scan Started				*/
+    WFX_RSI_ST_SLEEP_READY     = (1 << 11)  /* Notify the M4 to go to sleep*/
+} WfxStateType_e;
+
+typedef struct wfx_rsi_s
+{
+    // TODO: Change tp WfxEventType_e once the event queue is implemented
     EventGroupHandle_t events;
     TaskHandle_t drv_task;
     TaskHandle_t wlan_task;
@@ -76,9 +84,9 @@ struct wfx_rsi
     sl_wfx_mac_address_t ap_bssid; /* To which our STA is connected */
     uint16_t join_retries;
     uint8_t ip4_addr[4]; /* Not sure if this is enough */
-};
+} WfxRsi_t;
 
-extern struct wfx_rsi wfx_rsi;
+extern WfxRsi_t wfx_rsi;
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -92,6 +100,10 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
 int32_t wfx_wifi_rsi_init(void);
+#if SL_ICD_ENABLED
+void sl_wfx_host_si91x_sleep_wakeup();
+int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
+#endif /* SL_ICD_ENABLED */
 
 #ifdef __cplusplus
 }

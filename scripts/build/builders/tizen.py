@@ -116,6 +116,7 @@ class TizenBuilder(GnBuilder):
 
         if app == TizenApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
+            self.build_command = 'check'
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')

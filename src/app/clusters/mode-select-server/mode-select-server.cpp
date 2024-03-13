@@ -22,20 +22,20 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/att-storage.h>
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
 #include <app/util/af.h>
+#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <tracing/macros.h>
 
-#ifdef EMBER_AF_PLUGIN_ON_OFF
+#ifdef MATTER_DM_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h>
-#endif // EMBER_AF_PLUGIN_ON_OFF
+#endif // MATTER_DM_PLUGIN_ON_OFF
 
 using namespace std;
 using namespace chip;
@@ -98,6 +98,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
                                                   const ModeSelect::Commands::ChangeToMode::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("ChangeToMode", "ModeSelect");
     ChipLogProgress(Zcl, "ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
     EndpointId endpointId = commandPath.mEndpointId;
     uint8_t newMode       = commandData.newMode;
@@ -135,10 +136,10 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
         // attribute are listed below.
 
         DataModel::Nullable<uint8_t> startUpMode;
-        EmberAfStatus status = Attributes::StartUpMode::Get(endpointId, startUpMode);
-        if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpMode.IsNull())
+        Status status = Attributes::StartUpMode::Get(endpointId, startUpMode);
+        if (status == Status::Success && !startUpMode.IsNull())
         {
-#ifdef EMBER_AF_PLUGIN_ON_OFF
+#ifdef MATTER_DM_PLUGIN_ON_OFF
             // OnMode with Power Up
             // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
             // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
@@ -149,9 +150,9 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             {
                 Attributes::OnMode::TypeInfo::Type onMode;
                 bool onOffValueForStartUp = false;
-                if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
+                if (Attributes::OnMode::Get(endpointId, onMode) == Status::Success &&
                     !emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-                    OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
+                    OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == Status::Success)
                 {
                     if (onOffValueForStartUp && !onMode.IsNull())
                     {
@@ -160,7 +161,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                     }
                 }
             }
-#endif // EMBER_AF_PLUGIN_ON_OFF
+#endif // MATTER_DM_PLUGIN_ON_OFF
 
             BootReasonType bootReason = BootReasonType::kUnspecified;
             CHIP_ERROR error          = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
@@ -181,12 +182,12 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             uint8_t currentMode = 0;
             status              = Attributes::CurrentMode::Get(endpointId, &currentMode);
 
-            if ((status == EMBER_ZCL_STATUS_SUCCESS) && (startUpMode.Value() != currentMode))
+            if ((status == Status::Success) && (startUpMode.Value() != currentMode))
             {
                 status = Attributes::CurrentMode::Set(endpointId, startUpMode.Value());
-                if (status != EMBER_ZCL_STATUS_SUCCESS)
+                if (status != Status::Success)
                 {
-                    ChipLogError(Zcl, "ModeSelect: Error initializing CurrentMode, EmberAfStatus code 0x%02x", status);
+                    ChipLogError(Zcl, "ModeSelect: Error initializing CurrentMode, Status code 0x%02x", to_underlying(status));
                 }
                 else
                 {

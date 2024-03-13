@@ -17,6 +17,7 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#include "em_rmu.h"
 #include "sl_system_kernel.h"
 
 #ifdef ENABLE_WSTK_LEDS
@@ -48,7 +49,7 @@ extern "C" {
 #include "uart.h"
 #endif
 
-#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
+#ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
 #include "SEGGER_SYSVIEW.h"
 #endif
 }
@@ -69,11 +70,15 @@ CHIP_ERROR SilabsPlatform::Init(void)
 {
     sl_system_init();
 
+    mRebootCause = RMU_ResetCauseGet();
+    // Clear register so it does accumualate the causes of each reset
+    RMU_ResetCauseClear();
+
 #if CHIP_ENABLE_OPENTHREAD
     sl_ot_sys_init();
 #endif
 
-#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
+#ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_Start();
 #endif

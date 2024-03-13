@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-IDM-2.2] Report Data Action from DUT to TH. [{DUT_Server}]
+name: 3.2.2. [TC-IDM-2.2] Report Data Action from DUT to TH. [DUT as Server]
 
 PICS:
     - MCORE.IDM.S
@@ -1065,7 +1065,7 @@ tests:
           "Step 32: TH sends a Read Request Message to the DUT to read a non
           global attribute from all clusters at that Endpoint AttributePath =
           [[Endpoint = Specific Endpoint, Attribute = Specific Non Global
-          Attribute]]"
+          Attribute]] +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -1086,7 +1086,7 @@ tests:
     - label:
           "Step 33: TH sends a Read Request Message to the DUT to read a non
           global attribute from all clusters at all Endpoints AttributePath =
-          [[Attribute = Specific Non Global Attribute]]"
+          [[Attribute = Specific Non Global Attribute]] +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
@@ -1107,7 +1107,7 @@ tests:
           "Step 34: TH should have access to only a single cluster at one
           Endpoint1. TH sends a Read Request Message to the DUT to read all
           attributes from all clusters at Endpoint1 AttributePath = [[Endpoint =
-          Specific Endpoint]]"
+          Specific Endpoint]] +"
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 

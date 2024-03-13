@@ -30,6 +30,8 @@
 namespace chip {
 namespace DeviceLayer {
 
+__attribute__((section(".bss"))) static uint8_t mFactoryDataBuffer[FIXED_PARTITION_SIZE(factory_partition)];
+
 struct InternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
@@ -63,7 +65,6 @@ struct ExternalFlashFactoryData
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
-    uint8_t mFactoryDataBuffer[FIXED_PARTITION_SIZE(factory_partition)];
 };
 
 template <class FlashFactoryData>

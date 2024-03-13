@@ -48,9 +48,6 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
     {
     case DeviceLayer::DeviceEventType::kDnssdInitialized:
     case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    case DeviceLayer::DeviceEventType::kICDPollingIntervalChange:
-#endif
         app::DnssdServer::Instance().StartServer();
         break;
     default:
@@ -150,11 +147,21 @@ void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
     VerifyOrDieWithMsg(mICDManager != nullptr, Discovery,
                        "Invalid pointer to the ICDManager which is required for the LIT operating mode");
 
+    Dnssd::ICDModeAdvertise ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kNone;
     // Only advertise the ICD key if the device can operate as a LIT
     if (mICDManager->SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
     {
-        advParams.SetICDOperatingAsLIT(Optional<bool>(mICDManager->GetICDMode() == ICDConfigurationData::ICDMode::LIT));
+        if (mICDManager->GetICDMode() == ICDConfigurationData::ICDMode::LIT)
+        {
+            ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kLIT;
+        }
+        else
+        {
+            ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kSIT;
+        }
     }
+
+    advParams.SetICDModeToAdvertise(ICDModeToAdvertise);
 }
 #endif
 
@@ -184,7 +191,6 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                        .SetPort(GetSecuredPort())
                                        .SetInterfaceId(GetInterfaceId())
                                        .SetLocalMRPConfig(GetLocalMRPConfig())
-                                       .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
                                        .EnableIpV4(true);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -258,7 +264,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
     }
 
-    advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+    advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     AddICDKeyToAdvertisement(advertiseParameters);
@@ -329,13 +335,20 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
             }
         }
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
+    else
+    {
+        advertiseParameters.SetCommissionerPasscodeSupported(Optional<bool>(true));
+    }
+#endif
 
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u",
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u",
                     advertiseParameters.GetVendorId().ValueOr(0), advertiseParameters.GetProductId().ValueOr(0),
                     advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
-                    to_underlying(advertiseParameters.GetCommissioningMode()));
+                    to_underlying(advertiseParameters.GetCommissioningMode()),
+                    advertiseParameters.GetCommissionerPasscodeSupported().ValueOr(false) ? 1 : 0);
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
@@ -492,7 +505,7 @@ CHIP_ERROR DnssdServer::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[
 void DnssdServer::OnICDModeChange()
 {
     // ICDMode changed, restart DNS-SD advertising, because SII and ICD key are affected by this change.
-    // StartServer will take care of setting the operational and commissionable advertissements
+    // StartServer will take care of setting the operational and commissionable advertisements
     StartServer();
 }
 

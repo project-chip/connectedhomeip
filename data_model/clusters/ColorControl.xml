@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0300" name="Color Control" revision="6">
   <revisionHistory>
@@ -64,6 +66,9 @@ Davis, CA 95616, USA
     <revision revision="5" summary="new data model format and notation, FeatureMap support"/>
     <revision revision="6" summary="Added clarifications to Scenes support for Matter"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0300" name="Color Control"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CC" primaryTransaction="1"/>
   <features>
     <feature bit="0" code="HS" name="Hue/Saturation" summary="Supports color specification via hue/saturation.">
@@ -102,6 +107,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
       <constraint type="between" from="0" to="65534"/>
     </attribute>
@@ -123,19 +129,19 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="DriftCompensation" type="enum8" default="-">
       <enum>
-        <item value="0" name="None">
+        <item value="0" name="Item0" summary="None">
           <mandatoryConform/>
         </item>
-        <item value="1" name="Other / Unknown">
+        <item value="1" name="Item1" summary="Other / Unknown">
           <mandatoryConform/>
         </item>
-        <item value="2" name="Temperature monitoring">
+        <item value="2" name="Item2" summary="Temperature monitoring">
           <mandatoryConform/>
         </item>
-        <item value="3" name="Optical luminance monitoring and feedback">
+        <item value="3" name="Item3" summary="Optical luminance monitoring and feedback">
           <mandatoryConform/>
         </item>
-        <item value="4" name="Optical color monitoring and feedback">
+        <item value="4" name="Item4" summary="Optical color monitoring and feedback">
           <mandatoryConform/>
         </item>
       </enum>
@@ -158,13 +164,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="ColorMode" type="enum8" default="1">
       <enum>
-        <item value="0">
+        <item value="0" name="Item0">
           <mandatoryConform/>
         </item>
-        <item value="1">
+        <item value="1" name="Item1">
           <mandatoryConform/>
         </item>
-        <item value="2">
+        <item value="2" name="Item2">
           <mandatoryConform/>
         </item>
       </enum>
@@ -173,7 +179,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="between" from="0" to="2"/>
     </attribute>
-    <attribute id="0x000f" name="Options" type="map8" default="0">
+    <attribute id="0x000F" name="Options" type="map8" default="0">
       <bitmap>
         <bitfield name="ExecuteIfOff" bit="0" summary="0 – Do not execute command if the On/Off cluster, OnOff attribute is FALSE. +
                      1 – Execute command if the On/Off cluster, OnOff attribute is FALSE.">
@@ -230,13 +236,13 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x001a" name="Primary3Y" type="uint16" default="-">
+    <attribute id="0x001A" name="Primary3Y" type="uint16" default="-">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x001b" name="Primary3Intensity" type="uint8" default="-">
+    <attribute id="0x001B" name="Primary3Intensity" type="uint8" default="-">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
@@ -287,7 +293,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x002a" name="Primary6Intensity" type="uint8" default="-">
+    <attribute id="0x002A" name="Primary6Intensity" type="uint8" default="-">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
@@ -332,17 +338,17 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x003a" name="ColorPointBX" type="uint16" default="-">
+    <attribute id="0x003A" name="ColorPointBX" type="uint16" default="-">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x003b" name="ColorPointBY" type="uint16" default="-">
+    <attribute id="0x003B" name="ColorPointBY" type="uint16" default="-">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x003c" name="ColorPointBIntensity" type="uint8" default="-">
+    <attribute id="0x003C" name="ColorPointBIntensity" type="uint8" default="-">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
@@ -356,16 +362,16 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x4001" name="EnhancedColorMode" type="enum8" default="1">
       <enum>
-        <item value="0">
+        <item value="0" name="Item0">
           <mandatoryConform/>
         </item>
-        <item value="1">
+        <item value="1" name="Item1">
           <mandatoryConform/>
         </item>
-        <item value="2">
+        <item value="2" name="Item2">
           <mandatoryConform/>
         </item>
-        <item value="3">
+        <item value="3" name="Item3">
           <mandatoryConform/>
         </item>
       </enum>
@@ -407,26 +413,26 @@ Davis, CA 95616, USA
         <feature name="CL"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x400a" name="ColorCapabilities" type="map16" default="0">
+    <attribute id="0x400A" name="ColorCapabilities" type="map16" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint type="between" from="0" to="0x001F"/>
     </attribute>
-    <attribute id="0x400b" name="ColorTempPhysicalMinMireds" type="uint16" default="0">
+    <attribute id="0x400B" name="ColorTempPhysicalMinMireds" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x400c" name="ColorTempPhysicalMaxMireds" type="uint16" default="0xFEFF">
+    <attribute id="0x400C" name="ColorTempPhysicalMaxMireds" type="uint16" default="0xFEFF">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
       <constraint type="between" from="0" to="0xFEFF"/>
     </attribute>
-    <attribute id="0x400d" name="CoupleColorTempToLevelMinMireds" type="uint16" default="MS">
+    <attribute id="0x400D" name="CoupleColorTempToLevelMinMireds" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <orTerm>
@@ -434,7 +440,7 @@ Davis, CA 95616, USA
           <attribute name="ColorTemperatureMireds"/>
         </orTerm>
       </mandatoryConform>
-      <constraint type="between" from="ColorTempPhysicalMinMireds" to="ColorTemperatureMireds"/>
+      <constraint type="between" from="" to="ColorTemperatureMireds"/>
     </attribute>
     <attribute id="0x4010" name="StartUpColorTemperatureMireds" type="uint16" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -449,7 +455,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="MoveToHue" response="Y">
+    <command id="0x00" name="MoveToHue" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="HS"/>
@@ -460,16 +466,16 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Direction" type="enum8">
         <enum>
-          <item value="0" name="Shortest distance">
+          <item value="0" name="Item0" summary="Shortest distance">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Longest distance">
+          <item value="1" name="Item1" summary="Longest distance">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Up">
+          <item value="2" name="Item2" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Down">
+          <item value="3" name="Item3" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
@@ -489,23 +495,23 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x01" name="MoveHue" response="Y">
+    <command id="0x01" name="MoveHue" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
       <field id="0" name="MoveMode" type="enum8">
         <enum>
-          <item value="0" name="Stop">
+          <item value="0" name="Item0" summary="Stop">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Up">
+          <item value="1" name="Item1" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Reserved">
+          <item value="2" name="Item2" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Down">
+          <item value="3" name="Item3" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
@@ -524,23 +530,23 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x02" name="StepHue" response="Y">
+    <command id="0x02" name="StepHue" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
       <field id="0" name="StepMode" type="enum8">
         <enum>
-          <item value="0" name="Reserved">
+          <item value="0" name="Item0" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Up">
+          <item value="1" name="Item1" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Reserved">
+          <item value="2" name="Item2" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Down">
+          <item value="3" name="Item3" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
@@ -562,7 +568,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x03" name="MoveToSaturation" response="Y">
+    <command id="0x03" name="MoveToSaturation" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="HS"/>
@@ -584,23 +590,23 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x04" name="MoveSaturation" response="Y">
+    <command id="0x04" name="MoveSaturation" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
       <field id="0" name="MoveMode" type="enum8">
         <enum>
-          <item value="0" name="Stop">
+          <item value="0" name="Item0" summary="Stop">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Up">
+          <item value="1" name="Item1" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Reserved">
+          <item value="2" name="Item2" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Down">
+          <item value="3" name="Item3" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
@@ -619,23 +625,23 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x05" name="StepSaturation" response="Y">
+    <command id="0x05" name="StepSaturation" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
       <field id="0" name="StepMode" type="enum8">
         <enum>
-          <item value="0" name="Reserved">
+          <item value="0" name="Item0" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Up">
+          <item value="1" name="Item1" summary="Up">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Reserved">
+          <item value="2" name="Item2" summary="Reserved">
             <mandatoryConform/>
           </item>
-          <item value="3" name="Down">
+          <item value="3" name="Item3" summary="Down">
             <mandatoryConform/>
           </item>
         </enum>
@@ -657,7 +663,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x06" name="MoveToHueAndSaturation" response="Y">
+    <command id="0x06" name="MoveToHueAndSaturation" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="HS"/>
@@ -683,7 +689,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x07" name="MoveToColor" response="Y">
+    <command id="0x07" name="MoveToColor" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="XY"/>
@@ -709,7 +715,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x08" name="MoveColor" response="Y">
+    <command id="0x08" name="MoveColor" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="XY"/>
@@ -729,7 +735,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x09" name="StepColor" response="Y">
+    <command id="0x09" name="StepColor" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="XY"/>
@@ -753,7 +759,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x0a" name="MoveToColorTemperature" response="Y">
+    <command id="0x0A" name="MoveToColorTemperature" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CT"/>
@@ -775,7 +781,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x40" name="EnhancedMoveToHue" response="Y">
+    <command id="0x40" name="EnhancedMoveToHue" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="EHUE"/>
@@ -800,7 +806,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x41" name="EnhancedMoveHue" response="Y">
+    <command id="0x41" name="EnhancedMoveHue" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="EHUE"/>
@@ -821,7 +827,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x42" name="EnhancedStepHue" response="Y">
+    <command id="0x42" name="EnhancedStepHue" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="EHUE"/>
@@ -846,7 +852,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x43" name="EnhancedMoveToHueAndSaturation" response="Y">
+    <command id="0x43" name="EnhancedMoveToHueAndSaturation" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="EHUE"/>
@@ -871,14 +877,14 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x44" name="ColorLoopSet" response="Y">
+    <command id="0x44" name="ColorLoopSet" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
       <field id="0" name="UpdateFlags" type="map8">
         <bitmap>
-          <bitfield name="(Reserved)">
+          <bitfield name="Reserved" bit="4-7">
             <mandatoryConform/>
           </bitfield>
           <bitfield name="UpdateAction" bit="0">
@@ -899,13 +905,13 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Action" type="enum8">
         <enum>
-          <item value="0" name="De-activate the color loop.">
+          <item value="0" name="Item0" summary="De-activate the color loop.">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Activate the color loop from the value in the ColorLoopStartEnhancedHue field.">
+          <item value="1" name="Item1" summary="Activate the color loop from the value in the ColorLoopStartEnhancedHue field.">
             <mandatoryConform/>
           </item>
-          <item value="2" name="Activate the color loop from the value of the EnhancedCurrentHue attribute.">
+          <item value="2" name="Item2" summary="Activate the color loop from the value of the EnhancedCurrentHue attribute.">
             <mandatoryConform/>
           </item>
         </enum>
@@ -914,10 +920,10 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="Direction" type="enum8">
         <enum>
-          <item value="0" name="Decrement the hue in the color loop.">
+          <item value="0" name="Item0" summary="Decrement the hue in the color loop.">
             <mandatoryConform/>
           </item>
-          <item value="1" name="Increment the hue in the color loop.">
+          <item value="1" name="Item1" summary="Increment the hue in the color loop.">
             <mandatoryConform/>
           </item>
         </enum>
@@ -939,7 +945,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x47" name="StopMoveStep" response="Y">
+    <command id="0x47" name="StopMoveStep" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
@@ -957,7 +963,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x4b" name="MoveColorTemperature" response="Y">
+    <command id="0x4B" name="MoveColorTemperature" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CT"/>
@@ -986,7 +992,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x4c" name="StepColorTemperature" response="Y">
+    <command id="0x4C" name="StepColorTemperature" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CT"/>

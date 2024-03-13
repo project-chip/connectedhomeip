@@ -37,9 +37,10 @@ ti/ti_platform_overview
 -   [NXP - Android Commissioning](./nxp_k32w_android_commissioning.md)
 -   [NXP - Linux Examples](./nxp_imx8m_linux_examples.md)
 -   [NXP - Manufacturing Data](./nxp_manufacturing_flow.md)
--   [Silicon Labs - Documentation](https://github.com/SiliconLabs/matter#readme)
--   [Silicon Labs - Building](./silabs_efr32_building.md)
+-   [Silicon Labs - Documentation](https://siliconlabs.github.io/matter/latest/index.html)
+-   [Silicon Labs - Getting Started](./silabs_getting_started.md)
 -   [Silicon Labs - Software Update](./silabs_efr32_software_update.md)
+-   [Silicon Labs - CLI Guide](./silabs_cli_guide.md)
 -   [TI - Platform Overview](./ti/ti_platform_overview.md)
 
 ## Tool Guides
@@ -54,7 +55,6 @@ ti/ti_platform_overview
 ## Development Guides
 
 -   [Access Control](./access-control-guide.md)
--   [IP Commissioning](./ip_commissioning.md)
 -   [Matter IDL tooling and validation](./matter_idl_tooling.md)
 
 ## Setup Guides

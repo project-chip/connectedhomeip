@@ -25,7 +25,8 @@
 
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -186,9 +187,12 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     static CommonCaseDeviceServerInitParams initParams;
-    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 
@@ -558,7 +562,7 @@ void AppTask::DispatchEvent(const AppEvent & event)
 
 void AppTask::UpdateClusterState()
 {
-    EmberStatus status;
+    Protocols::InteractionModel::Status status;
 
     ChipLogProgress(NotSpecified, "UpdateClusterState");
 
@@ -567,99 +571,99 @@ void AppTask::UpdateClusterState()
     bool onOffState = !PumpMgr().IsStopped();
 
     status = OnOff::Attributes::OnOff::Set(kOnOffClusterEndpoint, onOffState);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", to_underlying(status));
     }
 
     int16_t maxPressure = PumpMgr().GetMaxPressure();
     status              = PumpConfigurationAndControl::Attributes::MaxPressure::Set(kPccClusterEndpoint, maxPressure);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %x", to_underlying(status));
     }
 
     uint16_t maxSpeed = PumpMgr().GetMaxSpeed();
     status            = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(kPccClusterEndpoint, maxSpeed);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %x", to_underlying(status));
     }
 
     uint16_t maxFlow = PumpMgr().GetMaxFlow();
     status           = PumpConfigurationAndControl::Attributes::MaxFlow::Set(kPccClusterEndpoint, maxFlow);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %x", to_underlying(status));
     }
 
     int16_t minConstPress = PumpMgr().GetMinConstPressure();
     status                = PumpConfigurationAndControl::Attributes::MinConstPressure::Set(kPccClusterEndpoint, minConstPress);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %x", to_underlying(status));
     }
 
     int16_t maxConstPress = PumpMgr().GetMaxConstPressure();
     status                = PumpConfigurationAndControl::Attributes::MaxConstPressure::Set(kPccClusterEndpoint, maxConstPress);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %x", to_underlying(status));
     }
 
     int16_t minCompPress = PumpMgr().GetMinCompPressure();
     status               = PumpConfigurationAndControl::Attributes::MinCompPressure::Set(kPccClusterEndpoint, minCompPress);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %x", to_underlying(status));
     }
 
     int16_t maxCompPress = PumpMgr().GetMaxCompPressure();
     status               = PumpConfigurationAndControl::Attributes::MaxCompPressure::Set(kPccClusterEndpoint, maxCompPress);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %x", to_underlying(status));
     }
 
     uint16_t minConstSpeed = PumpMgr().GetMinConstSpeed();
     status                 = PumpConfigurationAndControl::Attributes::MinConstSpeed::Set(kPccClusterEndpoint, minConstSpeed);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %x", to_underlying(status));
     }
 
     uint16_t maxConstSpeed = PumpMgr().GetMaxConstSpeed();
     status                 = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Set(kPccClusterEndpoint, maxConstSpeed);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %x", to_underlying(status));
     }
 
     uint16_t minConstFlow = PumpMgr().GetMinConstFlow();
     status                = PumpConfigurationAndControl::Attributes::MinConstFlow::Set(kPccClusterEndpoint, minConstFlow);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %x", to_underlying(status));
     }
 
     uint16_t maxConstFlow = PumpMgr().GetMaxConstFlow();
     status                = PumpConfigurationAndControl::Attributes::MaxConstFlow::Set(kPccClusterEndpoint, maxConstFlow);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %x", to_underlying(status));
     }
 
     int16_t minConstTemp = PumpMgr().GetMinConstTemp();
     status               = PumpConfigurationAndControl::Attributes::MinConstTemp::Set(kPccClusterEndpoint, minConstTemp);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %x", to_underlying(status));
     }
 
     int16_t maxConstTemp = PumpMgr().GetMaxConstTemp();
     status               = PumpConfigurationAndControl::Attributes::MaxConstTemp::Set(kPccClusterEndpoint, maxConstTemp);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %x", to_underlying(status));
     }
 }

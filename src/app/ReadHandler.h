@@ -36,14 +36,15 @@
 #include <app/MessageDef/DataVersionFilterIBs.h>
 #include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
-#include <app/ObjectList.h>
 #include <app/OperationalSessionSetup.h>
+#include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <app/SubscriptionResumptionStorage.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/LinkedList.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
@@ -152,6 +153,11 @@ public:
          * issues w.r.t the ReadHandler itself.
          */
         virtual ApplicationCallback * GetAppCallback() = 0;
+
+        /*
+         * Retrieve the InteractionalModelEngine that holds this ReadHandler.
+         */
+        virtual InteractionModelEngine * GetInteractionModelEngine() = 0;
     };
 
     // TODO (#27675) : Merge existing callback and observer into one class and have an observer pool in the Readhandler to notify
@@ -218,9 +224,9 @@ public:
     ReadHandler(ManagementCallback & apCallback, Observer * observer);
 #endif
 
-    const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
-    const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
-    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
+    const SingleLinkedListNode<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
+    const SingleLinkedListNode<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
+    const SingleLinkedListNode<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
 
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
@@ -253,13 +259,23 @@ public:
         return CHIP_NO_ERROR;
     }
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     *
+     *  @brief Initialize a ReadHandler for a resumed subsciption
+     *
+     *  Used after the SubscriptionResumptionSessionEstablisher establishs the CASE session
+     */
+    void OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionSessionEstablisher & sessionEstablisher);
+#endif
+
 private:
     PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
     EventNumber & GetEventMin() { return mEventMin; }
 
     /**
      * Returns SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
-     * For an ICD publisher, this SHALL be set to the idle mode interval.
+     * For an ICD publisher, this SHALL be set to the idle mode duration.
      * Otherwise, this SHALL be set to 60 minutes.
      */
     uint16_t GetPublisherSelectedIntervalLimit();
@@ -301,18 +317,6 @@ private:
      *
      */
     void OnInitialRequest(System::PacketBufferHandle && aPayload);
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    /**
-     *
-     *  @brief Resume a persisted subscription
-     *
-     *  Used after ReadHandler(ManagementCallback & apCallback). This will start a CASE session
-     *  with the subscriber if one doesn't already exist, and send full priming report when connected.
-     */
-    void ResumeSubscription(CASESessionManager & caseSessionManager,
-                            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
-#endif
 
     /**
      *  Send ReportData to initiator
@@ -485,11 +489,6 @@ private:
     /// @param aFlag Flag to clear
     void ClearStateFlag(ReadHandlerFlags aFlag);
 
-    // Helpers for continuing the subscription resumption
-    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                      const SessionHandle & sessionHandle);
-    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
-
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 
     // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
@@ -551,9 +550,9 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
 
-    ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
-    ObjectList<EventPathParams> * mpEventPathList           = nullptr;
-    ObjectList<DataVersionFilter> * mpDataVersionFilterList = nullptr;
+    SingleLinkedListNode<AttributePathParams> * mpAttributePathList   = nullptr;
+    SingleLinkedListNode<EventPathParams> * mpEventPathList           = nullptr;
+    SingleLinkedListNode<DataVersionFilter> * mpDataVersionFilterList = nullptr;
 
     ManagementCallback & mManagementCallback;
 
@@ -571,12 +570,6 @@ private:
 
     // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
     Observer * mObserver = nullptr;
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // Callbacks to handle server-initiated session success/failure
-    chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
-    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
-#endif
 };
 } // namespace app
 } // namespace chip

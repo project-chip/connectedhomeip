@@ -30,18 +30,19 @@ assert(chip_build_tools)
 declare_args() {
   chip_codesign = current_os == "ios"
 
-  # When config_enable_yaml_tests is false, the Matter SDK options are not available.
-  if (!config_enable_yaml_tests) {
-    chip_inet_config_enable_ipv4 = true
-    if (!defined(chip_config_network_layer_ble)) {
-      chip_config_network_layer_ble = true
-    }
-    if (!defined(is_clang)) {
-      is_clang = false
-    }
+  chip_inet_config_enable_ipv4 = true
+
+  if (!defined(chip_config_network_layer_ble)) {
+    chip_config_network_layer_ble = true
+  }
+  if (!defined(is_clang)) {
+    is_clang = false
   }
 
   enable_provisional_features = config_enable_yaml_tests
+
+  # Disable generating compiler database by default
+  generate_compilation_database = false
 }
 
 sdk = "macosx"
@@ -107,6 +108,12 @@ action("build-darwin-framework") {
     args += [ "--no-clang" ]
   }
 
+  if (generate_compilation_database) {
+    args += [ "--compdb" ]
+  } else {
+    args += [ "--no-compdb" ]
+  }
+
   if (config_enable_yaml_tests) {
     args += [ "--enable-encoding-sentinel-enum-values" ]
   } else {
@@ -116,17 +123,23 @@ action("build-darwin-framework") {
   output_name = "Matter.framework"
   outputs = [
     "${root_out_dir}/macos_framework_output/Build/Products/${output_sdk_type}/${output_name}",
+    "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/gen/include",
     "${root_build_dir}/darwin_framework_build.log",
     "${root_out_dir}/macos_framework_output/ModuleCache.noindex/",
     "${root_out_dir}/macos_framework_output/Logs",
     "${root_out_dir}/macos_framework_output/Index",
     "${root_out_dir}/macos_framework_output/Build",
   ]
+
+  if (sdk == "macosx") {
+    outputs += [ "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/lib/libCHIP.a" ]
+  }
 }
 
 config("config") {
   include_dirs = [
     ".",
+    "include",
     "${chip_root}/examples/common",
     "${chip_root}/examples/darwin-framework-tool/commands/common",
     "${chip_root}/zzz_generated/darwin-framework-tool",
@@ -141,7 +154,7 @@ config("config") {
   ]
 
   defines = [
-    "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
+    "CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
     "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
 
     # Disable availability annotations in Matter.framework headers because we
@@ -162,7 +175,11 @@ executable("darwin-framework-tool") {
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Commands.h",
     "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
+    "${chip_root}/examples/common/websocket-server/WebSocketServer.cpp",
+    "${chip_root}/examples/common/websocket-server/WebSocketServer.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "commands/bdx/Commands.h",
+    "commands/bdx/DownloadLogCommand.mm",
     "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",
     "commands/clusters/ReportCommandBridge.h",
@@ -176,6 +193,11 @@ executable("darwin-framework-tool") {
     "commands/common/MTRLogging.h",
     "commands/common/RemoteDataModelLogger.h",
     "commands/common/RemoteDataModelLogger.mm",
+    "commands/configuration/Commands.h",
+    "commands/configuration/ResetMRPParametersCommand.h",
+    "commands/configuration/ResetMRPParametersCommand.mm",
+    "commands/configuration/SetMRPParametersCommand.h",
+    "commands/configuration/SetMRPParametersCommand.mm",
     "commands/delay/Commands.h",
     "commands/delay/SleepCommand.h",
     "commands/delay/SleepCommand.mm",
@@ -203,17 +225,14 @@ executable("darwin-framework-tool") {
 
   deps = [
     ":build-darwin-framework",
+    "${chip_root}/third_party/libwebsockets",
     jsoncpp_root,
   ]
 
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.mm" ]
 
-    deps += [
-      "${chip_root}/examples/common/websocket-server",
-      "${chip_root}/src/platform/logging:headers",
-      "${editline_root}:editline",
-    ]
+    deps += [ "${editline_root}:editline" ]
   }
 
   ldflags = [
@@ -226,63 +245,35 @@ executable("darwin-framework-tool") {
     "Security.framework",
   ]
 
-  # When config_enable_yaml_tests=true the Matter SDK is pulled in as a dependency because the code of the test suite
-  # uses some helpers from the Matter SDK. As a result, the SDK is built twice. Once because of this dependency and once
-  # when the Matter.framework is built.
-  # It may results in different versions of the Matter SDK between the output binary and the linked Matter.framework.
-  #
-  # When config_enable_yaml_tests=false the Matter SDK is built once when the Matter.framework is built and the resulting
-  # libCHIP.a library is linked statically to the output binary.
-  if (config_enable_yaml_tests) {
-    deps += [
-      "${chip_root}/src/app/tests/suites/commands/delay",
+  include_dirs = [
+    "${chip_root}/config/standalone/",
+    "${chip_root}/src/",
+    "${chip_root}/src/include/",
+    "${chip_root}/src/protocols/",
+    "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/third_party/nlassert/repo/include/",
+    "${chip_root}/third_party/nlio/repo/include/",
+    "${chip_root}/zzz_generated/app-common/",
+    "${root_gen_dir}/include",
+    "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/gen/include",
+  ]
 
-      # IM is needed for MTRError
-      "${chip_root}/src/app/tests/suites/commands/interaction_model",
+  defines = [
+    "CHIP_HAVE_CONFIG_H=1",
+    "CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
+  ]
 
-      # Log is needed by tests UserPrompt and Log
-      "${chip_root}/src/app/tests/suites/commands/log",
+  frameworks += [
+    "CoreFoundation.framework",
+    "Foundation.framework",
+    "CoreBluetooth.framework",
+    "Network.framework",
+  ]
 
-      # System is needed by tests FactoryReset etc..
-      "${chip_root}/src/app/tests/suites/commands/system",
-
-      # pics is needed by tests
-      "${chip_root}/src/app/tests/suites/pics",
-      "${chip_root}/src/protocols/interaction_model",
-    ]
-
-    defines = []
-  } else {
-    include_dirs = [
-      "${chip_root}/config/standalone/",
-      "${chip_root}/src/",
-      "${chip_root}/src/include/",
-      "${chip_root}/src/protocols/",
-      "${chip_root}/src/protocols/interaction_model",
-      "${chip_root}/third_party/nlassert/repo/include/",
-      "${chip_root}/third_party/nlio/repo/include/",
-      "${chip_root}/zzz_generated/app-common/",
-      "${root_gen_dir}/include",
-      "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/gen/include",
-    ]
-
-    defines = [
-      "CHIP_HAVE_CONFIG_H=1",
-      "CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
-    ]
-
-    frameworks += [
-      "CoreFoundation.framework",
-      "Foundation.framework",
-      "CoreBluetooth.framework",
-      "Network.framework",
-    ]
-
-    # Other SDKs are linked statically to Matter.framework but the macosx SDK is linked dynamically but needs some symbols that are
-    # not exposed by the dylib.
-    if (sdk == "macosx") {
-      libs = [ "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/lib/libCHIP.a" ]
-    }
+  # Other SDKs are linked statically to Matter.framework but the macosx SDK is linked dynamically but needs some symbols that are
+  # not exposed by the dylib.
+  if (sdk == "macosx") {
+    libs = [ "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/lib/libCHIP.a" ]
   }
 
   if (enable_provisional_features) {

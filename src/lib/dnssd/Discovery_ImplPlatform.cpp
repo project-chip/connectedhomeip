@@ -19,7 +19,7 @@
 
 #include <inttypes.h>
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -213,19 +213,20 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     case TxtFieldKey::kSessionIdleInterval:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // A ICD operating as a LIT should not advertise its slow polling interval
-        if (params.GetICDOperatingAsLIT().HasValue() && params.GetICDOperatingAsLIT().Value())
-        {
-            // Returning UNINITIALIZED ensures that the SII string isn't added by the AddTxtRecord
-            // without erroring out the action.
-            return CHIP_ERROR_UNINITIALIZED;
-        }
+        // Returning UNINITIALIZED ensures that the SII string isn't added by the AddTxtRecord
+        // without erroring out the action.
+        VerifyOrReturnError(params.GetICDModeToAdvertise() != ICDModeAdvertise::kLIT, CHIP_ERROR_UNINITIALIZED);
         FALLTHROUGH;
 #endif
     case TxtFieldKey::kSessionActiveInterval:
     case TxtFieldKey::kSessionActiveThreshold:
         return CopyTextRecordValue(buffer, bufferLen, params.GetLocalMRPConfig(), key);
     case TxtFieldKey::kLongIdleTimeICD:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetICDOperatingAsLIT());
+        // The ICD key is only added to the advertissment when the device supports the ICD LIT feature-set.
+        // Return UNINITIALIZED when the operating mode is kNone to ensure that the ICD string isn't added
+        // by the AddTxtRecord without erroring out the action.
+        VerifyOrReturnError(params.GetICDModeToAdvertise() != ICDModeAdvertise::kNone, CHIP_ERROR_UNINITIALIZED);
+        return CopyTextRecordValue(buffer, bufferLen, (params.GetICDModeToAdvertise() == ICDModeAdvertise::kLIT));
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -251,6 +252,9 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         return CopyTextRecordValue(buffer, bufferLen, params.GetPairingHint());
     case TxtFieldKey::kCommissioningMode:
         return CopyTextRecordValue(buffer, bufferLen, params.GetCommissioningMode());
+    case TxtFieldKey::kCommissionerPasscode:
+        return CopyTextRecordValue(buffer, bufferLen,
+                                   static_cast<uint16_t>(params.GetCommissionerPasscodeSupported().ValueOr(false) ? 1 : 0));
     default:
         return CopyTxtRecord(key, buffer, bufferLen, static_cast<BaseAdvertisingParams<CommissionAdvertisingParameters>>(params));
     }
@@ -416,8 +420,13 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
 
 void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
 {
+    DiscoveryImplPlatform * publisher = static_cast<DiscoveryImplPlatform *>(context);
+
     if (error == CHIP_ERROR_FORCED_RESET)
     {
+        // Restore dnssd state before restart, also needs to call ChipDnssdShutdown()
+        publisher->Shutdown();
+
         DeviceLayer::ChipDeviceEvent event;
         event.Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
         error      = DeviceLayer::PlatformMgr().PostEvent(&event);
@@ -580,6 +589,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioner)
     {
+        ADD_TXT_RECORD(CommissionerPasscode);
         PUBLISH_RECORDS(Commissioner);
         return CHIP_NO_ERROR;
     }

@@ -77,7 +77,6 @@ private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
     CHIP_ERROR _InitThreadStack(void);
-
     // ===== Members for internal use by the following friends.
 
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);

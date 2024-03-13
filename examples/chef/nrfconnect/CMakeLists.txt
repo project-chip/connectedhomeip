@@ -60,6 +60,7 @@ target_include_directories(app PRIVATE
                            ${GEN_DIR}
                            ${CHEF}
                            ${CHEF}/common
+                           ${CHEF}/common/clusters/
                            ${GEN_DIR}/../
                            ${CHIP_ROOT}/src
                            ${CHIP_ROOT}/examples/shell/shell_common/include
@@ -80,13 +81,23 @@ if (CONFIG_CHIP_LIB_SHELL)
 endif()
 
 target_sources(app PRIVATE
-    ${CHEF}/nrfconnect/main.cpp
-    ${CHEF}/common/stubs.cpp
-    ${CHEF}/common/chef-channel-manager.cpp
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
+    ${CHEF}/common/chef-fan-control-manager.cpp
+    ${CHEF}/common/chef-operational-state-delegate-impl.cpp
+    ${CHEF}/common/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
+    ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
+    ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
+    ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp
+    ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
+    ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
+    ${CHEF}/common/clusters/channel/ChannelManager.cpp
+    ${CHEF}/common/clusters/keypad-input/KeypadInputManager.cpp
+    ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
+    ${CHEF}/common/stubs.cpp
+    ${CHEF}/nrfconnect/main.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
@@ -125,6 +136,17 @@ pw_proto_library(attributes_service
     ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.options
   PREFIX
     attributes_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
+pw_proto_library(boolean_state_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/boolean_state_service.proto
+  PREFIX
+    boolean_state_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
@@ -200,6 +222,7 @@ target_include_directories(app PRIVATE
 
 target_compile_options(app PRIVATE
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BOOLEAN_STATE_SERVICE=1"
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
@@ -207,12 +230,12 @@ target_compile_options(app PRIVATE
 
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc
+  boolean_state_service.nanopb_rpc
   descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
   thread_service.nanopb_rpc
   pw_checksum
   pw_hdlc
-  pw_hdlc.pw_rpc
   pw_log
   pw_rpc.server
   pw_sys_io

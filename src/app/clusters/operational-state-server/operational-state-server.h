@@ -66,6 +66,11 @@ public:
     ~Instance() override;
 
     /**
+     * Phase name's max length
+     */
+    static constexpr uint8_t kMaxPhaseNameLength = 64;
+
+    /**
      * Initialise the operational state server instance.
      * This function must be called after defining an Instance class object.
      * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
@@ -180,6 +185,14 @@ protected:
      */
     virtual bool IsDerivedClusterStateResumeCompatible(uint8_t aState) { return false; };
 
+    /**
+     * Handles the invocation of derived cluster commands.
+     * If a derived cluster defines its own commands, this method SHALL be implemented by the derived cluster's class
+     * to handle the derived cluster's specific commands.
+     * @param handlerContext The command handler context containing information about the received command.
+     */
+    virtual void InvokeDerivedClusterCommand(HandlerContext & handlerContext) { return; };
+
 private:
     Delegate * mDelegate;
 
@@ -191,7 +204,13 @@ private:
     uint8_t mOperationalState                 = 0; // assume 0 for now.
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
 
-    // Inherited from CommandHandlerInterface
+    /**
+     * This method is inherited from CommandHandlerInterface.
+     * This reimplementation does not check that the cluster ID in the HandlerContext (the cluster the command relates to)
+     * matches the cluster ID of the RequestT type.
+     * These cluster IDs may be different in the case where a command defined in the base cluster is intended for a
+     * derived cluster.
+     */
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
@@ -262,14 +281,18 @@ public:
     virtual CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) = 0;
 
     /**
-     * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
+     * Fills in the provided MutableCharSpan with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
+     *
+     * If CHIP_ERROR_NOT_FOUND is returned for index 0, that indicates that the PhaseList attribute is null
+     * (there are no phases defined at all).
+     *
      * Note: This is used by the SDK to populate the phase list attribute. If the contents of this list changes, the
      * device SHALL call the Instance's ReportPhaseListChange method to report that this attribute has changed.
      * @param index The index of the phase, with 0 representing the first phase.
-     * @param operationalPhase  The GenericOperationalPhase is filled.
+     * @param operationalPhase  The MutableCharSpan is filled.
      */
-    virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) = 0;
+    virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) = 0;
 
     // command callback
     /**
@@ -315,6 +338,37 @@ protected:
 
 namespace RvcOperationalState {
 
+class Delegate : public OperationalState::Delegate
+{
+public:
+    /**
+     * Handle Command Callback in application: GoHome
+     * @param[out] err operational error after callback.
+     */
+    virtual void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    };
+
+    /**
+     * The start command is not supported by the RvcOperationalState cluster hence this method should never be called.
+     * This is a dummy implementation of the handler method so the consumer of this class does not need to define it.
+     */
+    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    };
+
+    /**
+     * The stop command is not supported by the RvcOperationalState cluster hence this method should never be called.
+     * This is a dummy implementation of the handler method so the consumer of this class does not need to define it.
+     */
+    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    };
+};
+
 class Instance : public OperationalState::Instance
 {
 public:
@@ -327,8 +381,8 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      */
-    Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId) :
-        OperationalState::Instance(aDelegate, aEndpointId, Id)
+    Instance(Delegate * aDelegate, EndpointId aEndpointId) :
+        OperationalState::Instance(aDelegate, aEndpointId, Id), mDelegate(aDelegate)
     {}
 
 protected:
@@ -347,6 +401,20 @@ protected:
      * @return true if aState is pause-compatible, false otherwise.
      */
     bool IsDerivedClusterStateResumeCompatible(uint8_t aState) override;
+
+    /**
+     * Handles the invocation of RvcOperationalState specific commands
+     * @param handlerContext The command handler context containing information about the received command.
+     */
+    void InvokeDerivedClusterCommand(HandlerContext & handlerContext) override;
+
+private:
+    Delegate * mDelegate;
+
+    /**
+     * Handle Command: GoHome
+     */
+    void HandleGoHomeCommand(HandlerContext & ctx, const Commands::GoHome::DecodableType & req);
 };
 
 } // namespace RvcOperationalState

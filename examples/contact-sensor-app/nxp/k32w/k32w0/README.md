@@ -22,6 +22,7 @@ network.
 -   [Building](#building)
     -   [Overwrite board config files](#overwrite-board-config-files)
     -   [Known issues building](#known-issues-building)
+-   [Long Idle Time ICD Support](#long-idle-time-icd-support)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
@@ -94,6 +95,11 @@ In this example, to commission the device onto a Project CHIP network, it must
 be discoverable over Bluetooth LE. For security reasons, you must start
 Bluetooth LE advertising manually after powering up the device by pressing
 Button USERINTERFACE.
+
+## LIT ICD Active Mode
+
+If the device is acting as a LIT ICD and it's already commissioned, then Button
+USERINTERFACE can be pressed for forcing the switch to Active Mode.
 
 ### Bluetooth LE Rendezvous
 
@@ -177,56 +183,58 @@ contact status.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Start building the application either with Secure Element or without, SDK is
-    downloaded with west tool.
+Activate the Matter environment:
 
-    -   without Secure Element
+```bash
+user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+```
 
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+To bring the SDK in the environment, the user can:
+
+-   download it with west tool, in which case it will be handled automatically
+    by gn:
+
+    ```bash
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
     user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
     user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
     ```
 
-    In case there are local modification to the already installed git NXP SDK:
-    Use the below west `forall` command instead of the west init command to
-    reset the west workspace. Warning: all local changes will be lost after
+    In case there are local modification to the already installed github NXP
+    SDK, use the below `west forall` command instead of the `west init` command
+    to reset the west workspace. Warning: all local changes will be lost after
     running this command.
 
     ```bash
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
-    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$west forall -c "git reset --hard && git clean -xdf" -a
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
     ```
 
-    Build the application
-
-    Prior to building, the user can specify a custom `SDK` path by setting
-    `NXP_K32W0_SDK_ROOT`:
-
-    ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=$(pwd)/third_party/nxp/k32w0_sdk/repo/core
-    ```
-
-    If the environment variable `NXP_K32W0_SDK_ROOT` is not set, it will default
-    to the `SDK` found in `third_party/nxp/k32w0_sdk/repo/core`.
+-   set up a custom path to the SDK, in which case
+    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
+    command:
 
     ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
-    user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
-    user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ ninja -C out/debug
+    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
     ```
 
-    -   with Secure element Exactly the same steps as above but set
-        chip_with_se05x=1 in the gn command and add argument
-        chip_enable_ota_requestor=false
+Start building the application:
 
-Note that option chip_enable_ota_requestor=false are required for building with
-Secure Element. These can be changed if building without Secure Element
+```bash
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ ninja -C out/debug
+```
+
+To build with Secure Element, follow the same steps as above but set
+`chip_with_se05x=1 chip_enable_ota_requestor=false` in the `gn gen` command.
+
+Note that option `chip_enable_ota_requestor=false` is required for building with
+Secure Element due to flash constraints.
 
 -   K32W041AM flavor
 
-    Exactly the same steps as above but set argument build_for_k32w041am=1 in
+    Exactly the same steps as above but set argument `build_for_k32w041am=1` in
     the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
@@ -255,6 +263,42 @@ pycryptodome           3.9.8
 ```
 
 The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
+
+## Long Idle Time ICD Support
+
+By default, contact-sensor is compiled as SIT ICD (Short Idle Time
+Intermittently Connected Device) - see rules from k32w0_sdk.gni:
+
+```
+chip_ot_idle_interval_ms = 2000           # 2s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 600            # 10min Idle Mode Interval
+nxp_active_mode_duration_ms = 10000       # 10s Active Mode Interval
+nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
+nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+```
+
+If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified
+as gn argument and the above parameters can be modified to comply with LIT
+requirements (e.g.: LIT devices must configure
+`chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
+
+```
+chip_ot_idle_interval_ms = 15000          # 15s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 3600           # 60min Idle Mode Interval
+nxp_active_mode_duration_ms = 0           # 0 Active Mode Interval
+nxp_active_mode_threshold_ms = 30000      # 30s Active Mode Threshold
+```
+
+ICD parameters that may be disabled once LIT functionality is enabled:
+
+```
+chip_persist_subscriptions: try to re-establish subscriptions from the server side after reboot
+chip_subscription_timeout_resumption: same as above but retries are using a Fibonacci backoff
+```
 
 ### Overwrite board config files
 

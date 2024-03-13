@@ -30,6 +30,7 @@ RUN apt-get update \
   libgirepository1.0-dev \
   libglib2.0-dev \
   libjpeg-dev \
+  openssh-server \
   psmisc \
   python3-dev \
   python3-pip \
@@ -55,7 +56,12 @@ RUN apt-get update \
   && echo "ctrl_interface=/run/wpa_supplicant" >> /etc/wpa_supplicant/wpa_supplicant.conf \
   && echo "update_config=1" >> /etc/wpa_supplicant/wpa_supplicant.conf \
   && rm -rf /var/lib/apt/lists/* \
-  && pip3 install --no-cache-dir click==8.0.3
+  && pip3 install --no-cache-dir click==8.0.3 paramiko \
+  && mkdir /var/run/sshd \
+  && echo 'root:admin' | chpasswd \
+  && sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config \
+  && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+  && sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
 COPY CHIPCirqueDaemon.py /bin/CHIPCirqueDaemon.py
 COPY entrypoint.sh /opt/entrypoint.sh
@@ -65,3 +71,4 @@ WORKDIR /
 ENTRYPOINT ["/opt/entrypoint.sh"]
 
 EXPOSE 80
+EXPOSE 2222

@@ -48,6 +48,13 @@ enum class CommissioningMode
     kEnabledEnhanced // Enhanced Commissioning Mode, CM=2 in DNS-SD key/value pairs
 };
 
+enum class ICDModeAdvertise : uint8_t
+{
+    kNone, // The device does not support the LIT feature-set. No ICD= key is advertised in DNS-SD.
+    kSIT,  // The ICD supports the LIT feature-set, but is currently operating as a SIT. ICD=0 in DNS-SD key/value pairs.
+    kLIT,  // The ICD is currently operating as a LIT. ICD=1 in DNS-SD key/value pairs.
+};
+
 template <class Derived>
 class BaseAdvertisingParams
 {
@@ -94,6 +101,8 @@ public:
         return *reinterpret_cast<Derived *>(this);
     }
     const Optional<ReliableMessageProtocolConfig> & GetLocalMRPConfig() const { return mLocalMRPConfig; }
+
+    // NOTE: The SetTcpSupported API is deprecated and not compliant with 1.3. T flag should not be set.
     Derived & SetTcpSupported(Optional<bool> tcpSupported)
     {
         mTcpSupported = tcpSupported;
@@ -101,12 +110,12 @@ public:
     }
     Optional<bool> GetTcpSupported() const { return mTcpSupported; }
 
-    Derived & SetICDOperatingAsLIT(Optional<bool> operatesAsLIT)
+    Derived & SetICDModeToAdvertise(ICDModeAdvertise operatingMode)
     {
-        mICDOperatesAsLIT = operatesAsLIT;
+        mICDModeAdvertise = operatingMode;
         return *reinterpret_cast<Derived *>(this);
     }
-    Optional<bool> GetICDOperatingAsLIT() const { return mICDOperatesAsLIT; }
+    ICDModeAdvertise GetICDModeToAdvertise() const { return mICDModeAdvertise; }
 
 private:
     uint16_t mPort                   = CHIP_PORT;
@@ -116,7 +125,7 @@ private:
     size_t mMacLength                = 0;
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
     Optional<bool> mTcpSupported;
-    Optional<bool> mICDOperatesAsLIT;
+    ICDModeAdvertise mICDModeAdvertise = ICDModeAdvertise::kNone;
 };
 
 /// Defines parameters required for advertising a CHIP node
@@ -263,6 +272,13 @@ public:
     }
     CommssionAdvertiseMode GetCommissionAdvertiseMode() const { return mMode; }
 
+    CommissionAdvertisingParameters & SetCommissionerPasscodeSupported(Optional<bool> commissionerPasscodeSupported)
+    {
+        mCommissionerPasscodeSupported = commissionerPasscodeSupported;
+        return *this;
+    }
+    Optional<bool> GetCommissionerPasscodeSupported() const { return mCommissionerPasscodeSupported; }
+
 private:
     uint8_t mShortDiscriminator          = 0;
     uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
@@ -281,6 +297,8 @@ private:
 
     char mPairingInstr[kKeyPairingInstructionMaxLength + 1];
     bool mPairingInstrHasValue = false;
+
+    Optional<bool> mCommissionerPasscodeSupported;
 };
 
 /**

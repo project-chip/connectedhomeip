@@ -68,7 +68,7 @@ Davis, CA 95616, USA
     <cluster id="0x0004" name="Groups" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x005c" name="Smoke CO Alarm" side="server">
+    <cluster id="0x005C" name="Smoke CO Alarm" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0402" name="Temperature Measurement" side="server">
@@ -77,7 +77,7 @@ Davis, CA 95616, USA
     <cluster id="0x0405" name="Relative Humidity Measurement" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x040c" name="Carbon Monoxide Concentration Measurement" side="server">
+    <cluster id="0x040C" name="Carbon Monoxide Concentration Measurement" side="server">
       <optionalConform/>
     </cluster>
   </clusters>

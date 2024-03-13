@@ -24,11 +24,14 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/CommonIterator.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 #include <stddef.h>
 
 namespace chip {
 namespace app {
 
+using namespace Protocols::SecureChannel;
 /**
  * The ICDClientStorage class is an abstract interface that defines the operations
  * for storing, retrieving and deleting ICD client information in persistent storage.
@@ -71,13 +74,17 @@ public:
     virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNode) = 0;
 
     /**
-     * Process received ICD Check-in message payload.  The implementation needs to parse the payload,
+     * Process received ICD check-in message payload.  The implementation needs to parse the payload,
      * look for a key that allows successfully decrypting the payload, verify that the counter in the payload is valid,
      * and populate the clientInfo with the stored information corresponding to the key.
-     * @param[in] payload received checkIn Message payload
+     * @param[in] payload received check-in Message payload
      * @param[out] clientInfo retrieved matched clientInfo from storage
+     * @param[out] counter counter value received in the check-in message
      */
-    virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) = 0;
+    virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, CounterType & counter) = 0;
+
+    // 4 bytes for counter + 2 bytes for ActiveModeThreshold
+    static inline constexpr uint8_t kAppDataLength = 6;
 };
 } // namespace app
 } // namespace chip

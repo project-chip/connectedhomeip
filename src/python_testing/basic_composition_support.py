@@ -97,32 +97,18 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 
 class BasicCompositionTests:
-    async def setup_class_helper(self):
+    async def setup_class_helper(self, default_to_pase: bool = True):
         dev_ctrl = self.default_controller
         self.problems = []
 
-        do_test_over_pase = self.user_params.get("use_pase_only", True)
+        do_test_over_pase = self.user_params.get("use_pase_only", default_to_pase)
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
         if do_test_over_pase:
-            info = self.get_setup_payload_info()
-
-            commissionable_nodes = dev_ctrl.DiscoverCommissionableNodes(
-                info.filter_type, info.filter_value, stopOnFirst=True, timeoutSecond=15)
-            logging.info(f"Commissionable nodes: {commissionable_nodes}")
-            # TODO: Support BLE
-            if commissionable_nodes is not None and len(commissionable_nodes) > 0:
-                commissionable_node = commissionable_nodes[0]
-                instance_name = f"{commissionable_node.instanceName}._matterc._udp.local"
-                vid = f"{commissionable_node.vendorId}"
-                pid = f"{commissionable_node.productId}"
-                address = f"{commissionable_node.addresses[0]}"
-                logging.info(f"Found instance {instance_name}, VID={vid}, PID={pid}, Address={address}")
-
-                node_id = 1
-                dev_ctrl.EstablishPASESessionIP(address, info.passcode, node_id)
-            else:
-                asserts.fail("Failed to find the DUT according to command line arguments.")
+            setupCode = self.matter_test_config.qr_code_content if self.matter_test_config.qr_code_content is not None else self.matter_test_config.manual_code
+            asserts.assert_true(setupCode, "Require either --qr-code or --manual-code.")
+            node_id = self.dut_node_id
+            dev_ctrl.EstablishPASESession(setupCode, node_id)
         else:
             # Using the already commissioned node
             node_id = self.dut_node_id

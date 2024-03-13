@@ -18,11 +18,8 @@
 #include "DefaultTimeSyncDelegate.h"
 #include "time-synchronization-delegate.h"
 
-#if TIME_SYNC_ENABLE_TSC_FEATURE
-#include <app/InteractionModelEngine.h>
-#endif
-
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -32,14 +29,15 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/SortUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/RuntimeOptionsProvider.h>
 
-#include <app-common/zap-generated/cluster-enums.h>
-
 #include <system/SystemClock.h>
+
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+#include <app/InteractionModelEngine.h>
+#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -380,9 +378,9 @@ void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource
         }
         return;
     }
-    mGranularity         = granularity;
-    EmberAfStatus status = TimeSource::Set(kRootEndpointId, timeSource);
-    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
+    mGranularity  = granularity;
+    Status status = TimeSource::Set(kRootEndpointId, timeSource);
+    if (!(status == Status::Success || status == Status::UnsupportedAttribute))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
     }
@@ -394,8 +392,8 @@ void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessfu
     {
         mGranularity = GranularityEnum::kMillisecondsGranularity;
         // Non-matter SNTP because we know it's external and there's only one source
-        EmberAfStatus status = TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
-        if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
+        Status status = TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
+        if (!(status == Status::Success || status == Status::UnsupportedAttribute))
         {
             ChipLogError(Zcl, "Writing TimeSource failed.");
         }
@@ -773,12 +771,13 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
     CHIP_ERROR err = UpdateUTCTime(utcTime);
     if (err != CHIP_NO_ERROR && !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
     {
-        ChipLogError(Zcl, "Error setting UTC time on the device");
+        ChipLogError(Zcl, "Error setting UTC time on the device: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-    mGranularity         = granularity;
-    EmberAfStatus status = TimeSource::Set(ep, source);
-    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
+    GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
+    mGranularity  = granularity;
+    Status status = TimeSource::Set(ep, source);
+    if (!(status == Status::Success || status == Status::UnsupportedAttribute))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
         return CHIP_IM_GLOBAL_STATUS(Failure);
@@ -1263,7 +1262,7 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
             return true;
         }
         bool dnsResolve;
-        if (EMBER_ZCL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
+        if (Status::Success != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
         {
             commandObj->AddStatus(commandPath, Status::Failure);
             return true;

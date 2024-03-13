@@ -152,3 +152,41 @@ Generate event `CarbonDioxideConcentrationMeasurement`, to change the CO2 value.
 ```
 $ echo '{"Name":"CarbonDioxideConcentrationMeasurement","NewValue":400}' > /tmp/chip_air_quality_fifo_<PID>
 ```
+
+Generate event `CarbonMonoxideConcentrationMeasurement`, to change the CO value.
+
+```
+$ echo '{"Name":"CarbonMonoxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `NitrogenDioxideConcentrationMeasurement`, to change the NO₂
+value.
+
+```
+$ echo '{"Name":"NitrogenDioxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `Pm1ConcentrationMeasurement`, to change the PM1 value.
+
+```
+echo '{"Name":"Pm1ConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `Pm25ConcentrationMeasurement`, to change the PM2.5 value.
+
+```
+echo '{"Name":"Pm25ConcentrationMeasurement","NewValue":2.5}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `Pm10ConcentrationMeasurement`, to change the PM10 value.
+
+```
+echo '{"Name":"Pm10ConcentrationMeasurement","NewValue":10}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `TotalVolatileOrganicCompoundsConcentrationMeasurement`, to
+change the TVOC value.
+
+```
+$ echo '{"Name":"TotalVolatileOrganicCompoundsConcentrationMeasurement","NewValue":100}' > /tmp/chip_air_quality_fifo_<PID>
+```

@@ -17,6 +17,7 @@ import sys
 import xmlrpc.client
 
 _DEFAULT_KEY = 'default'
+_DEFAULT_WAIT_FOR_MESSAGE_TIMEOUT_SECONDS = 10
 _IP = '127.0.0.1'
 _PORT = 9000
 
@@ -67,6 +68,18 @@ def _get_start_options(request):
             elif name == 'otaDownloadPath':
                 options.append('--otaDownloadPath')
                 options.append(str(value))
+            elif name == 'endUserSupportLogPath':
+                options.append('--end_user_support_log')
+                options.append(str(value))
+            elif name == 'networkDiagnosticsLogPath':
+                options.append('--network_diagnostics_log')
+                options.append(str(value))
+            elif name == 'crashLogPath':
+                options.append('--crash_log')
+                options.append(str(value))
+            elif name == 'traceDecode':
+                options.append('--trace_decode')
+                options.append(str(value))
             elif name == 'registerKey':
                 pass
             else:
@@ -104,9 +117,11 @@ class AccessoryServerBridge():
     def waitForMessage(request):
         register_key = _get_option(request, 'registerKey', _DEFAULT_KEY)
         message = _get_option(request, 'message')
+        timeout_in_seconds = _get_option(
+            request, 'timeoutInSeconds', _DEFAULT_WAIT_FOR_MESSAGE_TIMEOUT_SECONDS)
 
         with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
-            proxy.waitForMessage(register_key, [message])
+            proxy.waitForMessage(register_key, [message], timeout_in_seconds)
 
     def createOtaImage(request):
         otaImageFilePath = _get_option(request, 'otaImageFilePath')
@@ -114,7 +129,8 @@ class AccessoryServerBridge():
         rawImageContent = _get_option(request, 'rawImageContent')
 
         with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
-            proxy.createOtaImage(otaImageFilePath, rawImageFilePath, rawImageContent)
+            proxy.createOtaImage(
+                otaImageFilePath, rawImageFilePath, rawImageContent)
 
     def compareFiles(request):
         file1 = _get_option(request, 'file1')
@@ -122,3 +138,16 @@ class AccessoryServerBridge():
 
         with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
             proxy.compareFiles(file1, file2)
+
+    def createFile(request):
+        filePath = _get_option(request, 'filePath')
+        fileContent = _get_option(request, 'fileContent')
+
+        with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
+            proxy.createFile(filePath, fileContent)
+
+    def deleteFile(request):
+        filePath = _get_option(request, 'filePath')
+
+        with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
+            proxy.deleteFile(filePath)

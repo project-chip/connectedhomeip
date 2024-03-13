@@ -27,20 +27,6 @@
 
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
-#include <app/MessageDef/AttributeReportIBs.h>
-#include <app/MessageDef/ReportDataMessage.h>
-#include <lib/core/CHIPCore.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/DLLUtil.h>
-#include <lib/support/Pool.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
-#include <messaging/Flags.h>
-#include <protocols/Protocols.h>
-#include <protocols/interaction_model/Constants.h>
-#include <system/SystemPacketBuffer.h>
-
 #include <app/AttributePathParams.h>
 #include <app/CommandHandler.h>
 #include <app/CommandHandlerInterface.h>
@@ -50,10 +36,13 @@
 #include <app/ConcreteEventPath.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventPathParams.h>
-#include <app/ObjectList.h>
+#include <app/MessageDef/AttributeReportIBs.h>
+#include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
+#include <app/SubscriptionResumptionSessionEstablisher.h>
+#include <app/SubscriptionsInfoProvider.h>
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
@@ -61,6 +50,18 @@
 #include <app/reporting/ReportScheduler.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/LinkedList.h>
+#include <lib/support/Pool.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
+#include <protocols/Protocols.h>
+#include <protocols/interaction_model/Constants.h>
+#include <system/SystemPacketBuffer.h>
 
 #include <app/CASESessionManager.h>
 
@@ -78,7 +79,9 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback,
-                               public FabricTable::Delegate
+                               public FabricTable::Delegate,
+                               public SubscriptionsInfoProvider,
+                               public TimedHandlerDelegate
 {
 public:
     /**
@@ -184,22 +187,22 @@ public:
 
     reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
-    void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
+    void ReleaseAttributePathList(SingleLinkedListNode<AttributePathParams> *& aAttributePathList);
 
-    CHIP_ERROR PushFrontAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList,
+    CHIP_ERROR PushFrontAttributePathList(SingleLinkedListNode<AttributePathParams> *& aAttributePathList,
                                           AttributePathParams & aAttributePath);
 
     // If a concrete path indicates an attribute that is also referenced by a wildcard path in the request,
     // the path SHALL be removed from the list.
-    void RemoveDuplicateConcreteAttributePath(ObjectList<AttributePathParams> *& aAttributePaths);
+    void RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths);
 
-    void ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList);
+    void ReleaseEventPathList(SingleLinkedListNode<EventPathParams> *& aEventPathList);
 
-    CHIP_ERROR PushFrontEventPathParamsList(ObjectList<EventPathParams> *& aEventPathList, EventPathParams & aEventPath);
+    CHIP_ERROR PushFrontEventPathParamsList(SingleLinkedListNode<EventPathParams> *& aEventPathList, EventPathParams & aEventPath);
 
-    void ReleaseDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList);
+    void ReleaseDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList);
 
-    CHIP_ERROR PushFrontDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList,
+    CHIP_ERROR PushFrontDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
 
     CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
@@ -216,28 +219,30 @@ public:
     }
     void UnregisterReadHandlerAppCallback() { mpReadHandlerApplicationCallback = nullptr; }
 
-    /**
-     * Called when a timed interaction has failed (i.e. the exchange it was
-     * happening on has closed while the exchange delegate was the timed
-     * handler).
-     */
-    void OnTimedInteractionFailed(TimedHandler * apTimedHandler);
-
-    /**
-     * Called when a timed invoke is received.  This function takes over all
-     * handling of the exchange, status reporting, and so forth.
-     */
+    // TimedHandlerDelegate implementation
+    void OnTimedInteractionFailed(TimedHandler * apTimedHandler) override;
     void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
-                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-
-    /**
-     * Called when a timed write is received.  This function takes over all
-     * handling of the exchange, status reporting, and so forth.
-     */
+                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
-                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
+    /**
+     *  Activate the idle subscriptions.
+     *
+     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
+     * resubscription can be triggered via OnActiveModeNotification().
+     */
+    void OnActiveModeNotification(ScopedNodeId aPeer);
+
+    /**
+     *  Used to notify when a peer becomes LIT ICD or vice versa.
+     *
+     *  ReadClient will call this function when it finds any updates of the OperatingMode attribute from ICD management
+     * cluster. The application doesn't need to call this function, usually.
+     */
+    void OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType);
+
     /**
      * Add a read client to the internally tracked list of weak references. This list is used to
      * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
@@ -306,8 +311,9 @@ public:
 
     CHIP_ERROR ResumeSubscriptions();
 
-    // Check if a given subject (CAT or NodeId) has at least 1 active subscription
-    bool SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subject);
+    bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
+
+    bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
@@ -348,6 +354,19 @@ public:
     //
     void SetForceHandlerQuota(bool forceHandlerQuota) { mForceHandlerQuota = forceHandlerQuota; }
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    //
+    // Override the subscription timeout resumption retry interval seconds. The default retry interval will be
+    // 300s + GetFibonacciForIndex(retry_times) * 300s, which is too long for unit-tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetSubscriptionTimeoutResumptionRetryIntervalSeconds(int32_t seconds)
+    {
+        mSubscriptionResumptionRetrySecondsOverride = seconds;
+    }
+#endif
+
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
     // they don't provide for the ability to shut down those subscriptions after they've been established.
@@ -380,12 +399,17 @@ private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
+    friend class SubscriptionResumptionSessionEstablisher;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
+    void TryToResumeSubscriptions();
+
     ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
+
+    InteractionModelEngine * GetInteractionModelEngine() override { return this; }
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
@@ -567,9 +591,9 @@ private:
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     template <typename T, size_t N>
-    void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);
+    void ReleasePool(SingleLinkedListNode<T> *& aObjectList, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool);
     template <typename T, size_t N>
-    CHIP_ERROR PushFront(ObjectList<T> *& aObjectList, T & aData, ObjectPool<ObjectList<T>, N> & aObjectPool);
+    CHIP_ERROR PushFront(SingleLinkedListNode<T> *& aObjectList, T & aData, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
 
@@ -597,13 +621,13 @@ private:
                   "CHIP_IM_MAX_NUM_READS is too small to match the requirements of spec 8.5.1");
 #endif
 
-    ObjectPool<ObjectList<AttributePathParams>,
+    ObjectPool<SingleLinkedListNode<AttributePathParams>,
                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS>
         mAttributePathPool;
-    ObjectPool<ObjectList<EventPathParams>,
+    ObjectPool<SingleLinkedListNode<EventPathParams>,
                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS>
         mEventPathPool;
-    ObjectPool<ObjectList<DataVersionFilter>,
+    ObjectPool<SingleLinkedListNode<DataVersionFilter>,
                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS>
         mDataVersionFilterPool;
 
@@ -628,7 +652,10 @@ private:
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
     bool mForceHandlerQuota = false;
-#endif
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    int mSubscriptionResumptionRetrySecondsOverride = -1;
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool HasSubscriptionsToResume();

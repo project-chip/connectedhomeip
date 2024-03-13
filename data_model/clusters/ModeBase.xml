@@ -58,16 +58,14 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Mode Base" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial version"/>
-    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status"/>
+    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status.
+Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId name="Mode Base"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MODB" scope="Endpoint"/>
   <features>
-    <feature name="base reserved" summary="This range of bits is reserved for this base cluster">
-      <optionalConform/>
-    </feature>
-    <feature name="derived reserved" summary="This range of bits is reserved for derived clusters">
-      <optionalConform/>
-    </feature>
     <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
       <optionalConform/>
     </feature>
@@ -75,44 +73,35 @@ Davis, CA 95616, USA
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label" type="string" default="MS">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="64"/>
       </field>
       <field id="1" name="Mode" type="uint8" default="MS">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="ModeTags" type="list[ModeTagStruct Type]" default="MS">
-        <access read="true"/>
+      <field id="2" name="ModeTags" type="list" default="MS">
+        <entry type="ModeTagStruct"/>
         <mandatoryConform/>
-        <constraint type="max" value="8"/>
+        <constraint type="maxCount" value="8"/>
       </field>
     </struct>
     <struct name="ModeTagStruct">
       <field id="0" name="MfgCode" type="vendor-id">
-        <access read="true"/>
         <optionalConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="Value" type="enum16">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute name="base reserved">
-      <mandatoryConform/>
-    </attribute>
-    <attribute name="derived reserved">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0000" name="SupportedModes" type="list[ModeOptionStruct Type]" default="MS">
+    <attribute id="0x0000" name="SupportedModes" type="list" default="MS">
+      <entry type="ModeOptionStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="2" to="255"/>
+      <constraint type="countBetween" from="2" to="255"/>
     </attribute>
     <attribute id="0x0001" name="CurrentMode" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -136,7 +125,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command name="ChangeToMode" response="ChangeToModeResponse">
+    <command id="0x00" name="ChangeToMode" direction="commandToServer" response="ChangeToModeResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="NewMode" type="uint8">
@@ -144,7 +133,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command name="ChangeToModeResponse" direction="responseFromServer">
+    <command id="0x01" name="ChangeToModeResponse" direction="responseFromServer">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="enum8">
@@ -165,12 +154,6 @@ Davis, CA 95616, USA
       <field id="1" name="StatusText" type="string">
         <constraint type="maxLength" value="64"/>
       </field>
-    </command>
-    <command name="base reserved" direction="commandToClient">
-      <access invokePrivilege="operate"/>
-    </command>
-    <command name="derived reserved" direction="commandToClient">
-      <access invokePrivilege="operate"/>
     </command>
   </commands>
 </cluster>

@@ -54,53 +54,67 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Network Identity Management" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0450" name="Network Identity Management" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="TODO" scope="Endpoint"/>
+  <clusterIds>
+    <clusterId id="0x0450" name="Network Identity Management"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="NETIM" scope="Endpoint"/>
   <dataTypes>
     <number name="Client Table" type=""/>
-    <struct name="ClientStruct">
-      <field id="0" name="ClientNumber" type="uint16">
+    <enum name="NetworkIdentityStatus">
+      <item value="2" name="INVALID_SIGNATURE" summary="The provided signature is invalid">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="2047"/>
-      </field>
-      <field id="1" name="ClientIdentifier" type="octets">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="20"/>
-      </field>
-      <field id="2" name="Endorsements" type="list[EndorsementStruct Type]">
-        <mandatoryConform/>
-        <constraint type="between" from="1" to="SupportedFabrics"/>
-      </field>
-    </struct>
-    <struct name="EndorsementStruct">
+      </item>
+    </enum>
+    <struct name="ClientEndorsementStruct">
       <field id="0" name="NodeID" type="node-id" default="null">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <struct name="ClientStruct">
+      <field id="0" name="ClientNumber" type="uint16">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="2047"/>
+      </field>
+      <field id="1" name="ClientIdentifier" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="20"/>
+      </field>
+      <field id="2" name="Endorsements" type="list">
+        <entry type="ClientEndorsementStruct"/>
+        <mandatoryConform/>
+        <constraint type="countBetween" from="1" to="SupportedFabrics"/>
+      </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="NetworkIdentifier" type="octets" default="null">
+    <attribute id="0x0000" name="NetworkIdentifier" type="octstr">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="20"/>
     </attribute>
-    <attribute id="0x0001" name="NetworkIdentity" type="octets" default="null">
+    <attribute id="0x0001" name="NetworkIdentity" type="octstr" default="desc">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="140"/>
     </attribute>
-    <attribute id="0x0002" name="Clients" type="list[ClientStruct Type]">
+    <attribute id="0x0002" name="Clients" type="list">
+      <entry type="ClientStruct"/>
       <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="max" value="ClientTableSize"/>
+      <constraint type="maxCount" value="ClientTableSize"/>
     </attribute>
     <attribute id="0x0003" name="ClientTableSize" type="uint16" default="500">
       <access read="true" readPrivilege="view"/>
@@ -110,22 +124,10 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="SetNetworkIdentity" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
+    <command id="0x00" name="AddOrUpdateClient" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
-      <field id="0" name="NetworkIdentity" type="octets">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="140"/>
-      </field>
-      <field id="1" name="PrivateKey" type="octets">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
-      </field>
-    </command>
-    <command id="0x01" name="AddOrUpdateClient" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
-      <mandatoryConform/>
-      <field id="0" name="ClientIdentity" type="octets">
+      <field id="0" name="ClientIdentity" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="140"/>
       </field>
@@ -133,15 +135,34 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x02" name="RemoveClient" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
+    <command id="0x01" name="RemoveClient" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="ClientNumber" type="uint16">
         <optionalConform choice="a"/>
       </field>
-      <field id="1" name="ClientIdentifier" type="octets">
+      <field id="1" name="ClientIdentifier" type="octstr">
         <optionalConform choice="a"/>
         <constraint type="maxLength" value="20"/>
+      </field>
+    </command>
+    <command id="0x40" name="EndorseNetworkIdentityUpdate" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NetworkIdentifier" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="20"/>
+      </field>
+      <field id="1" name="PreviousNetworkIdentifiers" type="list">
+        <entry type="octstr">
+          <constraint type="maxLength" value="20"/>
+        </entry>
+        <mandatoryConform/>
+        <constraint type="countBetween" from="1" to="3"/>
+      </field>
+      <field id="2" name="Signature" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="64"/>
       </field>
     </command>
   </commands>

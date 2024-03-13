@@ -73,3 +73,8 @@ CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeUsingNTPFallback(const CharSpan & 
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+
+void DefaultTimeSyncDelegate::UTCTimeAvailabilityChanged(uint64_t time)
+{
+    // placeholder implementation
+}

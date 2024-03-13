@@ -50,6 +50,7 @@
 #include <memory>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <utility>
 
 #include <gio/gio.h>
 #include <gio/gunixfdlist.h>
@@ -71,6 +72,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "BluezConnection.h"
+#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -261,40 +263,38 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
 void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
-    BluezGattManager1 * gattMgr = BLUEZ_GATT_MANAGER1(aObject);
-
-    gboolean success =
-        bluez_gatt_manager1_call_register_application_finish(gattMgr, aResult, &MakeUniquePointerReceiver(error).Get());
+    gboolean success = bluez_gatt_manager1_call_register_application_finish(reinterpret_cast<BluezGattManager1 *>(aObject), aResult,
+                                                                            &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, {
         ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message);
-        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false, nullptr);
+        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false);
     });
 
-    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(true, nullptr);
+    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(true);
     ChipLogDetail(DeviceLayer, "BluezPeripheralRegisterAppDone done");
 }
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 {
-    GDBusObject * adapter;
-    BluezGattManager1 * gattMgr;
+    GDBusObject * adapterObject;
+    GAutoPtr<BluezGattManager1> gattMgr;
     GVariantBuilder optionsBuilder;
     GVariant * options;
 
-    VerifyOrExit(mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mpAdapter in %s", __func__));
+    VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
-    adapter = g_dbus_interface_get_object(G_DBUS_INTERFACE(mpAdapter));
-    VerifyOrExit(adapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapter in %s", __func__));
+    adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
+    VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    gattMgr = bluez_object_get_gatt_manager1(BLUEZ_OBJECT(adapter));
-    VerifyOrExit(gattMgr != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL gattMgr in %s", __func__));
+    gattMgr.reset(bluez_object_get_gatt_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
+    VerifyOrExit(gattMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL gattMgr in %s", __func__));
 
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
     options = g_variant_builder_end(&optionsBuilder);
 
     bluez_gatt_manager1_call_register_application(
-        gattMgr, mpRootPath, options, nullptr,
+        gattMgr.get(), mpRootPath, options, nullptr,
         +[](GObject * aObj, GAsyncResult * aResult, void * self) {
             reinterpret_cast<BluezEndpoint *>(self)->RegisterGattApplicationDone(aObj, aResult);
         },
@@ -344,11 +344,11 @@ void BluezEndpoint::BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClie
                                                           GDBusProxy * aInterface, GVariant * aChangedProperties,
                                                           const char * const * aInvalidatedProps)
 {
-    VerifyOrReturn(mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mpAdapter in %s", __func__));
+    VerifyOrReturn(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
     VerifyOrReturn(strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0, );
 
     BluezDevice1 * device = BLUEZ_DEVICE1(aInterface);
-    VerifyOrReturn(BluezIsDeviceOnAdapter(device, mpAdapter));
+    VerifyOrReturn(BluezIsDeviceOnAdapter(device, mAdapter.get()));
 
     UpdateConnectionTable(device);
 }
@@ -383,10 +383,10 @@ void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBu
 {
     // TODO: right now we do not handle addition/removal of adapters
     // Primary focus here is to handle addition of a device
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(aObject)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObject)));
     VerifyOrReturn(device.get() != nullptr);
 
-    if (BluezIsDeviceOnAdapter(device.get(), mpAdapter) == TRUE)
+    if (BluezIsDeviceOnAdapter(device.get(), mAdapter.get()) == TRUE)
     {
         HandleNewDevice(device.get());
     }
@@ -395,7 +395,7 @@ void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBu
 void BluezEndpoint::BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject)
 {
     // TODO: for Device1, lookup connection, and call otPlatTobleHandleDisconnected
-    // for Adapter1: unclear, crash if this pertains to our adapter? at least null out the self->mpAdapter.
+    // for Adapter1: unclear, crash if this pertains to our adapter? at least null out the self->mAdapter.
     // for Characteristic1, or GattService -- handle here via calling otPlatTobleHandleDisconnected, or ignore.
 }
 
@@ -421,52 +421,45 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
     return service;
 }
 
-void BluezEndpoint::SetupAdapter()
+CHIP_ERROR BluezEndpoint::SetupAdapter()
 {
     char expectedPath[32];
     snprintf(expectedPath, sizeof(expectedPath), BLUEZ_PATH "/hci%u", mAdapterId);
 
-    GList * objects = g_dbus_object_manager_get_objects(mpObjMgr);
-    for (auto l = objects; l != nullptr && mpAdapter == nullptr; l = l->next)
+    for (BluezObject & object : BluezObjectList(mpObjMgr))
     {
-        BluezObject * object = BLUEZ_OBJECT(l->data);
-
-        GList * interfaces = g_dbus_object_get_interfaces(G_DBUS_OBJECT(object));
-        for (auto ll = interfaces; ll != nullptr; ll = ll->next)
+        GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(&object));
+        if (adapter.get() != nullptr)
         {
-            if (BLUEZ_IS_ADAPTER1(ll->data))
-            { // we found the adapter
-                BluezAdapter1 * adapter = BLUEZ_ADAPTER1(ll->data);
-                if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
+            if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
+            {
+                if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter.get())), expectedPath) == 0)
                 {
-                    if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter)), expectedPath) == 0)
-                    {
-                        mpAdapter = static_cast<BluezAdapter1 *>(g_object_ref(adapter));
-                    }
+                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter.get())));
+                    break;
                 }
-                else
+            }
+            else
+            {
+                if (strcmp(bluez_adapter1_get_address(adapter.get()), mpAdapterAddr) == 0)
                 {
-                    if (strcmp(bluez_adapter1_get_address(adapter), mpAdapterAddr) == 0)
-                    {
-                        mpAdapter = static_cast<BluezAdapter1 *>(g_object_ref(adapter));
-                    }
+                    mAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter.get())));
+                    break;
                 }
             }
         }
-        g_list_free_full(interfaces, g_object_unref);
     }
 
-    VerifyOrExit(mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mpAdapter in %s", __func__));
+    VerifyOrReturnError(mAdapter, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
-    bluez_adapter1_set_powered(mpAdapter, TRUE);
+    bluez_adapter1_set_powered(mAdapter.get(), TRUE);
 
     // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
     // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
     // and the flag is necessary to force using LE transport.
-    bluez_adapter1_set_discoverable(mpAdapter, FALSE);
+    bluez_adapter1_set_discoverable(mAdapter.get(), FALSE);
 
-exit:
-    g_list_free_full(objects, g_object_unref);
+    return CHIP_NO_ERROR;
 }
 
 BluezConnection * BluezEndpoint::GetBluezConnection(const char * aPath)
@@ -613,22 +606,16 @@ void BluezEndpoint::SetupGattServer(GDBusConnection * aConn)
 CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
 {
     GAutoPtr<GError> err;
-    GAutoPtr<GDBusConnection> conn(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &MakeUniquePointerReceiver(err).Get()));
+    GAutoPtr<GDBusConnection> conn(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &err.GetReceiver()));
     VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, err->message));
 
-    if (mpAdapterName != nullptr)
-        mpOwningName = g_strdup_printf("%s", mpAdapterName);
-    else
-        mpOwningName = g_strdup_printf("C-%04x", getpid() & 0xffff);
-    ChipLogDetail(DeviceLayer, "TRACE: Bus acquired for name %s", mpOwningName);
-
     SetupGattServer(conn.get());
 
-    mpObjMgr = g_dbus_object_manager_client_new_sync(
-        conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
-        nullptr /* unused user data in the Proxy Type Func */, nullptr /*destroy notify */, nullptr /* cancellable */,
-        &MakeUniquePointerReceiver(err).Get());
+    mpObjMgr = g_dbus_object_manager_client_new_sync(conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
+                                                     bluez_object_manager_client_get_proxy_type,
+                                                     nullptr /* unused user data in the Proxy Type Func */,
+                                                     nullptr /*destroy notify */, nullptr /* cancellable */, &err.GetReceiver());
     VerifyOrReturnError(mpObjMgr != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", err->message));
 
@@ -662,26 +649,14 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplication()
     return err;
 }
 
-CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName)
+CHIP_ERROR BluezEndpoint::Init(bool aIsCentral, uint32_t aAdapterId)
 {
-    CHIP_ERROR err;
+    VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     mAdapterId = aAdapterId;
     mIsCentral = aIsCentral;
 
-    if (apBleAddr != nullptr)
-        mpAdapterAddr = g_strdup(apBleAddr);
-
-    if (!aIsCentral)
-    {
-        mpAdapterName = g_strdup(apBleName);
-    }
-    else
-    {
-        mpConnectCancellable = g_cancellable_new();
-    }
-
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
@@ -689,6 +664,13 @@ CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char 
     mIsInitialized = true;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BluezEndpoint::Init(bool aIsCentral, const char * apBleAddr)
+{
+    VerifyOrReturnError(!mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    mpAdapterAddr = g_strdup(apBleAddr);
+    return Init(aIsCentral, mAdapterId);
 }
 
 void BluezEndpoint::Shutdown()
@@ -703,10 +685,7 @@ void BluezEndpoint::Shutdown()
         +[](BluezEndpoint * self) {
             if (self->mpObjMgr != nullptr)
                 g_object_unref(self->mpObjMgr);
-            if (self->mpAdapter != nullptr)
-                g_object_unref(self->mpAdapter);
-            if (self->mpDevice != nullptr)
-                g_object_unref(self->mpDevice);
+            self->mAdapter.reset();
             if (self->mpRoot != nullptr)
                 g_object_unref(self->mpRoot);
             if (self->mpService != nullptr)
@@ -717,14 +696,10 @@ void BluezEndpoint::Shutdown()
                 g_object_unref(self->mpC2);
             if (self->mpC3 != nullptr)
                 g_object_unref(self->mpC3);
-            if (self->mpConnectCancellable != nullptr)
-                g_object_unref(self->mpConnectCancellable);
             return CHIP_NO_ERROR;
         },
         this);
 
-    g_free(mpOwningName);
-    g_free(mpAdapterName);
     g_free(mpAdapterAddr);
     g_free(mpRootPath);
     g_free(mpServicePath);
@@ -735,67 +710,48 @@ void BluezEndpoint::Shutdown()
 
 // ConnectDevice callbacks
 
-void BluezEndpoint::ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams)
+CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice)
 {
-    BluezDevice1 * device  = BLUEZ_DEVICE1(aObject);
-    ConnectParams * params = static_cast<ConnectParams *>(apParams);
-    GAutoPtr<GError> error;
-
-    if (!bluez_device1_call_connect_finish(device, aResult, &MakeUniquePointerReceiver(error).Get()))
+    // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
+    // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
+    // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
+    // It's important to make sure that the connection is correctly ceased, by calling `Disconnect()`
+    // D-Bus method, or else `Connect()` returns immediately without any effect.
+    for (uint16_t i = 0; i < kMaxConnectRetries; i++)
     {
-        ChipLogError(DeviceLayer, "FAIL: ConnectDevice : %s (%d)", error->message, error->code);
-
-        // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
-        // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
-        // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
-        // It's important to make sure that the connection is correctly ceased, by calling `Disconnect()`
-        // D-Bus method, or else `Connect()` returns immediately without any effect.
-        if (g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_DBUS_ERROR) && params->mNumRetries++ < kMaxConnectRetries)
+        GAutoPtr<GError> error;
+        if (bluez_device1_call_connect_sync(&aDevice, mConnectCancellable.get(), &error.GetReceiver()))
         {
-            // Clear the error before usage in subsequent call.
-            g_clear_error(&MakeUniquePointerReceiver(error).Get());
-
-            bluez_device1_call_disconnect_sync(device, nullptr, &MakeUniquePointerReceiver(error).Get());
-            bluez_device1_call_connect(device, params->mEndpoint.mpConnectCancellable, ConnectDeviceDone, params);
-            return;
+            ChipLogDetail(DeviceLayer, "ConnectDevice complete");
+            return CHIP_NO_ERROR;
         }
 
-        BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
-    }
-    else
-    {
-        ChipLogDetail(DeviceLayer, "ConnectDevice complete");
+        ChipLogError(DeviceLayer, "FAIL: ConnectDevice: %s (%d)", error->message, error->code);
+        if (!g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_DBUS_ERROR))
+        {
+            break;
+        }
+
+        ChipLogProgress(DeviceLayer, "ConnectDevice retry: %u out of %u", i + 1, kMaxConnectRetries);
+        bluez_device1_call_disconnect_sync(&aDevice, nullptr, nullptr);
     }
 
-    chip::Platform::Delete(params);
-}
-
-CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(ConnectParams * apParams)
-{
-    g_cancellable_reset(apParams->mEndpoint.mpConnectCancellable);
-    bluez_device1_call_connect(apParams->mpDevice, apParams->mEndpoint.mpConnectCancellable, ConnectDeviceDone, apParams);
-    return CHIP_NO_ERROR;
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
+    return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
 {
-    auto params = chip::Platform::New<ConnectParams>(*this, &aDevice);
-    VerifyOrReturnError(params != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    if (PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectDeviceImpl, params) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "Failed to schedule ConnectDeviceImpl() on CHIPoBluez thread");
-        chip::Platform::Delete(params);
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    return CHIP_NO_ERROR;
+    auto params = std::make_pair(this, &aDevice);
+    mConnectCancellable.reset(g_cancellable_new());
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](typeof(params) * aParams) { return aParams->first->ConnectDeviceImpl(*aParams->second); }, &params);
 }
 
 void BluezEndpoint::CancelConnect()
 {
-    VerifyOrDie(mpConnectCancellable != nullptr);
-    g_cancellable_cancel(mpConnectCancellable);
+    g_cancellable_cancel(mConnectCancellable.get());
+    mConnectCancellable.reset();
 }
 
 } // namespace Internal

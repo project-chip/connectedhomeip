@@ -50,6 +50,8 @@ chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGr
 // All fabrics share the same ICD client storage.
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
+chip::app::DefaultCheckInDelegate CHIPCommand::sCheckInDelegate;
+chip::app::CheckInHandler CHIPCommand::sCheckInHandler;
 
 namespace {
 
@@ -137,7 +139,21 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
+    auto systemState = chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState();
+    VerifyOrReturnError(nullptr != systemState, CHIP_ERROR_INCORRECT_STATE);
+
+    auto server = systemState->BDXTransferServer();
+    VerifyOrReturnError(nullptr != server, CHIP_ERROR_INCORRECT_STATE);
+
+    server->SetDelegate(&BDXDiagnosticLogsServerDelegate::GetInstance());
+
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
+
+    auto engine = chip::app::InteractionModelEngine::GetInstance();
+    VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage, engine));
+    ReturnLogErrorOnFailure(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
+                                                 &sICDClientStorage, &sCheckInDelegate, engine));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));
@@ -150,7 +166,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
             cdTrustStorePath = getenv(kCDTrustStorePathVariable);
         }
 
-        auto additionalCdCerts = chip::Credentials::LoadAllX509DerCerts(cdTrustStorePath);
+        auto additionalCdCerts =
+            chip::Credentials::LoadAllX509DerCerts(cdTrustStorePath, chip::Credentials::CertificateValidationMode::kPublicKeyOnly);
         if (cdTrustStorePath != nullptr && additionalCdCerts.size() == 0)
         {
             ChipLogError(chipTool, "Warning: no CD signing certs found in path: %s, only defaults will be used", cdTrustStorePath);

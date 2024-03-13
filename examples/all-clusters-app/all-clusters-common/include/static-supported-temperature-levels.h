@@ -20,7 +20,7 @@
 
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/af.h>
-#include <zap-generated/gen_config.h>
+#include <app/util/config.h>
 
 namespace chip {
 namespace app {
@@ -49,7 +49,7 @@ class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsI
     static CharSpan temperatureLevelOptions[3];
 
 public:
-    static const EndpointPair supportedOptionsByEndpoints[EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    static const EndpointPair supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
     uint8_t Size() override;
 

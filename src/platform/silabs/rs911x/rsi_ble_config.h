@@ -14,17 +14,16 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
-
-#ifndef RSI_BLE_CONFIG_H
-#define RSI_BLE_CONFIG_H
+#pragma once
 
 #include "rsi_ble_apis.h"
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "rsi_bt_common_apis.h"
 #include "rsi_user.h"
 #else
 #include <rsi_data_types.h>
 #endif
+
 /******************************************************
  * *                      Macros
  * ******************************************************/
@@ -40,7 +39,10 @@
 #define RSI_BLE_GATT_WRITE_EVENT (0x03)
 #define RSI_BLE_MTU_EVENT (0x04)
 #define RSI_BLE_GATT_INDICATION_CONFIRMATION (0x05)
+#define RSI_BLE_RESP_ATT_VALUE (0x06)
 #define RSI_BLE_EVENT_GATT_RD (0x08)
+#define RSI_BLE_ADDR_LENGTH 6
+
 #define RSI_SSID (0x0D)
 #define RSI_SECTYPE (0x0E)
 #define RSI_BLE_WLAN_DISCONN_NOTIFY (0x0F)
@@ -57,6 +59,7 @@
 #define RSI_BLE_DEV_NAME "CCP_DEVICE"
 #define RSI_BLE_SET_RAND_ADDR "00:23:A7:12:34:56"
 #define RSI_BLE_EVENT_GATT_RD (0x08)
+#define RSI_BLE_ADDR_LENGTH 6
 
 #define CLEAR_WHITELIST (0x00)
 #define ADD_DEVICE_TO_WHITELIST (0x01)
@@ -70,6 +73,8 @@
 #define RSI_BLE_TX_TIME 2120 // microseconds
 #define RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH 240
 
+#define GATT_READ_ZERO_OFFSET 0x00
+#define GATT_READ_RESP 0x00
 #define ALL_PHYS (0x00)
 
 #define RSI_BLE_DEV_ADDR_RESOLUTION_ENABLE (0)
@@ -89,27 +94,27 @@
 #define RSI_BLE_CUSTOM_SERVICE_UUID (0xFFF6)
 #define RSI_BLE_CUSTOM_LEVEL_UUID (0x1FF1)
 
-#ifdef RSI_M4_INTERFACE
+#if (defined(RSI_M4_INTERFACE) || defined(SLI_SI91X_MCU_INTERFACE))
 #define RSI_BLE_MAX_NBR_ATT_REC (20)
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (1)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (1)
-#endif
+#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 
 #define RSI_BLE_NUM_CONN_EVENTS (2)
 #else
 #define RSI_BLE_MAX_NBR_ATT_REC (80)
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (3)
-#endif
+#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 
 #define RSI_BLE_NUM_CONN_EVENTS (20)
-#endif
+#endif // (defined(RSI_M4_INTERFACE) || defined(SLI_SI91X_MCU_INTERFACE))
 
 #define RSI_BLE_MAX_NBR_ATT_SERV (10)
 
@@ -132,7 +137,7 @@
 
 #define RSI_BLE_ADV_TYPE UNDIR_CONN
 #define RSI_BLE_ADV_FILTER_TYPE ALLOW_SCAN_REQ_ANY_CONN_REQ_ANY
-#define RSI_BLE_ADV_DIR_ADDR_TYPE LE_PUBLIC_ADDRESS
+#define RSI_BLE_ADV_DIR_ADDR_TYPE LE_RANDOM_ADDRESS
 #define RSI_BLE_ADV_DIR_ADDR "00:15:83:6A:64:17"
 
 //! Reduced the BLE adv interval time to match with EFR BLE
@@ -259,23 +264,23 @@
 #define BLE_ATT_REC_SIZE (500)
 #define NO_OF_VAL_ATT (5) //! Attribute value count
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_CENTRALS (1)
 #define FRONT_END_SWITCH_SEL2 BIT(30)
 #define RSI_FEATURE_BIT_MAP                                                                                                        \
     (SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1) //! To set wlan feature select bit map
 #define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT) //! TCP/IP feature select bitmap for selecting TCP/IP features
-#define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_FEAT_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
+#define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
 
 #ifdef CHIP_9117
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION // Adding Support for WPA3 transition
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
-    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV |                       \
+    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV |              \
      SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 | SL_SI91X_EXT_FEAT_IEEE_80211W)
 #else
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
-    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV |                       \
+    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV |              \
      SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0)
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
 #else  // EXP_BOARD
@@ -309,5 +314,3 @@ typedef struct rsi_ble_s
     uint16_t att_rec_list_count;
     rsi_ble_att_list_t att_rec_list[NO_OF_VAL_ATT];
 } rsi_ble_t;
-
-#endif

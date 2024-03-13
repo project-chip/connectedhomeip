@@ -27,7 +27,7 @@ using namespace chip::app::Clusters::SampleMei::Attributes;
 
 void MatterSampleMeiPluginServerInitCallback()
 {
-    ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
+    ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(&SampleMeiServer::Instance()));
     VerifyOrReturn(registerAttributeAccessOverride(&SampleMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
@@ -84,7 +84,7 @@ void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
     {
     case Commands::Ping::Id:
         HandleCommand<Commands::Ping::DecodableType>(
-            ctxt, [this, endpoint, fabricIndex, endpointIndex, ctxt](HandlerContext & ctx, const auto & req) {
+            ctxt, [this, endpoint, fabricIndex, endpointIndex](HandlerContext & ctx, const auto & req) {
                 ChipLogProgress(Zcl, "Ping Command on Ep %d", endpoint);
                 Events::PingCountEvent::Type event{ .count = content[endpointIndex].pingCount++, .fabricIndex = fabricIndex };
                 chip::EventNumber placeholderEventNumber;

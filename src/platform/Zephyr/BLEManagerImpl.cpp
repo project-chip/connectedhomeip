@@ -39,7 +39,12 @@
 
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
+#include <zephyr/bluetooth/hci.h>
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <zephyr/random/rand32.h>
+#else
+#include <zephyr/random/random.h>
+#endif
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 

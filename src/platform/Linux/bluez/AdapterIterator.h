@@ -17,13 +17,15 @@
 
 #pragma once
 
-#include <string>
+#include <cstdint>
 
 #include <gio/gio.h>
 
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
+#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -46,8 +48,6 @@ namespace Internal {
 class AdapterIterator
 {
 public:
-    ~AdapterIterator();
-
     /// Moves to the next DBUS interface.
     ///
     /// MUST be called before any of the 'current value' methods are
@@ -56,16 +56,16 @@ public:
 
     // Information about the current value. Safe to call only after
     // "Next" has returned true.
-    uint32_t GetIndex() const { return mCurrent.index; }
-    const char * GetAddress() const { return mCurrent.address.c_str(); }
-    const char * GetAlias() const { return mCurrent.alias.c_str(); }
-    const char * GetName() const { return mCurrent.name.c_str(); }
-    bool IsPowered() const { return mCurrent.powered; }
-    BluezAdapter1 * GetAdapter() const { return mCurrent.adapter; }
+    uint32_t GetIndex() const;
+    const char * GetAddress() const { return bluez_adapter1_get_address(mCurrentAdapter.get()); }
+    const char * GetAlias() const { return bluez_adapter1_get_alias(mCurrentAdapter.get()); }
+    const char * GetName() const { return bluez_adapter1_get_name(mCurrentAdapter.get()); }
+    bool IsPowered() const { return bluez_adapter1_get_powered(mCurrentAdapter.get()); }
+    BluezAdapter1 * GetAdapter() const { return mCurrentAdapter.get(); }
 
 private:
     /// Sets up the DBUS manager and loads the list
-    static CHIP_ERROR Initialize(AdapterIterator * self);
+    CHIP_ERROR Initialize();
 
     /// Loads the next value in the list.
     ///
@@ -73,23 +73,11 @@ private:
     /// iterate through.
     bool Advance();
 
-    static constexpr size_t kMaxAddressLength = 19; // xx:xx:xx:xx:xx:xx
-    static constexpr size_t kMaxNameLength    = 64;
-
-    GDBusObjectManager * mManager = nullptr; // DBus connection
-    GList * mObjectList           = nullptr; // listing of objects on the bus
-    GList * mCurrentListItem      = nullptr; // current item viewed in the list
-
-    // data valid only if Next() returns true
-    struct
-    {
-        uint32_t index;
-        std::string address;
-        std::string alias;
-        std::string name;
-        bool powered;
-        BluezAdapter1 * adapter;
-    } mCurrent = { 0 };
+    GAutoPtr<GDBusObjectManager> mManager;
+    BluezObjectList mObjectList;
+    BluezObjectIterator mIterator;
+    // Data valid only if Next() returns true
+    GAutoPtr<BluezAdapter1> mCurrentAdapter;
 };
 
 } // namespace Internal

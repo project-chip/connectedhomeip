@@ -30,12 +30,12 @@ if (lwip_platform == "") {
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13xx_26xx" || lwip_platform == "cc32xx" ||
            lwip_platform == "nxp" || lwip_platform == "silabs" ||
-           lwip_platform == "k32w0" || lwip_platform == "k32w1" ||
-           lwip_platform == "qpg" || lwip_platform == "mbed" ||
-           lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
-           lwip_platform == "bl602" || lwip_platform == "mw320" ||
-           lwip_platform == "bl702" || lwip_platform == "bl702l" ||
-           lwip_platform == "mt793x" || lwip_platform == "asr",
+           lwip_platform == "k32w0" || lwip_platform == "qpg" ||
+           lwip_platform == "mbed" || lwip_platform == "psoc6" ||
+           lwip_platform == "cyw30739" || lwip_platform == "bl602" ||
+           lwip_platform == "mw320" || lwip_platform == "bl702" ||
+           lwip_platform == "bl702l" || lwip_platform == "mt793x" ||
+           lwip_platform == "asr",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -56,8 +56,6 @@ if (lwip_platform == "cc13xx_26xx") {
   import("${qpg_sdk_build_root}/qpg_sdk.gni")
 } else if (lwip_platform == "k32w0") {
   import("//build_overrides/k32w0_sdk.gni")
-} else if (lwip_platform == "k32w1") {
-  import("//build_overrides/k32w1_sdk.gni")
 } else if (lwip_platform == "psoc6") {
   import("//build_overrides/psoc6.gni")
 } else if (lwip_platform == "cyw30739") {
@@ -225,12 +223,15 @@ if (current_os == "zephyr" || current_os == "mbed") {
           [ "${chip_root}/third_party/lwip/repo/lwip/src/apps/mdns/mdns.c" ]
     } else if (lwip_platform == "silabs") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+
+      sources += [
+        "${lwip_platform}/lwipopts-rs911x.h",
+        "${lwip_platform}/lwipopts-wf200.h",
+      ]
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
     } else if (lwip_platform == "k32w0") {
       public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
-    } else if (lwip_platform == "k32w1") {
-      public_deps += [ "${k32w1_sdk_build_root}:k32w1_sdk" ]
     } else if (lwip_platform == "cyw30739") {
       public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
     } else if (lwip_platform == "bl702") {

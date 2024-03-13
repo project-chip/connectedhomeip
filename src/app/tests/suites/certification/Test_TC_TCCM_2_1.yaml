@@ -38,6 +38,7 @@ tests:
 
           Verify that the DUT response contains list of ModeOptionsStruct entries
           - Verify that the list has two or more entries
+          - Verify that PIXIT.TCCM.MODE_CHANGE_FAIL is one of supported_modes_dut
           - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1690189665.585798][16159:16161] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0052 Attribute 0x0000_0000 DataVersion: 473867547
@@ -99,13 +100,13 @@ tests:
     - label:
           "Step 5: Manually put the device in a state from which it will FAIL to
           transition to PIXIT.TCCM.MODE_CHANGE_FAIL"
-      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Manual operation required
       disabled: true
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
-      PICS: TCCM.S.A0001
+      PICS: TCCM.S.A0001 && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 
@@ -147,12 +148,13 @@ tests:
     - label:
           "Step 9: Manually put the device in a state from which it will
           SUCCESSFULLY transition to PIXIT.TCCM.MODE_CHANGE_OK"
+      PICS: TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Manual operation required
       disabled: true
 
     - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
-      PICS: TCCM.S.A0001
+      PICS: TCCM.S.A0001 && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool refrigeratorandtemperaturecontrolledcabinetmode read current-mode 1 1
 

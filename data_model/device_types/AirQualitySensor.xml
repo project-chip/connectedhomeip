@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002c" name="Air Quality Sensor" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002C" name="Air Quality Sensor" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release of this document"/>
   </revisionHistory>
@@ -65,7 +65,7 @@ Davis, CA 95616, USA
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x005b" name="Air Quality" side="server">
+    <cluster id="0x005B" name="Air Quality" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0402" name="Temperature Measurement" side="server">
@@ -74,10 +74,10 @@ Davis, CA 95616, USA
     <cluster id="0x0405" name="Relative Humidity Measurement" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x040c" name="Carbon Monoxide Concentration Measurement" side="server">
+    <cluster id="0x040C" name="Carbon Monoxide Concentration Measurement" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x040d" name="Carbon Dioxide Concentration Measurement" side="server">
+    <cluster id="0x040D" name="Carbon Dioxide Concentration Measurement" side="server">
       <optionalConform/>
     </cluster>
     <cluster id="0x0413" name="Nitrogen Dioxide Concentration Measurement" side="server">
@@ -86,22 +86,22 @@ Davis, CA 95616, USA
     <cluster id="0x0415" name="Ozone Concentration Measurement" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x042a" name="PM2.5 Concentration Measurement" side="server">
+    <cluster id="0x042A" name="PM2" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x042b" name="Formaldehyde Concentration Measurement" side="server">
+    <cluster id="0x042B" name="Formaldehyde Concentration Measurement" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x042c" name="PM1 Concentration Measurement" side="server">
+    <cluster id="0x042C" name="PM1 Concentration Measurement" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x042d" name="PM10 Concentration Measurement" side="server">
+    <cluster id="0x042D" name="PM10 Concentration Measurement" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x042e" name="Total Volatile Organic Compounds Concentration Measurement" side="server">
+    <cluster id="0x042E" name="Total Volatile Organic Compounds Concentration Measurement" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x042f" name="Radon Concentration Measurement" side="server">
+    <cluster id="0x042F" name="Radon Concentration Measurement" side="server">
       <optionalConform/>
     </cluster>
   </clusters>

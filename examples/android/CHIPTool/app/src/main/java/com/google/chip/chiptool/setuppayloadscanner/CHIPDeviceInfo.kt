@@ -36,6 +36,7 @@ data class CHIPDeviceInfo(
   val discoveryCapabilities: MutableSet<DiscoveryCapability> = mutableSetOf(),
   val isShortDiscriminator: Boolean = false,
   val ipAddress: String? = null,
+  val port: Int = 5540
 ) : Parcelable {
 
   companion object {

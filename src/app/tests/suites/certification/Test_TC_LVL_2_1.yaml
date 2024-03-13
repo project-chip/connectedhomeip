@@ -23,7 +23,8 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: Reads the CurrentLevel attribute"
+    - label: "Step 1: TH reads the CurrentLevel attribute from the DUT"
       PICS: LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -42,7 +43,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Step 2: Reads the RemainingTime attribute"
+    - label: "Step 2: TH reads the RemainingTime attribute from the DUT"
       PICS: LVL.S.A0001
       command: "readAttribute"
       attribute: "RemainingTime"
@@ -52,7 +53,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 3a: Reads the MinLevel attribute"
+    - label: "Step 3a: TH reads the MinLevel attribute from the DUT"
       PICS: LVL.S.A0002 && LVL.S.F01
       command: "readAttribute"
       attribute: "MinLevel"
@@ -62,7 +63,7 @@ tests:
           constraints:
               type: int8u
 
-    - label: "Step 3b: Reads the MinLevel attribute"
+    - label: "Step 3b: TH reads the MinLevel attribute from the DUT"
       PICS: LVL.S.A0002 && !LVL.S.F01
       command: "readAttribute"
       attribute: "MinLevel"
@@ -73,7 +74,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Step 4: Reads the MaxLevel attribute"
+    - label: "Step 4: TH reads the MaxLevel attribute from the DUT"
       PICS: LVL.S.A0003 && LVL.S.F01
       command: "readAttribute"
       attribute: "MaxLevel"
@@ -84,7 +85,7 @@ tests:
               type: int8u
               minValue: MinLevelValue
 
-    - label: "Step 4a: Reads the MaxLevel attribute"
+    - label: "Step 4a: TH reads the MaxLevel attribute from the DUT"
       PICS: LVL.S.A0003 && !LVL.S.F01
       command: "readAttribute"
       attribute: "MaxLevel"
@@ -95,7 +96,7 @@ tests:
               minValue: MinLevelFeatureMapNotSupportedValue
               maxValue: 254
 
-    - label: "Step 4b & 4C Reads the CurrentLevel attribute"
+    - label: "Step 4b & 4C TH reads the CurrentLevel attribute"
       PICS: LVL.S.F01 && LVL.S.A0002 && LVL.S.A0003
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -105,7 +106,7 @@ tests:
               minValue: MinLevelValue
               maxValue: MaxLevelValue
 
-    - label: "Step 4b & 4C Reads the CurrentLevel attribute"
+    - label: "Step 4b & 4C TH reads the CurrentLevel attribute"
       PICS: LVL.S.A0002 && LVL.S.A0003 && !LVL.S.F01
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -115,7 +116,7 @@ tests:
               minValue: MinLevelFeatureMapNotSupportedValue
               maxValue: MaxLevelFeatureMapNotSupportedValue
 
-    - label: "Step 5: Reads the CurrentFrequency attribute"
+    - label: "Step 5: TH reads the CurrentFrequency attribute from the DUT"
       PICS: LVL.S.A0004
       command: "readAttribute"
       attribute: "CurrentFrequency"
@@ -125,7 +126,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 6: Reads the MinFrequency attribute"
+    - label: "Step 6: TH reads the MinFrequency attribute from the DUT"
       PICS: LVL.S.A0005
       command: "readAttribute"
       attribute: "MinFrequency"
@@ -136,7 +137,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 7: Reads the MaxFrequency attribute"
+    - label: "Step 7: TH reads the MaxFrequency attribute from the DUT"
       PICS: LVL.S.A0006
       command: "readAttribute"
       attribute: "MaxFrequency"
@@ -147,7 +148,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 7b & 7C Reads the CurrentFrequency attribute"
+    - label: "Step 7b & 7C TH reads the CurrentFrequency attribute"
       PICS: LVL.S.A0004 && LVL.S.A0005 && LVL.S.A0006
       command: "readAttribute"
       attribute: "CurrentFrequency"
@@ -157,7 +158,7 @@ tests:
               minValue: MinFrequencyValue
               maxValue: MaxFrequencyValue
 
-    - label: "Step 8: Reads the OnOffTransitionTime attribute"
+    - label: "Step 8: TH reads the OnOffTransitionTime attribute"
       PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "OnOffTransitionTime"
@@ -167,7 +168,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 9a: Reads the OnLevel attribute "
+    - label: "Step 9a: TH reads the OnLevel attribute from the DUT"
       PICS: LVL.S.F01 && LVL.S.A0011
       command: "readAttribute"
       attribute: "OnLevel"
@@ -177,7 +178,7 @@ tests:
               minValue: MinLevelValue
               maxValue: MaxLevelValue
 
-    - label: "Step 9b: Reads the OnLevel attribute "
+    - label: "Step 9b: TH reads the OnLevel attribute from the DUT"
       PICS: LVL.S.A0011 && !LVL.S.F01
       command: "readAttribute"
       attribute: "OnLevel"
@@ -187,7 +188,7 @@ tests:
               minValue: MinLevelFeatureMapNotSupportedValue
               maxValue: MaxLevelFeatureMapNotSupportedValue
 
-    - label: "Step 10: Reads the OnTransitionTime attribute "
+    - label: "Step 10: TH reads the OnTransitionTime attribute from the DUT"
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "OnTransitionTime"
@@ -197,7 +198,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 11: Reads the OffTransitionTime attribute "
+    - label: "Step 11: TH reads the OffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "OffTransitionTime"
@@ -207,7 +208,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 12: Reads the DefaultMoveRate attribute "
+    - label: "Step 12: TH reads the DefaultMoveRate attribute from the DUT"
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "DefaultMoveRate"
@@ -217,7 +218,7 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Step 13: Reads the Options attribute "
+    - label: "Step 13: TH reads the Options attribute from the DUT"
       PICS: LVL.S.A000f
       command: "readAttribute"
       attribute: "Options"
@@ -225,7 +226,7 @@ tests:
           constraints:
               type: bitmap8
 
-    - label: "Step 14: Reads the StartUpCurrentLevel attribute "
+    - label: "Step 14: TH reads the StartUpCurrentLevel attribute from the DUT"
       PICS: LVL.S.A4000
       command: "readAttribute"
       attribute: "StartUpCurrentLevel"

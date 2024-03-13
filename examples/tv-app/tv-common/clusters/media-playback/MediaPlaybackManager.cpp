@@ -277,42 +277,32 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
 
 bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)
 {
-    bool foundMatch = false;
+    std::string idString(trackId.data(), trackId.size());
     for (auto const & availableAudioTrack : mAvailableAudioTracks)
     {
-        if (strcmp(availableAudioTrack.id.data(), trackId.data()) == 0)
+        std::string nextIdString(availableAudioTrack.id.data(), availableAudioTrack.id.size());
+        if (nextIdString == idString)
         {
             mActiveAudioTrack = availableAudioTrack;
-            foundMatch        = true;
+            return true;
         }
     }
-
-    if (!foundMatch)
-    {
-        // return an error
-    }
-
-    return true;
+    return false;
 }
 
 bool MediaPlaybackManager::HandleActivateTextTrack(const chip::CharSpan & trackId)
 {
-    bool foundMatch = false;
+    std::string idString(trackId.data(), trackId.size());
     for (auto const & availableTextTrack : mAvailableTextTracks)
     {
-        if (strcmp(availableTextTrack.id.data(), trackId.data()) == 0)
+        std::string nextIdString(availableTextTrack.id.data(), availableTextTrack.id.size());
+        if (nextIdString == idString)
         {
-            mActiveAudioTrack = availableTextTrack;
-            foundMatch        = true;
+            mActiveTextTrack = availableTextTrack;
+            return true;
         }
     }
-
-    if (!foundMatch)
-    {
-        // return an error
-    }
-
-    return true;
+    return false;
 }
 
 bool MediaPlaybackManager::HandleDeactivateTextTrack()
@@ -327,12 +317,29 @@ bool MediaPlaybackManager::HandleDeactivateTextTrack()
 
 uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return mDynamicEndpointFeatureMap;
+        return kEndpointFeatureMap;
     }
 
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
+}
+
+uint16_t MediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    if (!success)
+    {
+        ChipLogError(Zcl, "MediaPlaybackManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }

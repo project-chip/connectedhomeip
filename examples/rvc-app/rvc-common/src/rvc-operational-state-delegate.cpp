@@ -33,15 +33,13 @@ CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
-                                                                   OperationalState::GenericOperationalPhase & operationalPhase)
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
-    if (index >= ArraySize(mOperationalPhaseList))
+    if (index >= mOperationalPhaseList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalPhase = mOperationalPhaseList[index];
-    return CHIP_NO_ERROR;
+    return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
 void RvcOperationalStateDelegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
@@ -52,4 +50,9 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(OperationalState::Gen
 void RvcOperationalStateDelegate::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
 {
     (mResumeRvcDeviceInstance->*mResumeCallback)(err);
+}
+
+void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
+{
+    (mGoHomeRvcDeviceInstance->*mGoHomeCallback)(err);
 }

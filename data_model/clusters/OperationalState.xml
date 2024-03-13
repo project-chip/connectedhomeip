@@ -55,12 +55,27 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0060" name="Operational State" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0060" name="Operational State" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Define reserved ranges for base/derived clusters."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0060" name="Operational State"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="OPSTATE" scope="Endpoint"/>
   <dataTypes>
+    <enum name="ErrorStateEnum">
+      <item from="0x00" to="0x3F" name="GeneralErrors" summary="Generally applicable values for error, defined herein">
+        <mandatoryConform/>
+      </item>
+      <item from="0x40" to="0x7F" name="DerivedClusterErrors" summary="Derived Cluster defined errors">
+        <mandatoryConform/>
+      </item>
+      <item from="0x80" to="0xBF" name="ManufacturerError" summary="Vendor specific errors">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="OperationalStateEnum">
       <item from="0x00" to="0x3F" name="GeneralStates" summary="Generally applicable values for state, defined herein">
         <mandatoryConform/>
@@ -73,38 +88,22 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="ErrorStateStruct">
-      <field id="0" name="ErrorStateID" type="enum8" default="0">
-        <enum>
-          <item from="0x00" to="0x3F" name="GeneralErrors" summary="Generally applicable values for error, defined herein">
-            <mandatoryConform/>
-          </item>
-          <item from="0x40" to="0x7F" name="DerivedClusterErrors" summary="Derived Cluster defined errors">
-            <mandatoryConform/>
-          </item>
-          <item from="0x80" to="0xBF" name="ManufacturerError" summary="Vendor specific errors">
-            <mandatoryConform/>
-          </item>
-        </enum>
-        <access read="true" write="true"/>
+      <field id="0" name="ErrorStateID" type="ErrorStateEnum" default="0">
         <mandatoryConform/>
       </field>
       <field id="1" name="ErrorStateLabel" type="string" default="empty">
-        <access read="true" write="true"/>
         <constraint type="maxLength" value="64"/>
       </field>
       <field id="2" name="ErrorStateDetails" type="string" default="empty">
-        <access read="true" write="true"/>
         <optionalConform/>
         <constraint type="maxLength" value="64"/>
       </field>
     </struct>
     <struct name="OperationalStateStruct">
       <field id="0" name="OperationalStateID" type="OperationalStateEnum" default="0">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="OperationalStateLabel" type="string">
-        <access read="true" write="true"/>
         <constraint type="maxLength" value="64"/>
       </field>
     </struct>
@@ -131,7 +130,8 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint type="max" value="259200"/>
     </attribute>
-    <attribute id="0x0003" name="OperationalStateList" type="list[OperationalStateStruct Type]" default="MS">
+    <attribute id="0x0003" name="OperationalStateList" type="list" default="MS">
+      <entry type="OperationalStateStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint type="desc"/>
@@ -147,36 +147,33 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Pause" response="OperationalCommandResponse">
+    <command id="0x00" name="Pause" direction="commandToServer" response="OperationalCommandResponse">
       <access invokePrivilege="operate"/>
       <otherwiseConform>
         <mandatoryConform>
-          <attribute name="Resume"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
-      <field id="0" name="CommandResponseState" type="ErrorStateStruct">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x01" name="Stop" response="OperationalCommandResponse">
-      <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="Start"/>
+          <command name="Resume"/>
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
     </command>
-    <command id="0x02" name="Start" response="OperationalCommandResponse">
+    <command id="0x01" name="Stop" direction="commandToServer" response="OperationalCommandResponse">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <command name="Start"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </command>
+    <command id="0x02" name="Start" direction="commandToServer" response="OperationalCommandResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>
-    <command id="0x03" name="Resume" response="OperationalCommandResponse">
+    <command id="0x03" name="Resume" direction="commandToServer" response="OperationalCommandResponse">
       <access invokePrivilege="operate"/>
       <otherwiseConform>
         <mandatoryConform>
-          <attribute name="Pause"/>
+          <command name="Pause"/>
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
@@ -185,10 +182,10 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>
-          <attribute name="Pause"/>
-          <attribute name="Stop"/>
-          <attribute name="Start"/>
-          <attribute name="Resume"/>
+          <command name="Pause"/>
+          <command name="Stop"/>
+          <command name="Start"/>
+          <command name="Resume"/>
         </orTerm>
       </mandatoryConform>
       <field id="0" name="CommandResponseState" type="ErrorStateStruct">

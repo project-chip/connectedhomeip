@@ -48,8 +48,6 @@ declare_args() {
 
 chip_data_model("chef-common") {
   zap_file = "${chef_project_dir}/devices/${sample_name}.zap"
-
-  zap_pregenerated_dir = "${chef_project_dir}/out/${sample_name}/zap-generated/"
   is_server = true
 }
 
@@ -120,6 +118,7 @@ silabs_executable("chef_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
       "$dir_pw_trace",

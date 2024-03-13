@@ -65,18 +65,70 @@ public:
 
     /**
      * @brief
-     *   Called to prompt the user to enter the setup pincode displayed by the given commissioneeName/vendorId/productId to be
-     * commissioned. For example "Please enter pin displayed in casting app."
+     *   Called to prompt the user to enter the setup passcode displayed by the given commissioneeName/vendorId/productId to be
+     * commissioned. For example "Please enter passcode displayed in casting app."
      *
-     * If user enters with pin then implementor should call CommissionerRespondPincode(uint32_t pincode);
+     * If user enters passcode then implementor should call CommissionerRespondPasscode(uint32_t passcode);
      * If user responds with Cancel then implementor should call CommissionerRespondCancel();
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    pairingHint        The pairingHint in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    pairingInstruction The pairingInstruction in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                             uint16_t pairingHint, const char * pairingInstruction) = 0;
+
+    /**
+     * @brief
+     *   Called to when CancelCommissioning is received via UDC.
+     * Indicates that commissioner can stop showing the passcode entry or display dialog.
+     * For example, can show text such as "Commissioning cancelled by client" before hiding dialog.
      *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
      *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
      *
      */
-    virtual void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) = 0;
+    virtual void HidePromptsOnCancel(uint16_t vendorId, uint16_t productId, const char * commissioneeName) = 0;
+
+    /**
+     * @brief
+     *   Return true if this UserPrompter displays QR code along with passcode
+     * When PromptWithCommissionerPasscode is called during Commissioner Passcode functionality.
+     */
+    virtual bool DisplaysPasscodeAndQRCode() = 0;
+
+    /**
+     * @brief
+     *   Called to display the given setup passcode to the user,
+     * for commissioning the given commissioneeName with the given vendorId and productId,
+     * and provide instructions for where to enter it in the commissionee (when pairingHint and pairingInstruction are provided).
+     * For example "Casting Passcode: [passcode]. For more instructions, click here."
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    passcode           The passcode to display.
+     *  @param[in]    pairingHint        The pairingHint in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    pairingInstruction The pairingInstruction in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                                uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction) = 0;
+
+    /**
+     * @brief
+     *   Called to alert the user that commissioning has begun."
+     *
+     *  @param[in]    vendorId           The vendorid from the DAC of the new node.
+     *  @param[in]    productId          The productid from the DAC of the new node.
+     *  @param[in]    commissioneeName   The commissioneeName in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual void PromptCommissioningStarted(uint16_t vendorId, uint16_t productId, const char * commissioneeName) = 0;
 
     /**
      * @brief
@@ -101,13 +153,41 @@ public:
     virtual ~UserPrompter() = default;
 };
 
-class DLL_EXPORT PincodeService
+// TODO: rename this to Passcode?
+class DLL_EXPORT PasscodeService
 {
 public:
     /**
      * @brief
-     *   Called to get the setup pincode from the content app corresponding to the given vendorId/productId
-     * Returns 0 if pincode cannot be obtained
+     *   Called to determine if the given target app is available to the commissionee with the given given
+     * vendorId/productId, and if so, return the passcode.
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    info               App info to look for.
+     *  @param[in]    passcode           Passcode for the given commissionee, or 0 if passcode cannot be obtained.
+     *
+     */
+    virtual bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                                     chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode) = 0;
+
+    /**
+     * @brief
+     *   Called to get the commissioner-generated setup passcode.
+     * Returns 0 if feature is disabled.
+     *
+     *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    productId          The productId in the DNS-SD advertisement of the requesting commissionee.
+     *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
+     *
+     */
+    virtual uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
+
+    /**
+     * @brief
+     *   Called to get the setup passcode from the content app corresponding to the given vendorId/productId
+     * Returns 0 if passcode cannot be obtained
      *
      * If user responds with OK then implementor should call CommissionerRespondOk();
      * If user responds with Cancel then implementor should call CommissionerRespondCancel();
@@ -117,9 +197,9 @@ public:
      *  @param[in]    rotatingId         The rotatingId in the DNS-SD advertisement of the requesting commissionee.
      *
      */
-    virtual uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
+    virtual uint32_t FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) = 0;
 
-    virtual ~PincodeService() = default;
+    virtual ~PasscodeService() = default;
 };
 
 class DLL_EXPORT PostCommissioningListener
@@ -152,12 +232,12 @@ public:
      *   Called to notify the commissioner that commissioning can now proceed for
      * the node identified by the given arguments.
      *
-     *  @param[in]    pincode             The pin code to use for the commissionee.
+     *  @param[in]    passcode            The passcode to use for the commissionee.
      *  @param[in]    longDiscriminator   The long discriminator for the commissionee.
      *  @param[in]    peerAddress         The peerAddress for the commissionee.
      *
      */
-    virtual void ReadyForCommissioning(uint32_t pincode, uint16_t longDiscriminator, PeerAddress peerAddress) = 0;
+    virtual void ReadyForCommissioning(uint32_t passcode, uint16_t longDiscriminator, PeerAddress peerAddress) = 0;
 
     virtual ~CommissionerCallback() = default;
 };
@@ -193,6 +273,7 @@ public:
      * indicated in the UserPrompter's PromptForCommissionOKPermission callback
      */
     void Ok();
+    void InternalOk();
 
     /**
      * This method should be called after the user has declined to give consent for commissioning of the client
@@ -201,10 +282,10 @@ public:
     void Cancel();
 
     /**
-     * This method should be called with the pincode for the client
-     * indicated in the UserPrompter's PromptForCommissionPincode callback
+     * This method should be called with the passcode for the client
+     * indicated in the UserPrompter's PromptForCommissionPasscode callback
      */
-    void CommissionWithPincode(uint32_t pincode);
+    void CommissionWithPasscode(uint32_t passcode);
 
     /**
      * This method should be called by the commissioner to indicate that commissioning succeeded.
@@ -253,9 +334,9 @@ public:
     inline void SetUserPrompter(UserPrompter * userPrompter) { mUserPrompter = userPrompter; }
 
     /**
-     * Assign a PincodeService
+     * Assign a PasscodeService
      */
-    inline void SetPincodeService(PincodeService * pincodeService) { mPincodeService = pincodeService; }
+    inline void SetPasscodeService(PasscodeService * passcodeService) { mPasscodeService = passcodeService; }
 
     /**
      * Assign a Commissioner Callback to perform commissioning once user consent has been given
@@ -293,7 +374,7 @@ protected:
 
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;
-    PincodeService * mPincodeService                       = nullptr;
+    PasscodeService * mPasscodeService                     = nullptr;
     CommissionerCallback * mCommissionerCallback           = nullptr;
     PostCommissioningListener * mPostCommissioningListener = nullptr;
 };

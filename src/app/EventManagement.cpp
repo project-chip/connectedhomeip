@@ -413,6 +413,7 @@ void EventManagement::VendEventNumber()
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
                                      EventNumber & aEventNumber)
 {
+    assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mState != EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
     return LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
 }
@@ -638,7 +639,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
     return err;
 }
 
-CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
+CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const SingleLinkedListNode<EventPathParams> * apEventPathList,
                                              EventNumber & aEventMin, size_t & aEventCount,
                                              const Access::SubjectDescriptor & aSubjectDescriptor)
 {
