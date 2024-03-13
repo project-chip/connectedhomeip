@@ -130,7 +130,7 @@ public:
     virtual void OnICDRegistrationInfoRequired() {}
 
     /**
-     * @bried
+     * @brief
      *   Called when the registration flow for the ICD completes.
      *
      * @param[in] icdNodeId    The node id of the ICD.
@@ -139,8 +139,8 @@ public:
     virtual void OnICDRegistrationComplete(NodeId icdNodeId, uint32_t icdCounter) {}
 
     /**
-     * @bried
-     *   Called when the stay active response is received in the end of the LIT ICD commissioning flow completes.
+     * @brief
+     *   Called when ICDStayActiveDuration is set and the stay active response is received in the end of the LIT ICD commissioning flow completes.
      *
      * @param[in] icdNodeId    The node id of the ICD.
      * @param[in] promisedActiveDurationMsec   The actual duration that the ICD server can stay active

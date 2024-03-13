@@ -145,6 +145,10 @@ const char * StageToString(CommissioningStage stage)
         return "FindOperational";
         break;
 
+    case kICDSendStayActive:
+        return "ICDSendStayActive";
+        break;
+
     case kSendComplete:
         return "SendComplete";
         break;

@@ -73,7 +73,7 @@ public:
                     "The monitored subject of the ICD, default: The node id used for icd-check-in-nodeid.");
         AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
         AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
-                    "The active duration after LIT ICD is commissioned");
+                    "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
         switch (networkType)
         {
         case PairingNetworkType::None:

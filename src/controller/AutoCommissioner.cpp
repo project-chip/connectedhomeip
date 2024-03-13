@@ -265,10 +265,6 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         // The values must be valid now.
         memcpy(mICDSymmetricKey, params.GetICDSymmetricKey().Value().data(), params.GetICDSymmetricKey().Value().size());
         mParams.SetICDSymmetricKey(ByteSpan(mICDSymmetricKey));
-        if (params.GetICDStayActiveDurationMsec().HasValue())
-        {
-            mParams.SetICDStayActiveDurationMsec(params.GetICDStayActiveDurationMsec().Value());
-        }
         mParams.SetICDCheckInNodeId(params.GetICDCheckInNodeId().Value());
         mParams.SetICDMonitoredSubject(params.GetICDMonitoredSubject().Value());
     }
@@ -500,6 +496,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
+        return CommissioningStage::kICDSendStayActive;
+    case CommissioningStage::kICDSendStayActive:
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
