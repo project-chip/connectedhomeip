@@ -39,13 +39,13 @@ public:
     RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
     void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
-    CHIP_ERROR SetDelegate(jobject checkInDeleagateObj);
+    CHIP_ERROR SetDelegate(jobject checkInDelegateObj);
 
 private:
     ICDClientStorage * mpStorage        = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
 
-    chip::JniGlobalReference mCheckInDeleagate;
+    chip::JniGlobalReference mCheckInDelegate;
 };
 
 } // namespace app

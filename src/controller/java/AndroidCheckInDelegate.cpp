@@ -45,9 +45,9 @@ CHIP_ERROR AndroidCheckInDelegate::Init(ICDClientStorage * storage, InteractionM
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AndroidCheckInDelegate::SetDelegate(jobject delegate)
+CHIP_ERROR AndroidCheckInDelegate::SetDelegate(jobject checkInDelegateObj)
 {
-    ReturnLogErrorOnFailure(mCheckInDeleagate.Init(delegate));
+    ReturnLogErrorOnFailure(mCheckInDelegate.Init(checkInDelegateObj));
     return CHIP_NO_ERROR;
 }
 
@@ -57,18 +57,18 @@ void AndroidCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
 
-    VerifyOrReturn(mCheckInDeleagate.HasValidObjectRef(), ChipLogProgress(ICD, "check-in delegate is not implemented!"));
+    VerifyOrReturn(mCheckInDelegate.HasValidObjectRef(), ChipLogProgress(ICD, "check-in delegate is not implemented!"));
 
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     PARSE_CLIENT_INFO(clientInfo, peerNodeId, startCounter, offset, monitoredSubject, jniICDAesKey, jniICDHmacKey)
 
     jmethodID onCheckInCompleteMethodID;
-    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagate.ObjectRef(), "onCheckInComplete",
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onCheckInComplete",
                                                                    "(JJJJ[B[B)V", &onCheckInCompleteMethodID);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogProgress(ICD, "onCheckInComplete - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-    env->CallVoidMethod(mCheckInDeleagate.ObjectRef(), onCheckInCompleteMethodID, peerNodeId, startCounter, offset,
+    env->CallVoidMethod(mCheckInDelegate.ObjectRef(), onCheckInCompleteMethodID, peerNodeId, startCounter, offset,
                         monitoredSubject, jniICDAesKey.jniValue(), jniICDHmacKey.jniValue());
 }
 
@@ -78,19 +78,19 @@ RefreshKeySender * AndroidCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
     RefreshKeySender::RefreshKeyBuffer newKey;
 
     bool isSetKey = false;
-    if (mCheckInDeleagate.HasValidObjectRef())
+    if (mCheckInDelegate.HasValidObjectRef())
     {
         JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
         PARSE_CLIENT_INFO(clientInfo, peerNodeId, startCounter, offset, monitoredSubject, jniICDAesKey, jniICDHmacKey)
 
         jmethodID onKeyRefreshNeededMethodID;
-        err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagate.ObjectRef(), "onKeyRefreshNeeded", "(JJJJ[B[B)V",
+        err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onKeyRefreshNeeded", "(JJJJ[B[B)V",
                                                             &onKeyRefreshNeededMethodID);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogProgress(ICD, "onKeyRefreshNeeded - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-        jbyteArray key = static_cast<jbyteArray>(env->CallObjectMethod(mCheckInDeleagate.ObjectRef(), onKeyRefreshNeededMethodID,
+        jbyteArray key = static_cast<jbyteArray>(env->CallObjectMethod(mCheckInDelegate.ObjectRef(), onKeyRefreshNeededMethodID,
                                                                        peerNodeId, startCounter, offset, monitoredSubject,
                                                                        jniICDAesKey.jniValue(), jniICDHmacKey.jniValue()));
 
@@ -137,16 +137,16 @@ void AndroidCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySende
         // The callee can take corrective action  based on the error received.
     }
 
-    VerifyOrReturn(mCheckInDeleagate.HasValidObjectRef(), ChipLogProgress(ICD, "check-in delegate is not implemented!"));
+    VerifyOrReturn(mCheckInDelegate.HasValidObjectRef(), ChipLogProgress(ICD, "check-in delegate is not implemented!"));
 
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onKeyRefreshDoneMethodID;
-    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDeleagate.ObjectRef(), "onKeyRefreshDone", "(I)V",
+    CHIP_ERROR err = chip::JniReferences::GetInstance().FindMethod(env, mCheckInDelegate.ObjectRef(), "onKeyRefreshDone", "(I)V",
                                                                    &onKeyRefreshDoneMethodID);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogProgress(ICD, "onKeyRefreshDone - FindMethod is failed! : %" CHIP_ERROR_FORMAT, err.Format()));
 
-    env->CallVoidMethod(mCheckInDeleagate.ObjectRef(), onKeyRefreshDoneMethodID, static_cast<jint>(error.AsInteger()));
+    env->CallVoidMethod(mCheckInDelegate.ObjectRef(), onKeyRefreshDoneMethodID, static_cast<jint>(error.AsInteger()));
 
     if (refreshKeySender != nullptr)
     {
