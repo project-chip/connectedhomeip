@@ -20,8 +20,7 @@
 
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
-
-#include <jni.h>
+#include <lib/support/JniTypeWrappers.h>
 
 namespace chip {
 namespace app {
@@ -40,13 +39,13 @@ public:
     RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
     void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
-    void setDelegate(jobject checkInDeleagateObj) { mCheckInDeleagateObj = checkInDeleagateObj; }
+    CHIP_ERROR SetDelegate(jobject checkInDeleagateObj);
 
 private:
     ICDClientStorage * mpStorage        = nullptr;
     InteractionModelEngine * mpImEngine = nullptr;
 
-    jobject mCheckInDeleagateObj = nullptr;
+    chip::JniGlobalReference mCheckInDeleagate;
 };
 
 } // namespace app

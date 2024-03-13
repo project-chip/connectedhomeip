@@ -212,7 +212,7 @@ public:
 
     chip::app::DefaultICDClientStorage * getICDClientStorage() { return &mICDClientStorage; }
 
-    CHIP_ERROR SetICDCheckInDeleagate(jobject checkInDelegate);
+    CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

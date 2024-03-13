@@ -18,6 +18,9 @@
 
 package chip.devicecontroller;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Delegate for ICD check in.
  *
@@ -30,7 +33,7 @@ public interface ICDCheckInDelegate {
    * @param info ICDClientInfo object representing the state associated with the node that sent the
    *     check-in message.
    */
-  void onCheckInComplete(ICDClientInfo info);
+  void onCheckInComplete(@Nonnull ICDClientInfo info);
 
   /**
    * Callback used to let the application know that a key refresh is needed to avoid counter
@@ -40,7 +43,7 @@ public interface ICDCheckInDelegate {
    *     check-in message.
    * @return refreshed key
    */
-  byte[] onKeyRefreshNeeded(ICDClientInfo info);
+  @Nullable byte[] onKeyRefreshNeeded(@Nonnull ICDClientInfo info);
 
   /**
    * Callback used to let the application know that the re-registration process is done.

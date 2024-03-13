@@ -588,7 +588,7 @@ exit:
 #endif
 }
 
-JNI_METHOD(void, setICDCheckInDeleagate)(JNIEnv * env, jobject self, jlong handle, jobject checkInDelegate)
+JNI_METHOD(void, setICDCheckInDelegate)(JNIEnv * env, jobject self, jlong handle, jobject checkInDelegate)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -596,9 +596,9 @@ JNI_METHOD(void, setICDCheckInDeleagate)(JNIEnv * env, jobject self, jlong handl
 
     VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(Controller, "setICDCheckInDeleagate() called");
+    ChipLogProgress(Controller, "setICDCheckInDelegate() called");
 
-    err = wrapper->SetICDCheckInDeleagate(checkInDelegate);
+    err = wrapper->SetICDCheckInDelegate(checkInDelegate);
 exit:
     if (err != CHIP_NO_ERROR)
     {
