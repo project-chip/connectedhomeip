@@ -467,7 +467,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
                 [self clearStoredAttributesForNodeID:nodeID];
             }
 
-            MTR_LOG_INFO("Fetch got no value for endpointIndex @ 0x%016llX", nodeID.unsignedLongLongValue);
+            MTR_LOG_INFO("Fetch got no value for endpointIndex @ %llu", nodeID.unsignedLongLongValue);
             attributesToReturn = nil;
             return;
         }
@@ -476,7 +476,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
         NSArray<NSNumber *> * endpointIndex = [self _fetchEndpointIndexForNodeID:nodeID];
 
 #if ATTRIBUTE_CACHE_VERBOSE_LOGGING
-        MTR_LOG_INFO("Fetch got %lu values for endpointIndex @ 0x%016llX", static_cast<unsigned long>(endpointIndex.count), nodeID.unsignedLongLongValue);
+        MTR_LOG_INFO("Fetch got %lu values for endpointIndex @ %llu", static_cast<unsigned long>(endpointIndex.count), nodeID.unsignedLongLongValue);
 #endif
 
         for (NSNumber * endpointID in endpointIndex) {
@@ -484,7 +484,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
 
 #if ATTRIBUTE_CACHE_VERBOSE_LOGGING
-            MTR_LOG_INFO("Fetch got %lu values for clusterIndex @ 0x%016llX:0x%04X", static_cast<unsigned long>(clusterIndex.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
+            MTR_LOG_INFO("Fetch got %lu values for clusterIndex @ %llu:0x%04X", static_cast<unsigned long>(clusterIndex.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
 #endif
 
             for (NSNumber * clusterID in clusterIndex) {
@@ -492,14 +492,14 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
                 NSArray<NSNumber *> * attributeIndex = [self _fetchAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
 
 #if ATTRIBUTE_CACHE_VERBOSE_LOGGING
-                MTR_LOG_INFO("Fetch got %lu values for attributeIndex @ 0x%016llX:0x%04X:0x%08lX", static_cast<unsigned long>(attributeIndex.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
+                MTR_LOG_INFO("Fetch got %lu values for attributeIndex @ %llu:0x%04X:0x%08lX", static_cast<unsigned long>(attributeIndex.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
 #endif
 
                 for (NSNumber * attributeID in attributeIndex) {
                     NSDictionary * value = [self _fetchAttributeValueForNodeID:nodeID endpointID:endpointID clusterID:clusterID attributeID:attributeID];
 
 #if ATTRIBUTE_CACHE_VERBOSE_LOGGING
-                    MTR_LOG_INFO("Fetch got %u values for attribute value @ 0x%016llX:0x%04X:0x%08lX:0x%08lX", value ? 1 : 0, nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue, attributeID.unsignedLongValue);
+                    MTR_LOG_INFO("Fetch got %u values for attribute value @ %llu:0x%04X:0x%08lX:0x%08lX", value ? 1 : 0, nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue, attributeID.unsignedLongValue);
 #endif
 
                     if (value) {
@@ -537,7 +537,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
     NSUInteger storeFailures = 0;
 
     // Fetch node index
-    NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex].mutableCopy;
+    NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
     NSMutableArray<NSNumber *> * nodeIndexCopy = nodeIndex.mutableCopy;
 
     for (NSNumber * nodeID in nodeIndex) {
@@ -547,12 +547,12 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 
         for (NSNumber * endpointID in endpointIndex) {
             // Fetch endpoint index
-            NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID].mutableCopy;
+            NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
             NSMutableArray<NSNumber *> * clusterIndexCopy = clusterIndex.mutableCopy;
 
             for (NSNumber * clusterID in clusterIndex) {
                 // Fetch endpoint index
-                NSArray<NSNumber *> * attributeIndex = [self _fetchAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID].mutableCopy;
+                NSArray<NSNumber *> * attributeIndex = [self _fetchAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
                 NSMutableArray<NSNumber *> * attributeIndexCopy = attributeIndex.mutableCopy;
 
                 for (NSNumber * attributeID in attributeIndex) {
@@ -572,7 +572,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
                         success = [self _deleteAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
                     }
                     storeFailures++;
-                    MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for attributeIndex (%lu) @ 0x%016llX:0x%04X:0x%08lX", static_cast<unsigned long>(attributeIndexCopy.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
+                    MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for attributeIndex (%lu) @ %llu:0x%04X:0x%08lX", static_cast<unsigned long>(attributeIndexCopy.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
                 }
             }
 
@@ -586,7 +586,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
                 }
                 if (!success) {
                     storeFailures++;
-                    MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for clusterIndex (%lu) @ 0x%016llX:0x%04X", static_cast<unsigned long>(clusterIndexCopy.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
+                    MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for clusterIndex (%lu) @ %llu:0x%04X", static_cast<unsigned long>(clusterIndexCopy.count), nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
                 }
             }
         }
@@ -601,7 +601,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             }
             if (!success) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for endpointIndex (%lu) @ 0x%016llX", static_cast<unsigned long>(endpointIndexCopy.count), nodeID.unsignedLongLongValue);
+                MTR_LOG_INFO("Store failed in _pruneEmptyStoredAttributesBranches for endpointIndex (%lu) @ %llu", static_cast<unsigned long>(endpointIndexCopy.count), nodeID.unsignedLongLongValue);
             }
         }
     }
@@ -620,7 +620,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
     }
 
     if (storeFailures) {
-        MTR_LOG_ERROR("Store failed in _pruneEmptyStoredAttributesBranches: total %lu", static_cast<unsigned long>(storeFailures));
+        MTR_LOG_ERROR("Store failed in _pruneEmptyStoredAttributesBranches: failure count %lu", static_cast<unsigned long>(storeFailures));
     }
 }
 
@@ -634,7 +634,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             NSDictionary * value = dataValue[MTRDataKey];
 
 #if ATTRIBUTE_CACHE_VERBOSE_LOGGING
-            MTR_LOG_INFO("Attempt to store attribute value @ 0x%016llX:0x%04X:0x%08lX:0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue, path.attribute.unsignedLongValue);
+            MTR_LOG_INFO("Attempt to store attribute value @ %llu:0x%04X:0x%08lX:0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue, path.attribute.unsignedLongValue);
 #endif
 
             BOOL storeFailed = NO;
@@ -662,7 +662,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             }
             if (storeFailed) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed for endpointIndex @ 0x%016llX", nodeID.unsignedLongLongValue);
+                MTR_LOG_INFO("Store failed for endpointIndex @ %llu", nodeID.unsignedLongLongValue);
                 continue;
             }
 
@@ -676,7 +676,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             }
             if (storeFailed) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed for clusterIndex @ 0x%016llX:0x%04X", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue);
+                MTR_LOG_INFO("Store failed for clusterIndex @ %llu:0x%04X", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue);
                 continue;
             }
 
@@ -693,7 +693,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             }
             if (storeFailed) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed for attributeIndex @ 0x%016llX:0x%04X:0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue);
+                MTR_LOG_INFO("Store failed for attributeIndex @ %llu:0x%04X:0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue);
                 continue;
             }
 
@@ -701,14 +701,14 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             storeFailed = ![self _storeAttributeValue:value forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute];
             if (storeFailed) {
                 storeFailures++;
-                MTR_LOG_INFO("Store failed for attribute value @ 0x%016llX:0x%04X:0x%08lX:0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue, path.attribute.unsignedLongValue);
+                MTR_LOG_INFO("Store failed for attribute value @ %llu:0x%04X:0x%08lX:0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue, path.attribute.unsignedLongValue);
             }
         }
 
         // In the rare event that store fails, allow all attribute store attempts to go through and prune empty branches at the end altogether.
         if (storeFailures) {
             [self _pruneEmptyStoredAttributesBranches];
-            MTR_LOG_ERROR("Store failed in -storeAttributeValues:forNodeID: total %lu", static_cast<unsigned long>(storeFailures));
+            MTR_LOG_ERROR("Store failed in -storeAttributeValues:forNodeID: failure count %lu", static_cast<unsigned long>(storeFailures));
         }
     });
 }
@@ -739,7 +739,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
             for (NSNumber * attributeID in attributeIndex) {
                 BOOL success = [self _deleteAttributeValueForNodeID:nodeID endpointID:endpointID clusterID:clusterID attributeID:attributeID];
                 if (!success) {
-                    MTR_LOG_INFO("Delete failed for attribute value @ 0x%016llX:0x%04X:0x%08lX:0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue, attributeID.unsignedLongValue);
+                    MTR_LOG_INFO("Delete failed for attribute value @ %llu:0x%04X:0x%08lX:0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue, attributeID.unsignedLongValue);
                 } else {
                     attributesCleared++;
                 }
@@ -747,7 +747,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 
             BOOL success = [self _deleteAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
             if (!success) {
-                MTR_LOG_INFO("Delete failed for attributeIndex @ 0x%016llX:0x%04X:0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
+                MTR_LOG_INFO("Delete failed for attributeIndex @ %llu:0x%04X:0x%08lX", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue, clusterID.unsignedLongValue);
             } else {
                 clustersCleared++;
             }
@@ -755,7 +755,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 
         BOOL success = [self _deleteClusterIndexForNodeID:nodeID endpointID:endpointID];
         if (!success) {
-            MTR_LOG_INFO("Delete failed for clusterIndex @ 0x%016llX:0x%04X", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
+            MTR_LOG_INFO("Delete failed for clusterIndex @ %llu:0x%04X", nodeID.unsignedLongLongValue, endpointID.unsignedShortValue);
         } else {
             endpointsCleared++;
         }
@@ -763,7 +763,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 
     BOOL success = [self _deleteEndpointIndexForNodeID:nodeID];
     if (!success) {
-        MTR_LOG_INFO("Delete failed for endpointrIndex @ 0x%016llX", nodeID.unsignedLongLongValue);
+        MTR_LOG_INFO("Delete failed for endpointrIndex @ %llu", nodeID.unsignedLongLongValue);
     }
 
     MTR_LOG_INFO("clearStoredAttributesForNodeID: deleted endpoints %lu/%lu clusters %lu/%lu attributes %lu/%lu", static_cast<unsigned long>(endpointsCleared), static_cast<unsigned long>(endpointsClearAttempts), static_cast<unsigned long>(clustersCleared), static_cast<unsigned long>(clustersClearAttempts), static_cast<unsigned long>(attributesCleared), static_cast<unsigned long>(attributesClearAttempts));
