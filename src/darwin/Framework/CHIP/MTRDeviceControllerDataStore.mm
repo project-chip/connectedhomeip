@@ -521,6 +521,15 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
     return attributesToReturn;
 }
 
+#ifdef DEBUG
+- (void)unitTestPruneEmptyStoredAttributesBranches
+{
+    dispatch_sync(_storageDelegateQueue, ^{
+        [self _pruneEmptyStoredAttributesBranches];
+    });
+}
+#endif
+
 - (void)_pruneEmptyStoredAttributesBranches
 {
     dispatch_assert_queue(_storageDelegateQueue);

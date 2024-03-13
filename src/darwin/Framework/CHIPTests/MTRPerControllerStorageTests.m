@@ -1152,7 +1152,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [controller.controllerDataStore storeAttributeValues:testAttribute forNodeID:@(2001)];
     NSString * testAttributeValueKey = [controller.controllerDataStore _attributeValueKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1) attributeID:@(1)];
     [storageDelegate controller:controller removeValueForKey:testAttributeValueKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
-    [controller.controllerDataStore _pruneEmptyStoredAttributesBranches];
+    [controller.controllerDataStore unitTestPruneEmptyStoredAttributesBranches];
 
     // Now check the indexes are pruned
     NSString * testAttributeIndexKey = [controller.controllerDataStore _attributeIndexKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1)];

@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
 - (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
 - (void)clearAllStoredAttributes;
-- (void)_pruneEmptyStoredAttributesBranches;
+- (void)unitTestPruneEmptyStoredAttributesBranches;
 - (NSString *)_endpointIndexKeyForNodeID:(NSNumber *)nodeID;
 - (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (NSString *)_attributeIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
