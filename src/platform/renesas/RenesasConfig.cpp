@@ -53,7 +53,7 @@ CHIP_ERROR RenesasConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufS
 
 CHIP_ERROR RenesasConfig::ReadConfigValueBin(Key key, void * buf, size_t bufSize, size_t & outLen)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 template CHIP_ERROR RenesasConfig::ReadConfigValue(Key key, bool & val);
@@ -91,7 +91,7 @@ CHIP_ERROR RenesasConfig::WriteConfigValueBin(Key key, const void * data, size_t
     if (dataLen == 0)
         return CHIP_NO_ERROR;
 
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR RenesasConfig::ClearConfigValue(Key key)

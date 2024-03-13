@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -36,6 +35,8 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
+
+#include <platform/ConnectivityManager.h>
 
 namespace chip {
 namespace DeviceLayer {
