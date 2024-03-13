@@ -43,7 +43,8 @@ public interface ICDCheckInDelegate {
    *     check-in message.
    * @return refreshed key
    */
-  @Nullable byte[] onKeyRefreshNeeded(@Nonnull ICDClientInfo info);
+  @Nullable
+  byte[] onKeyRefreshNeeded(@Nonnull ICDClientInfo info);
 
   /**
    * Callback used to let the application know that the re-registration process is done.
