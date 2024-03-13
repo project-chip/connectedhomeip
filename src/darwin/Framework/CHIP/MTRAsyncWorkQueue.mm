@@ -377,7 +377,6 @@ MTR_DIRECT_MEMBERS
 - (BOOL)hasDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData
 {
     std::lock_guard lock(_lock);
-    BOOL hasDuplicate = NO;
     // Start from the last item
     for (MTRAsyncWorkItem * item in [_items reverseObjectEnumerator]) {
         auto duplicateCheckHandler = item.duplicateCheckHandler;
@@ -386,13 +385,12 @@ MTR_DIRECT_MEMBERS
             BOOL isDuplicate = NO;
             duplicateCheckHandler(opaqueWorkItemData, &isDuplicate, &stop);
             if (stop) {
-                hasDuplicate = isDuplicate;
-                break;
+                return isDuplicate;
             }
         }
     }
 
-    return hasDuplicate;
+    return NO;
 }
 
 @end
