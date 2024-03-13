@@ -117,7 +117,7 @@ class TC_DISHM_3_3(MatterBaseTest):
 
         logging.info("OnMode: %s" % (old_on_mode_dut))
 
-        # asserts.assert_true(type_matches(old_on_mode_dut, uint) , "On mode value should be an integer value")
+        asserts.assert_true(type_matches(old_on_mode_dut, uint) , "On mode value should be an integer value")
 
         if old_on_mode_dut == startup_mode_dut:
 
@@ -140,6 +140,7 @@ class TC_DISHM_3_3(MatterBaseTest):
         self.print_step(8, "Read OnMode attribute")
 
         new_on_mode_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
+        asserts.assert_true(type_matches(new_on_mode_dut, uint) , "On mode value should be an integer value")
 
         logging.info("OnMode: %s" % (new_on_mode_dut))
         # There is an issue with the test plan here as new_mode_th cannot be read if step 7 is not executed so I've changed
