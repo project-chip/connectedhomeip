@@ -65,12 +65,16 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, readonly) MTRDeviceState state;
 
 /**
- * Is the state cache primed for this device?
+ * Is the device cache primed for this device?
  *
- * This verifies that both the MTRDeviceController has a storage delegate, and a subscription has been set up and the resulting state has been cached. If this is true this means most state is ready to cache and will not require a round trip to the accessory.
+ * This will be true after the deviceCachePrimed: delegate callback has been called, false if not.
+ *
+ * Please note if you have a storage delegate implemented, the cache is then stored persistently, so
+ * the delegate would then only be called once, ever - and this property would basically always be true
+ * if a subscription has ever been established at any point in the past.
  *
  */
-@property (readonly) BOOL deviceCachePrimed;
+@property (readonly) BOOL deviceCachePrimed MTR_NEWLY_AVAILABLE;
 
 /**
  * The estimated device system start time.
