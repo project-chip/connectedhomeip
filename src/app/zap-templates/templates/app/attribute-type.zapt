@@ -3,9 +3,22 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+
 // ZCL attribute types
 enum {
 {{#zcl_atomics}}
 {{ident}}ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPE = {{asHex atomicId 2}}, // {{description}}
 {{/zcl_atomics}}
 };
+
+namespace chip {
+namespace app {
+
+// Returns 0 for attribute types without a well-defined size (like strings).
+{{! TODO: Figure out whether we can use EmberAfAttributeType here? }}
+size_t AttributeTypeSize(uint8_t attributeType);
+
+} // namespace app
+} // namespace chip

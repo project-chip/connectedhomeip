@@ -20,6 +20,9 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+
 // ZCL attribute types
 enum
 {
@@ -99,3 +102,12 @@ enum
     ZCL_HWADR_ATTRIBUTE_TYPE             = 0xF6, // Hardware Address
     ZCL_UNKNOWN_ATTRIBUTE_TYPE           = 0xFF, // Unknown
 };
+
+namespace chip {
+namespace app {
+
+// Returns 0 for attribute types without a well-defined size (like strings).
+size_t AttributeTypeSize(uint8_t attributeType);
+
+} // namespace app
+} // namespace chip

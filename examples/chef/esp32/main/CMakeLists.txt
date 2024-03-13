@@ -71,6 +71,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/../common/clusters/channel/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/keypad-input/"
                       "${CMAKE_SOURCE_DIR}/../common/clusters/audio-output/"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
