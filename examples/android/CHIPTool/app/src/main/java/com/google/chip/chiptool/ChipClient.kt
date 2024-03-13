@@ -19,7 +19,6 @@ package com.google.chip.chiptool
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ControllerParams
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
@@ -64,20 +63,22 @@ object ChipClient {
         ExampleAttestationTrustStoreDelegate(chipDeviceController)
       )
 
-      chipDeviceController.setICDCheckInDelegate(object: ICDCheckInDelegate {
-        override fun onCheckInComplete(info: ICDClientInfo) {
-          Log.d(TAG, "onCheckInComplete : $info")
-        }
+      chipDeviceController.setICDCheckInDelegate(
+        object : ICDCheckInDelegate {
+          override fun onCheckInComplete(info: ICDClientInfo) {
+            Log.d(TAG, "onCheckInComplete : $info")
+          }
 
-        override fun onKeyRefreshNeeded(info: ICDClientInfo): ByteArray? {
-          Log.d(TAG, "onKeyRefreshNeeded : $info")
-          return null
-        }
+          override fun onKeyRefreshNeeded(info: ICDClientInfo): ByteArray? {
+            Log.d(TAG, "onKeyRefreshNeeded : $info")
+            return null
+          }
 
-        override fun onKeyRefreshDone(errorCode: Int) {
-          Log.d(TAG, "onKeyRefreshDone : $errorCode")
+          override fun onKeyRefreshDone(errorCode: Int) {
+            Log.d(TAG, "onKeyRefreshDone : $errorCode")
+          }
         }
-      })
+      )
     }
 
     return chipDeviceController
