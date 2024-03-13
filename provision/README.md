@@ -2,12 +2,15 @@
 
 
 The provisioning script is used to load mandatory information into Matter devices, including commissioning and authentication
-parameters. To facilitate the transition between development and production, this tool uses the same inputs as Silicon Labs's
-[Custom Part Manufacturing Service](https://www.silabs.com/services/custom-part-manufacturing-service). Most of the parameters
-are stored once during the manufacturing process, and shall not change during the lifetime of the device.
-During runtime, two interfaces are used to pull the authentication data from permanent storage:
-* [CommissionableDataProvider](../src/include/platform/CommissionableDataProvider.h), implemented as [SilabsDeviceDataProvider](../examples/platform/silabs/SilabsDeviceDataProvider.cpp)
-* [DeviceAttestationCredsProvider](../src/credentials/DeviceAttestationCredsProvider.h), implemented as [SilabsDeviceAttestationCreds](../examples/platform/silabs/SilabsDeviceAttestationCreds.h)
+data. To facilitate the transition between development and production, this tool uses the same inputs as Silicon Labs's
+[Custom Part Manufacturing Service](https://www.silabs.com/services/custom-part-manufacturing-service). Most of the information
+is stored once during the manufacturing process, and do not change during the lifetime of the device.
+
+Matter defines three interfaces to access the provisioned data during runtime:
+* [DeviceInstanceInfoProvider](../src/include/platform/DeviceInstanceInfoProvider.h)
+* [CommissionableDataProvider](../src/include/platform/CommissionableDataProvider.h)
+* [DeviceAttestationCredentialsProvider](../src/credentials/DeviceAttestationCredentialsProvider.h)
+In Silicon Labs devices, all three interfaces are implemented by the [ProvisionStorage](../examples/platform/silabs/./ProvisionStorage.h).
 
 The provisioning script on this folder now supercedes the following tools:
 * [Credentials Example](https://github.com/SiliconLabs/matter/tree/release_1.1.0-1.1/silabs_examples/credentials)
@@ -15,195 +18,348 @@ The provisioning script on this folder now supercedes the following tools:
 
 ## Provisioned Data
 
-The Commissionable Data includes Serial Number, Vendor Id, Product Id, and the Setup Payload (typicallty displayed in the QR), while the Attestation Credentials includes the Certificate Declaration (CD), the Product Attestation Intermediate (PAI) certificate, and the DAC (Device Attestation Certificate).
+The Commissionable Data includes Serial Number, Vendor Id, Product Id, and the Setup Payload (typicallty displayed in the QR),
+while the Attestation Credentials includes the Certificate Declaration (CD), the Product Attestation Intermediate (PAI) certificate,
+and the DAC (Device Attestation Certificate).
 
-During commissioning, Matter devices perform a Password Authenticated Key Exchange using the SPAKE2+ protocol. The SPAKE2+ verifier is pre-calculated [using an external tool](../src/tools/spake2p/README.md).
+During commissioning, Matter devices perform a Password Authenticated Key Exchange using the SPAKE2+ protocol.
+Calculating the SPAKE2+ verifier is computationally costly. For large iteration counts it may take several minutes to
+compute by the targe device. For this reason, the SPAKE2+ verifier is calculated on the host side by the script iself.
 
-The passcode is used to derive a QR code, typically printed on the label, or displayed by the device itself. The QR code contains the pre-computed setup payload, which allows the commissioner to establish a session with the device. The parameters required to generate and validate the session keys are static and stored in NVM3.
+The passcode is used to derive a QR code, typically printed on the label, or displayed by the device itself.
+The QR code contains the pre-computed setup payload, which allows the commissioner to establish a session with the device.
+The parameters required to generate and validate the session keys are static and stored in NVM3.
 
-To protect the attestation private-key (used to generate the DAC), the asymmetric key-pair should be generated on-device, using PSA, and the most secure storage location available to the specific part.
-However, the private-key may be generated externally, and imported using the --dac_key parameter.
+To protect the attestation private-key (used to generate the DAC), the asymmetric key-pair may be generated on-device, using PSA,
+and the most secure storage location available to the specific part. However, the private-key may be generated externally,
+and imported using the --dac_key option.
 
-The DAC is generated and signed by a Certification Authority (CA), which may reside on a separate host. The `modules/signing_server.py` script simulates the role of the CA, and uses OpenSSL to to generate and sign the DAC. In a real factory environment, this script is replaced by an actual CA.
-
+The DAC is generated and signed by a Certification Authority (CA), which may reside on a separate host. The `modules/signing_server.py`
+script simulates the role of the CA, and uses OpenSSL to to generate and sign the DAC. In a real factory environment,
+this script is replaced by an actual CA.
 
 ## Generator Firmware
 
-The Generator Firmware (GFW) is a baremetal application that runs on the targeted device, and assists with the initial setup of the device. The GFW performs the following tasks:
-
-* Generates the device key-pair on the most secure location available
-* Returns a CSR (Certificate Signing Request) to the provisioning script. The CSR contains the device public-key, Vendor Id, Product Id, and Serial Number.
+The Generator Firmware (GFW) is a FreeRTOS application that runs on the targeted device, and assists with the provisioning of the device.
+The GFW performs the following tasks:
+* When key-generation is used:
+  - Generates the key-pair on device on the most secure location available.
+  - Generates and returns a CSR (Certificate Signing Request). The CSR contains the device public-key, Vendor Id, Product Id, and Serial Number.
+* When key-import is used:
+  - Imports the key into the most secure location available.
 * Calculates the Setup Payload
 * Stores the Commissionable Data into NVM3 (including the Setup Payload)
 * Stores the Attestation Data on the main flash (CD, PAI, DAC)
-* Stores the size and offsets used to store the Attestation Data, along with the KeyId used to generate the private-key
+* Stores the size and offsets used to store the Attestation Data, along with the KeyId used to store the private-key.
 
-The main source code of the GFW is located under `provision/generator`, while the board support is located under `provision/support`. Pre-compiled images for the supported chips can be found in `provision/images`.
+The main source code of the GFW is located under `./generator`, while the board support is located under `./support`.
+Pre-compiled images for the supported chips can be found in `./images`.
+Backwards-compatibility files are stored under `./modules/vX_Y` where X.Y matches the targeted version.
 
 The directory structure is as follows:
 - provision
     - generator
     - images
     - modules
+        - v1_0
+        - v2_0
     - support
         - efr32mg12
         - efr32mg24
 
-## Provisioner Script
+
+## Provision Script
 
 The `provision.py` file is the main script used to load all the required data on the Matter device. This script requires:
 * [Simplicity Commander](https://community.silabs.com/s/article/simplicity-commander?language=en_US)
 * [SEGGER J-Link](https://www.segger.com/downloads/jlink/)
-* [SPAKE2+ generator](../src/tools/spake2p/README.md)
 * [PyLink](https://pylink.readthedocs.io/en/latest/index.html)
-
-sudo pip3 install ecdsa
+* [ECDSA](https://pypi.org/project/ecdsa/)
+* [Bleak](https://pypi.org/project/bleak/)
 
 The Provisioner Script executes the following steps:
+1. Gathers the parameter definitions from the internal `./modules/parameters.yaml` file, local `parameters.yaml`, and the file indicated by the `--params` option.
+2. Parses the inputs from the local `default.json` file, the file indicated by the `--inputs` option, and command-line arguments.
+3. Generates test certificates (if the `--generate` option is used). This step requires an external [`chip-cert`](../src/tools/chip-cert/README.md) tool binary.
+4. If a PKCS#12 file is provided, extracts the PAI, DAC, and DAC key files in DER format.
+4. Generates default values for the SPAKE2+ arguments, if necessary.
+5. Saves the input parameters as a JSON file (`latest.json` in the local folder, or the file indicated by `--output`).
+5. Flashes the Generator Firmware (GFW) into the device, if required.
+6. Sends the provisioned data to the targed device using the selected channel and protocol.
+7. Flashed the Production Firmware (PFW), if provided by the inputs.
 
-1. Parses and validates the command-line arguments
-2. Obtains the Part Number from the connected device (using Simplicity Commander)
-3. If no SPAKE2+ verifier is provided:
-   3.1. Generates SPAKE2+ verifier (using the external `spake2p` tool)
-4. Loads the Generator Firmware into the device (if no GFW path is provided, the Part Number is used to choose the corresponding file from the `provision/images`)
-5. Configures the NVM3 based on the flash size of the connected device
-6. If CSR mode is used (--csr):
-   6.1. Requests a CSR from the device
-    - The GFW generates the key-pair and CSR, then returns the the CSR to the host script
-   6.2. Sends the CSR to the Signing Server (`provision/modules/signing_server.py`), and retrieves the DAC
-7. Sends CD, PAI, and DAC to the GFW
-    - The GFW stores CD, PAI, and DAC on the last page of main flash, and updates the offsets and sizes in NVM3
+## Provision Protocol
 
-8. Sends the Commissionable Data to the GFW
-    - The GFW initializes the flash, generates the Setup Payload, and stores the data into NVM3
-9. If a PFW is provided, writes the PFW into flash using Simplicity Commander
+The Provision Tool exchange information with the Provision firmware (either GFW or the PFW itself) using a proprietary protocol.
+The original protocol, known as version 1.x, serves the basic purposes of CPMS and other factory environments, but is limited in scope.
+To overcome these limitations, a new protocol has been developed. For backwards compatibility, users familiar to this tool should not notice
+the difference between the protocols. It should only become evident when new functionality is required, which is only supported in version 2.0.
 
-The provisioning script and the GFW communicates through J-Link RTT using the PyLink module.
+### Version 1.x
+Verion 1 defines the following commands:
+* Init: Used for initialization. Sends the flash size and location to the firmware.
+* CSR: Used for on-device key and CSR generation.
+* Import: Used to transmit files to the device (DAC, DAC key, PAI, and CD). Each file is sent whole in a single exchange.
+* Setup: Used to transmit all other factory device to the device. The transmitted data is send in a single package,
+in precise order, with fixed data types and sizes.
+Users of version 1.0 do not execute any of these commands manually. The script simply execute these commands sequentially as needed.
+There are no extension capabilities on this protocol, nor any provision to read-back the provisioned data.
 
-### Arguments
+### Version 2.x
+Version 2 of the Provision Protocol enforces a maximum package size. Data larger than the limit is fragmented in
+as many packages are needed. This is done in both directions. Commands defined in this protocol are:
+* Init: Used for initialization. Sends the flash size and location to the firmware.
+* Finish: Sent to signal that provisioning is complete.
+* CSR: Used for on-device key and CSR generation.
+* Write: Send any number of arguments to the target device.
+* Read: Returns any number of arguments from the target device.
+With Write and Read, any number of arguments, of any length, may be sent in any order.
+However, by default, the script uses the Write and Read commands to send the same data as version 1,
+thus preserving the user experience of the tool.
+Instead of fixed-positions, this protocol uses IDs to identify the arguments in both ends.
+Custom arguments must have IDs range 0x00 to 0xff (255).
 
-| Arguments                 | Conformance          | Type               | Description                                                                             |
+## Channels
+
+The Provision Tool can transfer the arguments to the device in two ways:
+* J-Link RTT: When the device is phisically connected to the host, the GFW can communicate throught the serial port using J-Link RTT.
+This method can be used both in development and factory environments. This methods works with the legacy Protocol version 1.0 or
+the new protocol version 2.0.
+* Bluetooth: The provision script can transmit the data directly to applications running in provision-mode. While in this mode,
+Silicon Labs' example applications use the bluetooth communication to receive provisionning data. The Bluetooh channel requires
+Provision Protocol v2.0.
+
+### Parameters
+
+Parameter files define the name, type, and restrictions of the arguments recognized by the target device. The `modules/parameters.yaml`
+file defines the well-known (default) parameters used by the automatic provisioning action.
+
+### Well-known Parameters
+
+| Parameters                | Conformance          | Type               | Description                                                                             |
 | ------------------------- | -------------------- | ------------------ | --------------------------------------------------------------------------------------- |
-| -c,  --config             | optional             | string             | Path to a JSON configuration file            |
-| -j,  --jlink              | optional<sup>1</sup> | dec/string         | JLink connection string.  |
-| -l,  --pylink_lib         | optional             | string             | Path to the PyLink library.  |
-| -g,  --generate           | optional             | flag               | Auto-generate test certificates            |
+| -v,  --version            | optional             | string             | Provisioning version.   |
+| -p,  --params             | optional             | path               | YAML parameters file.   |
+| -i,  --inputs             | optional             | path               | JSON inputs file. Formerly --config.       |
+| -o,  --output             | optional             | path               | JSON output file.       |
+| -t,  --temp               | optional             | path               | Temporary folder.       |
+| -d,  --device             | optional             | string             | Target Device.          |
+| -c,  --channel            | optional<sup>1</sup> | dec/string         | Connection string.      |
 | -s,  --stop               | optional             | flag               | Stop mode: When true, only generate the JSON configuration, and exit.                    |
+| -g,  --generate           | optional             | flag               | Auto-generate test certificates            |
 | -r,  --csr                | optional             | flag               | CSR mode: When true, instructs the GFW to generate the private key, and issue a CSR.                    |
 | -gf, --gen_fw             | optional             | dec/hex            | Path to the Generator Firmware image.                                                   |
-| -pf, --prod_fw            | optional             | dec/hex            | Path to the Production Firmware image.                                                   |
-| -v,  --vendor_id          | optional             | dec/hex            | Vendor ID. e.g: 65521 or 0xFFF1 (Max 2 bytes).                              |
-| -V,  --vendor_name        | optional             | string             | Vendor name (Max 32 char).                                                  |
-| -p,  --product_id         | optional             | dec/hex            | Product ID. e.g: 32773 or 0x8005 (Max 2 bytes).                             |
-| -P,  --product_name       | optional             | string             | Product name (Max 32 char).                                                 |
+| -pg, --prod_fw            | optional             | dec/hex            | Path to the Production Firmware image.                                                   |
+| -ct, --cert_tool          | optional             | string             | Path to the chip-cert tool. Defaults to `../out/tools/chip-cert`          |
+| -jl, --pylink_lib         | optional             | string             | Path to the PyLink library.  |
+| -sn,  --serial_number     | optional             | string             | Serial Number.          |
+| -vi,  --vendor_id         | optional             | dec/hex            | Vendor ID. e.g: 65521 or 0xFFF1 (Max 2 bytes).                              |
+| -vn,  --vendor_name       | optional             | string             | Vendor name (Max 32 char).                                                  |
+| -pi,  --product_id        | optional             | dec/hex            | Product ID. e.g: 32773 or 0x8005 (Max 2 bytes).                             |
+| -pn,  --product_name      | optional             | string             | Product name (Max 32 char).                                                 |
 | -pl, --product_label      | optional             | string             | Product label.                |
 | -pu, --product_url        | optional             | string             | Product URL.                |
 | -pn, --part_number        | optional             | dec/hex            | Device Part Number (Max 32 char).                                               |
 | -hv, --hw_version         | optional             | dec/hex            | The hardware version value (Max 2 bytes).                                       |
 | -hs, --hw_version_str     | optional             | string             | The hardware version string (Max 64 char).                                      |
+| -md, --manufacturing_date | optional             | string             | Manufacturing date.                |
+| -ui,  --unique_id         | optional<sup>5</sup> | hex string         | A 128 bits hex string unique id (without 0x).                                           |
+| -sd,  --discriminator     | optional<sup>2</sup> | dec/hex            | BLE pairing discriminator. e.g: 3840 or 0xF00. (12-bit)                                 |
+| -sp, --spake2p_passcode   | required             | dec/hex            | Session passcode used to generate the SPAKE2+ verifier.        |
+| -si, --spake2p_iterations | required             | dec/hex            | Iteration count used to generate the SPAKE2+ verifier.                  |
+| -ss, --spake2p_salt       | required             | string<sup>6</sup> | Salt used to generate the SPAKE2+ verifier.                             |
+| -sv, --spake2p_verifier   | optional             | string<sup>6</sup> | Pre-generated SPAKE2+ verifier.                                          |
+| -sy, --setup_payload      | optional             | string<sup>6</sup> | Setup Payload.                             |
 | -cf, --commissioning_flow | optional             | dec/hex            | Commissioning Flow 0=Standard, 1=User Action, 2=Custom.                         |
 | -rf, --rendezvous_flags   | optional             | dec/hex            | Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Can be combined).                |
-| -md, --manufacturing_date | optional             | string             | Manufacturing date.                |
-| -d,  --discriminator      | optional<sup>2</sup> | dec/hex            | BLE pairing discriminator. e.g: 3840 or 0xF00. (12-bit)                                 |
-| -ct, --cert_tool          | optional             | string             | Path to the chip-cert tool. Defaults to `../out/tools/chip-cert`          |
-| -ki, --key_id             | required             | dec/hex            | Attestation Key ID.                |
-| -kp, --key_pass           | optional<sup>3</sup> | string             | Password for the key file.                |
-| -xc, --att_certs          | optional<sup>3</sup> | string             | Path to the PKCS#12 attestation certificates file.                |
+| -fi, --firmware_info      | optional             | string             | Firmware Information            |
+| -cd, --certification      | required             | string             | Path to the Certification Declaration (CD) file.                |
+| -cc, --cd_cert            | optional             | string             | Certification Declaration Signing Cert            |
+| -ck, --cd_key             | optional             | string             | Certification Declaration Signing Key            |
+| -ac, --paa_cert           | required             | string             | Path to the PAI certificate.                |
+| -ak, --paa_key            | optional<sup>3</sup> | string             | Path to the PAI certificate.                |
 | -ic, --pai_cert           | required             | string             | Path to the PAI certificate.                |
 | -dc, --dac_cert           | optional<sup>3</sup> | string             | Path to the PAI certificate.                |
 | -dk, --dac_key            | optional<sup>3</sup> | dec/hex            | Path to the PAI private-key.                |
-| -cd, --certification      | required             | string             | Path to the Certification Declaration (CD) file.                |
-| -cn, --common_name        | optional<sup>4</sup> | string             | Common Name to use in the Device Certificate (DAC) .                |
-| -u,  --unique_id          | optional<sup>5</sup> | hex string         | A 128 bits hex string unique id (without 0x).                                           |
-| -sv, --spake2p_verifier   | optional             | string<sup>6</sup> | Pre-generated SPAKE2+ verifier.                                          |
-| -sp, --spake2p_passcode   | required             | dec/hex            | Session passcode used to generate the SPAKE2+ verifier.        |
-| -ss, --spake2p_salt       | required             | string<sup>6</sup> | Salt used to generate the SPAKE2+ verifier.                             |
-| -si, --spake2p_iterations | required             | dec/hex            | Iteration count used to generate the SPAKE2+ verifier.                  |
+| -di, --key_id             | required             | dec/hex            | Attestation Key ID.                |
+| -dp, --key_pass           | optional<sup>3</sup> | string             | Password for the key file.                |
+| -dx, --pkcs12             | optional<sup>3</sup> | string             | Path to the PKCS#12 attestation certificates file. Formerly --att_certs.        |
+| -dn, --common_name        | optional<sup>4</sup> | string             | Common Name to use in the Device Certificate (DAC) .                |
 
-<sup>1</sup> Use xxxxxxxxx for serial, or xxx.xxx.xxx.xxx[:yyyy] for TCP.
-<sup>2</sup> If not provided (or zero), the `discriminator `is calculated as the last 12 bits of SHA256(serial_number)
+<sup>1</sup> Use xxxxxxxxx for serial, xxx.xxx.xxx.xxx[:yyyy] for TCP, or bt:XXXXXXXXXXXXXXXX for bluetooth
+<sup>2</sup> If not provided (or zero), the `discriminator `is generated at random
 <sup>3</sup> If the DAC is provided, its corresponding private-key also must be provided
 <sup>4</sup> Required if the DAC is not provided
-<sup>5</sup> If not provided, the `unique_id` is calculated as the first 128 bits of SHA256(serial_number)
+<sup>5</sup> If not provided, the `unique_id` is randomly generated
 <sup>6</sup> Salt and verifier must be provided as base64 string
 
-For the hex type, provide the value with the `0x` prefix. For hex string type, do not add the `0x` prefix.
+WARNING:
+    With the release of version 2.0, many shortcuts have been modified. Single-characters are now reserved for tool options.
+    Most long versions have been preserved, with the exception of --config and --att_certs.
 
-The -c/--config argument allows to read all the required parameters from a JSON file. The same validation rules apply
-both for command line or configuration file, but JSON does not support hexadecimal numbers. Command line arguments
-override arguments read from a configuration file.
-For instance, with the configuration `example.json`:
+### Custom Parameters
+
+Custom parameters may be defined in a YAML file formatted as the following example:
+```
+custom:
+  - id: 1
+    name: "example1"
+    short: "x1"
+    type: "int8u"
+    min: 1
+    max: 100
+    desc: "Example Parameter 1"
+
+  - id: 2
+    name: "example2"
+    short: "x2"
+    type: "string"
+    max: 8
+    desc: "Example Parameter 2"
+```
+Where `custom` is an arbitrary section name. There is no limit to the number of sections, but only 256 parameters may be defined.
+Names and shortcuts must be selected to not conflict with existing well-defined parameters.
+Custom IDs are ranged 0x00 to 0xff (255). To avoid conflict, well-defined (default) parameters IDs are ranged 0x100 (256) to 0x1ff (511).
+If a parameters file named `parameters.yaml` exists in the local directory, the parameters from that file are loaded automatically.
+Otherwise, the path to the parameters file may be provided with the `--params` option.
+
+Supported types are int8u, int16u, int32u, string, binary, and path. The `path` parameters must point to an existing file in the filesystem.
+If such file exits, its contents are read and sent to the firmware as a binary value.
+
+Given the previous configuration, the actual argument may be provided as command-line:
+```
+python3 provision.py -x1 99 --example2 "ABC123"
+```
+Or, as part of an input file:
 ```
 {
-    "version": "1.0",
+    "version": "2.0",
+    "options": {
+        "generate": true,
+    },
     "matter": {
-        "prod_fw": "/git/matter/out/lighting-app/BRD4187C/chip-efr32-lighting-example.s37",
-        "vendor_id": 4169,
-        "product_id": 32773,
-        "discriminator": 3841,
-        "attestation": {
-            "dac_cert": "temp/certs/dac_cert.pem",
-            "dac_key": "temp/certs/dac_key.pem",
-            "pai_cert": "temp/certs/pai_cert.pem",
-            "certification": "temp/certs/cd.der",
+        "instance_info": {
+            "vendor_id": 4169,
+            "product_id": 32773
+        }
+    },
+    "custom": {
+        "example1": 99,
+        "example2": "ABC123"
+    }
+}
+```
+
+On the firmware side, custom parameters are routed to the [Custom Provision Storage](examples/platform/silabs/provision/ProvisionStorageCustom.cpp).
+A sample implementation is provided, but it must be replaced with a class that matches with the parameters defined in the YAML descriptor.
+
+
+## Actions
+
+When using version 1.x, there is only one action available, which performs the device provisioning as automatically as possible.
+In contrast, version 2.x defines the following actions:
+* `auto`: This is the default action, and emulates the automatic provisioning performed in version 1.
+   This action sends: `version`, `serial_number`, `vendor_id`, `vendor_name`, `product_id`, `product_name`, `product_label`, `product_url`, `part_number`, `hw_version`, `hw_version_str`, `manufacturing_date`, `unique_id`, `discriminator`, `spake2p_passcode`, `spake2p_iterations`, `spake2p_salt`, `spake2p_verifier`, `setup_payload`, `commissioning_flow`, `rendezvous_flags`, `firmware_info`, `dac_cert`, `pai_cert`, `certification`, `dac_key`
+    And reads-back: `unique_id`, `discriminator`, `spake2p_passcode`, `setup_payload`
+* `write`: Only arguments defined either in input files or command-line are sent, for instance:
+```
+python3 provision.py write --vendor_name "Silicon Labs" --product_name "Silabs Example"
+```
+* `read`: Only arguments defined in a comma-separated list are read from the device. Arguments of type `path` are read in binary form, and
+stored in the given path, for instance:
+```
+python3 provision.py read "vendor_name, product_name, version, dac_cert" --dac_cert cert.der
+```
+
+## Use
+
+### Zero Command-line Arguments
+
+The simplest use of the Provision Tool is using all-defaults, for instance:
+```
+cd ./provision/
+python3 ./provision.py
+```
+This command works because the `./provision` folder contains a `defaults.json` file including `vendor_id`, `product_id`, and the `--generate` option.
+Any or all of these arguments may be overwritten though the command line.
+
+### Argument Files
+
+The -i/--inputs argument allows to read all the required arguments from a JSON file. The same validation rules apply
+both for command line or configuration file, but JSON does not support hexadecimal numbers. Command line arguments
+override arguments read from a configuration file. For instance, with the configuration `example.json`:
+```
+{
+    "version": "2.0",
+    "options": {
+        "generate": true
+    },
+    "matter": {
+        "instance_info": {
+            "vendor_id": 65521,
+            "product_id": 32773
         },
-        "spake2p": {
-            "passcode": 62034001,
-            "salt": "95834coRGvFhCB69IdmJyr5qYIzFgSirw6Ja7g5ySYA",
-            "iterations": 15000
+        "commissionable_data": {
+            "discriminator": 3840,
+            "passcode": 20202021,
+            "iterations": 15000,
+            "salt": "U1BBS0UyUCBLZXkgU2FsdA==",
+            "commissioning_flow": 0,
+            "rendezvous_flags": 2
         }
     }
 }
 ```
 You may run:
 ```
-python3 ./provision.py -c example.json -d 2748 -p 0x8006 -si 10000
+python3 ./provision.py --inputs example.json
 ```
-Which will set the connected device with discriminator 2748 (instead of 3841), product ID 32774 (instead of 32773),
+Which will set the connected device with discriminator 3840, product ID 32773, and use 15000 SPAKE2+ iterations. However, if you run instead:
+```
+python3 ./provision.py --inputs example.json --discriminator 2748 --product_id 0x8006 --spake2p_iterations 10000
+```
+The connected device will be set with discriminator 2748 (instead of 3840), product ID 32774 (instead of 32773),
 and use 10000 SPAKE2+ iterations (instead of 15000).
 
-To ease development and testing, the `provision.py` script provides defaults for most of the parameters. The only
-arguments that are truly mandatory are `vendor_id`, and `product_id`. Test certificates may be auto-generated using
-the -g flag, provided the `chip-cert` can be found, either in the default location, or through the `--cert-tool` argument.
+For each run, `provision.py` will generate a local file `./latest.json`, containing the arguments compiled from the different sources.
+Example input files may be found under `./inputs/`:
+```
+python ./provision.py --inputs inputs/develop.json
+```
+
+### Default Arguments
+
+To ease development and testing, either `provision.py` or the firmware provide defaults for all arguments. The only
+arguments that are truly mandatory are `vendor_id`, and `product_id`, and these are included in `defaults.json`.
+Test certificates may be auto-generated using the `--generate flag`, provided the `chip-cert` can be found, either
+in the default location, or through the `--cert-tool` argument.
 For instance, you may run:
 ```
-python3 ./provision.py -v 0x1049 -p 0x8005 -g
+python3 ./provision.py --vendor_id 0x1049 --product_id 0x8005 --generate
 ```
-Which will generate the test certificates using `chip-cert`, and set the device with the following parameters:
+Which will generate the test certificates using `chip-cert`, and provide the device with the following parameters:
 ```
 {
-    "version": "1.0",
+    "version": "2.0",
     "matter": {
-        "generate": true,
-        "vendor_id": 65522,
-        "product_id": 32773,
-        "discriminator": 3840,
-        "attestation": {
-            "cert_tool": "./out/tools/chip-cert",
-            "key_id": 2,
+        "instance_info": {
+            "vendor_id": 4169,
+            "product_id": 32773
         },
-        "spake2p": {
-            "verifier": null,
-            "passcode": 62034001,
-            "salt": "95834coRGvFhCB69IdmJyr5qYIzFgSirw6Ja7g5ySYA=",
-            "iterations": 15000
+        "commissionable_data": {
+            "discriminator": 3840,
+            "passcode": 20202021,
+            "iterations": 1500
         }
     }
 }
-```
-
-For each run, `provision.py` will generate the file `provision/config/latest.json`, containing the arguments used to set up the device.
-A default configuration with developer settings can be found at `provision/config/develop.json`:
-
-```
-python ./provision.py -c config/develop.json
 ```
 
 ## Attestation Files
 
 The `--generate` option instructs the `provider.py` script to generate test attestation files with the given Vendor ID, and Product ID.
 These files are generated using [the chip-cert tool](../src/tools/chip-cert/README.md),
-and stored under the `provision/temp` folder.
+and stored under the `./temp` folder (or the folder selected with `--temp` option).
 
 To generate the certificates manually:
 ```
@@ -216,36 +372,38 @@ To generate the certificates manually:
 ./out/debug/chip-cert gen-att-cert -t d -l 3660 -c "Matter DAC" -V 0xfff1 -P 0x8005 -C ./temp/pai_cert.pem -K ./temp/pai_key.pem -o ./temp/dac_cert.pem -O ./temp/dac_key.pem
 ```
 
-NOTE: The commissioning fails if the commissioner do not recognize the root certificate (PAA).
-When using [chip-tool](../examples/chip-tool),
-you can use the `--paa-trust-store-path` to enabled the PAA certificates for testing purposes.
+By default, `provision.py` uses the Matter Test PAA [Chip-Test-PAA-NoVID-Cert.der](../credentials/test/attestation/Chip-Test-PAA-NoVID-Cert.der) and
+its key [Chip-Test-PAA-NoVID-Key.der](../credentials/test/attestation/Chip-Test-PAA-NoVID-Key.der), which are recognized by
+[chip-tool](../examples/chip-tool). So when using `chip-tool`, no `--paa-trust-store-path` argument is required.
 
-## Example
+### Example
 
-From the root of the Silicon Labs Matter repo, build the application using the `chip_build_platform_attestation_credentials_provider` flag:
+From the root of the Silicon Labs Matter repo, build an sample application. For instance:
 ```
-./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32 ./out/lighting-app/ BRD2703A chip_build_platform_attestation_credentials_provider=true
+./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs ./out/lighting-app/ BRD4187C
 ```
 
 Set up the device with key generation:
 ```
-python3 ./provision.py -v 0x1049 -p 0x8005 \
-    -r -ki 2 -cn "Silabs Device" -ic ./temp/pai_cert.pem -cd ./temp/cd.der \
-    -sp 62034001 -ss 95834coRGvFhCB69IdmJyr5qYIzFgSirw6Ja7g5ySYA= -si 15000 \
-    -d 0xf01 -j 440266330 -pf /git/matter/core/out/lighting-app/BRD4187C/chip-efr32-lighting-example.s37
+python3 ./provision.py --channel 440144100 --vendor_id 0x1049 --product_id 0x8005 \
+    --csr --common_name  "Silabs Device" --certification ./samples/light/1/cd.bin --pai_cert ./samples/light/1/pai_cert.der \
+    --dac_cert ./samples/light/1/dac_cert.der -dk ./samples/light/1/dac_key.der \
+    --spake2p_passcode 62034001 --spake2p_salt 95834coRGvFhCB69IdmJyr5qYIzFgSirw6Ja7g5ySYA= --spake2p_iterations 15000 \
+    --discriminator 0xf01 --prod_fw ../out/lighting-app/BRD4187C/matter-silabs-lighting-example.s37
 ```
 
 Or, set up the device with imported key:
 ```
-python3 ./provision.py -v 0x1049 -p 0x8005 \
-    -ki 2 -cn "Silabs Device" -dc ./temp/dac_cert.pem  -dk ./temp/dac_key.pem  -ic ./temp/pai_cert.pem -cd ./temp/cd.der \
-    -sp 62034001 -ss 95834coRGvFhCB69IdmJyr5qYIzFgSirw6Ja7g5ySYA= -si 15000 \
-    -d 0xf01 -j 440266330 -pf /git/matter/core/out/lighting-app/BRD4187C/chip-efr32-lighting-example.s37
+python3 ./provision.py --channel 440144100 --vendor_id 0x1049 --product_id 0x8005 \
+    --certification ./samples/light/1/cd.bin --pai_cert ./samples/light/1/pai_cert.der --dac_cert ./samples/light/1/dac_cert.der -dk ./samples/light/1/dac_key.der \
+    --spake2p_passcode 62034001 --spake2p_salt 95834coRGvFhCB69IdmJyr5qYIzFgSirw6Ja7g5ySYA= --spake2p_iterations 15000 \
+    --discriminator 0xf01 --prod_fw ../out/lighting-app/BRD4187C/matter-silabs-lighting-example.s37
 ```
 
 ## Self-Provisioning
 
-Silicon Labs' Matter examples include the same provisioning engine used by the GFW. This allows applications to be flashed once but provisioned multiple times. There are two ways to put the application in provisioning mode:
+Silicon Labs' Matter examples include the same provisioning engine used by the GFW. This allows applications to be flashed once
+but provisioned multiple times. There are two ways to put the application in provisioning mode:
 * Factory-reset by pressing both BTN0 and BTN1 for six seconds
 * Write 1 to the NVM3 key 0x87228. This is useful in boards with less than two buttons, and can be accomplished using Simplicity Commander:
 ```
@@ -253,12 +411,19 @@ commander nvm3 read -o ./temp/nvm3.s37
 commander nvm3 set ./temp/nvm3.s37 --object 0x87228:01 --outfile ./temp/nvm3+.s37
 commander flash ./temp/nvm3+.s37
 ```
-Once in provisioning mode, the example firmware can be used as GFW, for instance:
+Once in provisioning mode, the example firmware can respond to Provision Protocol 2.0 commands using bluetooth. To use the
+bluetooth channel, use the `--channel` option with the string `bt:` followed by the bluetooth address of the device, for instance:
 ```
-python3 provision.py -c config/develop.json -gf ../out/light/BRD4187C/matter-silabs-lighting-example.s37
+python3 provision.py --inputs inputs/develop.json --channel bt:84:FD:27:EC:5D:FA
 ```
-If the device was factory-reset, it becomes ready for commissioning right after self-provisioning.
-
+The bluetooth channel closes upon the reception of the Finish command, or reset.
+To obtain the address of the device, the `bluet.py` tool may be used with the scan feature:
+```
+python3 bluet.py scan
+    Scanning....
+    00:0D:6F:5C:FB:E5  -40  "SiLabs-Light"
+    62:3A:46:09:CA:15  -48  "62-3A-46-09-CA-15"
+```
 
 ## Validation
 
@@ -279,7 +444,7 @@ commander readmem --range 0x0817E000:+1536 --serialno 440266330`
 ```
 
 The output should look something like:
-
+```
 commander readmem --range 0x0817E000:+1536 --serialno 440266330
 Reading 1536 bytes from 0x0817e000...
 {address:  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F}
@@ -313,7 +478,7 @@ has 476 octets:
 ...
 0817e1c0: 2E 4F 10 20 38 BA A6 B5 F6 A4 77 7A 19 91 23 79
 0817e1d0: 2F A0 FF AF F5 5C A1 59 98 08 C7 BC 5F 00 00 00
-
+```
 This should match the contents of the DER-formatted DAC certificate, which is
 stored by the setup script as ./temp/dac.der :
 
@@ -396,8 +561,8 @@ must match the contents of `cd.der`, `pai_cert.der`, and `dac.der`, respectively
 
 ## Board Support
 
-Pre-compiled images of the Generator Firmware can be found under provision/images. The source
-code of these images is found under provision/support. A single image is provided for all EFR32MG12
+Pre-compiled images of the Generator Firmware can be found under ./images. The source
+code of these images is found under ./support. A single image is provided for all EFR32MG12
 parts, and another one for the EFR32MG24 family. To copy with the different flash sizes, the
 `provision.py` script reads the device information using `commander`, and send it to the GFW,
 which configures the NVM3 during the initialization step.

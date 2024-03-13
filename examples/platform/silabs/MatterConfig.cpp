@@ -57,9 +57,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include "SilabsTestEventTriggerDelegate.h"
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
-#if !PROVISION_CHANNEL_ENABLED
-#include <SilabsDeviceDataProvider.h> // nogncheck
-#endif
+#include <provision/ProvisionManager.h>
 
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
@@ -184,16 +182,8 @@ void SilabsMatterConfig::AppInit()
 {
     GetPlatform().Init();
 
-    if(Provision::Manager::GetInstance().ProvisionRequired())
-    {
-        Provision::Manager::GetInstance().Start();
-    }
-    else
-    {
-        xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
-        SILABS_LOG("Starting scheduler");
-    }
-    
+    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
+    SILABS_LOG("Starting scheduler");
     GetPlatform().StartScheduler();
 
     // Should never get here.
@@ -263,13 +253,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
-#if PROVISION_CHANNEL_ENABLED
-    SetDeviceInstanceInfoProvider(&Silabs::Provision::Manager::GetInstance().GetStorage());
-    SetCommissionableDataProvider(&Silabs::Provision::Manager::GetInstance().GetStorage());
-#else
-    SetDeviceInstanceInfoProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
-    SetCommissionableDataProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
-#endif
+    // Provision Manager
+    Silabs::Provision::Manager & provision = Silabs::Provision::Manager::GetInstance();
+    ReturnErrorOnFailure(provision.Init());
+    SetDeviceInstanceInfoProvider(&provision.GetStorage());
+    SetCommissionableDataProvider(&provision.GetStorage());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 

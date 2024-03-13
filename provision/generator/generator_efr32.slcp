@@ -24,22 +24,22 @@ include:
     - path: app.h
   - path: ../../examples/
     file_list:
-    - path: platform/silabs/provision/ProvisionManager.cpp
-    - path: platform/silabs/provision/ProvisionManager.h
-    - path: platform/silabs/provision/ProvisionChannel.h
-    - path: platform/silabs/provision/RttStreamChannel.cpp
-    - path: platform/silabs/provision/RttStreamChannel.h
-    - path: platform/silabs/provision/ProvisionCommands.cpp
-    - path: platform/silabs/provision/ProvisionCommands.h
-    - path: platform/silabs/provision/ProvisionEncoder.cpp
-    - path: platform/silabs/provision/ProvisionEncoder.h
-    - path: platform/silabs/provision/ProvisionStorage.cpp
-    - path: platform/silabs/provision/ProvisionStorage.h
-    - path: platform/silabs/provision/ProvisionStorageDefault.cpp
-    - path: platform/silabs/provision/ProvisionStorageDefault.h
     - path: platform/silabs/provision/AttestationKey.h
     - path: platform/silabs/provision/AttestationKeyPSA.cpp
-    - path: platform/silabs/provision/AttestationKeyPSA.h
+    - path: platform/silabs/provision/ProvisionChannel.h
+    - path: platform/silabs/provision/ProvisionChannelRTT.cpp
+    - path: platform/silabs/provision/ProvisionEncoder.h
+    - path: platform/silabs/provision/ProvisionEncoder.cpp
+    - path: platform/silabs/provision/ProvisionManager.h
+    - path: platform/silabs/provision/ProvisionManager.cpp
+    - path: platform/silabs/provision/ProvisionProtocol.h
+    - path: platform/silabs/provision/ProvisionProtocolV1.cpp
+    - path: platform/silabs/provision/ProvisionProtocolV2.cpp
+    - path: platform/silabs/provision/ProvisionStorage.h
+    - path: platform/silabs/provision/ProvisionStorageGeneric.h
+    - path: platform/silabs/provision/ProvisionStorage.cpp
+    - path: platform/silabs/provision/ProvisionStorageCustom.cpp
+    - path: platform/silabs/provision/ProvisionStorageDefault.cpp
   - path: ../../examples/platform/silabs/
   - path: ../../src/
     file_list:
@@ -81,7 +81,8 @@ component:
   - id: bootloader_app_properties
 
 define:
-- { name: PROVISION_CHANNEL_ENABLED, value: '1' }
+- { name: SL_PROVISION_CHANNEL_ENABLED, value: '1' }
+- { name: SILABS_PROVISION_PROTOCOL_V1, value: '1' }
 - { name: CHIP_SYSTEM_CONFIG_USE_SOCKETS, value: '1' }
 - { name: CHIP_CONFIG_SHA256_CONTEXT_SIZE, value: '256' }
 

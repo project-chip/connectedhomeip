@@ -1,150 +1,138 @@
-from modules.util import *
-import subprocess
-import base64
+import modules.util as _util
+import modules.tools as _tools
+from modules.parameters import Types, Formats, ID
+
 
 class Exporter(object):
 
-    kSerialNumberLengthMax          = 32
-    kVendorNameLengthMax            = 32
-    kProductNameLengthMax           = 32
-    kProductLabelLengthMax          = 32
-    kProductUrlLengthMax            = 32
-    kPartNumberLengthMax            = 32
-    kHardwareVersionStrLengthMax    = 32
-    kManufacturingDateLengthMax     = 11 # yyyy-mm-dd + \0
-    kUniqueIdLengthMax              = 16
-    kVerifierLengthMax              = 150
-    kSpake2pSaltLengthMax           = 32
-    kFirmwareInfoSizeMax            = 32
-    kCertificateSizeMax             = 500
-    kCertificationSizeMax           = 350
-    kDeviceAttestationKeySizeMax    = 128
-    kSetupPayloadSizeMax            = 32
+    kVersionFieldLengthInBits = 3
+    kVendorIDFieldLengthInBits = 16
+    kProductIDFieldLengthInBits = 16
+    kCommissioningFlowFieldLengthInBits = 2
+    kRendezvousInfoFieldLengthInBits = 8
+    kPayloadDiscriminatorFieldLengthInBits = 12
+    kSetupPINCodeFieldLengthInBits = 27
+    kPaddingFieldLengthInBits = 4
 
-    def __init__(self):
-        self.reset()
+    def __init__(self, paths, args):
+        self.paths = paths
+        self.args = args
+        self.data = bytearray()
 
     def __str__(self):
         return "({}){}".format(len(self.data), self.data.hex())
 
     def reset(self):
         self.data = bytearray()
-        self.offset = 0
 
-    def addUint16(self, x, tag = None):
-        self.data.extend(int(x).to_bytes(2, 'big'))
+    def export(self):
+        self.reset()
+        # Well-known arguments
+        self.put(ID.kSerialNumber)
+        self.put(ID.kVendorId)
+        self.put(ID.kVendorName)
+        self.put(ID.kProductId)
+        self.put(ID.kProductName)
+        self.put(ID.kProductLabel)
+        self.put(ID.kProductUrl)
+        self.put(ID.kPartNumber)
+        self.put(ID.kHwVersion)
+        self.put(ID.kHwVersionStr)
+        self.put(ID.kManufacturingDate)
+        self.put(ID.kUniqueId)
+        self.put(ID.kDiscriminator)
+        self.put(ID.kSpake2pIterations)
+        self.put(ID.kSpake2pSalt)
+        self.put(ID.kSpake2pVerifier)
+        self.put(ID.kFirmwareInfo)
+        self.put(ID.kCertification)
+        self.put(ID.kPaiCert)
+        self.put(ID.kDacCert)
+        self.put(ID.kDacKey)
+        # Setup payload
+        sp = self.args.get(ID.kSetupPayload)
+        sp.set(_tools.QrCode.generateBits(self.args))
+        self.add(sp)
+        # Export to file
+        ser = self.serialize()
+        self.save(ser)
+        print("\n* Exported({}): {}".format(len(ser), self.args.str(ID.kOutputPath)))
 
-    def addUint32(self, x, tag = None):
-        self.data.extend(int(x).to_bytes(4, 'big'))
+    def serialize(self):
+        return self.data
 
-    def addArray(self, x, max, tag = None):
-        if x is None:
-            x = bytearray()
-        # print("* {}({}/{}) @{}".format(tag or '?', len(x), max, len(self.data)))
-        sz = len(x)
-        assert(sz <= max)
-        self.data.extend(int(sz).to_bytes(2, 'big'))
-        self.data.extend(x)
-        if sz < max:
-            self.data.extend(bytearray(max - sz))
+    def save(self, data):
+        output = self.args.get(ID.kOutputPath)
+        path = output.str()
+        if path is None:
+            path = self.paths.temp('binary.bin')
+            output.set(path)
+        _util.BinaryFile(path).write(data)
 
-    def addString(self, x, max, tag = None):
-        if x is None:
-            return self.addArray(x, max, tag)
+    def put(self, k):
+        self.add(self.args.get(k))
+
+    def add(self, a):
+        # print("++{}: {}; {}; [[{}]]".format(a.name, a.type, a.range(), a.value))
+        if Types.INT8U == a.type:
+            self.validateInt(a)
+            self.encodeInt8u(a)
+        elif Types.INT16U == a.type:
+            self.validateInt(a)
+            self.encodeInt16u(a)
+        elif Types.INT32U == a.type:
+            self.validateInt(a)
+            self.encodeInt32u(a)
+        elif Types.BINARY == a.type:
+            if Formats.PATH == a.format:
+                path = a.str()
+                if path is None: _util.fail("Missing path for \"{}\"".format(a.name))
+                self.addBinary(a, _util.BinaryFile(path).read())
+            elif Formats.STRING == a.format:
+                s = a.str()
+                self.addBinary(a, (s is not None) and s.encode('utf-8') or None)
+            else:
+                self.addBinary(a, a.value)
         else:
-            return self.addArray(x.encode('utf-8'), max, tag)
+            _util.fail("Export: Unsupported type {} for \"{}\"".format(a.type, a.name))
+
+    def validateInt(self, a):
+        i = a.int()
+        r = a.range()
+        # print("  {}? {}; {}".format(a.name, i, r))
+        if (r is not None) and (i is not None) and (i not in r):
+            _util.fail("Invalid value for \"{}\": {} [{}, {}]".format(a.name, i, r[0], r[-1]))
+
+    def addBinary(self, a, b):
+        if b is None: b = bytearray()
+        r = a.range()
+        if r is None:
+            _util.fail("Missing bounds for \"{}\"".format(a.name))
+        sz = len(b)
+        mx = r[-1]
+        if (r is not None) and (sz not in r):
+            _util.fail("Invalid size for \"{}\": {} > {}".format(a.name, sz, mx))
+        self.encodeBinary(a, b, mx)
+
+    def encodeInt8u(self, a):
+        pass
+
+    def encodeInt16u(self, a):
+        pass
+
+    def encodeInt16u(self, a):
+        pass
+
+    def encodeBinary(self, a, v, max_size):
+        pass
 
     # This method extracts the raw private-key from the DER file using the OpenSSL ASN.1 parser
     # Currently unused since the flash-only implementation reads DER
-    def extractKey(self, path):
+    @staticmethod
+    def extractKey(path):
         TAG = 'HEX DUMP'
         ps = subprocess.Popen(('openssl', 'asn1parse', '-inform', 'der', '-in', path), stdout=subprocess.PIPE)
         out = subprocess.check_output(('grep', TAG), stdin=ps.stdout)
         line = out.decode(sys.stdout.encoding).strip()
         off = line.find(TAG) + len(TAG) + 2 # [HEX DUMP]:xxxx...
         return bytearray.fromhex(line[off:])
-
-    def export(self, args, paths):
-        bitmap = 0xfffffffe
-        self.addUint32(bitmap, '')
-        self.addString(args.serial_number, Exporter.kSerialNumberLengthMax, 'serial_number')
-        self.addUint16(args.vendor_id, 'vendor_id')
-        self.addString(args.vendor_name, Exporter.kVendorNameLengthMax, 'vendor_name')
-        self.addUint16(args.product_id, 'product_id')
-        self.addString(args.product_name, Exporter.kProductNameLengthMax, 'product_name')
-        self.addString(args.product_label, Exporter.kProductLabelLengthMax, 'product_label')
-        self.addString(args.product_url, Exporter.kProductUrlLengthMax, 'product_url')
-        self.addString(args.part_number, Exporter.kPartNumberLengthMax, 'part_number')
-        self.addUint16(args.hw_version, 'hw_version')
-        self.addString(args.hw_version_str, Exporter.kHardwareVersionStrLengthMax, 'hw_version_str')
-        self.addString(args.manufacturing_date, Exporter.kManufacturingDateLengthMax, 'manufacturing_date')
-        self.addArray(args.unique_id, Exporter.kUniqueIdLengthMax, 'unique_id')
-        self.addUint16(args.discriminator, 'discriminator')
-        self.addUint32(args.spake2p.iterations, 'iterations')
-        self.addString(args.spake2p.salt, Exporter.kSpake2pSaltLengthMax, 'salt')
-        self.addString(args.spake2p.verifier, Exporter.kVerifierLengthMax, 'verifier')
-        self.addArray(bytearray(), Exporter.kFirmwareInfoSizeMax, 'fw_info') # TODO; FirmwareInfo
-        # self.addUint32(0) # Base Address
-        self.addArray(self.read(paths.cd), Exporter.kCertificationSizeMax, 'cd')
-        self.addArray(self.read(paths.pai_cert_der), Exporter.kCertificateSizeMax, 'pai')
-        self.addArray(self.read(paths.dac_cert_der), Exporter.kCertificateSizeMax, 'dac')
-        self.addArray(self.read(paths.dac_key_der), Exporter.kDeviceAttestationKeySizeMax, 'key')
-        self.addArray(self.generateQrCodeBitSet(args), Exporter.kSetupPayloadSizeMax, 'payload')
-
-        with open("{}".format(args.binary), 'wb') as f:
-            f.write(self.data)
-
-        print("\n◆ Exported({}): {}".format(len(self.data), args.binary))
-
-    def read(self, path):
-        contents = bytearray()
-        with open(path, 'rb') as f:
-            contents = bytearray(f.read())
-        return contents
-
-    def generateQrCodeBitSet(self, args):
-        kVersionFieldLengthInBits = 3
-        kVendorIDFieldLengthInBits = 16
-        kProductIDFieldLengthInBits = 16
-        kCommissioningFlowFieldLengthInBits = 2
-        kRendezvousInfoFieldLengthInBits = 8
-        kPayloadDiscriminatorFieldLengthInBits = 12
-        kSetupPINCodeFieldLengthInBits = 27
-        kPaddingFieldLengthInBits = 4
-
-        kTotalPayloadDataSizeInBits = (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits +
-                                       kCommissioningFlowFieldLengthInBits + kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits +
-                                       kSetupPINCodeFieldLengthInBits + kPaddingFieldLengthInBits)
-
-        offset = 0
-        fillBits = [0] * int(kTotalPayloadDataSizeInBits / 8)
-        offset = self.WriteBits(fillBits, offset, 0, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits)
-        offset = self.WriteBits(fillBits, offset, args.vendor_id, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits)
-        offset = self.WriteBits(fillBits, offset, args.product_id, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits)
-        offset = self.WriteBits(fillBits, offset, args.commissioning_flow,
-                                kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits)
-        offset = self.WriteBits(fillBits, offset, args.rendezvous_flags,
-                                kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits)
-        offset = self.WriteBits(fillBits, offset, args.discriminator,
-                                kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits)
-        offset = self.WriteBits(fillBits, offset, args.spake2p.passcode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits)
-        offset = self.WriteBits(fillBits, offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits)
-
-        return bytes(fillBits)
-
-    # Populates numberOfBits starting from LSB of input into bits, which is assumed to be zero-initialized
-    def WriteBits(self, bits, offset, input, numberOfBits, totalPayloadSizeInBits):
-        if ((offset + numberOfBits) > totalPayloadSizeInBits):
-            print("THIS IS NOT VALID")
-            return
-        # input < 1u << numberOfBits);
-
-        index = offset
-        offset += numberOfBits
-        while (input != 0):
-            if (input & 1):
-                bits[int(index / 8)] |= (1 << (index % 8))
-            index += 1
-            input >>= 1
-
-        return offset

@@ -1,0 +1,71 @@
+- version: '1.0'
+  supports:
+    - RC_1.1.0-1.1
+    - CSA_1.1.0.2
+  summary: |-
+    - Supports the old silabs_examples/credentials firmware.
+    - No NVM3 keys used for the attestation credentials.
+    - Applications use silabs_creds.h to match sizes and offsets of the stored credentials.
+
+- version: '1.1'
+  date: '2023-05-10'
+  supports:
+    - RC_2.1.0-1.1
+    - RC_2.0.0-1.1
+  module: 'v1_0'
+  summary: |-
+    - Supports the old ./cpms/ version of the script.
+    - Introduces the NVM3 keys for the credentials sizes and offsets.
+    - kConfigKey_Creds_KeyId = 0x87321
+    - PSA driver configuration:
+      - SL_PSA_ITS_SUPPORT_V1_DRIVER 1
+      - SL_PSA_ITS_SUPPORT_V2_DRIVER 1
+      - SL_PSA_ITS_SUPPORT_V2_DRIVER 0
+    - These Setup parameters change in later versions:
+      - vendor_id: Int32u
+      - product_id: Int32u
+      - commissioning_flow: Int32u
+      - rendezvous_flags: Int32u
+      - spake2p_iterations: Binary (little-endian)
+
+- version: '1.2'
+  date: '2023-10-25'
+  supports:
+    - RC_2.2.0-1.2
+    - CSA_1.2.0.0
+    - CSA_1.2.0.1
+  summary: |-
+    - PSA driver changed:
+      - SL_PSA_ITS_SUPPORT_V1_DRIVER 0
+      - SL_PSA_ITS_SUPPORT_V2_DRIVER 0
+      - SL_PSA_ITS_SUPPORT_V2_DRIVER 1
+    - Credentials NVM3 keys moved to the correct location:
+      - kConfigKey_Creds_KeyId = 0x87320
+    - Setup parameter fixed:
+      - spake2p_iterations: Int32u
+
+- version: '1.3'
+  date: '2024-01-24'
+  supports:
+    - RC_2.3.0-1.3
+  summary: |-
+    - Adds backwards compatibility for the PSA drivers:
+      - SL_PSA_ITS_SUPPORT_V1_DRIVER 1
+      - SL_PSA_ITS_SUPPORT_V2_DRIVER 1
+      - SL_PSA_ITS_SUPPORT_V3_DRIVER 1
+    - Setup parameters fixed:
+      - vendor_id: Int16u
+      - product_id: Int16u
+      - commissioning_flow: Int8u
+      - rendezvous_flags: Int8u
+
+- version: '2.0'
+  date: '2024-01-24'
+  supports:
+    - RC_2.3.0-1.3
+  summary: |-
+    - Version using the new provisioning firmware with:
+      - SL_PSA_ITS_SUPPORT_V1_DRIVER 1
+      - SL_PSA_ITS_SUPPORT_V2_DRIVER 1
+      - SL_PSA_ITS_SUPPORT_V3_DRIVER 1
+      - kConfigKey_Creds_KeyId = 0x87320:

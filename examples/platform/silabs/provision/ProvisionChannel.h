@@ -12,22 +12,14 @@ namespace Provision {
 class Channel
 {
 public:
-    Channel(bool active): mActive(active) {}
-    virtual ~Channel() = default;
-    virtual CHIP_ERROR Init() = 0;
-    virtual CHIP_ERROR Read(uint8_t *buffer, size_t buffer_length, size_t &bytes_read) = 0;
-    virtual CHIP_ERROR Write(const uint8_t *buffer, size_t buffer_length) = 0;
+    Channel() = default;
+    ~Channel() = default;
 
-    void SetActive(bool active) {
-        mActive = active;
-    }
+    CHIP_ERROR Init();
+    CHIP_ERROR Read(uint8_t *buffer, size_t buffer_length, size_t &bytes_read);
+    CHIP_ERROR Write(const uint8_t *buffer, size_t buffer_length);
 
-    bool IsActive() {
-        return mActive;
-    }
-
-private:
-    bool mActive = false;
+    static CHIP_ERROR Update(uint16_t handle);
 };
 
 } // namespace Provision

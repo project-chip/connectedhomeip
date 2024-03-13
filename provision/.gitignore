@@ -1,0 +1,8 @@
+# Files
+latest.json
+*.bak
+*-
+
+# Folders
+build
+temp

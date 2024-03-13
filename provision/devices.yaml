@@ -1,0 +1,57 @@
+efr32mg12:
+  ram_addr: 0x20000000
+  flash_addr: 0x0000000
+  stack_size: 0x8000
+  firmware:
+    - version: "1.0"
+      file: "efr32mg12_psa12_nvm3k2.s37"
+    - version: "1.1"
+      file: "efr32mg12_psa12_nvm3k1.s37"
+    - version: "1.2"
+      file: "efr32mg12_psa3_nvm3k2.s37"
+    - version: "1.3"
+      file: "efr32mg12_psa123_nvm3k2.s37"
+    - version: "2.0"
+      file: "efr32mg12_psa123_nvm3k2.s37"
+
+efr32mg24:
+  ram_addr: 0x20000000
+  flash_addr: 0x8000000
+  stack_size: 0x8000
+  firmware:
+    - version: "1.0"
+      file: "efr32mg24_psa12_nvm3k2.s37"
+    - version: "1.1"
+      file: "efr32mg24_psa12_nvm3k1.s37"
+    - version: "1.2"
+      file: "efr32mg24_psa3_nvm3k2.s37"
+    - version: "1.3"
+      file: "efr32mg24_psa123_nvm3k2.s37"
+    - version: "2.0"
+      file: "efr32mg24_psa123_nvm3k2.s37"
+
+mgm24:
+  ram_addr: 0x20000000
+  flash_addr: 0x0000000
+  stack_size: 0x8000
+  firmware:
+    - version: "1.0"
+      file: "efr32mg24_psa12_nvm3k2.s37"
+    - version: "1.1"
+      file: "efr32mg24_psa12_nvm3k1.s37"
+    - version: "1.2"
+      file: "efr32mg24_psa3_nvm3k2.s37"
+    - version: "1.3"
+      file: "efr32mg24_psa123_nvm3k2.s37"
+    - version: "2.0"
+      file: "efr32mg24_psa123_nvm3k2.s37"
+
+Si917Commonflash:
+  ram_addr: 0x400
+  flash_addr: 0x8202000
+  stack_size: 0x4FC00
+  firmware:
+    - version: "1.0"
+      file: "si917.rps"
+    - version: "2.0"
+      file: "si917.rps"

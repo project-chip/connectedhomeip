@@ -15,22 +15,33 @@
  *
  ******************************************************************************/
 
-#include <stdint.h>
-#include <stddef.h>
-#include <string.h>
-#include <stdio.h>
-
-#include <em_msc.h>
-#include <psa/crypto.h>
-
 #include <provision/ProvisionManager.h>
-#include <provision/ProvisionStorageDefault.h>
-#include <provision/RttStreamChannel.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/CHIPMem.h>
+#include <mbedtls/platform.h>
+#include <FreeRTOS.h>
+#include <task.h>
 
 using namespace chip::DeviceLayer::Silabs;
-Provision::RttStreamChannel sProvisionChannel;
-Provision::DefaultStorage sProvisionStore;
-Provision::Manager sProvisionManager(sProvisionStore, sProvisionChannel);
+
+#define MAIN_TASK_STACK_SIZE    (1024)
+#define MAIN_TASK_PRIORITY      (configMAX_PRIORITIES - 1)
+
+namespace {
+
+TaskHandle_t main_Task;
+
+void taskMain(void * pvParameter)
+{
+    // Run manager
+    Provision::Manager &man = Provision::Manager::GetInstance();
+    while (man.Step());
+    // Reset
+    vTaskDelay(pdMS_TO_TICKS(500));
+    NVIC_SystemReset();
+}
+
+} // namespace
 
 /*******************************************************************************
  * Initialize application.
@@ -38,11 +49,11 @@ Provision::Manager sProvisionManager(sProvisionStore, sProvisionChannel);
 
 void app_init(void)
 {
-#ifndef SIWX_917
-    MSC_Init();
-    psa_crypto_init();
+#if !defined(MBEDTLS_PLATFORM_CALLOC_MACRO) ||  !defined(MBEDTLS_PLATFORM_FREE_MACRO)
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    ReturnOnFailure(chip::Platform::MemoryInit());
 #endif
-    sProvisionManager.Start();
+    xTaskCreate(taskMain, "Provision Task", MAIN_TASK_STACK_SIZE, nullptr, MAIN_TASK_PRIORITY, &main_Task);
 }
 
 /*******************************************************************************

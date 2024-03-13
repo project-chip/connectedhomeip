@@ -18,9 +18,10 @@
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
 #include "nvm3_default_config.h"
-
 #include "sl_wifi_device.h"
+#include <stdio.h>
 
+namespace {
 extern char linker_nvm_begin;
 __attribute__((used)) uint8_t nvm3_default_storage[NVM3_DEFAULT_NVM_SIZE] __attribute__ ((section(".simee")));
 #define NVM3_BASE (&linker_nvm_begin)
@@ -31,14 +32,14 @@ __attribute__((used)) uint8_t nvm3_default_storage[NVM3_DEFAULT_NVM_SIZE] __attr
 // WiFi Client Interface
 #define SL_NET_WIFI_CLIENT_INTERFACE (1 << 3)
 
-static nvm3_Handle_t  nvm3_defaultHandleData;
+nvm3_Handle_t  nvm3_defaultHandleData;
 
 #if (NVM3_DEFAULT_CACHE_SIZE != 0)
-static nvm3_CacheEntry_t defaultCache[NVM3_DEFAULT_CACHE_SIZE];
+nvm3_CacheEntry_t defaultCache[NVM3_DEFAULT_CACHE_SIZE];
 #endif
 
 
-static nvm3_Init_t nvm3_defaultInitData =
+nvm3_Init_t nvm3_defaultInitData =
 {
   (nvm3_HalPtr_t)NVM3_BASE,
   0,
@@ -75,12 +76,14 @@ static const sl_wifi_device_configuration_t station_init_configuration = {
                       ),
                    .bt_feature_bit_map = 0,
                    .ext_tcp_ip_feature_bit_map =
-                     (SL_SI91X_EXT_TCP_IP_FEAT_SSL_HIGH_PERFORMANCE | SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD
+                     (SL_SI91X_EXT_FEAT_HTTP_OTAF_SUPPORT | SL_SI91X_EXT_TCP_IP_SSL_16K_RECORD
                       | SL_SI91X_CONFIG_FEAT_EXTENTION_VALID),
                    .ble_feature_bit_map     = 0,
                    .ble_ext_feature_bit_map = 0,
                    .config_feature_bit_map  = 0 }
 };
+
+} // namespace
 
 //------------------------------------------------------------------------------
 // Public

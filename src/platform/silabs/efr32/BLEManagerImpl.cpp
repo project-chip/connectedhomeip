@@ -50,6 +50,9 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
+#include <provision/ProvisionManager.h> // nogncheck
+#include <provision/ProvisionChannel.h> // nogncheck
+
 using namespace ::chip;
 using namespace ::chip::Ble;
 
@@ -712,12 +715,20 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 void BLEManagerImpl::HandleWriteEvent(volatile sl_bt_msg_t * evt)
 {
     uint16_t attribute = evt->data.evt_gatt_server_user_write_request.characteristic;
-
+    bool do_provision = chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().IsProvisionRequired();
     ChipLogProgress(DeviceLayer, "Char Write Req, char : %d", attribute);
 
     if (gattdb_CHIPoBLEChar_Rx == attribute)
     {
-        HandleRXCharWrite(evt);
+        if (do_provision)
+        {
+            chip::DeviceLayer::Silabs::Provision::Channel::Update(attribute);
+            chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().Step();
+        }
+        else
+        {
+            HandleRXCharWrite(evt);
+        }
     }
 }
 

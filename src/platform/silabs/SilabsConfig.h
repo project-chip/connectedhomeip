@@ -122,6 +122,7 @@ public:
     static constexpr Key kConfigKey_Creds_CD_Offset       = SilabsConfigKey(kMatterFactory_KeyBase, 0x26);
     static constexpr Key kConfigKey_Creds_CD_Size         = SilabsConfigKey(kMatterFactory_KeyBase, 0x27);
     static constexpr Key kConfigKey_Provision_Request     = SilabsConfigKey(kMatterFactory_KeyBase, 0x28);
+    static constexpr Key kConfigKey_Provision_Version     = SilabsConfigKey(kMatterFactory_KeyBase, 0x29);
     // Matter Config Keys
     static constexpr Key kConfigKey_ServiceConfig      = SilabsConfigKey(kMatterConfig_KeyBase, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = SilabsConfigKey(kMatterConfig_KeyBase, 0x02);

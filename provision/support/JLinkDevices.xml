@@ -23,4 +23,12 @@
    <ChipInfo Vendor="Silicon Labs" Name="Si917" Core="JLINK_CORE_CORTEX_M4" WorkRAMAddr="0x400" WorkRAMSize="0x00030000" />
    <FlashBankInfo Name="QSPI M4 Flash" BaseAddr="0x08202000" MaxSize="0x1ef000" Loader="si917/RS9117_SF_4MB_42bsp.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
   </Device>
+  <Device>
+   <ChipInfo Vendor="Silicon Labs" Name="Si917DualFlash" Core="JLINK_CORE_CORTEX_M4" WorkRAMAddr="0x00000000" WorkRAMSize="0x00020000" />
+   <FlashBankInfo Name="QSPI M4 Flash" BaseAddr="0x08012000" MaxSize="0x00400000" Loader="si917/RS9117_SF_4MB_42bsp.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
+  </Device>
+  <Device>
+   <ChipInfo Vendor="Silicon Labs" Name="Si917Commonflash" Core="JLINK_CORE_CORTEX_M4" WorkRAMAddr="0x400" WorkRAMSize="0x00030000" />
+   <FlashBankInfo Name="QSPI M4 Flash" BaseAddr="0x081c2000" MaxSize="0x00400000" Loader="si917/RS9117_SF_4MB_42bsp.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
+  </Device>
 </Database>

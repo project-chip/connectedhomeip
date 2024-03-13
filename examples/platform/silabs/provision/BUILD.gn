@@ -24,7 +24,7 @@ config("provision-config") {
 
   defines = [ "CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS=1" ]
   if (use_provision_channel) {
-    defines += [ "PROVISION_CHANNEL_ENABLED=1" ]
+    defines += [ "SL_PROVISION_CHANNEL_ENABLED=1" ]
   }
 }
 
@@ -33,16 +33,15 @@ source_set("provision-common") {
   sources = [
     "${silabs_common_plat_dir}/provision/AttestationKey.h",
     "${silabs_common_plat_dir}/provision/ProvisionChannel.h",
-    "${silabs_common_plat_dir}/provision/RttStreamChannel.cpp",
-    "${silabs_common_plat_dir}/provision/RttStreamChannel.h",
-    "${silabs_common_plat_dir}/provision/ProvisionCommands.cpp",
-    "${silabs_common_plat_dir}/provision/ProvisionCommands.h",
-    "${silabs_common_plat_dir}/provision/ProvisionEncoder.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionEncoder.h",
-    "${silabs_common_plat_dir}/provision/ProvisionManager.cpp",
+    "${silabs_common_plat_dir}/provision/ProvisionEncoder.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionManager.h",
+    "${silabs_common_plat_dir}/provision/ProvisionManager.cpp",
+    "${silabs_common_plat_dir}/provision/ProvisionProtocol.h",
+    "${silabs_common_plat_dir}/provision/ProvisionProtocolV2.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionStorage.h",
     "${silabs_common_plat_dir}/provision/ProvisionStorage.cpp",
+    "${silabs_common_plat_dir}/provision/ProvisionStorageCustom.cpp",
   ]
 
   public_deps = [
@@ -58,11 +57,8 @@ source_set("provision-common") {
 source_set("provision-flash-only") {
 
   sources = [
-    "${silabs_common_plat_dir}/provision/AttestationKeyMbed.h",
     "${silabs_common_plat_dir}/provision/AttestationKeyMbed.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionStorageFlash.cpp",
-    "${silabs_common_plat_dir}/provision/ProvisionStorageFlash.h",
-    "${silabs_common_plat_dir}/provision/ProvisionManagerFlashOnly.cpp",
   ]
 
   public_deps = [ ":provision-common" ]
@@ -73,10 +69,8 @@ static_library("provision-efr32") {
 
   sources = [
     "${silabs_common_plat_dir}/provision/AttestationKeyPSA.cpp",
-    "${silabs_common_plat_dir}/provision/AttestationKeyPSA.h",
+    "${silabs_common_plat_dir}/provision/ProvisionChannelEFR32BLE.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionStorageDefault.cpp",
-    "${silabs_common_plat_dir}/provision/ProvisionStorageDefault.h",
-    "${silabs_common_plat_dir}/provision/ProvisionManagerDefault.cpp",
   ]
 
   public_deps = [ ":provision-common" ]
@@ -87,10 +81,8 @@ static_library("provision-siwx917") {
 
   sources = [
     "${silabs_common_plat_dir}/provision/AttestationKeyMbed.cpp",
-    "${silabs_common_plat_dir}/provision/AttestationKeyMbed.h",
+    "${silabs_common_plat_dir}/provision/ProvisionChannelSi917BLE.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionStorageDefault.cpp",
-    "${silabs_common_plat_dir}/provision/ProvisionStorageDefault.h",
-    "${silabs_common_plat_dir}/provision/ProvisionManagerDefault.cpp",
   ]
 
   public_deps = [ ":provision-common" ]

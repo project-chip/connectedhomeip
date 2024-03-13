@@ -1,156 +1,105 @@
 #include "ProvisionManager.h"
-#include "ProvisionCommands.h"
+#include "ProvisionProtocol.h"
 #include "ProvisionEncoder.h"
-
-#include <FreeRTOS.h>
-#include <task.h>
-
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/CHIPPlatformMemory.h>
-#include <lib/support/CHIPMem.h>
-#include <mbedtls/platform.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
 namespace Provision {
 
-static uint8_t buffer[1024] = { 0xff };
-static InitCommand _init_command;
-static CsrCommand _csr_command;
-static ImportCommand _import_command;
-static SetupCommand _setup_command;
-
-
-#define MAIN_TASK_STACK_SIZE    (1024)
-#define MAIN_TASK_PRIORITY      (configMAX_PRIORITIES - 1)
-TaskHandle_t main_Task;
-
-
-void taskMain(void * pvParameter)
-{
-    Manager *man = static_cast<Manager*>(pvParameter);
-    if(man)
-    {
-        man->Run();
-    }
-}
-
-
-CHIP_ERROR Manager::Start()
-{
-#if !defined(MBEDTLS_PLATFORM_CALLOC_MACRO) ||  !defined(MBEDTLS_PLATFORM_FREE_MACRO)
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-    ReturnErrorOnFailure(chip::Platform::MemoryInit());
+namespace {
+#ifdef SILABS_PROVISION_PROTOCOL_V1
+/**
+ * Protocol v1.x does not support fragmention. The buffer must
+ * hold the entire files (DAC, PAI, CD)
+ */
+uint8_t rx_buffer[Storage::kArgumentSizeMax];
+uint8_t tx_buffer[Storage::kArgumentSizeMax];
+#else
+/**
+ * Protocol v2.0 enforces a maximum package size. Larger files
+ * are fragmented in as many packages as needed
+ */
+uint8_t rx_buffer[Protocol2::kPackageSizeMax];
+uint8_t tx_buffer[Protocol2::kPackageSizeMax];
 #endif
-    xTaskCreate(taskMain, "Provision Task", MAIN_TASK_STACK_SIZE, this, MAIN_TASK_PRIORITY, &main_Task);
+}// namespace
+
+CHIP_ERROR Manager::Init()
+{
+    if(CHIP_NO_ERROR != mStore.GetProvisionRequest(mProvisionRequested))
+    {
+#ifdef SL_PROVISION_CHANNEL_ENABLED
+        mProvisionRequested = SL_PROVISION_CHANNEL_ENABLED;
+#else
+        mProvisionRequested = false;
+#endif
+    }
+    if(mProvisionRequested)
+    {
+        ChipLogProgress(DeviceLayer, "Bluetooth Provision Enabled!");
+        // Disable provision mode for next boot
+        mStore.SetProvisionRequest(false);
+    }
     return CHIP_NO_ERROR;
 }
 
-void Manager::Run()
+bool Manager::Step()
 {
-    bool done = !ProvisionRequired();
-    while (!done)
+    size_t bytes_read = 0;
+    size_t offset = 0;
+
+    while(CHIP_NO_ERROR == mChannel.Read(&rx_buffer[offset], sizeof(rx_buffer) - offset, bytes_read))
     {
-        size_t bytes_read = 0;
-        size_t offset = 0;
-
-        while(CHIP_NO_ERROR == mChannel.Read(&buffer[offset], sizeof(buffer) - offset, bytes_read))
-        {
-            offset += bytes_read;
-            bytes_read = 0;
-        }
-        if(offset > 0)
-        {
-            Encoder input(buffer, offset);
-            Encoder output(buffer, sizeof(buffer));
-            done = ProcessCommand(input, output);
-            mChannel.Write(output.data(), output.offset());
-        }
+        offset += bytes_read;
+        bytes_read = 0;
     }
-    // Mark as provisioned
-    mStore.SetProvisionRequest(false);
-
-    // Reset
-    vTaskDelay(pdMS_TO_TICKS(500));
-    NVIC_SystemReset();
+    if(offset > 0)
+    {
+        ByteSpan input(rx_buffer, offset);
+        MutableByteSpan output(tx_buffer, sizeof(tx_buffer));
+        mProvisionRequested = ProcessCommand(input, output);
+        mChannel.Write(output.data(), output.size());
+    }
+    return mProvisionRequested;
 }
 
-
-bool Manager::ProvisionRequired()
+bool Manager::IsProvisionRequired()
 {
-    bool requested = false;
-    if(CHIP_NO_ERROR == mStore.GetProvisionRequest(requested))
+    return mProvisionRequested;
+}
+
+CHIP_ERROR Manager::SetProvisionRequired(bool do_provision)
+{
+    mProvisionRequested = do_provision;
+    return mStore.SetProvisionRequest(do_provision);
+}
+
+bool Manager::ProcessCommand(ByteSpan & req, MutableByteSpan & res)
+{
+    VerifyOrReturnError(req.size() > 1, false);
+    uint8_t prot_id = req.data()[0];
+    switch(prot_id)
     {
-        return requested;
-    }
-#if defined(PROVISION_CHANNEL_ENABLED)
-    return (PROVISION_CHANNEL_ENABLED > 0);
-#else
-    return false;
+#ifdef SILABS_PROVISION_PROTOCOL_V1
+        case 1:
+            return mProtocol1.Execute(req, res);
 #endif
-}
-
-
-CHIP_ERROR Manager::RequestProvision()
-{
-    return mStore.SetProvisionRequest(true);
-}
-
-
-bool Manager::ProcessCommand(Encoder & input, Encoder & output)
-{
-    // Decode header
-    Command *cmd = DecodeCommand(input);
-    if(!cmd)
-    {
-        EncodeHeader(output, 0, CHIP_ERROR_INVALID_ARGUMENT);
-        return true;
-    }
-
-    // Decode command
-    CHIP_ERROR err = cmd->DecodeRequest(input);
-    if(CHIP_NO_ERROR == err)
-    {
-        // Execute command
-        err = cmd->Execute(mStore);
-    }
-
-    // Encode response
-    EncodeHeader(output, cmd->id(), err);
-    if(CHIP_NO_ERROR == err)
-    {
-        cmd->EncodeResponse(output);
-        return (kCommand_Setup == cmd->id());
+        case 2:
+            return mProtocol2.Execute(req, res);
+        default:
+            res.reduce_size(0);
     }
     return false;
 }
 
-Command *Manager::DecodeCommand(Encoder & input)
-{
-    uint8_t command_id = kCommand_None;
-    VerifyOrReturnError(CHIP_NO_ERROR == input.getUint8(command_id), nullptr);
-
-    switch(command_id)
-    {
-    case kCommand_Init:
-        return &_init_command;
-    case kCommand_CSR:
-        return &_csr_command;
-    case kCommand_Import:
-        return &_import_command;
-    case kCommand_Setup:
-        return &_setup_command;
-    default:
-        return nullptr;
-    }
+namespace {
+Manager sManager;
 }
 
-void Manager::EncodeHeader(Encoder & output, uint8_t cid, CHIP_ERROR err)
-{
-    output.addUint8(cid);
-    output.addInt32(static_cast<uint32_t>(err.AsInteger()));
-}
+Manager & Manager::GetInstance() { return sManager; }
 
 } // namespace Provision
 } // namespace Silabs

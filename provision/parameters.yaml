@@ -1,0 +1,15 @@
+custom:
+  - id: 1
+    name: "example1"
+    short: "x1"
+    type: "int8u"
+    min: 1
+    max: 100
+    desc: "Example Parameter 1"
+
+  - id: 2
+    name: "example2"
+    short: "x2"
+    type: "string"
+    max: 8
+    desc: "Example Parameter 2"

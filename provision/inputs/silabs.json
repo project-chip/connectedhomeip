@@ -1,0 +1,15 @@
+{
+    "version": "2.0",
+    "matter": {
+        "instance_info": {
+            "vendor_id": 4169,
+            "product_id": 32773
+        },
+        "commissionable_data": {
+            "discriminator": 3841,
+            "passcode": 62034001,
+            "iterations": 1500,
+            "salt": "U1BBS0UyUCBLZXkgU2FsdA=="
+        }
+    }
+}

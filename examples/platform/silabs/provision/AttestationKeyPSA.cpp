@@ -1,29 +1,17 @@
-#include "AttestationKeyPSA.h"
+#include "AttestationKey.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <mbedtls/x509_csr.h>
 #include <mbedtls/asn1.h>
 #include <mbedtls/pk.h>
-// #include <em_msc.h>
+#include <sl_psa_crypto.h>
 #include <stdio.h>
 #include <string.h>
-
-
-#if defined(SEMAILBOX_PRESENT) && (_SILICON_LABS_SECURITY_FEATURE == _SILICON_LABS_SECURITY_FEATURE_VAULT)
-#define PSA_CRYPTO_LOCATION_FOR_DEVICE PSA_KEY_LOCATION_SL_SE_OPAQUE
-#elif defined(CRYPTOACC_PRESENT) && defined(SEPUF_PRESENT) && defined(SL_TRUSTZONE_NONSECURE)
-#define PSA_CRYPTO_LOCATION_FOR_DEVICE PSA_KEY_LOCATION_SL_CRYPTOACC_OPAQUE
-#else
-#define PSA_CRYPTO_LOCATION_FOR_DEVICE PSA_KEY_LOCATION_LOCAL_STORAGE
-#endif
-
 
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
 namespace Provision {
-
-#define ATT_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kDevice, (e))
 
 using SilabsConfig = chip::DeviceLayer::Internal::SilabsConfig;
 
@@ -50,6 +38,7 @@ int generateKey(uint32_t kid)
     destroyKey(kid);
 
     psa_key_attributes_t attr = psa_key_attributes_init();
+
     psa_set_key_id(&attr, kid);
     psa_set_key_type(&attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
     psa_set_key_bits(&attr, 256);
@@ -57,7 +46,7 @@ int generateKey(uint32_t kid)
     psa_set_key_usage_flags(
         &attr, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
     psa_set_key_lifetime(
-        &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, PSA_CRYPTO_LOCATION_FOR_DEVICE));
+        &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, sl_psa_get_most_secure_key_location()));
 
     psa_key_id_t id = 0;
     psa_status_t err = psa_generate_key(&attr, &id);
@@ -77,7 +66,7 @@ int importKey(uint32_t kid, const uint8_t * value, size_t size)
     psa_set_key_usage_flags(
         &attr, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
     psa_set_key_lifetime(
-        &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, PSA_CRYPTO_LOCATION_FOR_DEVICE));
+        &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, sl_psa_get_most_secure_key_location()));
 
     psa_key_id_t id = 0;
     psa_status_t err = psa_import_key(&attr, value, size, &id);
@@ -97,18 +86,22 @@ int importCallback(void *ctx, int tag, unsigned char *value, size_t size)
 }
 
 
-CHIP_ERROR AttestationKeyPSA::Import(const uint8_t * asn1, size_t size)
+CHIP_ERROR AttestationKey::Import(const uint8_t * asn1, size_t size)
 {
     uint8_t *p = (uint8_t *)asn1;
     uint8_t *q = p + size;
 
     int err = mbedtls_asn1_traverse_sequence_of(&p, q, 0, 0, 0, 0, importCallback, &mId);
-    return CHIP_ERROR(err ? (err < 0 ? (0x0f000000 - err) : (0x0e000000 + err)) : 0);
     return err ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AttestationKey::Export(uint8_t * asn1, size_t max, size_t &size)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
-CHIP_ERROR AttestationKeyPSA::GenerateCSR(uint16_t vid, uint16_t pid, const CharSpan &cn, MutableCharSpan & csr)
+
+CHIP_ERROR AttestationKey::GenerateCSR(uint16_t vid, uint16_t pid, const CharSpan &cn, MutableCharSpan & csr)
 {
     mbedtls_pk_context key_ctx;
     mbedtls_x509write_csr csr_ctx;
@@ -120,7 +113,14 @@ CHIP_ERROR AttestationKeyPSA::GenerateCSR(uint16_t vid, uint16_t pid, const Char
 
     // Subject name
     char subject_name[64] = { 0 };
-    snprintf(subject_name, sizeof(subject_name), "CN=%s Mvid:%04X Mpid:%04X", cn.data(), vid, pid);
+    if(cn.size() > 0)
+    {
+        snprintf(subject_name, sizeof(subject_name), "CN=%s Mvid:%04X Mpid:%04X", cn.data(), vid, pid);
+    }
+    else
+    {
+        snprintf(subject_name, sizeof(subject_name), "CN=Matter Device Mvid:%04X Mpid:%04X", vid, pid);
+    }
     int err = mbedtls_x509write_csr_set_subject_name(&csr_ctx, subject_name);
     VerifyOrReturnError(0 == err, CHIP_ERROR_INTERNAL);
 
@@ -146,12 +146,10 @@ CHIP_ERROR AttestationKeyPSA::GenerateCSR(uint16_t vid, uint16_t pid, const Char
 }
 
 
-CHIP_ERROR AttestationKeyPSA::SignMessage(const ByteSpan & message, MutableByteSpan & out_span)
+CHIP_ERROR AttestationKey::SignMessage(const ByteSpan & message, MutableByteSpan & out_span)
 {
     uint8_t signature[64] = { 0 };
     size_t signature_size = sizeof(signature);
-
-    ChipLogProgress(DeviceLayer, "SignWithDeviceAttestationKey, key:%lu", mId);
 
     psa_status_t err =
         psa_sign_message(static_cast<psa_key_id_t>(mId), PSA_ALG_ECDSA(PSA_ALG_SHA_256), message.data(),

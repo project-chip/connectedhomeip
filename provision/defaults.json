@@ -1,0 +1,17 @@
+{
+    "version": "2.0",
+    "options": {
+        "generate": true
+    },
+    "matter": {
+        "instance_info": {
+            "vendor_id": 4169,
+            "product_id": 32773
+        },
+        "commissionable_data": {
+            "discriminator": 3840,
+            "passcode": 20202021,
+            "iterations": 1500
+        }
+    }
+}

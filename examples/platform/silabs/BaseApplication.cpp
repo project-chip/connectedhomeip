@@ -35,7 +35,6 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include <SilabsDeviceDataProvider.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
@@ -751,7 +750,7 @@ void BaseApplication::ScheduleFactoryReset()
         // Press both buttons to request provisioning
         if(GetPlatform().GetButtonState(APP_ACTION_BUTTON))
         {
-            Provision::Manager::GetInstance().RequestProvision();
+            Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
         PlatformMgr().HandleServerShuttingDown();
         ConfigurationMgr().InitiateFactoryReset();
@@ -768,18 +767,13 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 
 void BaseApplication::OutputQrCode(bool refreshLCD)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     (void) refreshLCD; // could be unused
 
     // Create buffer for the Qr code setup payload that can fit max size and null terminator.
     char setupPayloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan setupPayload(setupPayloadBuffer);
 
-#if PROVISION_CHANNEL_ENABLED
-    err = Provision::Manager::GetInstance().GetStorage().GetSetupPayload(setupPayload);
-#else
-    err = Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(setupPayload);
-#endif
+    CHIP_ERROR err = Provision::Manager::GetInstance().GetStorage().GetSetupPayload(setupPayload);
     if (CHIP_NO_ERROR == err)
     {
         // Print setup info on LCD if available

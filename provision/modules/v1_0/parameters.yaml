@@ -1,0 +1,17 @@
+options:
+  - id: 0x013a
+    name: 'pylink_lib'
+    short: 'l'
+
+instance_info:
+  - id: 0x0141
+    name: 'serial_number'
+    short: 'S'
+
+  - id: 0x0143
+    name: 'vendor_name'
+    short: 'V'
+
+  - id: 0x0145
+    name: 'product_name'
+    short: 'P'

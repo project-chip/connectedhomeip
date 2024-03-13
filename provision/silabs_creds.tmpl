@@ -1,14 +1,32 @@
 /**
- *  To enable these credentias, compile the app with option "chip_build_device_attestation_credentials=true".
+ *  To enable these credentias, compile the app with option
+ *  "chip_build_device_attestation_credentials=true".
  */
 
-#define SILABS_CREDENTIALS_DAC_KEY_ID    {{key_id}}
+#ifndef SILABS_PROVISION_VERSION_1_0
+#define SILABS_PROVISION_VERSION_1_0    {{use_legacy_certs_format}}
+#endif
 
-#define SILABS_CREDENTIALS_DAC_OFFSET    {{dac_offset}}
-#define SILABS_CREDENTIALS_DAC_SIZE      {{dac_size}}
+#ifndef SILABS_CREDENTIALS_DAC_OFFSET
+#define SILABS_CREDENTIALS_DAC_OFFSET   {{dac_offset}}
+#endif
 
-#define SILABS_CREDENTIALS_PAI_OFFSET    {{pai_offset}}
-#define SILABS_CREDENTIALS_PAI_SIZE      {{pai_size}}
+#ifndef SILABS_CREDENTIALS_DAC_SIZE
+#define SILABS_CREDENTIALS_DAC_SIZE     {{dac_size}}
+#endif
 
-#define SILABS_CREDENTIALS_CD_OFFSET     {{cd_offset}}
-#define SILABS_CREDENTIALS_CD_SIZE       {{cd_size}}
+#ifndef SILABS_CREDENTIALS_PAI_OFFSET
+#define SILABS_CREDENTIALS_PAI_OFFSET   {{pai_offset}}
+#endif
+
+#ifndef SILABS_CREDENTIALS_PAI_SIZE
+#define SILABS_CREDENTIALS_PAI_SIZE     {{pai_size}}
+#endif
+
+#ifndef SILABS_CREDENTIALS_CD_OFFSET
+#define SILABS_CREDENTIALS_CD_OFFSET    {{cd_offset}}
+#endif
+
+#ifndef SILABS_CREDENTIALS_CD_SIZE
+#define SILABS_CREDENTIALS_CD_SIZE      {{cd_size}}
+#endif

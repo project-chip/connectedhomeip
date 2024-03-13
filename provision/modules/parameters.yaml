@@ -1,0 +1,386 @@
+internal:
+  - id: 0x0101
+    desc: 'Flash Address'
+    name: 'flash_address'
+    short: '_i1'
+    type: 'int32u'
+    format: 'hex'
+    hidden: true
+
+  - id: 0x0102
+    desc: 'Flash Size'
+    name: 'flash_size'
+    short: '_i2'
+    type: 'int32u'
+    hidden: true
+
+  - id: 0x0103
+    desc: 'Flash Page Size'
+    name: 'flash_page_size'
+    short: '_i3'
+    type: 'int32u'
+    hidden: true
+
+  - id: 0x0104
+    desc: 'Base Address'
+    name: 'base_address'
+    short: '_i4'
+    type: 'int32u'
+    format: 'hex'
+    hidden: true
+
+  - id: 0x0105
+    desc: 'Certificate Signing Request'
+    name: '_csr_'
+    short: '_i5'
+    type: 'string'
+    hidden: true
+
+options:
+  - id: 0x0111
+    desc: 'Version'
+    name: 'version'
+    short: 'v'
+    type: 'string'
+
+  - id: 0x0112
+    desc: 'Action'
+    name: 'action'
+    type: 'string'
+    default: 'auto'
+    fixed: true
+    hidden: true
+
+  - id: 0x0113
+    desc: 'Extra data'
+    name: 'extra'
+    type: 'string'
+    fixed: true
+    hidden: true
+
+  - id: 0x0114
+    desc: 'Stop'
+    name: 'stop'
+    short: 's'
+    type: 'flag'
+    hidden: true
+
+  - id: 0x0121
+    desc: 'Additional Parameters File'
+    name: 'params'
+    short: 'p'
+    type: 'path'
+
+  - id: 0x0122
+    desc: 'Inputs File'
+    name: 'inputs'
+    short: 'i'
+    type: 'path'
+
+  - id: 0x0123
+    desc: 'Output File'
+    name: 'output'
+    short: 'o'
+    type: 'path'
+    check: false
+
+  - id: 0x0124
+    desc: 'Temporary folder'
+    name: 'temp'
+    short: 't'
+    type: 'path'
+    check: false
+
+  - id: 0x0131
+    desc: 'Target Device'
+    name: 'device'
+    short: 'd'
+    type: 'string'
+
+  - id: 0x0132
+    desc: 'Connection String'
+    name: 'channel'
+    short: 'c'
+    type: 'string'
+
+  - id: 0x0133
+    desc: 'Generate Test Certificates'
+    name: 'generate'
+    short: 'g'
+    type: 'flag'
+
+  - id: 0x0134
+    desc: 'Certificate Signing Request Mode'
+    name: 'csr'
+    short: 'r'
+    type: 'flag'
+
+  - id: 0x0135
+    desc: 'Generator Firmware Path'
+    name: 'gen_fw'
+    short: 'gf'
+    type: 'path'
+
+  - id: 0x0136
+    desc: 'Production Firmware Path'
+    name: 'prod_fw'
+    short: 'pf'
+    type: 'path'
+
+  - id: 0x0137
+    desc: 'Cert-tool Path'
+    name: 'cert_tool'
+    short: 'ct'
+    type: 'path'
+    check: false
+
+  - id: 0x013a
+    desc: 'Pylink-square Library Path'
+    name: 'pylink_lib'
+    short: 'jl'
+    type: 'path'
+
+instance_info:
+  - id: 0x0141
+    desc: 'Serial Number'
+    name: 'serial_number'
+    short: 'sn'
+    type: 'string'
+    max: 32
+
+  - id: 0x0142
+    desc: 'Vendor ID'
+    name: 'vendor_id'
+    short: 'vi'
+    type: 'int16u'
+    format: 'hex'
+
+  - id: 0x0143
+    desc: 'Vendor Name'
+    name: 'vendor_name'
+    short: 'vn'
+    type: 'string'
+    max: 32
+
+  - id: 0x0144
+    desc: 'Product Id'
+    name: 'product_id'
+    short: 'pi'
+    type: 'int16u'
+    format: 'hex'
+
+  - id: 0x0145
+    desc: 'Product Name'
+    name: 'product_name'
+    short: 'pn'
+    type: 'string'
+    max: 32
+
+  - id: 0x0146
+    desc: 'Product Label'
+    name: 'product_label'
+    short: 'pl'
+    type: 'string'
+    max: 32
+
+  - id: 0x0147
+    desc: 'Product URL'
+    name: 'product_url'
+    short: 'pu'
+    type: 'string'
+    max: 32
+
+  - id: 0x0148
+    desc: 'Part Number'
+    name: 'part_number'
+    short: 'pm'
+    type: 'string'
+    max: 32
+
+  - id: 0x0151
+    desc: 'Hardware Version'
+    name: 'hw_version'
+    short: 'hv'
+    type: 'int16u'
+
+  - id: 0x0152
+    desc: 'Hardware Version String'
+    name: 'hw_version_str'
+    short: 'hs'
+    type: 'string'
+    max: 32
+
+  - id: 0x0153
+    desc: 'Manufacturing Date'
+    name: 'manufacturing_date'
+    short: 'hm'
+    type: 'date'
+    max: 10
+
+  - id: 0x0154
+    desc: 'Rotating Device ID, Unique ID'
+    name: 'unique_id'
+    short: 'ui'
+    type: 'binary'
+    min: 1
+    max: 16
+
+commissionable_data:
+  - id: 0x0161
+    desc: 'Setup Discriminator'
+    name: 'discriminator'
+    short: 'sd'
+    type: 'int16u'
+    format: 'hex'
+    max: 0x0fff
+
+  - id: 0x0162
+    desc: 'SPAKE2+ Setup Passcode'
+    name: 'spake2p_passcode'
+    short: 'sp'
+    type: 'int32u'
+    format: 'hex'
+    min: 0
+    max: 0x7ffffff
+    invalid: [ 00000000, 11111111, 22222222, 33333333, 44444444, 55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321 ]
+
+  - id: 0x0163
+    desc: 'SPAKE2+ Iteration Count'
+    name: 'spake2p_iterations'
+    short: 'si'
+    type: 'int32u'
+    min: 1000
+    max: 100000
+
+  - id: 0x0164
+    desc: 'SPAKE2+ Salt'
+    name: 'spake2p_salt'
+    short: 'ss'
+    type: 'string'
+    max: 45
+
+  - id: 0x0165
+    desc: 'SPAKE2+ Verifier'
+    name: 'spake2p_verifier'
+    short: 'sv'
+    type: 'string'
+    max: 133
+
+  - id: 0x0166
+    desc: 'Setup Payload'
+    name: 'setup_payload'
+    short: 'sy'
+    type: 'binary'
+    max: 88
+
+  - id: 0x0167
+    desc: 'Commissioning Flow'
+    name: 'commissioning_flow'
+    short: 'sf'
+    type: 'int8u'
+
+  - id: 0x0168
+    desc: 'Rendezvous Flags'
+    name: 'rendezvous_flags'
+    short: 'sr'
+    type: 'int8u'
+
+attestation_credentials:
+  - id: 0x0181
+    desc: 'Firmware Information'
+    name: 'firmware_info'
+    short: 'fi'
+    type: 'binary'
+    max: 32
+
+  - id: 0x0182
+    desc: 'Certification Declaration'
+    name: 'certification'
+    short: 'cd'
+    type: 'path'
+    max: 350
+    check: false
+
+  - id: 0x0183
+    desc: 'Certification Declaration Signing Cert'
+    name: 'cd_cert'
+    short: 'cc'
+    type: 'path'
+    max: 500
+
+  - id: 0x0184
+    desc: 'Certification Declaration Signing Key'
+    name: 'cd_key'
+    short: 'ck'
+    type: 'path'
+    max: 128
+
+  - id: 0x0191
+    desc: 'Product Attestation Authority Certificate'
+    name: 'paa_cert'
+    short: 'ac'
+    type: 'path'
+    max: 500
+
+  - id: 0x0192
+    desc: 'Product Attestation Authority Key'
+    name: 'paa_key'
+    short: 'ak'
+    type: 'path'
+    max: 128
+
+  - id: 0x0193
+    desc: 'Product Attestation Intermediate Certificate'
+    name: 'pai_cert'
+    short: 'ic'
+    type: 'path'
+    max: 500
+    check: false
+
+  - id: 0x0194
+    desc: 'Product Attestation Intermediate Key'
+    name: 'pai_key'
+    short: 'ik'
+    type: 'path'
+    max: 128
+
+  - id: 0x0195
+    desc: 'Device Attestation Certificate'
+    name: 'dac_cert'
+    short: 'dc'
+    type: 'path'
+    max: 500
+    check: false
+
+  - id: 0x0196
+    desc: 'Device Attestation Key'
+    name: 'dac_key'
+    short: 'dk'
+    type: 'path'
+    max: 128
+
+  - id: 0x0197
+    desc: 'Device Attestation Key ID'
+    name: 'key_id'
+    short: 'di'
+    type: 'int16u'
+
+  - id: 0x0198
+    desc: 'Device Attestation Key Password'
+    name: 'key_pass'
+    short: 'dp'
+    type: 'string'
+    max: 128
+
+  - id: 0x0199
+    desc: 'PKCS#12 Attestation Certificates'
+    name: 'pkcs12'
+    short: 'dx'
+    type: 'path'
+    max: 1024
+
+  - id: 0x01a1
+    desc: 'Common Name'
+    name: 'common_name'
+    short: 'dn'
+    type: 'string'

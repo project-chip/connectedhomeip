@@ -58,29 +58,29 @@ source:
   - path: ../../src/lib/support/CHIPMem.cpp
   - path: ../../src/lib/support/CHIPPlatformMemory.cpp
   - path: ../../src/lib/support/CHIPMem-Malloc.cpp
-  - path: ../../third_party/silabs/matter_support/matter/si91x/siwx917/BRD4338A/support/src/startup_common_RS1xxxx.c
+
 include:
   - path: .
     file_list:
     - path: app.h
   - path: ../../examples/
     file_list:
-    - path: platform/silabs/provision/ProvisionManager.cpp
-    - path: platform/silabs/provision/ProvisionManager.h
-    - path: platform/silabs/provision/ProvisionChannel.h
-    - path: platform/silabs/provision/RttStreamChannel.cpp
-    - path: platform/silabs/provision/RttStreamChannel.h
-    - path: platform/silabs/provision/ProvisionCommands.cpp
-    - path: platform/silabs/provision/ProvisionCommands.h
-    - path: platform/silabs/provision/ProvisionEncoder.cpp
-    - path: platform/silabs/provision/ProvisionEncoder.h
-    - path: platform/silabs/provision/ProvisionStorage.cpp
-    - path: platform/silabs/provision/ProvisionStorage.h
-    - path: platform/silabs/provision/ProvisionStorageDefault.cpp
-    - path: platform/silabs/provision/ProvisionStorageDefault.h
     - path: platform/silabs/provision/AttestationKey.h
     - path: platform/silabs/provision/AttestationKeyMbed.cpp
-    - path: platform/silabs/provision/AttestationKeyMbed.h
+    - path: platform/silabs/provision/ProvisionChannel.h
+    - path: platform/silabs/provision/ProvisionChannelRTT.cpp
+    - path: platform/silabs/provision/ProvisionEncoder.h
+    - path: platform/silabs/provision/ProvisionEncoder.cpp
+    - path: platform/silabs/provision/ProvisionManager.h
+    - path: platform/silabs/provision/ProvisionManager.cpp
+    - path: platform/silabs/provision/ProvisionProtocol.h
+    - path: platform/silabs/provision/ProvisionProtocolV1.cpp
+    - path: platform/silabs/provision/ProvisionProtocolV2.cpp
+    - path: platform/silabs/provision/ProvisionStorage.h
+    - path: platform/silabs/provision/ProvisionStorageGeneric.h
+    - path: platform/silabs/provision/ProvisionStorage.cpp
+    - path: platform/silabs/provision/ProvisionStorageCustom.cpp
+    - path: platform/silabs/provision/ProvisionStorageDefault.cpp
     - path: platform/silabs/syscalls_stubs.cpp
   - path: ../../examples/platform/silabs/
   - path: ../../src/

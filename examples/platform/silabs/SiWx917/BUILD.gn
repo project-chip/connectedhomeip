@@ -98,21 +98,6 @@ source_set("siwx917-matter-shell") {
   }
 }
 
-source_set("silabs-factory-data-provider") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
-    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/setup_payload",
-  ]
-
-  public_configs = [ ":siwx917-common-config" ]
-}
-
 config("siwx917-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
@@ -250,11 +235,6 @@ source_set("siwx917-common") {
 
   # Provisionned data and credentials
   public_deps += [ "${silabs_common_plat_dir}/provision:provision-siwx917" ]
-
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider && !use_provision_channel) {
-    public_deps += [ ":silabs-factory-data-provider" ]
-  }
 
   if (silabs_test_event_trigger_enabled) {
     sources +=

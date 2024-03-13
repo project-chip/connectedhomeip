@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ProvisionStorageGeneric.h"
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/CommissionableDataProvider.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -8,6 +9,7 @@
 #include <lib/core/CHIPError.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
+#include <app/data-model/Nullable.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -16,82 +18,185 @@ namespace DeviceLayer {
 namespace Silabs {
 namespace Provision {
 
-static constexpr size_t kSerialNumberLengthMax          = 32;
-static constexpr size_t kVendorNameLengthMax            = 32;
-static constexpr size_t kProductNameLengthMax           = 32;
-static constexpr size_t kProductLabelLengthMax          = 32;
-static constexpr size_t kProductUrlLengthMax            = 32;
-static constexpr size_t kPartNumberLengthMax            = 32;
-static constexpr size_t kHardwareVersionStrLengthMax    = 32;
-static constexpr size_t kManufacturingDateLengthMax     = 11; // yyyy-mm-dd + \0
-static constexpr size_t kUniqueIdLengthMax              = 16;
-static constexpr size_t kSpake2pVerifierB64LengthMax    = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
-static constexpr size_t kSpake2pSaltB64LengthMax        = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
-static constexpr size_t kFirmwareInfoSizeMax            = 32;
-static constexpr size_t kCertificateSizeMax             = 500;
-static constexpr size_t kCertificationSizeMax           = 350;
-static constexpr size_t kDeviceAttestationKeySizeMax    = 128;
-static constexpr size_t kSetupPayloadSizeMax            = 32;
+namespace Parameters {
 
-static constexpr size_t kVersionFieldLengthInBits = 3;
-static constexpr size_t kVendorIDFieldLengthInBits = 16;
-static constexpr size_t kProductIDFieldLengthInBits = 16;
-static constexpr size_t kCommissioningFlowFieldLengthInBits = 2;
-static constexpr size_t kRendezvousInfoFieldLengthInBits = 8;
-static constexpr size_t kPayloadDiscriminatorFieldLengthInBits = 12;
-static constexpr size_t kSetupPINCodeFieldLengthInBits = 27;
-static constexpr size_t kPaddingFieldLengthInBits = 4;
-static constexpr size_t kTotalPayloadDataSizeInBits = (
-                            kVersionFieldLengthInBits + kVendorIDFieldLengthInBits +
-                            kProductIDFieldLengthInBits + kCommissioningFlowFieldLengthInBits +
-                            kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits +
-                            kSetupPINCodeFieldLengthInBits + kPaddingFieldLengthInBits);
-static constexpr size_t kTotalPayloadDataSize = kTotalPayloadDataSizeInBits / 8;
+enum ID: uint16_t
+{
+    // Internal,
+    kFlashAddress       = 0x0101,
+    kFlashSize          = 0x0102,
+    kFlashPageSize      = 0x0103,
+    kBaseAddress        = 0x0104,
+    kCsrFile            = 0x0105,
+    // Options,
+    kVersion            = 0x0111,
+    kAction             = 0x0112,
+    kExtra              = 0x0113,
+    kStop               = 0x0114,
+    kParamsPath         = 0x0121,
+    kInputsPath         = 0x0122,
+    kOutputPath         = 0x0123,
+    kTemporaryDir       = 0x0124,
+    kTargetDevice       = 0x0131,
+    kChannel            = 0x0132,
+    kGenerateCreds      = 0x0133,
+    kCsrMode            = 0x0134,
+    kGeneratorFW        = 0x0135,
+    kProductionFW       = 0x0136,
+    kCertToolPath       = 0x0137,
+    kPylinkLib          = 0x0138,
+    // Instance Info,
+    kSerialNumber       = 0x0141,
+    kVendorId           = 0x0142,
+    kVendorName         = 0x0143,
+    kProductId          = 0x0144,
+    kProductName        = 0x0145,
+    kProductLabel       = 0x0146,
+    kProductUrl         = 0x0147,
+    kPartNumber         = 0x0148,
+    kHwVersion          = 0x0151,
+    kHwVersionStr       = 0x0152,
+    kManufacturingDate  = 0x0153,
+    kUniqueId           = 0x0154,
+    // Commissionable Data,
+    kDiscriminator      = 0x0161,
+    kSpake2pPasscode    = 0x0162,
+    kSpake2pIterations  = 0x0163,
+    kSpake2pSalt        = 0x0164,
+    kSpake2pVerifier    = 0x0165,
+    kSetupPayload       = 0x0166,
+    kCommissioningFlow  = 0x0167,
+    kRendezvousFlags    = 0x0168,
+    // Attestation Credentials,
+    kFirmwareInfo       = 0x0181,
+    kCertification      = 0x0182,
+    kCdCert             = 0x0183,
+    kCdKey              = 0x0184,
+    kPaaCert            = 0x0191,
+    kPaaKey             = 0x0192,
+    kPaiCert            = 0x0193,
+    kPaiKey             = 0x0194,
+    kDacCert            = 0x0195,
+    kDacKey             = 0x0196,
+    kKeyId              = 0x0197,
+    kKeyPass            = 0x0198,
+    kPKCS12             = 0x0199,
+    kCommonName         = 0x01a1,
+};
 
-struct Storage: public DeviceInstanceInfoProvider,
-                public CommissionableDataProvider,
+} // namespace Parameters
+
+
+
+struct CustomStorage: public GenericStorage
+{
+    CHIP_ERROR Set(uint16_t id, const uint8_t *value) override;
+    CHIP_ERROR Get(uint16_t id, uint8_t &value) override;
+    CHIP_ERROR Set(uint16_t id, const uint16_t *value) override;
+    CHIP_ERROR Get(uint16_t id, uint16_t &value) override;
+    CHIP_ERROR Set(uint16_t id, const uint32_t *value) override;
+    CHIP_ERROR Get(uint16_t id, uint32_t &value) override;
+    CHIP_ERROR Set(uint16_t id, const uint64_t *value) override;
+    CHIP_ERROR Get(uint16_t id, uint64_t &value) override;
+    CHIP_ERROR Get(uint16_t id, uint8_t *value, size_t max_size, size_t &size) override;
+    CHIP_ERROR Set(uint16_t id, const uint8_t *value, size_t size) override;
+};
+
+namespace {
+constexpr size_t kVersionFieldLengthInBits = 3;
+constexpr size_t kVendorIDFieldLengthInBits = 16;
+constexpr size_t kProductIDFieldLengthInBits = 16;
+constexpr size_t kCommissioningFlowFieldLengthInBits = 2;
+constexpr size_t kRendezvousInfoFieldLengthInBits = 8;
+constexpr size_t kPayloadDiscriminatorFieldLengthInBits = 12;
+constexpr size_t kSetupPINCodeFieldLengthInBits = 27;
+constexpr size_t kPaddingFieldLengthInBits = 4;
+} // namespace
+
+struct Storage: public GenericStorage,
+                public chip::DeviceLayer::DeviceInstanceInfoProvider,
+                public chip::DeviceLayer::CommissionableDataProvider,
                 public chip::Credentials::DeviceAttestationCredentialsProvider
 {
-    friend class Manager;
-    friend class CsrCommand;
-    friend class ImportCommand;
-    friend class SetupCommand;
-public:
+    static constexpr size_t kArgumentSizeMax                = 512;
+    static constexpr size_t kVersionLengthMax               = 16;
+    static constexpr size_t kSerialNumberLengthMax          = 32;
+    static constexpr size_t kVendorNameLengthMax            = 32;
+    static constexpr size_t kProductNameLengthMax           = 32;
+    static constexpr size_t kProductLabelLengthMax          = 32;
+    static constexpr size_t kProductUrlLengthMax            = 32;
+    static constexpr size_t kPartNumberLengthMax            = 32;
+    static constexpr size_t kHardwareVersionStrLengthMax    = 32;
+    static constexpr size_t kManufacturingDateLengthMax     = 11; // yyyy-mm-dd + \0
+    static constexpr size_t kUniqueIdLengthMax              = 16;
+    static constexpr size_t kSpake2pVerifierB64LengthMax    = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
+    static constexpr size_t kSpake2pSaltB64LengthMax        = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+    static constexpr size_t kFirmwareInfoSizeMax            = 32;
+    static constexpr size_t kCertificationSizeMax           = 350;
+    static constexpr size_t kCertificateSizeMax             = kArgumentSizeMax;
+    static constexpr size_t kDeviceAttestationKeySizeMax    = 128;
+    static constexpr size_t kSetupPayloadSizeMax            = 32;
+    static constexpr size_t kCsrLengthMax   = 512;
+    static constexpr size_t kCommonNameMax  = 128;
+    static constexpr size_t kTotalPayloadDataSizeInBits = (
+                                kVersionFieldLengthInBits + kVendorIDFieldLengthInBits +
+                                kProductIDFieldLengthInBits + kCommissioningFlowFieldLengthInBits +
+                                kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits +
+                                kSetupPINCodeFieldLengthInBits + kPaddingFieldLengthInBits);
+    static constexpr size_t kTotalPayloadDataSize = kTotalPayloadDataSizeInBits / 8;
 
-    virtual ~Storage() = default;
+public:
+    static uint8_t aux_buffer[Storage::kArgumentSizeMax];
+
+    friend class Manager;
+    friend class Protocol1;
+    friend class Command;
+    friend class CsrCommand;
+    friend class ReadCommand;
+    friend class WriteCommand;
 
     //
     // Initialization
     //
 
-    virtual CHIP_ERROR Initialize(uint32_t flash_addr, uint32_t flash_size) = 0;
-    virtual CHIP_ERROR GetBaseAddress(uint32_t & value) = 0;
+    CHIP_ERROR Initialize(uint32_t flash_addr, uint32_t flash_size);
+    CHIP_ERROR Commit();
+    CHIP_ERROR GetBaseAddress(uint32_t & value);
+
+    //
+    // Generic Interface
+    //
+
+    CHIP_ERROR Get(uint16_t id, uint8_t &value) override;
+    CHIP_ERROR Get(uint16_t id, uint16_t &value) override;
+    CHIP_ERROR Get(uint16_t id, uint32_t &value) override;
+    CHIP_ERROR Get(uint16_t id, uint64_t &value) override;
+    CHIP_ERROR Get(uint16_t id, uint8_t *value, size_t max_size, size_t &size) override;
 
     //
     // DeviceInstanceInfoProvider
     //
 
-    virtual CHIP_ERROR GetSerialNumber(char * value, size_t max) = 0;
-    virtual CHIP_ERROR GetVendorId(uint16_t & value) = 0;
-    virtual CHIP_ERROR GetVendorName(char * value, size_t max) = 0;
-    virtual CHIP_ERROR GetProductId(uint16_t & productId) = 0;
-    virtual CHIP_ERROR GetProductName(char * value, size_t max) = 0;
-    virtual CHIP_ERROR GetProductLabel(char * value, size_t max) = 0;
-    virtual CHIP_ERROR GetProductURL(char * value, size_t max) = 0;
-    virtual CHIP_ERROR GetPartNumber(char * value, size_t max) = 0;
-    virtual CHIP_ERROR GetHardwareVersion(uint16_t & value) = 0;
-    virtual CHIP_ERROR GetHardwareVersionString(char * value, size_t max) = 0;
-    virtual CHIP_ERROR GetManufacturingDate(char * value, size_t max) = 0;
+    CHIP_ERROR GetSerialNumber(char * value, size_t max);
+    CHIP_ERROR GetVendorId(uint16_t & value);
+    CHIP_ERROR GetVendorName(char * value, size_t max);
+    CHIP_ERROR GetProductId(uint16_t & productId);
+    CHIP_ERROR GetProductName(char * value, size_t max);
+    CHIP_ERROR GetProductLabel(char * value, size_t max);
+    CHIP_ERROR GetProductURL(char * value, size_t max);
+    CHIP_ERROR GetPartNumber(char * value, size_t max);
+    CHIP_ERROR GetHardwareVersion(uint16_t & value);
+    CHIP_ERROR GetHardwareVersionString(char * value, size_t max);
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day);
-    virtual CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & value) = 0;
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & value);
 
     //
     // CommissionableDataProvider
     //
 
-    virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & value) = 0;
-    virtual CHIP_ERROR GetSpake2pIterationCount(uint32_t & value) = 0;
-    virtual CHIP_ERROR GetSetupPasscode(uint32_t & value) = 0;
+    CHIP_ERROR GetSetupDiscriminator(uint16_t & value);
+    CHIP_ERROR GetSpake2pIterationCount(uint32_t & value);
+    CHIP_ERROR GetSetupPasscode(uint32_t & value);
     CHIP_ERROR GetSpake2pSalt(MutableByteSpan & value);
     CHIP_ERROR GetSpake2pVerifier(MutableByteSpan & value, size_t & size);
 
@@ -99,54 +204,73 @@ public:
     // DeviceAttestationCredentialsProvider
     //
 
-    virtual CHIP_ERROR GetFirmwareInformation(MutableByteSpan & value) = 0;
-    virtual CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & value) = 0;
-    virtual CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & value) = 0;
-    virtual CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & value) = 0;
-    virtual CHIP_ERROR GetDeviceAttestationCSR(uint32_t kid, uint16_t vid, uint16_t pid, const CharSpan &cn, MutableCharSpan & csr) = 0;
-    virtual CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message, MutableByteSpan & signature) = 0;
+    CHIP_ERROR GetFirmwareInformation(MutableByteSpan & value);
+    CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & value);
+    CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & value);
+    CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & value);
+    CHIP_ERROR GetDeviceAttestationCSR(uint16_t vid, uint16_t pid, const CharSpan &cn, MutableCharSpan & csr);
+    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message, MutableByteSpan & signature);
 
     //
     // Other
     //
 
-    // Setup Payload
     CHIP_ERROR GetSetupPayload(chip::MutableCharSpan &value);
+    CHIP_ERROR SetProvisionRequest(bool value);
+    CHIP_ERROR GetProvisionRequest(bool &value);
 
-    // Provision Request
-    virtual CHIP_ERROR SetProvisionRequest(bool value) = 0;
-    virtual CHIP_ERROR GetProvisionRequest(bool &value) = 0;
+private:
+    // Generic Interface
+    CHIP_ERROR Set(uint16_t id, const uint8_t *value) override;
+    CHIP_ERROR Set(uint16_t id, const uint16_t *value) override;
+    CHIP_ERROR Set(uint16_t id, const uint32_t *value) override;
+    CHIP_ERROR Set(uint16_t id, const uint64_t *value) override;
+    CHIP_ERROR Set(uint16_t id, const uint8_t *value, size_t size) override;
+    // DeviceInstanceInfoProvider
+    CHIP_ERROR SetSerialNumber(const char * value, size_t len);
+    CHIP_ERROR SetVendorId(uint16_t value);
+    CHIP_ERROR SetVendorName(const char * value, size_t len);
+    CHIP_ERROR SetProductId(uint16_t productId);
+    CHIP_ERROR SetProductName(const char * value, size_t len);
+    CHIP_ERROR SetProductLabel(const char * value, size_t len);
+    CHIP_ERROR SetProductURL(const char * value, size_t len);
+    CHIP_ERROR SetPartNumber(const char * value, size_t len);
+    CHIP_ERROR SetHardwareVersion(uint16_t value);
+    CHIP_ERROR SetHardwareVersionString(const char * value, size_t len);
+    CHIP_ERROR SetManufacturingDate(const char * value, size_t len);
+    CHIP_ERROR GetManufacturingDate(uint8_t * value, size_t max, size_t &size);
+    CHIP_ERROR SetUniqueId(const uint8_t * value, size_t size);
+    CHIP_ERROR GetUniqueId(uint8_t * value, size_t max, size_t &size);
+    // CommissionableDataProvider
+    CHIP_ERROR SetSetupDiscriminator(uint16_t value);
+    CHIP_ERROR SetSpake2pIterationCount(uint32_t value);
+    CHIP_ERROR SetSetupPasscode(uint32_t value);
+    CHIP_ERROR SetSpake2pSalt(const char * value, size_t size);
+    CHIP_ERROR GetSpake2pSalt(char * value, size_t max, size_t &size);
+    CHIP_ERROR SetSpake2pVerifier(const char * value, size_t size);
+    CHIP_ERROR GetSpake2pVerifier(char * value, size_t max, size_t &size);
+    // DeviceAttestationCredentialsProvider
+    CHIP_ERROR SetFirmwareInformation(const ByteSpan & value);
+    CHIP_ERROR SetCertificationDeclaration(const ByteSpan & value);
+    CHIP_ERROR SetProductAttestationIntermediateCert(const ByteSpan & value);
+    CHIP_ERROR SetDeviceAttestationCert(const ByteSpan & value);
+    CHIP_ERROR SetDeviceAttestationKey(const ByteSpan & value);
+    // Other
+    CHIP_ERROR SetProvisionVersion(const char * value, size_t len);
+    CHIP_ERROR GetProvisionVersion(char * value, size_t max, size_t &size);
+    CHIP_ERROR SetSetupPayload(const uint8_t * value, size_t size);
+    CHIP_ERROR GetSetupPayload(uint8_t * value, size_t max, size_t &size);
 
-protected:
-    virtual CHIP_ERROR SetSerialNumber(const char * value, size_t len) = 0;
-    virtual CHIP_ERROR SetVendorId(uint16_t value) = 0;
-    virtual CHIP_ERROR SetVendorName(const char * value, size_t len) = 0;
-    virtual CHIP_ERROR SetProductId(uint16_t productId) = 0;
-    virtual CHIP_ERROR SetProductName(const char * value, size_t len) = 0;
-    virtual CHIP_ERROR SetProductLabel(const char * value, size_t len) = 0;
-    virtual CHIP_ERROR SetProductURL(const char * value, size_t len) = 0;
-    virtual CHIP_ERROR SetPartNumber(const char * value, size_t len) = 0;
-    virtual CHIP_ERROR SetHardwareVersion(uint16_t & value) = 0;
-    virtual CHIP_ERROR SetHardwareVersionString(const char * value, size_t len) = 0;
-    virtual CHIP_ERROR SetManufacturingDate(const char * value, size_t len) = 0;
-    virtual CHIP_ERROR SetUniqueId(const uint8_t * value, size_t size) = 0;
-
-    virtual CHIP_ERROR SetSetupDiscriminator(uint16_t value) = 0;
-    virtual CHIP_ERROR SetSpake2pIterationCount(uint32_t value) = 0;
-    virtual CHIP_ERROR SetSetupPasscode(uint32_t value) = 0;
-    virtual CHIP_ERROR SetSpake2pSalt(const char * value, size_t size) = 0;
-    virtual CHIP_ERROR GetSpake2pSalt(char * value, size_t max, size_t &size) = 0;
-    virtual CHIP_ERROR SetSpake2pVerifier(const char * value, size_t size) = 0;
-    virtual CHIP_ERROR GetSpake2pVerifier(char * value, size_t max, size_t &size) = 0;
-
-    virtual CHIP_ERROR SetFirmwareInformation(const ByteSpan & value) = 0;
-    virtual CHIP_ERROR SetCertificationDeclaration(const ByteSpan & value) = 0;
-    virtual CHIP_ERROR SetProductAttestationIntermediateCert(const ByteSpan & value) = 0;
-    virtual CHIP_ERROR SetDeviceAttestationCert(const ByteSpan & value) = 0;
-    virtual CHIP_ERROR SetDeviceAttestationKey(uint32_t kid, const ByteSpan & value) = 0;
-
-    virtual CHIP_ERROR SetSetupPayload(const uint8_t * value, size_t size) = 0;
-    virtual CHIP_ERROR GetSetupPayload(uint8_t * value, size_t max, size_t &size) = 0;
+    uint16_t mVendorId = 0;
+    uint16_t mProductId = 0;
+    uint16_t mHwVersion = 0;
+    uint16_t mDiscriminator = 0; // 12-bit
+    uint32_t mCommissioningFlow = 0;
+    uint32_t mRendezvousFlags = 0;
+    uint32_t mPasscode = 0;
+    uint32_t mKeyId = 0;
+    char mCommonName[kCommonNameMax] = { 0 };
+    CustomStorage mCustom;
 
 };
 

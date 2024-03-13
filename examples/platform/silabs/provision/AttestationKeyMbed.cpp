@@ -1,15 +1,11 @@
-#include "AttestationKeyMbed.h"
+#include "AttestationKey.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <mbedtls/x509_csr.h>
 #include <mbedtls/asn1.h>
-#ifdef SIWX_917
-#include <mbedtls/sha256.h>
-#endif
 #include <em_msc.h>
 #include <stdio.h>
 #include <string.h>
-
 
 namespace chip {
 namespace DeviceLayer {
@@ -18,25 +14,31 @@ namespace Provision {
 
 using SilabsConfig = chip::DeviceLayer::Internal::SilabsConfig;
 
-
-CHIP_ERROR AttestationKeyMbed::Import(const uint8_t * asn1, size_t size)
-{
-    VerifyOrReturnError(sizeof(mValue) >= size, CHIP_ERROR_INVALID_ARGUMENT);
-    mSize = size;
-    memcpy(mValue, asn1, size);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AttestationKeyMbed::Export(uint8_t * asn1, size_t max, size_t &size)
-{
-    VerifyOrReturnError(max >= mSize, CHIP_ERROR_INVALID_ARGUMENT);
-    memcpy(asn1, mValue, mSize);
-    mSize = size;
-    return CHIP_NO_ERROR;
+namespace {
+uint8_t sValue[128] = { 0 };
+size_t sSize = 0;
 }
 
 
-CHIP_ERROR AttestationKeyMbed::GenerateCSR(uint16_t vid, uint16_t pid, const CharSpan &cn, MutableCharSpan & csr)
+CHIP_ERROR AttestationKey::Import(const uint8_t * asn1, size_t size)
+{
+    VerifyOrReturnError(sizeof(sValue) >= size, CHIP_ERROR_INVALID_ARGUMENT);
+    sSize = size;
+    memcpy(sValue, asn1, size);
+    return CHIP_NO_ERROR;
+}
+
+
+CHIP_ERROR AttestationKey::Export(uint8_t * asn1, size_t max, size_t &size)
+{
+    VerifyOrReturnError(max >= sSize, CHIP_ERROR_INVALID_ARGUMENT);
+    memcpy(asn1, sValue, sSize);
+    sSize = size;
+    return CHIP_NO_ERROR;
+}
+
+
+CHIP_ERROR AttestationKey::GenerateCSR(uint16_t vid, uint16_t pid, const CharSpan &cn, MutableCharSpan & csr)
 {
     mbedtls_pk_context key_ctx;
     mbedtls_x509write_csr csr_ctx;
@@ -113,7 +115,7 @@ private:
 };
 
 
-CHIP_ERROR AttestationKeyMbed::SignMessage(const ByteSpan & message, MutableByteSpan & out_span)
+CHIP_ERROR AttestationKey::SignMessage(const ByteSpan & message, MutableByteSpan & out_span)
 {
     uint8_t hash[32];
     size_t hash_size = sizeof(hash);
@@ -122,17 +124,15 @@ CHIP_ERROR AttestationKeyMbed::SignMessage(const ByteSpan & message, MutableByte
 
     int(*f_rng)(void *, unsigned char *, size_t) = nullptr;
     void *p_rng = nullptr;
-    mbedtls_pk_context ctx = { 0 };
-
-    ChipLogProgress(DeviceLayer, "SignWithDeviceAttestationKey, key(%u)", (unsigned) mSize);
+    mbedtls_pk_context ctx;
 
 #ifdef SIWX_917
     mbedtls_sha256(message.data(), message.size(), hash, 0);
-    VerifyOrReturnError(0 == mbedtls_pk_parse_key(&ctx, mValue, mSize, nullptr, 0), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(0 == mbedtls_pk_parse_key(&ctx, sValue, sSize, nullptr, 0), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(0 == mbedtls_pk_sign(&ctx, MBEDTLS_MD_SHA256, hash, hash_size, signature, &signature_size, f_rng, p_rng ), CHIP_ERROR_INTERNAL);
 #else
     VerifyOrReturnError(0 == mbedtls_sha256(message.data(), message.size(), hash, 0), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(0 == mbedtls_pk_parse_key(&ctx, mValue, mSize, nullptr, 0, f_rng, p_rng), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(0 == mbedtls_pk_parse_key(&ctx, sValue, sSize, nullptr, 0, f_rng, p_rng), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(0 == mbedtls_pk_sign(&ctx, MBEDTLS_MD_SHA256, hash, hash_size, signature, sizeof(signature), &signature_size, f_rng, p_rng ), CHIP_ERROR_INTERNAL);
 #endif
 
