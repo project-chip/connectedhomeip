@@ -104,7 +104,7 @@ static_library("shell") {
     ]
   } else if (chip_device_platform == "ameba") {
     sources += [
-      "MainLoopDefault.cpp",
+      "MainLoopAmeba.cpp",
       "streamer_ameba.cpp",
     ]
   } else if (chip_device_platform == "openiotsdk") {
