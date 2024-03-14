@@ -3239,7 +3239,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendComplete: {
-        //CommissioningComplete command happens over the CASE connection.
+        // CommissioningComplete command happens over the CASE connection.
         GeneralCommissioning::Commands::CommissioningComplete::Type request;
         CHIP_ERROR err =
             SendCommissioningCommand(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint, timeout);
