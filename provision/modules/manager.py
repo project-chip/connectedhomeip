@@ -40,14 +40,16 @@ class ProvisionManager:
             os.makedirs(temp.value)
         paths.setTemp(args.str(ID.kTemporaryDir))
 
+        # Compute defaults
+        if ('auto' == action) or ('binary' == action):
+            self.computeDefaults(paths, args)
+        # Export arguments (including generated values)
+        args.export()
+
         # Stop
         if args.value(ID.kStop):
             _util.warn("Stop requested.")
             exit(0)
-
-        # Compute defaults
-        if ('auto' == action) or ('binary' == action):
-            self.computeDefaults(paths, args)
 
         # Connection string
         conn = ConnectionArguments(args)

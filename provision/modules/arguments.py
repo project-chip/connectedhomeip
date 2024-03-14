@@ -142,9 +142,8 @@ class ArgumentList(ParameterList):
             file_ver = self.compileFileInputs(versions, inputs_path)
         # Command-line inputs
         cmd_ver = self.compileCommandInputs(versions, file_ver, params_path)
-        # Export compiled inputs
+        # Update version
         self.set(ID.kVersion, cmd_ver.tag)
-        self.export()
         # Apply defaults
         for k, a in self.ids.items():
             if (a.value is None) and (a.default is not None):

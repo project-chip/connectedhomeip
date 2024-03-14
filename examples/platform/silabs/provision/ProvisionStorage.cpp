@@ -1,9 +1,11 @@
 #include "ProvisionStorage.h"
 #include "ProvisionProtocol.h"
+#include <CHIPProjectConfig.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceError.h>
 #include <setup_payload/Base38Encode.h>
 #include <setup_payload/SetupPayload.h>

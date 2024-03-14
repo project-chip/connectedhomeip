@@ -440,15 +440,15 @@ CHIP_ERROR Storage::SetCertificationDeclaration(const ByteSpan & value)
 CHIP_ERROR Storage::GetCertificationDeclaration(MutableByteSpan & value)
 {
     CHIP_ERROR err = ReadFileByKey(*this, "GetCertificationDeclaration", SilabsConfig::kConfigKey_Creds_CD_Offset, SilabsConfig::kConfigKey_Creds_CD_Size, value);
-#if defined(SILABS_PROVISION_VERSION_1_0) && SILABS_PROVISION_VERSION_1_0
-    if(CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+#if defined(SL_PROVISION_VERSION_1_0) && SL_PROVISION_VERSION_1_0
+    if(CHIP_ERROR_NOT_FOUND == err)
     {
         // Reading from the old script's location.
-        err = ReadFileByOffset(*this, "GetDeviceAttestationCert", SILABS_CREDENTIALS_CD_OFFSET, SILABS_CREDENTIALS_CD_SIZE, value);
+        err = ReadFileByOffset(*this, "GetDeviceAttestationCert", SL_CREDENTIALS_CD_OFFSET, SL_CREDENTIALS_CD_SIZE, value);
     }
 #endif
 #ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
-    if(CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    if(CHIP_ERROR_NOT_FOUND == err)
     {
         // Example CD
         err = Examples::GetExampleDACProvider()->GetCertificationDeclaration(value);
@@ -466,15 +466,15 @@ CHIP_ERROR Storage::SetProductAttestationIntermediateCert(const ByteSpan & value
 CHIP_ERROR Storage::GetProductAttestationIntermediateCert(MutableByteSpan & value)
 {
     CHIP_ERROR err = ReadFileByKey(*this, "GetProductAttestationIntermediateCert", SilabsConfig::kConfigKey_Creds_PAI_Offset, SilabsConfig::kConfigKey_Creds_PAI_Size, value);
-#if defined(SILABS_PROVISION_VERSION_1_0) && SILABS_PROVISION_VERSION_1_0
-    if(CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+#if defined(SL_PROVISION_VERSION_1_0) && SL_PROVISION_VERSION_1_0
+    if(CHIP_ERROR_NOT_FOUND == err)
     {
         // Reading from the old script's location.
-        err = ReadFileByOffset(*this, "GetDeviceAttestationCert", SILABS_CREDENTIALS_PAI_OFFSET, SILABS_CREDENTIALS_PAI_SIZE, value);
+        err = ReadFileByOffset(*this, "GetDeviceAttestationCert", SL_CREDENTIALS_PAI_OFFSET, SL_CREDENTIALS_PAI_SIZE, value);
     }
 #endif
 #ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
-    if(CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    if(CHIP_ERROR_NOT_FOUND == err)
     {
         // Example PAI
         err =  Examples::GetExampleDACProvider()->GetProductAttestationIntermediateCert(value);
@@ -492,15 +492,15 @@ CHIP_ERROR Storage::SetDeviceAttestationCert(const ByteSpan & value)
 CHIP_ERROR Storage::GetDeviceAttestationCert(MutableByteSpan & value)
 {
     CHIP_ERROR err = ReadFileByKey(*this, "GetDeviceAttestationCert", SilabsConfig::kConfigKey_Creds_DAC_Offset, SilabsConfig::kConfigKey_Creds_DAC_Size, value);
-#if defined(SILABS_PROVISION_VERSION_1_0) && SILABS_PROVISION_VERSION_1_0
-    if(CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+#if defined(SL_PROVISION_VERSION_1_0) && SL_PROVISION_VERSION_1_0
+    if(CHIP_ERROR_NOT_FOUND == err)
     {
         // Reading from the old script's location.
-        err = ReadFileByOffset(*this, "GetDeviceAttestationCert", SILABS_CREDENTIALS_DAC_OFFSET, SILABS_CREDENTIALS_DAC_SIZE, value);
+        err = ReadFileByOffset(*this, "GetDeviceAttestationCert", SL_CREDENTIALS_DAC_OFFSET, SL_CREDENTIALS_DAC_SIZE, value);
     }
 #endif
 #ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
-    if(CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    if(CHIP_ERROR_NOT_FOUND == err)
     {
         // Example DAC
         return Examples::GetExampleDACProvider()->GetDeviceAttestationCert(value);
