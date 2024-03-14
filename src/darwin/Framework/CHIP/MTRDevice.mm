@@ -765,10 +765,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    
+
     if ( _internalDeviceState >= MTRInternalDeviceStateSubscribed )
         return;
-    
+
     MTR_LOG_DEFAULT("%@ still not subscribed, marking the device as unreachable", self);
     [self _changeState: MTRDeviceStateUnreachable];
 }
@@ -1021,7 +1021,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [strongSelf _markDeviceAsUnreachableIfNotSusbcribed];
         os_unfair_lock_unlock(&strongSelf->_lock);
     });
-    
+
 
     [_deviceController
         getSessionForNode:_nodeID.unsignedLongLongValue
