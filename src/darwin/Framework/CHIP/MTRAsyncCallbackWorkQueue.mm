@@ -116,7 +116,7 @@
     // sanity check if running
     if (!self.runningWorkItemCount) {
         // something is wrong with state - nothing is currently running
-x        MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue endWork: no work is running on work queue");
+        MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue endWork: no work is running on work queue");
         return;
     }
 
