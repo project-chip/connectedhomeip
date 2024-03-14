@@ -53,7 +53,7 @@
 #define WFX_RSI_ST_SCANSTARTED (0x400) /* Scan Started				*/
 #define WFX_RSI_ST_SLEEP_READY (0x800) /* Notify the M4 to go to sleep*/
 
-struct wfx_rsi
+typedef struct wfx_rsi_s
 {
     EventGroupHandle_t events;
     TaskHandle_t drv_task;
@@ -76,9 +76,9 @@ struct wfx_rsi
     sl_wfx_mac_address_t ap_bssid; /* To which our STA is connected */
     uint16_t join_retries;
     uint8_t ip4_addr[4]; /* Not sure if this is enough */
-};
+} WfxRsi_t;
 
-extern struct wfx_rsi wfx_rsi;
+extern WfxRsi_t wfx_rsi;
 #ifdef __cplusplus
 extern "C" {
 #endif
