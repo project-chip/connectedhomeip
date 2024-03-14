@@ -27,17 +27,17 @@ from chip.ble.types import DeviceScannedCallback, ScanDoneCallback, ScanErrorCal
 @DeviceScannedCallback
 def ScanFoundCallback(closure, address: str, discriminator: int, vendor: int,
                       product: int):
-    closure.DeviceFound(address, discriminator, vendor, product)
+    closure.OnDeviceScanned(address, discriminator, vendor, product)
 
 
 @ScanDoneCallback
 def ScanDoneCallback(closure):
-    closure.ScanCompleted()
+    closure.OnScanComplete()
 
 
 @ScanErrorCallback
 def ScanErrorCallback(closure, errorCode: int):
-    closure.ScanErrorCallback(errorCode)
+    closure.OnScanError(errorCode)
 
 
 @dataclass
@@ -59,13 +59,13 @@ class _DeviceInfoReceiver:
     def __init__(self):
         self.queue = Queue()
 
-    def DeviceFound(self, address, discriminator, vendor, product):
+    def OnDeviceScanned(self, address, discriminator, vendor, product):
         self.queue.put(DeviceInfo(address, discriminator, vendor, product))
 
-    def ScanCompleted(self):
+    def OnScanComplete(self):
         self.queue.put(None)
 
-    def ScanError(self, errorCode):
+    def OnScanError(self, errorCode):
         # TODO need to determine what we do with this error. Most of the time this
         # error is just a timeout introduced in PR #24873, right before we get a
         # ScanCompleted.

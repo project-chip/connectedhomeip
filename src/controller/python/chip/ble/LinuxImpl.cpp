@@ -113,7 +113,7 @@ public:
         }
     }
 
-    virtual void OnScanError(CHIP_ERROR error) override
+    void OnScanError(CHIP_ERROR error) override
     {
         if (mErrorCallback)
         {
