@@ -117,6 +117,12 @@ class AndroidApp(Enum):
         else:
             return None
 
+    def BuildRoot(self, root):
+        if self == AndroidApp.CHIP_TEST:
+            return os.path.join(root, 'examples/android/CHIPTest')
+        else:
+            return None
+
 
 class AndroidProfile(Enum):
     RELEASE = auto()
@@ -374,10 +380,13 @@ class AndroidBuilder(Builder):
                 args,
             ]
 
+            rootName = self.app.BuildRoot(self.root)
             exampleName = self.app.ExampleName()
-            if exampleName is not None:
+            if rootName is not None:
+                gn_gen += ["--root=%s" % rootName]
+            elif exampleName is not None:
                 gn_gen += ["--root=%s/examples/%s/android/" %
-                           (self.root, exampleName)]
+                        (self.root, exampleName)]
 
             if self.board.IsIde():
                 gn_gen += [
