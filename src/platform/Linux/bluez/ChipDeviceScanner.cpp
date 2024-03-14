@@ -112,16 +112,12 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     VerifyOrReturnError(mTimerState == ScannerTimerState::TIMER_CANCELED, CHIP_ERROR_INCORRECT_STATE);
 
     mCancellable.reset(g_cancellable_new());
-    if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStartScan, this) != CHIP_NO_ERROR)
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStartScan, this);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed to schedule BLE scan start.");
-
-        ChipDeviceScannerDelegate * delegate = this->mDelegate;
-        // callback is explicitly allowed to delete the scanner (hence no more
-        // references to 'self' here)
-        delegate->OnScanComplete();
-
-        return CHIP_ERROR_INTERNAL;
+        ChipLogError(Ble, "Failed to initiate BLE scan start: %" CHIP_ERROR_FORMAT, err.Format());
+        mDelegate->OnScanComplete();
+        return err;
     }
 
     // Here need to set the Bluetooth scanning status immediately.
@@ -129,14 +125,14 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     // calling StopScan will be effective.
     mScannerState = ChipDeviceScannerState::SCANNER_SCANNING;
 
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
-
+    err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed to schedule scan timeout.");
+        ChipLogError(Ble, "Failed to schedule scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
         StopScan();
         return err;
     }
+
     mTimerState = ScannerTimerState::TIMER_STARTED;
 
     ChipLogDetail(Ble, "ChipDeviceScanner has started scanning!");
@@ -157,9 +153,10 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mScannerState == ChipDeviceScannerState::SCANNER_SCANNING, CHIP_NO_ERROR);
 
-    if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStopScan, this) != CHIP_NO_ERROR)
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStopScan, this);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed to schedule BLE scan stop.");
+        ChipLogError(Ble, "Failed to initiate BLE scan stop: %" CHIP_ERROR_FORMAT, err.Format());
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -176,10 +173,7 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     // Reset timer status
     mTimerState = ScannerTimerState::TIMER_CANCELED;
 
-    ChipDeviceScannerDelegate * delegate = this->mDelegate;
-    // callback is explicitly allowed to delete the scanner (hence no more
-    // references to 'self' here)
-    delegate->OnScanComplete();
+    mDelegate->OnScanComplete();
 
     return CHIP_NO_ERROR;
 }
