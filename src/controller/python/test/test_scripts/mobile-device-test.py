@@ -141,11 +141,11 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing subscription")
-    FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
+    FailIfNot(asyncio.run(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to subscribe attributes.")
 
     logger.info("Testing another subscription that kills previous subscriptions")
-    FailIfNot(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID),
+    FailIfNot(asyncio.run(test.TestSubscription(nodeid=device_nodeid, endpoint=LIGHTING_ENDPOINT_ID)),
               "Failed to subscribe attributes.")
 
     logger.info("Testing re-subscription")

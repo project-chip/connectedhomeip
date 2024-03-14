@@ -1243,79 +1243,66 @@ class BaseTestHelper:
             return False
         return True
 
-    def TestSubscription(self, nodeid: int, endpoint: int):
+    async def TestSubscription(self, nodeid: int, endpoint: int):
         desiredPath = None
         receivedUpdate = 0
-        updateLock = threading.Lock()
-        updateCv = threading.Condition(updateLock)
+        updateEvent = asyncio.Event()
+        loop = asyncio.get_running_loop()
 
         def OnValueChange(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
-            nonlocal desiredPath, updateCv, updateLock, receivedUpdate
+            nonlocal desiredPath, updateEvent, receivedUpdate
             if path.Path != desiredPath:
                 return
 
             data = transaction.GetAttribute(path)
             logger.info(
                 f"Received report from server: path: {path.Path}, value: {data}")
-            with updateLock:
-                receivedUpdate += 1
-                updateCv.notify_all()
+            receivedUpdate += 1
+            loop.call_soon_threadsafe(updateEvent.set)
 
-        class _conductAttributeChange(threading.Thread):
-            def __init__(self, devCtrl: ChipDeviceCtrl.ChipDeviceController, nodeid: int, endpoint: int):
-                super(_conductAttributeChange, self).__init__()
-                self.nodeid = nodeid
-                self.endpoint = endpoint
-                self.devCtrl = devCtrl
-
-            def run(self):
-                for i in range(5):
-                    time.sleep(3)
-                    self.devCtrl.ZCLSend(
-                        "OnOff", "Toggle", self.nodeid, self.endpoint, 0, {})
+        async def _conductAttributeChange(devCtrl: ChipDeviceCtrl.ChipDeviceController, nodeid: int, endpoint: int):
+            for i in range(5):
+                await asyncio.sleep(3)
+                await self.devCtrl.SendCommand(nodeid, endpoint, Clusters.OnOff.Commands.Toggle())
 
         try:
             desiredPath = Clusters.Attribute.AttributePath(
                 EndpointId=1, ClusterId=6, AttributeId=0)
             # OnOff Cluster, OnOff Attribute
-            subscription = self.devCtrl.ZCLSubscribeAttribute(
-                "OnOff", "OnOff", nodeid, endpoint, 1, 10)
+            subscription = await self.devCtrl.ReadAttribute(nodeid, [(endpoint, Clusters.OnOff.Attributes.OnOff)], None, False, reportInterval=(1, 10),
+                                                            keepSubscriptions=False, autoResubscribe=True)
             subscription.SetAttributeUpdateCallback(OnValueChange)
-            changeThread = _conductAttributeChange(
-                self.devCtrl, nodeid, endpoint)
             # Reset the number of subscriptions received as subscribing causes a callback.
-            changeThread.start()
-            with updateCv:
-                while receivedUpdate < 5:
-                    # We should observe 5 attribute changes
-                    # The changing thread will change the value after 3 seconds. If we're waiting more than 10, assume something
-                    # is really wrong and bail out here with some information.
-                    if not updateCv.wait(10.0):
-                        self.logger.error(
-                            "Failed to receive subscription update")
-                        break
+            taskAttributeChange = loop.create_task(_conductAttributeChange(self.devCtrl, nodeid, endpoint))
+
+            while receivedUpdate < 5:
+                # We should observe 5 attribute changes
+                # The changing thread will change the value after 3 seconds. If we're waiting more than 10, assume something
+                # is really wrong and bail out here with some information.
+                try:
+                    await asyncio.wait_for(updateEvent.wait(), 10)
+                    updateEvent.clear()
+                except TimeoutError:
+                    self.logger.error(
+                        "Failed to receive subscription update")
+                    break
 
             # thread changes 5 times, and sleeps for 3 seconds in between.
             # Add an additional 3 seconds of slack. Timeout is in seconds.
-            changeThread.join(18.0)
-
-            #
-            # Clean-up by shutting down the sub. Otherwise, we're going to get callbacks through
-            # OnValueChange on what will soon become an invalid
-            # execution context above.
-            #
-            subscription.Shutdown()
-
-            if changeThread.is_alive():
-                # Thread join timed out
-                self.logger.error("Failed to join change thread")
-                return False
+            await asyncio.wait_for(taskAttributeChange, 3)
 
             return True if receivedUpdate == 5 else False
 
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")
             return False
+        finally:
+            #
+            # Clean-up by shutting down the sub. Otherwise, we're going to get callbacks through
+            # OnValueChange on what will soon become an invalid
+            # execution context above.
+            #
+            subscription.Shutdown()
 
         return True
 
