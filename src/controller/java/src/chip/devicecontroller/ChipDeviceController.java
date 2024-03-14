@@ -454,6 +454,15 @@ public class ChipDeviceController {
   }
 
   /**
+   * This function stops a pairing or commissioning process that is in progress.
+   *
+   * @param deviceId The remote device Id.
+   */
+  public void stopDevicePairing(long deviceId) {
+    stopDevicePairing(deviceControllerPtr, deviceId);
+  }
+
+  /**
    * Returns a pointer to a device currently being commissioned. This should be used before the
    * device is operationally available.
    */
@@ -1473,6 +1482,8 @@ public class ChipDeviceController {
 
   private native void unpairDeviceCallback(
       long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
+
+  private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
