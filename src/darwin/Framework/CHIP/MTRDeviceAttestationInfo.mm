@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceAttestationInfo.h"
+#import <Matter/MTRDeviceAttestationInfo.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

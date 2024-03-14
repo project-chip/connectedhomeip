@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRCommissioningParameters.h"
+#import <Matter/MTRCommissioningParameters.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

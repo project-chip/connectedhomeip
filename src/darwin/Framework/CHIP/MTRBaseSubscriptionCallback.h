@@ -14,10 +14,7 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#import "Foundation/Foundation.h"
-#import "MTRBaseDevice.h"
+#import <Matter/MTRBaseDevice.h>
 
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>

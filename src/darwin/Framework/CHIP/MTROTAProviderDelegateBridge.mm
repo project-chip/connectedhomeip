@@ -16,10 +16,13 @@
  */
 
 #import "MTROTAProviderDelegateBridge.h"
-#import "MTRBaseClusters.h"
-#import "MTRCommandPayloadsObjC.h"
+
+#import <Matter/MTRBaseClusters.h>
+#import <Matter/MTRCommandPayloadsObjC.h>
+
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
+#import "MTRError_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -27,14 +30,12 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/Global.h>
 #include <lib/support/TypeTraits.h>
-#include <platform/PlatformManager.h>
-#include <protocols/interaction_model/Constants.h>
-
-#include <MTRError_Internal.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/LockTracker.h>
+#include <platform/PlatformManager.h>
 #include <protocols/bdx/BdxUri.h>
 #include <protocols/bdx/TransferFacilitator.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 using namespace chip::app;

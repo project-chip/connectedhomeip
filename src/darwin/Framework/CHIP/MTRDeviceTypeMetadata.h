@@ -15,10 +15,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#import <Foundation/Foundation.h>
-
 #include <lib/core/DataModelTypes.h>
 
 BOOL MTRIsKnownUtilityDeviceType(chip::DeviceTypeId aDeviceTypeId);

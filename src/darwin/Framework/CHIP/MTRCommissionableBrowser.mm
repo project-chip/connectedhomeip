@@ -16,9 +16,11 @@
  */
 
 #import "MTRCommissionableBrowser.h"
-#import "MTRCommissionableBrowserDelegate.h"
+
+#import <Matter/MTRCommissionableBrowserDelegate.h>
+#import <Matter/MTRDeviceController.h>
+
 #import "MTRCommissionableBrowserResult_Internal.h"
-#import "MTRDeviceController.h"
 #import "MTRLogging_Internal.h"
 
 #include <controller/CHIPDeviceController.h>

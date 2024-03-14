@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRBaseDevice.h"
-#import <Foundation/Foundation.h>
+#import <Matter/MTRBaseDevice.h>
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>

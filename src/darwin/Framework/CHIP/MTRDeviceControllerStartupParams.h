@@ -14,8 +14,6 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
 #import <Matter/MTRCertificates.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTROperationalCertificateIssuer.h>

@@ -1,4 +1,5 @@
 /**
+ *
  *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRCertificateInfo.h"
+#import <Matter/MTRCertificateInfo.h>
 
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"

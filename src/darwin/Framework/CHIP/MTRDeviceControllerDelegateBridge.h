@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceControllerDelegate.h"
+#import <Matter/MTRDeviceControllerDelegate.h>
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningDelegate.h>

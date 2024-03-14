@@ -15,10 +15,9 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <Matter/MTRCluster.h>
 
 #import <Matter/MTRBaseDevice.h>
-#import <Matter/MTRCluster.h>
 #import <Matter/MTRDevice.h>
 
 #import "MTRBaseDevice_Internal.h"

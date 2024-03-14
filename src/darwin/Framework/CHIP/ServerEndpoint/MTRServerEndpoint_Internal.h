@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import <Matter/MTRDeviceController.h>
 #import <Matter/MTRServerEndpoint.h>
+
+#import <Matter/MTRDeviceController.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

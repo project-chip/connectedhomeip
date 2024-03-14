@@ -1,4 +1,3 @@
-//
 /**
  *    Copyright (c) 2023 Project CHIP Authors
  *
@@ -15,14 +14,16 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import <Matter/Matter.h>
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import "MTRDefines_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_EXTERN @interface MTRDeviceControllerLocalTestStorage : NSObject<MTRDeviceControllerStorageDelegate>
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+
+MTR_TESTABLE
+@interface MTRDeviceControllerLocalTestStorage : NSObject <MTRDeviceControllerStorageDelegate>
 
 // Setting this variable only affects subsequent MTRDeviceController initializations
 @property (class, nonatomic, assign) BOOL localTestStorageEnabled;
@@ -32,6 +33,6 @@ MTR_EXTERN @interface MTRDeviceControllerLocalTestStorage : NSObject<MTRDeviceCo
 
 @end
 
-NS_ASSUME_NONNULL_END
-
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
+NS_ASSUME_NONNULL_END

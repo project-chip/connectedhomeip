@@ -14,8 +14,6 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #import <Foundation/Foundation.h>
 
 #include <lib/support/Span.h>

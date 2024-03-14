@@ -14,15 +14,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#import "MTRManualSetupPayloadParser.h"
+
+#import <Matter/MTRManualSetupPayloadParser.h>
 
 #import "MTRError_Internal.h"
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
 #import "MTRSetupPayload_Internal.h"
 
-#import <setup_payload/ManualSetupPayloadParser.h>
-#import <setup_payload/SetupPayload.h>
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/SetupPayload.h>
 
 @implementation MTRManualSetupPayloadParser {
     NSString * _decimalStringRepresentation;

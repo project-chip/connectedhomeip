@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <MTRDefines.h>
 #import <Matter/MTRMetrics.h>
 
 NS_ASSUME_NONNULL_BEGIN

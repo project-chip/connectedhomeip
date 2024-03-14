@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRStructsObjc.h"
+#import <Matter/MTRStructsObjc.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

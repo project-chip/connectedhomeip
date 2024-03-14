@@ -15,9 +15,10 @@
  *    limitations under the License.
  */
 
-#import "MTRKeypair.h"
+#import <Matter/MTRKeypair.h>
 
 #import "MTRError_Internal.h"
+
 #include <crypto/CHIPCryptoPAL.h>
 
 NS_ASSUME_NONNULL_BEGIN

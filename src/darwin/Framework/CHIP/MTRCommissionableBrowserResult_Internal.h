@@ -15,10 +15,9 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import <Matter/MTRDefines.h>
+#import <Matter/MTRCommissionableBrowserResult.h>
 
-#import "MTRCommissionableBrowserResult.h"
+#import <Foundation/Foundation.h>
 
 #include <controller/SetUpCodePairer.h>
 

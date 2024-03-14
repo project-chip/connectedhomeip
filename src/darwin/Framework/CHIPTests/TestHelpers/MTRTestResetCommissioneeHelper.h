@@ -14,10 +14,7 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
-
-#pragma once
 
 void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCase * testcase, uint16_t commandTimeout);

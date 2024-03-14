@@ -17,12 +17,13 @@
 
 #import "MTRDeviceOverXPC.h"
 
-#import "MTRCluster.h"
+#import <Matter/MTRCluster.h>
+#import <Matter/MTRDeviceController+XPC.h>
+#import <Matter/MTRError.h>
+
 #import "MTRClusterStateCacheContainer+XPC.h"
-#import "MTRDeviceController+XPC.h"
 #import "MTRDeviceControllerOverXPC_Internal.h"
 #import "MTRDeviceControllerXPCConnection.h"
-#import "MTRError.h"
 #import "MTRLogging_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN

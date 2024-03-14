@@ -17,7 +17,8 @@
 
 #import "MTREventTLVValueDecoder_Internal.h"
 
-#import "MTRStructsObjc.h"
+#import <Matter/MTRStructsObjc.h>
+
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 

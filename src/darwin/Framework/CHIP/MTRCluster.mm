@@ -15,8 +15,10 @@
  *    limitations under the License.
  */
 
-#import "MTRBaseDevice.h"
 #import "MTRCluster_Internal.h"
+
+#import <Matter/MTRBaseDevice.h>
+
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 

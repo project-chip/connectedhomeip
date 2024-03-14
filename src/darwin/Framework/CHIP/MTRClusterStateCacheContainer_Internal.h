@@ -15,9 +15,10 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRClusterStateCacheContainer.h>
+
 #import <Foundation/Foundation.h>
 
-#import "MTRClusterStateCacheContainer.h"
 #import "MTRDeviceControllerOverXPC.h"
 
 #include <app/ClusterStateCache.h>

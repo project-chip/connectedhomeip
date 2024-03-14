@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceControllerStartupParams.h"
-#import "MTRCertificates.h"
+#import <Matter/MTRDeviceControllerStartupParams.h>
+
+#import <Matter/MTRCertificates.h>
+
 #import "MTRConversion.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"

@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRDeviceAttestationDelegate.h>
+
+#include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <lib/core/NodeId.h>
 #include <platform/CHIPDeviceConfig.h>
-
-#include <Matter/MTRDeviceAttestationDelegate.h>
-#include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 
 @class MTRDeviceController;
 

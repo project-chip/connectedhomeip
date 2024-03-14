@@ -19,9 +19,9 @@
 #import "MTRLogging.h"
 #import <Matter/Matter.h>
 
-#import <app/MessageDef/StatusIB.h>
-#import <inet/InetError.h>
-#import <lib/support/TypeTraits.h>
+#include <app/MessageDef/StatusIB.h>
+#include <inet/InetError.h>
+#include <lib/support/TypeTraits.h>
 
 #import <objc/runtime.h>
 

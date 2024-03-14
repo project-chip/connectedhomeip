@@ -15,11 +15,7 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
-#import "MTRClusters.h"
-#import "MTRDevice.h"
-#import "MTRDevice_Internal.h"
+#import <Matter/MTRClusters.h>
 
 // Nothing here for now, but leaving this file in place in case we need to add
 // something.

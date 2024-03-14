@@ -15,16 +15,16 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
-#import "MTRClusterConstants.h"
-#import "MTRCluster_Internal.h"
 #import "MTRClusters_Internal.h"
-#import "MTRCommandPayloadsObjc.h"
+
+#import <Matter/MTRClusterConstants.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRStructsObjc.h>
+
+#import "MTRCluster_Internal.h"
 #import "MTRDefines_Internal.h"
 #import "MTRDevice_Internal.h"
 #import "MTRLogging_Internal.h"
-#import "MTRStructsObjc.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
