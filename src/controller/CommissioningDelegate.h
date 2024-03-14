@@ -686,7 +686,6 @@ struct GeneralCommissioningInfo
 // the ICD Management cluster, and is used to communicate that information.
 struct ICDManagementClusterInfo
 {
-    bool isICD = false;
     // Whether the ICD is capable of functioning as a LIT device.  If false, the ICD can only be a SIT device.
     bool isLIT = false;
     // Whether the ICD supports the check-in protocol.  LIT devices have to support it, but SIT devices
