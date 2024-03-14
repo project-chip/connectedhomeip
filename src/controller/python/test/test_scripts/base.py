@@ -1336,7 +1336,7 @@ class BaseTestHelper:
 
         return status == IM.Status.UnsupportedAccess
 
-    def TestSubscriptionResumption(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int, remote_server_app: str):
+    async def TestSubscriptionResumption(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int, remote_server_app: str):
         '''
         This test validates that the device can resume the subscriptions after restarting.
         It is executed in Linux Cirque tests and the steps of this test are:
@@ -1345,42 +1345,40 @@ class BaseTestHelper:
         3. Validate that the controller can receive a report from the remote server app
         '''
         desiredPath = None
-        receivedUpdate = False
-        updateLock = threading.Lock()
-        updateCv = threading.Condition(updateLock)
+        updateEvent = asyncio.Event()
+        loop = asyncio.get_running_loop()
 
         def OnValueReport(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
-            nonlocal desiredPath, updateCv, updateLock, receivedUpdate
+            nonlocal desiredPath, updateEvent, receivedUpdate
             if path.Path != desiredPath:
                 return
 
             data = transaction.GetAttribute(path)
             logger.info(
                 f"Received report from server: path: {path.Path}, value: {data}")
-            with updateLock:
-                receivedUpdate = True
-                updateCv.notify_all()
+            loop.call_soon_threadsafe(updateEvent.set)
 
         try:
             desiredPath = Clusters.Attribute.AttributePath(
                 EndpointId=0, ClusterId=0x28, AttributeId=5)
             # BasicInformation Cluster, NodeLabel Attribute
-            subscription = self.devCtrl.ZCLSubscribeAttribute(
-                "BasicInformation", "NodeLabel", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+            subscription = await self.devCtrl.ReadAttribute(nodeid, [(endpoint, Clusters.BasicInformation.Attributes.NodeLabel)], None, False, reportInterval=(1, 50),
+                                                            keepSubscriptions=True, autoResubscribe=False)
             subscription.SetAttributeUpdateCallback(OnValueReport)
 
-            self.logger.info("Restart remote deivce")
+            self.logger.info("Restart remote device")
             restartRemoteThread = restartRemoteDevice(
                 remote_ip, ssh_port, "root", "admin", remote_server_app, "--thread --discriminator 3840")
             restartRemoteThread.start()
             # After device restarts, the attribute will be set dirty so the subscription can receive
             # the update
-            with updateCv:
-                while receivedUpdate is False:
-                    if not updateCv.wait(10.0):
-                        self.logger.error(
-                            "Failed to receive subscription resumption report")
-                        break
+            receivedUpdate = False
+            try:
+                await asyncio.wait_for(updateEvent.wait(), 10)
+                receivedUpdate = True
+            except TimeoutError:
+                self.logger.error(
+                    "Failed to receive subscription resumption report")
 
             restartRemoteThread.join(10.0)
 
