@@ -549,7 +549,7 @@ exit:
 
 JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, jobject otaProviderDelegate)
 {
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -570,7 +570,7 @@ exit:
 
 JNI_METHOD(void, finishOTAProvider)(JNIEnv * env, jobject self, jlong handle)
 {
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);

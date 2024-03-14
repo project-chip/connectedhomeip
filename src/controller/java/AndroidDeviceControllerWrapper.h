@@ -46,7 +46,7 @@
 #include "AndroidOperationalCredentialsIssuer.h"
 #include "AttestationTrustStoreBridge.h"
 #include "DeviceAttestationDelegateBridge.h"
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
 #include "OTAProviderDelegateBridge.h"
 #endif
 
@@ -262,7 +262,7 @@ private:
     DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge        = nullptr;
     AttestationTrustStoreBridge * mAttestationTrustStoreBridge                = nullptr;
     chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     OTAProviderDelegateBridge * mOtaProviderBridge = nullptr;
 #endif
     bool mDeviceIsICD = false;
