@@ -140,8 +140,8 @@ public:
 
     /**
      * @brief
-     *   Called when ICDStayActiveDuration is set and the stay active response is received in the end of the LIT ICD commissioning
-     * flow completes.
+     *   Called upon completion of the LIT ICD commissioning flow, when ICDStayActiveDuration is set 
+     *   and the corresponding stayActive command response is received
      *
      * @param[in] icdNodeId    The node id of the ICD.
      * @param[in] promisedActiveDurationMsec   The actual duration that the ICD server can stay active

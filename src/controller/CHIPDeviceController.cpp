@@ -3223,8 +3223,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
 
+        // StayActive Command happens over CASE Connection
         IcdManagement::Commands::StayActiveRequest::Type request;
-
         request.stayActiveDuration = params.GetICDStayActiveDurationMsec().Value();
         ChipLogError(Controller, "Send ICD StayActive with Duration %u", request.stayActiveDuration);
         CHIP_ERROR err =
@@ -3239,6 +3239,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kSendComplete: {
+        //CommissioningComplete command happens over the CASE connection.
         GeneralCommissioning::Commands::CommissioningComplete::Type request;
         CHIP_ERROR err =
             SendCommissioningCommand(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint, timeout);
