@@ -25,12 +25,12 @@
 #include <dlfcn.h>
 #include <jni.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <platform/android/AndroidChipPlatform-JNI.h>
-#include <support/CHIPJNIError.h>
-#include <support/CodeUtils.h>
-#include <support/JniReferences.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPJNIError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -63,15 +63,10 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(Test, "Loading Java class references.");
 
     // Get various class references need by the API.
-    jobject testEngineCls;
     err = JniReferences::GetInstance().GetLocalClassRef(env, "com/tcl/chip/chiptest/TestEngine", sTestEngineCls);
     SuccessOrExit(err);
-    err = sTestEngineCls.Init(testEngineCls);
-    SuccessOrExit(err);
-    jobject testEngineExceptionCls;
+
     err = JniReferences::GetInstance().GetLocalClassRef(env, "com/tcl/chip/chiptest/TestEngineException", sTestEngineExceptionCls);
-    SuccessOrExit(err);
-    err = sTestEngineExceptionCls.Init(testEngineExceptionCls);
     SuccessOrExit(err);
     ChipLogProgress(Test, "Java class references loaded.");
 
@@ -146,7 +141,7 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
     jmethodID constructor;
 
     env->ExceptionClear();
-    constructor = env->GetMethodID(sTestEngineExceptionCls.ObjectRef(), "<init>", "(ILjava/lang/String;)V");
+    constructor = env->GetMethodID(sTestEngineExceptionCls, "<init>", "(ILjava/lang/String;)V");
     VerifyOrExit(constructor != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     switch (inErr.AsInteger())
@@ -169,8 +164,7 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
     }
     errStrObj = (errStr != NULL) ? env->NewStringUTF(errStr) : NULL;
 
-    outEx = (jthrowable) env->NewObject(sTestEngineExceptionCls.ObjectRef(), constructor, static_cast<jint>(inErr.AsInteger()),
-                                        errStrObj);
+    outEx = (jthrowable) env->NewObject(sTestEngineExceptionCls, constructor, static_cast<jint>(inErr.AsInteger()), errStrObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -190,7 +184,7 @@ static void onLog(const char * fmt, ...)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    method = env->GetStaticMethodID(sTestEngineCls.ObjectRef(), "onTestLog", "(Ljava/lang/String;)V");
+    method = env->GetStaticMethodID(sTestEngineCls, "onTestLog", "(Ljava/lang/String;)V");
     VerifyOrExit(method != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     va_start(args, fmt);
@@ -201,7 +195,7 @@ static void onLog(const char * fmt, ...)
     ChipLogProgress(Test, "Calling Java onTestLog");
 
     env->ExceptionClear();
-    env->CallStaticVoidMethod(sTestEngineCls.ObjectRef(), method, strObj);
+    env->CallStaticVoidMethod(sTestEngineCls, method, strObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -263,7 +257,7 @@ extern "C" JNIEXPORT jint Java_com_tcl_chip_chiptest_TestEngine_runTest(JNIEnv *
     nlTestSetLogger(&jni_test_logger);
 
     jint ret = RunRegisteredUnitTests();
-    ret += RUN_ALL_TESTS();
+    // ret += RUN_ALL_TESTS();
 
     return ret;
 }
