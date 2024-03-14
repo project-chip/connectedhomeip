@@ -164,11 +164,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) BOOL receivingReport;
 @property (nonatomic) BOOL receivingPrimingReport;
 
-
 // TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
 //   Actively receiving report
 //   Actively receiving priming report
-
 
 @property (nonatomic) MTRInternalDeviceState internalDeviceState;
 
@@ -760,17 +758,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_unlock(&self->_lock);
 }
 
-
 - (void)_markDeviceAsUnreachableIfNotSusbcribed
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-
-    if ( _internalDeviceState >= MTRInternalDeviceStateSubscribed )
+    if (_internalDeviceState >= MTRInternalDeviceStateSubscribed)
         return;
 
     MTR_LOG_DEFAULT("%@ still not subscribed, marking the device as unreachable", self);
-    [self _changeState: MTRDeviceStateUnreachable];
+    [self _changeState:MTRDeviceStateUnreachable];
 }
 
 - (void)_handleReportBegin
@@ -1021,7 +1017,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [strongSelf _markDeviceAsUnreachableIfNotSusbcribed];
         os_unfair_lock_unlock(&strongSelf->_lock);
     });
-
 
     [_deviceController
         getSessionForNode:_nodeID.unsignedLongLongValue
