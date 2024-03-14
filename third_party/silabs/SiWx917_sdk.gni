@@ -32,6 +32,9 @@ declare_args() {
 
   # Periodic time at which the 917 SoC should wakeup
   si91x_alarm_periodic_time = 30
+
+  # option to select the crypto library
+  sl_crypto_lib = "tinycrypt"
 }
 
 # Defines an siwx917 SDK build target.
@@ -41,6 +44,10 @@ declare_args() {
 #   sources - The sources files to build.
 template("siwx917_sdk") {
   sdk_target_name = target_name
+
+  assert(sl_crypto_lib == "tinycrypt" || sl_crypto_lib == "mbedtls" ||
+             sl_crypto_lib == "psa",
+         "sl_crypto_lib must be tinycrypt or mbedtls or psa")
 
   config("${sdk_target_name}_config") {
     defines = []
@@ -316,7 +323,8 @@ template("siwx917_sdk") {
     }
   }
 
-  if (chip_crypto == "psa") {
+  if (chip_crypto == "psa" ||
+      (chip_crypto == "platform" && sl_crypto_lib == "psa")) {
     _mbedtls_root = "${efr32_sdk_root}/util/third_party/mbedtls"
     sl_si91x_psa_crypto_path =
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/"
@@ -462,7 +470,7 @@ template("siwx917_sdk") {
     }
   }
 
-  if (chip_crypto == "platform") {
+  if (chip_crypto == "platform" && sl_crypto_lib == "tinycrypt") {
     _mbedtls_root = "${mbedtls_root}/repo"
 
     config("siwx917_tinycrypt_config") {
@@ -681,7 +689,8 @@ template("siwx917_sdk") {
       public_deps += [ ":siwx917_tinycrypt" ]
     }
 
-    if (chip_crypto == "psa") {
+    if (chip_crypto == "psa" ||
+        (chip_crypto == "platform" && sl_crypto_lib == "psa")) {
       public_deps += [ ":sl_si91x_psa_crypto" ]
     }
 
