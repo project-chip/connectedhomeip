@@ -74,7 +74,7 @@ object ChipClient {
             return null
           }
 
-          override fun onKeyRefreshDone(errorCode: Int) {
+          override fun onKeyRefreshDone(errorCode: Long) {
             Log.d(TAG, "onKeyRefreshDone : $errorCode")
           }
         }

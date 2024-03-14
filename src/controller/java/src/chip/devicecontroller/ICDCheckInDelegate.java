@@ -51,5 +51,5 @@ public interface ICDCheckInDelegate {
    *
    * @param errorCode to check for success and failure
    */
-  void onKeyRefreshDone(int errorCode);
+  void onKeyRefreshDone(long errorCode);
 }
