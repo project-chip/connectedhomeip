@@ -644,7 +644,7 @@ exit:
 
 CHIP_ERROR AndroidDeviceControllerWrapper::StartOTAProvider(jobject otaProviderDelegate)
 {
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     OTAProviderDelegateBridge * otaProviderBridge = new OTAProviderDelegateBridge();
@@ -674,7 +674,7 @@ exit:
 
 CHIP_ERROR AndroidDeviceControllerWrapper::FinishOTAProvider()
 {
-#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     if (mOtaProviderBridge != nullptr)
     {
         mOtaProviderBridge->Shutdown();
