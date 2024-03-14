@@ -697,13 +697,13 @@ class BaseTestHelper:
         # on the sub we established previously. Since it was just marked defunct, it should return back to being
         # active and a report should get delivered.
         #
-        sawValueChange = False
+        sawValueChangeEvent = asyncio.Event()
+        loop = asyncio.get_running_loop()
 
         def OnValueChange(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
-            nonlocal sawValueChange
             self.logger.info("Saw value change!")
             if (path.AttributeType == Clusters.UnitTesting.Attributes.Int8u and path.Path.EndpointId == 1):
-                sawValueChange = True
+                loop.call_soon_threadsafe(sawValueChangeEvent.set)
 
         self.logger.info("Testing CASE defunct logic")
 
@@ -720,14 +720,15 @@ class BaseTestHelper:
         # was received.
         #
         await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
-        await asyncio.sleep(2)
 
-        sub.Shutdown()
-
-        if sawValueChange is False:
+        try:
+            await asyncio.wait_for(sawValueChangeEvent.wait(), 2)
+        except TimeoutError:
             self.logger.error(
                 "Didn't see value change in time, likely because sub got terminated due to unexpected session eviction!")
             return False
+        finally:
+            sub.Shutdown()
 
         #
         # In this test, we're going to setup a subscription on fabric1 through devCtl, then, constantly keep
@@ -739,7 +740,7 @@ class BaseTestHelper:
         #
         self.logger.info("Testing fabric-isolated CASE eviction")
 
-        sawValueChange = False
+        sawValueChangeEvent.clear()
         sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.UnitTesting.Attributes.Int8u)], reportInterval=(0, 1))
         sub.SetAttributeUpdateCallback(OnValueChange)
 
@@ -752,13 +753,14 @@ class BaseTestHelper:
         # was received.  Use a different value from before, so there is an actual change.
         #
         await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(5))])
-        await asyncio.sleep(2)
 
-        sub.Shutdown()
-
-        if sawValueChange is False:
+        try:
+            await asyncio.wait_for(sawValueChangeEvent.wait(), 2)
+        except TimeoutError:
             self.logger.error("Didn't see value change in time, likely because sub got terminated due to other fabric (fabric1)")
             return False
+        finally:
+            sub.Shutdown()
 
         #
         # Do the same test again, but reversing the roles of fabric1 and fabric2.  And again
@@ -766,7 +768,7 @@ class BaseTestHelper:
         #
         self.logger.info("Testing fabric-isolated CASE eviction (reverse)")
 
-        sawValueChange = False
+        sawValueChangeEvent.clear()
         sub = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.UnitTesting.Attributes.Int8u)], reportInterval=(0, 1))
         sub.SetAttributeUpdateCallback(OnValueChange)
 
@@ -775,13 +777,13 @@ class BaseTestHelper:
             await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(6))])
-        await asyncio.sleep(2)
-
-        sub.Shutdown()
-
-        if sawValueChange is False:
+        try:
+            await asyncio.wait_for(sawValueChangeEvent.wait(), 2)
+        except TimeoutError:
             self.logger.error("Didn't see value change in time, likely because sub got terminated due to other fabric (fabric2)")
             return False
+        finally:
+            sub.Shutdown()
 
         return True
 
