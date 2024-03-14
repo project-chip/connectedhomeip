@@ -41,3 +41,10 @@ runs:
       uses: ./.github/actions/upload-bootstrap-logs
       with:
         bootstrap-log-name: ${{ inputs.bootstrap-log-name }}
+    - name: Work around TSAN ASLR issues
+      if: runner.os == 'Linux' && !env.ACT
+      shell: bash
+      run: |
+        # See https://stackoverflow.com/a/77856955/2365113
+        if [[ "$UID" == 0 ]]; then function sudo() { "$@"; }; fi
+        sudo sysctl vm.mmap_rnd_bits=28
