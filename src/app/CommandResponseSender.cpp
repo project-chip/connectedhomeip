@@ -23,8 +23,8 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
-CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                               System::PacketBufferHandle && aPayload)
+CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
+                                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Status> failureStatusToSend;
@@ -174,7 +174,7 @@ void CommandResponseSender::Close()
 }
 
 void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
-                                              bool isTimedInvoke)
+                                                   bool isTimedInvoke)
 {
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement, "state should be ReadyForInvokeResponses");
@@ -201,8 +201,9 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
 #if CHIP_WITH_NLFAULTINJECTION
 
 void CommandResponseSender::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
-                                                                      System::PacketBufferHandle && payload, bool isTimedInvoke,
-                                                                      CommandHandler::NlFaultInjectionType faultType)
+                                                                           System::PacketBufferHandle && payload,
+                                                                           bool isTimedInvoke,
+                                                                           CommandHandler::NlFaultInjectionType faultType)
 {
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "TH Failure: Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement,
