@@ -30,7 +30,7 @@
 #include <app/AttributePathParams.h>
 #include <app/CommandHandler.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/CommandResponder.h>
+#include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -78,7 +78,7 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
-                               public CommandResponder::Callback,
+                               public CommandResponseSender::Callback,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
@@ -404,7 +404,7 @@ private:
     friend class SubscriptionResumptionSessionEstablisher;
     using Status = Protocols::InteractionModel::Status;
 
-    void OnDone(CommandResponder & apResponderObj) override;
+    void OnDone(CommandResponseSender & apResponderObj) override;
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
@@ -602,7 +602,7 @@ private:
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
 
-    ObjectPool<CommandResponder, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandResponderObjs;
+    ObjectPool<CommandResponseSender, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandResponderObjs;
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;

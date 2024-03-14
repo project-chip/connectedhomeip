@@ -26,6 +26,7 @@
 namespace chip {
 namespace app {
 
+// TODO(#30453): Rename CommandResponseSender to CommandResponder in follow up PR
 /**
  * Manages the process of sending InvokeResponseMessage(s) to the requester.
  *
@@ -33,7 +34,7 @@ namespace app {
  * InvokeRequestCommand. The CommandHandler is provided a reference to this
  * CommandResponderInterface implementation to enable sending InvokeResponseMessage(s).
  */
-class CommandResponder : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public CommandResponderInterface
+class CommandResponseSender : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public CommandResponderInterface
 {
 public:
     class Callback
@@ -44,10 +45,10 @@ public:
          * Signals registered callback that this object has finished its work and can now be
          * safely destroyed/released.
          */
-        virtual void OnDone(CommandResponder & apResponderObj) = 0;
+        virtual void OnDone(CommandResponseSender & apResponderObj) = 0;
     };
 
-    CommandResponder(Callback * apCallback, CommandHandler::Callback * apDispatchCallback) :
+    CommandResponseSender(Callback * apCallback, CommandHandler::Callback * apDispatchCallback) :
         mpCallback(apCallback), mpCommandHandlerCallback(apDispatchCallback), mCommandHandler(this), mExchangeCtx(*this)
     {}
 
@@ -199,7 +200,7 @@ private:
     bool HasMoreToSend() { return !mChunks.IsNull() || mReportResponseDropped; }
     void Close();
 
-    // A list of InvokeResponseMessages to be sent out by CommandResponder.
+    // A list of InvokeResponseMessages to be sent out by CommandResponseSender.
     System::PacketBufferHandle mChunks;
 
     Callback * mpCallback;

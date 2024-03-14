@@ -374,7 +374,7 @@ bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabric
     return false;
 }
 
-void InteractionModelEngine::OnDone(CommandResponder & apResponderObj)
+void InteractionModelEngine::OnDone(CommandResponseSender & apResponderObj)
 {
     mCommandResponderObjs.ReleaseObject(&apResponderObj);
 }
@@ -417,7 +417,7 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
                                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                                       bool aIsTimedInvoke)
 {
-    CommandResponder * commandResponder = mCommandResponderObjs.CreateObject(this, this);
+    CommandResponseSender * commandResponder = mCommandResponderObjs.CreateObject(this, this);
     if (commandResponder == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");

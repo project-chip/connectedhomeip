@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "CommandResponder.h"
+#include "CommandResponseSender.h"
 #include "InteractionModelEngine.h"
 #include "messaging/ExchangeContext.h"
 
@@ -23,7 +23,7 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
-CHIP_ERROR CommandResponder::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                                System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -54,7 +54,7 @@ CHIP_ERROR CommandResponder::OnMessageReceived(Messaging::ExchangeContext * apEx
         return CHIP_NO_ERROR;
     }
 
-    ChipLogDetail(DataManagement, "CommandResponder: Unexpected message type %d", aPayloadHeader.GetMessageType());
+    ChipLogDetail(DataManagement, "CommandResponseSender: Unexpected message type %d", aPayloadHeader.GetMessageType());
     err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     if (mState != State::AllInvokeResponsesSent)
     {
@@ -72,16 +72,16 @@ exit:
     return err;
 }
 
-void CommandResponder::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
+void CommandResponseSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogDetail(DataManagement, "CommandResponder: Timed out waiting for response from requester mState=[%10.10s]",
+    ChipLogDetail(DataManagement, "CommandResponseSender: Timed out waiting for response from requester mState=[%10.10s]",
                   GetStateStr());
     // We don't need to consider remaining async CommandHandlers here. We become the exchange
     // delegate only after CommandHandler::OnDone is called.
     Close();
 }
 
-void CommandResponder::StartSendingCommandResponses()
+void CommandResponseSender::StartSendingCommandResponses()
 {
     VerifyOrDie(mState == State::ReadyForInvokeResponses);
     CHIP_ERROR err = SendCommandResponse();
@@ -114,7 +114,7 @@ void CommandResponder::StartSendingCommandResponses()
     }
 }
 
-CHIP_ERROR CommandResponder::SendCommandResponse()
+CHIP_ERROR CommandResponseSender::SendCommandResponse()
 {
     VerifyOrReturnError(HasMoreToSend(), CHIP_ERROR_INCORRECT_STATE);
     if (mChunks.IsNull())
@@ -139,7 +139,7 @@ CHIP_ERROR CommandResponder::SendCommandResponse()
     return CHIP_NO_ERROR;
 }
 
-const char * CommandResponder::GetStateStr() const
+const char * CommandResponseSender::GetStateStr() const
 {
 #if CHIP_DETAIL_LOGGING
     switch (mState)
@@ -157,7 +157,7 @@ const char * CommandResponder::GetStateStr() const
     return "N/A";
 }
 
-void CommandResponder::MoveToState(const State aTargetState)
+void CommandResponseSender::MoveToState(const State aTargetState)
 {
     if (mState == aTargetState)
     {
@@ -167,13 +167,13 @@ void CommandResponder::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "Command response sender moving to [%10.10s]", GetStateStr());
 }
 
-void CommandResponder::Close()
+void CommandResponseSender::Close()
 {
     MoveToState(State::AllInvokeResponsesSent);
     mpCallback->OnDone(*this);
 }
 
-void CommandResponder::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
+void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload,
                                               bool isTimedInvoke)
 {
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "Incoming exchange context should not be null");
@@ -200,7 +200,7 @@ void CommandResponder::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, S
 
 #if CHIP_WITH_NLFAULTINJECTION
 
-void CommandResponder::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
+void CommandResponseSender::TestOnlyInvokeCommandRequestWithFaultsInjected(Messaging::ExchangeContext * ec,
                                                                       System::PacketBufferHandle && payload, bool isTimedInvoke,
                                                                       CommandHandler::NlFaultInjectionType faultType)
 {

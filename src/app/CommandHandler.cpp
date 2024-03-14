@@ -843,7 +843,7 @@ CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessage(bool aHasMoreChunks)
 
 void CommandHandler::SetCommandResponder(CommandResponderInterface * commandResponder)
 {
-    VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "CommandResponder can only be set in idle state");
+    VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "CommandResponseSender can only be set in idle state");
     mpResponder = commandResponder;
 }
 
