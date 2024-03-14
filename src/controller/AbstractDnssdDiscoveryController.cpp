@@ -34,9 +34,10 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
         {
             continue;
         }
+        // TODO Check if IP address are the same. Must account for `numIPs` in the list of `ipAddress`.
+        // Additionally, must NOT assume that the ordering is consistent.
         if (strcmp(discoveredNode.resolutionData.hostName, nodeData.resolutionData.hostName) == 0 &&
-            discoveredNode.resolutionData.port == nodeData.resolutionData.port &&
-            discoveredNode.resolutionData.ipAddress == nodeData.resolutionData.ipAddress)
+            discoveredNode.resolutionData.port == nodeData.resolutionData.port)
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
