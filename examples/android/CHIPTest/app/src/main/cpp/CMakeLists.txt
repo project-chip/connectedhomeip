@@ -21,6 +21,7 @@ endif()
 
 message(STATUS "MATTER_SDK_ROOT=${MATTER_SDK_ROOT}")
 message(STATUS "MATTER_SDK_BUILD=${MATTER_SDK_BUILD}")
+set(CMAKE_CXX_STANDARD 17)
 
 set(CHIPTest_srcs
         CHIPTest-JNI.cpp)
