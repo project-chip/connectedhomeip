@@ -51,6 +51,8 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 NSString * const MTRPreviousDataKey = @"previousData";
 NSString * const MTRDataVersionKey = @"dataVersion";
 
+#define kTimeToWaitBeforeMarkingUnreachableAfterSettingUpSubscription 10
+
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 // This class is for storing weak references in a container
@@ -125,6 +127,12 @@ private:
 } // anonymous namespace
 
 #pragma mark - MTRDevice
+typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
+    MTRInternalDeviceStateUnsubscribed = 0,
+    MTRInternalDeviceStateSubscribing = 1,
+    MTRInternalDeviceStateSubscribed = 2
+};
+
 typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     MTRDeviceExpectedValueFieldExpirationTimeIndex = 0,
     MTRDeviceExpectedValueFieldValueIndex = 1,
@@ -157,18 +165,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) BOOL receivingPrimingReport;
 
 // TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
-//   Unsubscribed (not attemping)
-//   Attempting subscription
-//   Subscribed (gotten subscription response / in steady state with no OnError/OnDone)
 //   Actively receiving report
 //   Actively receiving priming report
 
-/**
- * If subscriptionActive is true that means that either we are in the middle of
- * trying to get a CASE session for the publisher or we have a live ReadClient
- * right now (possibly with a lost subscription and trying to re-subscribe).
- */
-@property (nonatomic) BOOL subscriptionActive;
+@property (nonatomic) MTRInternalDeviceState internalDeviceState;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
@@ -640,6 +640,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
+    _internalDeviceState = MTRInternalDeviceStateSubscribed;
 
     // As subscription is established, check if the delegate needs to be informed
     if (!_delegateDeviceCachePrimedCalled) {
@@ -663,7 +664,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_lock(&self->_lock);
 
-    _subscriptionActive = NO;
+    _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
     _unreportedEvents = nil;
 
     [self _changeState:MTRDeviceStateUnreachable];
@@ -755,6 +756,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _reattemptSubscriptionNowIfNeeded];
 
     os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)_markDeviceAsUnreachableIfNotSusbcribed
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (_internalDeviceState >= MTRInternalDeviceStateSubscribed)
+        return;
+
+    MTR_LOG_DEFAULT("%@ still not subscribed, marking the device as unreachable", self);
+    [self _changeState:MTRDeviceStateUnreachable];
 }
 
 - (void)_handleReportBegin
@@ -991,11 +1003,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #endif
 
     // for now just subscribe once
-    if (_subscriptionActive) {
+    if (_internalDeviceState > MTRInternalDeviceStateUnsubscribed) {
         return;
     }
 
-    _subscriptionActive = YES;
+    _internalDeviceState = MTRInternalDeviceStateSubscribing;
+
+    // Set up a timer to mark as not reachable if it takes too long to set up a subscription
+    MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kTimeToWaitBeforeMarkingUnreachableAfterSettingUpSubscription * NSEC_PER_SEC)), self.queue, ^{
+        MTRDevice * strongSelf = weakSelf.strongObject;
+        os_unfair_lock_lock(&strongSelf->_lock);
+        [strongSelf _markDeviceAsUnreachableIfNotSusbcribed];
+        os_unfair_lock_unlock(&strongSelf->_lock);
+    });
 
     [_deviceController
         getSessionForNode:_nodeID.unsignedLongLongValue
