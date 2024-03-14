@@ -33,15 +33,15 @@
 
 typedef enum
 {
-    WFX_EVT_STA_CONN       = (1 << 0),
-    WFX_EVT_STA_DISCONN    = (1 << 1),
-    WFX_EVT_AP_START       = (1 << 2),
-    WFX_EVT_AP_STOP        = (1 << 3),
-    WFX_EVT_SCAN           = (1 << 4), /* This is used as scan result and start */
-    WFX_EVT_STA_START_JOIN = (1 << 5),
-    WFX_EVT_STA_DO_DHCP    = (1 << 6),
-    WFX_EVT_STA_DHCP_DONE  = (1 << 7),
-    WFX_EVT_DHCP_POLL      = (1 << 8)
+    WFX_EVT_STA_CONN,
+    WFX_EVT_STA_DISCONN,
+    WFX_EVT_AP_START,
+    WFX_EVT_AP_STOP,
+    WFX_EVT_SCAN, /* This is used as scan result and start */
+    WFX_EVT_STA_START_JOIN,
+    WFX_EVT_STA_DO_DHCP,
+    WFX_EVT_STA_DHCP_DONE,
+    WFX_EVT_DHCP_POLL
 } WfxEventType_e;
 
 typedef enum

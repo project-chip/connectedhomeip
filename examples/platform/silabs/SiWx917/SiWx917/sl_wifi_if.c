@@ -89,6 +89,8 @@ bool is_wifi_disconnection_event = false;
 uint32_t retryInterval                 = WLAN_MIN_RETRY_TIMER_MS;
 volatile bool scan_results_complete    = false;
 volatile bool bg_scan_results_complete = false;
+
+// TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 #define WIFI_SCAN_TIMEOUT_TICK 10000
 
 extern osSemaphoreId_t sl_rs_ble_init_sem;
@@ -374,7 +376,7 @@ int32_t wfx_wifi_rsi_init(void)
         return SL_STATUS_ALLOCATION_FAILED;
     }
 
-    // Create timer for scan timeout
+    // Create timer for DHCP polling
     sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, NULL, NULL);
     if (sDHCPTimer == NULL)
     {
@@ -771,7 +773,12 @@ void HandleDHCPPolling()
 
 void WfxPostEvent(WfxEvent_t * event)
 {
-    osMessageQueuePut(sWifiEventQueue, event, 0, 0);
+    sl_status_t status = osMessageQueuePut(sWifiEventQueue, event, 0, 0);
+
+    if (status != osOK)
+    {
+        SILABS_LOG("WfxPostEvent: failed to post event with status: %d", status);
+    }
 }
 
 void ProcessEvent(WfxEvent_t inEvent)
@@ -913,6 +920,7 @@ void wfx_rsi_task(void * arg)
         }
         else
         {
+            // TODO: Everywhere in this file(and related) SILABS_LOG ---> Chiplog
             SILABS_LOG("Failed to get event with status: %x", status);
         }
     }
