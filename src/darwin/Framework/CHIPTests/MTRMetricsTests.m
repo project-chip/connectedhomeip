@@ -132,9 +132,9 @@
 {
     MTRMetrics * metrics1 = [[MTRMetrics alloc] initWithCapacity:1];
     MTRMetrics * metrics2 = [[MTRMetrics alloc] initWithCapacity:1];
-    XCTAssertTrue(metrics1.uniqueIdentifier != nil);
-    XCTAssertTrue(metrics2.uniqueIdentifier != nil);
-    XCTAssertTrue([metrics1.uniqueIdentifier isEqual:metrics2.uniqueIdentifier] == NO);
+    XCTAssertNotNil(metrics1.uniqueIdentifier);
+    XCTAssertNotNil(metrics2.uniqueIdentifier);
+    XCTAssertNotEqualObjects(metrics1.uniqueIdentifier, metrics2.uniqueIdentifier);
 }
 
 @end
