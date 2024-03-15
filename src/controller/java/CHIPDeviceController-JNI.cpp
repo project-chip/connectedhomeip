@@ -588,6 +588,25 @@ exit:
 #endif
 }
 
+JNI_METHOD(void, setICDCheckInDelegate)(JNIEnv * env, jobject self, jlong handle, jobject checkInDelegate)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Controller, "setICDCheckInDelegate() called");
+
+    err = wrapper->SetICDCheckInDelegate(checkInDelegate);
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to set ICD Check-In Deleagate. : %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 JNI_METHOD(void, commissionDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials)
 {
