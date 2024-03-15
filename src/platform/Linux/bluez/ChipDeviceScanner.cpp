@@ -69,11 +69,11 @@ CHIP_ERROR ChipDeviceScanner::Init(BluezAdapter1 * adapter, ChipDeviceScannerDel
             VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
             GAutoPtr<GError> err;
-            self->mManager = g_dbus_object_manager_client_new_for_bus_sync(
+            self->mManager.reset(g_dbus_object_manager_client_new_for_bus_sync(
                 G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
                 bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-                nullptr /* destroy notify */, nullptr /* cancellable */, &err.GetReceiver());
-            VerifyOrReturnError(self->mManager != nullptr, CHIP_ERROR_INTERNAL,
+                nullptr /* destroy notify */, nullptr /* cancellable */, &err.GetReceiver()));
+            VerifyOrReturnError(self->mManager, CHIP_ERROR_INTERNAL,
                                 ChipLogError(Ble, "Failed to get D-Bus object manager for device scanning: %s", err->message));
             return CHIP_NO_ERROR;
         },
@@ -95,8 +95,7 @@ void ChipDeviceScanner::Shutdown()
     // released during a D-Bus signal being processed.
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) {
-            if (self->mManager != nullptr)
-                g_object_unref(self->mManager);
+            self->mManager.reset();
             self->mAdapter.reset();
             return CHIP_NO_ERROR;
         },
@@ -187,13 +186,13 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
 
     if (self->mObjectAddedSignal)
     {
-        g_signal_handler_disconnect(self->mManager, self->mObjectAddedSignal);
+        g_signal_handler_disconnect(self->mManager.get(), self->mObjectAddedSignal);
         self->mObjectAddedSignal = 0;
     }
 
     if (self->mInterfaceChangedSignal)
     {
-        g_signal_handler_disconnect(self->mManager, self->mInterfaceChangedSignal);
+        g_signal_handler_disconnect(self->mManager.get(), self->mInterfaceChangedSignal);
         self->mInterfaceChangedSignal = 0;
     }
 
@@ -271,15 +270,15 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
     GAutoPtr<GError> error;
 
-    self->mObjectAddedSignal = g_signal_connect(self->mManager, "object-added", G_CALLBACK(SignalObjectAdded), self);
+    self->mObjectAddedSignal = g_signal_connect(self->mManager.get(), "object-added", G_CALLBACK(SignalObjectAdded), self);
     self->mInterfaceChangedSignal =
-        g_signal_connect(self->mManager, "interface-proxy-properties-changed", G_CALLBACK(SignalInterfaceChanged), self);
+        g_signal_connect(self->mManager.get(), "interface-proxy-properties-changed", G_CALLBACK(SignalInterfaceChanged), self);
 
     ChipLogProgress(Ble, "BLE removing known devices.");
-    for (BluezObject & object : BluezObjectList(self->mManager))
+    for (BluezObject & object : BluezObjectList(self->mManager.get()))
     {
         GAutoPtr<BluezDevice1> device(bluez_object_get_device1(&object));
-        if (device.get() != nullptr)
+        if (device)
         {
             self->RemoveDevice(*device.get());
         }

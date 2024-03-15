@@ -107,7 +107,7 @@ private:
     /// so that it can be re-discovered if it's still advertising.
     void RemoveDevice(BluezDevice1 & device);
 
-    GDBusObjectManager * mManager = nullptr;
+    GAutoPtr<GDBusObjectManager> mManager;
     GAutoPtr<BluezAdapter1> mAdapter;
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
