@@ -95,10 +95,10 @@ private:
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
     static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
     static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
-    static void SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self);
-    static void SignalInterfaceChanged(GDBusObjectManagerClient * manager, GDBusObjectProxy * object, GDBusProxy * aInterface,
-                                       GVariant * aChangedProperties, const gchar * const * aInvalidatedProps,
-                                       ChipDeviceScanner * self);
+
+    void SignalObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject);
+    void SignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject, GDBusProxy * aInterface,
+                                          GVariant * aChangedProperties, const char * const * aInvalidatedProps);
 
     /// Check if a given device is a CHIP device and if yes, report it as discovered
     void ReportDevice(BluezDevice1 & device);
@@ -110,8 +110,8 @@ private:
     GAutoPtr<GDBusObjectManager> mManager;
     GAutoPtr<BluezAdapter1> mAdapter;
     ChipDeviceScannerDelegate * mDelegate = nullptr;
-    gulong mObjectAddedSignal             = 0;
-    gulong mInterfaceChangedSignal        = 0;
+    unsigned int mObjectAddedSignal       = 0;
+    unsigned int mPropertiesChangedSignal = 0;
     ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
     /// Used to track if timer has already expired and doesn't need to be canceled.
     ScannerTimerState mTimerState = ScannerTimerState::TIMER_CANCELED;

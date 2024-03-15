@@ -190,10 +190,10 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
         self->mObjectAddedSignal = 0;
     }
 
-    if (self->mInterfaceChangedSignal)
+    if (self->mPropertiesChangedSignal)
     {
-        g_signal_handler_disconnect(self->mManager.get(), self->mInterfaceChangedSignal);
-        self->mInterfaceChangedSignal = 0;
+        g_signal_handler_disconnect(self->mManager.get(), self->mPropertiesChangedSignal);
+        self->mPropertiesChangedSignal = 0;
     }
 
     GAutoPtr<GError> error;
@@ -212,22 +212,22 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
     return CHIP_NO_ERROR;
 }
 
-void ChipDeviceScanner::SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self)
+void ChipDeviceScanner::SignalObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject)
 {
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(object)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObject)));
     VerifyOrReturn(device);
 
-    self->ReportDevice(*device.get());
+    ReportDevice(*device.get());
 }
 
-void ChipDeviceScanner::SignalInterfaceChanged(GDBusObjectManagerClient * manager, GDBusObjectProxy * object,
-                                               GDBusProxy * aInterface, GVariant * aChangedProperties,
-                                               const gchar * const * aInvalidatedProps, ChipDeviceScanner * self)
+void ChipDeviceScanner::SignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
+                                                         GDBusProxy * aInterface, GVariant * aChangedProperties,
+                                                         const char * const * aInvalidatedProps)
 {
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(object)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObject)));
     VerifyOrReturn(device);
 
-    self->ReportDevice(*device.get());
+    ReportDevice(*device.get());
 }
 
 void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
@@ -270,9 +270,19 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
     GAutoPtr<GError> error;
 
-    self->mObjectAddedSignal = g_signal_connect(self->mManager.get(), "object-added", G_CALLBACK(SignalObjectAdded), self);
-    self->mInterfaceChangedSignal =
-        g_signal_connect(self->mManager.get(), "interface-proxy-properties-changed", G_CALLBACK(SignalInterfaceChanged), self);
+    self->mObjectAddedSignal =
+        g_signal_connect(self->mManager.get(), "object-added",
+                         G_CALLBACK(+[](GDBusObjectManager * aMgr, GDBusObject * aObj, ChipDeviceScanner * self_) {
+                             return self_->SignalObjectAdded(aMgr, aObj);
+                         }),
+                         self);
+    self->mPropertiesChangedSignal = g_signal_connect(
+        self->mManager.get(), "interface-proxy-properties-changed",
+        G_CALLBACK(+[](GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface, GVariant * aChangedProps,
+                       const char * const * aInvalidatedProps, ChipDeviceScanner * self_) {
+            return self_->SignalInterfacePropertiesChanged(aMgr, aObj, aIface, aChangedProps, aInvalidatedProps);
+        }),
+        self);
 
     ChipLogProgress(Ble, "BLE removing known devices.");
     for (BluezObject & object : BluezObjectList(self->mManager.get()))
