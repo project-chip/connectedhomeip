@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,23 +18,30 @@
 
 #pragma once
 
+#include "../support/MatterCallback-JNI.h"
+#include "core/CastingPlayer.h" // from tv-casting-common
+
 #include <jni.h>
 
 namespace matter {
 namespace casting {
 namespace core {
 
-class CastingPlayerJNI
+class MatterCastingPlayerJNI
 {
 public:
+    MatterCastingPlayerJNI() : mConnectionSuccessHandler([](void *) { return nullptr; }) {}
+    support::MatterCallbackJNI<void *> mConnectionSuccessHandler;
+    support::MatterFailureCallbackJNI mConnectionFailureHandler;
+
 private:
-    friend CastingPlayerJNI & CastingAppJNIMgr();
-    static CastingPlayerJNI sInstance;
+    friend MatterCastingPlayerJNI & MatterCastingPlayerJNIMgr();
+    static MatterCastingPlayerJNI sInstance;
 };
 
-inline class CastingPlayerJNI & CastingAppJNIMgr()
+inline class MatterCastingPlayerJNI & MatterCastingPlayerJNIMgr()
 {
-    return CastingPlayerJNI::sInstance;
+    return MatterCastingPlayerJNI::sInstance;
 }
 }; // namespace core
 }; // namespace casting
