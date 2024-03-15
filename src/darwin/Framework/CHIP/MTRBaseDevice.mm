@@ -62,6 +62,7 @@ using namespace chip::Protocols::InteractionModel;
 using chip::Optional;
 using chip::SessionHandle;
 using chip::Messaging::ExchangeManager;
+using namespace chip::Metrics::DarwinFramework;
 
 NSString * const MTRAttributePathKey = @"attributePath";
 NSString * const MTRCommandPathKey = @"commandPath";
@@ -1862,12 +1863,12 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                                             queue:(dispatch_queue_t)queue
                                        completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
-    MATTER_LOG_METRIC_BEGIN(kMetricDarwinFrameworkOpenPairingWindow);
+    MATTER_LOG_METRIC_BEGIN(kMetricOpenPairingWindow);
 
     if (self.isPASEDevice) {
         MTR_LOG_ERROR("Can't open a commissioning window over PASE");
         dispatch_async(queue, ^{
-            MATTER_LOG_METRIC_END(kMetricDarwinFrameworkOpenPairingWindow, CHIP_ERROR_INCORRECT_STATE);
+            MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INCORRECT_STATE);
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
         return;
@@ -1877,7 +1878,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     if (!CanCastTo<uint16_t>(durationVal)) {
         MTR_LOG_ERROR("Error: Duration %llu is too large.", durationVal);
         dispatch_async(queue, ^{
-            MATTER_LOG_METRIC_END(kMetricDarwinFrameworkOpenPairingWindow, CHIP_ERROR_INVALID_INTEGER_VALUE);
+            MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INVALID_INTEGER_VALUE);
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
         });
         return;
@@ -1888,7 +1889,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     if (discriminatorVal > 0xFFF) {
         MTR_LOG_ERROR("Error: Discriminator %llu is too large. Max value %d", discriminatorVal, 0xFFF);
         dispatch_async(queue, ^{
-            MATTER_LOG_METRIC_END(kMetricDarwinFrameworkOpenPairingWindow, CHIP_ERROR_INVALID_INTEGER_VALUE);
+            MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INVALID_INTEGER_VALUE);
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
         });
         return;
@@ -1900,7 +1901,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         if (!CanCastTo<uint32_t>(passcodeVal) || !SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(passcodeVal))) {
             MTR_LOG_ERROR("Error: Setup passcode %llu is not valid", passcodeVal);
             dispatch_async(queue, ^{
-                MATTER_LOG_METRIC_END(kMetricDarwinFrameworkOpenPairingWindow, CHIP_ERROR_INVALID_INTEGER_VALUE);
+                MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INVALID_INTEGER_VALUE);
                 completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
             });
             return;
@@ -1913,7 +1914,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
             auto resultCallback = ^(CHIP_ERROR status, const SetupPayload & payload) {
                 if (status != CHIP_NO_ERROR) {
                     dispatch_async(queue, ^{
-                        MATTER_LOG_METRIC_END(kMetricDarwinFrameworkOpenPairingWindow, status);
+                        MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, status);
                         completion(nil, [MTRError errorForCHIPErrorCode:status]);
                     });
                     return;
@@ -1921,14 +1922,14 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                 auto * payloadObj = [[MTRSetupPayload alloc] initWithSetupPayload:payload];
                 if (payloadObj == nil) {
                     dispatch_async(queue, ^{
-                        MATTER_LOG_METRIC_END(kMetricDarwinFrameworkOpenPairingWindow, CHIP_ERROR_NO_MEMORY);
+                        MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_NO_MEMORY);
                         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
                     });
                     return;
                 }
 
                 dispatch_async(queue, ^{
-                    MATTER_LOG_METRIC_END(kMetricDarwinFrameworkOpenPairingWindow, CHIP_NO_ERROR);
+                    MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_NO_ERROR);
                     completion(payloadObj, nil);
                 });
             };
@@ -1940,7 +1941,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
             if (errorCode != CHIP_NO_ERROR) {
                 dispatch_async(queue, ^{
-                    MATTER_LOG_METRIC_END(kMetricDarwinFrameworkOpenPairingWindow, errorCode);
+                    MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, errorCode);
                     completion(nil, [MTRError errorForCHIPErrorCode:errorCode]);
                 });
                 return;
@@ -1950,7 +1951,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         }
         errorHandler:^(NSError * error) {
             dispatch_async(queue, ^{
-                MATTER_LOG_METRIC_END(kMetricDarwinFrameworkOpenPairingWindow, [MTRError errorToCHIPErrorCode:error]);
+                MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, [MTRError errorToCHIPErrorCode:error]);
                 completion(nil, error);
             });
         }];

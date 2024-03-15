@@ -14,35 +14,44 @@
  *    limitations under the License.
  */
 
+#include <lib/core/CHIPError.h>
 #include <tracing/metric_event.h>
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkDeviceCommissioning = "dwnfw_device_commissioning";
+namespace chip {
+namespace Metrics {
+namespace DarwinFramework {
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkSetupWithPayload = "dwnfw_setup_with_payload";
+constexpr Tracing::MetricKey kMetricDeviceCommissioning = "dwnfw_device_commissioning";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkPairDevice = "dwnfw_pair_device";
+constexpr Tracing::MetricKey kMetricSetupWithPayload = "dwnfw_setup_with_payload";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkSetupWithDiscovered = "dwnfw_setup_with_discovered";
+constexpr Tracing::MetricKey kMetricPairDevice = "dwnfw_pair_device";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkPreWarmCommissioning = "dwnfw_prewarm_commissioning";
+constexpr Tracing::MetricKey kMetricSetupWithDiscovered = "dwnfw_setup_with_discovered";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkStartBrowseForCommissionables = "dwnfw_start_browse_commissionables";
+constexpr Tracing::MetricKey kMetricPreWarmCommissioning = "dwnfw_prewarm_commissioning";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkStopBrowseForCommissionables = "dwnfw_stop_browse_commissionables";
+constexpr Tracing::MetricKey kMetricStartBrowseForCommissionables = "dwnfw_start_browse_commissionables";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkCancelCommissioning = "dwnfw_cancel_commissioning";
+constexpr Tracing::MetricKey kMetricStopBrowseForCommissionables = "dwnfw_stop_browse_commissionables";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkContinueCommissioningAfterAttestation =
-    "dwnfw_commission_post_attestation";
+constexpr Tracing::MetricKey kMetricCancelCommissioning = "dwnfw_cancel_commissioning";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkCommissionNode = "dwnfw_commission_node";
+constexpr Tracing::MetricKey kMetricContinueCommissioningAfterAttestation = "dwnfw_commission_post_attestation";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkDeviceBeingCommissioned = "dwnfw_dev_being_commissioned";
+constexpr Tracing::MetricKey kMetricCommissionNode = "dwnfw_commission_node";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkPASEVerifierForSetupCode = "dwnfw_pase_verifier_for_code";
+constexpr Tracing::MetricKey kMetricDeviceBeingCommissioned = "dwnfw_dev_being_commissioned";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkOpenPairingWindow = "dwnfw_pase_verifier_for_code";
+constexpr Tracing::MetricKey kMetricPASEVerifierForSetupCode = "dwnfw_pase_verifier_for_code";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkDeviceVendorID = "dwnfw_device_vendor_id";
+constexpr Tracing::MetricKey kMetricOpenPairingWindow = "dwnfw_pase_verifier_for_code";
 
-constexpr chip::Tracing::MetricKey kMetricDarwinFrameworkDeviceProductID = "dwnfw_device_product_id";
+constexpr Tracing::MetricKey kMetricDeviceVendorID = "dwnfw_device_vendor_id";
+
+constexpr Tracing::MetricKey kMetricDeviceProductID = "dwnfw_device_product_id";
+
+} // namespace DarwinFramework
+} // namespace Metrics
+} // namespace chip
+
