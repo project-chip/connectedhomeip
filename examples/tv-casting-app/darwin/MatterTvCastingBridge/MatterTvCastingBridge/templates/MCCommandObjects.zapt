@@ -1,3 +1,31 @@
 {{> header excludeZapComment=false}}
 
-// TODO: To be implemented in the following PR.
+#import "../MCCommand.h"
+#import "MCCommandPayloads.h"
+#import <Foundation/Foundation.h>
+
+#ifndef MCCommandObjects_h
+#define MCCommandObjects_h
+
+@interface MCNullObjectType : NSObject
+@end
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name))}}
+{{#if (isInConfigList name "MatterCastingClusters")}}
+
+// {{asUpperCamelCase name}} cluster:
+
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+@interface MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command : MCCommand <MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Params *, {{>command_response_type command=.}} *>
+@end
+
+{{/if}}
+{{/if}}
+{{/zcl_commands}}
+{{/if}}
+{{/if}}
+{{/zcl_clusters}}
+#endif /* MCCommandObjects_h */

@@ -1,8 +1,8 @@
 {{> header excludeZapComment=false}}
 
-#import "MCAttributeObjects.h"
 #import "../MCCluster.h"
-#import "../MCCommandObjects.h"
+#import "MCAttributeObjects.h"
+#import "MCCommandObjects.h"
 #import <Foundation/Foundation.h>
 
 #ifndef MCClusterObjects_h
@@ -19,8 +19,8 @@
 // {{asUpperCamelCase name}} cluster commands:
 
 {{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
 {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
-{{#if (isInConfigList name "MatterCastingImplementedCommands")}}
 
 /**
  * @brief Returns non-nil pointer to MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command if supported, nil otherwise.

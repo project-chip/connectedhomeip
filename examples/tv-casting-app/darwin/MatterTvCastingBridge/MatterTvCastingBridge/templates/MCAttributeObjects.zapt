@@ -1,6 +1,6 @@
 {{> header excludeZapComment=false}}
 
-#import "MCStructsObjc.h"
+#import "MCInteractionModelStructs.h"
 
 #import "../MCAttribute.h"
 #import <Foundation/Foundation.h>

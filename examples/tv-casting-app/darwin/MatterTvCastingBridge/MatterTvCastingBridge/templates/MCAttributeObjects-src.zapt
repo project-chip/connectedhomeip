@@ -57,7 +57,6 @@
     if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType>)) {
         std::shared_ptr<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType>>(cppValue);
         chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType _cppValue = *sharedPtr;
-        //auto & valueSharedPtr = *sharedPtr;
         *aError = CHIP_NO_ERROR;
         {{asObjectiveCType type parent.name structTypePrefix="MC"}} value;
         {{>decode_value target="value" source="_cppValue" cluster=parent.name errorCode="*aError = err; return nil;" depth=0}}

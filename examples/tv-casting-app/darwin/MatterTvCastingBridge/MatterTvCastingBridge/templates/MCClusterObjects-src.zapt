@@ -23,8 +23,8 @@
 // {{asUpperCamelCase name}} cluster commands:
 
 {{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
 {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
-{{#if (isInConfigList name "MatterCastingImplementedCommands")}}
 
 - (id){{asMethodName name}}Command
 {

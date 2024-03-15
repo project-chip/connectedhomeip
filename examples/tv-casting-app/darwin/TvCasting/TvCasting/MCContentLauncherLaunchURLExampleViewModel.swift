@@ -60,7 +60,7 @@ class MCContentLauncherLaunchURLExampleViewModel: ObservableObject {
             }
                 
             // create the LaunchURL request
-            let request: MCContentLauncherClusterLaunchURLRequest = MCContentLauncherClusterLaunchURLRequest()
+            let request: MCContentLauncherClusterLaunchURLParams = MCContentLauncherClusterLaunchURLParams()
             request.contentURL = contentUrl
             request.displayString = displayString
                     
