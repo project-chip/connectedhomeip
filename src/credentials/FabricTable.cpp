@@ -755,6 +755,20 @@ public:
     System::Clock::Seconds32 mLatestNotBefore;
 };
 
+CHIP_ERROR FabricTable::NotifyFabricAdded(FabricIndex fabricIndex)
+{
+    FabricTable::Delegate * delegate = mDelegateListRoot;
+    while (delegate)
+    {
+        // It is possible that delegate will remove itself from the list in the callback
+        // so we grab the next delegate in the list now.
+        FabricTable::Delegate * nextDelegate = delegate->next;
+        delegate->OnFabricAdded(*this, fabricIndex);
+        delegate = nextDelegate;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR FabricTable::NotifyFabricUpdated(FabricIndex fabricIndex)
 {
     MATTER_TRACE_SCOPE("NotifyFabricUpdated", "Fabric");
@@ -1731,6 +1745,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
 
     // Notify that NOC was added (at least transiently)
     *outNewFabricIndex = fabricIndexToUse;
+    NotifyFabricAdded(fabricIndexToUse);
     NotifyFabricUpdated(fabricIndexToUse);
 
     return CHIP_NO_ERROR;
