@@ -44,6 +44,7 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRServerEndpoint_Internal.h"
 #import "MTRSetupPayload.h"
+#import "MTRTimeUtils.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
@@ -737,40 +738,34 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         // to add, but in practice devices likely support only 2 and
         // AutoCommissioner caps the list at 10.  Let's do up to 4 transitions
         // for now.
+        constexpr size_t dstOffsetMaxCount = 4;
         using DSTOffsetType = chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type;
+        // dstOffsets needs to live long enough, so its existence is not
+        // conditional on having offsets.
+        DSTOffsetType dstOffsets[dstOffsetMaxCount];
 
-        DSTOffsetType dstOffsets[4];
-        size_t dstOffsetCount = 0;
-        auto nextOffset = tz.daylightSavingTimeOffset;
-        uint64_t nextValidStarting = 0;
-        auto * nextTransition = tz.nextDaylightSavingTimeTransition;
-        for (auto & dstOffset : dstOffsets) {
-            ++dstOffsetCount;
-            dstOffset.offset = static_cast<int32_t>(nextOffset);
-            dstOffset.validStarting = nextValidStarting;
-            if (nextTransition != nil) {
-                uint32_t transitionEpochS;
-                if (DateToMatterEpochSeconds(nextTransition, transitionEpochS)) {
-                    using Microseconds64 = chip::System::Clock::Microseconds64;
-                    using Seconds32 = chip::System::Clock::Seconds32;
-                    dstOffset.validUntil.SetNonNull(Microseconds64(Seconds32(transitionEpochS)).count());
-                } else {
-                    // Out of range; treat as "forever".
-                    dstOffset.validUntil.SetNull();
+        auto * offsets = MTRComputeDSTOffsets(dstOffsetMaxCount);
+        if (offsets != nil) {
+            size_t dstOffsetCount = 0;
+            for (MTRTimeSynchronizationClusterDSTOffsetStruct * offset in offsets) {
+                if (dstOffsetCount >= dstOffsetMaxCount) {
+                    // Really shouldn't happen, but let's be extra careful about
+                    // buffer overruns.
+                    break;
                 }
-            } else {
-                dstOffset.validUntil.SetNull();
+                auto & targetOffset = dstOffsets[dstOffsetCount];
+                targetOffset.offset = offset.offset.intValue;
+                targetOffset.validStarting = offset.validStarting.unsignedLongLongValue;
+                if (offset.validUntil == nil) {
+                    targetOffset.validUntil.SetNull();
+                } else {
+                    targetOffset.validUntil.SetNonNull(offset.validUntil.unsignedLongLongValue);
+                }
+                ++dstOffsetCount;
             }
 
-            if (dstOffset.validUntil.IsNull()) {
-                break;
-            }
-
-            nextOffset = [tz daylightSavingTimeOffsetForDate:nextTransition];
-            nextValidStarting = dstOffset.validUntil.Value();
-            nextTransition = [tz nextDaylightSavingTimeTransitionAfterDate:nextTransition];
+            params.SetDSTOffsets(chip::app::DataModel::List<DSTOffsetType>(dstOffsets, dstOffsetCount));
         }
-        params.SetDSTOffsets(chip::app::DataModel::List<DSTOffsetType>(dstOffsets, dstOffsetCount));
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(deviceId);

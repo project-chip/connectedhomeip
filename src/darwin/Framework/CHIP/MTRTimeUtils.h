@@ -1,7 +1,5 @@
-/*
- *
+/**
  *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,26 +14,21 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRStructsObjc.h>
 
-#include <jni.h>
+#import "MTRDefines_Internal.h"
 
-namespace matter {
-namespace casting {
-namespace core {
+NS_ASSUME_NONNULL_BEGIN
 
-class CastingPlayerJNI
-{
-public:
-private:
-    friend CastingPlayerJNI & CastingAppJNIMgr();
-    static CastingPlayerJNI sInstance;
-};
+/**
+ * Utility method to compute up to the given count of instances of
+ * MTRTimeSynchronizationClusterDSTOffsetStruct and return them.
+ *
+ * Returns nil on errors.
+ */
+MTR_EXTERN MTR_TESTABLE
+    NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> * _Nullable MTRComputeDSTOffsets(size_t maxCount);
 
-inline class CastingPlayerJNI & CastingAppJNIMgr()
-{
-    return CastingPlayerJNI::sInstance;
-}
-}; // namespace core
-}; // namespace casting
-}; // namespace matter
+NS_ASSUME_NONNULL_END
