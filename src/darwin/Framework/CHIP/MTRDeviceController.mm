@@ -107,7 +107,7 @@ typedef void (^SyncWorkQueueBlock)(void);
 typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
 typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
-using namespace chip::Metrics::DarwinFramework;
+using namespace chip::Tracing::DarwinFramework;
 
 @implementation MTRDeviceController {
     // Atomic because it can be touched from multiple threads.

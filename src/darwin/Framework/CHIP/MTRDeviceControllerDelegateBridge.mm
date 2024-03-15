@@ -23,7 +23,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 
-using namespace chip::Metrics::DarwinFramework;
+using namespace chip::Tracing::DarwinFramework;
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)

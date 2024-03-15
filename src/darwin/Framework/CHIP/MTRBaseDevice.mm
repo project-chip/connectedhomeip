@@ -62,7 +62,7 @@ using namespace chip::Protocols::InteractionModel;
 using chip::Optional;
 using chip::SessionHandle;
 using chip::Messaging::ExchangeManager;
-using namespace chip::Metrics::DarwinFramework;
+using namespace chip::Tracing::DarwinFramework;
 
 NSString * const MTRAttributePathKey = @"attributePath";
 NSString * const MTRCommandPathKey = @"commandPath";

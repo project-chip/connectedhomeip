@@ -18,7 +18,7 @@
 #include <tracing/metric_event.h>
 
 namespace chip {
-namespace Metrics {
+namespace Tracing {
 namespace DarwinFramework {
 
 constexpr Tracing::MetricKey kMetricDeviceCommissioning = "dwnfw_device_commissioning";
