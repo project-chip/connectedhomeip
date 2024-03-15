@@ -786,8 +786,8 @@ exit:
 void BLEManagerImpl::HandleScannerTimer(chip::System::Layer *, void * appState)
 {
     auto * manager = static_cast<BLEManagerImpl *>(appState);
-    manager->mDeviceScanner.StopScan();
     manager->OnScanError(CHIP_ERROR_TIMEOUT);
+    manager->mDeviceScanner.StopScan();
 }
 
 void BLEManagerImpl::CleanScanConfig()
