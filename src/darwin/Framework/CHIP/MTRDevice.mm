@@ -33,6 +33,7 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
@@ -270,31 +271,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
-    NSTimeZone * localTimeZone = [NSTimeZone localTimeZone];
-    BOOL setDST = TRUE;
-    if (!localTimeZone) {
-        MTR_LOG_ERROR("%@ Could not retrieve local time zone. Unable to setDSTOffset on endpoints.", self);
-        setDST = FALSE;
-    }
-
     uint64_t matterEpochTimeMicroseconds = 0;
-    uint64_t nextDSTInMatterEpochTimeMicroseconds = 0;
     if (!DateToMatterEpochMicroseconds(now, matterEpochTimeMicroseconds)) {
         MTR_LOG_ERROR("%@ Could not convert NSDate (%@) to Matter Epoch Time. Unable to setUTCTime on endpoints.", self, now);
         return;
-    }
-
-    int32_t dstOffset = 0;
-    if (setDST) {
-        NSTimeInterval dstOffsetAsInterval = [localTimeZone daylightSavingTimeOffsetForDate:now];
-        dstOffset = int32_t(dstOffsetAsInterval);
-
-        // Calculate time to next DST. This is needed when we set the current DST.
-        NSDate * nextDSTTransitionDate = [localTimeZone nextDaylightSavingTimeTransition];
-        if (!DateToMatterEpochMicroseconds(nextDSTTransitionDate, nextDSTInMatterEpochTimeMicroseconds)) {
-            MTR_LOG_ERROR("%@ Could not convert NSDate (%@) to Matter Epoch Time. Unable to setDSTOffset on endpoints.", self, nextDSTTransitionDate);
-            setDST = FALSE;
-        }
     }
 
     // Set Time on each Endpoint with a Time Synchronization Cluster Server
@@ -302,9 +282,39 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     for (NSNumber * endpoint in endpointsToSync) {
         MTR_LOG_DEBUG("%@ Setting Time on Endpoint %@", self, endpoint);
         [self _setUTCTime:matterEpochTimeMicroseconds withGranularity:MTRTimeSynchronizationGranularityMicrosecondsGranularity forEndpoint:endpoint];
-        if (setDST) {
-            [self _setDSTOffset:dstOffset validStarting:0 validUntil:nextDSTInMatterEpochTimeMicroseconds forEndpoint:endpoint];
+
+        // Check how many DST offsets this endpoint supports.
+        auto dstOffsetsMaxSizePath = [MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeTimeSynchronizationID) attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetListMaxSizeID)];
+        auto dstOffsetsMaxSize = [self readAttributeWithEndpointID:dstOffsetsMaxSizePath.endpoint clusterID:dstOffsetsMaxSizePath.cluster attributeID:dstOffsetsMaxSizePath.attribute params:nil];
+        if (dstOffsetsMaxSize == nil) {
+            // This endpoint does not support TZ, so won't support SetDSTOffset.
+            MTR_LOG_DEFAULT("%@ Unable to SetDSTOffset on endpoint %@, since it does not support the TZ feature", self, endpoint);
+            continue;
         }
+        auto attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
+            MTRAttributePathKey : dstOffsetsMaxSizePath,
+            MTRDataKey : dstOffsetsMaxSize,
+        }
+                                                                      error:nil];
+        uint8_t maxOffsetCount;
+        if (attrReport == nil) {
+            MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is invalid. Defaulting to 1.", self, endpoint);
+            maxOffsetCount = 1;
+        } else {
+            NSNumber * maxOffsetCountAsNumber = attrReport.value;
+            maxOffsetCount = maxOffsetCountAsNumber.unsignedCharValue;
+            if (maxOffsetCount == 0) {
+                MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is 0, which is not allowed. Defaulting to 1.", self, endpoint);
+                maxOffsetCount = 1;
+            }
+        }
+        auto * dstOffsets = MTRComputeDSTOffsets(maxOffsetCount);
+        if (dstOffsets == nil) {
+            MTR_LOG_ERROR("%@ Could not retrieve DST offset information. Unable to setDSTOffset on endpoint %@.", self, endpoint);
+            continue;
+        }
+
+        [self _setDSTOffsets:dstOffsets forEndpoint:endpoint];
     }
 }
 
@@ -410,23 +420,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                  completion:setUTCTimeResponseHandler];
 }
 
-- (void)_setDSTOffset:(int32_t)dstOffset validStarting:(uint64_t)validStarting validUntil:(uint64_t)validUntil forEndpoint:(NSNumber *)endpoint
+- (void)_setDSTOffsets:(NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> *)dstOffsets forEndpoint:(NSNumber *)endpoint
 {
-    MTR_LOG_DEBUG("%@ _setDSTOffset with offset: %d, validStarting: %llu, validUntil: %llu, endpoint %@",
-        self,
-        dstOffset, validStarting, validUntil, endpoint);
+    MTR_LOG_DEBUG("%@ _setDSTOffsets with offsets: %@, endpoint %@",
+        self, dstOffsets, endpoint);
 
     MTRTimeSynchronizationClusterSetDSTOffsetParams * params = [[MTRTimeSynchronizationClusterSetDSTOffsetParams
         alloc] init];
-    MTRTimeSynchronizationClusterDSTOffsetStruct * dstOffsetStruct = [[MTRTimeSynchronizationClusterDSTOffsetStruct alloc] init];
-    dstOffsetStruct.offset = @(dstOffset);
-    dstOffsetStruct.validStarting = @(validStarting);
-    dstOffsetStruct.validUntil = @(validUntil);
-    params.dstOffset = @[ dstOffsetStruct ];
+    params.dstOffset = dstOffsets;
 
     auto setDSTOffsetResponseHandler = ^(id _Nullable response, NSError * _Nullable error) {
         if (error) {
-            MTR_LOG_ERROR("%@ _setDSTOffset failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
+            MTR_LOG_ERROR("%@ _setDSTOffsets failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
         }
     };
 
