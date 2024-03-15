@@ -13,7 +13,7 @@ class Credentials:
     DEFAULT_PAA_KEY = "credentials/test/attestation/Chip-Test-PAA-NoVID-Key.der"
     PKCS_GENERATED = 'certs.p12'
     DEFAULT_HEADER_TEMPLATE = 'silabs_creds.tmpl'
-    DEFAULT_HEADER_FILE = 'examples/platform/silabs/silabs_creds.h'
+    DEFAULT_HEADER_FILE = 'silabs_creds.h'
     DEFAULT_CERT_TOOL = 'out/tools/chip-cert'
 
     def __init__(self, paths, args) -> None:
@@ -84,7 +84,7 @@ class Credentials:
         header = header.replace('{{pai_size}}',   str(pai_stats.st_size))
         header = header.replace('{{cd_size}}',    str(cd_stats.st_size))
         # Write header
-        _util.File(self.paths.root(Credentials.DEFAULT_HEADER_FILE)).write(header)
+        _util.File(self.paths.temp(Credentials.DEFAULT_HEADER_FILE)).write(header)
 
 
     def collectCD(self, cdc, cdk, cd):
