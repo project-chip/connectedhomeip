@@ -92,9 +92,9 @@ private:
         TIMER_EXPIRED
     };
 
+    CHIP_ERROR StartScanImpl();
+    CHIP_ERROR StopScanImpl();
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
-    static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
-    static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
 
     void SignalObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject);
     void SignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject, GDBusProxy * aInterface,
