@@ -689,6 +689,11 @@ CHIP_ERROR AndroidDeviceControllerWrapper::FinishOTAProvider()
 #endif
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::SetICDCheckInDelegate(jobject checkInDelegate)
+{
+    return mCheckInDelegate.SetDelegate(checkInDelegate);
+}
+
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     chip::DeviceLayer::StackUnlock unlock;

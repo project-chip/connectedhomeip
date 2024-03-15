@@ -25,7 +25,6 @@
 #include <jni.h>
 
 #include <app/icd/client/CheckInHandler.h>
-#include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -43,6 +42,7 @@
 #include <platform/android/CHIPP256KeypairBridge.h>
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
+#include "AndroidCheckInDelegate.h"
 #include "AndroidOperationalCredentialsIssuer.h"
 #include "AttestationTrustStoreBridge.h"
 #include "DeviceAttestationDelegateBridge.h"
@@ -212,6 +212,8 @@ public:
 
     chip::app::DefaultICDClientStorage * getICDClientStorage() { return &mICDClientStorage; }
 
+    CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
+
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
@@ -225,7 +227,7 @@ private:
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
     chip::app::DefaultICDClientStorage mICDClientStorage;
-    chip::app::DefaultCheckInDelegate mCheckInDelegate;
+    chip::app::AndroidCheckInDelegate mCheckInDelegate;
     chip::app::CheckInHandler mCheckInHandler;
 
     JavaVM * mJavaVM = nullptr;
