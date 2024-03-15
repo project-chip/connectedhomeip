@@ -377,6 +377,7 @@ int32_t wfx_wifi_rsi_init(void)
     }
 
     // Create timer for DHCP polling
+    // TODO: Use LWIP timer instead of creating a new one here
     sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, NULL, NULL);
     if (sDHCPTimer == NULL)
     {
@@ -730,23 +731,37 @@ static sl_status_t wfx_rsi_do_join(void)
     return status;
 }
 
+/// NotifyConnectivity
+/// @brief Notify the application about the connectivity status if it has not been notified yet.
+///        Helper function for HandleDHCPPolling.
+void NotifyConnectivity()
+{
+    if (!hasNotifiedWifiConnectivity)
+    {
+        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
+        hasNotifiedWifiConnectivity = true;
+    }
+}
+
 void HandleDHCPPolling()
 {
     struct netif * sta_netif;
     WfxEvent_t event;
 
     sta_netif = wfx_get_netif(SL_WFX_STA_INTERFACE);
+    if (sta_netif == NULL)
+    {
+        // TODO: Notify the application that the interface is not set up or Chipdie here because we are in an unkonwn state
+        SILABS_LOG("HandleDHCPPolling: failed to get STA netif");
+        return;
+    }
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
     uint8_t dhcp_state = dhcpclient_poll(sta_netif);
     if (dhcp_state == DHCP_ADDRESS_ASSIGNED && !hasNotifiedIPV4)
     {
         wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
         hasNotifiedIPV4 = true;
-        if (!hasNotifiedWifiConnectivity)
-        {
-            wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
-            hasNotifiedWifiConnectivity = true;
-        }
+        NotifyConnectivity();
     }
     else if (dhcp_state == DHCP_OFF)
     {
@@ -763,11 +778,7 @@ void HandleDHCPPolling()
         hasNotifiedIPV6 = true;
         event.eventType = WFX_EVT_STA_DHCP_DONE;
         WfxPostEvent(&event);
-        if (!hasNotifiedWifiConnectivity)
-        {
-            wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
-            hasNotifiedWifiConnectivity = true;
-        }
+        NotifyConnectivity();
     }
 }
 
@@ -778,25 +789,36 @@ void WfxPostEvent(WfxEvent_t * event)
     if (status != osOK)
     {
         SILABS_LOG("WfxPostEvent: failed to post event with status: %d", status);
+        // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
     }
+}
+
+/// ResetDHCPNotificationFlags
+/// @brief Reset the flags that are used to notify the application about DHCP connectivity
+///        and emits a WFX_EVT_STA_DO_DHCP event to trigger DHCP polling checks. Helper function for ProcessEvent.
+void ResetDHCPNotificationFlags()
+{
+    WfxEvent_t outEvent;
+
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+    hasNotifiedIPV4 = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    hasNotifiedIPV6             = false;
+    hasNotifiedWifiConnectivity = false;
+
+    outEvent.eventType = WFX_EVT_STA_DO_DHCP;
+    WfxPostEvent(&outEvent);
 }
 
 void ProcessEvent(WfxEvent_t inEvent)
 {
-    WfxEvent_t outEvent;
     // Process event
     switch (inEvent.eventType)
     {
     case WFX_EVT_STA_CONN:
         SILABS_LOG("%s: starting LwIP STA", __func__);
         wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
-        outEvent.eventType = WFX_EVT_STA_DO_DHCP;
-        WfxPostEvent(&outEvent);
-        hasNotifiedWifiConnectivity = false;
-#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-        hasNotifiedIPV4 = false;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-        hasNotifiedIPV6 = false;
+        ResetDHCPNotificationFlags();
         wfx_lwip_set_sta_link_up();
         /* We need to get AP Mac - TODO */
         // Uncomment once the hook into MATTER is moved to IP connectivty instead
@@ -810,17 +832,13 @@ void ProcessEvent(WfxEvent_t inEvent)
             ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
         SILABS_LOG("%s: disconnect notify", __func__);
         /* TODO: Implement disconnect notify */
+        ResetDHCPNotificationFlags();
         wfx_lwip_set_sta_link_down(); // Internally dhcpclient_poll(netif) ->
                                       // wfx_ip_changed_notify(0) for IPV4
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
         wfx_ip_changed_notify(IP_STATUS_FAIL);
-        hasNotifiedIPV4 = false;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         wfx_ipv6_notify(GET_IPV6_FAIL);
-        hasNotifiedIPV6    = false;
-        outEvent.eventType = WFX_EVT_STA_DO_DHCP;
-        WfxPostEvent(&outEvent);
-        hasNotifiedWifiConnectivity = false;
         break;
     case WFX_EVT_AP_START:
         // TODO: Currently unimplemented
@@ -844,6 +862,13 @@ void ProcessEvent(WfxEvent_t inEvent)
             advanced_scan_configuration.trigger_level_change = ADV_RSSI_TOLERANCE_THRESHOLD;
             advanced_scan_configuration.enable_multi_probe   = ADV_MULTIPROBE;
             status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
+            if (SL_STATUS_OK != status)
+            {
+                // TODO: Seems like Chipdie should be called here, the device should be initialized here
+                SILABS_LOG("Failed to set advanced scan configuration with status: %d", status);
+                return;
+            }
+
             if (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED)
             {
                 /* Terminate with end of scan which is no ap sent back */
