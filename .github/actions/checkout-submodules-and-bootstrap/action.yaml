@@ -11,7 +11,7 @@ inputs:
   bootstrap-log-name:
     description: "Bootstrap log name"
     required: false
-    default: bootstrap-logs
+    default: bootstrap-logs-${{ github.job }}
 runs:
   using: "composite"
   steps:
