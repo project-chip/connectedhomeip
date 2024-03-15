@@ -307,7 +307,7 @@ exit:
 /// Update the table of open BLE connections whenever a new device is spotted or its attributes have changed.
 void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
 {
-    const char * objectPath      = g_dbus_proxy_get_object_path(G_DBUS_PROXY(apDevice));
+    const char * objectPath      = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(apDevice));
     BluezConnection * connection = GetBluezConnection(objectPath);
 
     if (connection != nullptr && !bluez_device1_get_connected(apDevice))
@@ -321,22 +321,9 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
         return;
     }
 
-    if (connection == nullptr && !bluez_device1_get_connected(apDevice) && mIsCentral)
+    if (connection == nullptr)
     {
-        return;
-    }
-
-    if (connection == nullptr && bluez_device1_get_connected(apDevice) &&
-        (!mIsCentral || bluez_device1_get_services_resolved(apDevice)))
-    {
-        connection                 = chip::Platform::New<BluezConnection>(*this, apDevice);
-        mpPeerDevicePath           = g_strdup(objectPath);
-        mConnMap[mpPeerDevicePath] = connection;
-
-        ChipLogDetail(DeviceLayer, "New BLE connection: conn %p, device %s, path %s", connection, connection->GetPeerAddress(),
-                      mpPeerDevicePath);
-
-        BLEManagerImpl::HandleNewConnection(connection);
+        HandleNewDevice(apDevice);
     }
 }
 
@@ -355,28 +342,22 @@ void BluezEndpoint::BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClie
 
 void BluezEndpoint::HandleNewDevice(BluezDevice1 * device)
 {
-    VerifyOrReturn(!mIsCentral);
+    VerifyOrReturn(bluez_device1_get_connected(device));
+    VerifyOrReturn(!mIsCentral || bluez_device1_get_services_resolved(device));
 
-    // We need to handle device connection both this function and BluezSignalInterfacePropertiesChanged
-    // When a device is connected for first time, this function will be triggered.
-    // The future connections for the same device will trigger ``Connect'' property change.
-    // TODO: Factor common code in the two function.
-    BluezConnection * conn;
-    VerifyOrExit(bluez_device1_get_connected(device), ChipLogError(DeviceLayer, "FAIL: device is not connected"));
-
-    conn = GetBluezConnection(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
-    VerifyOrExit(conn == nullptr,
-                 ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %p new device: %s", conn,
-                              g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
+    const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(device));
+    BluezConnection * conn  = GetBluezConnection(objectPath);
+    VerifyOrReturn(conn == nullptr,
+                   ChipLogError(DeviceLayer, "FAIL: Connection already tracked: conn=%p device=%s path=%s", conn,
+                                conn->GetPeerAddress(), objectPath));
 
     conn                       = chip::Platform::New<BluezConnection>(*this, device);
-    mpPeerDevicePath           = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
+    mpPeerDevicePath           = g_strdup(objectPath);
     mConnMap[mpPeerDevicePath] = conn;
 
-    ChipLogDetail(DeviceLayer, "BLE device connected: conn %p, device %s, path %s", conn, conn->GetPeerAddress(), mpPeerDevicePath);
+    ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
-exit:
-    return;
+    BLEManagerImpl::HandleNewConnection(conn);
 }
 
 void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject)
