@@ -128,4 +128,13 @@
     XCTAssertTrue([keys count] == 0);
 }
 
+- (void)test006_TestUniqueIdentifier
+{
+    MTRMetrics * metrics1 = [[MTRMetrics alloc] initWithCapacity:1];
+    MTRMetrics * metrics2 = [[MTRMetrics alloc] initWithCapacity:1];
+    XCTAssertNotNil(metrics1.uniqueIdentifier);
+    XCTAssertNotNil(metrics2.uniqueIdentifier);
+    XCTAssertNotEqualObjects(metrics1.uniqueIdentifier, metrics2.uniqueIdentifier);
+}
+
 @end
