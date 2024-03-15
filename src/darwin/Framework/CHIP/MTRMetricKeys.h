@@ -52,6 +52,5 @@ constexpr Tracing::MetricKey kMetricDeviceVendorID = "dwnfw_device_vendor_id";
 constexpr Tracing::MetricKey kMetricDeviceProductID = "dwnfw_device_product_id";
 
 } // namespace DarwinFramework
-} // namespace Metrics
+} // namespace Tracing
 } // namespace chip
-
