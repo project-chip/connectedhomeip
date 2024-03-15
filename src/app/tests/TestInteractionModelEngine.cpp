@@ -28,6 +28,7 @@
 #include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
@@ -81,6 +82,7 @@ public:
     static void TestSubjectHasActiveSubscriptionSingleSubMultipleEntries(nlTestSuite * apSuite, void * apContext);
     static void TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry(nlTestSuite * apSuite, void * apContext);
     static void TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries(nlTestSuite * apSuite, void * apContext);
+    static void TestSubjectHasActiveSubscriptionSubWithCAT(nlTestSuite * apSuite, void * apContext);
 };
 
 int TestInteractionModelEngine::GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apAttributePathParamsList)
@@ -514,6 +516,57 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsMul
     NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
 }
 
+void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSubWithCAT(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx               = *reinterpret_cast<TestContext *>(apContext);
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+    NullReadHandlerCallback nullCallback;
+
+    CASEAuthTag cat            = 0x1111'0001;
+    CASEAuthTag invalidCAT     = 0x1112'0001;
+    CATValues cats             = CATValues{ { cat } };
+    NodeId valideSubjectId     = NodeIdFromCASEAuthTag(cat);
+    NodeId invalideSubjectId   = NodeIdFromCASEAuthTag(invalidCAT);
+    FabricIndex bobFabricIndex = 1;
+
+    // InteractionModelEngine init
+    NL_TEST_ASSERT(apSuite,
+                   CHIP_NO_ERROR ==
+                       engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), reporting::GetDefaultReportScheduler()));
+
+    // Make sure we are using CASE sessions, because there is no defunct-marking for PASE.
+    ctx.ExpireSessionBobToAlice();
+    ctx.ExpireSessionAliceToBob();
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == ctx.CreateCASESessionBobToAlice(cats));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == ctx.CreateCASESessionAliceToBob(cats));
+
+    // Create ExchangeContexts
+    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToBob(nullptr, false);
+    NL_TEST_ASSERT(apSuite, exchangeCtx);
+
+    // Create readHandler
+    ReadHandler * readHandler = engine->GetReadHandlerPool().CreateObject(
+        nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, reporting::GetDefaultReportScheduler());
+
+    // Verify there are not active subscriptions
+    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, valideSubjectId) == false);
+    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, invalideSubjectId) == false);
+
+    // Set readHandler to active
+    readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::ActiveSubscription, true);
+
+    // Verify tthat valid subjectID has an active subscription
+    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, valideSubjectId));
+    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, invalideSubjectId) == false);
+
+    // Clean up read handlers
+    engine->GetReadHandlerPool().ReleaseAll();
+
+    // Verify there are not active subscriptions
+    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, valideSubjectId) == false);
+    NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, invalideSubjectId) == false);
+}
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 void TestInteractionModelEngine::TestSubjectHasPersistedSubscription(nlTestSuite * apSuite, void * apContext)
@@ -630,6 +683,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("TestSubjectHasActiveSubscriptionSingleSubMultipleEntries", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubMultipleEntries),
                 NL_TEST_DEF("TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry),
                 NL_TEST_DEF("TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries),
+                NL_TEST_DEF("TestSubjectHasActiveSubscriptionSubWithCAT", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSubWithCAT),
                 NL_TEST_SENTINEL()
         };
 // clang-format on
