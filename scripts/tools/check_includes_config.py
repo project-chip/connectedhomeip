@@ -134,7 +134,6 @@ ALLOW: Dict[str, Set[str]] = {
 
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
-    'src/credentials/attestation_verifier/JSONFileRevocationSet.cpp': {'fstream'},
 
     'src/setup_payload/AdditionalDataPayload.h': {'string'},
     'src/setup_payload/AdditionalDataPayloadParser.cpp': {'vector'},

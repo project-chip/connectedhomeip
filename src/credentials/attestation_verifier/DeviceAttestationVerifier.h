@@ -259,25 +259,6 @@ protected:
     const size_t mNumCerts;
 };
 
-/**
- * @brief Helper utility to model a basic Revocation Set usable for device attestation verifiers.
- *
- */
-class RevocationSet
-{
-public:
-    RevocationSet()          = default;
-    virtual ~RevocationSet() = default;
-
-    // Not copyable
-    RevocationSet(const RevocationSet &)             = delete;
-    RevocationSet & operator=(const RevocationSet &) = delete;
-
-    virtual AttestationVerificationResult IsCertificateRevoked(bool isPaa, Crypto::AttestationCertVidPid vidPidUnderTest,
-                                                               ByteSpan issuer, ByteSpan authorityKeyId,
-                                                               ByteSpan serialNumber) const = 0;
-};
-
 class DeviceAttestationVerifier
 {
 public:
@@ -405,8 +386,8 @@ public:
                                                            const Crypto::P256PublicKey & dacPublicKey,
                                                            const ByteSpan & csrNonce) = 0;
 
-    virtual AttestationVerificationResult IsCertificateRevoked(bool isPaa, Crypto::AttestationCertVidPid vidPidUnderTest,
-                                                               ByteSpan issuer, ByteSpan authorityKeyId, ByteSpan serialNumber) = 0;
+    virtual void ValidateDACChainRevocationStatus(const AttestationInfo & info,
+                                                  Callback::Callback<OnAttestationInformationVerification> * onCompletion) = 0;
 
     /**
      * @brief Get the trust store used for the attestation verifier.

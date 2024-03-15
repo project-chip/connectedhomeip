@@ -70,10 +70,11 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    AttestationVerificationResult IsCertificateRevoked(bool isPaa, Crypto::AttestationCertVidPid vidPidUnderTest, ByteSpan issuer,
-                                                       ByteSpan authorityKeyId, ByteSpan serialNumber) override
+    void ValidateDACChainRevocationStatus(const AttestationInfo & info,
+                                          Callback::Callback<OnAttestationInformationVerification> * onCompletion) override
     {
-        return AttestationVerificationResult::kNotImplemented;
+        (void) info;
+        (void) onCompletion;
     }
 };
 

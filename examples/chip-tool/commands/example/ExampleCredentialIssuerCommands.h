@@ -34,12 +34,11 @@ public:
         return mOpCredsIssuer.Initialize(storage);
     }
     CHIP_ERROR SetupDeviceAttestation(chip::Controller::SetupParams & setupParams,
-                                      const chip::Credentials::AttestationTrustStore * trustStore,
-                                      const chip::Credentials::RevocationSet * revocationSet) override
+                                      const chip::Credentials::AttestationTrustStore * trustStore) override
     {
         chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-        mDacVerifier                          = chip::Credentials::GetDefaultDACVerifier(trustStore, revocationSet);
+        mDacVerifier                          = chip::Credentials::GetDefaultDACVerifier(trustStore);
         setupParams.deviceAttestationVerifier = mDacVerifier;
         mDacVerifier->EnableCdTestKeySupport(mAllowTestCdSigningKey);
 

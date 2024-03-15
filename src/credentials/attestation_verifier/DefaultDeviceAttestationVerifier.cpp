@@ -458,20 +458,6 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
         VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess, attestationError = attestationError);
     }
 
-    {
-        attestationError = IsCertificateRevoked(true, paaVidPid, paaDerBuffer);
-        VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess,
-                     attestationError = AttestationVerificationResult::kPaaRevoked);
-
-        attestationError = IsCertificateRevoked(false, paiVidPid, info.paiDerBuffer);
-        VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess,
-                     attestationError = AttestationVerificationResult::kPaiRevoked);
-
-        attestationError = IsCertificateRevoked(false, dacVidPid, info.dacDerBuffer);
-        VerifyOrExit(attestationError == AttestationVerificationResult::kSuccess,
-                     attestationError = AttestationVerificationResult::kDacRevoked);
-    }
-
 exit:
     onCompletion->mCall(onCompletion->mContext, info, attestationError);
 }
@@ -621,33 +607,14 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     return CHIP_NO_ERROR;
 }
 
-AttestationVerificationResult DefaultDACVerifier::IsCertificateRevoked(bool isPaa, Crypto::AttestationCertVidPid vidPidUnderTest,
-                                                                       ByteSpan certificate)
+void DefaultDACVerifier::ValidateDACChainRevocationStatus(const AttestationInfo & info,
+                                                          Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
-    uint8_t issuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
-    MutableByteSpan issuer(issuerBuf);
-    uint8_t akidBuf[kAuthorityKeyIdentifierLength];
-    MutableByteSpan akid(akidBuf);
-    uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength];
-    MutableByteSpan serialNumber(serialNumberBuf);
+    AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
-    VerifyOrReturnError(ExtractIssuerFromX509Cert(certificate, issuer) == CHIP_NO_ERROR,
-                        AttestationVerificationResult::kPaaFormatInvalid);
-    VerifyOrReturnError(ExtractAKIDFromX509Cert(certificate, akid) == CHIP_NO_ERROR,
-                        AttestationVerificationResult::kPaaFormatInvalid);
-    VerifyOrReturnError(ExtractSerialNumberFromX509Cert(certificate, serialNumber) == CHIP_NO_ERROR,
-                        AttestationVerificationResult::kPaaFormatInvalid);
+    // TODO
 
-    return IsCertificateRevoked(isPaa, vidPidUnderTest, issuer, akid, serialNumber);
-}
-
-AttestationVerificationResult DefaultDACVerifier::IsCertificateRevoked(bool isPaa, AttestationCertVidPid vidPidUnderTest,
-                                                                       ByteSpan issuer, ByteSpan authorityKeyId,
-                                                                       ByteSpan serialNumber)
-{
-    VerifyOrReturnError(mRevocationSet != nullptr, AttestationVerificationResult::kSuccess);
-
-    return mRevocationSet->IsCertificateRevoked(isPaa, vidPidUnderTest, issuer, authorityKeyId, serialNumber);
+    onCompletion->mCall(onCompletion->mContext, info, attestationError);
 }
 
 bool CsaCdKeysTrustStore::IsCdTestKey(const ByteSpan & kid) const
@@ -726,9 +693,9 @@ const AttestationTrustStore * GetTestAttestationTrustStore()
     return &gTestAttestationTrustStore.get();
 }
 
-DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore, const RevocationSet * revocationSet)
+DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore)
 {
-    static DefaultDACVerifier defaultDACVerifier{ paaRootStore, revocationSet };
+    static DefaultDACVerifier defaultDACVerifier{ paaRootStore };
 
     return &defaultDACVerifier;
 }

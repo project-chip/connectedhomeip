@@ -388,6 +388,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSendAttestationRequest:
         return CommissioningStage::kAttestationVerification;
     case CommissioningStage::kAttestationVerification:
+        return CommissioningStage::kAttestationRevocationCheck;
+    case CommissioningStage::kAttestationRevocationCheck:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kValidateCSR;
