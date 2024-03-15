@@ -25,10 +25,13 @@ shared_library("jni") {
   sources = [ "app/src/main/cpp/CHIPTest-JNI.cpp" ]
 
   deps = [
+    "${chip_root}/src/controller/java",
+    "${chip_root}/src/controller/java:onboarding_payload",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform/android:java",
     "${chip_root}/third_party/inipp",
   ]
 
@@ -40,7 +43,7 @@ shared_library("jni") {
 }
 
 android_library("java") {
-  output_name = "TvApp.jar"
+  output_name = "ChipTestApp.jar"
 
   deps = [
     ":android",

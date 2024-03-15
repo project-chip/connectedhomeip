@@ -108,6 +108,8 @@ class AndroidApp(Enum):
             return "tv-casting-app"
         elif self == AndroidApp.VIRTUAL_DEVICE_APP:
             return "virtual-device-app"
+        elif self == AndroidApp.CHIP_TEST:
+            return "chip-test"
         else:
             return None
 
@@ -508,6 +510,25 @@ class AndroidBuilder(Builder):
 
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
+            elif exampleName == "chip-test":
+                jnilibs_dir = os.path.join(
+                    self.root,
+                    "examples/android/CHIPTest/app/libs/jniLibs",
+                    self.board.AbiName(),
+                )
+
+                libs_dir = os.path.join(
+                    self.root, "examples/android/CHIPTest/app/libs"
+                )
+
+                libs = ["libc++_shared.so", "libChipTestApp.so"]
+
+                jars = {
+                    "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
+                    "ChipTestApp.jar": "ChipTestApp.jar",
+                }
+                self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
+                self.gradlewBuildSrcAndroid()
             elif exampleName == "virtual-device-app":
                 jnilibs_dir = os.path.join(
                     self.root,
@@ -575,7 +596,7 @@ class AndroidBuilder(Builder):
                     self.output_dir, "outputs", "apk", "debug", "app-debug.apk"
                 ),
                 "CHIPController.jar": os.path.join(
-                    self.output_dir, "lib", "src/controller/java/CHIPController.jar"
+                    self.output_dir, "lib/third_party/connectedhomeip/src/controller/java/CHIPController.jar",
                 ),
                 "libMatterTlv.jar": os.path.join(
                     self.output_dir, "lib", "src/controller/java/libMatterTlv.jar"
@@ -598,13 +619,13 @@ class AndroidBuilder(Builder):
                     "lib",
                     "src/controller/java/CHIPClusterID.jar",
                 ),
-                "jni/%s/libCHIPController.so"
+                "jni/%s/libChipTestApp.so"
                 % self.board.AbiName(): os.path.join(
                     self.output_dir,
                     "lib",
                     "jni",
                     self.board.AbiName(),
-                    "libCHIPController.so",
+                    "libChipTestApp.so",
                 ),
                 "jni/%s/libc++_shared.so"
                 % self.board.AbiName(): os.path.join(
