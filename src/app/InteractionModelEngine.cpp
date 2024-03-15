@@ -336,16 +336,10 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricInd
 {
     bool isActive = false;
     mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
-        if (!handler->IsType(ReadHandler::InteractionType::Subscribe))
-        {
-            return Loop::Continue;
-        }
+        VerifyOrReturnValue(handler->IsType(ReadHandler::InteractionType::Subscribe), Loop::Continue);
 
         Access::SubjectDescriptor subject = handler->GetSubjectDescriptor();
-        if (subject.fabricIndex != aFabricIndex)
-        {
-            return Loop::Continue;
-        }
+        VerifyOrReturnValue(subject.fabricIndex == aFabricIndex, Loop::Continue);
 
         if (subject.authMode == Access::AuthMode::kCase)
         {
@@ -353,13 +347,9 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricInd
             {
                 isActive = handler->IsActiveSubscription();
 
-                // Exit loop only if isActive is set to true
-                // Otherwise keep looking for another subscription that could
-                // match the subject
-                if (isActive)
-                {
-                    return Loop::Break;
-                }
+                // Exit loop only if isActive is set to true.
+                // Otherwise keep looking for another subscription that could match the subject.
+                VerifyOrReturnValue(!isActive, Loop::Break);
             }
         }
 
