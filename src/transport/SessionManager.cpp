@@ -57,6 +57,20 @@ using Transport::SecureSession;
 
 namespace {
 Global<GroupPeerTable> gGroupPeerTable;
+
+// Helper function that strips off the interface ID from a peer address that is
+// not an IPv6 link-local address.  For any other address type we should rely on
+// the device's routing table to route messages sent.  Forcing messages down a
+// specific interface might fail with "no route to host".
+void CorrectPeerAddressInterfaceID(Transport::PeerAddress & peerAddress)
+{
+    if (peerAddress.GetIPAddress().IsIPv6LinkLocal())
+    {
+        return;
+    }
+    peerAddress.SetInterface(Inet::InterfaceId::Null());
+}
+
 } // namespace
 
 uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
@@ -633,7 +647,9 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
 
     const SessionHandle & session                        = optionalSession.Value();
     Transport::UnauthenticatedSession * unsecuredSession = session->AsUnauthenticatedSession();
-    unsecuredSession->SetPeerAddress(peerAddress);
+    Transport::PeerAddress mutablePeerAddress            = peerAddress;
+    CorrectPeerAddressInterfaceID(mutablePeerAddress);
+    unsecuredSession->SetPeerAddress(mutablePeerAddress);
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
 
     unsecuredSession->MarkActiveRx();
@@ -766,12 +782,11 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
     }
 
-    // TODO: once mDNS address resolution is available reconsider if this is required
-    // This updates the peer address once a packet is received from a new address
-    // and serves as a way to auto-detect peer changing IPs.
-    if (secureSession->GetPeerAddress() != peerAddress)
+    Transport::PeerAddress mutablePeerAddress = peerAddress;
+    CorrectPeerAddressInterfaceID(mutablePeerAddress);
+    if (secureSession->GetPeerAddress() != mutablePeerAddress)
     {
-        secureSession->SetPeerAddress(peerAddress);
+        secureSession->SetPeerAddress(mutablePeerAddress);
     }
 
     if (mCB != nullptr)
