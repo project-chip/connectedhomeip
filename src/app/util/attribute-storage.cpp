@@ -214,16 +214,9 @@ void emberAfEndpointConfigure()
         emAfEndpoints[ep].endpoint = fixedEndpoints[ep];
         emAfEndpoints[ep].deviceTypeList =
             Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[ep]], fixedDeviceTypeListLengths[ep]);
-        emAfEndpoints[ep].endpointType = &generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[ep]];
-        emAfEndpoints[ep].dataVersions = currentDataVersions;
-        if (fixedParentEndpoints[ep] == 0)
-        {
-            emAfEndpoints[ep].parentEndpointId = kInvalidEndpointId;
-        }
-        else
-        {
-            emAfEndpoints[ep].parentEndpointId = fixedParentEndpoints[ep];
-        }
+        emAfEndpoints[ep].endpointType     = &generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[ep]];
+        emAfEndpoints[ep].dataVersions     = currentDataVersions;
+        emAfEndpoints[ep].parentEndpointId = fixedParentEndpoints[ep];
 
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
