@@ -213,7 +213,7 @@ instance_info:
   - id: 0x0153
     desc: 'Manufacturing Date'
     name: 'manufacturing_date'
-    short: 'hm'
+    short: 'md'
     type: 'date'
     max: 10
 

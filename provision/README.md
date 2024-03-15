@@ -149,7 +149,7 @@ file defines the well-known (default) parameters used by the automatic provision
 | -g,  --generate           | optional             | flag               | Auto-generate test certificates            |
 | -r,  --csr                | optional             | flag               | CSR mode: When true, instructs the GFW to generate the private key, and issue a CSR.                    |
 | -gf, --gen_fw             | optional             | dec/hex            | Path to the Generator Firmware image.                                                   |
-| -pg, --prod_fw            | optional             | dec/hex            | Path to the Production Firmware image.                                                   |
+| -pf, --prod_fw            | optional             | dec/hex            | Path to the Production Firmware image.                                                   |
 | -ct, --cert_tool          | optional             | string             | Path to the chip-cert tool. Defaults to `../out/tools/chip-cert`          |
 | -jl, --pylink_lib         | optional             | string             | Path to the PyLink library.  |
 | -sn,  --serial_number     | optional             | string             | Serial Number.          |
@@ -159,28 +159,29 @@ file defines the well-known (default) parameters used by the automatic provision
 | -pn,  --product_name      | optional             | string             | Product name (Max 32 char).                                                 |
 | -pl, --product_label      | optional             | string             | Product label.                |
 | -pu, --product_url        | optional             | string             | Product URL.                |
-| -pn, --part_number        | optional             | dec/hex            | Device Part Number (Max 32 char).                                               |
+| -pm, --part_number        | optional             | dec/hex            | Device Part Number (Max 32 char).                                               |
 | -hv, --hw_version         | optional             | dec/hex            | The hardware version value (Max 2 bytes).                                       |
 | -hs, --hw_version_str     | optional             | string             | The hardware version string (Max 64 char).                                      |
 | -md, --manufacturing_date | optional             | string             | Manufacturing date.                |
-| -ui,  --unique_id         | optional<sup>5</sup> | hex string         | A 128 bits hex string unique id (without 0x).                                           |
+| -ui, --unique_id         | optional<sup>5</sup> | hex string         | A 128 bits hex string unique id (without 0x).                                           |
 | -sd,  --discriminator     | optional<sup>2</sup> | dec/hex            | BLE pairing discriminator. e.g: 3840 or 0xF00. (12-bit)                                 |
 | -sp, --spake2p_passcode   | required             | dec/hex            | Session passcode used to generate the SPAKE2+ verifier.        |
 | -si, --spake2p_iterations | required             | dec/hex            | Iteration count used to generate the SPAKE2+ verifier.                  |
 | -ss, --spake2p_salt       | required             | string<sup>6</sup> | Salt used to generate the SPAKE2+ verifier.                             |
 | -sv, --spake2p_verifier   | optional             | string<sup>6</sup> | Pre-generated SPAKE2+ verifier.                                          |
 | -sy, --setup_payload      | optional             | string<sup>6</sup> | Setup Payload.                             |
-| -cf, --commissioning_flow | optional             | dec/hex            | Commissioning Flow 0=Standard, 1=User Action, 2=Custom.                         |
-| -rf, --rendezvous_flags   | optional             | dec/hex            | Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Can be combined).                |
+| -sf, --commissioning_flow | optional             | dec/hex            | Commissioning Flow 0=Standard, 1=User Action, 2=Custom.                         |
+| -sr, --rendezvous_flags   | optional             | dec/hex            | Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Can be combined).                |
 | -fi, --firmware_info      | optional             | string             | Firmware Information            |
 | -cd, --certification      | required             | string             | Path to the Certification Declaration (CD) file.                |
 | -cc, --cd_cert            | optional             | string             | Certification Declaration Signing Cert            |
 | -ck, --cd_key             | optional             | string             | Certification Declaration Signing Key            |
-| -ac, --paa_cert           | required             | string             | Path to the PAI certificate.                |
-| -ak, --paa_key            | optional<sup>3</sup> | string             | Path to the PAI certificate.                |
+| -ac, --paa_cert           | required             | string             | Path to the PAA certificate.                |
+| -ak, --paa_key            | optional<sup>3</sup> | string             | Path to the PAA private-key.                |
 | -ic, --pai_cert           | required             | string             | Path to the PAI certificate.                |
-| -dc, --dac_cert           | optional<sup>3</sup> | string             | Path to the PAI certificate.                |
-| -dk, --dac_key            | optional<sup>3</sup> | dec/hex            | Path to the PAI private-key.                |
+| -ik, --pai_key            | required             | string             | Path to the PAI private-key.                |
+| -dc, --dac_cert           | optional<sup>3</sup> | string             | Path to the DAC certificate.                |
+| -dk, --dac_key            | optional<sup>3</sup> | dec/hex            | Path to the DAC private-key.                |
 | -di, --key_id             | required             | dec/hex            | Attestation Key ID.                |
 | -dp, --key_pass           | optional<sup>3</sup> | string             | Password for the key file.                |
 | -dx, --pkcs12             | optional<sup>3</sup> | string             | Path to the PKCS#12 attestation certificates file. Formerly --att_certs.        |
