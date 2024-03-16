@@ -191,8 +191,8 @@ CHIP_ERROR SetTagList(chip::EndpointId endpoint,
 // metadata including all attributes already exists and can be re-used this way,
 // without error prone manual duplicating with DECLARE_DYNAMIC_*
 //
-EmberAfStatus setupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, chip::EndpointId templateEndpointId,
-                                              const chip::Span<const chip::ClusterId> & templateClusterIds);
+CHIP_ERROR setupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, chip::EndpointId templateEndpointId,
+                                           const chip::Span<const chip::ClusterId> & templateClusterIds);
 
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing

@@ -276,8 +276,8 @@ const EmberAfCluster * getClusterTypeDefinition(EndpointId endpointId, ClusterId
     return nullptr;
 }
 
-EmberAfStatus setupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, EndpointId templateEndpointId,
-                                              const Span<const ClusterId> & templateClusterIds)
+CHIP_ERROR setupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, EndpointId templateEndpointId,
+                                           const Span<const ClusterId> & templateClusterIds)
 {
     // allocate cluster list
     endpointType.clusterCount = static_cast<uint8_t>(templateClusterIds.size());
@@ -296,7 +296,7 @@ EmberAfStatus setupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType
         // sum up the needed storage
         endpointType.endpointSize = (uint16_t) (endpointType.endpointSize + cluster->clusterSize);
     }
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
@@ -360,7 +360,7 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
         // Flag the endpoint as enabled here, because otherwise loading attributes cannot work
         emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isEnabled);
         // Load attributes from NVstorage or set defaults
-        emAfLoadAttributeDefaults(id, false);
+        emberAfInitializeAttributes(id);
         // set disabled again, so enabling below will detect a transition
         emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     }
