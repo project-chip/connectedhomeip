@@ -109,10 +109,10 @@ private:
 
     GAutoPtr<GDBusObjectManager> mManager;
     GAutoPtr<BluezAdapter1> mAdapter;
-    ChipDeviceScannerDelegate * mDelegate = nullptr;
-    unsigned int mObjectAddedSignal       = 0;
-    unsigned int mPropertiesChangedSignal = 0;
-    ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
+    ChipDeviceScannerDelegate * mDelegate  = nullptr;
+    unsigned long mObjectAddedSignal       = 0;
+    unsigned long mPropertiesChangedSignal = 0;
+    ChipDeviceScannerState mScannerState   = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
     /// Used to track if timer has already expired and doesn't need to be canceled.
     ScannerTimerState mTimerState = ScannerTimerState::TIMER_CANCELED;
     GAutoPtr<GCancellable> mCancellable;
