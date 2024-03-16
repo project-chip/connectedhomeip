@@ -282,6 +282,13 @@ template("siwx917_sdk") {
       }
     }
 
+    if (sl_uart_log_output) {
+      defines += [
+        "SILABS_LOG_OUT_UART=1",
+        "SILABS_LOG_OUT_RTT=0",
+      ]
+    }
+
     if (chip_build_libshell) {  # matter shell
       defines += [ "ENABLE_CHIP_SHELL" ]
     }

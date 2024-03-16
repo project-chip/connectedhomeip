@@ -48,7 +48,12 @@ object ChipClient {
 
     if (!this::chipDeviceController.isInitialized) {
       chipDeviceController =
-        ChipDeviceController(ControllerParams.newBuilder().setControllerVendorId(VENDOR_ID).build())
+        ChipDeviceController(
+          ControllerParams.newBuilder()
+            .setControllerVendorId(VENDOR_ID)
+            .setEnableServerInteractions(true)
+            .build()
+        )
 
       // Set delegate for attestation trust store for device attestation verifier.
       // It will replace the default attestation trust store.

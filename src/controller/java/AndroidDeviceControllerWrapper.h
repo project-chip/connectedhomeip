@@ -24,6 +24,8 @@
 
 #include <jni.h>
 
+#include <app/icd/client/CheckInHandler.h>
+#include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -50,6 +52,8 @@
 
 constexpr uint8_t kUserActiveModeTriggerInstructionBufferLen =
     128 + 1; // 128bytes is max UserActiveModeTriggerInstruction size and 1 byte is for escape sequence.
+
+constexpr uint8_t kCountryCodeBufferLen = 2;
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
  * to handle all controller-related processing.
@@ -123,10 +127,7 @@ public:
 
     chip::Credentials::PartialDACVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
 
-    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
-    {
-        return mAutoCommissioner.GetCommissioningParameters();
-    }
+    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const { return mCommissioningParameter; }
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
@@ -184,7 +185,8 @@ public:
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
                 jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure);
+                bool skipCommissioningComplete, bool skipAttestationCertificateValidation, jstring countryCode,
+                bool enableServerInteractions, CHIP_ERROR * errInfoOnFailure);
 
     void Shutdown();
 
@@ -223,6 +225,8 @@ private:
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
     chip::app::DefaultICDClientStorage mICDClientStorage;
+    chip::app::DefaultCheckInDelegate mCheckInDelegate;
+    chip::app::CheckInHandler mCheckInHandler;
 
     JavaVM * mJavaVM = nullptr;
     chip::JniGlobalReference mJavaObjectRef;
@@ -246,6 +250,8 @@ private:
     std::vector<uint8_t> mIcacCertificate;
     std::vector<uint8_t> mRcacCertificate;
 
+    char mCountryCode[kCountryCodeBufferLen];
+
     chip::Controller::AutoCommissioner mAutoCommissioner;
 
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
@@ -261,6 +267,8 @@ private:
     char mUserActiveModeTriggerInstructionBuffer[kUserActiveModeTriggerInstructionBufferLen];
     chip::MutableCharSpan mUserActiveModeTriggerInstruction = chip::MutableCharSpan(mUserActiveModeTriggerInstructionBuffer);
     chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerHint;
+
+    chip::Controller::CommissioningParameters mCommissioningParameter;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST

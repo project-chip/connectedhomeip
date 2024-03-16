@@ -153,5 +153,27 @@ Davis, CA 95616, USA
       <quality singleton="true"/>
       <mandatoryConform/>
     </cluster>
+    <cluster id="0x0046" name="ICD Management" side="server">
+      <quality singleton="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <orTerm>
+            <feature name="SIT"/>
+            <feature name="LIT"/>
+          </orTerm>
+        </mandatoryConform>
+      </otherwiseConform>
+      <features>
+        <feature code="" name="LITS">
+          <otherwiseConform>
+            <provisionalConform/>
+            <mandatoryConform>
+              <feature name="LIT"/>
+            </mandatoryConform>
+          </otherwiseConform>
+        </feature>
+      </features>
+    </cluster>
   </clusters>
 </deviceType>

@@ -23,10 +23,6 @@
  *      mechanisms for manipulating packets of octet-serialized
  *      data.
  */
-// Include standard C library limit macros
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 
 // Include module header
 #include <system/SystemPacketBuffer.h>

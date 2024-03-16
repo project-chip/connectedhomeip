@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 99,
+  "featureLevel": 100,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -3501,7 +3501,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3517,7 +3517,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3533,7 +3533,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -4148,14 +4148,16 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     },
     {
       "endpointTypeName": "MA-dimmablelight",
       "endpointTypeIndex": 1,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     }
   ]
 }

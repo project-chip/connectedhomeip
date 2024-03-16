@@ -21,10 +21,6 @@
  *    the ability to compile and use the test implementation of the time source.
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <system/SystemConfig.h>
 
 #include <lib/core/ErrorStr.h>

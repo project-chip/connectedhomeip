@@ -140,7 +140,8 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
 void CallbackOk(System::Layer * aSystemLayer, void * aAppState)
 {
     ChipLogDetail(AppServer, "UX Ok: now on main thread");
-    GetCommissionerDiscoveryController()->InternalOk();
+    CommissionerDiscoveryController * cdc = static_cast<CommissionerDiscoveryController *>(aAppState);
+    cdc->InternalOk();
 }
 
 /// Callback for getting execution out of the main chip thread
@@ -177,15 +178,13 @@ void CallbackExternalWorkerOk(System::Layer * aSystemLayer, void * aAppState)
 void CommissionerDiscoveryController::Ok()
 {
     ChipLogDetail(AppServer, "UX Ok: moving to main thread");
-    // need to ensure callback is on main chip thread
-    chip::DeviceLayer::StackLock lock;
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackOk, nullptr);
+    assertChipStackLockedByCurrentThread();
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(0), CallbackOk, this);
 }
 
 void CommissionerDiscoveryController::InternalOk()
 {
     ChipLogDetail(AppServer, "UX InternalOk");
-
     assertChipStackLockedByCurrentThread();
     ValidateSession();
 

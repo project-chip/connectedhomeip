@@ -152,7 +152,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetActiveTrack(bool audio, AttributeValue
     }
     else
     {
-        err = aEncoder.EncodeNull();
+        return aEncoder.EncodeNull();
     }
 
 exit:

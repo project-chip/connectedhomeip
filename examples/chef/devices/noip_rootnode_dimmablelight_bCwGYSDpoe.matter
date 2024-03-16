@@ -1052,7 +1052,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -1610,7 +1610,7 @@ cluster FixedLabel = 64 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 3;
+  revision 4;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;

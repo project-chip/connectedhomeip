@@ -32,6 +32,26 @@ _app_root = get_path_info(".", "abspath")
 #
 # Forwards all the remaining variables to the source_set.
 #
+#
+#
+# Additional underlying source sets that will be provided
+#
+#   - ${name}-endpoint-metadata
+#     contains HEADERS that define endpoint metadata from zap/matter files:
+#        - zap-generated/gen_config.h
+#        - zap-generated/endpoint_config.h
+#        - zap-generated/access.h
+#        - PluginApplicationCallbacks.h
+#   - ${name}-callbacks
+#     contains the callback implementation for cluster init:
+#        - cluster-init-callback.cpp
+#        - callback-stub.cpp (contains __weak__ implementations. TODO: we should not be using
+#          weak linkage over time at all)
+#   - ${name}-command-dispatch:
+#     contains the implementation of `DispatchServerCommand` which forwards data to
+#     `emberAf....Cluster...Callback` callbacks
+#        - zap-generated/IMClusterCommandHandler.cpp
+#
 template("chip_data_model") {
   _data_model_name = target_name
 
@@ -56,20 +76,8 @@ template("chip_data_model") {
       "zap-generated/endpoint_config.h",
     ]
 
-    # NOTE: these are ALSO auto-generated but handled below:
-    #       "zap-generated/IMClusterCommandHandler.cpp"
-    #         -> contains one large DispatchSingleClusterCommand and DispatchServerCommand
-
-    if (chip_code_pre_generated_directory == "") {
-      prune_outputs = []
-    }
-
     if (!chip_build_controller_dynamic_server) {
       outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
-    } else {
-      if (defined(prune_outputs)) {
-        prune_outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
-      }
     }
 
     if (!defined(deps)) {
@@ -97,6 +105,62 @@ template("chip_data_model") {
       ":${_data_model_name}_zapgen",
       "${chip_root}/src/app/common:cluster-objects",
     ]
+  }
+
+  # Fixed source sets for allowing reasonable dependencies on things:
+  source_set("${_data_model_name}-endpoint-metadata") {
+    sources = filter_include(
+            get_target_outputs(":${_data_model_name}_codegen_generate"),
+            [ "*/PluginApplicationCallbacks.h" ])
+    sources += filter_include(
+            get_target_outputs(":${_data_model_name}_zapgen_generate"),
+            [
+              "*/access.h",
+              "*/endpoint_config.h",
+              "*/gen_config.h",
+            ])
+
+    deps = [
+      ":${_data_model_name}_codegen_generate",
+      ":${_data_model_name}_zapgen_generate",
+      "${chip_root}/src/access",
+      "${chip_root}/src/lib/core:chip_config_header",
+    ]
+  }
+
+  source_set("${_data_model_name}-callbacks") {
+    sources = filter_include(
+            get_target_outputs(":${_data_model_name}_codegen_generate"),
+            [
+              "*/callback-stup.cpp",
+              "*/cluster-init-callback.cpp",
+            ])
+
+    deps = [
+      ":${_data_model_name}_codegen_generate",
+      "${chip_root}/src/app/common:ids",
+      "${chip_root}/src/lib/support:span",
+      "${chip_root}/src/protocols/interaction_model",
+    ]
+  }
+
+  if (!chip_build_controller_dynamic_server) {
+    source_set("${_data_model_name}-command-dispatch") {
+      sources = filter_include(
+              get_target_outputs(":${_data_model_name}_zapgen_generate"),
+              [ "*/IMClusterCommandHandler.cpp" ])
+
+      deps = [
+        ":${_data_model_name}_zapgen_generate",
+        "${chip_root}/src/app",
+        "${chip_root}/src/app:interaction-model",
+        "${chip_root}/src/app/common:cluster-objects",
+        "${chip_root}/src/app/common:enums",
+        "${chip_root}/src/app/common:ids",
+        "${chip_root}/src/lib/core",
+        "${chip_root}/src/lib/support",
+      ]
+    }
   }
 
   source_set(_data_model_name) {
@@ -134,7 +198,6 @@ template("chip_data_model") {
       "${_app_root}/util/binding-table.cpp",
       "${_app_root}/util/binding-table.h",
       "${_app_root}/util/generic-callback-stubs.cpp",
-      "${_app_root}/util/message.cpp",
       "${_app_root}/util/privilege-storage.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
@@ -336,9 +399,12 @@ template("chip_data_model") {
     public_deps += [
       ":${_data_model_name}_codegen",
       ":${_data_model_name}_zapgen",
+      "${chip_root}/src/access",
       "${chip_root}/src/app",
+      "${chip_root}/src/app/common:attribute-type",
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/app/common:enums",
+      "${chip_root}/src/app/util:types",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",

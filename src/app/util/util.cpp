@@ -15,13 +15,15 @@
  *    limitations under the License.
  */
 
-#include "app/util/common.h"
+#include <app/util/util.h>
+
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEncoding.h>
@@ -30,42 +32,9 @@
 // TODO: figure out a clear path for compile-time codegen
 #include <app/PluginApplicationCallbacks.h>
 
-#ifdef MATTER_DM_PLUGIN_GROUPS_SERVER
-#include <app/clusters/groups-server/groups-server.h>
-#endif // MATTER_DM_PLUGIN_GROUPS_SERVER
-
 using namespace chip;
 
 using chip::Protocols::InteractionModel::Status;
-
-//------------------------------------------------------------------------------
-// Forward Declarations
-
-//------------------------------------------------------------------------------
-// Globals
-
-const EmberAfClusterName zclClusterNames[] = {
-    CLUSTER_IDS_TO_NAMES            // defined in print-cluster.h
-    { kInvalidClusterId, nullptr }, // terminator
-};
-
-#ifdef MATTER_DM_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
-MATTER_DM_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
-#endif
-
-//------------------------------------------------------------------------------
-
-// Is the device identifying?
-bool emberAfIsDeviceIdentifying(EndpointId endpoint)
-{
-#ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
-    uint16_t identifyTime;
-    Status status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
-    return (status == Status::Success && 0 < identifyTime);
-#else
-    return false;
-#endif
-}
 
 // Calculates difference. See EmberAfDifferenceType for the maximum data size
 // that this function will support.
@@ -170,72 +139,6 @@ void MatterEnergyEvseModePluginServerInitCallback() {}
 void MatterPowerTopologyPluginServerInitCallback() {}
 void MatterElectricalEnergyMeasurementPluginServerInitCallback() {}
 void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
-
-// ****************************************
-// Print out information about each cluster
-// ****************************************
-
-uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
-{
-    static_assert(sizeof(ClusterId) == 4, "May need to adjust our index type or somehow define it in terms of cluster id type");
-    uint16_t index = 0;
-    while (zclClusterNames[index].id != kInvalidClusterId)
-    {
-        if (zclClusterNames[index].id == cluster)
-        {
-            return index;
-        }
-        index++;
-    }
-    return 0xFFFF;
-}
-
-void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
-{
-    if (src == nullptr)
-    {
-        dest[0] = 0; // Zero out the length of string
-    }
-    else if (src[0] == 0xFF)
-    {
-        dest[0] = src[0];
-    }
-    else
-    {
-        uint8_t length = emberAfStringLength(src);
-        if (size < length)
-        {
-            // Since we have checked that size < length, size must be able to fit into the type of length.
-            length = static_cast<decltype(length)>(size);
-        }
-        memmove(dest + 1, src + 1, length);
-        dest[0] = length;
-    }
-}
-
-void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
-{
-    if (src == nullptr)
-    {
-        dest[0] = dest[1] = 0; // Zero out the length of string
-    }
-    else if ((src[0] == 0xFF) && (src[1] == 0xFF))
-    {
-        dest[0] = 0xFF;
-        dest[1] = 0xFF;
-    }
-    else
-    {
-        uint16_t length = emberAfLongStringLength(src);
-        if (size < length)
-        {
-            // Since we have checked that size < length, size must be able to fit into the type of length.
-            length = static_cast<decltype(length)>(size);
-        }
-        memmove(dest + 2, src + 2, length);
-        Encoding::LittleEndian::Put16(dest, length);
-    }
-}
 
 #if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
 #define EM_BIG_ENDIAN true

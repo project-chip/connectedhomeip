@@ -49,6 +49,16 @@ jobs:
             - name: Validate zap-cli is NOT available
               # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
               run: scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
+            - name: Run watchOS Build Debug
+              working-directory: src/darwin/Framework
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk watchos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+            - name: Run tvOS Build Debug
+              working-directory: src/darwin/Framework
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk appletvos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Run iOS Build Debug
               working-directory: src/darwin/Framework
               # Disable availability annotations, since we are not building a system
@@ -119,13 +129,10 @@ jobs:
               run: |
                   xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
               working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
-            - name: Uploading .ips files in Xcode derived data to debug the failure
-              uses: actions/upload-artifact@v4
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: darwin-framework-derived-data
-                  path: ~/Library/Developer/Xcode/DerivedData/**/*.ips
-                  retention-days: 5
+            - name: Collect crash logs
+              run: |
+                  mkdir -p /tmp/darwin/framework-tests
+                  find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
               uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
