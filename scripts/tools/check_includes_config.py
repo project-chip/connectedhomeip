@@ -167,6 +167,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/PendingResponseTrackerImpl.h': {'unordered_set'},
 
     # Not intended for embedded clients
+    'src/lib/core/TLVVectorWriter.cpp': {'vector'},
+    'src/lib/core/TLVVectorWriter.h': {'vector'},
     'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream', 'string', 'vector'},
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
     'src/lib/support/jsontlv/TlvToJson.h': {'string'},

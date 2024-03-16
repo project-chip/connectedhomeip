@@ -54,6 +54,11 @@ jobs:
               # Disable availability annotations, since we are not building a system
               # Matter.framework.
               run: xcodebuild -target "Matter" -sdk watchos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+            - name: Run tvOS Build Debug
+              working-directory: src/darwin/Framework
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk appletvos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Run iOS Build Debug
               working-directory: src/darwin/Framework
               # Disable availability annotations, since we are not building a system

@@ -25,9 +25,9 @@
 #include "glib.h"
 #include "sl_component_catalog.h"
 #include "sl_memlcd.h"
-#if SL_WIFI && !SIWX_917
+#if SL_WIFI && !SLI_SI91X_MCU_INTERFACE
 #include "spi_multiplex.h"
-#endif // SL_WIFI && !SIWX_917
+#endif // SL_WIFI && !SLI_SI91X_MCU_INTERFACE
 #include <stdio.h>
 #include <string.h>
 
@@ -106,9 +106,9 @@ void demoUIInit(GLIB_Context_t * context)
 sl_status_t updateDisplay(void)
 {
     sl_status_t status = SL_STATUS_OK;
-#if SIWX_917 && SL_ICD_ENABLED && DISPLAY_ENABLED
+#if SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED && DISPLAY_ENABLED
     sl_memlcd_post_wakeup_init();
-#endif // SIWX_917 && SL_ICD_ENABLED && DISPLAY_ENABLED
+#endif // SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED && DISPLAY_ENABLED
 #if SL_LCDCTRL_MUX
     status = sl_wfx_host_pre_lcd_spi_transfer();
     if (status != SL_STATUS_OK)

@@ -17,7 +17,7 @@
 #pragma once
 
 #include "rsi_ble_apis.h"
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "rsi_bt_common_apis.h"
 #include "rsi_user.h"
 #else
@@ -97,21 +97,21 @@
 #if (defined(RSI_M4_INTERFACE) || defined(SLI_SI91X_MCU_INTERFACE))
 #define RSI_BLE_MAX_NBR_ATT_REC (20)
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (1)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (1)
-#endif // (SIWX_917 | EXP_BOARD)
+#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 
 #define RSI_BLE_NUM_CONN_EVENTS (2)
 #else
 #define RSI_BLE_MAX_NBR_ATT_REC (80)
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (3)
-#endif // (SIWX_917 | EXP_BOARD)
+#endif // (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 
 #define RSI_BLE_NUM_CONN_EVENTS (20)
 #endif // (defined(RSI_M4_INTERFACE) || defined(SLI_SI91X_MCU_INTERFACE))
@@ -264,7 +264,7 @@
 #define BLE_ATT_REC_SIZE (500)
 #define NO_OF_VAL_ATT (5) //! Attribute value count
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_CENTRALS (1)
 #define FRONT_END_SWITCH_SEL2 BIT(30)
 #define RSI_FEATURE_BIT_MAP                                                                                                        \

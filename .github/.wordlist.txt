@@ -1440,6 +1440,7 @@ ttymxc
 ttyUSB
 TurbidityConcentrationMeasurement
 TvCasting
+TVOC
 tvOS
 TXD
 txt

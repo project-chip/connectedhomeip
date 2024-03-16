@@ -262,7 +262,7 @@ class TestSpecParsingSupport(MatterBaseTest):
                              0, "Unexpected number of unknown commands in base")
         asserts.assert_equal(len(clusters[0xFFFF].unknown_commands), 2, "Unexpected number of unknown commands in derived cluster")
 
-        combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name)
+        combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
         # Ensure the base-only attribute (1) was added to the derived cluster
         asserts.assert_equal(set(clusters[0xFFFF].attributes.keys()), set(
             [0, 1, 2, 3] + expected_global_attrs), "Unexpected attribute list")
