@@ -161,6 +161,8 @@ public:
      *   Called to determine if the given target app is available to the commissionee with the given given
      * vendorId/productId, and if so, return the passcode.
      *
+     * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
+     *
      * After lookup and attempting to obtain the passcode, implementor should call HandleContentAppCheck();
      *
      *  @param[in]    vendorId           The vendorId in the DNS-SD advertisement of the requesting commissionee.
@@ -187,6 +189,8 @@ public:
     /**
      * @brief
      *   Called to get the setup passcode from the content app corresponding to the given vendorId/productId.
+     *
+     * This will be called by the main chip thread so any blocking work should be moved to a separate thread.
      *
      * After attempting to obtain the passcode, implementor should call HandleContentAppPasscodeResponse();
      *
@@ -293,7 +297,12 @@ public:
      *
      */
     void HandleContentAppPasscodeResponse(uint32_t passcode);
-    void InternalHandleContentAppPasscodeResponse(uint32_t passcode);
+    void InternalHandleContentAppPasscodeResponse();
+
+    /**
+     * Cache the passcode to use for commissioning
+     */
+    inline void SetPasscode(uint32_t passcode) { mPasscode = passcode; }
 
     /**
      * @brief
@@ -304,14 +313,13 @@ public:
      *
      */
     void HandleTargetContentAppCheck(chip::Protocols::UserDirectedCommissioning::TargetAppInfo target, uint32_t passcode);
-    void InternalHandleTargetContentAppCheck(chip::Protocols::UserDirectedCommissioning::TargetAppInfo target, uint32_t passcode);
 
     /**
      * This method should be called with the passcode for the client
      * indicated in the UserPrompter's PromptForCommissionPasscode callback
      */
     void CommissionWithPasscode(uint32_t passcode);
-    void InternalCommissionWithPasscode(uint32_t passcode);
+    void InternalCommissionWithPasscode();
 
     /**
      * This method should be called by the commissioner to indicate that commissioning succeeded.
@@ -398,6 +406,7 @@ protected:
     uint16_t mVendorId  = 0;
     uint16_t mProductId = 0;
     NodeId mNodeId      = 0;
+    uint32_t passcode   = 0;
 
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;
