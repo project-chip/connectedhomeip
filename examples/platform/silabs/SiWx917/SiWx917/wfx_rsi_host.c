@@ -176,10 +176,12 @@ void wfx_clear_wifi_provision(void)
  ****************************************************************************/
 sl_status_t wfx_connect_to_ap(void)
 {
+    WfxEvent_t event;
     if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
     {
         SILABS_LOG("%s: connecting to access point -> SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
-        xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+        event.eventType = WFX_EVT_STA_START_JOIN;
+        WfxPostEvent(&event);
     }
     else
     {
@@ -385,7 +387,7 @@ int32_t wfx_reset_counts()
 bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
     int sz;
-
+    WfxEvent_t event;
     if (wfx_rsi.scan_cb)
         return false; /* Already in progress */
     if (ssid)
@@ -398,7 +400,9 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
         strcpy(wfx_rsi.scan_ssid, ssid);
     }
     wfx_rsi.scan_cb = callback;
-    xEventGroupSetBits(wfx_rsi.events, WFX_EVT_SCAN);
+
+    event.eventType = WFX_EVT_SCAN;
+    WfxPostEvent(&event);
 
     return true;
 }
