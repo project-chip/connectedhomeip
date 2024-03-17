@@ -406,7 +406,7 @@ protected:
     uint16_t mVendorId  = 0;
     uint16_t mProductId = 0;
     NodeId mNodeId      = 0;
-    uint32_t passcode   = 0;
+    uint32_t mPasscode  = 0;
 
     UserDirectedCommissioningServer * mUdcServer           = nullptr;
     UserPrompter * mUserPrompter                           = nullptr;
