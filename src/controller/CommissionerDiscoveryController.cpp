@@ -213,7 +213,6 @@ void CommissionerDiscoveryController::InternalOk()
 
 void CommissionerDiscoveryController::HandleTargetContentAppCheck(TargetAppInfo target, uint32_t passcode)
 {
-    // need to ensure callback is on main chip thread
     assertChipStackLockedByCurrentThread();
     ValidateSession();
 

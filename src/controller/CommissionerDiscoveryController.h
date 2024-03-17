@@ -309,6 +309,7 @@ public:
      *   Called with the result of attempting to lookup and obtain the passcode from the content app corresponding to the given
      * target.
      *
+     *  @param[in]    target             Target app info for app check.
      *  @param[in]    passcode           Passcode for the given commissionee, or 0 if passcode cannot be obtained.
      *
      */
