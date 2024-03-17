@@ -416,6 +416,4 @@ protected:
     PostCommissioningListener * mPostCommissioningListener = nullptr;
 };
 
-CommissionerDiscoveryController * GetCommissionerDiscoveryController();
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

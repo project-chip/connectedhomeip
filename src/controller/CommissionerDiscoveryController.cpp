@@ -197,16 +197,20 @@ void CommissionerDiscoveryController::InternalOk()
             TargetAppInfo info;
             if (client->GetTargetAppInfo(i, info))
             {
-                GetCommissionerDiscoveryController()->GetPasscodeService()->LookupTargetContentApp(
-                    client->GetVendorId(), client->GetProductId(), rotatingIdSpan, info);
+                if (mPasscodeService != nullptr)
+                {
+                    mPasscodeService->LookupTargetContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan, info);
+                }
             }
         }
         return;
     }
     ChipLogDetail(AppServer, "UX InternalOk: checking target app associated with client");
 
-    GetCommissionerDiscoveryController()->GetPasscodeService()->FetchCommissionPasscodeFromContentApp(
-        client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
+    if (mPasscodeService != nullptr)
+    {
+        mPasscodeService->FetchCommissionPasscodeFromContentApp(client->GetVendorId(), client->GetProductId(), rotatingIdSpan);
+    }
 
     ChipLogDetail(AppServer, "UX Ok: done moving out of main thread");
 }
