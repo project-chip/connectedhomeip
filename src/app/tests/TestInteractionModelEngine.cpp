@@ -259,6 +259,9 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
 }
 
+/**
+ * @brief Test verifies the SubjectHasActiveSubscription with a single subscription with a single entry
+ */
 void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubOneEntry(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -300,6 +303,10 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubOneEnt
     NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(bobFabricIndex, bobNodeId) == false);
 }
 
+/**
+ * @brief Test verifies that the SubjectHasActiveSubscription will continue iterating till it fines at least one valid active
+ * subscription
+ */
 void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubMultipleEntries(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -354,6 +361,9 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSingleSubMultip
     engine->GetReadHandlerPool().ReleaseAll();
 }
 
+/**
+ * @brief Test validates that the SubjectHasActiveSubscription can support multiple subscriptions from different clients
+ */
 void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -427,6 +437,10 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsSin
     NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
 }
 
+/**
+ * @brief Test validates that the SubjectHasActiveSubscription can find the active subscription even if there are multiple
+ * subscriptions for each client
+ */
 void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries(nlTestSuite * apSuite,
                                                                                              void * apContext)
 {
@@ -516,6 +530,9 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsMul
     NL_TEST_ASSERT(apSuite, engine->SubjectHasActiveSubscription(aliceFabricIndex, aliceNodeId) == false);
 }
 
+/**
+ * @brief Verifies that SubjectHasActiveSubscription support CATs as a subject-id
+ */
 void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSubWithCAT(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx               = *reinterpret_cast<TestContext *>(apContext);
@@ -569,6 +586,9 @@ void TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSubWithCAT(nlTe
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
+/**
+ * @brief Test verifies the SubjectHasPersistedSubscription with single and multiple persisted subscriptions.
+ */
 void TestInteractionModelEngine::TestSubjectHasPersistedSubscription(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);

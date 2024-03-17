@@ -38,9 +38,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <system/SystemClock.h>
 
-#define CHIP_CONFIG_ENABLE_ICD_CIP 1
-#define CHIP_CONFIG_ENABLE_ICD_LIT 1
-
 namespace chip {
 namespace Crypto {
 using SymmetricKeystore = SessionKeystore;

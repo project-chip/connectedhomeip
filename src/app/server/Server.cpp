@@ -527,11 +527,11 @@ bool Server::CheckInWouldBeSentAtBootVerifier(FabricIndex aFabricIndex, NodeId s
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     // At least one registration has a persisted entry. Do not send Check-In message.
     // This is to cover the use-case where the subscription resumption feature is used with the Check-In message.
-    VerifyOrReturnValue(chip::app::InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(aFabricIndex, subjectID),
-                        true);
+    VerifyOrReturnValue(!chip::app::InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(aFabricIndex, subjectID),
+                        false);
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-    return false;
+    return true;
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
