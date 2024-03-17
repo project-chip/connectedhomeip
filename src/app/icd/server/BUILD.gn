@@ -75,9 +75,6 @@ source_set("manager") {
     ":configuration-data",
     ":notifier",
     ":observer",
-
-    # TODO : can this be in checkin?
-    "${chip_root}/src/app:subscription-manager",
     "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/messaging",
   ]
@@ -87,6 +84,7 @@ source_set("manager") {
       ":monitoring-table",
       ":sender",
       "${chip_root}/src/app:app_config",
+      "${chip_root}/src/app:subscription-manager",
     ]
   }
 }
