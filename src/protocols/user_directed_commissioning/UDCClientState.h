@@ -126,6 +126,8 @@ public:
             info.vendorId   = mTargetAppInfos[index].vendorId;
             info.productId  = mTargetAppInfos[index].productId;
             info.checkState = mTargetAppInfos[index].checkState;
+            info.passcode   = mTargetAppInfos[index].passcode;
+            info.foundApp   = mTargetAppInfos[index].foundApp;
             return true;
         }
         return false;
@@ -149,6 +151,8 @@ public:
         mTargetAppInfos[mNumTargetAppInfos].vendorId   = vid.vendorId;
         mTargetAppInfos[mNumTargetAppInfos].productId  = vid.productId;
         mTargetAppInfos[mNumTargetAppInfos].checkState = TargetAppCheckState::kNotInitialized;
+        mTargetAppInfos[mNumTargetAppInfos].passcode   = 0;
+        mTargetAppInfos[mNumTargetAppInfos].foundApp   = false;
         mNumTargetAppInfos++;
         return true;
     }
@@ -221,7 +225,7 @@ private:
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
     uint16_t mPairingHint                                         = 0;
 
-    constexpr static size_t kMaxTargetAppInfos = 3;
+    constexpr static size_t kMaxTargetAppInfos = 10;
     uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
     TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
 
