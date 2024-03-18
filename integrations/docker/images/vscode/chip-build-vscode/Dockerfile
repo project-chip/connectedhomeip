@@ -129,7 +129,7 @@ ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.16.1
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.16.2
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
-ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.16.1
+ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.16.5
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 
 ENV TIZEN_VERSION 7.0
