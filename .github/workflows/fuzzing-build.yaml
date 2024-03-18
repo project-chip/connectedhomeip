@@ -46,12 +46,8 @@ jobs:
               run: |
                   mkdir objdir-clone || true
 
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               uses: ./.github/actions/bootstrap
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build all-clusters-app
               run: |
@@ -84,12 +80,8 @@ jobs:
               run: |
                   mkdir objdir-clone || true
 
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               uses: ./.github/actions/bootstrap
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build all-clusters-app
               run: |

@@ -57,6 +57,7 @@ jobs:
               with:
                 platform: linux
 
+            # TODO: Is what's being cached here actually compatible with a regular bootstrap?
             - name: Bootstrap Cache
               uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap Cirque
