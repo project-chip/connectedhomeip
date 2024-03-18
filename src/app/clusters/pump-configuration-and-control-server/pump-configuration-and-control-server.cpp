@@ -25,6 +25,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <app/util/config.h>
 
 using namespace chip;

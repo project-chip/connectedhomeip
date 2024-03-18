@@ -33,6 +33,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPFaultInjection.h>
