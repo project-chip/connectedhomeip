@@ -41,13 +41,11 @@ source_set("types") {
 
 # This source set also depends on data-model
 source_set("af-types") {
-  sources = [
-      "af-types.h"
-  ]
+  sources = [ "af-types.h" ]
   deps = [
     ":types",
-    "${chip_root}/src/app/data-model",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/interaction_model",
   ]
