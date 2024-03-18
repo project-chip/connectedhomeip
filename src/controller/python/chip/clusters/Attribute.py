@@ -18,6 +18,7 @@
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
 
+import asyncio
 import builtins
 import ctypes
 import inspect
@@ -27,7 +28,7 @@ from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple, Union
 
 import chip
 import chip.exceptions
@@ -473,8 +474,6 @@ class SubscriptionTransaction:
         self._devCtrl = devCtrl
         self._isDone = False
         self._onResubscriptionSucceededCb = None
-        self._onResubscriptionSucceededCb_isAsync = False
-        self._onResubscriptionAttemptedCb_isAsync = False
 
     def GetAttributes(self):
         ''' Returns the attribute value cache tracking the latest state on the publisher.
@@ -520,7 +519,9 @@ class SubscriptionTransaction:
 
         return minIntervalSec.value, maxIntervalSec.value
 
-    def SetResubscriptionAttemptedCallback(self, callback: Callable[[SubscriptionTransaction, int, int], None], isAsync=False):
+    def SetResubscriptionAttemptedCallback(
+        self, callback: Callable[[SubscriptionTransaction, int, int], Union[None, Awaitable[None]]]
+    ):
         '''
         Sets the callback function that gets invoked anytime a re-subscription is attempted. The callback is expected
         to have the following signature:
@@ -530,9 +531,8 @@ class SubscriptionTransaction:
         '''
         if callback is not None:
             self._onResubscriptionAttemptedCb = callback
-            self._onResubscriptionAttemptedCb_isAsync = isAsync
 
-    def SetResubscriptionSucceededCallback(self, callback: Callable[[SubscriptionTransaction], None], isAsync=False):
+    def SetResubscriptionSucceededCallback(self, callback: Callable[[SubscriptionTransaction], Union[None, Awaitable[None]]]):
         '''
         Sets the callback function that gets invoked when a re-subscription attempt succeeds. The callback
         is expected to have the following signature:
@@ -542,9 +542,10 @@ class SubscriptionTransaction:
         '''
         if callback is not None:
             self._onResubscriptionSucceededCb = callback
-            self._onResubscriptionSucceededCb_isAsync = isAsync
 
-    def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
+    def SetAttributeUpdateCallback(
+        self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], Union[None, Awaitable[None]]]
+    ):
         '''
         Sets the callback function for the attribute value change event,
         accepts a Callable accepts an attribute path and the cached data.
@@ -552,28 +553,28 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onAttributeChangeCb = callback
 
-    def SetEventUpdateCallback(self, callback: Callable[[EventReadResult, SubscriptionTransaction], None]):
+    def SetEventUpdateCallback(self, callback: Callable[[EventReadResult, SubscriptionTransaction], Union[None, Awaitable[None]]]):
         if callback is not None:
             self._onEventChangeCb = callback
 
-    def SetErrorCallback(self, callback: Callable[[int, SubscriptionTransaction], None]):
+    def SetErrorCallback(self, callback: Callable[[int, SubscriptionTransaction], Union[None, Awaitable[None]]]):
         '''
-        Sets the callback function in case a subscription error occured,
+        Sets the callback function in case a subscription error occurred,
         accepts a Callable accepts an error code and the cached data.
         '''
         if callback is not None:
             self._onErrorCb = callback
 
     @property
-    def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
+    def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], Union[None, Awaitable[None]]]:
         return self._onAttributeChangeCb
 
     @property
-    def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], None]:
+    def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], Union[None, Awaitable[None]]]:
         return self._onEventChangeCb
 
     @property
-    def OnErrorCb(self) -> Callable[[int, SubscriptionTransaction], None]:
+    def OnErrorCb(self) -> Callable[[int, SubscriptionTransaction], Union[None, Awaitable[None]]]:
         return self._onErrorCb
 
     @property
@@ -723,9 +724,12 @@ class AsyncReadTransaction:
                 Header=header, Data=eventValue, Status=chip.interaction_model.Status(status))
             self._events.append(eventResult)
 
-            if (self._subscription_handler is not None):
-                self._subscription_handler.OnEventChangeCb(
-                    eventResult, self._subscription_handler)
+            if self._subscription_handler is not None:
+                callback = self._subscription_handler.OnEventChangeCb
+                if inspect.iscoroutinefunction(callback):
+                    asyncio.run_coroutine_threadsafe(callback(), self._event_loop)
+                else:
+                    callback(eventResult, self._subscription_handler)
 
         except Exception as ex:
             logging.exception(ex)
@@ -741,11 +745,11 @@ class AsyncReadTransaction:
         else:
             logging.info("Re-subscription succeeded!")
             if self._subscription_handler._onResubscriptionSucceededCb is not None:
-                if (self._subscription_handler._onResubscriptionSucceededCb_isAsync):
-                    self._event_loop.create_task(
-                        self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler))
+                callback = self._subscription_handler._onResubscriptionSucceededCb
+                if inspect.iscoroutinefunction(callback):
+                    self._event_loop.create_task(callback(self._subscription_handler))
                 else:
-                    self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler)
+                    callback(self._subscription_handler)
 
     def handleSubscriptionEstablished(self, subscriptionId):
         self._event_loop.call_soon_threadsafe(
@@ -754,13 +758,14 @@ class AsyncReadTransaction:
     def handleResubscriptionAttempted(self, terminationCause: PyChipError, nextResubscribeIntervalMsec: int):
         if not self._subscription_handler:
             return
-        if (self._subscription_handler._onResubscriptionAttemptedCb_isAsync):
-            self._event_loop.create_task(self._subscription_handler._onResubscriptionAttemptedCb(
-                self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec))
+
+        callback = self._subscription_handler._onResubscriptionAttemptedCb
+        if inspect.iscoroutinefunction(callback):
+            asyncio.run_coroutine_threadsafe(callback(
+                self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec), self._event_loop)
         else:
-            self._event_loop.call_soon_threadsafe(
-                self._subscription_handler._onResubscriptionAttemptedCb,
-                self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
+            self._event_loop.call_soon_threadsafe(callback,
+                                                  self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec)
 
     def _handleReportBegin(self):
         pass
@@ -776,13 +781,16 @@ class AsyncReadTransaction:
                     # path could not be resolved into a TypedAttributePath
                     logging.getLogger(__name__).exception(err)
                     continue
-                self._subscription_handler.OnAttributeChangeCb(
-                    attribute_path, self._subscription_handler)
+                callback = self._subscription_handler.OnAttributeChangeCb
+                if inspect.iscoroutinefunction(callback):
+                    asyncio.run_coroutine_threadsafe(callback(attribute_path, self._subscription_handler), self._event_loop)
+                else:
+                    callback(attribute_path, self._subscription_handler)
 
             # Clear it out once we've notified of all changes in this transaction.
         self._changedPathSet = set()
 
-    def _handleDone(self):
+    async def _handleDone(self):
         #
         # We only set the exception/result on the future in this _handleDone call (if it hasn't
         # already been set yet, which can be in the case of subscriptions) since doing so earlier
@@ -792,7 +800,10 @@ class AsyncReadTransaction:
         if not self._future.done():
             if self._resultError:
                 if self._subscription_handler:
-                    self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
+                    if inspect.iscoroutinefunction(self._subscription_handler.OnErrorCb):
+                        await self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
+                    else:
+                        self._subscription_handler.OnErrorCb(self._resultError, self._subscription_handler)
                 else:
                     self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
             else:
@@ -807,13 +818,15 @@ class AsyncReadTransaction:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
-        self._event_loop.call_soon_threadsafe(self._handleDone)
+        asyncio.run_coroutine_threadsafe(self._handleDone(), self._event_loop)
 
     def handleReportBegin(self):
         pass
 
     def handleReportEnd(self):
-        # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
+        # We can't post this on the self._event_loop using call_soon_threadsafe() since
+        # the event loop might no longer be open (typically when ZCLSubscribeAttribute
+        # is used).
         self._handleReportEnd()
 
 
