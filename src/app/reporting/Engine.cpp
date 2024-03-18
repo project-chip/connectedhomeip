@@ -29,10 +29,10 @@
 #endif
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
-#include <app/reporting/Engine.h>
 #include <app/RequiredPrivilege.h>
-#include <app/util/ember-compatibility-functions.h>
+#include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
+#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip::Access;
 
