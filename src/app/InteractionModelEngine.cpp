@@ -368,7 +368,7 @@ bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabric
 
     while (iterator->Next(subscriptionInfo))
     {
-        // TODO(#31873): Persistant subscription only stores the NodeID for now. We cannot check if the CAT matches
+        // TODO(#31873): Persistent subscription only stores the NodeID for now. We cannot check if the CAT matches
         if (subscriptionInfo.mFabricIndex == aFabricIndex && subscriptionInfo.mNodeId == subjectID)
         {
             persistedSubMatches = true;
