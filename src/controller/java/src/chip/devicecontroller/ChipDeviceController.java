@@ -1349,10 +1349,12 @@ public class ChipDeviceController {
   /**
    * Extract skid from paa cert.
    *
-   * @param paaCert The product attestation authority (PAA) cert
-   * @return The subject key identifier (SKID)
+   * <p>This method was deprecated. Please use {@link DeviceAttestation.extractSkidFromPaaCert}.
    */
-  public native byte[] extractSkidFromPaaCert(byte[] paaCert);
+  @Deprecated
+  public byte[] extractSkidFromPaaCert(byte[] paaCert) {
+    return DeviceAttestation.extractSkidFromPaaCert(paaCert);
+  }
 
   /**
    * Generates a new PASE verifier for the given setup PIN code.

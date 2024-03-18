@@ -1260,38 +1260,6 @@ exit:
     return outJbytes;
 }
 
-JNI_METHOD(jbyteArray, extractSkidFromPaaCert)
-(JNIEnv * env, jobject self, jbyteArray paaCert)
-{
-    uint32_t allocatedCertLength = chip::Credentials::kMaxCHIPCertLength;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> outBuf;
-    jbyteArray outJbytes = nullptr;
-    JniByteArray paaCertBytes(env, paaCert);
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
-    {
-        MutableByteSpan outBytes(outBuf.Get(), allocatedCertLength);
-
-        err = chip::Crypto::ExtractSKIDFromX509Cert(paaCertBytes.byteSpan(), outBytes);
-        SuccessOrExit(err);
-
-        VerifyOrExit(chip::CanCastTo<uint32_t>(outBytes.size()), err = CHIP_ERROR_INTERNAL);
-
-        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<jsize>(outBytes.size()), outJbytes);
-        SuccessOrExit(err);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to extract skid frome X509 cert. Err = %" CHIP_ERROR_FORMAT, err.Format());
-        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
-    }
-
-    return outJbytes;
-}
-
 JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
