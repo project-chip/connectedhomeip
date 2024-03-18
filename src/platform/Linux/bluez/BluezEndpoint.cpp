@@ -264,10 +264,9 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
 void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_manager1_call_register_application_finish(reinterpret_cast<BluezGattManager1 *>(aObject), aResult,
-                                                                            &error.GetReceiver());
-
-    VerifyOrReturn(success == TRUE, {
+    if (!bluez_gatt_manager1_call_register_application_finish(reinterpret_cast<BluezGattManager1 *>(aObject), aResult,
+                                                              &error.GetReceiver()))
+    {
         ChipLogError(DeviceLayer, "FAIL: RegisterGattApplication: %s", error->message);
         switch (error->code)
         {
@@ -279,7 +278,8 @@ void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult 
         default:
             BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR_INTERNAL);
         }
-    });
+        return;
+    }
 
     ChipLogDetail(DeviceLayer, "GATT application registered successfully");
     BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_NO_ERROR);

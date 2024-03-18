@@ -222,10 +222,9 @@ void BluezAdvertisement::Shutdown()
 void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
-    gboolean success = bluez_leadvertising_manager1_call_register_advertisement_finish(
-        reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject), aResult, &error.GetReceiver());
-
-    VerifyOrReturn(success == TRUE, {
+    if (!bluez_leadvertising_manager1_call_register_advertisement_finish(reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject),
+                                                                         aResult, &error.GetReceiver()))
+    {
         ChipLogError(DeviceLayer, "FAIL: RegisterAdvertisement: %s", error->message);
         switch (error->code)
         {
@@ -237,7 +236,8 @@ void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
         default:
             BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR_INTERNAL);
         }
-    });
+        return;
+    }
 
     mIsAdvertising = true;
 
@@ -286,10 +286,9 @@ CHIP_ERROR BluezAdvertisement::Start()
 void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
-    gboolean success = bluez_leadvertising_manager1_call_unregister_advertisement_finish(
-        reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject), aResult, &error.GetReceiver());
-
-    VerifyOrReturn(success == TRUE, {
+    if (!bluez_leadvertising_manager1_call_unregister_advertisement_finish(reinterpret_cast<BluezLEAdvertisingManager1 *>(aObject),
+                                                                           aResult, &error.GetReceiver()))
+    {
         ChipLogError(DeviceLayer, "FAIL: UnregisterAdvertisement: %s", error->message);
         switch (error->code)
         {
@@ -301,7 +300,8 @@ void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
         default:
             BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR_INTERNAL);
         }
-    });
+        return;
+    }
 
     mIsAdvertising = false;
 
