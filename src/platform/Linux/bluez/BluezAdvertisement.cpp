@@ -247,13 +247,13 @@ CHIP_ERROR BluezAdvertisement::StartImpl()
     GVariant * options;
 
     VerifyOrExit(!mIsAdvertising, ChipLogError(DeviceLayer, "FAIL: Advertising has already been enabled in %s", __func__));
-    VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
+    VerifyOrExit(mAdapter, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
     advMgr.reset(bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
-    VerifyOrExit(advMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
+    VerifyOrExit(advMgr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
     options = g_variant_builder_end(&optionsBuilder);
@@ -303,13 +303,13 @@ CHIP_ERROR BluezAdvertisement::StopImpl()
     GAutoPtr<BluezLEAdvertisingManager1> advMgr;
 
     VerifyOrExit(mIsAdvertising, ChipLogError(DeviceLayer, "FAIL: Advertising has already been disabled in %s", __func__));
-    VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
+    VerifyOrExit(mAdapter, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
     advMgr.reset(bluez_object_get_leadvertising_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
-    VerifyOrExit(advMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
+    VerifyOrExit(advMgr, ChipLogError(DeviceLayer, "FAIL: NULL advMgr in %s", __func__));
 
     bluez_leadvertising_manager1_call_unregister_advertisement(
         advMgr.get(), mAdvPath, nullptr,
