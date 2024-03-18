@@ -21,8 +21,8 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/EventLogging.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip;
 using namespace chip::app;

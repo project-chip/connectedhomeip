@@ -20,8 +20,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>

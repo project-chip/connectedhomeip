@@ -22,9 +22,9 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
+#include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/Span.h>

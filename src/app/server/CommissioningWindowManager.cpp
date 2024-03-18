@@ -20,9 +20,9 @@
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
+#include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>

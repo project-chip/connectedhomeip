@@ -28,7 +28,7 @@
 #include <assert.h>
 
 // We need this for initializating default reporting configurations.
-#include <app/util/ember-compatibility-functions.h>
+#include <app/reporting/reporting.h>
 
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>

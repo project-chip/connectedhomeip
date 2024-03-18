@@ -24,8 +24,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 

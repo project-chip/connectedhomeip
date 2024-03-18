@@ -20,9 +20,9 @@
 #include <app/AttributeAccessInterfaceCache.h>
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
