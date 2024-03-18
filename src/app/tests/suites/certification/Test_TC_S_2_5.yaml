@@ -249,7 +249,7 @@ tests:
           to 20000 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0001 0x01 20000 scene1 [] 1 1
+          scenesmanagement add-scene 0x0001 0x01 20000 scene1 [] 1 1
 
           Verify the AddSceneResponse with following fields:
           Status is SUCCESS
