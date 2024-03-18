@@ -78,6 +78,17 @@ tests:
               type: list
               contains: [0]
 
+    - label:
+          "Step 3c: TH reads the optional attribute(LinkLocalAddress) in
+          AttributeList"
+      PICS: WAKEONLAN.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
     - label: "Step 4: TH reads the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
