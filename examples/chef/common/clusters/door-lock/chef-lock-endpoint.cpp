@@ -590,8 +590,8 @@ bool LockEndpoint::weekDayScheduleForbidsAccess(uint16_t userIndex, bool * haveS
     auto chipError = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
     if (chipError != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Lock App: unable to get current time to check user schedules [endpointId=%d,error=%d (%s)]", mEndpointId,
-                     chipError.AsInteger(), chipError.AsString());
+        ChipLogError(Zcl, "Lock App: unable to get current time to check user schedules [endpointId=%d (%s)]", mEndpointId,
+                     chipError.AsString());
         return true;
     }
     time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
@@ -637,8 +637,8 @@ bool LockEndpoint::yearDayScheduleForbidsAccess(uint16_t userIndex, bool * haveS
     auto chipError = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
     if (chipError != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Lock App: unable to get current time to check user schedules [endpointId=%d,error=%d (%s)]", mEndpointId,
-                     chipError.AsInteger(), chipError.AsString());
+        ChipLogError(Zcl, "Lock App: unable to get current time to check user schedules [endpointId=%d (%s)]", mEndpointId,
+                     chipError.AsString());
         return true;
     }
     auto unixEpoch     = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
