@@ -82,9 +82,11 @@ public:
 
     /**
      * @brief Verifier template function
-     *        This type can be used to implement specific verifiers that can be used in
-     *        the CheckInMessagesWouldBeSent function. The goal is to avoid having multiple functions that implement the iterator
-     *        loop with only the check changing.
+     *        This type can be used to implement specific verifiers that can be used in the CheckInMessagesWouldBeSent function.
+     *        The goal is to avoid having multiple functions that implement the iterator loop with only the check changing.
+     *
+     * @return true if at least one Check-In message wuld be sent
+     *         false No Check-In messages would be sent
      */
 
     using RegistrationVerificationFunction = bool(FabricIndex aFabricIndex, NodeId subjectID);
