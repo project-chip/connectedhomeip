@@ -21,11 +21,11 @@
 #include <app/icd/server/ICDServerConfig.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/SubscriptionsInfoProvider.h>     // nogncheck
 #include <app/icd/server/ICDCheckInSender.h>   // nogncheck
 #include <app/icd/server/ICDMonitoringTable.h> // nogncheck
 #endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
 
-#include <app/SubscriptionsInfoProvider.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>

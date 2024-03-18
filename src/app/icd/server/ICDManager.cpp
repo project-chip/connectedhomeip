@@ -236,7 +236,7 @@ bool ICDManager::CheckInMessagesWouldBeSent(std::function<RegistrationVerificati
             }
 
             // At least one registration would require a Check-In message
-            VerifyOrReturnValue(RegistrationVerifier(entry.fabricIndex, entry.monitoredSubject), true);
+            VerifyOrReturnValue(!RegistrationVerifier(entry.fabricIndex, entry.monitoredSubject), true);
         }
     }
 
