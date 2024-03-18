@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-k32w:33
+            image: ghcr.io/project-chip/chip-build-k32w:38
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -46,7 +46,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: k32w
+                platform: nxp
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
