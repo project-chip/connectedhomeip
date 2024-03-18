@@ -521,11 +521,11 @@ class AndroidBuilder(Builder):
                     self.root, "examples/android/CHIPTest/app/libs"
                 )
 
-                libs = ["libc++_shared.so", "libChipTestApp.so"]
+                libs = ["libc++_shared.so", "libCHIPTest.so"]
 
                 jars = {
                     "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
-                    "ChipTestApp.jar": "ChipTestApp.jar",
+                    "CHIPTest.jar": "CHIPTest.jar",
                 }
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildSrcAndroid()
@@ -619,13 +619,13 @@ class AndroidBuilder(Builder):
                     "lib",
                     "src/controller/java/CHIPClusterID.jar",
                 ),
-                "jni/%s/libChipTestApp.so"
+                "jni/%s/libCHIPTest.so"
                 % self.board.AbiName(): os.path.join(
                     self.output_dir,
                     "lib",
                     "jni",
                     self.board.AbiName(),
-                    "libChipTestApp.so",
+                    "libCHIPTest.so",
                 ),
                 "jni/%s/libc++_shared.so"
                 % self.board.AbiName(): os.path.join(

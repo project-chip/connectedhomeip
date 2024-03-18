@@ -20,19 +20,25 @@ import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tools.gni")
 
 shared_library("jni") {
-  output_name = "libChipTestApp"
+  output_name = "libCHIPTest"
 
   sources = [ "app/src/main/cpp/CHIPTest-JNI.cpp" ]
 
   deps = [
+    # "${chip_root}/build/chip/java/tests:java_build_test",
     "${chip_root}/src/controller/java",
     "${chip_root}/src/controller/java:onboarding_payload",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/platform/android",
     "${chip_root}/src/platform/android:java",
+    "${chip_root}/src/platform/logging:android",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/nlfaultinjection:nlfaultinjection",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -40,10 +46,12 @@ shared_library("jni") {
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 
   ldflags = [ "-Wl,--gc-sections" ]
+
+  libs = [ "log" ]
 }
 
 android_library("java") {
-  output_name = "ChipTestApp.jar"
+  output_name = "CHIPTest.jar"
 
   deps = [
     ":android",
