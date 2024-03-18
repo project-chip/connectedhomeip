@@ -19,7 +19,6 @@ name:
 
 PICS:
     - S.S
-    - S.S.F03
 
 config:
     nodeId: 0x12344321
