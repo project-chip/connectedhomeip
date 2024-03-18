@@ -227,6 +227,7 @@ public:
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
     void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage) override;
+    void OnResponderBusy(System::Clock::Milliseconds16 requestedDelay) override;
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
 
@@ -318,6 +319,8 @@ private:
     uint8_t mAttemptsDone      = 0;
 
     uint8_t mResolveAttemptsAllowed = 0;
+
+    System::Clock::Milliseconds16 mRequestedBusyDelay = System::Clock::kZero;
 
     Callback::CallbackDeque mConnectionRetry;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES

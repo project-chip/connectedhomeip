@@ -17,10 +17,6 @@
  */
 #include <lib/core/TLVWriter.h>
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>

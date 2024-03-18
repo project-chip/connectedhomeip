@@ -85,7 +85,7 @@ public:
 private:
     CHIP_ERROR StartupEndpointBindings();
 
-    void SetupAdapter();
+    CHIP_ERROR SetupAdapter();
     void SetupGattServer(GDBusConnection * aConn);
     void SetupGattService();
 

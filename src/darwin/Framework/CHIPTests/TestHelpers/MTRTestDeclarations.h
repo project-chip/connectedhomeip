@@ -28,6 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
 - (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
 - (void)clearAllStoredAttributes;
+- (void)unitTestPruneEmptyStoredAttributesBranches;
+- (NSString *)_endpointIndexKeyForNodeID:(NSNumber *)nodeID;
+- (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
+- (NSString *)_attributeIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+- (NSString *)_attributeValueKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
 @end
 
 // Declare internal methods for testing

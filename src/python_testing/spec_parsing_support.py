@@ -487,7 +487,7 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
         clusters[action_id].accepted_commands[c].conformance = optional()
         remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
 
-    combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name)
+    combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
 
     for alias_base_name, aliased_clusters in CLUSTER_ALIASES.items():
         for id, (alias_name, pics) in aliased_clusters.items():
@@ -547,10 +547,10 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     return clusters, problems
 
 
-def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int]) -> None:
+def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, int], problems: list[ProblemNotice]) -> None:
     ''' Overrides base elements with the derived cluster values for derived clusters. '''
 
-    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint) -> dict[uint, XmlAttribute]:
+    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint, problems: list[ProblemNotice]) -> dict[uint, XmlAttribute]:
         ret = deepcopy(base)
         extras = {k: v for k, v in derived.items() if k not in base.keys()}
         overrides = {k: v for k, v in derived.items() if k in base.keys()}
@@ -590,7 +590,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[int, XmlCluster], pure
             command_map.update(c.command_map)
             features = deepcopy(base.features)
             features.update(c.features)
-            attributes = combine_attributes(base.attributes, c.attributes, id)
+            attributes = combine_attributes(base.attributes, c.attributes, id, problems)
             accepted_commands = deepcopy(base.accepted_commands)
             accepted_commands.update(c.accepted_commands)
             generated_commands = deepcopy(base.generated_commands)

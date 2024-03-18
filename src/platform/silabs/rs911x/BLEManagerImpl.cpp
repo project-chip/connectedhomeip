@@ -28,7 +28,7 @@
 
 #include "cmsis_os2.h"
 #include <platform/internal/BLEManager.h>
-#ifndef SIWX_917
+#ifndef SLI_SI91X_MCU_INTERFACE
 #include "rail.h"
 #endif
 #include <crypto/RandUtils.h>
@@ -42,7 +42,7 @@ extern "C" {
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #include "wfx_sl_ble_init.h"
-#if !(SIWX_917 | EXP_BOARD)
+#if !(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include <rsi_driver.h>
 #endif
 #include <rsi_utils.h>
@@ -58,11 +58,11 @@ extern "C" {
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <string.h>
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 extern "C" {
 #include "sl_si91x_trng.h"
 }
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
@@ -85,7 +85,7 @@ using namespace ::chip::DeviceLayer::Internal;
 void sl_ble_init()
 {
     uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
-#if SIWX_917
+#if SLI_SI91X_MCU_INTERFACE
     sl_status_t sl_status;
     //! Get Random number of desired length
     sl_status = sl_si91x_trng_get_random_num((uint32_t *) randomAddrBLE, RSI_BLE_ADDR_LENGTH);
@@ -100,7 +100,7 @@ void sl_ble_init()
 #else
     uint64_t randomAddr = chip::Crypto::GetRandU64();
     memcpy(randomAddrBLE, &randomAddr, RSI_BLE_ADDR_LENGTH);
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,

@@ -50,6 +50,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
+                bootstrap-log-name: bootstrap-logs-unittest-${{ matrix.type }}
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1

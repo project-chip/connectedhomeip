@@ -34,6 +34,7 @@
 {
     if (self = [super init]) {
         _metricsData = [NSMutableDictionary dictionaryWithCapacity:numItems];
+        _uniqueIdentifier = [NSUUID UUID];
     }
     return self;
 }
@@ -42,6 +43,7 @@
 {
     return [_metricsData allKeys];
 }
+
 - (nullable MTRMetricData *)metricDataForKey:(NSString *)key
 {
     if (!key) {
