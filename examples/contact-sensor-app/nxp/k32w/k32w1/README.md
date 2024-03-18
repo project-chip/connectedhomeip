@@ -102,7 +102,7 @@ states are depicted:
 
 NOTE:
     LED2 will be disabled when CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR is enabled.
-    On K32W1 EVK board, PTB0 is wired to LED2 also is wired to CS (Chip Select) 
+    On K32W1 EVK board, `PTB0` is wired to `LED2` also is wired to CS (Chip Select) 
     External Flash Memory. OTA image is stored in external memory because of it's size.
     If LED2 is enabled then it will affect External Memory CS and OTA will not work.
 
@@ -110,7 +110,7 @@ NOTE:
 the sensor is contacted, when not lit, the sensor is non-contacted.
 
 **Button SW2**. SHORT press function is overloaded depending on the device type and
-commissioning state. If the device is not commissioned, a SHORT press of the buttton
+commissioning state. If the device is not commissioned, a SHORT press of the button
 will enable Bluetooth LE advertising for a predefined period of time. If the device
 is commissioned and is acting as a LIT ICD then a SHORT press of the button will enable
 Active Mode.

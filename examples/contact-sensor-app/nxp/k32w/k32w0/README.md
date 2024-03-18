@@ -241,10 +241,10 @@ argument to 1.
 K32W0x1 supports antenna diversity feature, which is a technique that maximizes
 the performance of an antenna system, allowing the radio signal to be switched
 between two antennas that have very low correlation between their received signals.
-Typically, this is achieved by spacing two antennas around 0.25 wavelenghts appart
+Typically, this is achieved by spacing two antennas around 0.25 wavelengths apart
 or by using 2 orthogonal polarizations. This is controlled by software.
-K32W0x1 provides an output (ADO) on one of DIO7, DIO9 or DIO19 and optionally its
-complement (ADE) on DIO6 that can be used to control an antenna switch.
+K32W0x1 provides an output (`ADO`) on one of `DIO7`, `DIO9` or `DIO19` and optionally its
+complement (`ADE`) on `DIO6` that can be used to control an antenna switch.
 In order to use this feature, user must set `use_antenna_diversity` to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
@@ -450,14 +450,6 @@ To stop using  Ultrafast P256 ECC Library, simply build with _chip_crypto=\"mbed
 or with Tinycrypt.
 
 ## Tinycrypt ECC library
-
-### Building steps
-
-In order to use the Tinycrypt ECC library, use the following build arguments:
-
--   Build without Secure element (_chip_with_se05x=0_), with crypto platform
-    (_chip_crypto=\"platform\"_) and with tinycrypt selected
-    (_chip_crypto_flavour=\"tinycrypt\"_).
 
 ### Building steps
 

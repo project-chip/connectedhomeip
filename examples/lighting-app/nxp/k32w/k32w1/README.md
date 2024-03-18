@@ -166,11 +166,11 @@ Some Matter instances and global variables can be placed in the `NBU` `SMU2` mem
 
 These instances and global variables are placed in `SMU2` memory through name matching in the application linker script. They should not be changed or, if changed, the names must be updated in `k32w1_app.ld`. See [k32w1_app.ld](../../../../platform/nxp/k32w/k32w1/app/ldscripts/k32w1_app.ld) for names and `SMU2` memory range size.
 
-The OpenThread buffers can be allocated from a 13KB `SMU2` range after a successful commmissioning process until a factory reset is initiated. This way, the OpenThread buffers will be dynamically allocated instead of statically, freeing some SRAM. To enable this feature compile with OpenThread FTD support (`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
+The OpenThread buffers can be allocated from a 13KB `SMU2` range after a successful commissioning process until a factory reset is initiated. This way, the OpenThread buffers will be dynamically allocated instead of statically, freeing some `SRAM`. To enable this feature compile with OpenThread FTD support (`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
 
 ### LED PWM
 
-In the default configuration, the onboard RGB LED pins are configured as GPIO pins. In order to enable the dimming feature, the pins need to be configured in PWM mode and synced with channels of the TPM (Timmer PWM Module). To enable this feature, compile the application with: `chip_config_dimmable_led=true`
+In the default configuration, the onboard RGB LED pins are configured as GPIO pins. In order to enable the dimming feature, the pins need to be configured in PWM mode and synced with channels of the `TPM` (Timer PWM Module). To enable this feature, compile the application with: `chip_config_dimmable_led=true`
 
 If the feature is enabled, the LED brightness can be controlled using **Level control** cluster [commands](../../../../../docs/guides/chip_tool_guide.md#step-7-control-application-data-model-clusters).
 
@@ -273,9 +273,9 @@ Run -> Debug Configurations... -> C/C++ Application
 
 ### Convert `srec` into `sb3` file
 
-The OTA image files must be encrypted using Over The Air Programming Tool ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)). Bootloader will load the new OTA image only if it detects that the file was encrypted with the OTAP correct keys. 
+The OTA image files must be encrypted using Over The Air Programming Tool ([OTAP](https://www.nxp.com/design/microcontrollers-developer-resources/connectivity-tool-suite:CONNECTIVITY-TOOL-SUITE?#downloads)). Bootloader will load the new OTA image only if it detects that the file was encrypted with the `OTAP` correct keys. 
 
-.srec file is input for Over The air Programming (`OTAP`) application (unencrypted) and it's converted to `.sb3`` format (encrypted).
+`.srec` file is input for Over The air Programming (`OTAP`) application (unencrypted) and it's converted to `.sb3` format (encrypted).
 
 In `OTAP` application
 - select OTA protocol => `OTAP` Matter
