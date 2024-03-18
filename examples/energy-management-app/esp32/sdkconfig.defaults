@@ -64,3 +64,6 @@ CONFIG_DISABLE_READ_CLIENT=y
 
 # Increase LwIP IPv6 address number
 CONFIG_LWIP_IPV6_NUM_ADDRESSES=6
+
+# Enable sntp time sync
+CONFIG_ENABLE_SNTP_TIME_SYNC=y

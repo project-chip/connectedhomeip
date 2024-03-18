@@ -1,0 +1,48 @@
+name: Maximize runner disk
+description: Free up disk space on the github runner
+runs:
+  using: "composite"
+  steps:
+    - name: Free up disk space on the github runner
+      if: runner.os == 'Linux' && !env.ACT
+      shell: bash
+      run: |
+        # maximize-runner-disk
+        # Directories to prune to free up space. Candidates:
+        #   1.6G  /usr/share/dotnet
+        #   1.1G  /usr/local/lib/android/sdk/platforms
+        #   1000M /usr/local/lib/android/sdk/build-tools
+        #   8.9G  /usr/local/lib/android/sdk
+        # This list can be amended later to change the trade-off between the amount of
+        # disk space freed up, and how long it takes to do so (deleting many files is slow).
+        prune=(/usr/share/dotnet /usr/local/lib/android/sdk/platforms /usr/local/lib/android/sdk/build-tools)
+
+        if [[ "$UID" -eq 0 && -d /__w ]]; then
+          root=/runner-root-volume
+          if [[ ! -d "$root" ]]; then
+            echo "Unable to maximize disk space, job is running inside a container and $root is not mounted"
+            exit 0
+          fi
+          function sudo() { "$@"; } # we're already root (and sudo is probably unavailable)
+        elif [[ "$UID" -ne 0 && "$RUNNER_ENVIRONMENT" == github-hosted ]]; then
+          root=
+        else
+          echo "Unable to maximize disk space, unknown runner environment"
+          exit 0
+        fi
+
+        echo "Freeing up runner disk space on ${root:-/}"
+        function avail() { df -k --output=avail "${root:-/}" | grep '^[0-9]*$'; }
+        function now() { date '+%s'; }
+        before="$(avail)" start="$(now)"
+        for dir in "${prune[@]}"; do
+          if [[ -d "${root}${dir}" ]]; then
+            echo "- $dir"
+            # du -sh -- "${root}${dir}"
+            sudo rm -rf -- "${root}${dir}"
+          else
+            echo "- $dir (not found)"
+          fi
+        done
+        after="$(avail)" end="$(now)"
+        echo "Done, freed up $(( (after - before) / 1024 ))M of disk space in $(( end - start )) seconds."

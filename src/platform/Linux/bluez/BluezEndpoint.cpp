@@ -72,6 +72,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "BluezConnection.h"
+#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -262,9 +263,8 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
 void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
-    BluezGattManager1 * gattMgr = BLUEZ_GATT_MANAGER1(aObject);
-
-    gboolean success = bluez_gatt_manager1_call_register_application_finish(gattMgr, aResult, &error.GetReceiver());
+    gboolean success = bluez_gatt_manager1_call_register_application_finish(reinterpret_cast<BluezGattManager1 *>(aObject), aResult,
+                                                                            &error.GetReceiver());
 
     VerifyOrReturn(success == TRUE, {
         ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message);
@@ -287,7 +287,7 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
     adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
     VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
 
-    gattMgr.reset(bluez_object_get_gatt_manager1(BLUEZ_OBJECT(adapterObject)));
+    gattMgr.reset(bluez_object_get_gatt_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
     VerifyOrExit(gattMgr.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL gattMgr in %s", __func__));
 
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
@@ -307,7 +307,7 @@ exit:
 /// Update the table of open BLE connections whenever a new device is spotted or its attributes have changed.
 void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
 {
-    const char * objectPath      = g_dbus_proxy_get_object_path(G_DBUS_PROXY(apDevice));
+    const char * objectPath      = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(apDevice));
     BluezConnection * connection = GetBluezConnection(objectPath);
 
     if (connection != nullptr && !bluez_device1_get_connected(apDevice))
@@ -321,22 +321,9 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
         return;
     }
 
-    if (connection == nullptr && !bluez_device1_get_connected(apDevice) && mIsCentral)
+    if (connection == nullptr)
     {
-        return;
-    }
-
-    if (connection == nullptr && bluez_device1_get_connected(apDevice) &&
-        (!mIsCentral || bluez_device1_get_services_resolved(apDevice)))
-    {
-        connection                 = chip::Platform::New<BluezConnection>(*this, apDevice);
-        mpPeerDevicePath           = g_strdup(objectPath);
-        mConnMap[mpPeerDevicePath] = connection;
-
-        ChipLogDetail(DeviceLayer, "New BLE connection: conn %p, device %s, path %s", connection, connection->GetPeerAddress(),
-                      mpPeerDevicePath);
-
-        BLEManagerImpl::HandleNewConnection(connection);
+        HandleNewDevice(apDevice);
     }
 }
 
@@ -355,35 +342,29 @@ void BluezEndpoint::BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClie
 
 void BluezEndpoint::HandleNewDevice(BluezDevice1 * device)
 {
-    VerifyOrReturn(!mIsCentral);
+    VerifyOrReturn(bluez_device1_get_connected(device));
+    VerifyOrReturn(!mIsCentral || bluez_device1_get_services_resolved(device));
 
-    // We need to handle device connection both this function and BluezSignalInterfacePropertiesChanged
-    // When a device is connected for first time, this function will be triggered.
-    // The future connections for the same device will trigger ``Connect'' property change.
-    // TODO: Factor common code in the two function.
-    BluezConnection * conn;
-    VerifyOrExit(bluez_device1_get_connected(device), ChipLogError(DeviceLayer, "FAIL: device is not connected"));
-
-    conn = GetBluezConnection(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
-    VerifyOrExit(conn == nullptr,
-                 ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %p new device: %s", conn,
-                              g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
+    const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(device));
+    BluezConnection * conn  = GetBluezConnection(objectPath);
+    VerifyOrReturn(conn == nullptr,
+                   ChipLogError(DeviceLayer, "FAIL: Connection already tracked: conn=%p device=%s path=%s", conn,
+                                conn->GetPeerAddress(), objectPath));
 
     conn                       = chip::Platform::New<BluezConnection>(*this, device);
-    mpPeerDevicePath           = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
+    mpPeerDevicePath           = g_strdup(objectPath);
     mConnMap[mpPeerDevicePath] = conn;
 
-    ChipLogDetail(DeviceLayer, "BLE device connected: conn %p, device %s, path %s", conn, conn->GetPeerAddress(), mpPeerDevicePath);
+    ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
-exit:
-    return;
+    BLEManagerImpl::HandleNewConnection(conn);
 }
 
 void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject)
 {
     // TODO: right now we do not handle addition/removal of adapters
     // Primary focus here is to handle addition of a device
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(aObject)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObject)));
     VerifyOrReturn(device.get() != nullptr);
 
     if (BluezIsDeviceOnAdapter(device.get(), mAdapter.get()) == TRUE)
@@ -421,15 +402,14 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
     return service;
 }
 
-void BluezEndpoint::SetupAdapter()
+CHIP_ERROR BluezEndpoint::SetupAdapter()
 {
     char expectedPath[32];
     snprintf(expectedPath, sizeof(expectedPath), BLUEZ_PATH "/hci%u", mAdapterId);
 
-    GList * objects = g_dbus_object_manager_get_objects(mpObjMgr);
-    for (auto l = objects; l != nullptr && mAdapter.get() == nullptr; l = l->next)
+    for (BluezObject & object : BluezObjectList(mpObjMgr))
     {
-        GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(BLUEZ_OBJECT(l->data)));
+        GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(&object));
         if (adapter.get() != nullptr)
         {
             if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
@@ -451,7 +431,7 @@ void BluezEndpoint::SetupAdapter()
         }
     }
 
-    VerifyOrExit(mAdapter.get() != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
+    VerifyOrReturnError(mAdapter, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
 
     bluez_adapter1_set_powered(mAdapter.get(), TRUE);
 
@@ -460,8 +440,7 @@ void BluezEndpoint::SetupAdapter()
     // and the flag is necessary to force using LE transport.
     bluez_adapter1_set_discoverable(mAdapter.get(), FALSE);
 
-exit:
-    g_list_free_full(objects, g_object_unref);
+    return CHIP_NO_ERROR;
 }
 
 BluezConnection * BluezEndpoint::GetBluezConnection(const char * aPath)

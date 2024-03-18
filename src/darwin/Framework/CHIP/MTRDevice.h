@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -62,6 +63,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *      The device is currently unreachable.
  */
 @property (nonatomic, readonly) MTRDeviceState state;
+
+/**
+ * Is the device cache primed for this device?
+ *
+ * This will be true after the deviceCachePrimed: delegate callback has been called, false if not.
+ *
+ * Please note if you have a storage delegate implemented, the cache is then stored persistently, so
+ * the delegate would then only be called once, ever - and this property would basically always be true
+ * if a subscription has ever been established at any point in the past.
+ *
+ */
+@property (readonly) BOOL deviceCachePrimed MTR_NEWLY_AVAILABLE;
 
 /**
  * The estimated device system start time.
@@ -325,6 +338,27 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
+/**
+ * Download log of the desired type from the device.
+ *
+ * Note: The consumer of this API should move the file that the url points to or open it for reading before the
+ * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ *
+ * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
+ * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
+ *                   has been retrieved by that point (which might be none or a partial log).
+ *                   If the timeout is set to 0, the request will not expire and completion will not be called until
+ *                   the log is fully retrieved or an error occurs.
+ * @param queue      The queue on which completion will be called.
+ * @param completion The completion handler that is called after attempting to retrieve the requested log.
+ *                     - In case of success, the completion handler is called with a non-nil URL and a nil error.
+ *                     - If there is an error, a non-nil error is used and the url can be non-nil too if some logs have already been downloaded.
+ */
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_EXTERN NSString * const MTRPreviousDataKey MTR_NEWLY_AVAILABLE;
@@ -380,6 +414,15 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
  * device, especially if the device is sleepy and might not be active very often.
  */
 - (void)deviceBecameActive:(MTRDevice *)device MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Notifies delegate when the device attribute cache has been primed with initial configuration data of the device
+ *
+ * This is called when the MTRDevice object goes from not knowing the device to having cached the first attribute reports that include basic mandatory information, e.g. Descriptor clusters.
+ *
+ * The intention is that after this is called, the client should be able to call read for mandatory attributes and likely expect non-nil values.
+ */
+- (void)deviceCachePrimed:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
 @end
 

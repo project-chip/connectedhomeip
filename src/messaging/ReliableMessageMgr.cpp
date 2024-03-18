@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <inttypes.h>
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
@@ -45,6 +46,10 @@ using namespace chip::System::Clock::Literals;
 
 namespace chip {
 namespace Messaging {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+Optional<System::Clock::Milliseconds64> ReliableMessageMgr::sAdditionalMRPBackoffTime;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
 
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry(ReliableMessageContext * rc) :
     ec(*rc->GetExchangeContext()), nextRetransTime(0), sendCount(0)
@@ -262,7 +267,11 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     mrpBackoffTime += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+    mrpBackoffTime += sAdditionalMRPBackoffTime.ValueOr(CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST);
+#else
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
 
     return mrpBackoffTime;
 }

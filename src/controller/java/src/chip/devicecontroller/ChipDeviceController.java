@@ -151,6 +151,11 @@ public class ChipDeviceController {
     finishOTAProvider(deviceControllerPtr);
   }
 
+  /** Set the delegate of ICD check in */
+  public void setICDCheckInDelegate(ICDCheckInDelegate delegate) {
+    setICDCheckInDelegate(deviceControllerPtr, new ICDCheckInDelegateWrapper(delegate));
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -451,6 +456,15 @@ public class ChipDeviceController {
 
   public void unpairDeviceCallback(long deviceId, UnpairDeviceCallback callback) {
     unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
+  }
+
+  /**
+   * This function stops a pairing or commissioning process that is in progress.
+   *
+   * @param deviceId The remote device Id.
+   */
+  public void stopDevicePairing(long deviceId) {
+    stopDevicePairing(deviceControllerPtr, deviceId);
   }
 
   /**
@@ -1205,6 +1219,32 @@ public class ChipDeviceController {
         imTimeoutMs);
   }
 
+  /**
+   * @brief ExtendableInvoke command to target device
+   * @param ExtendableInvokeCallback Callback when invoke responses have been received and processed
+   *     for the given batched invoke commands.
+   * @param devicePtr connected device pointer
+   * @param invokeElementList invoke element list
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void extendableInvoke(
+      ExtendableInvokeCallback callback,
+      long devicePtr,
+      List<InvokeElement> invokeElementList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    ExtendableInvokeCallbackJni jniCallback = new ExtendableInvokeCallbackJni(callback);
+    extendableInvoke(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        invokeElementList,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
+  }
+
   /** Create a root (self-signed) X.509 DER encoded certificate */
   public static byte[] createRootCertificate(
       KeypairDelegate keypair, long issuerId, @Nullable Long fabricId) {
@@ -1377,6 +1417,14 @@ public class ChipDeviceController {
       int timedRequestTimeoutMs,
       int imTimeoutMs);
 
+  static native void extendableInvoke(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<InvokeElement> invokeElementList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs);
+
   private native long newDeviceController(ControllerParams params);
 
   private native void setDeviceAttestationDelegate(
@@ -1390,6 +1438,9 @@ public class ChipDeviceController {
   private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
 
   private native void finishOTAProvider(long deviceControllerPtr);
+
+  private native void setICDCheckInDelegate(
+      long deviceControllerPtr, ICDCheckInDelegateWrapper delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,
@@ -1439,6 +1490,8 @@ public class ChipDeviceController {
 
   private native void unpairDeviceCallback(
       long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
+
+  private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 

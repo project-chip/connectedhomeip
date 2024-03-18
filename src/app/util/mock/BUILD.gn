@@ -29,6 +29,7 @@ source_set("mock_ember") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/common:attribute-type",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:testing_nlunit",

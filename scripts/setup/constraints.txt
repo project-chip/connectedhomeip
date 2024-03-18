@@ -98,7 +98,7 @@ ghapi==1.0.3
     # via -r requirements.memory.txt
 humanfriendly==10.0
     # via coloredlogs
-idf-component-manager==1.2.2
+idf-component-manager==1.5.2
     # via -r requirements.esp32.txt
 idna==3.4
     # via requests

@@ -53,4 +53,11 @@
     return @(2); // seconds
 }
 
+- (void)deviceCachePrimed:(MTRDevice *)device
+{
+    if (self.onDeviceCachePrimed != nil) {
+        self.onDeviceCachePrimed();
+    }
+}
+
 @end

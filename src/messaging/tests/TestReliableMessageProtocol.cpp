@@ -22,6 +22,7 @@
  *      implementation.
  */
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestContext.h>
@@ -2194,8 +2195,10 @@ const nlTest sTests[] = {
                 TestReliableMessageProtocol::CheckLostStandaloneAck),
     NL_TEST_DEF("Test Is Peer Active Retry logic", TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator),
     NL_TEST_DEF("Test MRP backoff algorithm", TestReliableMessageProtocol::CheckGetBackoff),
-    NL_TEST_DEF("Test an application response that comes after MRP retransmits run out",
-                TestReliableMessageProtocol::CheckApplicationResponseDelayed),
+    // TODO: Re-enable this test, after changing test to use Mock clock / DriveIO rather than DriveIOUntil.
+    // Issue: https://github.com/project-chip/connectedhomeip/issues/32440
+    // NL_TEST_DEF("Test an application response that comes after MRP retransmits run out",
+    //            TestReliableMessageProtocol::CheckApplicationResponseDelayed),
     NL_TEST_DEF("Test an application response that never comes, so MRP retransmits run out and then exchange times out",
                 TestReliableMessageProtocol::CheckApplicationResponseNeverComes),
     NL_TEST_SENTINEL(),
