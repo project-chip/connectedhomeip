@@ -28,21 +28,20 @@
 #define WFX_RSI_TASK_SZ (1024 + 1024)           /* Stack for the WFX/RSI task		*/
 #define WFX_RSI_BUF_SZ (1024 * 10)              /* May need tweak 			*/
 #define WFX_RSI_CONFIG_MAX_JOIN (5)             /* Max join retries			*/
+// TODO: Default values are usually in minutes, but this is in ms. Confirm if this is correct
+#define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP		*/
 
-/*
- * Various events fielded by the wfx_rsi task
- * Make sure that we only use 8 bits (otherwise freeRTOS - may need some changes)
- */
 typedef enum
 {
-    WFX_EVT_STA_CONN       = (1 << 0),
-    WFX_EVT_STA_DISCONN    = (1 << 1),
-    WFX_EVT_AP_START       = (1 << 2),
-    WFX_EVT_AP_STOP        = (1 << 3),
-    WFX_EVT_SCAN           = (1 << 4), /* This is used as scan result and start */
-    WFX_EVT_STA_START_JOIN = (1 << 5),
-    WFX_EVT_STA_DO_DHCP    = (1 << 6),
-    WFX_EVT_STA_DHCP_DONE  = (1 << 7)
+    WFX_EVT_STA_CONN,
+    WFX_EVT_STA_DISCONN,
+    WFX_EVT_AP_START,
+    WFX_EVT_AP_STOP,
+    WFX_EVT_SCAN, /* This is used as scan result and start */
+    WFX_EVT_STA_START_JOIN,
+    WFX_EVT_STA_DO_DHCP,
+    WFX_EVT_STA_DHCP_DONE,
+    WFX_EVT_DHCP_POLL
 } WfxEventType_e;
 
 typedef enum
@@ -60,6 +59,17 @@ typedef enum
     WFX_RSI_ST_SCANSTARTED     = (1 << 10), /* Scan Started				*/
     WFX_RSI_ST_SLEEP_READY     = (1 << 11)  /* Notify the M4 to go to sleep*/
 } WfxStateType_e;
+
+typedef struct WfxEvent_s
+{
+    WfxEventType_e eventType;
+    void * eventData; // event data TODO: confirm needed
+} WfxEvent_t;
+
+/// WfxPostEvent
+/// @brief Allows to allocate an event to the WFX task event queue from outside of sl_wifi_if.c
+/// @param event The event that will be allocated to the event queue
+void WfxPostEvent(WfxEvent_t * event);
 
 typedef struct wfx_rsi_s
 {

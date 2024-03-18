@@ -29,7 +29,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:35
+            image: ghcr.io/project-chip/chip-build:39
 
         steps:
             - name: Checkout
@@ -267,12 +267,11 @@ jobs:
               run: |
                   git grep -I -n 'emberAfWriteAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/af.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)examples/common/pigweed/rpc_services/Attributes.h' ':(exclude)src/app/util/attribute-table.h' ':(exclude)src/app/util/ember-compatibility-functions.cpp' && exit 1 || exit 0
 
-            # Run python Linter (flake8) and verify python files
-            # ignore some style errors, restyler should do that
-            - name: Check for errors using flake8 Python linter
+            # Run ruff python linter
+            - name: Check for errors using ruff Python linter
               if: always()
               run: |
-                  flake8 --extend-ignore=E501,W391
+                  ruff check
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,

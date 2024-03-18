@@ -43,8 +43,9 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
     err = (mConnectionState != CASTING_PLAYER_CONNECTING ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(
         mConnectionState != CASTING_PLAYER_CONNECTING,
-        ChipLogError(AppServer,
-                     "CastingPlayer::VerifyOrEstablishConnection() called while already connecting to this CastingPlayer"));
+        ChipLogError(
+            AppServer,
+            "CastingPlayer::VerifyOrEstablishConnection() called while already connecting/connected to this CastingPlayer"));
     mConnectionState               = CASTING_PLAYER_CONNECTING;
     mOnCompleted                   = onCompleted;
     mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
@@ -67,7 +68,10 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
                 ChipLogProgress(
                     AppServer,
                     "CastingPlayer::VerifyOrEstablishConnection() calling FindOrEstablishSession on cached CastingPlayer");
-                *this = cachedCastingPlayers[index];
+                *this                          = cachedCastingPlayers[index];
+                mConnectionState               = CASTING_PLAYER_CONNECTING;
+                mOnCompleted                   = onCompleted;
+                mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
 
                 FindOrEstablishSession(
                     nullptr,
