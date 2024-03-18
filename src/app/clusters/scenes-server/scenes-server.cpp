@@ -70,6 +70,10 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
         {
             resp.status = to_underlying(Protocols::InteractionModel::Status::ResourceExhausted);
         }
+        else if (CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err)
+        {
+            resp.status = to_underlying(Protocols::InteractionModel::Status::InvalidCommand);
+        }
         else
         {
             resp.status = to_underlying(StatusIB(err).mStatus);
