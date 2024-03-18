@@ -27,8 +27,14 @@
 #include <string>
 #include <vector>
 
+constexpr char kLocalDot[] = "local.";
+
+constexpr char kOpenThreadDot[] = "openthread.thread.home.arpa";
+
 namespace chip {
 namespace Dnssd {
+
+std::string GetDomainNameFromHostName(const char * hostname);
 
 enum class ContextType
 {
@@ -227,9 +233,11 @@ struct InterfaceInfo
 struct ResolveContext : public GenericContext
 {
     DnssdResolveCallback callback;
-    std::map<uint32_t, InterfaceInfo> interfaces;
+    std::map<std::pair<uint32_t, std::string>, InterfaceInfo> interfaces;
     DNSServiceProtocol protocol;
     std::string instanceName;
+    std::string domainName;
+    bool isResolveRequested = false;
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
 
@@ -244,7 +252,7 @@ struct ResolveContext : public GenericContext
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
-    CHIP_ERROR OnNewAddress(uint32_t interfaceId, const struct sockaddr * address);
+    CHIP_ERROR OnNewAddress(const std::pair<uint32_t, std::string> interfaceKey, const struct sockaddr * address);
     bool HasAddress();
 
     void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,

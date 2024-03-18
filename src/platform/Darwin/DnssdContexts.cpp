@@ -30,12 +30,6 @@ namespace {
 
 constexpr uint8_t kDnssdKeyMaxSize          = 32;
 constexpr uint8_t kDnssdTxtRecordMaxEntries = 20;
-constexpr char kLocalDot[]                  = "local.";
-
-bool IsLocalDomain(const char * domain)
-{
-    return strcmp(kLocalDot, domain) == 0;
-}
 
 std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
 {
@@ -252,6 +246,7 @@ void MdnsContexts::Delete(GenericContext * context)
     {
         DNSServiceRefDeallocate(context->serviceRef);
     }
+
     chip::Platform::Delete(context);
 }
 
@@ -388,7 +383,6 @@ void BrowseContext::OnBrowseAdd(const char * name, const char * type, const char
     ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
-    VerifyOrReturn(IsLocalDomain(domain));
     auto service = GetService(name, type, protocol, interfaceId);
     services.push_back(service);
 }
@@ -399,7 +393,6 @@ void BrowseContext::OnBrowseRemove(const char * name, const char * type, const c
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
     VerifyOrReturn(name != nullptr);
-    VerifyOrReturn(IsLocalDomain(domain));
 
     services.erase(std::remove_if(services.begin(), services.end(),
                                   [name, type, interfaceId](const DnssdService & service) {
@@ -443,7 +436,6 @@ void BrowseWithDelegateContext::OnBrowseAdd(const char * name, const char * type
     ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
-    VerifyOrReturn(IsLocalDomain(domain));
 
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     auto service  = GetService(name, type, protocol, interfaceId);
@@ -456,7 +448,6 @@ void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * t
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
     VerifyOrReturn(name != nullptr);
-    VerifyOrReturn(IsLocalDomain(domain));
 
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     auto service  = GetService(name, type, protocol, interfaceId);
@@ -473,6 +464,7 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     callback        = cb;
     protocol        = GetProtocol(cbAddressType);
     instanceName    = instanceNameToResolve;
+    domainName      = std::string(kLocalDot);
     consumerCounter = std::move(consumerCounterToUse);
 }
 
@@ -485,6 +477,7 @@ ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::In
     callback        = nullptr;
     protocol        = GetProtocol(cbAddressType);
     instanceName    = instanceNameToResolve;
+    domainName      = std::string(kLocalDot);
     consumerCounter = std::move(consumerCounterToUse);
 }
 
@@ -548,7 +541,7 @@ void ResolveContext::DispatchSuccess()
 
     for (auto & interface : interfaces)
     {
-        if (TryReportingResultsForInterfaceIndex(interface.first))
+        if (TryReportingResultsForInterfaceIndex(interface.first.first))
         {
             break;
         }
@@ -568,7 +561,8 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
         return false;
     }
 
-    auto & interface = interfaces[interfaceIndex];
+    std::pair<uint32_t, std::string> interfaceKey = std::make_pair(interfaceIndex, this->domainName);
+    auto & interface = interfaces[interfaceKey];
     auto & ips       = interface.addresses;
 
     // Some interface may not have any ips, just ignore them.
@@ -596,7 +590,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     return true;
 }
 
-CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)
+CHIP_ERROR ResolveContext::OnNewAddress(const std::pair<uint32_t, std::string> interfaceKey, const struct sockaddr * address)
 {
     // If we don't have any information about this interfaceId, just ignore the
     // address, since it won't be usable anyway without things like the port.
@@ -604,7 +598,9 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
     // on the system, because the hostnames we are looking up all end in
     // ".local".  In other words, we can get regular DNS results in here, not
     // just DNS-SD ones.
-    if (interfaces.find(interfaceId) == interfaces.end())
+    uint32_t interfaceId = interfaceKey.first;
+
+    if (interfaces.find(interfaceKey) == interfaces.end())
     {
         return CHIP_NO_ERROR;
     }
@@ -627,7 +623,7 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
         return CHIP_NO_ERROR;
     }
 
-    interfaces[interfaceId].addresses.push_back(ip);
+    interfaces[interfaceKey].addresses.push_back(ip);
 
     return CHIP_NO_ERROR;
 }
@@ -709,7 +705,9 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
-    interfaces.insert(std::make_pair(interfaceId, std::move(interface)));
+    std::pair<uint32_t, std::string> interfaceKey = std::make_pair(interfaceId, GetDomainNameFromHostName(hostnameWithDomain));
+
+    interfaces.insert(std::make_pair(interfaceKey, std::move(interface)));
 }
 
 bool ResolveContext::HasInterface()
