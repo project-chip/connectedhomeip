@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2023 Project CHIP Authors
+ *   Copyright (c) 2024 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +17,11 @@
 package com.matter.casting.core;
 
 import com.matter.casting.support.EndpointFilter;
+import com.matter.casting.support.MatterCallback;
+import com.matter.casting.support.MatterError;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * A Matter Casting Player represents a Matter commissioner that is able to play media to a physical
@@ -131,6 +132,9 @@ public class MatterCastingPlayer implements CastingPlayer {
   }
 
   @Override
+  public native List<Endpoint> getEndpoints();
+
+  @Override
   public String toString() {
     return this.deviceId;
   }
@@ -167,8 +171,11 @@ public class MatterCastingPlayer implements CastingPlayer {
    *     CastingException will contain the error code and message from the CastingApp.
    */
   @Override
-  public native CompletableFuture<Void> VerifyOrEstablishConnection(
-      long commissioningWindowTimeoutSec, EndpointFilter desiredEndpointFilter);
+  public native MatterError verifyOrEstablishConnection(
+      long commissioningWindowTimeoutSec,
+      EndpointFilter desiredEndpointFilter,
+      MatterCallback<Void> successCallback,
+      MatterCallback<MatterError> failureCallback);
 
   /**
    * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
@@ -183,7 +190,12 @@ public class MatterCastingPlayer implements CastingPlayer {
    *     CastingException will contain the error code and message from the CastingApp.
    */
   @Override
-  public CompletableFuture<Void> VerifyOrEstablishConnection() {
-    return VerifyOrEstablishConnection(MIN_CONNECTION_TIMEOUT_SEC, null);
+  public MatterError verifyOrEstablishConnection(
+      MatterCallback<Void> successCallback, MatterCallback<MatterError> failureCallback) {
+    return verifyOrEstablishConnection(
+        MIN_CONNECTION_TIMEOUT_SEC, null, successCallback, failureCallback);
   }
+
+  @Override
+  public native void disconnect();
 }

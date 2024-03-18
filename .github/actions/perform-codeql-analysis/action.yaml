@@ -27,7 +27,7 @@ runs:
       with:
         sarif_file: "sarif-results/${{ inputs.language }}.sarif"
     - name: Upload loc as a Build Artifact
-      uses: actions/upload-artifact@v2.2.0
+      uses: actions/upload-artifact@v4
       with:
         name: sarif-results
         path: sarif-results

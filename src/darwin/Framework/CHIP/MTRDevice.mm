@@ -33,6 +33,7 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTimeUtils.h"
 #import "MTRUnfairLock.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 
@@ -50,6 +51,8 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
 NSString * const MTRPreviousDataKey = @"previousData";
 NSString * const MTRDataVersionKey = @"dataVersion";
+
+#define kTimeToWaitBeforeMarkingUnreachableAfterSettingUpSubscription 10
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
@@ -125,6 +128,12 @@ private:
 } // anonymous namespace
 
 #pragma mark - MTRDevice
+typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
+    MTRInternalDeviceStateUnsubscribed = 0,
+    MTRInternalDeviceStateSubscribing = 1,
+    MTRInternalDeviceStateSubscribed = 2
+};
+
 typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     MTRDeviceExpectedValueFieldExpirationTimeIndex = 0,
     MTRDeviceExpectedValueFieldValueIndex = 1,
@@ -157,18 +166,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) BOOL receivingPrimingReport;
 
 // TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
-//   Unsubscribed (not attemping)
-//   Attempting subscription
-//   Subscribed (gotten subscription response / in steady state with no OnError/OnDone)
 //   Actively receiving report
 //   Actively receiving priming report
 
-/**
- * If subscriptionActive is true that means that either we are in the middle of
- * trying to get a CASE session for the publisher or we have a live ReadClient
- * right now (possibly with a lost subscription and trying to re-subscribe).
- */
-@property (nonatomic) BOOL subscriptionActive;
+@property (nonatomic) MTRInternalDeviceState internalDeviceState;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
@@ -270,31 +271,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
-    NSTimeZone * localTimeZone = [NSTimeZone localTimeZone];
-    BOOL setDST = TRUE;
-    if (!localTimeZone) {
-        MTR_LOG_ERROR("%@ Could not retrieve local time zone. Unable to setDSTOffset on endpoints.", self);
-        setDST = FALSE;
-    }
-
     uint64_t matterEpochTimeMicroseconds = 0;
-    uint64_t nextDSTInMatterEpochTimeMicroseconds = 0;
     if (!DateToMatterEpochMicroseconds(now, matterEpochTimeMicroseconds)) {
         MTR_LOG_ERROR("%@ Could not convert NSDate (%@) to Matter Epoch Time. Unable to setUTCTime on endpoints.", self, now);
         return;
-    }
-
-    int32_t dstOffset = 0;
-    if (setDST) {
-        NSTimeInterval dstOffsetAsInterval = [localTimeZone daylightSavingTimeOffsetForDate:now];
-        dstOffset = int32_t(dstOffsetAsInterval);
-
-        // Calculate time to next DST. This is needed when we set the current DST.
-        NSDate * nextDSTTransitionDate = [localTimeZone nextDaylightSavingTimeTransition];
-        if (!DateToMatterEpochMicroseconds(nextDSTTransitionDate, nextDSTInMatterEpochTimeMicroseconds)) {
-            MTR_LOG_ERROR("%@ Could not convert NSDate (%@) to Matter Epoch Time. Unable to setDSTOffset on endpoints.", self, nextDSTTransitionDate);
-            setDST = FALSE;
-        }
     }
 
     // Set Time on each Endpoint with a Time Synchronization Cluster Server
@@ -302,9 +282,39 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     for (NSNumber * endpoint in endpointsToSync) {
         MTR_LOG_DEBUG("%@ Setting Time on Endpoint %@", self, endpoint);
         [self _setUTCTime:matterEpochTimeMicroseconds withGranularity:MTRTimeSynchronizationGranularityMicrosecondsGranularity forEndpoint:endpoint];
-        if (setDST) {
-            [self _setDSTOffset:dstOffset validStarting:0 validUntil:nextDSTInMatterEpochTimeMicroseconds forEndpoint:endpoint];
+
+        // Check how many DST offsets this endpoint supports.
+        auto dstOffsetsMaxSizePath = [MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeTimeSynchronizationID) attributeID:@(MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetListMaxSizeID)];
+        auto dstOffsetsMaxSize = [self readAttributeWithEndpointID:dstOffsetsMaxSizePath.endpoint clusterID:dstOffsetsMaxSizePath.cluster attributeID:dstOffsetsMaxSizePath.attribute params:nil];
+        if (dstOffsetsMaxSize == nil) {
+            // This endpoint does not support TZ, so won't support SetDSTOffset.
+            MTR_LOG_DEFAULT("%@ Unable to SetDSTOffset on endpoint %@, since it does not support the TZ feature", self, endpoint);
+            continue;
         }
+        auto attrReport = [[MTRAttributeReport alloc] initWithResponseValue:@{
+            MTRAttributePathKey : dstOffsetsMaxSizePath,
+            MTRDataKey : dstOffsetsMaxSize,
+        }
+                                                                      error:nil];
+        uint8_t maxOffsetCount;
+        if (attrReport == nil) {
+            MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is invalid. Defaulting to 1.", self, endpoint);
+            maxOffsetCount = 1;
+        } else {
+            NSNumber * maxOffsetCountAsNumber = attrReport.value;
+            maxOffsetCount = maxOffsetCountAsNumber.unsignedCharValue;
+            if (maxOffsetCount == 0) {
+                MTR_LOG_ERROR("%@ DSTOffsetListMaxSize value on endpoint %@ is 0, which is not allowed. Defaulting to 1.", self, endpoint);
+                maxOffsetCount = 1;
+            }
+        }
+        auto * dstOffsets = MTRComputeDSTOffsets(maxOffsetCount);
+        if (dstOffsets == nil) {
+            MTR_LOG_ERROR("%@ Could not retrieve DST offset information. Unable to setDSTOffset on endpoint %@.", self, endpoint);
+            continue;
+        }
+
+        [self _setDSTOffsets:dstOffsets forEndpoint:endpoint];
     }
 }
 
@@ -410,23 +420,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                  completion:setUTCTimeResponseHandler];
 }
 
-- (void)_setDSTOffset:(int32_t)dstOffset validStarting:(uint64_t)validStarting validUntil:(uint64_t)validUntil forEndpoint:(NSNumber *)endpoint
+- (void)_setDSTOffsets:(NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> *)dstOffsets forEndpoint:(NSNumber *)endpoint
 {
-    MTR_LOG_DEBUG("%@ _setDSTOffset with offset: %d, validStarting: %llu, validUntil: %llu, endpoint %@",
-        self,
-        dstOffset, validStarting, validUntil, endpoint);
+    MTR_LOG_DEBUG("%@ _setDSTOffsets with offsets: %@, endpoint %@",
+        self, dstOffsets, endpoint);
 
     MTRTimeSynchronizationClusterSetDSTOffsetParams * params = [[MTRTimeSynchronizationClusterSetDSTOffsetParams
         alloc] init];
-    MTRTimeSynchronizationClusterDSTOffsetStruct * dstOffsetStruct = [[MTRTimeSynchronizationClusterDSTOffsetStruct alloc] init];
-    dstOffsetStruct.offset = @(dstOffset);
-    dstOffsetStruct.validStarting = @(validStarting);
-    dstOffsetStruct.validUntil = @(validUntil);
-    params.dstOffset = @[ dstOffsetStruct ];
+    params.dstOffset = dstOffsets;
 
     auto setDSTOffsetResponseHandler = ^(id _Nullable response, NSError * _Nullable error) {
         if (error) {
-            MTR_LOG_ERROR("%@ _setDSTOffset failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
+            MTR_LOG_ERROR("%@ _setDSTOffsets failed on endpoint %@, with parameters %@, error: %@", self, endpoint, params, error);
         }
     };
 
@@ -640,6 +645,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
+    _internalDeviceState = MTRInternalDeviceStateSubscribed;
 
     // As subscription is established, check if the delegate needs to be informed
     if (!_delegateDeviceCachePrimedCalled) {
@@ -663,7 +669,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_lock(&self->_lock);
 
-    _subscriptionActive = NO;
+    _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
     _unreportedEvents = nil;
 
     [self _changeState:MTRDeviceStateUnreachable];
@@ -755,6 +761,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _reattemptSubscriptionNowIfNeeded];
 
     os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)_markDeviceAsUnreachableIfNotSusbcribed
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (_internalDeviceState >= MTRInternalDeviceStateSubscribed)
+        return;
+
+    MTR_LOG_DEFAULT("%@ still not subscribed, marking the device as unreachable", self);
+    [self _changeState:MTRDeviceStateUnreachable];
 }
 
 - (void)_handleReportBegin
@@ -991,11 +1008,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #endif
 
     // for now just subscribe once
-    if (_subscriptionActive) {
+    if (_internalDeviceState > MTRInternalDeviceStateUnsubscribed) {
         return;
     }
 
-    _subscriptionActive = YES;
+    _internalDeviceState = MTRInternalDeviceStateSubscribing;
+
+    // Set up a timer to mark as not reachable if it takes too long to set up a subscription
+    MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kTimeToWaitBeforeMarkingUnreachableAfterSettingUpSubscription * NSEC_PER_SEC)), self.queue, ^{
+        MTRDevice * strongSelf = weakSelf.strongObject;
+        os_unfair_lock_lock(&strongSelf->_lock);
+        [strongSelf _markDeviceAsUnreachableIfNotSusbcribed];
+        os_unfair_lock_unlock(&strongSelf->_lock);
+    });
 
     [_deviceController
         getSessionForNode:_nodeID.unsignedLongLongValue

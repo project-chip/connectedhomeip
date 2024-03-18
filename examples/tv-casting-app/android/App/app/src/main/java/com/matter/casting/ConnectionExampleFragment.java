@@ -27,10 +27,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.R;
 import com.matter.casting.core.CastingPlayer;
-import com.matter.casting.support.DeviceTypeStruct;
 import com.matter.casting.support.EndpointFilter;
-import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
+import com.matter.casting.support.MatterCallback;
+import com.matter.casting.support.MatterError;
 import java.util.concurrent.Executors;
 
 /** A {@link Fragment} to Verify or establish a connection with a selected Casting Player. */
@@ -39,12 +38,16 @@ public class ConnectionExampleFragment extends Fragment {
   // Time (in sec) to keep the commissioning window open, if commissioning is required.
   // Must be >= 3 minutes.
   private static final long MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
+  private static final Integer DESIRED_ENDPOINT_VENDOR_ID = 65521;
   private final CastingPlayer targetCastingPlayer;
   private TextView connectionFragmentStatusTextView;
   private Button connectionFragmentNextButton;
 
   public ConnectionExampleFragment(CastingPlayer targetCastingPlayer) {
-    Log.i(TAG, "ConnectionExampleFragment() called with target CastingPlayer");
+    Log.i(
+        TAG,
+        "ConnectionExampleFragment() called with target CastingPlayer ID: "
+            + targetCastingPlayer.getDeviceId());
     this.targetCastingPlayer = targetCastingPlayer;
   }
 
@@ -81,7 +84,11 @@ public class ConnectionExampleFragment extends Fragment {
     connectionFragmentStatusTextView = getView().findViewById(R.id.connectionFragmentStatusText);
     connectionFragmentStatusTextView.setText(
         "Verifying or establishing connection with Casting Player with device name: "
-            + targetCastingPlayer.getDeviceName());
+            + targetCastingPlayer.getDeviceName()
+            + "\nSetup Passcode: "
+            + InitializationExample.commissionableDataProvider.get().getSetupPasscode()
+            + "\nDiscriminator: "
+            + InitializationExample.commissionableDataProvider.get().getDiscriminator());
 
     connectionFragmentNextButton = getView().findViewById(R.id.connectionFragmentNextButton);
     Callback callback = (ConnectionExampleFragment.Callback) this.getActivity();
@@ -94,48 +101,54 @@ public class ConnectionExampleFragment extends Fragment {
     Executors.newSingleThreadExecutor()
         .submit(
             () -> {
-              Log.d(TAG, "onViewCreated() calling verifyOrEstablishConnection()");
+              Log.d(TAG, "onViewCreated() calling CastingPlayer.verifyOrEstablishConnection()");
 
-              EndpointFilter desiredEndpointFilter =
-                  new EndpointFilter(null, 65521, new ArrayList<DeviceTypeStruct>());
-              // The desired commissioning window timeout and EndpointFilter are optional.
-              CompletableFuture<Void> completableFuture =
-                  targetCastingPlayer.VerifyOrEstablishConnection(
-                      MIN_CONNECTION_TIMEOUT_SEC, desiredEndpointFilter);
+              EndpointFilter desiredEndpointFilter = new EndpointFilter();
+              desiredEndpointFilter.vendorId = DESIRED_ENDPOINT_VENDOR_ID;
 
-              Log.d(TAG, "onViewCreated() verifyOrEstablishConnection() called");
-
-              completableFuture
-                  .thenRun(
-                      () -> {
-                        Log.i(
-                            TAG,
-                            "CompletableFuture.thenRun(), connected to CastingPlayer with deviceId: "
-                                + targetCastingPlayer.getDeviceId());
-                        getActivity()
-                            .runOnUiThread(
-                                () -> {
-                                  connectionFragmentStatusTextView.setText(
-                                      "Connected to Casting Player with device name: "
-                                          + targetCastingPlayer.getDeviceName());
-                                  connectionFragmentNextButton.setEnabled(true);
-                                });
-                      })
-                  .exceptionally(
-                      exc -> {
-                        Log.e(
-                            TAG,
-                            "CompletableFuture.exceptionally(), CastingPLayer connection failed: "
-                                + exc.getMessage());
-                        getActivity()
-                            .runOnUiThread(
-                                () -> {
-                                  connectionFragmentStatusTextView.setText(
-                                      "Casting Player connection failed due to: "
-                                          + exc.getMessage());
-                                });
-                        return null;
+              MatterError err =
+                  targetCastingPlayer.verifyOrEstablishConnection(
+                      MIN_CONNECTION_TIMEOUT_SEC,
+                      desiredEndpointFilter,
+                      new MatterCallback<Void>() {
+                        @Override
+                        public void handle(Void v) {
+                          Log.i(
+                              TAG,
+                              "Connected to CastingPlayer with deviceId: "
+                                  + targetCastingPlayer.getDeviceId());
+                          getActivity()
+                              .runOnUiThread(
+                                  () -> {
+                                    connectionFragmentStatusTextView.setText(
+                                        "Connected to Casting Player with device name: "
+                                            + targetCastingPlayer.getDeviceName()
+                                            + "\n\n");
+                                    connectionFragmentNextButton.setEnabled(true);
+                                  });
+                        }
+                      },
+                      new MatterCallback<MatterError>() {
+                        @Override
+                        public void handle(MatterError err) {
+                          Log.e(TAG, "CastingPlayer connection failed: " + err);
+                          getActivity()
+                              .runOnUiThread(
+                                  () -> {
+                                    connectionFragmentStatusTextView.setText(
+                                        "Casting Player connection failed due to: " + err + "\n\n");
+                                  });
+                        }
                       });
+
+              if (err.hasError()) {
+                getActivity()
+                    .runOnUiThread(
+                        () -> {
+                          connectionFragmentStatusTextView.setText(
+                              "Casting Player connection failed due to: " + err + "\n\n");
+                        });
+              }
             });
   }
 
