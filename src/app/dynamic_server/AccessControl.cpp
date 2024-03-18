@@ -44,7 +44,12 @@ class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
 public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
     {
-        return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
+      // TODO: DynamicDispatcher.cpp actually hardcodes `false` here for every device/ep
+      //       we could remove the ember-compatibility-functions.h dependency if we hardcode
+      //       false here as well.
+      //
+      //       Should determine if hardcoding false here is the correct thing to do.
+      return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
     }
 };
 
