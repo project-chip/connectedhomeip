@@ -145,7 +145,7 @@ jobs:
               run: xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
 
     darwin:
-        name: Build Darwin
+        name: Build Darwin # Matches the previous monolithic build that's marked "required" for PRs
         needs: [ framework, tests ]
         runs-on: macos-latest
         steps:

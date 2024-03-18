@@ -195,8 +195,7 @@
         if (!controllerDictionary) {
             return;
         }
-        NSNumber * nodeIdKey = [NSNumber numberWithUnsignedLongLong:nodeId];
-        NSMutableArray * nodeArray = controllerDictionary[nodeIdKey];
+        NSMutableArray * nodeArray = controllerDictionary[@(nodeId)];
         if (!nodeArray) {
             return;
         }
