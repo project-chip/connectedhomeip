@@ -75,6 +75,7 @@ source_set("manager") {
     ":configuration-data",
     ":notifier",
     ":observer",
+    "${chip_root}/src/app:subscription-info-provider",
     "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/messaging",
   ]
@@ -84,7 +85,6 @@ source_set("manager") {
       ":monitoring-table",
       ":sender",
       "${chip_root}/src/app:app_config",
-      "${chip_root}/src/app:subscription-manager",
     ]
   }
 }
