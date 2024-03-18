@@ -20,10 +20,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
-#include <app/MessageDef/AttributeReportIBs.h>
 #include <app/WriteHandler.h>
 #include <app/util/attribute-metadata.h>
-#include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
