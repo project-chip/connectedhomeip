@@ -24,6 +24,6 @@ public class TestEngine {
   public static native int runTest();
 
   static {
-    System.loadLibrary("CHIPTest");
+    System.loadLibrary("ChipTestApp");
   }
 }
