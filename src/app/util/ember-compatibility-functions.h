@@ -94,4 +94,3 @@ Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventP
 
 } // namespace app
 } // namespace chip
-

@@ -16,10 +16,10 @@
  */
 #include "reporting.h"
 
-#include <platform/LockTracker.h>
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/af.h>
+#include <platform/LockTracker.h>
 
 using namespace chip;
 using namespace chip::app;
