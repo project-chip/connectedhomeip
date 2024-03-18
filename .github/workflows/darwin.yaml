@@ -143,3 +143,11 @@ jobs:
             - name: Build
               working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
               run: xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
+
+    darwin:
+        name: Build Darwin
+        needs: [ framework, tests ]
+        runs-on: macos-latest
+        steps:
+            - name: Done
+              run: 'true' # nothing to do
