@@ -14,12 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *          Contains the functions for compatibility with ember ZCL inner state
- *          when calling ember callbacks.
- */
+#include <app/ember-compatibility-functions.h>
 
 #include <access/AccessControl.h>
 #include <app/CommandHandlerInterface.h>
