@@ -95,6 +95,3 @@ Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventP
 } // namespace app
 } // namespace chip
 
-void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
-void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath);
-void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint);

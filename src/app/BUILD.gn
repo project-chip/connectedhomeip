@@ -189,6 +189,8 @@ static_library("interaction-model") {
     "reporting/ReportSchedulerImpl.h",
     "reporting/SynchronizedReportSchedulerImpl.cpp",
     "reporting/SynchronizedReportSchedulerImpl.h",
+    # TODO: Reporting changes data model versions and is implemented in data_model.
+    #       This dependency on generated code should ideally be broken up.
     "reporting/reporting.h",
   ]
 
