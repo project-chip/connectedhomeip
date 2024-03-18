@@ -25,7 +25,7 @@
 
 #import <Matter/MTRServerAttribute.h>
 
-#include <app/reporting/reporting.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/SafeInt.h>

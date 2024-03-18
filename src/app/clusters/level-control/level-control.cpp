@@ -29,7 +29,7 @@
 #include <app/util/config.h>
 #include <app/util/util.h>
 
-#include <app/reporting/reporting.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <lib/core/Optional.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>

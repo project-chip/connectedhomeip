@@ -189,7 +189,6 @@ static_library("interaction-model") {
     "reporting/ReportSchedulerImpl.h",
     "reporting/SynchronizedReportSchedulerImpl.cpp",
     "reporting/SynchronizedReportSchedulerImpl.h",
-    "reporting/reporting.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]

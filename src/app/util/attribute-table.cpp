@@ -22,7 +22,7 @@
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPConfig.h>
 
-#include <app/reporting/reporting.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <protocols/interaction_model/Constants.h>
 
 using chip::Protocols::InteractionModel::Status;

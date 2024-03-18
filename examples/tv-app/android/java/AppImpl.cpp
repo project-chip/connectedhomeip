@@ -27,10 +27,10 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/InteractionModelEngine.h>
-#include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <cstdio>
 #include <inttypes.h>
 #include <jni.h>

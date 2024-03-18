@@ -19,9 +19,9 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model/Nullable.h>
-#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <app/util/util.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
