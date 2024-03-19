@@ -57,7 +57,7 @@ public:
     /**
      * @brief Called to indicate that response was dropped.
      */
-    virtual void ResponseDropped()                                              = 0;
+    virtual void ResponseDropped() = 0;
 };
 
 } // namespace app
