@@ -25,6 +25,9 @@
 
 #pragma once
 
+// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed (next two includes)
+#include <lib/core/CHIPCore.h>
+
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>

@@ -22,11 +22,6 @@
  *
  */
 
-// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed (next two includes)
-#include <lib/core/CHIPCore.h>
-// add a line to avoid the reorder
-#include <app/reporting/ReportScheduler.h>
-
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeAccessInterface.h>
