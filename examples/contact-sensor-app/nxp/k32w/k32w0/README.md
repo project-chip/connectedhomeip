@@ -173,7 +173,8 @@ DS3, which can be found on the DK6 board.
 Also, by long pressing the **USERINTERFACE** button, the factory reset action
 will be initiated.
 
-When low power is enabled, the **ISP button** on DK6 board is used to change contact status.
+When low power is enabled, the **ISP button** on DK6 board is used to change
+contact status.
 
 ## Building
 
@@ -188,7 +189,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 
 To bring the SDK in the environment, the user can:
 
--   download it with west tool, in which case it will be handled automatically by gn:
+-   download it with west tool, in which case it will be handled automatically
+    by gn:
 
     ```bash
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
@@ -196,14 +198,19 @@ To bring the SDK in the environment, the user can:
     user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
     ```
 
-    In case there are local modification to the already installed github NXP SDK, use the below `west forall` command instead of the `west init` command to reset the west workspace. Warning: all local changes will be lost after running this command.
+    In case there are local modification to the already installed github NXP
+    SDK, use the below `west forall` command instead of the `west init` command
+    to reset the west workspace. Warning: all local changes will be lost after
+    running this command.
 
     ```bash
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
     user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
     ```
 
--   set up a custom path to the SDK, in which case `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen` command:
+-   set up a custom path to the SDK, in which case
+    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
+    command:
 
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
@@ -223,9 +230,10 @@ To build with Secure Element, follow the same steps as above but set
 Note that option `chip_enable_ota_requestor=false` is required for building with
 Secure Element due to flash constraints.
 
-- K32W041AM flavor
+-   K32W041AM flavor
 
-    Exactly the same steps as above but set argument `build_for_k32w041am=1` in the gn command.
+    Exactly the same steps as above but set argument `build_for_k32w041am=1` in
+    the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -240,12 +248,13 @@ argument to 1.
 
 K32W0x1 supports antenna diversity feature, which is a technique that maximizes
 the performance of an antenna system, allowing the radio signal to be switched
-between two antennas that have very low correlation between their received signals.
-Typically, this is achieved by spacing two antennas around 0.25 wavelengths apart
-or by using 2 orthogonal polarizations. This is controlled by software.
-K32W0x1 provides an output (`ADO`) on one of `DIO7`, `DIO9` or `DIO19` and optionally its
-complement (`ADE`) on `DIO6` that can be used to control an antenna switch.
-In order to use this feature, user must set `use_antenna_diversity` to 1.
+between two antennas that have very low correlation between their received
+signals. Typically, this is achieved by spacing two antennas around 0.25
+wavelengths apart or by using 2 orthogonal polarizations. This is controlled by
+software. K32W0x1 provides an output (`ADO`) on one of `DIO7`, `DIO9` or `DIO19`
+and optionally its complement (`ADE`) on `DIO6` that can be used to control an
+antenna switch. In order to use this feature, user must set
+`use_antenna_diversity` to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 (run automatically) install the recommanded packages (python version > 3, pip3,
@@ -264,7 +273,9 @@ pycryptodome           3.9.8
 The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
 
 ## Long Idle Time ICD Support
-By default, contact-sensor is compiled as SIT ICD (Short Idle Time Intermittently Connected Device) - see rules from k32w0_sdk.gni:
+
+By default, contact-sensor is compiled as SIT ICD (Short Idle Time
+Intermittently Connected Device) - see rules from k32w0_sdk.gni:
 
 ```
 chip_ot_idle_interval_ms = 2000           # 2s Idle Intervals
@@ -276,8 +287,10 @@ nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
 nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 ```
 
-If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified as gn argument and the above parameters can be modified to
-comply with LIT requirements (e.g.: LIT devices must configure `chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
+If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified
+as gn argument and the above parameters can be modified to comply with LIT
+requirements (e.g.: LIT devices must configure
+`chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
 
 ```
 chip_ot_idle_interval_ms = 15000          # 15s Idle Intervals
@@ -309,8 +322,8 @@ k32w0_sdk("sdk") {
 }
 ```
 
-This variable will be used by `k32w0_sdk.gni` to overwrite `chip_with_DK6` option,
-thus the reference board configuration files will no longer be used.
+This variable will be used by `k32w0_sdk.gni` to overwrite `chip_with_DK6`
+option, thus the reference board configuration files will no longer be used.
 
 ### Known issues building
 
@@ -440,14 +453,14 @@ unplug and plug the board and then rerun the script.
 
 ### Building steps
 
-By default, the application builds with NXP Ultrafast P256 ECC Library.
-To build with this library, use the following arguments:
+By default, the application builds with NXP Ultrafast P256 ECC Library. To build
+with this library, use the following arguments:
 
 -   Build without Secure element (_chip_with_se05x=0_) and with crypto platform
     (_chip_crypto=\"platform\"_).
 
-To stop using  Ultrafast P256 ECC Library, simply build with _chip_crypto=\"mbedtls\"_
-or with Tinycrypt.
+To stop using Ultrafast P256 ECC Library, simply build with
+_chip_crypto=\"mbedtls\"_ or with Tinycrypt.
 
 ## Tinycrypt ECC library
 
@@ -502,14 +515,18 @@ Optionally, add the following defines:
 
 #### Simple hash verification
 
-When secure boot is not used, a simple hash can be appended at the end of the image
-for integrity check. Applications should be built with `chip_simple_hash_verification=1`.
+When secure boot is not used, a simple hash can be appended at the end of the
+image for integrity check. Applications should be built with
+`chip_simple_hash_verification=1`.
 
-To support simple hash verification feature, the SSBL project must be compiled with:
+To support simple hash verification feature, the SSBL project must be compiled
+with:
+
 -   `gSimpleHashVerification=1`
 
-and update the post-build command to use simple hash verification instead of the default
-options. Go to `Project -> Properties -> C/C++ Build -> Settings -> Build steps` and press
+and update the post-build command to use simple hash verification instead of the
+default options. Go to
+`Project -> Properties -> C/C++ Build -> Settings -> Build steps` and press
 `Edit` under `Post-build steps` subsection. The command should look similar to:
 
 ![SSBL_SIMPLE_HASH_VERIFICATION](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_simple_hash.JPG)
@@ -601,8 +618,8 @@ C904     -> 0x4C9 pages of 512-bytes (= 612.5kB)
 01       -> image type for the application
 ```
 
-Please note the user can write additional partitions by
-writing `image_dir_2/3/4` with the wanted configuration.
+Please note the user can write additional partitions by writing
+`image_dir_2/3/4` with the wanted configuration.
 
 ### Writing the application
 
@@ -812,17 +829,19 @@ professional tools must be used if exact power consumption needs to be known.
 -   Power Measurement Tool may not work correctly in MCUXpresso versions greater
     that 11.0.1.
 
-
 ## Removing SSBL Upgrade Region
 
-The example also offers the possibility to remove SSBL upgrade region, for reserving more
-space for application level.
+The example also offers the possibility to remove SSBL upgrade region, for
+reserving more space for application level.
 
-A new flag `chip_reduce_ssbl_size` is introduced. In order to remove the SSBL upgrade region,
-`chip_reduce_ssbl_size=true` must be provided to the build system
+A new flag `chip_reduce_ssbl_size` is introduced. In order to remove the SSBL
+upgrade region, `chip_reduce_ssbl_size=true` must be provided to the build
+system
 
 The programming method will change:
-* writing image directory 1 should change to
+
+-   writing image directory 1 should change to
+
     ```
     DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00200000D9040101
     ```
@@ -835,7 +854,8 @@ The programming method will change:
     01       -> bootable flag
     01       -> image type for the application
     ```
-* Matter application offset address should change to
+
+-   Matter application offset address should change to
     ```
     DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x2000="chip-k32w0x-contact-example.bin"
     ```
