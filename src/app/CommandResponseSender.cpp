@@ -87,6 +87,7 @@ void CommandResponseSender::StartSendingCommandResponses()
     CHIP_ERROR err = SendCommandResponse();
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(DataManagement, "Failed to send InvokeResponseMessage");
         // TODO(#30453): It should be our responsibility to send a Failure StatusResponse to the requestor
         // if there is a SessionHandle, but legacy unit tests explicitly check the behavior where
         // we do not send any message. Changing this behavior should be done in a standalone
@@ -192,8 +193,9 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
     {
         VerifyOrDie(mState == State::ReadyForInvokeResponses);
         SendStatusResponse(status);
-        // We can't safely call Close() yet, even though we won't be sending more data on this exchange.
-        // It must be deferred until OnDone is called.
+        // The API contract of OnInvokeCommandRequest requires the CommandResponder instance to outlive 
+        // the CommandHandler. Therefore, we cannot safely call Close() here, even though we have 
+        // finished sending data. Closing must be deferred until the CommandHandler::OnDone callback.
         mDelayCallingCloseUntilOnDone = true;
     }
 }

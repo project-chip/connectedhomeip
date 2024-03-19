@@ -113,21 +113,16 @@ public:
         return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
     }
 
-    bool IsForGroup() const override
+    Optional<GroupId> GetGroupId() const override
     {
         VerifyOrDie(mExchangeCtx);
-        return mExchangeCtx->IsGroupExchangeContext();
+        if (!mExchangeCtx->IsGroupExchangeContext())
+        {
+            return NullOptional;
+        }
+        return MakeOptional(mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId());
     }
 
-    GroupId GetGroupId() const override
-    {
-        VerifyOrDie(mExchangeCtx);
-        return mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
-    }
-
-    /**
-     * @brief Flush acks right now, typically done when processing a slow command
-     */
     void FlushAcksRightNow() override
     {
         VerifyOrReturn(mExchangeCtx);
@@ -142,9 +137,6 @@ public:
         mChunks.AddToEnd(std::move(aPacket));
     }
 
-    /**
-     * @brief Called to indicate that response was dropped.
-     */
     void ResponseDropped() override { mReportResponseDropped = true; }
 
     /*

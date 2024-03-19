@@ -197,7 +197,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     invokeRequestMessage.PrettyPrint();
 #endif
     VerifyOrDie(mpResponder);
-    if (mpResponder->IsForGroup())
+    if (mpResponder->GetGroupId().HasValue())
     {
         SetGroupRequest(true);
     }
@@ -429,7 +429,9 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     VerifyOrDie(mpResponder);
-    groupId = mpResponder->GetGroupId();
+    auto optionalGroupId = mpResponder->GetGroupId();
+    VerifyOrDie(optionalGroupId.HasValue());
+    groupId = optionalGroupId.Value();
     fabric  = GetAccessingFabricIndex();
 
     ChipLogDetail(DataManagement, "Received group command for Group=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
@@ -743,6 +745,7 @@ CHIP_ERROR CommandHandler::RollbackResponse()
 {
     VerifyOrReturnError(mRollbackBackupValid, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == State::Preparing || mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    ChipLogDetail(DataManagement, "Rolling back response");
     // TODO(#30453): Rollback of mInvokeResponseBuilder should handle resetting
     // InvokeResponses.
     mInvokeResponseBuilder.GetInvokeResponses().ResetError();
@@ -930,7 +933,7 @@ void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandRespo
     ChipLogProgress(DataManagement, "   Injecting the following response:%s", GetFaultInjectionTypeStr(faultType));
 
     Handle workHandle(this);
-    VerifyOrDieWithMsg(!commandResponder.IsForGroup(), DataManagement, "DUT Failure: Unexpected Group Command");
+    VerifyOrDieWithMsg(!commandResponder.GetGroupId().HasValue(), DataManagement, "DUT Failure: Unexpected Group Command");
 
     System::PacketBufferTLVReader reader;
     InvokeRequestMessage::Parser invokeRequestMessage;

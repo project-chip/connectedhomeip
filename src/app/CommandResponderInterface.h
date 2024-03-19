@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <lib/core/Optional.h>
 #include <messaging/ExchangeHolder.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -40,14 +41,22 @@ public:
     virtual Messaging::ExchangeContext * GetExchangeContext() const = 0;
     virtual Access::SubjectDescriptor GetSubjectDescriptor() const  = 0;
     virtual FabricIndex GetAccessingFabricIndex() const             = 0;
-    virtual bool IsForGroup() const                                 = 0;
-    virtual GroupId GetGroupId() const                              = 0;
+    virtual Optional<GroupId> GetGroupId() const                    = 0;
 
-    /* Exchange methods that CommandHandler's may need to perform while processing request */
+    /**
+     * @brief Flush acks right now.
+     * 
+     * Typically called when processing a slow command.
+     */
     virtual void FlushAcksRightNow() = 0;
 
-    /* CommandResponder core methods */
+    /**
+     * @brief Adds completed InvokeResponseMessage for sending to command requestor.
+     */
     virtual void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket) = 0;
+    /**
+     * @brief Called to indicate that response was dropped.
+     */
     virtual void ResponseDropped()                                              = 0;
 };
 

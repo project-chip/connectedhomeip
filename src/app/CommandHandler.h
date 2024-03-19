@@ -177,7 +177,7 @@ public:
         bool mStartOrEndDataStruct = true;
     };
 
-    class TestOnlyOverrides
+    struct TestOnlyOverrides
     {
     public:
         CommandPathRegistry * commandPathRegistry    = nullptr;
@@ -212,7 +212,9 @@ public:
      * transaction (i.e. was preceded by a Timed Request).  If we reach here,
      * the timer verification has already been done.
      *
-     * commandResponder handles sending InvokeResponses, added by clusters, to the client.
+     * commandResponder handles sending InvokeResponses, added by clusters, to the client. The
+     * command responder object must outlive this CommandHandler object. It is only safe to 
+     * release after client recieved OnDone callback.
      */
     Protocols::InteractionModel::Status OnInvokeCommandRequest(CommandResponderInterface & commandResponder,
                                                                System::PacketBufferHandle && payload, bool isTimedInvoke);

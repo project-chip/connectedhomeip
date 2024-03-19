@@ -291,8 +291,7 @@ public:
     Access::SubjectDescriptor GetSubjectDescriptor() const override { return Access::SubjectDescriptor(); }
     FabricIndex GetAccessingFabricIndex() const override { return kUndefinedFabricIndex; }
 
-    bool IsForGroup() const override { return false; }
-    GroupId GetGroupId() const override { return kUndefinedGroupId; }
+    Optional<GroupId> GetGroupId() const override { return NullOptional; }
 
     void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket) override { mChunks.AddToEnd(std::move(aPacket)); }
     void ResponseDropped() override { mResponseDropped = true; }
