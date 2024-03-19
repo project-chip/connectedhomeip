@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
-#include <app/server/Server.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <map>
 
