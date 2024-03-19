@@ -203,8 +203,8 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
 
     if (length != 0)
     {
-        /** 
-         * If the reading process is over, 
+        /**
+         * If the reading process is over,
          * let CLI Task enter blocked state until notification
         **/
         if (readDone)
@@ -217,11 +217,11 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
         assert(status != kStatus_SerialManager_Error);
 
         /**
-         * In certain cases such as a copy-paste of multiple commands, we may encounter '\n' or '\r' caracters 
-         * although the buffer is not empty yet, so the reading process should be considered done only when the 
+         * In certain cases such as a copy-paste of multiple commands, we may encounter '\n' or '\r' caracters
+         * although the buffer is not empty yet, so the reading process should be considered done only when the
          * bytesRead return null,
          * this is to ensure that all commands are processed before blocking the CLI task
-         * 
+         *
         **/
         if (bytesRead == 0)
         {
@@ -234,14 +234,14 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
 
 ssize_t streamer_nxp_write(streamer_t * streamer, const char * buffer, size_t length)
 {
-    uint32_t intMask; 
+    uint32_t intMask;
     serial_manager_status_t status = kStatus_SerialManager_Success;
     size_t len = 0;
 
     /* Mutex lock to ensure the streamer write is accessed by only one task at a time */
     osa_status_t status_osa = OSA_MutexLock(streamerMutex, osaWaitForever_c);
 
-    //If length is 0 there will be an assert in Serial Manager. Some OT functions output 0 bytes, for example 
+    //If length is 0 there will be an assert in Serial Manager. Some OT functions output 0 bytes, for example
     //in SrpServer::Process<Cmd("service")> -> OutputLine(hasSubType ? "" : "(null)");
     if (length > 0)
     {

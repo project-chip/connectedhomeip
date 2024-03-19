@@ -147,8 +147,8 @@ const mcuxClEls_KeyProp_t shared_secret_prop = {
         .uckdf       = MCUXCLELS_KEYPROPERTY_CKDF_TRUE,
         .upprot_priv = MCUXCLELS_KEYPROPERTY_PRIVILEGED_TRUE,
         .upprot_sec  = MCUXCLELS_KEYPROPERTY_SECURE_TRUE,
-        
-        
+
+
     },
 };
 
@@ -160,7 +160,7 @@ const mcuxClEls_KeyProp_t wrap_in_key_prop = {
             .ukuok       = MCUXCLELS_KEYPROPERTY_KUOK_TRUE,
             .upprot_priv = MCUXCLELS_KEYPROPERTY_PRIVILEGED_TRUE,
             .upprot_sec  = MCUXCLELS_KEYPROPERTY_SECURE_TRUE,
-            
+
         },
 };
 
@@ -176,8 +176,8 @@ const mcuxClEls_KeyProp_t wrap_out_key_prop = {
             .ukwk        = MCUXCLELS_KEYPROPERTY_KWK_TRUE,
             .upprot_priv = MCUXCLELS_KEYPROPERTY_PRIVILEGED_TRUE,
             .upprot_sec  = MCUXCLELS_KEYPROPERTY_SECURE_TRUE,
-            
-            
+
+
         },
 };
 
@@ -192,7 +192,7 @@ const mcuxClEls_KeyProp_t mac_key_prop = {
             .kactv       = MCUXCLELS_KEYPROPERTY_ACTIVE_TRUE,
             .ucmac       = MCUXCLELS_KEYPROPERTY_CMAC_TRUE,
             .upprot_priv = MCUXCLELS_KEYPROPERTY_PRIVILEGED_TRUE,
-            .upprot_sec  = MCUXCLELS_KEYPROPERTY_SECURE_TRUE,            
+            .upprot_sec  = MCUXCLELS_KEYPROPERTY_SECURE_TRUE,
         },
 };
 
