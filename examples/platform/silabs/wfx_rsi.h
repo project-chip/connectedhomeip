@@ -32,7 +32,7 @@
 #define WFX_RSI_CONFIG_MAX_JOIN (5)             /* Max join retries			*/
 // TODO: Default values are usually in minutes, but this is in ms. Confirm if this is correct
 #define WFX_RSI_DHCP_POLL_INTERVAL (250) /* Poll interval in ms for DHCP		*/
-#define WFX_RSI_NUM_TIMERS (2)                  /* Number of RSI timers to alloc	*/
+#define WFX_RSI_NUM_TIMERS (2)           /* Number of RSI timers to alloc	*/
 
 typedef enum
 {
