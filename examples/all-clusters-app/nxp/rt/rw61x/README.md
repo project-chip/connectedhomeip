@@ -158,17 +158,17 @@ software key before flashing them to the device flash.
 
 Using DAC private key secure usage: Experimental feature, contain some
 limitation: potential concurrent access issue during sign with dac key operation
-due to the lack of protection between multiple access to _ELS_ crypto module. The
+due to the lack of protection between multiple access to `ELS` crypto module. The
 argument `chip_enable_secure_dac_private_key_storage=1` must be added to the _gn
 gen_ command to enable secure private DAC key usage with S50.
 `chip_with_factory_data=1` must have been added to the _gn gen_ command
 
 DAC private key generation: The argument `chip_convert_dac_private_key=1` must
-be added to the _gn gen_ command to enable DAC private plain key convertion to
+be added to the _gn gen_ command to enable DAC private plain key conversion to
 blob with S50. `chip_enable_secure_dac_private_key_storage=1` must have been
 added to the _gn gen_ command
 
-_ELS_ contain concurrent access risks. They must be fixed before enabling it by default.
+`ELS` contain concurrent access risks. They must be fixed before enabling it by default.
 
 <a name="flashing-and-debugging"></a>
 
