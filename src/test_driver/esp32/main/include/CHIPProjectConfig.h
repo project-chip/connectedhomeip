@@ -30,4 +30,6 @@
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
 
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
+
 #endif // CHIP_PROJECT_CONFIG_H
