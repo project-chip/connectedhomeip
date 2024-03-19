@@ -190,8 +190,12 @@ static_library("interaction-model") {
     "reporting/SynchronizedReportSchedulerImpl.cpp",
     "reporting/SynchronizedReportSchedulerImpl.h",
 
-    # TODO: Reporting changes data model versions and is implemented in data_model.
-    #       This dependency on generated code should ideally be broken up.
+    # TODO: reporting header is part of interaction-model, however actual implementation depends
+    #       on generated code as subscriptions depend on attribute data versioning to determine
+    #       when "data changed" reports should be sent.
+    #
+    #       This breaks having `.h` and `.cpp` based off the same compilation unit and
+    #       should ideally be cleaned up.
     "reporting/reporting.h",
   ]
 
