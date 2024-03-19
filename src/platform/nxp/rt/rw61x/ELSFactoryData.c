@@ -50,7 +50,7 @@ void printf_buffer(const char * name, const unsigned char * buffer, size_t size)
         }
         line_buffer[len++] = '\n';
         line_buffer[len++] = '\0';
-        PRINTF("%s (0x%p): %s", name, pos, line_buffer);
+        PRINTF("%s (%p): %s", name, pos, line_buffer);
         remaining -= block_size;
     }
 }
