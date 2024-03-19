@@ -203,8 +203,13 @@ public class DiscoveryExampleFragment extends Fragment {
 
   @Override
   public void onResume() {
+    Log.i(TAG, "onResume() called");
     super.onResume();
-    Log.i(TAG, "onResume() called. Calling startDiscovery()");
+    MatterError err =
+        matterCastingPlayerDiscovery.removeCastingPlayerChangeListener(castingPlayerChangeListener);
+    if (err.hasError()) {
+      Log.e(TAG, "onResume() removeCastingPlayerChangeListener() err: " + err);
+    }
     if (!startDiscovery()) {
       Log.e(TAG, "onResume() Warning: startDiscovery() call Failed");
     }
@@ -253,13 +258,9 @@ public class DiscoveryExampleFragment extends Fragment {
 
     matterDiscoveryMessageTextView.setText(
         getString(R.string.matter_discovery_message_discovering_text));
-    Log.d(
-        TAG,
-        "startDiscovery() text set to: "
-            + getString(R.string.matter_discovery_message_discovering_text));
 
     // TODO: In following PRs. Enable this to auto-stop discovery after stopDiscovery is
-    //  implemented in the core Matter SKD DNS-SD API.
+    //  implemented in the core Matter SDK DNS-SD API.
     // Schedule a service to stop discovery and remove the CastingPlayerChangeListener
     // Safe to call if discovery is not running
     //    scheduledFutureTask =

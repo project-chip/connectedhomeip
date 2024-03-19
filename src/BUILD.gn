@@ -145,7 +145,8 @@ if (chip_build_tests) {
       # TODO [PW_MIGRATION] There will be a list of already migrated platforms
       if (chip_device_platform == "esp32" ||
           chip_device_platform == "nrfconnect" ||
-          chip_device_platform == "openiotsdk") {
+          chip_device_platform == "openiotsdk" ||
+          chip_device_platform == "efr32") {
         deps += [ "${chip_root}/src/lib/support:pw_tests_wrapper" ]
       }
       build_monolithic_library = true
