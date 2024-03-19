@@ -22,7 +22,8 @@
  *
  */
 
-// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
+// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed (next two includes)
+#include <app/reporting/ReportScheduler.h>
 #include <lib/core/CHIPCore.h>
 
 #include "lib/support/CHIPMem.h"
@@ -1372,8 +1373,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
         public:
             DirtyingMockDelegate(AttributePathParams (&aReadPaths)[2], int & aNumAttributeResponsesWhenSetDirty,
                                  int & aNumArrayItemsWhenSetDirty) :
-                mReadPaths(aReadPaths),
-                mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
+                mReadPaths(aReadPaths), mNumAttributeResponsesWhenSetDirty(aNumAttributeResponsesWhenSetDirty),
                 mNumArrayItemsWhenSetDirty(aNumArrayItemsWhenSetDirty)
             {}
 
