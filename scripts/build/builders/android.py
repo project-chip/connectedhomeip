@@ -358,6 +358,10 @@ class AndroidBuilder(Builder):
             gn_args["target_cpu"] = self.board.TargetCpuName()
             gn_args["android_ndk_root"] = os.environ["ANDROID_NDK_HOME"]
             gn_args["android_sdk_root"] = os.environ["ANDROID_HOME"]
+
+            exampleName = self.app.ExampleName()
+            if exampleName == "chip-test":
+                gn_args["chip_build_tests"] = True
             if self.profile != AndroidProfile.DEBUG:
                 gn_args["is_debug"] = False
             gn_args.update(self.app.AppGnArgs())
@@ -383,7 +387,6 @@ class AndroidBuilder(Builder):
             ]
 
             rootName = self.app.BuildRoot(self.root)
-            exampleName = self.app.ExampleName()
             if rootName is not None:
                 gn_gen += ["--root=%s" % rootName]
             elif exampleName is not None:

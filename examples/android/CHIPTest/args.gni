@@ -16,10 +16,21 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/config/standalone/args.gni")
 
-# chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
-# chip_project_config_include = "<CHIPProjectAppConfig.h>"
-# chip_system_project_config_include = "<SystemProjectConfig.h>"
+import("//build_overrides/pigweed.gni")
 
 chip_project_config_include_dirs = [ "${chip_root}/config/standalone" ]
 
 chip_build_libshell = true
+
+pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"
+
+pw_assert_BACKEND = "$dir_pw_assert_log"
+pw_log_BACKEND = "$dir_pw_log_basic"
+
+pw_unit_test_BACKEND = "$dir_pw_unit_test:light"
+
+# TODO: Make sure only unit tests link against this
+pw_build_LINK_DEPS = [
+  "$dir_pw_assert:impl",
+  "$dir_pw_log:impl",
+]
