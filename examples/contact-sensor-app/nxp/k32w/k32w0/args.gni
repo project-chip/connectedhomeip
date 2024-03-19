@@ -19,8 +19,8 @@ import("${chip_root}/config/standalone/args.gni")
 k32w0_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_enable_ota_requestor = true
-chip_with_ota_encryption=1
-chip_with_ota_key="1234567890ABCDEFA1B2C3D4E5F6F1B4"
+chip_with_ota_encryption = 1
+chip_with_ota_key = "1234567890ABCDEFA1B2C3D4E5F6F1B4"
 
 chip_stack_lock_tracking = "fatal"
 chip_enable_ble = true

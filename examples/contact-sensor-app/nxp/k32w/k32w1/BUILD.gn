@@ -31,6 +31,7 @@ import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 declare_args() {
   chip_software_version = 0
+
   # Setup discriminator as argument
   setup_discriminator = 3840
   chip_with_diag_logs_demo = true
@@ -79,9 +80,7 @@ k32w1_sdk("sdk") {
   ]
 
   if (chip_with_diag_logs_demo) {
-    defines += [
-      "CONFIG_DIAG_LOGS_DEMO=1",
-    ]
+    defines += [ "CONFIG_DIAG_LOGS_DEMO=1" ]
   }
 }
 
@@ -114,17 +113,11 @@ k32w1_executable("contact_sensor_app") {
 
   #lit and sit are using different zap files
   if (chip_enable_icd_lit) {
-    deps += [
-      "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/",
-    ]
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
 
-    defines += [
-      "CHIP_ENABLE_LIT=1",
-    ]
+    defines += [ "CHIP_ENABLE_LIT=1" ]
   } else {
-      deps += [
-        "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/",
-      ]
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/" ]
   }
 
   if (chip_openthread_ftd) {
@@ -171,9 +164,7 @@ k32w1_executable("contact_sensor_app") {
   }
 
   if (chip_with_diag_logs_demo) {
-     deps += [
-       "${chip_root}/src/platform/nxp:nxp_diagnostic_logs",
-     ]
+    deps += [ "${chip_root}/src/platform/nxp:nxp_diagnostic_logs" ]
   }
 
   output_dir = root_out_dir

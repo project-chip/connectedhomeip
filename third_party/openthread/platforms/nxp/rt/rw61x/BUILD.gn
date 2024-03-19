@@ -66,18 +66,18 @@ source_set("libopenthread-rw61x") {
   sources = [
     "${openthread_nxp_root}/src/common/alarm_freertos.c",
     "${openthread_nxp_root}/src/common/logging.c",
-    "${openthread_nxp_root}/src/rw/rw612/platform/entropy.c",
     "${openthread_nxp_root}/src/rw/rw612/platform/diag.c",
+    "${openthread_nxp_root}/src/rw/rw612/platform/entropy.c",
   ]
 
   if (chip_enable_wifi && chip_enable_openthread) {
     sources += [
-    "${openthread_nxp_root}/src/common/br/infra_if.c",
-    "${openthread_nxp_root}/src/common/br/udp_plat.c",
-    "${openthread_nxp_root}/src/common/br/border_agent.c",
-    "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
-    "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
-    "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
+      "${openthread_nxp_root}/src/common/br/border_agent.c",
+      "${openthread_nxp_root}/src/common/br/br_rtos_manager.c",
+      "${openthread_nxp_root}/src/common/br/infra_if.c",
+      "${openthread_nxp_root}/src/common/br/lwip_hooks.c",
+      "${openthread_nxp_root}/src/common/br/lwip_mcast.c",
+      "${openthread_nxp_root}/src/common/br/udp_plat.c",
     ]
     deps += [ "${nxp_sdk_build_root}:nxp_lwip" ]
   }
@@ -102,7 +102,7 @@ source_set("libopenthread-rw61x") {
   } else if (rt_nvm_component == "littlefs") {
     sources += [ "${openthread_nxp_root}/src/common/flash_littlefs.c" ]
   } else if (rt_nvm_component == "key_storage") {
-    sources += [ "${openthread_nxp_root}/src/common/flash_fsa.c" ]  
+    sources += [ "${openthread_nxp_root}/src/common/flash_fsa.c" ]
   }
 
   defines = [

@@ -233,7 +233,6 @@ template("rw61x_sdk_drivers") {
       "gPlatformMonolithicApp_d=1",
     ]
 
-
     if (board_version != "A1") {
       defines += [ "RW610_A1=0" ]
     }
@@ -449,7 +448,6 @@ template("rw61x_sdk_drivers") {
 
       # framework coex file to initialize controllers
       "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_coex.c",
-
     ]
 
     if (sdk_fsl_assert_support) {
@@ -459,6 +457,7 @@ template("rw61x_sdk_drivers") {
     if (rw610_mbedtls_port_els_pkc) {
       # els_pkc component for mbedtls els_pkc port
       sources += [
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAead/src/mcuxClAead.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_AesCcm.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_AesGcm.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_CcmEngineAes.c",
@@ -466,19 +465,18 @@ template("rw61x_sdk_drivers") {
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_Modes.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_Multipart.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClAeadModes/src/mcuxClAeadModes_Els_Oneshot.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClAead/src/mcuxClAead.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClAes/src/mcuxClAes_KeyTypes.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipher/src/mcuxClCipher.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Els_Aes.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Els_EngineAes.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Helper.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipherModes/src/mcuxClCipherModes_Modes.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClCipher/src/mcuxClCipher.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Constants.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateKeyPair.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateKeyPair_FUP.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateSignature.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateSignature_FUP.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateSignatureMode.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_GenerateSignature_FUP.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_InitPrivKeyInputMode.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_CalcHashModN.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_EdDSA_Internal_CalcHashModN_FUP.c",
@@ -491,9 +489,9 @@ template("rw61x_sdk_drivers") {
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_BlindedScalarMult.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_Convert_FUP.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_GenerateMultiplicativeBlinding.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_Interleave_FUP.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_InterleaveScalar.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_InterleaveTwoScalars.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_Interleave_FUP.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_PointComparison_FUP.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_RecodeAndReorderScalar.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEcc/src/mcuxClEcc_Internal_SetupEnvironment.c",
@@ -555,11 +553,11 @@ template("rw61x_sdk_drivers") {
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Kdf.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_KeyManagement.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClEls/src/mcuxClEls_Rng.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/src/mcuxClHashModes_Core_els_sha2.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/src/mcuxClHashModes_Internal_els_sha2.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClHash/src/mcuxClHash_api_multipart_common.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClHash/src/mcuxClHash_api_multipart_compute.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClHash/src/mcuxClHash_api_oneshot_compute.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/src/mcuxClHashModes_Core_els_sha2.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClHashModes/src/mcuxClHashModes_Internal_els_sha2.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_Els.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_Functions.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_Helper.c",
@@ -568,12 +566,12 @@ template("rw61x_sdk_drivers") {
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClHmac/src/mcuxClHmac_Sw.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClKey/src/mcuxClKey.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClKey/src/mcuxClKey_Protection.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMac/src/mcuxClMac.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes_Els_Cbcmac.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes_Els_Cmac.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes_Els_Functions.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMacModes/src/mcuxClMacModes_Modes.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClMac/src/mcuxClMac.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ExactDivide.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ExactDivideOdd.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMath/src/mcuxClMath_ExactDivideOdd_FUP.c",
@@ -595,6 +593,8 @@ template("rw61x_sdk_drivers") {
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClPkc/src/mcuxClPkc_Initialize.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClPkc/src/mcuxClPkc_UPTRT.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClPrng/src/mcuxClPrng_ELS.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandom/src/mcuxClRandom_DRBG.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandom/src/mcuxClRandom_PRNG.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_CtrDrbg.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_CtrDrbg_Els.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_CtrDrbg_PrDisabled.c",
@@ -603,8 +603,6 @@ template("rw61x_sdk_drivers") {
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_PatchMode.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_PrDisabled.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandomModes/src/mcuxClRandomModes_TestMode.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandom/src/mcuxClRandom_DRBG.c",
-        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRandom/src/mcuxClRandom_PRNG.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_ComputeD.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_ComputeD_FUP.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_GenerateProbablePrime.c",

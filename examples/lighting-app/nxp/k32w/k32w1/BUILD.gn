@@ -101,11 +101,10 @@ k32w1_executable("light_app") {
   deps = []
   defines = []
 
-  if (chip_config_dimmable_led)
-  {
-     defines += ["CHIP_CONFIG_ENABLE_DIMMABLE_LED = 1"]
+  if (chip_config_dimmable_led) {
+    defines += [ "CHIP_CONFIG_ENABLE_DIMMABLE_LED = 1" ]
   } else {
-     defines += ["CHIP_CONFIG_ENABLE_DIMMABLE_LED = 0"]
+    defines += [ "CHIP_CONFIG_ENABLE_DIMMABLE_LED = 0" ]
   }
 
   if (chip_enable_pw_rpc) {
@@ -125,16 +124,15 @@ k32w1_executable("light_app") {
     "main/include/LightingManager.h",
     "main/main.cpp",
   ]
-  
-  if (chip_config_dimmable_led)
-  {
-     sources += [
-       "${k32w1_platform_dir}/util/LED_Dimmer.cpp",
-       "${k32w1_platform_dir}/util/include/LED_Dimmer.h",
-     ]
-     deps += ["${chip_root}/examples/lighting-app/lighting-common/"]
+
+  if (chip_config_dimmable_led) {
+    sources += [
+      "${k32w1_platform_dir}/util/LED_Dimmer.cpp",
+      "${k32w1_platform_dir}/util/include/LED_Dimmer.h",
+    ]
+    deps += [ "${chip_root}/examples/lighting-app/lighting-common/" ]
   } else {
-     deps += ["${chip_root}/examples/lighting-app/nxp/zap/"]
+    deps += [ "${chip_root}/examples/lighting-app/nxp/zap/" ]
   }
 
   deps += [

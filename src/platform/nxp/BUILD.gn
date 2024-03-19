@@ -25,5 +25,6 @@ group("nxp") {
 # "nxp_diagnostic_logs" source set.
 # Usage: deps += [ "${chip_root}/src/platform/nxp:nxp_diagnostic_logs" ]
 group("nxp_diagnostic_logs") {
-  public_deps = [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_diagnostic_logs" ]
+  public_deps =
+      [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_diagnostic_logs" ]
 }

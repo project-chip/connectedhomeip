@@ -38,7 +38,8 @@ chip_project_config_include = "<CHIPProjectConfig.h>"
 chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
 chip_ble_project_config_include = "<CHIPProjectConfig.h>"
-chip_project_config_include_dirs = ["${chip_root}/examples/platform/${nxp_platform}/app/project_include"]
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/platform/${nxp_platform}/app/project_include" ]
 
 chip_enable_openthread = true
 chip_openthread_ftd = false

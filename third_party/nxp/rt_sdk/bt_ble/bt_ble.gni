@@ -112,12 +112,9 @@ template("bt_ble_target") {
       bt_ble_include_dirs += [
         #sdk hook for fatfs config file required for ethermind include files
         "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/fatfs/config",
-        ]
-
+      ]
     } else {
-      bt_ble_include_dirs += [
-        "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/configs",
-        ]
+      bt_ble_include_dirs += [ "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/configs" ]
     }
 
     defines += [
@@ -229,7 +226,6 @@ template("bt_ble_target") {
 
     defines =
         [ "vApplicationMallocFailedHook=vApplicationMallocFailedHookBTBLE" ]
-
 
     if (!defined(public_configs)) {
       public_configs = []

@@ -14,14 +14,14 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/crypto/crypto.gni")
-import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 declare_args() {
@@ -86,16 +86,18 @@ template("k32w0_sdk") {
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
   assert(
-    use_custom_factory_provider == 0 || chip_with_factory_data == 1,
-    "Please set chip_with_factory_data=1 if using custom factory provider.")
+      use_custom_factory_provider == 0 || chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using custom factory provider.")
 
   assert(
-    chip_enable_ota_factory_data_processor == 0 || chip_enable_ota_firmware_processor == 1,
-    "Please set chip_enable_ota_firmware_processor=1 if using default factory data processor.")
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_enable_ota_firmware_processor == 1,
+      "Please set chip_enable_ota_firmware_processor=1 if using default factory data processor.")
 
   assert(
-    chip_enable_ota_factory_data_processor == 0 || chip_with_factory_data == 1,
-    "Please set chip_with_factory_data=1 if using default factory data processor.")
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using default factory data processor.")
 
   assert(
       chip_enable_ota_factory_data_processor == 0 ||
@@ -145,7 +147,7 @@ template("k32w0_sdk") {
     chip_with_ntag = 0
   }
 
-  if(k32w0_sdk_root == "${chip_root}/third_party/nxp/k32w0_sdk/repo/core") {
+  if (k32w0_sdk_root == "${chip_root}/third_party/nxp/k32w0_sdk/repo/core") {
     chip_with_sdk_package = 0
   } else {
     chip_with_sdk_package = 1
@@ -374,11 +376,9 @@ template("k32w0_sdk") {
       "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
 
-    if (use_antenna_diversity == 1){
+    if (use_antenna_diversity == 1) {
       print("Check ADO/ADE pin configuration when using Antenna Diversity.")
-      defines += [
-        "ANTENNA_DIVERSITY_ENABLE",
-      ]
+      defines += [ "ANTENNA_DIVERSITY_ENABLE" ]
     }
 
     # If OTA default processors are enabled, then OTA custom entry structure
@@ -669,27 +669,27 @@ template("k32w0_sdk") {
       ]
     } else {
       sources += [
-        "${k32w0_sdk_root}/drivers/lpc_adc/fsl_adc.c",
-        "${k32w0_sdk_root}/drivers/aes/fsl_aes.c",
         "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_clock.c",
-        "${k32w0_sdk_root}/drivers/common/fsl_common.c",
-        "${k32w0_sdk_root}/drivers/ctimer/fsl_ctimer.c",
-        "${k32w0_sdk_root}/drivers/jn_flash/fsl_flash.c",
-        "${k32w0_sdk_root}/drivers/flexcomm/fsl_flexcomm.c",
-        "${k32w0_sdk_root}/drivers/fmeas/fsl_fmeas.c",
-        "${k32w0_sdk_root}/drivers/lpc_gpio/fsl_gpio.c",
-        "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c.c",
-        "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c_freertos.c",
-        "${k32w0_sdk_root}/drivers/inputmux/fsl_inputmux.c",
-        "${k32w0_sdk_root}/drivers/pint/fsl_pint.c",
         "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_power.c",
         "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_reset.c",
+        "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
+        "${k32w0_sdk_root}/drivers/aes/fsl_aes.c",
+        "${k32w0_sdk_root}/drivers/common/fsl_common.c",
+        "${k32w0_sdk_root}/drivers/ctimer/fsl_ctimer.c",
+        "${k32w0_sdk_root}/drivers/flexcomm/fsl_flexcomm.c",
+        "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c.c",
+        "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c_freertos.c",
+        "${k32w0_sdk_root}/drivers/flexcomm/fsl_usart.c",
+        "${k32w0_sdk_root}/drivers/fmeas/fsl_fmeas.c",
+        "${k32w0_sdk_root}/drivers/inputmux/fsl_inputmux.c",
+        "${k32w0_sdk_root}/drivers/jn_flash/fsl_flash.c",
         "${k32w0_sdk_root}/drivers/jn_rng/fsl_rng.c",
         "${k32w0_sdk_root}/drivers/jn_rtc/fsl_rtc.c",
+        "${k32w0_sdk_root}/drivers/lpc_adc/fsl_adc.c",
+        "${k32w0_sdk_root}/drivers/lpc_gpio/fsl_gpio.c",
+        "${k32w0_sdk_root}/drivers/pint/fsl_pint.c",
         "${k32w0_sdk_root}/drivers/sha/fsl_sha.c",
         "${k32w0_sdk_root}/drivers/spifi/fsl_spifi.c",
-        "${k32w0_sdk_root}/drivers/flexcomm/fsl_usart.c",
-        "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
         "${k32w0_sdk_root}/utilities/debug_console/fsl_debug_console.c",
         "${k32w0_sdk_root}/utilities/debug_console/str/fsl_str.c",
       ]

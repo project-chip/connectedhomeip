@@ -28,7 +28,6 @@ import(
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/mbedtls/mbedtls.gni")
-
 rt_mbedtls_root = "${rt_sdk_root}/middleware/mbedtls"
 
 config("mbedtls_els_pkc_config") {
@@ -74,7 +73,7 @@ mbedtls_target("nxp_els_pkc_mbedtls") {
 }
 
 group("nxp_sdk_mbedtls_config") {
-  public_configs = [  ":mbedtls_els_pkc_config" ]
+  public_configs = [ ":mbedtls_els_pkc_config" ]
 }
 
 group("nxp_mbedtls") {
@@ -85,15 +84,13 @@ source_set("nxp_sdk_mbedtls_dep") {
   # Add here SDK source files which have a dependency on mbedtls
   # this approach helps avoid circular dependencies between mbedtls and rw61x_sdk_drivers targets
   if (chip_enable_secure_dac_private_key_storage == 0) {
-    sources = [
-      "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider/fwk_factory_data_provider.c",
-    ]
+    sources = [ "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider/fwk_factory_data_provider.c" ]
   }
 
   deps = [
-    nxp_sdk_driver_target,
-    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk_mbedtls_config",
     "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_mbedtls",
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk_mbedtls_config",
+    nxp_sdk_driver_target,
   ]
 }
 
