@@ -213,7 +213,7 @@ public:
     /// @brief Get the number of ReadHandlers registered in the scheduler's node pool
     size_t GetNumReadHandlers() const { return mNodesPool.Allocated(); }
 
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Timestamp GetMinTimestampForHandler(const ReadHandler * aReadHandler)
     {
         ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
