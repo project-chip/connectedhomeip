@@ -855,7 +855,6 @@ void ProcessEvent(WfxEvent_t inEvent)
             sl_wifi_scan_configuration_t wifi_scan_configuration;
             memset(&wifi_scan_configuration, 0, sizeof(sl_wifi_scan_configuration_t));
 
-
             // TODO: Add scan logic
             sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = { 0 };
             int32_t status;
