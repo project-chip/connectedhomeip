@@ -279,6 +279,7 @@ class ProductLabel(StrArgument):
     def max_length(self):
         return 64
 
+
 class ProductFinish(StrArgument):
 
     VALUES = ["Other", "Matte", "Satin", "Polished", "Rugged", "Fabric"]
@@ -304,6 +305,7 @@ class ProductFinish(StrArgument):
 
     def max_length(self):
         return 64
+
 
 class ProductPrimaryColor(StrArgument):
 

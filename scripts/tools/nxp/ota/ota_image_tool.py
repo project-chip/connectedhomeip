@@ -57,13 +57,15 @@ OTA_FACTORY_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_factory
 
 INITIALIZATION_VECTOR = "00000010111213141516171800000000"
 
+
 class TAG:
-    APPLICATION  = 1
-    BOOTLOADER   = 2
+    APPLICATION = 1
+    BOOTLOADER = 2
     FACTORY_DATA = 3
     # Reserving 99 tags (highly unlikely this number will be reached) for NXP use.
     # Custom TLVs should set its tag values to a number greater than LAST_RESERVED.
     LAST_RESERVED = 99
+
 
 def write_to_temp(path: str, payload: bytearray):
     with open(path, "wb") as _handle:
@@ -76,6 +78,7 @@ def generate_header(tag: int, length: int):
     header = bytearray(tag.to_bytes(4, "little"))
     header += bytearray(length.to_bytes(4, "little"))
     return header
+
 
 def generate_factory_data(args: object):
     """
@@ -107,6 +110,7 @@ def generate_factory_data(args: object):
     write_to_temp(OTA_FACTORY_TLV_TEMP, payload)
     return [OTA_FACTORY_TLV_TEMP]
 
+
 def generate_descriptor(version: int, versionStr: str, buildDate: str):
     """
     Generate descriptor as bytearray for app/SSBL payload.
@@ -125,6 +129,7 @@ def generate_descriptor(version: int, versionStr: str, buildDate: str):
 
     return v + vs + bd
 
+
 def generate_app(args: object):
     """
     Generate app payload with descriptor. If a certain option is not specified, use the default values.
@@ -133,7 +138,7 @@ def generate_app(args: object):
     descriptor = generate_descriptor(args.app_version, args.app_version_str, args.app_build_date)
     logging.info(f"App encryption enable: {args.enc_enable}")
     if args.enc_enable:
-        inputFile = open(args.app_input_file,"rb")
+        inputFile = open(args.app_input_file, "rb")
         enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
         enc_file1 = bytes([ord(x) for x in enc_file])
         file_size = len(enc_file1)
@@ -149,6 +154,7 @@ def generate_app(args: object):
     else:
         return [OTA_APP_TLV_TEMP, args.app_input_file]
 
+
 def generate_bootloader(args: object):
     """
     Generate SSBL payload with descriptor. If a certain option is not specified, use the default values.
@@ -157,7 +163,7 @@ def generate_bootloader(args: object):
     descriptor = generate_descriptor(args.bl_version, args.bl_version_str, args.bl_build_date)
     logging.info(f"Bootloader encryption enable: {args.enc_enable}")
     if args.enc_enable:
-        inputFile = open(args.bl_input_file,"rb")
+        inputFile = open(args.bl_input_file, "rb")
         enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
         enc_file1 = bytes([ord(x) for x in enc_file])
         file_size = len(enc_file1)
@@ -173,6 +179,7 @@ def generate_bootloader(args: object):
     else:
         return [OTA_BOOTLOADER_TLV_TEMP, args.bl_input_file]
 
+
 def validate_json(data: str):
     with open(os.path.join(os.path.dirname(__file__), 'ota_payload.schema'), 'r') as fd:
         payload_schema = json.load(fd)
@@ -183,6 +190,7 @@ def validate_json(data: str):
     except jsonschema.exceptions.ValidationError as err:
         logging.error(f"JSON data is invalid: {err}")
         sys.exit(1)
+
 
 def generate_custom_tlvs(data):
     """
@@ -204,7 +212,8 @@ def generate_custom_tlvs(data):
         file_size = os.path.getsize(entry["path"])
 
         if entry["tag"] <= TAG.LAST_RESERVED:
-            print(f"There is a custom TLV with a reserved tag {entry['tag']}. Please ensure all tags are greater than {TAG.LAST_RESERVED}")
+            print(
+                f"There is a custom TLV with a reserved tag {entry['tag']}. Please ensure all tags are greater than {TAG.LAST_RESERVED}")
             sys.exit(1)
 
         payload = generate_header(entry["tag"], len(descriptor) + file_size) + descriptor
@@ -218,12 +227,14 @@ def generate_custom_tlvs(data):
 
     return input_files
 
+
 def show_payload(args: object):
     """
     Parse and present OTA custom payload in human-readable form.
     """
     # TODO: implement to show current TLVs
     pass
+
 
 def create_image(args: object):
     ota_image_tool.validate_header_attributes(args)
@@ -260,6 +271,7 @@ def create_image(args: object):
     if args.enc_enable:
         for filename in glob.glob(os.path.dirname(__file__) + "/enc_ota_temp_*"):
             os.remove(filename)
+
 
 def main():
     """
@@ -331,7 +343,8 @@ def main():
     create_parser.add_argument('--json', help="[path] Path to the JSON describing custom TLVs")
 
     create_parser.add_argument('--enc_enable', action="store_true", help='enable ota encryption')
-    create_parser.add_argument('--input_ota_key', type=str, default="1234567890ABCDEFA1B2C3D4E5F6F1B4", help='Input OTA Encryption KEY (string:16Bytes)')
+    create_parser.add_argument('--input_ota_key', type=str, default="1234567890ABCDEFA1B2C3D4E5F6F1B4",
+                               help='Input OTA Encryption KEY (string:16Bytes)')
 
     create_parser.add_argument('-i', '--input_files', default=list(),
                                help='Path to input image payload file')
@@ -376,6 +389,7 @@ def main():
         ota_image_tool.remove_header(args)
     elif args.subcommand == 'change_header':
         ota_image_tool.update_header_args(args)
+
 
 if __name__ == "__main__":
     main()
