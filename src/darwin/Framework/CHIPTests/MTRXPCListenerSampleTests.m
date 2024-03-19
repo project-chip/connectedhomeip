@@ -26,7 +26,6 @@
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
-#import "MTRUnfairLock.h"
 
 #import <math.h> // For INFINITY
 
@@ -123,8 +122,9 @@ static MTRDeviceController * sController = nil;
 
     newConnection.invalidationHandler = ^{
         NSLog(@"XPC connection disconnected");
-        std::lock_guard lock(_serversLock);
+        os_unfair_lock_lock(&self->_serversLock);
         [self.servers removeObjectForKey:newServer.identifier];
+        os_unfair_lock_unlock(&self->_serversLock);
     };
     [newConnection resume];
     return YES;

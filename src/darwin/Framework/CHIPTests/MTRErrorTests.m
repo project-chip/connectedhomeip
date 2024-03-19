@@ -35,8 +35,9 @@
     os_unfair_lock_t lockPtr = &lock;
     NSMutableSet<NSString *> * errors = [[NSMutableSet alloc] init];
     MTRSetLogCallback(MTRLogTypeError, ^(MTRLogType type, NSString * moduleName, NSString * message) {
-        std::lock_guard lock(lockPtr);
+        os_unfair_lock_lock(lockPtr);
         [errors addObject:message];
+        os_unfair_lock_unlock(lockPtr);
     });
 
     // Provoke an error in the C++ layer
