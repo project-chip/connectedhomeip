@@ -147,7 +147,8 @@ template("k32w0_sdk") {
     chip_with_ntag = 0
   }
 
-  if (k32w0_sdk_root == "${chip_root}/third_party/nxp/k32w0_sdk/repo/core") {
+  if (k32w0_sdk_root == "${chip_root}/third_party/nxp/k32w0_sdk/repo/core" ||
+      k32w0_sdk_root == "/opt/sdk/core") {
     chip_with_sdk_package = 0
   } else {
     chip_with_sdk_package = 1
