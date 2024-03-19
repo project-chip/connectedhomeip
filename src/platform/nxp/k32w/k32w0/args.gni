@@ -21,7 +21,12 @@ nxp_sdk_name = "k32w0_sdk"
 nxp_device_layer = "nxp/${nxp_platform}"
 nxp_use_lwip = false
 nxp_use_mbedtls_port = false
-k32w0_sdk_root="${chip_root}/third_party/nxp/k32w0_sdk/repo/core"
+
+if (getenv("NXP_K32W0_SDK_ROOT") == "") {
+  k32w0_sdk_root = "${chip_root}/third_party/nxp/k32w0_sdk/repo/core"
+} else {
+  k32w0_sdk_root = getenv("NXP_K32W0_SDK_ROOT")
+}
 
 # ARM architecture flags will be set based on NXP board.
 arm_platform_config = "${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_arm.gni"
