@@ -140,7 +140,7 @@ public:
     void TriggerCheckInMessages(const std::function<RegistrationVerificationFunction> & verifier);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
 #endif
 
