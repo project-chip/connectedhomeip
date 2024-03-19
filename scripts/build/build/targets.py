@@ -25,12 +25,12 @@ from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, Ho
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBoard, K32WBuilder
-from builders.rw61x import RW61XApp, RW61XBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.rw61x import RW61XApp, RW61XBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder

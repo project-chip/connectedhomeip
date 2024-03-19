@@ -23,8 +23,9 @@ import subprocess
 import sys
 
 from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVersion, HardwareVersionStr, IterationCount,
-                    ManufacturingDate, PaiCert, PartNumber, ProductId, ProductLabel, ProductName, ProductURL, Salt, SerialNum,
-                    SetupPasscode, StrArgument, UniqueId, VendorId, VendorName, Verifier, ProductFinish, ProductPrimaryColor)
+                    ManufacturingDate, PaiCert, PartNumber, ProductFinish, ProductId, ProductLabel, ProductName,
+                    ProductPrimaryColor, ProductURL, Salt, SerialNum, SetupPasscode, StrArgument, UniqueId, VendorId, VendorName,
+                    Verifier)
 from default import InputArgument
 
 # Global variable for hash ID

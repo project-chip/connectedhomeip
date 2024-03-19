@@ -43,9 +43,9 @@ If any strings are of the wrong length a ValueError is thrown
 # deleting all the comments and renaming all the variables
 
 import copy
+import logging
 import string
 import struct
-import logging
 
 shifts = [[[0, 0], [1, 3], [2, 2], [3, 1]],
           [[0, 0], [1, 5], [2, 4], [3, 3]],

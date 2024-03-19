@@ -31,11 +31,11 @@ import glob
 import json
 import logging
 import os
+import string
 import struct
 import sys
-import string
-import crypto_utils
 
+import crypto_utils
 import jsonschema
 
 sys.path.insert(0, os.path.join(
