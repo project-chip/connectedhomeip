@@ -35,4 +35,4 @@
  *        that uses this flag, either appropriately conditionalize the entire test on this flag, or to exclude
  *        the compliation of that test source file entirely.
  */
-#define CONFIG_BUILD_FOR_HOST_UNIT_TEST CONFIG_BUILD_CHIP_TESTS
+#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
