@@ -213,7 +213,7 @@ public:
      * the timer verification has already been done.
      *
      * commandResponder handles sending InvokeResponses, added by clusters, to the client. The
-     * command responder object must outlive this CommandHandler object. It is only safe to 
+     * command responder object must outlive this CommandHandler object. It is only safe to
      * release after client recieved OnDone callback.
      */
     Protocols::InteractionModel::Status OnInvokeCommandRequest(CommandResponderInterface & commandResponder,

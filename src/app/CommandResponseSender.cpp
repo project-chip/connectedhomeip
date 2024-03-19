@@ -193,8 +193,8 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
     {
         VerifyOrDie(mState == State::ReadyForInvokeResponses);
         SendStatusResponse(status);
-        // The API contract of OnInvokeCommandRequest requires the CommandResponder instance to outlive 
-        // the CommandHandler. Therefore, we cannot safely call Close() here, even though we have 
+        // The API contract of OnInvokeCommandRequest requires the CommandResponder instance to outlive
+        // the CommandHandler. Therefore, we cannot safely call Close() here, even though we have
         // finished sending data. Closing must be deferred until the CommandHandler::OnDone callback.
         mDelayCallingCloseUntilOnDone = true;
     }

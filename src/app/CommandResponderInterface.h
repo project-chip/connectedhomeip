@@ -45,7 +45,7 @@ public:
 
     /**
      * @brief Flush acks right now.
-     * 
+     *
      * Typically called when processing a slow command.
      */
     virtual void FlushAcksRightNow() = 0;
