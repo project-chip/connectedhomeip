@@ -92,9 +92,9 @@ public:
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
 
-    static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess);
-    static void NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess);
-    static void NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess);
+    static void NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error);
+    static void NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error);
+    static void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
     static void NotifyBLEPeripheralAdvReleased();
 
 private:

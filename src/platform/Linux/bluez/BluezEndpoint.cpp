@@ -57,6 +57,7 @@
 #include <glib-object.h>
 #include <glib.h>
 
+#include <ble/BleError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -263,35 +264,45 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
 void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
-    gboolean success = bluez_gatt_manager1_call_register_application_finish(reinterpret_cast<BluezGattManager1 *>(aObject), aResult,
-                                                                            &error.GetReceiver());
+    if (!bluez_gatt_manager1_call_register_application_finish(reinterpret_cast<BluezGattManager1 *>(aObject), aResult,
+                                                              &error.GetReceiver()))
+    {
+        ChipLogError(DeviceLayer, "FAIL: RegisterGattApplication: %s", error->message);
+        switch (error->code)
+        {
+        case G_DBUS_ERROR_NO_REPLY:        // BlueZ crashed or the D-Bus connection is broken
+        case G_DBUS_ERROR_SERVICE_UNKNOWN: // BlueZ service is not available on the bus
+        case G_DBUS_ERROR_UNKNOWN_OBJECT:  // Requested BLE adapter is not available
+            BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(BLE_ERROR_ADAPTER_UNAVAILABLE);
+            break;
+        default:
+            BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR_INTERNAL);
+        }
+        return;
+    }
 
-    VerifyOrReturn(success == TRUE, {
-        ChipLogError(DeviceLayer, "FAIL: RegisterApplication : %s", error->message);
-        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(false);
-    });
-
-    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(true);
-    ChipLogDetail(DeviceLayer, "BluezPeripheralRegisterAppDone done");
+    ChipLogDetail(DeviceLayer, "GATT application registered successfully");
+    BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 {
-    GDBusObject * adapterObject;
-    GAutoPtr<BluezGattManager1> gattMgr;
+    VerifyOrReturnError(mAdapter, CHIP_ERROR_UNINITIALIZED);
+
+    // If the adapter configured in the Init() was unplugged, the g_dbus_interface_get_object()
+    // or bluez_object_get_gatt_manager1() might return nullptr (depending on the timing, since
+    // the D-Bus communication is handled on a separate thread). In such case, we should not
+    // report internal error, but adapter unavailable, so the application can handle the situation
+    // properly.
+
+    GDBusObject * adapterObject = g_dbus_interface_get_object(reinterpret_cast<GDBusInterface *>(mAdapter.get()));
+    VerifyOrReturnError(adapterObject != nullptr, BLE_ERROR_ADAPTER_UNAVAILABLE);
+    GAutoPtr<BluezGattManager1> gattMgr(bluez_object_get_gatt_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
+    VerifyOrReturnError(gattMgr, BLE_ERROR_ADAPTER_UNAVAILABLE);
+
     GVariantBuilder optionsBuilder;
-    GVariant * options;
-
-    VerifyOrExit(mAdapter, ChipLogError(DeviceLayer, "FAIL: NULL mAdapter in %s", __func__));
-
-    adapterObject = g_dbus_interface_get_object(G_DBUS_INTERFACE(mAdapter.get()));
-    VerifyOrExit(adapterObject != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapterObject in %s", __func__));
-
-    gattMgr.reset(bluez_object_get_gatt_manager1(reinterpret_cast<BluezObject *>(adapterObject)));
-    VerifyOrExit(gattMgr, ChipLogError(DeviceLayer, "FAIL: NULL gattMgr in %s", __func__));
-
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
-    options = g_variant_builder_end(&optionsBuilder);
+    GVariant * options = g_variant_builder_end(&optionsBuilder);
 
     bluez_gatt_manager1_call_register_application(
         gattMgr.get(), mpRootPath, options, nullptr,
@@ -300,7 +311,6 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
         },
         this);
 
-exit:
     return CHIP_NO_ERROR;
 }
 
@@ -624,11 +634,8 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplication()
 {
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) { return self->RegisterGattApplicationImpl(); }, this);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(Ble, "Failed to schedule RegisterGattApplication() on CHIPoBluez thread"));
-    return err;
 }
 
 CHIP_ERROR BluezEndpoint::Init(bool aIsCentral, uint32_t aAdapterId)

@@ -145,7 +145,7 @@ find_in_ancestors() {
     fi
 
     # there are environments where these bits are unwanted, unnecessary, or impossible
-    [[ -n $CHIP_NO_SUBMODULES ]] || git submodule update --init
+    [[ -n $CHIP_NO_SUBMODULES ]] || scripts/checkout_submodules.py --shallow --platform darwin
     if [[ -z $CHIP_NO_ACTIVATE ]]; then
         # first run bootstrap/activate in an external env to build everything
         env -i PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 bash -c '. scripts/activate.sh'
