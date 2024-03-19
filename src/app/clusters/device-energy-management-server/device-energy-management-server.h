@@ -180,6 +180,7 @@ public:
     virtual CHIP_ERROR SetAbsMaxPower(int64_t)                                                 = 0;
     virtual CHIP_ERROR SetPowerAdjustmentCapability(PowerAdjustmentCapability::TypeInfo::Type) = 0;
     virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type>)         = 0;
+    virtual CHIP_ERROR SetOptOutState(OptOutStateEnum)                                         = 0;
 
 protected:
     EndpointId mEndpointId = 0;

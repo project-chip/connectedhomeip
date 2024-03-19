@@ -134,7 +134,7 @@ void SetTestEventTrigger_StartTimeAdjustment()
 
 }
 
-void SetTestEventTrigger_UserOptOutOptimization( OptOutStateEnum optOutState )
+void SetTestEventTrigger_UserOptOutOptimization( OptOutStateEnum optOutState)
 {
     ChipLogProgress(Support, "[UserOptOutOptimization-handle] L-%d", __LINE__ );
 
@@ -142,9 +142,9 @@ void SetTestEventTrigger_UserOptOutOptimization( OptOutStateEnum optOutState )
     sOptOutState = dg->GetOptOutState();
 
     // ChipLogProgress(Support, "[UserOptOutOptimization-Test-Event] ");
+    dg->SetOptOutState(optOutState);
 
-    
-// TODO:     
+    // TODO: ??
 }
 
 void SetTestEventTrigger_PowerAdjustRequest()
@@ -179,7 +179,7 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         break;
     case DeviceEnergyManagementTrigger::kUserOptOutLocalOptimization:
         ChipLogProgress(Support, "[UserOptOutLocalOptimization-Test-Event] => Set User opt-out Local Optimization");
-                SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum::kLocalOptOut);
+        SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum::kLocalOptOut);
         break;
     case DeviceEnergyManagementTrigger::kUserOptOutGridOptimization:
         ChipLogProgress(Support, "[UserOptOutGrisOptimization-Test-Event] => Set User opt-out Grid Optimization");

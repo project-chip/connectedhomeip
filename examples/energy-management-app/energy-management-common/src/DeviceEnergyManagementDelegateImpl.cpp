@@ -103,25 +103,29 @@ Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
  */
 Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause)
 {
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = GetForecast();
+    // DataModel::Nullable<Structs::ForecastStruct::Type> forecast = GetForecast();
 
-    if (forecast.IsNull())
+    ChipLogDetail(AppServer, "xxxxxxxxxxx if(null)");
+
+    if (mForecast.IsNull())
     {
+        ChipLogDetail(AppServer, "xxxxxxxxxxx it is null");
         return Status::Failure;
     }
 
-    uint32_t duration = forecast.Value().endTime - forecast.Value().startTime; // the current entire forecast duration
+    uint32_t duration = mForecast.Value().endTime - mForecast.Value().startTime; // the current entire forecast duration
 
     /* Modify start time and end time */
-    forecast.Value().startTime = requestedStartTime;
-    forecast.Value().endTime   = requestedStartTime + duration;
+    mForecast.Value().startTime = requestedStartTime;
+    mForecast.Value().endTime   = requestedStartTime + duration;
 
-    SetForecast(forecast); // This will increment forecast ID
+    SetForecast(mForecast); // This will increment forecast ID
 
     // TODO: callback to the appliance to notify it of a new start time
 
     return Status::Success;
 }
+
 /**
  * @brief Delegate handler for Pause Request
  *
@@ -270,7 +274,7 @@ DataModel::Nullable<Structs::ForecastStruct::Type> DeviceEnergyManagementDelegat
 
 OptOutStateEnum DeviceEnergyManagementDelegate::GetOptOutState()
 {
-    ChipLogDetail(AppServer, "kkkkkkkkkkk mOptOutState %d", static_cast<int>(mOptOutState));
+    ChipLogDetail(AppServer, "mOptOutState %d", static_cast<int>(mOptOutState));
     return mOptOutState;
 }
 
@@ -367,6 +371,25 @@ DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(PowerAdjustmentCapa
 CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type> forecast)
 {
     // TODO see Issue #31147
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum state)
+{
+    // TODO see Issue #31147
+    ChipLogDetail(AppServer, "mOptOutState was %d changed to %d ", static_cast<int>(mOptOutState), static_cast<int>(state));
+    mOptOutState = state;
+
+
+
+    ChipLogDetail(AppServer, "MMMMMMMMMMMMMMMMMM  if (mForecast.IsNull())");
+    if (mForecast.IsNull())
+    {
+        ChipLogDetail(AppServer, "MMMMMMMMMMMMMMMMMM  it is null !");
+    }
+
+
 
     return CHIP_NO_ERROR;
 }

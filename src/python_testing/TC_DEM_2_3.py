@@ -52,30 +52,30 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
             TestStep("4b", "TH reads OptOutState attribute. Verify value is 0x01 (LocalOptOut)"),
             TestStep("5", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
             TestStep("5a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("5b", "TH reads Forecast attribute. Value has to be unchanged from step 3b."),
-            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear."),
-            TestStep("6a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("6b", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            TestStep("7", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization. Verify Command response is SUCCESS."),
-            TestStep("7a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("7b", "TH reads Forecast attribute. Value has to include EarliestStartTime=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Local Optimization."),
-            TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event"),
-            TestStep("8a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("8b", "TH reads OptOutState attribute. Verify value is 0x01 (LocalOptOut)"),
-            TestStep("8c", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
-            TestStep("9", "TH sends StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime) from Forecast, Cause=GridOptimization. Verify Command response is SUCCESS."),
-            TestStep("9a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("9b", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime=EndTime, and ForecastUpdateReason=Grid Optimization"),
-            TestStep("10", "TH sends CancelRequest. Verify Command response is SUCCESS."),
-            TestStep("10a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("10b", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
-            TestStep("11", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime-1 from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
-            TestStep("11a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("11b", "TH reads Forecast attribute. Value has to include StartTime and EndTime unchanged from step 10b"),
-            TestStep("12", "TH sends StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime)+1 from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
-            TestStep("12a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            TestStep("12b", "TH reads Forecast attribute. Value has to include StartTime and EndTime unchanged from step 10b"),
-            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Start Time Adjustment Test Event Clear."),
+            # TestStep("5b", "TH reads Forecast attribute. Value has to be unchanged from step 3b."),
+            # TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear."),
+            # TestStep("6a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            # TestStep("6b", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
+            # TestStep("7", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization. Verify Command response is SUCCESS."),
+            # TestStep("7a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            # TestStep("7b", "TH reads Forecast attribute. Value has to include EarliestStartTime=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Local Optimization."),
+            # TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event"),
+            # TestStep("8a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            # TestStep("8b", "TH reads OptOutState attribute. Verify value is 0x01 (LocalOptOut)"),
+            # TestStep("8c", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
+            # TestStep("9", "TH sends StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime) from Forecast, Cause=GridOptimization. Verify Command response is SUCCESS."),
+            # TestStep("9a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            # TestStep("9b", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime=EndTime, and ForecastUpdateReason=Grid Optimization"),
+            # TestStep("10", "TH sends CancelRequest. Verify Command response is SUCCESS."),
+            # TestStep("10a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            # TestStep("10b", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
+            # TestStep("11", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime-1 from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
+            # TestStep("11a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            # TestStep("11b", "TH reads Forecast attribute. Value has to include StartTime and EndTime unchanged from step 10b"),
+            # TestStep("12", "TH sends StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime)+1 from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
+            # TestStep("12a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            # TestStep("12b", "TH reads Forecast attribute. Value has to include StartTime and EndTime unchanged from step 10b"),
+            # TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Start Time Adjustment Test Event Clear."),
         ]
 
         return steps
@@ -127,6 +127,22 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
         self.step("3c")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
 
+        self.step("4")
+        await self.send_test_event_trigger_user_opt_out_local()
+
+        self.step("4a")
+        await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
+
+        self.step("4b")
+        await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kLocalOptOut)
+
+# TestStep("5", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
+        self.step("5")
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast.EarliestStartTime,
+                                            cause = Clusters.Objects.DeviceEnergyManagement.Enums.CauseEnum.kLocalOptimization)
+
+        self.step("5a")
+        await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
 
 if __name__ == "__main__":
     default_matter_test_main()
