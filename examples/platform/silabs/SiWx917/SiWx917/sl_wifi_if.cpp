@@ -25,15 +25,11 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "sl_board_configuration.h"
-#include "sl_net.h"
-#include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
-#include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
 #include "sl_wlan_config.h"
 #include "task.h"
-#include "wfx_host_events.h"
 
 #if (EXP_BOARD)
 #include "rsi_bt_common_apis.h"
@@ -53,7 +49,6 @@ bool btn0_pressed = false;
 #endif // SL_ICD_ENABLED && SLI_SI91X_MCU_INTERFACE
 
 #include "dhcp_client.h"
-#include "sl_wifi.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #define ADV_SCAN_THRESHOLD -40
@@ -65,11 +60,17 @@ bool btn0_pressed = false;
 
 // TODO: Confirm that this value works for size and timing
 #define WFX_QUEUE_SIZE 10
-
+extern "C" {
+#include "sl_net.h"
+#include "sl_si91x_host_interface.h"
+#include "sl_wifi.h"
+#include "sl_wifi_callback_framework.h"
+#include "wfx_host_events.h"
 #if SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_trng.h"
 #define TRNGKEY_SIZE 4
 #endif // SLI_SI91X_MCU_INTERFACE
+} // extern "C" {
 
 WfxRsi_t wfx_rsi;
 
@@ -553,7 +554,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
             SILABS_LOG("SCAN SSID: %s , ap scan: %s", wfx_rsi.scan_ssid, ap.ssid);
             if (strcmp(wfx_rsi.scan_ssid, ap.ssid) == CMP_SUCCESS)
             {
-                ap.security = scan_result->scan_info[x].security_mode;
+                ap.security = static_cast<wfx_sec_t>(scan_result->scan_info[x].security_mode);
                 ap.rssi     = (-1) * scan_result->scan_info[x].rssi_val;
                 memcpy(&ap.bssid[0], &scan_result->scan_info[x].bssid[0], BSSID_MAX_STR_LEN);
                 (*wfx_rsi.scan_cb)(&ap);
@@ -562,7 +563,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
         }
         else
         {
-            ap.security = scan_result->scan_info[x].security_mode;
+            ap.security = static_cast<wfx_sec_t>(scan_result->scan_info[x].security_mode);
             ap.rssi     = (-1) * scan_result->scan_info[x].rssi_val;
             memcpy(&ap.bssid[0], &scan_result->scan_info[x].bssid[0], BSSID_MAX_STR_LEN);
             (*wfx_rsi.scan_cb)(&ap);
@@ -597,8 +598,7 @@ static void wfx_rsi_save_ap_info() // translation
 {
     sl_status_t status = SL_STATUS_OK;
 #ifndef EXP_BOARD // TODO: this changes will be reverted back after the SDK team fix the scan API
-    sl_wifi_scan_configuration_t wifi_scan_configuration = { 0 };
-    wifi_scan_configuration                              = default_wifi_scan_configuration;
+    sl_wifi_scan_configuration_t wifi_scan_configuration = default_wifi_scan_configuration;
 #endif
     sl_wifi_ssid_t ssid_arg;
     ssid_arg.length = strlen(wfx_rsi.sec.ssid);
@@ -682,10 +682,11 @@ static sl_status_t wfx_rsi_do_join(void)
         /* Call rsi connect call with given ssid and password
          * And check there is a success
          */
-        sl_wifi_credential_t cred = { 0 };
-        cred.type                 = SL_WIFI_PSK_CREDENTIAL;
+        sl_wifi_credential_t cred;
+        memset(&cred, 0, sizeof(sl_wifi_credential_t));
+        cred.type = SL_WIFI_PSK_CREDENTIAL;
         memcpy(cred.psk.value, &wfx_rsi.sec.passkey[0], strlen(wfx_rsi.sec.passkey));
-        sl_wifi_credential_id_t id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
+        sl_net_credential_id_t id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
         status = sl_net_set_credential(id, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0], strlen(wfx_rsi.sec.passkey));
         if (SL_STATUS_OK != status)
         {
@@ -851,7 +852,9 @@ void ProcessEvent(WfxEvent_t inEvent)
         if (!(wfx_rsi.dev_state & WFX_RSI_ST_SCANSTARTED))
         {
             SILABS_LOG("%s: start SSID scan", __func__);
-            sl_wifi_scan_configuration_t wifi_scan_configuration = { 0 };
+            sl_wifi_scan_configuration_t wifi_scan_configuration;
+            memset(&wifi_scan_configuration, 0, sizeof(sl_wifi_scan_configuration_t));
+
 
             // TODO: Add scan logic
             sl_wifi_advanced_scan_configuration_t advanced_scan_configuration = { 0 };

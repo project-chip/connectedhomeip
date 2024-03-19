@@ -103,16 +103,14 @@ bool wfx_is_sta_mode_enabled(void)
  ***********************************************************************/
 void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
 {
-    sl_wfx_mac_address_t * mac;
-
+    if (addr)
+    {
 #ifdef SL_WFX_CONFIG_SOFTAP
-    mac = (interface == SL_WFX_SOFTAP_INTERFACE) ? &wfx_rsi.softap_mac : &wfx_rsi.sta_mac;
+        *addr = (interface == SL_WFX_SOFTAP_INTERFACE) ? wfx_rsi.softap_mac : wfx_rsi.sta_mac;
 #else
-    mac = &wfx_rsi.sta_mac;
+        *addr = wfx_rsi.sta_mac;
 #endif
-    *addr = *mac;
-    SILABS_LOG("%s: %02x:%02x:%02x:%02x:%02x:%02x", __func__, mac->octet[0], mac->octet[1], mac->octet[2], mac->octet[3],
-               mac->octet[4], mac->octet[5]);
+    }
 }
 
 /*********************************************************************
@@ -125,10 +123,11 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * 
  ***********************************************************************/
 void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
 {
-    SILABS_LOG("%s: SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
-
-    wfx_rsi.sec = *cfg;
-    wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
+    if (cfg)
+    {
+        wfx_rsi.sec = *cfg;
+        wfx_rsi.dev_state |= WFX_RSI_ST_STA_PROVISIONED;
+    }
 }
 
 /*********************************************************************
@@ -179,13 +178,13 @@ sl_status_t wfx_connect_to_ap(void)
     WfxEvent_t event;
     if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
     {
-        SILABS_LOG("%s: connecting to access point -> SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
+        SILABS_LOG("Connecting to access point -> SSID: %s", &wfx_rsi.sec.ssid[0]);
         event.eventType = WFX_EVT_STA_START_JOIN;
         WfxPostEvent(&event);
     }
     else
     {
-        SILABS_LOG("%s: error: access point not provisioned", __func__);
+        SILABS_LOG("Error: access point not provisioned.");
         return SL_STATUS_INVALID_CONFIGURATION;
     }
     return SL_STATUS_OK;
@@ -237,9 +236,8 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
  ***********************************************************************/
 bool wfx_is_sta_connected(void)
 {
-    bool status;
-    status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) ? true : false;
-    SILABS_LOG("%s: status: %s", __func__, (status ? "connected" : "not connected"));
+    bool status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) > 0;
+    SILABS_LOG("%s: %s", __func__, (status ? "Connected" : "Disconnected"));
     return status;
 }
 
@@ -289,7 +287,7 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
     bool status = false;
     if (which_if == SL_WFX_STA_INTERFACE)
     {
-        status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_DHCP_DONE) ? true : false;
+        status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_DHCP_DONE) > 0;
     }
     else
     {
@@ -313,13 +311,13 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
     bool status = false;
     if (which_if == SL_WFX_STA_INTERFACE)
     {
-        status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) ? true : false;
+        status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) > 0;
     }
     else
     {
         status = false; /* TODO */
     }
-    SILABS_LOG("%s: status: %d", __func__, status);
+    SILABS_LOG("%s: %d", __func__, status);
     return status;
 }
 
