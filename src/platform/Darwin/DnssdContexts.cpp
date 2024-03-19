@@ -436,7 +436,6 @@ void BrowseWithDelegateContext::OnBrowseAdd(const char * name, const char * type
     ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
-
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     auto service  = GetService(name, type, protocol, interfaceId);
     delegate->OnBrowseAdd(service);
@@ -562,8 +561,8 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     }
 
     std::pair<uint32_t, std::string> interfaceKey = std::make_pair(interfaceIndex, this->domainName);
-    auto & interface = interfaces[interfaceKey];
-    auto & ips       = interface.addresses;
+    auto & interface                              = interfaces[interfaceKey];
+    auto & ips                                    = interface.addresses;
 
     // Some interface may not have any ips, just ignore them.
     if (ips.size() == 0)

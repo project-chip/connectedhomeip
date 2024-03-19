@@ -60,7 +60,7 @@ std::string GetHostNameWithLocalDomain(const char * hostname)
 
 bool HostNameHasDomain(const char * hostname, const char * domain)
 {
-    size_t domainLength = strlen(domain);
+    size_t domainLength   = strlen(domain);
     size_t hostnameLength = strlen(hostname);
     if (domainLength > hostnameLength)
     {
@@ -151,7 +151,6 @@ std::shared_ptr<uint32_t> GetCounterHolder(const char * name)
 namespace chip {
 namespace Dnssd {
 
-
 std::string GetDomainFromHostName(const char * hostname)
 {
     if (HostNameHasDomain(hostname, kLocalDot))
@@ -178,7 +177,8 @@ namespace {
 void OpenThreadTimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
     ChipLogProgress(Discovery, "Mdns: Resolve completed on the open thread domain.");
-    VerifyOrReturn(callbackContext != nullptr && systemLayer != nullptr, ChipLogError(Discovery, "Open thread timer callback context is null"));
+    VerifyOrReturn(callbackContext != nullptr && systemLayer != nullptr,
+                   ChipLogError(Discovery, "Open thread timer callback context is null"));
 
     auto sdCtx = reinterpret_cast<ResolveContext *>(callbackContext);
     VerifyOrReturn(sdCtx != nullptr, ChipLogError(Discovery, "Resolve Context is null"));
@@ -195,8 +195,8 @@ void OpenThreadTimerExpiredCallback(System::Layer * systemLayer, void * callback
 void StartOpenThreadTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
 {
     VerifyOrReturn(ctx != nullptr, ChipLogError(Discovery, "Can't schedule open thread timer since context is null"));
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeoutInMSecs),
-        OpenThreadTimerExpiredCallback, reinterpret_cast<void*>(ctx));
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeoutInMSecs), OpenThreadTimerExpiredCallback,
+                                          reinterpret_cast<void *>(ctx));
 }
 
 static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType err, const char * name, const char * type,
@@ -254,7 +254,7 @@ CHIP_ERROR Browse(BrowseHandler * sdCtx, uint32_t interfaceId, const char * type
     ChipLogProgress(Discovery, "Browsing for: %s on domain %s", StringOrNullMarker(type), kLocalDot);
 
     auto sdRefLocal = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    err = DNSServiceBrowse(&sdRefLocal, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
+    err             = DNSServiceBrowse(&sdRefLocal, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     ChipLogProgress(Discovery, "Browsing for: %s on domain %s", StringOrNullMarker(type), kOpenThreadDot);
@@ -316,7 +316,9 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
         }
         else if (sdCtx->domainName.compare(kLocalDot) == 0)
         {
-            ChipLogProgress(Discovery, "Mdns: Resolve completed on the local domain. Starting a timer for the open thread resolve to come back");
+            ChipLogProgress(
+                Discovery,
+                "Mdns: Resolve completed on the local domain. Starting a timer for the open thread resolve to come back");
             if (!hasOpenThreadTimerStarted)
             {
                 // Schedule a timer to allow the resolve on OpenThread domain to complete.
@@ -379,11 +381,11 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
 
     // Similar to browse, will try to resolve using both the local domain and the open thread domain.
     auto sdRefLocal = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    err            = DNSServiceResolve(&sdRefLocal, kResolveFlags, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
+    err             = DNSServiceResolve(&sdRefLocal, kResolveFlags, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     auto sdRefOpenThread = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    err            = DNSServiceResolve(&sdRefOpenThread, kResolveFlags, interfaceId, name, type, kOpenThreadDot, OnResolve, sdCtx);
+    err = DNSServiceResolve(&sdRefOpenThread, kResolveFlags, interfaceId, name, type, kOpenThreadDot, OnResolve, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     auto retval = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
