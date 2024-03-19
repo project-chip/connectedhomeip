@@ -152,7 +152,7 @@ namespace chip {
 namespace Dnssd {
 
 
-std::string GetDomainNameFromHostName(const char * hostname)
+std::string GetDomainFromHostName(const char * hostname)
 {
     if (HostNameHasDomain(hostname, kLocalDot))
     {
@@ -293,7 +293,12 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     ReturnOnFailure(MdnsContexts::GetInstance().Has(sdCtx));
     LogOnFailure(__func__, err);
 
-    sdCtx->domainName = GetDomainNameFromHostName(hostname);
+    sdCtx->domainName = GetDomainFromHostName(hostname);
+    if (sdCtx->domainName.empty())
+    {
+        ChipLogError(Discovery, "Mdns: Domain name is not set");
+        return;
+    }
     if (kDNSServiceErr_NoError == err)
     {
         std::pair<uint32_t, std::string> key = std::make_pair(interfaceId, sdCtx->domainName);

@@ -705,7 +705,14 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
-    std::pair<uint32_t, std::string> interfaceKey = std::make_pair(interfaceId, GetDomainNameFromHostName(hostnameWithDomain));
+    std::string domainFromHostname = GetDomainFromHostName(hostnameWithDomain);
+    if (domainFromHostname.empty())
+    {
+        ChipLogError(Discovery, "Mdns: Domain from hostname is empty");
+        return;
+    }
+
+    std::pair<uint32_t, std::string> interfaceKey = std::make_pair(interfaceId, domainFromHostname);
 
     interfaces.insert(std::make_pair(interfaceKey, std::move(interface)));
 }

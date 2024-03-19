@@ -34,7 +34,7 @@ constexpr char kOpenThreadDot[] = "openthread.thread.home.arpa";
 namespace chip {
 namespace Dnssd {
 
-std::string GetDomainNameFromHostName(const char * hostname);
+std::string GetDomainFromHostName(const char * hostname);
 
 enum class ContextType
 {
