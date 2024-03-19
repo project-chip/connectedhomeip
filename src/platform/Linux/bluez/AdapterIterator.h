@@ -48,6 +48,9 @@ namespace Internal {
 class AdapterIterator
 {
 public:
+    AdapterIterator() = default;
+    ~AdapterIterator() { Shutdown(); }
+
     /// Moves to the next DBUS interface.
     ///
     /// MUST be called before any of the 'current value' methods are
@@ -66,6 +69,8 @@ public:
 private:
     /// Sets up the DBUS manager and loads the list
     CHIP_ERROR Initialize();
+    /// Destroys the DBUS manager
+    CHIP_ERROR Shutdown();
 
     /// Loads the next value in the list.
     ///

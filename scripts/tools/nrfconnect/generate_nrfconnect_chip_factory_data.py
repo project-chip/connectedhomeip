@@ -246,7 +246,7 @@ class FactoryDataGenerator:
             "Cannot find paths to DAC or PAI certificates .der files. To generate a new ones please provide a path to chip-cert executable (--chip_cert_path) and add --gen_certs argument"
         assert self._args.output.endswith(".json"), \
             "Output path doesn't contain .json file path. ({})".format(self._args.output)
-        assert not (self._args.passcode in INVALID_PASSCODES), \
+        assert self._args.passcode not in INVALID_PASSCODES, \
             "Provided invalid passcode!"
 
     def generate_json(self):

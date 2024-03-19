@@ -76,8 +76,8 @@ static_library("nxp_platform") {
 
   if (chip_enable_ble) {
     sources += [
-      # Adding rand32 file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
-      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/random/rand32.cpp",
+      # Adding random file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/random/random.cpp",
       "../../../Zephyr/BLEAdvertisingArbiter.cpp",
       "../../../Zephyr/BLEManagerImpl.cpp",
       "../../common/ble_zephyr/BLEManagerImpl.h",

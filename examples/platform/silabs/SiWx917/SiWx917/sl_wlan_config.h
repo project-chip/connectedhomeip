@@ -48,21 +48,11 @@ static const sl_wifi_device_configuration_t config = {
 #endif
                                                 | SL_SI91X_TCP_IP_FEAT_ICMP | SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID),
                      .custom_feature_bit_map     = (SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID | RSI_CUSTOM_FEATURE_BIT_MAP),
-                     .ext_custom_feature_bit_map = (
-#ifdef SLI_SI917
-                         (RSI_EXT_CUSTOM_FEATURE_BIT_MAP)
-#else // defaults
-#ifdef SLI_SI91X_MCU_INTERFACE
-                         (SL_SI91X_EXT_FEAT_256K_MODE | RSI_EXT_CUSTOM_FEATURE_BIT_MAP)
-#else
-                         (SL_SI91X_EXT_FEAT_384K_MODE | RSI_EXT_CUSTOM_FEATURE_BIT_MAP)
-#endif
-#endif // SLI_SI917
-                         | (SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE)
+                     .ext_custom_feature_bit_map = (RSI_EXT_CUSTOM_FEATURE_BIT_MAP | (SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE)
 #if (defined A2DP_POWER_SAVE_ENABLE)
-                         | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2)
+                                                    | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2)
 #endif
-                             ),
+                                                        ),
                      .bt_feature_bit_map = (RSI_BT_FEATURE_BITMAP
 #if (RSI_BT_GATT_ON_CLASSIC)
                                             | SL_SI91X_BT_ATT_OVER_CLASSIC_ACL /* to support att over classic acl link */

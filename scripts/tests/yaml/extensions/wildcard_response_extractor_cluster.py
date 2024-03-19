@@ -113,7 +113,7 @@ class wildcard_response_extractor_cluster(PseudoCluster):
         if arguments is None:
             return None
 
-        if not type(arguments) is list:
+        if type(arguments) is not list:
             return None
 
         for argument in arguments:

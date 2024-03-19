@@ -29,13 +29,12 @@
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
+#include "BluezEndpoint.h"
 #include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-class BluezEndpoint;
 
 class BluezAdvertisement
 {
