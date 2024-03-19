@@ -26,11 +26,12 @@
 #include <jni.h>
 
 #include <lib/core/CHIPError.h>
-#include <platform/android/AndroidChipPlatform-JNI.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/UnitTest.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <platform/android/AndroidChipPlatform-JNI.h>
 
 #include <nlunit-test.h>
 
@@ -255,9 +256,9 @@ static nl_test_output_logger_t jni_test_logger = {
 extern "C" JNIEXPORT jint Java_com_tcl_chip_chiptest_TestEngine_runTest(JNIEnv * env, jclass clazz)
 {
     nlTestSetLogger(&jni_test_logger);
-
+    // TODO [PW_MIGRATION] Remove NLUnit tests call after migration
     jint ret = RunRegisteredUnitTests();
-    // ret += RUN_ALL_TESTS();
+    ret += chip::test::RunAllTests();
 
     return ret;
 }
