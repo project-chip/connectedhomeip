@@ -31,7 +31,7 @@ The example supports:
 
 -   Matter over Wi-Fi
 -   Matter over Openthread
--   Matter over Wi-Fi with OpenThead Border Router support.
+-   Matter over Wi-Fi with OpenThread Border Router support.
 
 ### Hardware requirements
 
@@ -46,7 +46,7 @@ For Matter over WiFi configuration :
 -   BLE antenna (to plug in Ant1)
 -   Wi-Fi antenna (to plug in Ant2)
 
-For Matter over Wi-Fi with OpenThead Border Router :
+For Matter over Wi-Fi with OpenThread Border Router :
 
 -   [`NXP RD-RW612-BGA`] board
 -   BLE/15.4 antenna (to plug in Ant1)
@@ -143,7 +143,7 @@ Optional GN options that can be added when building an application:
 -   To build the application with the OTA Requestor enabled, the arguments
     `chip_enable_ota_requestor=true no_mcuboot=false` must be added to the _gn
     gen_ command. (More information about the OTA Requestor feature in
-    [OTA Requestor README](../../../../../docs/guides/nxp_rw61x_ota_software_update.md)))
+    [OTA Requestor README](../../../../../docs/guides/nxp_rw61x_ota_software_update.md)
 
 ## Manufacturing data
 
@@ -158,9 +158,9 @@ software key before flashing them to the device flash.
 
 Using DAC private key secure usage: Experimental feature, contain some
 limitation: potential concurrent access issue during sign with dac key operation
-due to the lack of protection between multiple access to ELS crypto module. The
+due to the lack of protection between multiple access to _ELS_ crypto module. The
 argument `chip_enable_secure_dac_private_key_storage=1` must be added to the _gn
-gen_ command to enable secure privte DAC key usage with S50.
+gen_ command to enable secure private DAC key usage with S50.
 `chip_with_factory_data=1` must have been added to the _gn gen_ command
 
 DAC private key generation: The argument `chip_convert_dac_private_key=1` must
@@ -168,8 +168,7 @@ be added to the _gn gen_ command to enable DAC private plain key convertion to
 blob with S50. `chip_enable_secure_dac_private_key_storage=1` must have been
 added to the _gn gen_ command
 
-ELS contain concurrent access risks. They must be fixed before default
-enablement.
+_ELS_ contain concurrent access risks. They must be fixed before enabling it by default.
 
 <a name="flashing-and-debugging"></a>
 
