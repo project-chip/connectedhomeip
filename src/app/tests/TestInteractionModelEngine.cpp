@@ -22,9 +22,10 @@
  *
  */
 
-#include <app/AppConfig.h>
+// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
 #include <lib/core/CHIPCore.h>
 
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>

@@ -22,6 +22,9 @@
  *
  */
 
+// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
+#include <lib/core/CHIPCore.h>
+
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeAccessInterface.h>
