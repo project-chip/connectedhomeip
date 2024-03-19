@@ -26,7 +26,7 @@
 #include "AppTaskZephyr.h"
 #endif
 
-namespace ThermostatApp{
+namespace ThermostatApp {
 #if CONFIG_APP_FREERTOS_OS
 class AppTask : public chip::NXP::App::AppTaskFreeRTOS
 #else

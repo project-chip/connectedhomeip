@@ -20,7 +20,6 @@
 #include "AppEvent.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <lib/core/ErrorStr.h>
 
 #include <DeviceInfoProviderImpl.h>
@@ -34,11 +33,9 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/attribute-storage.h>
 #include <app/InteractionModelEngine.h>
+#include <app/util/attribute-storage.h>
 
-
-#include "PWR_Interface.h"
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
@@ -195,7 +192,7 @@ void AppTask::InitServer(intptr_t arg)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-    auto& infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
+    auto & infoProvider = chip::DeviceLayer::DeviceInfoProviderImpl::GetDefaultInstance();
     infoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&infoProvider);
 
@@ -336,7 +333,7 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 
 void AppTask::KBD_Callback(uint8_t events)
 {
-    eventMask = eventMask | (uint32_t)(1 << events);
+    eventMask = eventMask | (uint32_t) (1 << events);
 
     HandleKeyboard();
 }

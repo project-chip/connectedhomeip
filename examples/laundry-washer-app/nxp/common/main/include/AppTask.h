@@ -45,7 +45,7 @@ private:
     static AppTask sAppTask;
 };
 
-} //namespace LaundryWasherApp
+} // namespace LaundryWasherApp
 
 /**
  * Returns the application-specific implementation of the AppTaskBase object.

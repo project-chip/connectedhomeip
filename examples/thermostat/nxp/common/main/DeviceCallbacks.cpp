@@ -78,8 +78,9 @@ using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
-void ThermostatApp::DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                                          uint8_t type, uint16_t size, uint8_t * value)
+void ThermostatApp::DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId,
+                                                                 AttributeId attributeId, uint8_t type, uint16_t size,
+                                                                 uint8_t * value)
 {
     ChipLogProgress(DeviceLayer,
                     "endpointId " ChipLogFormatMEI " clusterId " ChipLogFormatMEI " attribute ID: " ChipLogFormatMEI

@@ -36,7 +36,7 @@ public:
     // This returns an instance of this class.
     static DeviceCallbacks & GetDefaultInstance();
     void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t type, uint16_t size, uint8_t * value);
+                                     uint8_t type, uint16_t size, uint8_t * value);
 
 private:
     void OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);

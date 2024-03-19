@@ -26,7 +26,6 @@
 
 using namespace chip;
 
-
 void ThermostatApp::AppTask::PreInitMatterStack()
 {
     ChipLogProgress(DeviceLayer, "Welcome to NXP thermostat Demo App");

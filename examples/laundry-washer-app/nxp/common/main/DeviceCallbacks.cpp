@@ -80,8 +80,9 @@ using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
-void LaundryWasherApp::DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                                          uint8_t type, uint16_t size, uint8_t * value)
+void LaundryWasherApp::DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId,
+                                                                    AttributeId attributeId, uint8_t type, uint16_t size,
+                                                                    uint8_t * value)
 {
     ChipLogProgress(DeviceLayer,
                     "endpointId " ChipLogFormatMEI " clusterId " ChipLogFormatMEI " attribute ID: " ChipLogFormatMEI
@@ -95,8 +96,8 @@ void LaundryWasherApp::DeviceCallbacks::PostAttributeChangeCallback(EndpointId e
     }
 }
 
-void LaundryWasherApp::DeviceCallbacks::OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                                                                 uint8_t * value)
+void LaundryWasherApp::DeviceCallbacks::OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId,
+                                                                           chip::AttributeId attributeId, uint8_t * value)
 {
     switch (attributeId)
     {
