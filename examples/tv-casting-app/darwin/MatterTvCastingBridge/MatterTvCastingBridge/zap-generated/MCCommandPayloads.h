@@ -19,9 +19,6 @@
 
 #import "MCInteractionModelStructs.h"
 
-#import <Matter/MTRDefines.h>
-#import <Matter/MTRStructsObjc.h>
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MCAbstractPayload : NSObject <NSCopying>

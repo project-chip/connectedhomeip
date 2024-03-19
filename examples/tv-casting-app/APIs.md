@@ -907,7 +907,7 @@ playback state, and [subscribe](#subscriptions) to playback events.
 
 On Linux refer to the following platform specific files:
 
-1. For list of clusters, command and attributes supported by the Matter TV
+1. For a list of clusters, commands and attributes supported by the Matter TV
    Casting library:
    [tv-casting-common/clusters/Clusters.h](tv-casting-common/clusters/Clusters.h)
 2. For the IDs and request / response types to use with these APIs:
@@ -915,10 +915,10 @@ On Linux refer to the following platform specific files:
 
 On iOS refer to the following platform specific files:
 
-1. For list of clusters, command and attributes supported by the Matter TV
+1. For a list of clusters, commands and attributes supported by the Matter TV
    Casting library:
    [/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.h](/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.h)
-2. For the IDs and request / response types to use with these APIs:
+2. For the IDs and request / response types to use with the commands:
    [/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandObjects.h](/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandObjects.h)
    and
    [/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandPayloads.h](/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandPayloads.h)

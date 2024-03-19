@@ -1722,156 +1722,157 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type cppStruct;
     ListFreer listFreer;
     {
-        { using ListType_1 = std::remove_reference_t<decltype(cppStruct.search.parameterList)>;
-    using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-    if (self.search.parameterList.count != 0) {
-        auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.search.parameterList.count);
-        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        listFreer.add(listHolder_1);
-        for (size_t i_1 = 0; i_1 < self.search.parameterList.count; ++i_1) {
-            if (![self.search.parameterList[i_1] isKindOfClass:[MCContentLauncherClusterParameterStruct class]]) {
-                // Wrong kind of value.
-                return CHIP_ERROR_INVALID_ARGUMENT;
+        {
+            using ListType_1 = std::remove_reference_t<decltype(cppStruct.search.parameterList)>;
+            using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+            if (self.search.parameterList.count != 0) {
+                auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.search.parameterList.count);
+                if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_1);
+                for (size_t i_1 = 0; i_1 < self.search.parameterList.count; ++i_1) {
+                    if (![self.search.parameterList[i_1] isKindOfClass:[MCContentLauncherClusterParameterStruct class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_1 = (MCContentLauncherClusterParameterStruct *) self.search.parameterList[i_1];
+                    listHolder_1->mList[i_1].type = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].type)>>(element_1.type.unsignedCharValue);
+                    listHolder_1->mList[i_1].value = AsCharSpan(element_1.value);
+                    if (element_1.externalIDList != nil) {
+                        auto & definedValue_3 = listHolder_1->mList[i_1].externalIDList.Emplace();
+                        {
+                            using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
+                            using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                            if (element_1.externalIDList.count != 0) {
+                                auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_1.externalIDList.count);
+                                if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_4);
+                                for (size_t i_4 = 0; i_4 < element_1.externalIDList.count; ++i_4) {
+                                    if (![element_1.externalIDList[i_4] isKindOfClass:[MCContentLauncherClusterAdditionalInfoStruct class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_4 = (MCContentLauncherClusterAdditionalInfoStruct *) element_1.externalIDList[i_4];
+                                    listHolder_4->mList[i_4].name = AsCharSpan(element_4.name);
+                                    listHolder_4->mList[i_4].value = AsCharSpan(element_4.value);
+                                }
+                                definedValue_3 = ListType_4(listHolder_4->mList, element_1.externalIDList.count);
+                            } else {
+                                definedValue_3 = ListType_4();
+                            }
+                        }
+                    }
+                }
+                cppStruct.search.parameterList = ListType_1(listHolder_1->mList, self.search.parameterList.count);
+            } else {
+                cppStruct.search.parameterList = ListType_1();
             }
-            auto element_1 = (MCContentLauncherClusterParameterStruct *) self.search.parameterList[i_1];
-            listHolder_1->mList[i_1].type = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].type)>>(element_1.type.unsignedCharValue);
-            listHolder_1->mList[i_1].value = AsCharSpan(element_1.value);
-            if (element_1.externalIDList != nil) {
-                auto & definedValue_3 = listHolder_1->mList[i_1].externalIDList.Emplace();
+        }
+    }
+    {
+        cppStruct.autoPlay = self.autoPlay.boolValue;
+    }
+    {
+        if (self.data != nil) {
+            auto & definedValue_0 = cppStruct.data.Emplace();
+            definedValue_0 = AsCharSpan(self.data);
+        }
+    }
+    {
+        if (self.playbackPreferences != nil) {
+            auto & definedValue_0 = cppStruct.playbackPreferences.Emplace();
+            definedValue_0.playbackPosition = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
+            definedValue_0.textTrack.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
+            if (self.playbackPreferences.textTrack.characteristics != nil) {
+                auto & definedValue_3 = definedValue_0.textTrack.characteristics.Emplace();
                 {
                     using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
                     using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                    if (element_1.externalIDList.count != 0) {
-                        auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_1.externalIDList.count);
+                    if (self.playbackPreferences.textTrack.characteristics.count != 0) {
+                        auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.textTrack.characteristics.count);
                         if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         listFreer.add(listHolder_4);
-                        for (size_t i_4 = 0; i_4 < element_1.externalIDList.count; ++i_4) {
-                            if (![element_1.externalIDList[i_4] isKindOfClass:[MCContentLauncherClusterAdditionalInfoStruct class]]) {
+                        for (size_t i_4 = 0; i_4 < self.playbackPreferences.textTrack.characteristics.count; ++i_4) {
+                            if (![self.playbackPreferences.textTrack.characteristics[i_4] isKindOfClass:[NSNumber class]]) {
                                 // Wrong kind of value.
                                 return CHIP_ERROR_INVALID_ARGUMENT;
                             }
-                            auto element_4 = (MCContentLauncherClusterAdditionalInfoStruct *) element_1.externalIDList[i_4];
-                            listHolder_4->mList[i_4].name = AsCharSpan(element_4.name);
-                            listHolder_4->mList[i_4].value = AsCharSpan(element_4.value);
+                            auto element_4 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_4];
+                            listHolder_4->mList[i_4] = static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(element_4.unsignedCharValue);
                         }
-                        definedValue_3 = ListType_4(listHolder_4->mList, element_1.externalIDList.count);
+                        definedValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.textTrack.characteristics.count);
                     } else {
                         definedValue_3 = ListType_4();
                     }
                 }
             }
-        }
-        cppStruct.search.parameterList = ListType_1(listHolder_1->mList, self.search.parameterList.count);
-    } else {
-        cppStruct.search.parameterList = ListType_1();
-    }
-}
-}
-{
-    cppStruct.autoPlay = self.autoPlay.boolValue;
-}
-{
-    if (self.data != nil) {
-        auto & definedValue_0 = cppStruct.data.Emplace();
-        definedValue_0 = AsCharSpan(self.data);
-    }
-}
-{
-    if (self.playbackPreferences != nil) {
-        auto & definedValue_0 = cppStruct.playbackPreferences.Emplace();
-        definedValue_0.playbackPosition = self.playbackPreferences.playbackPosition.unsignedLongLongValue;
-        definedValue_0.textTrack.languageCode = AsCharSpan(self.playbackPreferences.textTrack.languageCode);
-        if (self.playbackPreferences.textTrack.characteristics != nil) {
-            auto & definedValue_3 = definedValue_0.textTrack.characteristics.Emplace();
-            {
-                using ListType_4 = std::remove_reference_t<decltype(definedValue_3)>;
-                using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                if (self.playbackPreferences.textTrack.characteristics.count != 0) {
-                    auto * listHolder_4 = new ListHolder<ListMemberType_4>(self.playbackPreferences.textTrack.characteristics.count);
-                    if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_4);
-                    for (size_t i_4 = 0; i_4 < self.playbackPreferences.textTrack.characteristics.count; ++i_4) {
-                        if (![self.playbackPreferences.textTrack.characteristics[i_4] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
+            definedValue_0.textTrack.audioOutputIndex = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
+            if (self.playbackPreferences.audioTracks != nil) {
+                auto & definedValue_2 = definedValue_0.audioTracks.Emplace();
+                {
+                    using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
+                    using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                    if (self.playbackPreferences.audioTracks.count != 0) {
+                        auto * listHolder_3 = new ListHolder<ListMemberType_3>(self.playbackPreferences.audioTracks.count);
+                        if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_4 = (NSNumber *) self.playbackPreferences.textTrack.characteristics[i_4];
-                        listHolder_4->mList[i_4] = static_cast<std::remove_reference_t<decltype(listHolder_4->mList[i_4])>>(element_4.unsignedCharValue);
-                    }
-                    definedValue_3 = ListType_4(listHolder_4->mList, self.playbackPreferences.textTrack.characteristics.count);
-                } else {
-                    definedValue_3 = ListType_4();
-                }
-            }
-        }
-        definedValue_0.textTrack.audioOutputIndex = self.playbackPreferences.textTrack.audioOutputIndex.unsignedCharValue;
-        if (self.playbackPreferences.audioTracks != nil) {
-            auto & definedValue_2 = definedValue_0.audioTracks.Emplace();
-            {
-                using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
-                using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
-                if (self.playbackPreferences.audioTracks.count != 0) {
-                    auto * listHolder_3 = new ListHolder<ListMemberType_3>(self.playbackPreferences.audioTracks.count);
-                    if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_3);
-                    for (size_t i_3 = 0; i_3 < self.playbackPreferences.audioTracks.count; ++i_3) {
-                        if (![self.playbackPreferences.audioTracks[i_3] isKindOfClass:[MCContentLauncherClusterTrackPreferenceStruct class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_3 = (MCContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_3];
-                        listHolder_3->mList[i_3].languageCode = AsCharSpan(element_3.languageCode);
-                        if (element_3.characteristics != nil) {
-                            auto & definedValue_5 = listHolder_3->mList[i_3].characteristics.Emplace();
-                            {
-                                using ListType_6 = std::remove_reference_t<decltype(definedValue_5)>;
-                                using ListMemberType_6 = ListMemberTypeGetter<ListType_6>::Type;
-                                if (element_3.characteristics.count != 0) {
-                                    auto * listHolder_6 = new ListHolder<ListMemberType_6>(element_3.characteristics.count);
-                                    if (listHolder_6 == nullptr || listHolder_6->mList == nullptr) {
-                                        return CHIP_ERROR_INVALID_ARGUMENT;
-                                    }
-                                    listFreer.add(listHolder_6);
-                                    for (size_t i_6 = 0; i_6 < element_3.characteristics.count; ++i_6) {
-                                        if (![element_3.characteristics[i_6] isKindOfClass:[NSNumber class]]) {
-                                            // Wrong kind of value.
+                        listFreer.add(listHolder_3);
+                        for (size_t i_3 = 0; i_3 < self.playbackPreferences.audioTracks.count; ++i_3) {
+                            if (![self.playbackPreferences.audioTracks[i_3] isKindOfClass:[MCContentLauncherClusterTrackPreferenceStruct class]]) {
+                                // Wrong kind of value.
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            auto element_3 = (MCContentLauncherClusterTrackPreferenceStruct *) self.playbackPreferences.audioTracks[i_3];
+                            listHolder_3->mList[i_3].languageCode = AsCharSpan(element_3.languageCode);
+                            if (element_3.characteristics != nil) {
+                                auto & definedValue_5 = listHolder_3->mList[i_3].characteristics.Emplace();
+                                {
+                                    using ListType_6 = std::remove_reference_t<decltype(definedValue_5)>;
+                                    using ListMemberType_6 = ListMemberTypeGetter<ListType_6>::Type;
+                                    if (element_3.characteristics.count != 0) {
+                                        auto * listHolder_6 = new ListHolder<ListMemberType_6>(element_3.characteristics.count);
+                                        if (listHolder_6 == nullptr || listHolder_6->mList == nullptr) {
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
-                                        auto element_6 = (NSNumber *) element_3.characteristics[i_6];
-                                        listHolder_6->mList[i_6] = static_cast<std::remove_reference_t<decltype(listHolder_6->mList[i_6])>>(element_6.unsignedCharValue);
+                                        listFreer.add(listHolder_6);
+                                        for (size_t i_6 = 0; i_6 < element_3.characteristics.count; ++i_6) {
+                                            if (![element_3.characteristics[i_6] isKindOfClass:[NSNumber class]]) {
+                                                // Wrong kind of value.
+                                                return CHIP_ERROR_INVALID_ARGUMENT;
+                                            }
+                                            auto element_6 = (NSNumber *) element_3.characteristics[i_6];
+                                            listHolder_6->mList[i_6] = static_cast<std::remove_reference_t<decltype(listHolder_6->mList[i_6])>>(element_6.unsignedCharValue);
+                                        }
+                                        definedValue_5 = ListType_6(listHolder_6->mList, element_3.characteristics.count);
+                                    } else {
+                                        definedValue_5 = ListType_6();
                                     }
-                                    definedValue_5 = ListType_6(listHolder_6->mList, element_3.characteristics.count);
-                                } else {
-                                    definedValue_5 = ListType_6();
                                 }
                             }
+                            listHolder_3->mList[i_3].audioOutputIndex = element_3.audioOutputIndex.unsignedCharValue;
                         }
-                        listHolder_3->mList[i_3].audioOutputIndex = element_3.audioOutputIndex.unsignedCharValue;
+                        definedValue_2 = ListType_3(listHolder_3->mList, self.playbackPreferences.audioTracks.count);
+                    } else {
+                        definedValue_2 = ListType_3();
                     }
-                    definedValue_2 = ListType_3(listHolder_3->mList, self.playbackPreferences.audioTracks.count);
-                } else {
-                    definedValue_2 = ListType_3();
                 }
             }
         }
     }
-}
-{
-    if (self.useCurrentContext != nil) {
-        auto & definedValue_0 = cppStruct.useCurrentContext.Emplace();
-        definedValue_0 = self.useCurrentContext.boolValue;
+    {
+        if (self.useCurrentContext != nil) {
+            auto & definedValue_0 = cppStruct.useCurrentContext.Emplace();
+            definedValue_0 = self.useCurrentContext.boolValue;
+        }
     }
-}
 
-return std::any(cppStruct);
+    return std::any(cppStruct);
 }
 
 - (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct
