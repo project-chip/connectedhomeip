@@ -1121,10 +1121,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (NSArray<MTRDeviceController *> *)getRunningControllers
 {
-    os_unfair_lock_lock(&_controllersLock);
-    NSArray<MTRDeviceController *> * controllersCopy = [_controllers copy];
-    os_unfair_lock_unlock(&_controllersLock);
-    return controllersCopy;
+    std::lock_guard lock(_controllersLock);
+    return [_controllers copy];
 }
 
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(FabricIndex)fabricIndex
@@ -1196,9 +1194,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint
 {
-    os_unfair_lock_lock(&_serverEndpointsLock);
+    std::lock_guard lock(_serverEndpointsLock);
     [_serverEndpoints removeObject:endpoint];
-    os_unfair_lock_unlock(&_serverEndpointsLock);
 }
 
 - (NSArray<MTRAccessGrant *> *)accessGrantsForFabricIndex:(chip::FabricIndex)fabricIndex clusterPath:(MTRClusterPath *)clusterPath
