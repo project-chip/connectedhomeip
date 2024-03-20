@@ -119,6 +119,7 @@ rt_executable("all_cluster_app") {
     sources += [
       "${chip_root}/examples/${app_common_folder}/src/EnergyEvseDelegateImpl.cpp",
       "${chip_root}/examples/${app_common_folder}/src/EnergyEvseManager.cpp",
+      "${chip_root}/examples/${app_common_folder}/src/EnergyEvseTargetStore.cpp",
       "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
       "${chip_root}/examples/${app_common_folder}/src/energy-evse-stub.cpp",
       "${chip_root}/examples/${app_common_folder}/src/smco-stub.cpp",

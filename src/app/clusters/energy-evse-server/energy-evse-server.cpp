@@ -29,6 +29,8 @@ using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::EnergyEvse::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
+using EvseTargetIterator = CommonIterator<EvseTargetEntry>;
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -360,27 +362,84 @@ void Instance::HandleStartDiagnostics(HandlerContext & ctx, const Commands::Star
 void Instance::HandleSetTargets(HandlerContext & ctx, const Commands::SetTargets::DecodableType & commandData)
 {
     // Call the delegate
-    // TODO
-    // Status status = mDelegate.SetTargets();
-    Status status = Status::UnsupportedCommand;
+    auto & chargingTargetSchedules = commandData.chargingTargetSchedules;
+
+    Status status = mDelegate.SetTargets(chargingTargetSchedules);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData)
 {
-    // Call the delegate
-    // TODO
-    // Status status = mDelegate.GetTargets();
-    Status status = Status::UnsupportedCommand;
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    app::CommandHandler::Handle commandHandleRef = CommandHandler::Handle(&ctx.mCommandHandler);
+    auto commandHandle                           = commandHandleRef.Get();
+
+    TLV::TLVWriter * writer;
+    TLV::TLVType listContainerType;
+    EvseTargetIterator * it = nullptr;
+
+    EvseTargetEntry chargingTargetScheduleEntry;
+    Structs::ChargingTargetScheduleStruct::Type entry;
+    Structs::ChargingTargetStruct::Type array[kEvseTargetsMaxTargetsPerDay];
+
+    if (commandHandle == nullptr)
+    {
+        // When the platform has shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        return;
+    }
+
+    const CommandHandler::InvokeResponseParameters prepareParams(ctx.mRequestPath);
+    SuccessOrExit(
+        err = commandHandle->PrepareInvokeResponseCommand(
+            ConcreteCommandPath(ctx.mRequestPath.mEndpointId, ctx.mRequestPath.mClusterId, Commands::GetTargetsResponse::Id),
+            prepareParams));
+
+    VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::GetTargetsResponse::Fields::kChargingTargetSchedules),
+                                               TLV::TLVType::kTLVType_Array, listContainerType));
+
+    SuccessOrExit(err = mDelegate.PrepareGetTargets(&it));
+    VerifyOrExit(it != nullptr, err = CHIP_ERROR_UNINITIALIZED);
+
+    while (it->Next(chargingTargetScheduleEntry))
+    {
+        entry.dayOfWeekForSequence = chargingTargetScheduleEntry.dayOfWeekMap;
+
+        uint8_t index = 0;
+        // copy from our vector to a local array of structs which we can reduce to the length required
+        // so we can pass it into our Encode engine
+        for (const EvseChargingTarget & chargingTarget : chargingTargetScheduleEntry.dailyChargingTargets)
+        {
+            array[index].targetTimeMinutesPastMidnight = chargingTarget.targetTimeMinutesPastMidnight;
+            array[index].targetSoC                     = chargingTarget.targetSoC;
+            array[index].addedEnergy                   = chargingTarget.addedEnergy;
+            index++;
+        }
+
+        DataModel::List<Structs::ChargingTargetStruct::Type> mSpan(array);
+        mSpan.reduce_size(index);
+        entry.chargingTargets = mSpan;
+
+        SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), entry));
+    }
+
+    SuccessOrExit(err = writer->EndContainer(listContainerType));
+    SuccessOrExit(err = commandHandle->FinishCommand());
+exit:
+    // Release iterator and any memory
+    mDelegate.GetTargetsFinished();
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData)
 {
     // Call the delegate
-    // TODO
-    // Status status = mDelegate.ClearTargets();
-    Status status = Status::UnsupportedCommand;
+    Status status = mDelegate.ClearTargets();
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }

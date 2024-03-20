@@ -88,6 +88,7 @@ target_sources(app PRIVATE
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/ElectricalPowerMeasurementDelegate.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseTargetsStore.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp                  
                ${TELINK_COMMON}/common/src/mainCommon.cpp

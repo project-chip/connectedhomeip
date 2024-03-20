@@ -234,6 +234,206 @@ Status EnergyEvseDelegate::StartDiagnostics()
     return Status::Success;
 }
 
+/**
+ * @brief    Called when EVSE cluster receives SetTargets command
+ */
+Status EnergyEvseDelegate::SetTargets(
+    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules)
+{
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::SetTargets()");
+
+    Status status = ValidateTargets(chargingTargetSchedules);
+    if (status != Status::Success)
+    {
+        ChipLogError(AppServer, "SetTargets contained invalid data - Rejecting");
+        return status;
+    }
+
+    status = SaveTargets(chargingTargetSchedules);
+
+    /* The Application needs to be told that the Targets have been updated
+     * so it can potentially re-optimize the charging start time etc
+     */
+    NotifyApplicationChargingPreferencesChange();
+
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::ValidateTargets(
+    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules)
+{
+    /* A) check that the targets are valid
+     *  1) each target must be within valid range (TargetTimeMinutesPastMidnight < 1440)
+     *  2) each target must be within valid range (TargetSoC percent 0 - 100)
+     *      If SOC feature not supported then this MUST be 100 or not present
+     *  3) each target must be within valid range (AddedEnergy >= 0)
+     * B) Day of Week is only allowed to be included once
+     */
+
+    uint8_t dayOfWeekBitmap = 0;
+
+    auto iter = chargingTargetSchedules.begin();
+    while (iter.Next())
+    {
+        auto & entry    = iter.GetValue();
+        uint8_t bitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
+        ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
+
+        if ((dayOfWeekBitmap & bitmask) != 0)
+        {
+            // A bit has already been set - Return ConstraintError
+            ChipLogError(AppServer, "DayOfWeekForSequence has a bit set which has already been set in another entry.");
+            return Status::ConstraintError;
+        }
+        dayOfWeekBitmap |= bitmask; // add this day Of week to the previously seen days
+
+        auto iterInner   = entry.chargingTargets.begin();
+        uint8_t innerIdx = 0;
+        while (iterInner.Next())
+        {
+            auto & targetStruct          = iterInner.GetValue();
+            uint16_t minutesPastMidnight = targetStruct.targetTimeMinutesPastMidnight;
+            ChipLogProgress(AppServer, "[%d] MinutesPastMidnight : %d", innerIdx,
+                            static_cast<short unsigned int>(minutesPastMidnight));
+
+            if (minutesPastMidnight > 1439)
+            {
+                ChipLogError(AppServer, "MinutesPastMidnight has invalid value (%d)", static_cast<int>(minutesPastMidnight));
+                return Status::ConstraintError;
+            }
+
+            uint8_t targetSoC;
+            int64_t addedEnergy;
+
+            /* Check that we have at least an AddedEnergy or TargetSoC value */
+            if (!(targetStruct.targetSoC.HasValue()) && !(targetStruct.addedEnergy.HasValue()))
+            {
+                ChipLogError(AppServer, "Must have one of AddedEnergy or TargetSoC");
+                return Status::ConstraintError;
+            }
+
+            if (targetStruct.targetSoC.HasValue())
+            {
+                targetSoC = targetStruct.targetSoC.Value();
+                ChipLogProgress(AppServer, "[%d] TargetSoC           : %d", innerIdx, static_cast<int>(targetSoC));
+
+                if (targetSoC > 100)
+                {
+                    ChipLogError(AppServer, "TargetSoC has invalid value (%d)", static_cast<int>(targetSoC));
+                    return Status::ConstraintError;
+                }
+                /* If SoC feature is not supported check that the value is 100% */
+                if (targetSoC != 100) // TODO work out how to check feature support in Delegate
+                {
+                    /* The only value we allow is 100 */
+                    ChipLogError(AppServer, "TargetSoC has can only be 100%% if SOC feature is not supported");
+                    return Status::ConstraintError;
+                }
+            }
+            if (targetStruct.addedEnergy.HasValue())
+            {
+                addedEnergy = targetStruct.addedEnergy.Value();
+                ChipLogProgress(AppServer, "[%d] AddedEnergy         : %ld", innerIdx, static_cast<signed long int>(addedEnergy));
+                if (addedEnergy < 0)
+                {
+                    ChipLogError(AppServer, "AddedEnergy has invalid value (%ld)", static_cast<signed long int>(addedEnergy));
+                    return Status::ConstraintError;
+                }
+            }
+            innerIdx++;
+        }
+    }
+
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::SaveTargets(
+    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules)
+{
+    Status status = Status::Success;
+
+    auto iter                     = chargingTargetSchedules.begin();
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrExit(targets != nullptr, status = Status::Failure);
+
+    while (iter.Next())
+    {
+        auto & entry = iter.GetValue();
+
+        targets->CopyTarget(entry);
+    }
+
+exit:
+    return status;
+}
+
+/**
+ * @brief    Called when EVSE cluster receives GetTargets command to load the
+ *           targets into RAM and create an iterator for the cluster server to use
+ */
+CHIP_ERROR EnergyEvseDelegate::PrepareGetTargets(EvseTargetIterator ** iterator)
+{
+    CHIP_ERROR err;
+
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrReturnError(targets != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    EvseTargetIteratorImpl * tempIterator = targets->GetEvseTargetsIterator();
+    VerifyOrReturnError(tempIterator != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    *iterator = tempIterator; // Assign the value to iterator
+
+    err = tempIterator->Load(); // Load data into the iterator
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+/**
+ * @brief    Called when EVSE cluster has finished copying the data into the
+ *           GetTargetsResponse to free up memory
+ */
+CHIP_ERROR EnergyEvseDelegate::GetTargetsFinished()
+{
+    CHIP_ERROR err;
+
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrReturnError(targets != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    EvseTargetIteratorImpl * tempIterator = targets->GetEvseTargetsIterator();
+    tempIterator->Release();
+
+    return err;
+}
+
+/**
+ * @brief    Called when EVSE cluster receives ClearTargets command
+ */
+Status EnergyEvseDelegate::ClearTargets()
+{
+    Status status = Status::Success;
+    CHIP_ERROR err;
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::ClearTargets()");
+
+    EvseTargetsDelegate * targets = GetEvseTargetsDelegate();
+    VerifyOrExit(targets != nullptr, status = Status::Failure);
+
+    err = targets->ClearTargets();
+    if (err != CHIP_NO_ERROR)
+    {
+        return Status::Failure;
+    }
+
+    /* The Application needs to be told that the Targets have been deleted
+     * so it can potentially re-optimize the charging start time etc
+     */
+    NotifyApplicationChargingPreferencesChange();
+
+exit:
+    return status;
+}
+
 /* ---------------------------------------------------------------------------
  *  EVSE Hardware interface below
  */
@@ -909,6 +1109,20 @@ Status EnergyEvseDelegate::NotifyApplicationStateChange()
     return Status::Success;
 }
 
+Status EnergyEvseDelegate::NotifyApplicationChargingPreferencesChange()
+{
+    EVSECbInfo cbInfo;
+
+    cbInfo.type = EVSECallbackType::ChargingPreferencesChanged;
+
+    if (mCallbacks.handler != nullptr)
+    {
+        mCallbacks.handler(&cbInfo, mCallbacks.arg);
+    }
+
+    return Status::Success;
+}
+
 Status EnergyEvseDelegate::GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue)
 {
     EVSECbInfo cbInfo;
@@ -1378,17 +1592,97 @@ DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeStartTime()
 {
     return mNextChargeStartTime;
 }
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeStartTime(DataModel::Nullable<uint32_t> newValue)
+{
+    DataModel::Nullable<uint32_t> oldValue = mNextChargeStartTime;
+
+    mNextChargeStartTime = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "NextChargeStartTime updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "NextChargeStartTime updated to %d", mNextChargeStartTime.Value());
+        }
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeStartTime::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeTargetTime()
 {
     return mNextChargeTargetTime;
 }
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeTargetTime(DataModel::Nullable<uint32_t> newValue)
+{
+    DataModel::Nullable<uint32_t> oldValue = mNextChargeTargetTime;
+
+    mNextChargeTargetTime = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetTime updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetTime updated to %d", mNextChargeTargetTime.Value());
+        }
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeTargetTime::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<int64_t> EnergyEvseDelegate::GetNextChargeRequiredEnergy()
 {
     return mNextChargeRequiredEnergy;
 }
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeRequiredEnergy(DataModel::Nullable<int64_t> newValue)
+{
+    DataModel::Nullable<int64_t> oldValue = mNextChargeRequiredEnergy;
+
+    mNextChargeRequiredEnergy = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "NextChargeRequiredEnergy updated to %ld",
+                          static_cast<long>(mNextChargeRequiredEnergy.Value()));
+        }
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeRequiredEnergy::Id);
+    }
+    return CHIP_NO_ERROR;
+}
+
 DataModel::Nullable<Percent> EnergyEvseDelegate::GetNextChargeTargetSoC()
 {
     return mNextChargeTargetSoC;
+}
+CHIP_ERROR EnergyEvseDelegate::SetNextChargeTargetSoC(DataModel::Nullable<Percent> newValue)
+{
+    DataModel::Nullable<Percent> oldValue = mNextChargeTargetSoC;
+
+    mNextChargeTargetSoC = newValue;
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetSoC updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "NextChargeTargetSoC updated to %d %%", mNextChargeTargetSoC.Value());
+        }
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, NextChargeTargetSoC::Id);
+    }
+    return CHIP_NO_ERROR;
 }
 
 /* ApproximateEVEfficiency */
@@ -1402,7 +1696,7 @@ CHIP_ERROR EnergyEvseDelegate::SetApproximateEVEfficiency(DataModel::Nullable<ui
     DataModel::Nullable<uint16_t> oldValue = mApproximateEVEfficiency;
 
     mApproximateEVEfficiency = newValue;
-    if ((oldValue != newValue))
+    if (oldValue != newValue)
     {
         if (newValue.IsNull())
         {
@@ -1458,42 +1752,13 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetSessionEnergyDischarged()
 }
 
 /**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
+ * @brief   Helper function to get know if the EV is plugged in based on state
+ *          (regardless of if it is actually transferring energy)
  */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
+bool EnergyEvseDelegate::IsEvsePluggedIn()
 {
-    chipEpoch = 0;
-
-    System::Clock::Milliseconds64 cTMs;
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
-
-    /* If the GetClock_RealTimeMS returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, then
-     * This platform cannot ever report real time !
-     * This should not be certifiable since getting time is a Mandatory
-     * feature of EVSE Cluster
-     */
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        ChipLogError(Zcl, "Platform does not support GetClock_RealTimeMS. Check EVSE certification requirements!");
-        return err;
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "EVSE: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-
-    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
-    if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
-    {
-        ChipLogError(Zcl, "EVSE: unable to convert Unix Epoch time to Matter Epoch Time");
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
+    return (mState == StateEnum::kPluggedInCharging || mState == StateEnum::kPluggedInDemand ||
+            mState == StateEnum::kPluggedInDischarging || mState == StateEnum::kPluggedInNoDemand);
 }
 
 /**
@@ -1548,6 +1813,8 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
     // TODO persist mSessionEnergyDischargedAtStart
 }
 
+/*---------------------- EvseSession functions --------------------------*/
+
 /**
  * @brief This function updates the session attrs to allow read attributes to return latest values
  */
@@ -1590,4 +1857,116 @@ void EvseSession::UpdateEnergyDischarged(int64_t dischargingMeterValue)
 {
     mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+}
+
+/*---------------------- Non class helper functions --------------------------*/
+/**
+ * @brief   Helper function to get current timestamp in Epoch format
+ *
+ * @param   chipEpoch reference to hold return timestamp
+ */
+CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
+{
+    chipEpoch = 0;
+
+    System::Clock::Milliseconds64 cTMs;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+
+    /* If the GetClock_RealTimeMS returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, then
+     * This platform cannot ever report real time !
+     * This should not be certifiable since getting time is a Mandatory
+     * feature of EVSE Cluster
+     */
+    VerifyOrDie(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "EVSE: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
+    if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
+    {
+        ChipLogError(Zcl, "EVSE: unable to convert Unix Epoch time to Matter Epoch Time");
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+/**
+ * @brief   Helper function to get current timestamp and work out the day of week
+ *
+ * NOTE that the time_t is converted using localtime to provide the timestamp
+ * in local time. If this is not supported on some platforms an alternative
+ * implementation may be required.
+ *
+ * @param   unixEpoch (as time_t)
+ *
+ * @return  bitmap value for day of week
+ * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ */
+uint8_t GetDayOfWeekUnixEpoch(time_t unixEpoch)
+{
+    // Define a timezone structure and initialize it to the local timezone
+    // This will capture any daylight saving time changes
+    struct tm local_time;
+    localtime_r(&unixEpoch, &local_time);
+
+    // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    uint8_t dayOfWeek = static_cast<uint8_t>(local_time.tm_wday);
+
+    // Calculate the bitmap value based on the day of the week
+    uint8_t bitmap = static_cast<uint8_t>(1 << dayOfWeek);
+
+    return bitmap;
+}
+/**
+ * @brief   Helper function to get current timestamp and work out the day of week based on localtime
+ *
+ * @param   reference to hold the day of week as a bitmap
+ *
+ * Sunday = 0x01, Monday = 0x01 ... Saturday = 0x40 (1<<6)
+ */
+CHIP_ERROR GetDayOfWeekNow(uint8_t & dayOfWeekMap)
+{
+    chip::System::Clock::Milliseconds64 cTMs;
+    CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "EVSE: unable to get current time to check user schedules error=%" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+    time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
+    dayOfWeekMap     = GetDayOfWeekUnixEpoch(unixEpoch);
+
+    return CHIP_NO_ERROR;
+}
+
+/**
+ * @brief   Helper function to get current timestamp and work out the current number of minutes
+ *          past midnight based on localtime
+ *
+ * @param   reference to hold the number of minutes past midnight
+ */
+CHIP_ERROR GetMinutesPastMidnight(uint32_t & minutesPastMidnight)
+{
+    chip::System::Clock::Milliseconds64 cTMs;
+    CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "EVSE: unable to get current time to check user schedules error=%" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+    time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
+
+    // Define a timezone structure and initialize it to the local timezone
+    // This will capture any daylight saving time changes
+    struct tm local_time;
+    localtime_r(&unixEpoch, &local_time);
+
+    minutesPastMidnight = static_cast<uint32_t>((local_time.tm_hour * 60) + local_time.tm_min);
+
+    return err;
 }
