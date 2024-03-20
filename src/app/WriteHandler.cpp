@@ -327,7 +327,9 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         mProcessingAttributeIsList = dataAttributePath.IsListOperation();
         mProcessingAttributePath.SetValue(dataAttributePath);
 
-        MatterPreAttributeWriteCallback(dataAttributePath);
+        ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Write,
+                                                                ApplicationCallbacks::OperationOrder::Pre, dataAttributePath);
+
         TLV::TLVWriter backup;
         DataVersion version = 0;
         mWriteResponseBuilder.GetWriteResponses().Checkpoint(backup);
@@ -347,7 +349,9 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             mWriteResponseBuilder.GetWriteResponses().Rollback(backup);
             err = AddStatus(dataAttributePath, StatusIB(err));
         }
-        MatterPostAttributeWriteCallback(dataAttributePath);
+
+        ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Write,
+                                                                ApplicationCallbacks::OperationOrder::Post, dataAttributePath);
         SuccessOrExit(err);
     }
 
@@ -676,6 +680,3 @@ void WriteHandler::MoveToState(const State aTargetState)
 
 } // namespace app
 } // namespace chip
-
-void __attribute__((weak)) MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-void __attribute__((weak)) MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
