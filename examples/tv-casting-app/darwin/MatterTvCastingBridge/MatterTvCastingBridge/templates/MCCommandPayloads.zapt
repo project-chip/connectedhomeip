@@ -25,10 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 {{> struct_field_decl cluster=parent.parent.name type=type label=commandField}};
 {{/if}}
 {{/inline}}
-{{#if (and includeRenamedProperties
-           (hasOldName ../cluster command=../command commandField=(asStructPropertyName label)))}}
-{{> oldNameFieldDecl commandField=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
-{{/if}}
 {{/zcl_command_arguments}}
 @end
 {{/if}}
