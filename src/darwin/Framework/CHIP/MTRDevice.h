@@ -18,7 +18,6 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
-#import <Matter/MTRDiagnosticLogsType.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

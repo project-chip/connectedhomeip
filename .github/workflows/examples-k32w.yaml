@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-k32w:33
+            image: ghcr.io/project-chip/chip-build-k32w:38
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -46,7 +46,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: k32w
+                platform: nxp
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -59,11 +59,8 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target k32w-k32w0-light-crypto-platform-tokenizer \
-                      --target k32w-k32w0-lock-crypto-platform-tokenizer \
-                      --target k32w-k32w0-lock-crypto-platform-low-power-nologs \
                       --target k32w-k32w0-contact-crypto-platform-tokenizer \
                       --target k32w-k32w0-contact-crypto-platform-low-power-nologs \
-                      --target k32w-k32w0-shell-crypto-platform \
                       --target k32w-k32w1-light-crypto-platform-openthread-ftd \
                       --target k32w-k32w1-contact-crypto-platform-low-power-nologs \
                       build \
@@ -78,12 +75,6 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     k32w k32w1+release light \
                     out/artifacts/k32w-k32w1-light-crypto-platform-openthread-ftd/chip-k32w1-light-example.elf \
-                    /tmp/bloat_reports/
-            - name: Get lock size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w0+release lock \
-                    out/artifacts/k32w-k32w0-lock-crypto-platform-tokenizer/chip-k32w0x-lock-example.elf \
                     /tmp/bloat_reports/
             - name: Get contact size stats
               run: |
