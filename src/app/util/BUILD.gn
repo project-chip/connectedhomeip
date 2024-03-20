@@ -58,7 +58,7 @@ source_set("callbacks") {
   ]
 
   deps = [
-      "${chip_root}/app/paths",
+      "${chip_root}/src/app:paths",
       "${chip_root}/src/access",
   ]
 }
