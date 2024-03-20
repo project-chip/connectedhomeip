@@ -136,18 +136,18 @@
 
     # Handle arguments
     case "$1" in
-        --system)
-            show_system
-            usage
-            ;;
-        --complete)
-            show_system
-            usage
-            ;;
-        *)
-            usage
-            exit 1
-            ;;
+    --system)
+        show_system
+        usage
+        ;;
+    --complete)
+        show_system
+        usage
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
     esac
 
 } 2>&1 | tee sdk-doctor.txt
