@@ -99,8 +99,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         {
             ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
 
-            strncpy(thread->NameBuf, taskStatusArray[x].pcTaskName, kMaxThreadNameLength - 1);
-            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
             thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
             thread->id = taskStatusArray[x].xTaskNumber;
 

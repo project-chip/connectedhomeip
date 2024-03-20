@@ -36,17 +36,10 @@ FactoryDataProviderImpl::~FactoryDataProviderImpl()
 CHIP_ERROR FactoryDataProviderImpl::Init()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    uint32_t sum     = 0;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
     SSS_RunApiTest();
 #endif
-
-    if (sum > kFactoryDataSize)
-    {
-        ChipLogError(DeviceLayer, "Max size of factory data: %lu is bigger than reserved factory data size: %lu", sum,
-                     kFactoryDataSize);
-    }
 
     error = Validate();
     if (error != CHIP_NO_ERROR)
