@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,18 +13,13 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/examples/platform/nxp/k32w/k32w0/args.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
 
-# SDK target. This is overridden to add our SDK app_config.h & defines.
-k32w0_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+chip_data_model("zap-sit") {
+  zap_file = "contact-sensor-app.zap"
 
-chip_enable_ota_requestor = true
-chip_stack_lock_tracking = "fatal"
-chip_enable_ble = true
-
-chip_enable_icd_server = true
-chip_enable_icd_lit = false
-icd_enforce_sit_slow_poll_limit = true
-chip_persist_subscriptions = true
-chip_subscription_timeout_resumption = true
+  zap_pregenerated_dir =
+      "${chip_root}/zzz_generated/contact-sensor-app/nxp/zap-generated"
+  is_server = true
+}

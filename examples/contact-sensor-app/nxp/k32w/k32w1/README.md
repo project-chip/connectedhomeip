@@ -19,6 +19,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
+-   [Long Idle Time ICD Support](#long-idle-time-icd-support)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing](#flashing)
     -   [Flashing the NBU image](#flashing-the-nbu-image)
@@ -100,13 +101,15 @@ will not work.
 **RGB LED** shows the state of the simulated contact sensor. when the LED is
 lit, the sensor is contacted, when not lit, the sensor is non-contacted.
 
-**Button SW2** can be used to start BLE advertising. A SHORT press of the button
-will enable Bluetooth LE advertising for a predefined period of time. A LONG
-Press Button SW2 initiates a factory reset. After an initial period of 3
-seconds, LED 2 and RGB LED will flash in unison to signal the pending reset.
-After 6 seconds will cause the device to reset its persistent configuration and
-initiate a reboot. The reset action can be cancelled by press SW2 button at any
-point before the 6 second limit.
+**Button SW2**. SHORT press function is overloaded depending on the device type
+and commissioning state. If the device is not commissioned, a SHORT press of the
+button will enable Bluetooth LE advertising for a predefined period of time. If
+the device is commissioned and is acting as a LIT ICD then a SHORT press of the
+button will enable Active Mode. A LONG Press of Button SW2 initiates a factory
+reset. After an initial period of 3 seconds, LED 2 and RGB LED will flash in
+unison to signal the pending reset. After 6 seconds will cause the device to
+reset its persistent configuration and initiate a reboot. The reset action can
+be cancelled by press SW2 button at any point before the 6 second limit.
 
 **Button SW3** can be used to change the state of the simulated contact sensor.
 The button behaves as a toggle, swapping the state every time it is short
@@ -140,6 +143,43 @@ After a successful build, the `elf` and `srec` files are found in `out/debug/` -
 `see the files prefixed with chip-k32w1-contact-example`. After a successful
 build, the `elf` and `srec` files are found in `out/debug/` -
 `see the files prefixed with chip-k32w1-contact-example`.
+
+## Long Idle Time ICD Support
+
+By default, contact-sensor is compiled as SIT ICD (Short Idle Time
+Intermittently Connected Device) - see rules from k32w1_sdk.gni:
+
+```
+chip_ot_idle_interval_ms = 2000           # 2s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 600            # 10min Idle Mode Interval
+nxp_active_mode_duration_ms = 10000       # 10s Active Mode Interval
+nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
+nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+```
+
+If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified
+as gn argument and the above parameters can be modified to comply with LIT
+requirements (e.g.: LIT devices must configure
+`chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
+
+```
+chip_ot_idle_interval_ms = 15000          # 15s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 3600           # 60min Idle Mode Interval
+nxp_active_mode_duration_ms = 0           # 0 Active Mode Interval
+nxp_active_mode_threshold_ms = 30000      # 30s Active Mode Threshold
+```
+
+ICD parameters that may be disabled once LIT functionality is enabled:
+
+```
+chip_persist_subscriptions: try once to re-establish subscriptions from the server side after reboot
+chip_subscription_timeout_resumption: same as above + try to re-establish timeout out subscriptions
+using Fibonacci backoff for retries pacing.
+```
 
 ## Manufacturing data
 

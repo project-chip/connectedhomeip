@@ -45,7 +45,16 @@ declare_args() {
   nxp_software_version = 1
 
   # Defines the current software string version
-  nxp_software_version_string = "1.1"
+  nxp_software_version_string = "1.3"
+
+  # ICD Matter Configuration flags
+  nxp_ot_idle_interval_ms = 2000  # 2s Idle Intervals
+  nxp_ot_active_interval_ms = 500  # 500ms Active Intervals
+
+  nxp_idle_mode_duration_s = 600  # 10min Idle Mode Interval
+  nxp_active_mode_duration_ms = 10000  # 10s Active Mode Interval
+  nxp_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
+  nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 }
 
 declare_args() {
