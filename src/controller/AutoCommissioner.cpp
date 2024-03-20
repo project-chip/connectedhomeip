@@ -877,7 +877,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
 DeviceProxy * AutoCommissioner::GetDeviceProxyForStep(CommissioningStage nextStage)
 {
-    if (nextStage == CommissioningStage::kSendComplete ||
+    if (nextStage == CommissioningStage::kSendComplete || nextStage == CommissioningStage::kICDSendStayActive ||
         (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy.GetDeviceId() != kUndefinedNodeId))
     {
         return &mOperationalDeviceProxy;
