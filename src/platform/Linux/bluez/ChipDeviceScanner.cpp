@@ -23,6 +23,7 @@
 
 #include <glib-object.h>
 
+#include <ble/BleError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/GLibTypeDeleter.h>
@@ -302,7 +303,15 @@ CHIP_ERROR ChipDeviceScanner::StartScanImpl()
     if (!bluez_adapter1_call_start_discovery_sync(mAdapter.get(), mCancellable.get(), &error.GetReceiver()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);
-        return CHIP_ERROR_INTERNAL;
+        switch (error->code)
+        {
+        case G_DBUS_ERROR_NO_REPLY:        // BlueZ crashed or the D-Bus connection is broken
+        case G_DBUS_ERROR_SERVICE_UNKNOWN: // BlueZ service is not available on the bus
+        case G_DBUS_ERROR_UNKNOWN_OBJECT:  // Requested BLE adapter is not available
+            return BLE_ERROR_ADAPTER_UNAVAILABLE;
+        default:
+            return CHIP_ERROR_INTERNAL;
+        }
     }
 
     return CHIP_NO_ERROR;
