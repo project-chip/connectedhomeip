@@ -496,9 +496,24 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
-        return CommissioningStage::kICDSendStayActive;
+        if (mActionOverCase == ActionOverCase::kICDSendStayActive)
+        {
+            return CommissioningStage::kICDSendStayActive;
+        }
+        else if (mActionOverCase == ActionOverCase::kSendComplete)
+        {
+            return CommissioningStage::kSendComplete;
+        }
+        return CommissioningStage::kError;
     case CommissioningStage::kICDSendStayActive:
-        return CommissioningStage::kSendComplete;
+        if (mActionOverCase == ActionOverCase::kSkip)
+        {
+            return CommissioningStage::kSendComplete;
+        }
+        else
+        {
+            return CommissioningStage::kFindOperational;
+        }
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
 
@@ -752,6 +767,11 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 {
                     mNeedIcdRegistration = true;
                     ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
+                }
+                else if (mParams.GetICDStayActiveDurationMsec().HasValue())
+                {
+                    ChipLogDetail(Controller, "AutoCommissioner: Clear ICD StayActiveDurationMsec");
+                    mParams.ClearICDStayActiveDurationMsec();
                 }
             }
             break;

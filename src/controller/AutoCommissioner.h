@@ -44,6 +44,8 @@ public:
     ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
+    void SetActionOverCase(ActionOverCase value) override { mActionOverCase = value; }
+
 protected:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
@@ -122,8 +124,8 @@ private:
     ReadCommissioningInfo mDeviceCommissioningInfo;
     bool mNeedsDST = false;
 
-    bool mNeedIcdRegistration = false;
-
+    bool mNeedIcdRegistration      = false;
+    ActionOverCase mActionOverCase = ActionOverCase::kICDSendStayActive;
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;
     uint16_t mDACLen = 0;

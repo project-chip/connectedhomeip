@@ -550,6 +550,10 @@ public:
         mICDStayActiveDurationMsec = MakeOptional(stayActiveDurationMsec);
         return *this;
     }
+    void ClearICDStayActiveDurationMsec()
+    {
+        mICDStayActiveDurationMsec.ClearValue();
+    }
 
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
@@ -753,6 +757,12 @@ struct NetworkCommissioningStatusInfo
 class CommissioningDelegate
 {
 public:
+    enum class ActionOverCase : uint8_t
+    {
+        kSkip,
+        kICDSendStayActive,
+        kSendComplete
+    };
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo: Reported together with ReadCommissioningInfo2
@@ -792,6 +802,7 @@ public:
     virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
     virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
     virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;
+    virtual void SetActionOverCase(ActionOverCase value)                                                            = 0;
 };
 
 } // namespace Controller

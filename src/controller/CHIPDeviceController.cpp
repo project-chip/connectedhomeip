@@ -1234,6 +1234,10 @@ void DeviceCommissioner::OnICDManagementStayActiveResponse(
     }
 
 exit:
+    if (commissioner->mDefaultCommissioner != nullptr)
+    {
+        commissioner->mDefaultCommissioner->SetActionOverCase(AutoCommissioner::ActionOverCase::kSendComplete);
+    }
     CommissioningDelegate::CommissioningReport report;
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
@@ -3219,6 +3223,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kICDSendStayActive: {
         if (!(params.GetICDStayActiveDurationMsec().HasValue()))
         {
+            ChipLogProgress(Controller, "Skipping kICDSendStayActive since ICDStayActiveDurationMsec is not set");
+            mDefaultCommissioner->SetActionOverCase(AutoCommissioner::ActionOverCase::kSkip);
             CommissioningStageComplete(CHIP_NO_ERROR);
             return;
         }
