@@ -18,6 +18,7 @@
 
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/util/mock/Constants.h>
+#include <app/util/mock/MockNodeConfigImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
@@ -26,6 +27,8 @@
 #include <nlunit-test.h>
 
 using namespace chip;
+using namespace chip::Test;
+using namespace chip::app::Clusters::Globals::Attributes;
 
 using SceneTable        = scenes::SceneTable<scenes::ExtensionFieldSetsImpl>;
 using SceneTableEntry   = scenes::DefaultSceneTableImpl::SceneTableEntry;
@@ -45,6 +48,7 @@ constexpr uint8_t defaultTestFabricCapacity = (defaultTestTableSize - 1) / 2;
 constexpr chip::ClusterId kOnOffClusterId        = 0x0006;
 constexpr chip::ClusterId kLevelControlClusterId = 0x0008;
 constexpr chip::ClusterId kColorControlClusterId = 0x0300;
+constexpr chip::ClusterId kScenesClusterId       = 0x0062;
 
 // Test Endpoint ID
 constexpr chip::EndpointId kTestEndpoint1 = chip::Test::kMockEndpoint1;
@@ -152,6 +156,43 @@ static uint32_t OO_buffer_serialized_length = 0;
 static uint32_t LC_buffer_serialized_length = 0;
 static uint32_t CC_buffer_serialized_length = 0;
 
+// clang-format off
+static const MockNodeConfig SceneMockNodeConfig({
+    MockEndpointConfig(kTestEndpoint1, {
+        MockClusterConfig(kScenesClusterId, {}),
+        MockClusterConfig(kOnOffClusterId, {
+            kOnOffAttId
+        }),
+        MockClusterConfig(kLevelControlClusterId, {
+            kCurrentLevelId, kCurrentFrequencyId
+        }),
+    }),
+    MockEndpointConfig(kTestEndpoint2, {
+        MockClusterConfig(kScenesClusterId, {}),
+        MockClusterConfig(kOnOffClusterId, {
+            kOnOffAttId
+        }),
+        MockClusterConfig(kColorControlClusterId, {
+            kCurrentSaturationId, kCurrentXId,kCurrentYId, kColorTemperatureMiredsId,
+            kEnhancedCurrentHueId,kColorLoopActiveId, kColorLoopDirectionId, kColorLoopTimeId
+        }),
+    }),
+    MockEndpointConfig(kTestEndpoint3, {
+        MockClusterConfig(kScenesClusterId, {}),
+        MockClusterConfig(kOnOffClusterId, {
+            kOnOffAttId
+        }),
+        MockClusterConfig(kLevelControlClusterId, {
+            kCurrentLevelId, kCurrentFrequencyId
+        }),
+        MockClusterConfig(kColorControlClusterId, {
+            kCurrentSaturationId, kCurrentXId,kCurrentYId, kColorTemperatureMiredsId,
+            kEnhancedCurrentHueId,kColorLoopActiveId, kColorLoopDirectionId, kColorLoopTimeId
+        }),
+    }),
+});
+// clang-format on
+
 /// @brief Simulates a Handler where Endpoint 1 supports onoff and level control and Endpoint 2 supports onoff and color control
 class TestSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
@@ -208,7 +249,7 @@ public:
             }
         }
 
-        if (endpoint == kTestEndpoint1)
+        if (endpoint == kTestEndpoint2)
         {
             if (cluster == kOnOffClusterId || cluster == kColorControlClusterId)
             {
@@ -216,7 +257,7 @@ public:
             }
         }
 
-        if (endpoint == kTestEndpoint1)
+        if (endpoint == kTestEndpoint3)
         {
             if (cluster == kOnOffClusterId || cluster == kLevelControlClusterId || cluster == kColorControlClusterId)
             {
@@ -258,7 +299,7 @@ public:
                 break;
             }
         }
-        if (endpoint == kTestEndpoint1)
+        if (endpoint == kTestEndpoint2)
         {
             switch (cluster)
             {
@@ -280,7 +321,7 @@ public:
                 break;
             }
         }
-        if (endpoint == kTestEndpoint1)
+        if (endpoint == kTestEndpoint3)
         {
             switch (cluster)
             {
@@ -347,7 +388,7 @@ public:
         }
 
         // Takes values from cluster in Endpoint 2
-        if (endpoint == kTestEndpoint1)
+        if (endpoint == kTestEndpoint2)
         {
             switch (cluster)
             {
@@ -369,7 +410,7 @@ public:
         }
 
         // Takes values from cluster in Endpoint 3
-        if (endpoint == kTestEndpoint1)
+        if (endpoint == kTestEndpoint3)
         {
             switch (cluster)
             {
@@ -600,8 +641,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
 
-    NL_TEST_ASSERT(aSuite, sHandler.SupportsCluster(kTestEndpoint1, extensionFieldSetIn.clusterID));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldSetIn, buff_span));
+    NL_TEST_ASSERT(aSuite, sHandler.SupportsCluster(kTestEndpoint2, extensionFieldSetIn.clusterID));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint2, extensionFieldSetIn, buff_span));
 
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(CC_list.data(), buff_span.data(), buff_span.size()));
@@ -632,9 +673,9 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     memset(buffer, 0, buff_span.size());
 
     // Verify Deserializing is properly filling out output extension field set for color control
-    NL_TEST_ASSERT(aSuite, sHandler.SupportsCluster(kTestEndpoint1, kColorControlClusterId));
+    NL_TEST_ASSERT(aSuite, sHandler.SupportsCluster(kTestEndpoint2, kColorControlClusterId));
     NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint1, kColorControlClusterId, CC_list, extensionFieldSetOut));
+                   CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint2, kColorControlClusterId, CC_list, extensionFieldSetOut));
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for color control previously
     writer.Init(buff_span);
@@ -1817,6 +1858,8 @@ namespace {
 int TestSetup(void * inContext)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
+
+    SetMockNodeConfig(&TestScenes::SceneMockNodeConfig);
 
     // Initialize Scene Table
     SceneTable * sceneTable = scenes::GetSceneTableImpl();
