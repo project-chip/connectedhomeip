@@ -262,6 +262,8 @@
 		7596A8512878709F004DAE0E /* MTRAsyncCallbackQueueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */; };
 		7596A85528788557004DAE0E /* MTRClusters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7596A85228788557004DAE0E /* MTRClusters.mm */; };
 		7596A85728788557004DAE0E /* MTRClusters.h in Headers */ = {isa = PBXBuildFile; fileRef = 7596A85428788557004DAE0E /* MTRClusters.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		75A202E52BA8DBAC00A771DD /* reporting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75A202E42BA8DBAC00A771DD /* reporting.cpp */; };
+		75A202E62BA8DBAC00A771DD /* reporting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75A202E42BA8DBAC00A771DD /* reporting.cpp */; };
 		75B0D01E2B71B47F002074DD /* MTRDeviceTestDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 75B0D01D2B71B47F002074DD /* MTRDeviceTestDelegate.m */; };
 		75B765C12A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h in Headers */ = {isa = PBXBuildFile; fileRef = 75B765C02A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h */; };
 		75B765C32A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm in Sources */ = {isa = PBXBuildFile; fileRef = 75B765C22A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm */; };
@@ -669,6 +671,7 @@
 		7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRAsyncCallbackQueueTests.m; sourceTree = "<group>"; };
 		7596A85228788557004DAE0E /* MTRClusters.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRClusters.mm; sourceTree = "<group>"; };
 		7596A85428788557004DAE0E /* MTRClusters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRClusters.h; sourceTree = "<group>"; };
+		75A202E42BA8DBAC00A771DD /* reporting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = reporting.cpp; sourceTree = "<group>"; };
 		75B0D01C2B71B46F002074DD /* MTRDeviceTestDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceTestDelegate.h; sourceTree = "<group>"; };
 		75B0D01D2B71B47F002074DD /* MTRDeviceTestDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceTestDelegate.m; sourceTree = "<group>"; };
 		75B765BF2A1D70F80014719B /* MTRAttributeSpecifiedCheck-src.zapt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MTRAttributeSpecifiedCheck-src.zapt"; sourceTree = "<group>"; };
@@ -1013,6 +1016,7 @@
 		1E857311265519DE0050A4D9 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				75A202E72BA8DBB700A771DD /* reporting */,
 				5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */,
 				514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */,
 				514C79EF2B62ADDA00DD6D7B /* descriptor.cpp */,
@@ -1164,6 +1168,14 @@
 				514C7A032B6436D500DD6D7B /* MTRServerCluster_Internal.h */,
 			);
 			path = ServerEndpoint;
+			sourceTree = "<group>";
+		};
+		75A202E72BA8DBB700A771DD /* reporting */ = {
+			isa = PBXGroup;
+			children = (
+				75A202E42BA8DBAC00A771DD /* reporting.cpp */,
+			);
+			path = reporting;
 			sourceTree = "<group>";
 		};
 		B20252832459E34F00F97062 = {
@@ -1788,6 +1800,7 @@
 				B45373F32A9FEC1A00807602 /* server-ws.c in Sources */,
 				03F430AA2994113500166449 /* sysunix.c in Sources */,
 				B45373C42A9FEA9100807602 /* dummy-callback.c in Sources */,
+				75A202E62BA8DBAC00A771DD /* reporting.cpp in Sources */,
 				514C79EE2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp in Sources */,
 				039145E82993179300257B3E /* GetCommissionerNodeIdCommand.mm in Sources */,
 				0395469F2991DFC5006D42A8 /* json_reader.cpp in Sources */,
@@ -1896,6 +1909,7 @@
 				51B22C262740CB32008D5055 /* MTRStructsObjc.mm in Sources */,
 				2C222AD1255C620600E446B9 /* MTRBaseDevice.mm in Sources */,
 				1EC3238D271999E2002A8BF0 /* cluster-objects.cpp in Sources */,
+				75A202E52BA8DBAC00A771DD /* reporting.cpp in Sources */,
 				3CF134A9289D8D800017A19E /* MTRCSRInfo.mm in Sources */,
 				991DC0892475F47D00C13860 /* MTRDeviceController.mm in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* MTRQRCodeSetupPayloadParser.mm in Sources */,
