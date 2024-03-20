@@ -367,7 +367,7 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
         if (!sdCtx->isResolveRequested)
         {
             GetAddrInfo(sdCtx);
-            sdCtx->isResolveRequested = true;
+            sdCtx->isResolveRequested        = true;
             sdCtx->hasOpenThreadTimerStarted = false;
         }
     }

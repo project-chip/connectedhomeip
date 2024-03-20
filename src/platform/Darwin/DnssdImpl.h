@@ -261,7 +261,6 @@ struct ResolveContext : public GenericContext
     bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
 
 private:
-
     /**
      * Try reporting the results we got on the provided interface index.
      * Returns true if information was reported, false if not (e.g. if there
