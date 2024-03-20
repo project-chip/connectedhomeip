@@ -177,11 +177,8 @@ namespace {
 void OpenThreadTimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
     ChipLogProgress(Discovery, "Mdns: Resolve completed on the open thread domain.");
-    VerifyOrReturn(callbackContext != nullptr && systemLayer != nullptr,
-                   ChipLogError(Discovery, "Open thread timer callback context is null"));
-
-    auto sdCtx = reinterpret_cast<ResolveContext *>(callbackContext);
-    VerifyOrReturn(sdCtx != nullptr, ChipLogError(Discovery, "Resolve Context is null"));
+    auto sdCtx = static_cast<ResolveContext *>(callbackContext);
+    VerifyOrDie(sdCtx != nullptr);
     sdCtx->Finalize();
     hasOpenThreadTimerStarted = false;
 }
