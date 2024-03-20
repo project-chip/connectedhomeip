@@ -31,7 +31,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #if CONFIG_DIAG_LOGS_DEMO
-#include <src/platform/nxp/common/DiagnosticLogsProviderDelegateImpl.h>
+#include "DiagnosticLogsProviderDelegateImpl.h"
 #endif
 
 #include <app-common/zap-generated/attribute-type.h>

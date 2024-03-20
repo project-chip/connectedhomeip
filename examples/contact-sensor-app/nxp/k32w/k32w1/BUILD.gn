@@ -39,6 +39,7 @@ declare_args() {
 
 assert(current_os == "freertos")
 
+common_example_dir = "${chip_root}/examples/platform/nxp/common"
 k32w1_platform_dir = "${chip_root}/examples/platform/nxp/k32w/k32w1"
 k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
 
@@ -100,6 +101,8 @@ k32w1_executable("contact_sensor_app") {
     "main/include/ContactSensorManager.h",
     "main/main.cpp",
   ]
+
+  include_dirs = [ "${common_example_dir}/diagnostic_logs" ]
 
   deps = [
     ":sdk",
@@ -164,7 +167,10 @@ k32w1_executable("contact_sensor_app") {
   }
 
   if (chip_with_diag_logs_demo) {
-    deps += [ "${chip_root}/src/platform/nxp:nxp_diagnostic_logs" ]
+    sources += [
+      "${common_example_dir}/diagnostic_logs/DiagnosticLogsProviderDelegateImpl.cpp",
+      "${common_example_dir}/diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h",
+    ]
   }
 
   output_dir = root_out_dir

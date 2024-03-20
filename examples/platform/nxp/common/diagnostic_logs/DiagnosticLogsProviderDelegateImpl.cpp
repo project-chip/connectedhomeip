@@ -16,7 +16,10 @@
  *    limitations under the License.
  */
 
-#include <src/platform/nxp/common/DiagnosticLogsProviderDelegateImpl.h>
+#include "DiagnosticLogsProviderDelegateImpl.h"
+
+#include <src/app/server/Server.h>
+#include <src/lib/support/SafeInt.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::DiagnosticLogs;
@@ -59,7 +62,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     VerifyOrReturnValue(IsValidIntent(intent), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto key = GetKeyForIntent(intent);
-    VerifyOrReturnValue(key.IsInitialized() == TRUE, CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnValue(key.IsInitialized(), CHIP_ERROR_NOT_FOUND);
 
     uint16_t diagSize = GetSizeForIntent(intent);
     VerifyOrReturnError(diagSize, CHIP_ERROR_NOT_FOUND);
@@ -67,7 +70,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     uint8_t * diagData = (uint8_t *) calloc(1, diagSize);
     VerifyOrReturnError(diagData, CHIP_ERROR_NO_MEMORY);
 
-    err = Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), diagData, diagSize);
+    err = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), diagData, diagSize);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, err);
 
     MutableByteSpan * mutableSpan = reinterpret_cast<MutableByteSpan *>(calloc(1, sizeof(MutableByteSpan)));
@@ -130,7 +133,7 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     CHIP_ERROR err         = CHIP_NO_ERROR;
 
     auto key = GetKeyForIntent(intent);
-    VerifyOrReturnValue(key.IsInitialized() == TRUE, 0);
+    VerifyOrReturnValue(key.IsInitialized(), 0);
 
     uint16_t bufferLen = CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE;
     Platform::ScopedMemoryBuffer<uint8_t> buffer;

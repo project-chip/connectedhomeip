@@ -31,8 +31,8 @@
 #include <app/util/af.h>
 
 #if CONFIG_DIAG_LOGS_DEMO
+#include "DiagnosticLogsProviderDelegateImpl.h"
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
-#include <src/platform/nxp/common/DiagnosticLogsProviderDelegateImpl.h>
 #endif
 
 using namespace ::chip;
