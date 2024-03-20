@@ -85,18 +85,14 @@ Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool a
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
-    
-    ApplicationCallbacks::GetInstance()->AttributeOperation(
-        ApplicationCallbacks::OperationType::Read,
-        ApplicationCallbacks::OperationOrder::Pre,
-        aPath);
+
+    ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Read,
+                                                            ApplicationCallbacks::OperationOrder::Pre, aPath);
 
     ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReportIBs, aEncoderState));
 
-    ApplicationCallbacks::GetInstance()->AttributeOperation(
-        ApplicationCallbacks::OperationType::Read,
-        ApplicationCallbacks::OperationOrder::Post,
-        aPath);
+    ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Read,
+                                                            ApplicationCallbacks::OperationOrder::Post, aPath);
 
     return CHIP_NO_ERROR;
 }
