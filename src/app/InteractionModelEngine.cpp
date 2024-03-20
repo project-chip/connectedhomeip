@@ -32,6 +32,7 @@
 #include <app/AppConfig.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>

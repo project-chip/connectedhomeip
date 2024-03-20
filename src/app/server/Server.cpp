@@ -24,6 +24,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
 #include <app/util/DataModelHandler.h>
+#include <app/util/ember-compatibility-functions.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BLEEndPoint.h>

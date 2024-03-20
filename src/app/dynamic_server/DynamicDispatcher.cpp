@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/util/ember-compatibility-functions.h>
 
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/callback.h>

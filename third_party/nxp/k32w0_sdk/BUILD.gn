@@ -13,11 +13,14 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/nxp_sdk.gni")
 
-import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 import("${mbedtls_root}/mbedtls.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 declare_args() {
   # Build target to use for k32w0 SDK. Use this to set global SDK defines.
@@ -26,7 +29,7 @@ declare_args() {
 
 assert(k32w0_sdk_target != "", "k32w0_sdk_target must be specified")
 
-group("k32w0_sdk") {
+group("nxp_sdk") {
   public_deps = [ k32w0_sdk_target ]
 }
 
@@ -95,7 +98,7 @@ mbedtls_target("mbedtls") {
   public_configs = [ ":mbedtls_k32w0_config" ]
 
   public_deps = [
-    ":k32w0_sdk",
+    ":nxp_sdk",
     "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w0:openthread_mbedtls_config_k32w0",
   ]
 }

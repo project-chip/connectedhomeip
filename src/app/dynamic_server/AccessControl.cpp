@@ -25,6 +25,11 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Global.h>
 
+// TODO: this include is unclear as dynamic server should NOT link those.
+//       we should probably have some separate includes here for dynamic
+//       server
+#include <app/util/ember-compatibility-functions.h>
+
 using namespace chip;
 using namespace chip::Access;
 using namespace chip::app::Clusters;

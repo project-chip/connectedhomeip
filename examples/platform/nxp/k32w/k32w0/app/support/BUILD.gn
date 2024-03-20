@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 
 config("support_config") {
   include_dirs = [ "../../../../.." ]
