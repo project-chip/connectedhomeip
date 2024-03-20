@@ -485,7 +485,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
             chip::TLV::TLVReader tmpDataReader(dataReader);
 
-            MatterPreAttributeWriteCallback(dataAttributePath);
+            ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Write,
+                                                                    ApplicationCallbacks::OperationOrder::Pre, dataAttributePath);
             err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, tmpDataReader, this);
 
             if (err != CHIP_NO_ERROR)
@@ -496,7 +497,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                              mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                              ChipLogValueMEI(dataAttributePath.mAttributeId), err.Format());
             }
-            MatterPostAttributeWriteCallback(dataAttributePath);
+            ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Write,
+                                                                    ApplicationCallbacks::OperationOrder::Post, dataAttributePath);
         }
 
         dataAttributePath.mEndpointId = kInvalidEndpointId;

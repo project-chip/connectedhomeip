@@ -555,11 +555,11 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
                 continue;
             }
         }
-        if ((err = MatterPreCommandReceivedCallback(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
+        if ((err = ApplicationCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
             mpCallback->DispatchCommand(*this, concretePath, dataReader);
-            MatterPostCommandReceivedCallback(concretePath, GetSubjectDescriptor());
+            ApplicationCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
         }
         else
         {
