@@ -463,7 +463,6 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     callback        = cb;
     protocol        = GetProtocol(cbAddressType);
     instanceName    = instanceNameToResolve;
-    domainName      = std::string(kLocalDot);
     consumerCounter = std::move(consumerCounterToUse);
 }
 
@@ -476,7 +475,6 @@ ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::In
     callback        = nullptr;
     protocol        = GetProtocol(cbAddressType);
     instanceName    = instanceNameToResolve;
-    domainName      = std::string(kLocalDot);
     consumerCounter = std::move(consumerCounterToUse);
 }
 
@@ -528,7 +526,17 @@ void ResolveContext::DispatchSuccess()
 
     for (auto interfaceIndex : priorityInterfaceIndices)
     {
-        if (TryReportingResultsForInterfaceIndex(static_cast<uint32_t>(interfaceIndex)))
+        // Try finding interfaces for domains kLocalDot and kOpenThreadDot and delete them.
+        if (TryReportingResultsForInterfaceIndex(static_cast<uint32_t>(interfaceIndex), std::string(kLocalDot)))
+        {
+            if (needDelete)
+            {
+                MdnsContexts::GetInstance().Delete(this);
+            }
+            return;
+        }
+
+        if (TryReportingResultsForInterfaceIndex(static_cast<uint32_t>(interfaceIndex), std::string(kOpenThreadDot)))
         {
             if (needDelete)
             {
@@ -540,7 +548,7 @@ void ResolveContext::DispatchSuccess()
 
     for (auto & interface : interfaces)
     {
-        if (TryReportingResultsForInterfaceIndex(interface.first.first))
+        if (TryReportingResultsForInterfaceIndex(interface.first.first, interface.first.second))
         {
             break;
         }
@@ -552,7 +560,7 @@ void ResolveContext::DispatchSuccess()
     }
 }
 
-bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex)
+bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, std::string domainName)
 {
     if (interfaceIndex == 0)
     {
@@ -560,7 +568,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
         return false;
     }
 
-    std::pair<uint32_t, std::string> interfaceKey = std::make_pair(interfaceIndex, this->domainName);
+    std::pair<uint32_t, std::string> interfaceKey = std::make_pair(interfaceIndex, domainName);
     auto & interface                              = interfaces[interfaceKey];
     auto & ips                                    = interface.addresses;
 
@@ -707,7 +715,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     std::string domainFromHostname = GetDomainFromHostName(hostnameWithDomain);
     if (domainFromHostname.empty())
     {
-        ChipLogError(Discovery, "Mdns: Domain from hostname is empty");
+        ChipLogError(Discovery, "Mdns: No domain set in hostname %s", hostnameWithDomain);
         return;
     }
 

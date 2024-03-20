@@ -35,8 +35,6 @@ namespace {
 // The extra time in milliseconds that we will wait for the resolution on the open thread domain to complete.
 constexpr uint16_t kOpenThreadTimeoutInMsec = 250;
 
-static bool hasOpenThreadTimerStarted = false;
-
 constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
 constexpr DNSServiceFlags kBrowseFlags          = kDNSServiceFlagsShareConnection;
 constexpr DNSServiceFlags kGetAddrInfoFlags     = kDNSServiceFlagsTimeout | kDNSServiceFlagsShareConnection;
@@ -56,22 +54,6 @@ uint32_t GetInterfaceId(chip::Inet::InterfaceId interfaceId)
 std::string GetHostNameWithLocalDomain(const char * hostname)
 {
     return std::string(hostname) + '.' + kLocalDot;
-}
-
-bool HostNameHasDomain(const char * hostname, const char * domain)
-{
-    size_t domainLength   = strlen(domain);
-    size_t hostnameLength = strlen(hostname);
-    if (domainLength > hostnameLength)
-    {
-        return false;
-    }
-    const char * found = strstr(hostname, domain);
-    if (found == nullptr)
-    {
-        return false;
-    }
-    return (strncmp(found, domain, domainLength) == 0);
 }
 
 void LogOnFailure(const char * name, DNSServiceErrorType err)
@@ -151,15 +133,31 @@ std::shared_ptr<uint32_t> GetCounterHolder(const char * name)
 namespace chip {
 namespace Dnssd {
 
-std::string GetDomainFromHostName(const char * hostname)
+/**
+ * @brief Returns the domain name from a given hostname with domain.
+ *        The assumption here is that the hostname comprises of "hostnameWithoutDomain.<domain>."
+ *        The domainName returned from this API is "<domain>."
+ *
+ * @param[in] hostname The hostname with domain.
+ */
+std::string GetDomainFromHostName(const char * hostnameWithDomain)
 {
-    if (HostNameHasDomain(hostname, kLocalDot))
+    std::string hostname = std::string(hostnameWithDomain);
+
+    // Find the last occurence of '.'
+    size_t last_pos = hostname.find_last_of(".");
+    if (last_pos != std::string::npos)
     {
-        return std::string(kLocalDot);
-    }
-    else if (HostNameHasDomain(hostname, kOpenThreadDot))
-    {
-        return std::string(kOpenThreadDot);
+        // Get a substring without last '.'
+        std::string substring = hostname.substr(0, last_pos);
+
+        // Find the last occurence of '.' in the substring created above.
+        size_t pos = substring.find_last_of(".");
+        if (pos != std::string::npos)
+        {
+            // Return the domain name between the last 2 occurences of '.' including the trailing dot'.'.
+            return std::string(hostname.substr(pos + 1, last_pos));
+        }
     }
     return std::string();
 }
@@ -176,11 +174,14 @@ namespace {
  */
 void OpenThreadTimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
-    ChipLogProgress(Discovery, "Mdns: Resolve completed on the open thread domain.");
+    ChipLogProgress(Discovery, "Mdns: Timer expired for resolve to complete on the open thread domain.");
     auto sdCtx = static_cast<ResolveContext *>(callbackContext);
     VerifyOrDie(sdCtx != nullptr);
-    sdCtx->Finalize();
-    hasOpenThreadTimerStarted = false;
+
+    if (sdCtx->hasOpenThreadTimerStarted)
+    {
+        sdCtx->Finalize();
+    }
 }
 
 /**
@@ -290,15 +291,15 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     ReturnOnFailure(MdnsContexts::GetInstance().Has(sdCtx));
     LogOnFailure(__func__, err);
 
-    sdCtx->domainName = GetDomainFromHostName(hostname);
-    if (sdCtx->domainName.empty())
+    std::string domainName = GetDomainFromHostName(hostname);
+    if (domainName.empty())
     {
-        ChipLogError(Discovery, "Mdns: Domain name is not set");
+        ChipLogError(Discovery, "Mdns: Domain name is not set in hostname %s", hostname);
         return;
     }
     if (kDNSServiceErr_NoError == err)
     {
-        std::pair<uint32_t, std::string> key = std::make_pair(interfaceId, sdCtx->domainName);
+        std::pair<uint32_t, std::string> key = std::make_pair(interfaceId, domainName);
         sdCtx->OnNewAddress(key, address);
     }
 
@@ -306,21 +307,25 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     {
         VerifyOrReturn(sdCtx->HasAddress(), sdCtx->Finalize(kDNSServiceErr_BadState));
 
-        if (sdCtx->domainName.compare(kOpenThreadDot) == 0)
+        if (domainName.compare(kOpenThreadDot) == 0)
         {
             ChipLogProgress(Discovery, "Mdns: Resolve completed on the open thread domain.");
             sdCtx->Finalize();
         }
-        else if (sdCtx->domainName.compare(kLocalDot) == 0)
+        else if (domainName.compare(kLocalDot) == 0)
         {
             ChipLogProgress(
                 Discovery,
                 "Mdns: Resolve completed on the local domain. Starting a timer for the open thread resolve to come back");
-            if (!hasOpenThreadTimerStarted)
+
+            // Usually the resolution on the local domain is quicker than on the open thread domain. We would like to give the
+            // resolution on the open thread domain around 250 millisecs more to give it a chance to resolve before finalizing
+            // the resolution.
+            if (!sdCtx->hasOpenThreadTimerStarted)
             {
                 // Schedule a timer to allow the resolve on OpenThread domain to complete.
                 StartOpenThreadTimer(kOpenThreadTimeoutInMsec, sdCtx);
-                hasOpenThreadTimerStarted = true;
+                sdCtx->hasOpenThreadTimerStarted = true;
             }
         }
     }
@@ -363,6 +368,7 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
         {
             GetAddrInfo(sdCtx);
             sdCtx->isResolveRequested = true;
+            sdCtx->hasOpenThreadTimerStarted = false;
         }
     }
 }
