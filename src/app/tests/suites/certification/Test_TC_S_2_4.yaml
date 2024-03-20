@@ -449,7 +449,7 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Please confirm that transition to AC1 was made over 5s"
+                value: "Please confirm that transition to AC1 was made over 20s"
               - name: "expectedValue"
                 value: "y"
 
