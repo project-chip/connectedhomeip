@@ -32,6 +32,7 @@
 #include <lib/core/Global.h>
 #include <lib/core/NodeId.h>
 
+#include <app/util/ember-compatibility-functions.h>
 #include <app/util/privilege-storage.h>
 
 using namespace chip;

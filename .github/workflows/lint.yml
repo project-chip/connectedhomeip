@@ -97,6 +97,7 @@ jobs:
                      --known-failure app/CommandSenderLegacyCallback.h \
                      --known-failure app/data-model/ListLargeSystemExtensions.h \
                      --known-failure app/ReadHandler.h \
+                     --known-failure app/reporting/reporting.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
                      --known-failure app/TestEventTriggerDelegate.h \
@@ -111,6 +112,7 @@ jobs:
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \
                      --known-failure app/util/ember-compatibility-functions.cpp \
+                     --known-failure app/util/ember-compatibility-functions.h \
                      --known-failure app/util/endpoint-config-api.h \
                      --known-failure app/util/generic-callbacks.h \
                      --known-failure app/util/generic-callback-stubs.cpp \
