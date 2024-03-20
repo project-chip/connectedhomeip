@@ -328,8 +328,8 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         mProcessingAttributeIsList = dataAttributePath.IsListOperation();
         mProcessingAttributePath.SetValue(dataAttributePath);
 
-        ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Write,
-                                                                ApplicationCallbacks::OperationOrder::Pre, dataAttributePath);
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                              DataModelCallbacks::OperationOrder::Pre, dataAttributePath);
 
         TLV::TLVWriter backup;
         DataVersion version = 0;
@@ -351,8 +351,8 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             err = AddStatus(dataAttributePath, StatusIB(err));
         }
 
-        ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Write,
-                                                                ApplicationCallbacks::OperationOrder::Post, dataAttributePath);
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                              DataModelCallbacks::OperationOrder::Post, dataAttributePath);
         SuccessOrExit(err);
     }
 
@@ -486,8 +486,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
             chip::TLV::TLVReader tmpDataReader(dataReader);
 
-            ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Write,
-                                                                    ApplicationCallbacks::OperationOrder::Pre, dataAttributePath);
+            DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                                  DataModelCallbacks::OperationOrder::Pre, dataAttributePath);
             err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, tmpDataReader, this);
 
             if (err != CHIP_NO_ERROR)
@@ -498,8 +498,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                              mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                              ChipLogValueMEI(dataAttributePath.mAttributeId), err.Format());
             }
-            ApplicationCallbacks::GetInstance()->AttributeOperation(ApplicationCallbacks::OperationType::Write,
-                                                                    ApplicationCallbacks::OperationOrder::Post, dataAttributePath);
+            DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                                  DataModelCallbacks::OperationOrder::Post, dataAttributePath);
         }
 
         dataAttributePath.mEndpointId = kInvalidEndpointId;

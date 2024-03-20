@@ -449,9 +449,9 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
     {
         ChipLogDetail(DataManagement, "Received command for Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
-        SuccessOrExit(err = ApplicationCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor()));
+        SuccessOrExit(err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor()));
         mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
-        ApplicationCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
+        DataModelCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
     }
 
 exit:
@@ -555,11 +555,11 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
                 continue;
             }
         }
-        if ((err = ApplicationCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
+        if ((err = DataModelCallbacks::GetInstance()->PreCommandReceived(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
             mpCallback->DispatchCommand(*this, concretePath, dataReader);
-            ApplicationCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
+            DataModelCallbacks::GetInstance()->PostCommandReceived(concretePath, GetSubjectDescriptor());
         }
         else
         {

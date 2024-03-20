@@ -22,7 +22,7 @@
 namespace chip {
 
 /// Allows for application hooks for processing attribute and command operations
-class ApplicationCallbacks
+class DataModelCallbacks
 {
 public:
     enum class OperationType
@@ -37,7 +37,7 @@ public:
         Post
     };
 
-    virtual ~ApplicationCallbacks() = default;
+    virtual ~DataModelCallbacks() = default;
 
     /// This callback is called on attribute operations:
     /// - for reads and writes
@@ -62,8 +62,8 @@ public:
                                      const chip::Access::SubjectDescriptor & subjectDescriptor)
     {}
 
-    static ApplicationCallbacks * GetInstance();
-    static ApplicationCallbacks * SetInstance(ApplicationCallbacks * newInstance);
+    static DataModelCallbacks * GetInstance();
+    static DataModelCallbacks * SetInstance(DataModelCallbacks * newInstance);
 };
 
 } // namespace chip

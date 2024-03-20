@@ -17,7 +17,7 @@
 
 // The defines below are using link-time callback and should be removed
 //
-// TODO: applications should be converted to use ApplicationCallbacks instead
+// TODO: applications should be converted to use DataModelCallbacks instead
 //       of relying on weak linkage
 void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
 void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
@@ -35,7 +35,7 @@ void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::Co
 namespace chip {
 namespace {
 
-class WeakRedirectCallbacks : public ApplicationCallbacks
+class WeakRedirectCallbacks : public DataModelCallbacks
 {
 public:
     void AttributeOperation(OperationType operation, OperationOrder order, const chip::app::ConcreteAttributePath & path) override
@@ -82,19 +82,19 @@ public:
 };
 
 WeakRedirectCallbacks gWeakCallbacks;
-ApplicationCallbacks * gInstance = &gWeakCallbacks;
+DataModelCallbacks * gInstance = &gWeakCallbacks;
 
 } // namespace
 
-ApplicationCallbacks * ApplicationCallbacks::GetInstance()
+DataModelCallbacks * DataModelCallbacks::GetInstance()
 {
     return gInstance;
 }
 
-ApplicationCallbacks * ApplicationCallbacks::SetInstance(ApplicationCallbacks * newInstance)
+DataModelCallbacks * DataModelCallbacks::SetInstance(DataModelCallbacks * newInstance)
 {
-    ApplicationCallbacks * old = gInstance;
-    gInstance                  = newInstance;
+    DataModelCallbacks * old = gInstance;
+    gInstance                = newInstance;
     return old;
 }
 
