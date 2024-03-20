@@ -24,6 +24,8 @@ source_set("mock_ember") {
     "Functions.h",
     "MockNodeConfig.cpp",
     "MockNodeConfig.h",
+    "MockNodeConfigImpl.cpp",
+    "MockNodeConfigImpl.h",
     "attribute-storage.cpp",
   ]
 

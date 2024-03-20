@@ -36,7 +36,7 @@
 #include <app/util/af.h>
 #include <app/util/att-storage.h>
 #include <app/util/mock/Constants.h>
-#include <app/util/mock/MockNodeConfig.h>
+#include <app/util/mock/MockNodeConfigImpl.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
@@ -61,58 +61,7 @@ using namespace Clusters::Globals::Attributes;
 
 namespace {
 
-DataVersion dataVersion           = 0;
-const MockNodeConfig * mockConfig = nullptr;
-
-const MockNodeConfig & DefaultMockNodeConfig()
-{
-    // clang-format off
-    static const MockNodeConfig config({
-        MockEndpointConfig(kMockEndpoint1, {
-            MockClusterConfig(MockClusterId(1), {
-                ClusterRevision::Id, FeatureMap::Id,
-            }, {
-                MockEventId(1), MockEventId(2),
-            }),
-            MockClusterConfig(MockClusterId(2), {
-                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
-            }),
-        }),
-        MockEndpointConfig(kMockEndpoint2, {
-            MockClusterConfig(MockClusterId(1), {
-                ClusterRevision::Id, FeatureMap::Id,
-            }),
-            MockClusterConfig(MockClusterId(2), {
-                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
-            }),
-            MockClusterConfig(MockClusterId(3), {
-                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
-            }),
-        }),
-        MockEndpointConfig(kMockEndpoint3, {
-            MockClusterConfig(MockClusterId(1), {
-                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
-            }),
-            MockClusterConfig(MockClusterId(2), {
-                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
-            }),
-            MockClusterConfig(MockClusterId(3), {
-                ClusterRevision::Id, FeatureMap::Id,
-            }),
-            MockClusterConfig(MockClusterId(4), {
-                ClusterRevision::Id, FeatureMap::Id,
-            }),
-        }),
-    });
-    // clang-format on
-    return config;
-}
-
-const MockNodeConfig & GetMockNodeConfig()
-{
-    return (mockConfig != nullptr) ? *mockConfig : DefaultMockNodeConfig();
-}
-
+DataVersion dataVersion      = 0;
 uint16_t mockClusterRevision = 1;
 uint32_t mockFeatureMap      = 0x1234;
 bool mockAttribute1          = true;
@@ -239,8 +188,7 @@ bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
 {
     auto config = GetMockNodeConfig();
     VerifyOrReturnValue(index < config.endpoints.size(), false);
-    return true; // TODO: TestSceneTable relies on returning true here: https://github.com/project-chip/connectedhomeip/issues/30696
-    // return config.endpoints[index].clusterById(clusterId) != nullptr;
+    return config.endpoints[index].clusterById(clusterId) != nullptr;
 }
 
 const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpointId)
