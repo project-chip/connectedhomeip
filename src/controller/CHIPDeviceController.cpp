@@ -2335,13 +2335,10 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
     }
 
     ReturnErrorOnFailure(err);
-    if (!isICD)
-    {
-        return CHIP_NO_ERROR;
-    }
 
     info.icd.userActiveModeTriggerHint.ClearAll();
     info.icd.userActiveModeTriggerInstruction = CharSpan();
+
     if (hasUserActiveModeTrigger)
     {
         // Intentionally ignore errors since they are not mandatory.
@@ -2377,13 +2374,17 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         }
     }
 
+    if (!isICD)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     err = mAttributeCache->Get<IcdManagement::Attributes::IdleModeDuration::TypeInfo>(kRootEndpointId, info.icd.idleModeDuration);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "IcdManagement.IdleModeDuration expected, but failed to read.");
+        ChipLogError(Controller, "IcdManagement.IdleModeDuration expected, but failed to read: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-
     err =
         mAttributeCache->Get<IcdManagement::Attributes::ActiveModeDuration::TypeInfo>(kRootEndpointId, info.icd.activeModeDuration);
     if (err != CHIP_NO_ERROR)
@@ -2704,8 +2705,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                 app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
         }
 
-        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id);
+        if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+        {
+            readPaths[numberOfAttributes++] =
+                app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
+        }
 
+        // Always read the active mode trigger hint attributes to notify users about it.
+        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerHint::Id);
+        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id);
+        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::IdleModeDuration::Id);
+        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeDuration::Id);
+        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeThreshold::Id);
         SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
     }
     break;
