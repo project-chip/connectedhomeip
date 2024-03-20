@@ -249,8 +249,8 @@ bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex
     VerifyOrReturnValue(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID), true);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // At least one registration has a persisted entry. Do not send Check-In message.
-    // This is to cover the use-case where the subscription resumption feature is used with the Check-In message.
+    // If at least one registration has a persisted entry, do not send Check-In message.
+    // The resumption of the persisted subscription will serve the same function a check-in would have served.
     VerifyOrReturnValue(mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID), true);
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     return false;
