@@ -17,14 +17,16 @@
 
 #include "ChipDeviceScanner.h"
 
-#include <errno.h>
-#include <pthread.h>
+#include <cstdint>
+#include <cstring>
+#include <memory>
+
+#include <glib-object.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/GLibTypeDeleter.h>
 
-#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -54,30 +56,13 @@ bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIden
 
 CHIP_ERROR ChipDeviceScanner::Init(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate)
 {
+    VerifyOrReturnError(adapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Make this function idempotent by shutting down previously initialized state if any.
     Shutdown();
 
     mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(adapter)));
     mDelegate = delegate;
-
-    // Create the D-Bus object manager client object on the glib thread, so that all D-Bus signals
-    // will be delivered to the glib thread.
-    ReturnErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](ChipDeviceScanner * self) {
-            // When creating D-Bus proxy object, the thread default context must be initialized.
-            VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-
-            GAutoPtr<GError> err;
-            self->mManager.reset(g_dbus_object_manager_client_new_for_bus_sync(
-                G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
-                bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-                nullptr /* destroy notify */, nullptr /* cancellable */, &err.GetReceiver()));
-            VerifyOrReturnError(self->mManager, CHIP_ERROR_INTERNAL,
-                                ChipLogError(Ble, "Failed to get D-Bus object manager for device scanning: %s", err->message));
-            return CHIP_NO_ERROR;
-        },
-        this));
 
     mScannerState = ChipDeviceScannerState::SCANNER_INITIALIZED;
 
@@ -95,7 +80,6 @@ void ChipDeviceScanner::Shutdown()
     // released during a D-Bus signal being processed.
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) {
-            self->mManager.reset();
             self->mAdapter.reset();
             return CHIP_NO_ERROR;
         },
@@ -188,13 +172,13 @@ CHIP_ERROR ChipDeviceScanner::StopScanImpl()
 
     if (mObjectAddedSignal)
     {
-        g_signal_handler_disconnect(mManager.get(), mObjectAddedSignal);
+        g_signal_handler_disconnect(mObjectManager.GetObjectManager(), mObjectAddedSignal);
         mObjectAddedSignal = 0;
     }
 
     if (mPropertiesChangedSignal)
     {
-        g_signal_handler_disconnect(mManager.get(), mPropertiesChangedSignal);
+        g_signal_handler_disconnect(mObjectManager.GetObjectManager(), mPropertiesChangedSignal);
         mPropertiesChangedSignal = 0;
     }
 
@@ -270,16 +254,15 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 & device)
 
 CHIP_ERROR ChipDeviceScanner::StartScanImpl()
 {
-    GAutoPtr<GError> error;
 
-    mObjectAddedSignal = g_signal_connect(mManager.get(), "object-added",
+    mObjectAddedSignal = g_signal_connect(mObjectManager.GetObjectManager(), "object-added",
                                           G_CALLBACK(+[](GDBusObjectManager * aMgr, GDBusObject * aObj, ChipDeviceScanner * self) {
                                               return self->SignalObjectAdded(aMgr, aObj);
                                           }),
                                           this);
 
     mPropertiesChangedSignal = g_signal_connect(
-        mManager.get(), "interface-proxy-properties-changed",
+        mObjectManager.GetObjectManager(), "interface-proxy-properties-changed",
         G_CALLBACK(+[](GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface, GVariant * aChangedProps,
                        const char * const * aInvalidatedProps, ChipDeviceScanner * self) {
             return self->SignalInterfacePropertiesChanged(aMgr, aObj, aIface, aChangedProps, aInvalidatedProps);
@@ -287,7 +270,7 @@ CHIP_ERROR ChipDeviceScanner::StartScanImpl()
         this);
 
     ChipLogProgress(Ble, "BLE removing known devices");
-    for (BluezObject & object : BluezObjectList(mManager.get()))
+    for (BluezObject & object : mObjectManager.GetObjects())
     {
         GAutoPtr<BluezDevice1> device(bluez_object_get_device1(&object));
         if (device)
@@ -307,6 +290,7 @@ CHIP_ERROR ChipDeviceScanner::StartScanImpl()
     g_variant_builder_add(&filterBuilder, "{sv}", "Transport", g_variant_new_string("le"));
     GVariant * filter = g_variant_builder_end(&filterBuilder);
 
+    GAutoPtr<GError> error;
     if (!bluez_adapter1_call_set_discovery_filter_sync(mAdapter.get(), filter, mCancellable.get(), &error.GetReceiver()))
     {
         // Not critical: ignore if fails
