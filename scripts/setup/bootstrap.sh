@@ -21,14 +21,14 @@ _install_additional_pip_requirements() {
     # figure out additional pip install items
     while [ $# -gt 0 ]; do
         case $1 in
-            -p | --platform)
-                _SETUP_PLATFORM=$2
-                shift # argument
-                shift # value
-                ;;
-            *)
-                shift
-                ;;
+        -p | --platform)
+            _SETUP_PLATFORM=$2
+            shift # argument
+            shift # value
+            ;;
+        *)
+            shift
+            ;;
         esac
     done
 
@@ -41,7 +41,7 @@ _install_additional_pip_requirements() {
 
         for platform in ${_SETUP_PLATFORM}; do
             # Allow none as an alias of nothing extra installed (like -p none)
-            if [ "$platform" != "none" ]; then
+            if [ "$platform" != "none" -a -e "$_CHIP_ROOT/scripts/setup/requirements.$platform.txt" ]; then
                 echo "Installing pip requirements for $platform..."
                 pip install -q \
                     -r "$_CHIP_ROOT/scripts/setup/requirements.$platform.txt" \
@@ -66,7 +66,7 @@ _bootstrap_or_activate() {
     local _BOOTSTRAP_NAME="${_BOOTSTRAP_PATH##*/}"
     local _BOOTSTRAP_DIR="${_BOOTSTRAP_PATH%/*}"
     # Strip off the 'scripts[/setup]' directory, leaving the root of the repo.
-    _CHIP_ROOT="$(cd "${_BOOTSTRAP_DIR%/setup}/.." > /dev/null && pwd)"
+    _CHIP_ROOT="$(cd "${_BOOTSTRAP_DIR%/setup}/.." >/dev/null && pwd)"
 
     local _CONFIG_FILE="scripts/setup/environment.json"
 
