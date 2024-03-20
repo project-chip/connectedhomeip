@@ -443,7 +443,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             {
                 return CommissioningStage::kCleanup;
             }
-            return CommissioningStage::kFindOperational;
+            return CommissioningStage::kEvictPreviousCaseSessions;
         }
     case CommissioningStage::kScanNetworks:
         return CommissioningStage::kNeedsNetworkCreds;
@@ -486,7 +486,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         else
         {
             SetCASEFailsafeTimerIfNeeded();
-            return CommissioningStage::kFindOperational;
+            return CommissioningStage::kEvictPreviousCaseSessions;
         }
     case CommissioningStage::kThreadNetworkEnable:
         SetCASEFailsafeTimerIfNeeded();
@@ -494,26 +494,15 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kCleanup;
         }
-        return CommissioningStage::kFindOperational;
-    case CommissioningStage::kFindOperational:
-        if (mActionOverCase == ActionOverCase::kICDSendStayActive)
-        {
-            return CommissioningStage::kICDSendStayActive;
-        }
-        else if (mActionOverCase == ActionOverCase::kSendComplete)
-        {
-            return CommissioningStage::kSendComplete;
-        }
-        return CommissioningStage::kError;
+        return CommissioningStage::kEvictPreviousCaseSessions;
+    case CommissioningStage::kEvictPreviousCaseSessions:
+        return CommissioningStage::kFindOperationalForStayActive;
+    case CommissioningStage::kFindOperationalForStayActive:
+        return CommissioningStage::kICDSendStayActive;
     case CommissioningStage::kICDSendStayActive:
-        if (mActionOverCase == ActionOverCase::kSkip)
-        {
-            return CommissioningStage::kSendComplete;
-        }
-        else
-        {
-            return CommissioningStage::kFindOperational;
-        }
+        return CommissioningStage::kFindOperationalForCommissioningComplete;
+    case CommissioningStage::kFindOperationalForCommissioningComplete:
+        return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
 
@@ -553,7 +542,7 @@ void AutoCommissioner::SetCASEFailsafeTimerIfNeeded()
         //
         // A false return from ExtendArmFailSafe is fine; we don't want to make
         // the fail-safe shorter here.
-        mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, CommissioningStage::kFindOperational,
+        mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, mCommissioner->GetCommissioningStage(),
                                          mParams.GetCASEFailsafeTimerSeconds().Value(),
                                          GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe),
                                          OnExtendFailsafeSuccessForCASE, OnFailsafeFailureForCASE);
@@ -841,7 +830,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kICDRegistration:
             // Noting to do. DevicePairingDelegate will handle this.
             break;
-        case CommissioningStage::kFindOperational:
+        case CommissioningStage::kFindOperationalForStayActive:
+        case CommissioningStage::kFindOperationalForCommissioningComplete:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
         case CommissioningStage::kCleanup:

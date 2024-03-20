@@ -1234,10 +1234,6 @@ void DeviceCommissioner::OnICDManagementStayActiveResponse(
     }
 
 exit:
-    if (commissioner->mDefaultCommissioner != nullptr)
-    {
-        commissioner->mDefaultCommissioner->SetActionOverCase(AutoCommissioner::ActionOverCase::kSendComplete);
-    }
     CommissioningDelegate::CommissioningReport report;
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
@@ -1873,7 +1869,8 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::Exchange
 {
     // CASE session established.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForStayActive ||
+                commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(commissioner->mDeviceBeingCommissioned->GetDeviceId() == sessionHandle->GetPeer().GetNodeId());
     commissioner->CancelCASECallbacks(); // ensure all CASE callbacks are unregistered
 
@@ -1886,7 +1883,8 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const Scope
 {
     // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForStayActive ||
+                commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(commissioner->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
     commissioner->CancelCASECallbacks(); // ensure all CASE callbacks are unregistered
 
@@ -1927,7 +1925,8 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
                  ChipLogValueScopedNodeId(peerId), error.Format(), retryTimeout.count());
 
     auto self = static_cast<DeviceCommissioner *>(context);
-    VerifyOrDie(self->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(self->GetCommissioningStage() == CommissioningStage::kFindOperationalForStayActive ||
+                self->GetCommissioningStage() == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(self->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
 
     // We need to do the fail-safe arming over the PASE session.
@@ -1955,7 +1954,7 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
     }
 
     // A false return is fine; we don't want to make the fail-safe shorter here.
-    self->ExtendArmFailSafeInternal(commissioneeDevice, CommissioningStage::kFindOperational, failsafeTimeout,
+    self->ExtendArmFailSafeInternal(commissioneeDevice, self->GetCommissioningStage(), failsafeTimeout,
                                     MakeOptional(kMinimumCommissioningStepTimeout), OnExtendFailsafeForCASERetrySuccess,
                                     OnExtendFailsafeForCASERetryFailure, /* fireAndForget = */ true);
 }
@@ -3199,8 +3198,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-    case CommissioningStage::kFindOperational: {
-        // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
+    case CommissioningStage::kEvictPreviousCaseSessions: {
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
 
         // If we ever had a commissioned device with this node ID before, we may
@@ -3210,7 +3208,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // clearing the ones associated with our fabric index is good enough and
         // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
-
+        CommissioningStageComplete(CHIP_NO_ERROR);
+        return;
+    }
+    case CommissioningStage::kFindOperationalForStayActive:
+    case CommissioningStage::kFindOperationalForCommissioningComplete: {
+        // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
+        auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
                                                                &mOnDeviceConnectionFailureCallback
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -3223,8 +3227,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kICDSendStayActive: {
         if (!(params.GetICDStayActiveDurationMsec().HasValue()))
         {
-            ChipLogProgress(Controller, "Skipping kICDSendStayActive since ICDStayActiveDurationMsec is not set");
-            mDefaultCommissioner->SetActionOverCase(AutoCommissioner::ActionOverCase::kSkip);
+            ChipLogProgress(Controller, "Skipping kICDSendStayActive");
             CommissioningStageComplete(CHIP_NO_ERROR);
             return;
         }

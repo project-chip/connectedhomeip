@@ -60,10 +60,14 @@ enum CommissioningStage : uint8_t
     kFailsafeBeforeThreadEnable, ///< Extend the fail-safe before doing kThreadNetworkEnable
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
-    kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
-    kSendComplete,               ///< Send CommissioningComplete (0x30:4) command to the device
-    kICDSendStayActive,          ///< Send Keep Alive to ICD
-    kCleanup,                    ///< Call delegates with status, free memory, clear timers and state
+    kEvictPreviousCaseSessions,  ///< Evict previous stale case sessions from a commissioned device with this node ID before
+    kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
+                                   ///< StayActive command
+    kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
+                                              ///< Commissioning Complete command
+    kSendComplete,                            ///< Send CommissioningComplete (0x30:4) command to the device
+    kICDSendStayActive,                       ///< Send Keep Alive to ICD
+    kCleanup,                                 ///< Call delegates with status, free memory, clear timers and state
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
     /// However, the cirque tests fail if it is earlier in the list
@@ -754,12 +758,6 @@ struct NetworkCommissioningStatusInfo
 class CommissioningDelegate
 {
 public:
-    enum class ActionOverCase : uint8_t
-    {
-        kSkip,
-        kICDSendStayActive,
-        kSendComplete
-    };
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo: Reported together with ReadCommissioningInfo2
@@ -783,7 +781,9 @@ public:
      * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkEnable: NetworkCommissioningStatusInfo if there is an error
-     * kFindOperational: OperationalNodeFoundData
+     * kFindOperationalForStayActive OperationalNodeFoundData
+     * kFindOperationalForCommissioningComplete: OperationalNodeFoundData
+     * kICDSendStayActive: CommissioningErrorInfo if there is an error
      * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: none
      */
@@ -799,7 +799,6 @@ public:
     virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
     virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
     virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;
-    virtual void SetActionOverCase(ActionOverCase value)                                                            = 0;
 };
 
 } // namespace Controller
