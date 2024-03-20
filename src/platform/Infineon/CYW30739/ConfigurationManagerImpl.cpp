@@ -31,6 +31,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Infineon/CYW30739/CYW30739Config.h>
 #include <platform/KeyValueStoreManager.h>
+#include <wiced_sleep.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -51,9 +52,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     {
         err = GetRebootCount(rebootCount);
         SuccessOrExit(err);
-
-        err = StoreRebootCount(rebootCount + 1);
-        SuccessOrExit(err);
+        if (wiced_sleep_get_boot_mode() != WICED_SLEEP_FAST_BOOT)
+        {
+            err = StoreRebootCount(rebootCount + 1);
+            SuccessOrExit(err);
+        }
     }
     else
     {
