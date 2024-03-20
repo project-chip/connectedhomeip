@@ -58,7 +58,7 @@ jobs:
                       build                             \
                   "
             - name: Run all tests
-              # Disabled being tracked here: https://github.com/project-chip/connectedhomeip/issues/32587
+            # Enabling the tests.
               run: |
                   src/test_driver/esp32/run_qemu_image.py \
                     --verbose                             \
