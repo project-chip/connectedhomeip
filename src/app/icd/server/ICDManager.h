@@ -85,7 +85,7 @@ public:
      *        This type can be used to implement specific verifiers that can be used in the CheckInMessagesWouldBeSent function.
      *        The goal is to avoid having multiple functions that implement the iterator loop with only the check changing.
      *
-     * @return true if at least one Check-In message wuld be sent
+     * @return true if at least one Check-In message would be sent
      *         false No Check-In messages would be sent
      */
 
