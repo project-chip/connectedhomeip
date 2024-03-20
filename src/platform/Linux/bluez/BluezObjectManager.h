@@ -32,7 +32,10 @@ namespace Internal {
 class BluezObjectManager
 {
 public:
-    BluezObjectManager()  = default;
+    BluezObjectManager()                                       = default;
+    BluezObjectManager(const BluezObjectManager &)             = delete;
+    BluezObjectManager & operator=(const BluezObjectManager &) = delete;
+
     ~BluezObjectManager() = default;
 
     CHIP_ERROR Init();
