@@ -2712,11 +2712,16 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
 
         // Always read the active mode trigger hint attributes to notify users about it.
-        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerHint::Id);
-        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id);
-        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::IdleModeDuration::Id);
-        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeDuration::Id);
-        readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeThreshold::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerHint::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::IdleModeDuration::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeDuration::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::ActiveModeThreshold::Id);
         SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
     }
     break;
