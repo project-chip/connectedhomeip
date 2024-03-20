@@ -2009,9 +2009,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CHIP_BUILD_TOOLS = true;
-				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
@@ -2070,9 +2068,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
-				STRIP_INSTALLED_PRODUCT = NO;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(CHIP_ROOT)/src/darwin/Framework/CHIP/";
-				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
 					"-Wformat",
 					"-Wformat-nonliteral",
@@ -2087,13 +2083,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CHIP_BUILD_TOOLS = true;
-				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -2151,7 +2144,6 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(CHIP_ROOT)/src/darwin/Framework/CHIP/";
-				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
 					"-Wformat",
 					"-Wformat-nonliteral",
@@ -2166,6 +2158,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -2194,12 +2187,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -2222,6 +2212,8 @@
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TAPI_ENABLE_PROJECT_HEADERS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -2238,7 +2230,6 @@
 		BA09EB742474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -2253,6 +2244,7 @@
 					"MTR_ENABLE_PROVISIONAL=1",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
+				INSTALLHDRS_SCRIPT_PHASE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
@@ -2329,8 +2321,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "CHIPTests/MatterTests-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Debug;
@@ -2339,6 +2329,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -2367,7 +2358,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -2389,6 +2379,7 @@
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -2405,7 +2396,6 @@
 		BA09EB782474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -2420,6 +2410,7 @@
 					"MTR_ENABLE_PROVISIONAL=1",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
+				INSTALLHDRS_SCRIPT_PHASE = YES;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
@@ -2460,7 +2451,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
-				STRIP_STYLE = "non-global";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
@@ -2498,7 +2488,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "CHIPTests/MatterTests-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Release;
