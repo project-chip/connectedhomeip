@@ -550,10 +550,7 @@ public:
         mICDStayActiveDurationMsec = MakeOptional(stayActiveDurationMsec);
         return *this;
     }
-    void ClearICDStayActiveDurationMsec()
-    {
-        mICDStayActiveDurationMsec.ClearValue();
-    }
+    void ClearICDStayActiveDurationMsec() { mICDStayActiveDurationMsec.ClearValue(); }
 
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
