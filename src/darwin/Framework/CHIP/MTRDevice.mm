@@ -1760,11 +1760,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    [_deviceController downloadLogFromNodeWithID:_nodeID
-                                            type:type
-                                         timeout:timeout
-                                           queue:queue
-                                      completion:completion];
+    auto * baseDevice = [self newBaseDevice];
+    [baseDevice downloadLogOfType:type
+                          timeout:timeout
+                            queue:queue
+                       completion:completion];
 }
 
 #pragma mark - Cache management
