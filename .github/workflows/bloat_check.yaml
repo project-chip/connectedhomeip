@@ -49,4 +49,4 @@ jobs:
                     --github-limit-artifacts 500 \
                     --github-limit-comments 20 \
                     --github-repository project-chip/connectedhomeip \
-                    --github-api-token "${{ secrets.GITHUB_TOKEN }}"
+                    --github-api-token "${{ secrets.BLOAT_REPORT }}"
