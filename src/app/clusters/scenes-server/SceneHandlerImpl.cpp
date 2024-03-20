@@ -27,13 +27,15 @@ namespace {
 /// @param[in] clusterID  Cluster ID
 /// @param[in] attID      Attribute ID
 /// @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute does not exist for a given cluster or is not scenable
+/// @note This will allways fail for global list attributes. If we do want to make them scenable someday, we will need to
+///       use a different validation method.
 // TODO: Assess if we also want to throw an error if the attribute value is out of range
 // TODO: Add check for "S" quality to determine if the attribute is scenable once suported :
 // https://github.com/project-chip/connectedhomeip/issues/24177
-CHIP_ERROR ValideAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeId)
+CHIP_ERROR ValidateAttributePath(EndpointId endpoint, ClusterId cluster, AttributeId attributeId)
 {
-    uint16_t attIndex = emberAfGetServerAttributeIndexByAttributeId(endpoint, cluster, attributeId);
-    if (attIndex == UINT16_MAX)
+    bool attIndex = emberAfContainsAttribute(endpoint, cluster, attributeId);
+    if (!attIndex)
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
@@ -79,7 +81,7 @@ DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint, const ExtensionFieldS
     auto pair_iterator = extensionFieldSet.attributeValueList.begin();
     while (pair_iterator.Next())
     {
-        ReturnErrorOnFailure(ValideAttribute(endpoint, extensionFieldSet.clusterID, pair_iterator.GetValue().attributeID));
+        ReturnErrorOnFailure(ValidateAttributePath(endpoint, extensionFieldSet.clusterID, pair_iterator.GetValue().attributeID));
         aVPairs[pairCount] = pair_iterator.GetValue();
         pairCount++;
     }
