@@ -36,6 +36,7 @@
 namespace {
 
 char kInteractiveModeName[]                         = "";
+char kQueuedCommandModeName[]                       = "(queue)";
 constexpr size_t kInteractiveModeArgumentsMaxLength = 32;
 constexpr char kOptionalArgumentPrefix[]            = "--";
 constexpr char kJsonClusterKey[]                    = "cluster";
@@ -230,6 +231,11 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    if (strncmp(argv[0], kQueuedCommandModeName, strlen(kQueuedCommandModeName)) == 0)
+    {
+        ChipLogProgress(chipTool, "Running previously queued command.");
+    }
+
     auto commandSetIter = GetCommandSet(argv[1]);
     if (commandSetIter == mCommandSets.end())
     {
@@ -307,7 +313,22 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
 
     if (interactive)
     {
-        return command->RunAsInteractive(interactiveStorageDirectory, interactiveAdvertiseOperational);
+        if (!command->ShouldQueue())
+        {
+            return command->RunAsInteractive(interactiveStorageDirectory, interactiveAdvertiseOperational);
+        }
+
+        chip::ScopedNodeId destination = command->GetDestination();
+        std::vector<std::string> queuedCommand;
+        for (int i = 1; i < argc; i++)
+        {
+            queuedCommand.push_back(std::string(argv[i]));
+        }
+
+        mQueuedCommands[destination].emplace_back(queuedCommand);
+        ChipLogError(chipTool, "The command is queued for LIT-ICD node %" PRIu32 ":" ChipLogFormatX64,
+                     static_cast<uint32_t>(destination.GetFabricIndex()), ChipLogValueX64(destination.GetNodeId()));
+        return CHIP_NO_ERROR;
     }
 
     // Now that the command is initialized, get our storage from it as needed
@@ -329,6 +350,51 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
 #endif // CONFIG_USE_LOCAL_STORAGE
 
     return command->Run();
+}
+
+void Commands::RunAllQueuedCommandsForNode(chip::ScopedNodeId nodeId, const chip::Optional<char *> & interactiveStorageDirectory,
+                                           bool interactiveAdvertiseOperational)
+{
+    auto commands = mQueuedCommands[nodeId];
+    mQueuedCommands[nodeId].clear();
+
+    for (auto && command : commands)
+    {
+        int argc                                        = 0;
+        char * argv[kInteractiveModeArgumentsMaxLength] = {};
+        argv[argc++]                                    = kQueuedCommandModeName;
+
+        std::string commandStr;
+        for (auto & arg : command)
+        {
+            argv[argc] = new char[arg.size() + 1];
+            strcpy(argv[argc++], arg.c_str());
+            commandStr += arg;
+            commandStr += " ";
+        }
+
+        ChipLogProgress(chipTool, "Execute previously queued command: %s", commandStr.c_str());
+        auto err = RunCommand(argc, argv, true, interactiveStorageDirectory, interactiveAdvertiseOperational);
+
+        // Do not delete arg[0]
+        for (auto i = 1; i < argc; i++)
+        {
+            delete[] argv[i];
+        }
+
+        ChipLogError(chipTool, "Command execution complete!");
+        ChipLogError(chipTool, "Execution result: %s", chip::ErrorStr(err));
+    }
+}
+
+std::vector<std::vector<std::string>> Commands::GetQueuedCommandsForNode(chip::ScopedNodeId nodeId) const
+{
+    auto commands = mQueuedCommands.find(nodeId);
+    if (commands == mQueuedCommands.end())
+    {
+        return std::vector<std::vector<std::string>>();
+    }
+    return commands->second;
 }
 
 Commands::CommandSetMap::iterator Commands::GetCommandSet(std::string commandSetName)

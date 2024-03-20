@@ -310,8 +310,12 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
     // is dumped to stdout while the user is typing a command.
     chip::Logging::SetLogRedirectCallback(InteractiveServerLoggingCallback);
 
+    StartCommandExecutorThread();
+
     RemoteDataModelLogger::SetDelegate(this);
     ReturnErrorOnFailure(mWebSocketServer.Run(mPort, this));
+
+    JoinCommandExecutorThread();
 
     gInteractiveServerResult.Reset();
     SetCommandExitStatus(CHIP_NO_ERROR);
@@ -361,6 +365,8 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
     // is dumped to stdout while the user is typing a command.
     chip::Logging::SetLogRedirectCallback(LoggingCallback);
 
+    StartCommandExecutorThread();
+
     char * command = nullptr;
     int status;
     while (true)
@@ -378,8 +384,68 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         command = nullptr;
     }
 
+    JoinCommandExecutorThread();
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;
+}
+
+void InteractiveCommand::StartCommandExecutorThread()
+{
+    commandExecutorQueueThread = std::thread(&InteractiveCommand::CommandExecutor, this);
+}
+
+void InteractiveCommand::JoinCommandExecutorThread()
+{
+    {
+        std::lock_guard<std::mutex> lock(commandExecutorQueueMutex);
+        commandExecutorQueue.push(CommandExecutorTask(false));
+        commandExecutorQueueCv.notify_all();
+    }
+    commandExecutorQueueThread.join();
+}
+
+void InteractiveCommand::CommandExecutor()
+{
+    std::vector<CommandExecutorTask> tasks;
+    while (true)
+    {
+        // Hold the lock as short as possible. Since OnCheckInComplete also uses the lock.
+        // If the lock covers execution call it will be a deadlock when a check-in message arrived during executing the commands.
+        {
+            std::unique_lock lock(commandExecutorQueueMutex);
+            commandExecutorQueueCv.wait(lock, [this]() { return !commandExecutorQueue.empty(); });
+
+            while (!commandExecutorQueue.empty())
+            {
+                tasks.emplace_back(commandExecutorQueue.front());
+                commandExecutorQueue.pop();
+            }
+        }
+
+        for (const auto & task : tasks)
+        {
+            switch (task.kind)
+            {
+            case CommandExecutorTask::Kind::STOP:
+                return;
+            case CommandExecutorTask::Kind::ON_CHECK_IN_COMPLETE: {
+                std::lock_guard<std::mutex> lock(commandExecutorMutex);
+                mHandler->RunAllQueuedCommandsForNode(task.payload.Get<chip::ScopedNodeId>(), GetStorageDirectory(),
+                                                      NeedsOperationalAdvertising());
+            }
+            break;
+            }
+        }
+    }
+}
+
+void InteractiveCommand::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
+{
+    ChipToolCheckInDelegate::OnCheckInComplete(clientInfo);
+
+    std::lock_guard<std::mutex> lock(commandExecutorQueueMutex);
+    commandExecutorQueue.push(CommandExecutorTask(clientInfo.peer_node));
+    commandExecutorQueueCv.notify_all();
 }
 
 bool InteractiveCommand::ParseCommand(char * command, int * status)
@@ -395,7 +461,10 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 
     ClearLine();
 
-    *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
+    {
+        std::lock_guard<std::mutex> lock(commandExecutorMutex);
+        *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
+    }
 
     return true;
 }

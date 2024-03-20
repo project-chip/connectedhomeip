@@ -64,13 +64,50 @@ CHIP_ERROR ICDListCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ICDQueueCommand::RunCommand()
+{
+    app::ICDClientInfo info;
+    auto iter = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
+    if (iter == nullptr)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
+
+    while (iter->Next(info))
+    {
+        auto commands =
+            mCommands->GetQueuedCommandsForNode(chip::ScopedNodeId(info.peer_node.GetNodeId(), info.peer_node.GetFabricIndex()));
+        if (commands.empty())
+        {
+            continue;
+        }
+        fprintf(stderr, "Node: %u:" ChipLogFormatX64 "\n", static_cast<uint32_t>(info.peer_node.GetFabricIndex()),
+                ChipLogValueX64(info.peer_node.GetNodeId()));
+        for (const auto & command : commands)
+        {
+            fprintf(stderr, " ");
+            for (const auto & arg : command)
+            {
+                fprintf(stderr, " %s", arg.c_str());
+            }
+            fprintf(stderr, "\n");
+        }
+    }
+
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+}
+
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * name = "ICD";
 
     commands_list list = {
         make_unique<ICDListCommand>(credsIssuerConfig),
+        make_unique<ICDQueueCommand>(&commands, credsIssuerConfig),
     };
 
     commands.RegisterCommandSet(name, list, "Commands for client-side ICD management.");
+    commands.RegisterCommandSet(name, list, "Commands for listing queued commands.");
 }

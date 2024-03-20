@@ -15,16 +15,16 @@
  *    limitations under the License.
  */
 
-#include <app/icd/client/DefaultCheckInDelegate.h>
+#include "ChipToolCheckInDelegate.h"
 #include <app/icd/client/RefreshKeySender.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-namespace chip {
-namespace app {
+using namespace chip;
+using namespace chip::app;
 
-CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage, InteractionModelEngine * engine)
+CHIP_ERROR ChipToolCheckInDelegate::Init(ICDClientStorage * storage, InteractionModelEngine * engine)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -33,14 +33,14 @@ CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage, InteractionM
     return CHIP_NO_ERROR;
 }
 
-void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
+void ChipToolCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 {
     ChipLogProgress(
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
 }
 
-RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
+RefreshKeySender * ChipToolCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     RefreshKeySender::RefreshKeyBuffer newKey;
@@ -60,7 +60,7 @@ RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
     return refreshKeySender;
 }
 
-void DefaultCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error)
+void ChipToolCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error)
 {
     if (error == CHIP_NO_ERROR)
     {
@@ -77,5 +77,3 @@ void DefaultCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySende
         refreshKeySender = nullptr;
     }
 }
-} // namespace app
-} // namespace chip

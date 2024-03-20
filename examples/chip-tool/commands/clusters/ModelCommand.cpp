@@ -84,12 +84,17 @@ void ModelCommand::CheckPeerICDType()
         return;
     }
 
+    mIsPeerLIT.SetValue(IsDestinationRegisteredLIT());
+}
+
+bool ModelCommand::IsDestinationRegisteredLIT()
+{
     app::ICDClientInfo info;
-    auto destinationPeerId = chip::ScopedNodeId(mDestinationId, CurrentCommissioner().GetFabricIndex());
+    auto destinationPeerId = GetDestination();
     auto iter              = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
     if (iter == nullptr)
     {
-        return;
+        return false;
     }
     app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
 
@@ -98,8 +103,13 @@ void ModelCommand::CheckPeerICDType()
         if (ScopedNodeId(info.peer_node.GetNodeId(), info.peer_node.GetFabricIndex()) == destinationPeerId)
         {
             ChipLogProgress(chipTool, "Peer is a registered LIT ICD.");
-            mIsPeerLIT.SetValue(true);
-            return;
+            return true;
         }
     }
+    return false;
+}
+
+bool ModelCommand::ShouldQueue()
+{
+    return IsDestinationRegisteredLIT() && mIsPeerLIT.ValueOr(true);
 }
