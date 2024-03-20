@@ -359,6 +359,9 @@ class AndroidBuilder(Builder):
             gn_args["android_ndk_root"] = os.environ["ANDROID_NDK_HOME"]
             gn_args["android_sdk_root"] = os.environ["ANDROID_HOME"]
 
+            if self.options.pw_command_launcher:
+                gn_args["pw_command_launcher"] = self.options.pw_command_launcher
+
             exampleName = self.app.ExampleName()
             if exampleName == "chip-test":
                 gn_args["chip_build_tests"] = True
