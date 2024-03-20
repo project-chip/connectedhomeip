@@ -75,16 +75,6 @@ _bootstrap_or_activate() {
         unset PW_CONFIG_FILE
     fi
 
-    if [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
-        # Make sure our submodule remotes are correct for this revision.
-        git submodule sync --recursive
-        git submodule update --init
-    elif [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ]; then
-        # In this case, only update already checked out submodules.
-        git submodule sync --recursive
-        git submodule update
-    fi
-
     PW_BRANDING_BANNER="$_CHIP_ROOT/scripts/setup/banner.txt"
     export PW_BRANDING_BANNER
 
@@ -94,6 +84,10 @@ _bootstrap_or_activate() {
     PW_ROOT="$_CHIP_ROOT/third_party/pigweed/repo"
     export PW_ROOT
 
+    # Update or init the pigweed submodule if necessary. Don't touch any other submodules.
+    if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" -a ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
+        git submodule update --init "$_CHIP_ROOT/third_party/pigweed/repo"
+    fi
     . "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh"
 
     _chip_bootstrap_banner() {
@@ -105,7 +99,7 @@ _bootstrap_or_activate() {
 
     local _PW_BANNER_FUNC="_chip_bootstrap_banner"
 
-    # Force the Pigweed environment directory to be '.environment'
+    # Default the Pigweed environment directory to be '.environment'
     if [ -z "$PW_ENVIRONMENT_ROOT" ]; then
         export PW_ENVIRONMENT_ROOT="$PW_PROJECT_ROOT/.environment"
     fi
