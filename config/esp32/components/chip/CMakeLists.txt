@@ -458,6 +458,11 @@ if (CONFIG_ENABLE_ENCRYPTED_OTA)
     list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
 endif()
 
+if (CONFIG_ENABLE_DELTA_OTA)
+    idf_component_get_property(esp_delta_ota_lib espressif__esp_delta_ota COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_delta_ota_lib}>)
+endif()
+
 idf_component_get_property(main_lib main COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
