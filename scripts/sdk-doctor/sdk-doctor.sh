@@ -151,5 +151,3 @@
     esac
 
 } 2>&1 | tee sdk-doctor.txt
-
-#
