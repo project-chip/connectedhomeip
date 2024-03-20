@@ -59,6 +59,7 @@ pw_python_package("build_examples") {
     "builders/nrf.py",
     "builders/openiotsdk.py",
     "builders/qpg.py",
+    "builders/rw61x.py",
     "builders/telink.py",
     "builders/tizen.py",
     "runner/__init__.py",

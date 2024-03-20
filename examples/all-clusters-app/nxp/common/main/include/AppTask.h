@@ -2,6 +2,7 @@
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2021-2023 Google LLC.
+ *    Copyright 2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,47 +20,31 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "AppEvent.h"
-#include "DeviceCallbacks.h"
-
-class AppTask
+#if CONFIG_APP_FREERTOS_OS
+#include "AppTaskFreeRTOS.h"
+#else
+#include "AppTaskZephyr.h"
+#endif
+namespace AllClustersApp {
+#if CONFIG_APP_FREERTOS_OS
+class AppTask : public chip::NXP::App::AppTaskFreeRTOS
+#else
+class AppTask : public chip::NXP::App::AppTaskZephyr
+#endif
 {
 public:
-    CHIP_ERROR StartAppTask();
-    static void AppTaskMain(void * pvParameter);
-
-    void PostEvent(const AppEvent * event);
-
-    /* Commissioning handlers */
-    void StartCommissioningHandler(void);
-    void StopCommissioningHandler(void);
-    void SwitchCommissioningStateHandler(void);
-
-    /* FactoryResetHandler */
-    void FactoryResetHandler(void);
-
-private:
-    DeviceCallbacks deviceCallbacks;
-
-    friend AppTask & GetAppTask(void);
-
-    CHIP_ERROR Init();
-    void DispatchEvent(AppEvent * event);
-    CHIP_ERROR DisplayDeviceInformation(void);
-
-    /* Functions that would be called in the Matter task context */
-    static void StartCommissioning(intptr_t arg);
-    static void StopCommissioning(intptr_t arg);
-    static void SwitchCommissioningState(intptr_t arg);
-    static void InitServer(intptr_t arg);
-
-    static AppTask sAppTask;
+    ~AppTask() override{};
+    void PreInitMatterStack(void) override;
+    void PostInitMatterStack(void) override;
+    void PostInitMatterServerInstance(void) override;
+    // This returns an instance of this class.
+    static AppTask & GetDefaultInstance();
 };
-
-inline AppTask & GetAppTask(void)
-{
-    return AppTask::sAppTask;
-}
+} // namespace AllClustersApp
+/**
+ * Returns the application-specific implementation of the AppTaskBase object.
+ *
+ * Applications can use this to gain access to features of the AppTaskBase
+ * that are specific to the selected application.
+ */
+chip::NXP::App::AppTaskBase & GetAppTask();

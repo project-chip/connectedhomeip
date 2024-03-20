@@ -66,7 +66,7 @@
 #endif // CHIP_CONFIG_ERROR_CLASS
 
 #ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
-#define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(unsigned int) * 76)
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(unsigned int) * 98)
 #endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
 
 // ==================== Security Adaptations ====================

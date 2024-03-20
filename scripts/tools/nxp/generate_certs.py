@@ -20,7 +20,7 @@ import logging as log
 import os
 import subprocess
 
-MATTER_ROOT = os.path.dirname(os.path.realpath(f"{__file__}/../../../"))
+MATTER_ROOT = os.path.dirname(os.path.realpath(__file__))[:-len("/scripts/tools/nxp")]
 
 
 def gen_test_certs(chip_cert_exe: str,
