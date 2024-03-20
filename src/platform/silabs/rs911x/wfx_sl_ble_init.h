@@ -27,9 +27,6 @@
 
 #ifndef WFX_SL_BLE_INIT
 #define WFX_SL_BLE_INIT
-#ifndef RSI_BLE_ENABLE
-#define RSI_BLE_ENABLE (1)
-#endif // RSI_BLE_ENABLE
 
 // BLE include file to refer BLE APIs
 #include "FreeRTOS.h"
