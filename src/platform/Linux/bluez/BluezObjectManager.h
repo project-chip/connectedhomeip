@@ -63,6 +63,9 @@ private:
     GAutoPtr<GDBusObjectManager> mObjectManager;
 };
 
+// Helper function to convert glib error returned by bluez_*_call_*() functions to CHIP_ERROR.
+CHIP_ERROR BluezCallToChipError(const GError * aError);
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

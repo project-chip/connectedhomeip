@@ -21,6 +21,7 @@
 #include <glib-object.h>
 #include <glib.h>
 
+#include <ble/BleError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
@@ -128,6 +129,23 @@ CHIP_ERROR BluezObjectManager::SetupObjectManager()
                         ChipLogError(DeviceLayer, "FAIL: Get D-Bus object manager client: %s", err->message));
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BluezCallToChipError(const GError * aError)
+{
+    switch (aError->code)
+    {
+    // BlueZ crashed or the D-Bus connection is broken in both cases adapter is not available.
+    case G_DBUS_ERROR_NO_REPLY:
+    // BlueZ service is not available on the bus, hence the adapter is not available too.
+    case G_DBUS_ERROR_SERVICE_UNKNOWN:
+    // Requested D-Bus object is not available on the given path. This happens when the adapter
+    // was unplugged and unregistered from the BlueZ object manager.
+    case G_DBUS_ERROR_UNKNOWN_OBJECT:
+        return BLE_ERROR_ADAPTER_UNAVAILABLE;
+    default:
+        return CHIP_ERROR_INTERNAL;
+    }
 }
 
 } // namespace Internal

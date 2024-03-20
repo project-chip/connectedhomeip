@@ -267,16 +267,7 @@ void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult 
                                                               &error.GetReceiver()))
     {
         ChipLogError(DeviceLayer, "FAIL: RegisterGattApplication: %s", error->message);
-        switch (error->code)
-        {
-        case G_DBUS_ERROR_NO_REPLY:        // BlueZ crashed or the D-Bus connection is broken
-        case G_DBUS_ERROR_SERVICE_UNKNOWN: // BlueZ service is not available on the bus
-        case G_DBUS_ERROR_UNKNOWN_OBJECT:  // Requested BLE adapter is not available
-            BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(BLE_ERROR_ADAPTER_UNAVAILABLE);
-            break;
-        default:
-            BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR_INTERNAL);
-        }
+        BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(BluezCallToChipError(error.get()));
         return;
     }
 

@@ -186,10 +186,9 @@ CHIP_ERROR ChipDeviceScanner::StopScanImpl()
     GAutoPtr<GError> error;
     if (!bluez_adapter1_call_stop_discovery_sync(mAdapter.get(), nullptr /* not cancellable */, &error.GetReceiver()))
     {
-        // Do not report error if BlueZ service is not available on the bus (service unknown) or
-        // the requested BLE adapter is not available (unknown object). In both cases the scan is
-        // already stopped.
-        if (error->code != G_DBUS_ERROR_SERVICE_UNKNOWN && error->code != G_DBUS_ERROR_UNKNOWN_OBJECT)
+        // Do not report error if returned error indicates that the BLE adapter is not available.
+        // In such case the scan is already stopped.
+        if (BluezCallToChipError(error.get()) != BLE_ERROR_ADAPTER_UNAVAILABLE)
         {
             ChipLogError(Ble, "Failed to stop discovery: %s", error->message);
             return CHIP_ERROR_INTERNAL;
@@ -303,15 +302,7 @@ CHIP_ERROR ChipDeviceScanner::StartScanImpl()
     if (!bluez_adapter1_call_start_discovery_sync(mAdapter.get(), mCancellable.get(), &error.GetReceiver()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);
-        switch (error->code)
-        {
-        case G_DBUS_ERROR_NO_REPLY:        // BlueZ crashed or the D-Bus connection is broken
-        case G_DBUS_ERROR_SERVICE_UNKNOWN: // BlueZ service is not available on the bus
-        case G_DBUS_ERROR_UNKNOWN_OBJECT:  // Requested BLE adapter is not available
-            return BLE_ERROR_ADAPTER_UNAVAILABLE;
-        default:
-            return CHIP_ERROR_INTERNAL;
-        }
+        return BluezCallToChipError(error.get());
     }
 
     return CHIP_NO_ERROR;
