@@ -25,7 +25,7 @@
 	branch  = main
 [submodule "openthread"]
 	path = third_party/openthread/repo
-	url = https://github.com/openthread/openthread.git
+	url = ../openthread.git
 	branch  = main
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
@@ -58,7 +58,7 @@
 	platforms = nxp
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
-	url = https://github.com/NXP/ot-nxp.git
+	url = ../ot-nxp.git
 	platforms = nxp
 [submodule "third_party/openthread/ot-qorvo"]
 	path = third_party/openthread/ot-qorvo
@@ -204,6 +204,7 @@
 [submodule "third_party/nxp/mw320_sdk/repo"]
 	path = third_party/nxp/mw320_sdk/repo
 	url = https://github.com/nxptest/mw320_sdk
+	branch = SDK_2.9.11
 	platforms = mw320
 [submodule "third_party/silabs/matter_support"]
 	path = third_party/silabs/matter_support
@@ -302,7 +303,7 @@
 	platforms = infineon
 [submodule "third_party/nxp/nxp_matter_support"]
 	path = third_party/nxp/nxp_matter_support
-	url = https://github.com/NXP/nxp_matter_support.git
+	url = ../nxp_matter_support.git
 	branch = master
 	platforms = nxp
 [submodule "third_party/infineon/psoc6/psoc6_sdk/libs/btstack-integration"]
