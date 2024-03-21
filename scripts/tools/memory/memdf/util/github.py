@@ -18,14 +18,13 @@
 import itertools
 import logging
 import os
+import subprocess
 from typing import Iterable, Mapping, Optional
 
 import dateutil  # type: ignore
 import dateutil.parser  # type: ignore
 import ghapi.all  # type: ignore
 from memdf import Config, ConfigDescription
-
-import subprocess
 
 
 def postprocess_config(config: Config, _key: str, _info: Mapping) -> None:
@@ -191,18 +190,17 @@ class Gh:
 
             download_url = f"https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
 
-
             # Follow https://docs.github.com/en/rest/actions/artifacts?apiVersion=2022-11-28#download-an-artifact
             return subprocess.check_output(
-                    [
-                        'curl',
-                        '-L',
-                        '-H', 'Accept: application/vnd.github+json',
-                        '-H', f'Authorization: Bearer {token}',
-                        '-H', 'X-GitHub-Api-Version: 2022-11-28',
-                        '--output', '-',
-                        download_url
-                    ]
+                [
+                    'curl',
+                    '-L',
+                    '-H', 'Accept: application/vnd.github+json',
+                    '-H', f'Authorization: Bearer {token}',
+                    '-H', 'X-GitHub-Api-Version: 2022-11-28',
+                    '--output', '-',
+                    download_url
+                ]
             )
         except Exception as e:
             logging.error('Failed to download artifact %d: %s', artifact_id, e)
