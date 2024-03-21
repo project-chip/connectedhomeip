@@ -190,11 +190,17 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
     State_t new_state;
 
     // Initiate Turn Lock/Unlock Action only when the previous one is complete.
-    if (mState == kState_LockCompleted && aAction == UNLOCK_ACTION)
+    if ((mState == kState_LockCompleted || mState == kState_UnlatchCompleted) && (aAction == UNLOCK_ACTION))
     {
         action_initiated = true;
 
         new_state = kState_UnlockInitiated;
+    }
+    else if ((mState == kState_LockCompleted || mState == kState_UnlockCompleted) && (aAction == UNLATCH_ACTION))
+    {
+        action_initiated = true;
+        SILABS_LOG("Unlatching!");
+        new_state = kState_UnlatchInitiated;
     }
     else if (mState == kState_UnlockCompleted && aAction == LOCK_ACTION)
     {
@@ -205,7 +211,6 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
 
     if (action_initiated)
     {
-
         StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
 
         // Since the timer started successfully, update the state and trigger callback
@@ -261,6 +266,24 @@ void LockManager::TimerEventHandler(TimerHandle_t xTimer)
     event.Handler            = ActuatorMovementTimerEventHandler;
     AppTask::GetAppTask().PostEvent(&event);
 }
+void LockManager::UnlockAfterUnlatch()
+{
+    // write the new lock value
+    bool succes = false;
+    if (mUnlatchContext.mEndpointId != kInvalidEndpointId)
+    {
+        SILABS_LOG("Update to Unlock after Unlatch");
+        succes = setLockState(mUnlatchContext.mEndpointId, mUnlatchContext.mFabricIdx, mUnlatchContext.mNodeId,
+                              DlLockState::kUnlocked, mUnlatchContext.mPin, mUnlatchContext.mErr);
+    }
+
+    if (!succes)
+    {
+        SILABS_LOG("Failed to update the lock state after Unlatch");
+    }
+
+    InitiateAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION);
+}
 
 void LockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 {
@@ -272,6 +295,11 @@ void LockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
     {
         lock->mState    = kState_LockCompleted;
         actionCompleted = LOCK_ACTION;
+    }
+    else if (lock->mState == kState_UnlatchInitiated)
+    {
+        lock->mState    = kState_UnlatchCompleted;
+        actionCompleted = UNLATCH_ACTION;
     }
     else if (lock->mState == kState_UnlockInitiated)
     {
@@ -297,6 +325,29 @@ bool LockManager::Lock(chip::EndpointId endpointId, const Nullable<chip::FabricI
 bool LockManager::Unlock(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
                          const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
 {
+    if (DoorLockServer::Instance().SupportsUnbolt(endpointId))
+    {
+        // TODO: Our current implementation does not support multiple endpoint. This needs to be fixed in the future.
+        if (endpointId != mUnlatchContext.mEndpointId)
+        {
+            // If we get a request to unlock on a different endpoint while the current endpoint is in the middle of an action,
+            // we return false for now. This needs to be fixed in the future.
+            if (mState != kState_UnlockCompleted && mState != kState_LockCompleted)
+            {
+                ChipLogError(Zcl, "Cannot unlock while unlatch on another endpoint is in progress on  anotther endpoint");
+                return false;
+            }
+            else
+            {
+                mUnlatchContext.Update(endpointId, fabricIdx, nodeId, pin, err);
+                return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlatched, pin, err);
+            }
+        }
+        else
+        {
+            return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlatched, pin, err);
+        }
+    }
     return setLockState(endpointId, fabricIdx, nodeId, DlLockState::kUnlocked, pin, err);
 }
 
