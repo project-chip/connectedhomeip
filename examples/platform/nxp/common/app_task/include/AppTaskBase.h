@@ -52,7 +52,7 @@ public:
      * This function is called at the begging of the InitServer function.
      *
      */
-    virtual void PreInitMatterServerInstance(void){};
+    virtual void PreInitMatterServerInstance(void) {};
 
     /**
      * \brief This function could be overridden in order to execute code at the end of the InitServer function.
@@ -60,7 +60,7 @@ public:
      * Example of usage: all-cluster-apps example disable last fixed endpoint after InitServer function execution.
      *
      */
-    virtual void PostInitMatterServerInstance(void){};
+    virtual void PostInitMatterServerInstance(void) {};
 
     /**
      * \brief This function could be overridden in order to execute code before matter stack init function.
@@ -68,7 +68,7 @@ public:
      * Example of usage: if some initialization has to be done before the matter stack initialization.
      *
      */
-    virtual void PreInitMatterStack(void){};
+    virtual void PreInitMatterStack(void) {};
 
     /**
      * \brief This function could be overridden in order to execute code after matter stack init function.
@@ -77,7 +77,7 @@ public:
      * done after matter stack init. Developper can override this function to add cluster initialization/customization.
      *
      */
-    virtual void PostInitMatterStack(void){};
+    virtual void PostInitMatterStack(void) {};
 
     /**
      * \brief This function could be overridden in order to register features.
@@ -95,7 +95,7 @@ public:
      * Example of usage: Laundry washer application used additionnal CLI commands.
      *
      */
-    virtual void AppMatter_RegisterCustomCliCommands(void){};
+    virtual void AppMatter_RegisterCustomCliCommands(void) {};
 
     /**
      * \brief This function could be overridden in order to dispatch event.
@@ -103,7 +103,7 @@ public:
      * Example of usage: FreeRtos dispatch event using the event handler.
      *
      */
-    virtual void DispatchEvent(const AppEvent & event){};
+    virtual void DispatchEvent(const AppEvent & event) {};
 
     /**
      * \brief Return a pointer to the NXP Wifi Driver instance.
