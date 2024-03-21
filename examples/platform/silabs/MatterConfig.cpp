@@ -179,7 +179,6 @@ void application_start(void * unused)
 }
 } // namespace
 
-
 void SilabsMatterConfig::AppInit()
 {
     GetPlatform().Init();
