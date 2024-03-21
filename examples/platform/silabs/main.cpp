@@ -27,5 +27,5 @@ int main(void)
 
     // Initialize the application. For example, create periodic timer(s) or
     // task(s) if the kernel is present.
-    SilabsMatterConfig::app_init();
+    SilabsMatterConfig::AppInit();
 }

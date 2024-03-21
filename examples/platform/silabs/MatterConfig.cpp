@@ -98,7 +98,6 @@ using namespace ::chip::Credentials::Silabs;
 using namespace chip::DeviceLayer::Silabs;
 
 TaskHandle_t main_Task;
-void application_start(void * unused);
 volatile int apperror_cnt;
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -156,20 +155,6 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-void SilabsMatterConfig::app_init()
-{
-    GetPlatform().Init();
-
-    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
-    SILABS_LOG("Starting scheduler");
-    GetPlatform().StartScheduler();
-
-    // Should never get here.
-    chip::Platform::MemoryShutdown();
-    SILABS_LOG("Start Scheduler Failed");
-    appError(CHIP_ERROR_INTERNAL);
-}
-
 void application_start(void * unused)
 {
     CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
@@ -190,6 +175,20 @@ void application_start(void * unused)
         appError(err);
 
     vTaskDelete(main_Task);
+}
+
+void SilabsMatterConfig::AppInit()
+{
+    GetPlatform().Init();
+
+    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
+    SILABS_LOG("Starting scheduler");
+    GetPlatform().StartScheduler();
+
+    // Should never get here.
+    chip::Platform::MemoryShutdown();
+    SILABS_LOG("Start Scheduler Failed");
+    appError(CHIP_ERROR_INTERNAL);
 }
 
 #if SILABS_OTA_ENABLED

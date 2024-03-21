@@ -26,7 +26,7 @@ class SilabsMatterConfig
 {
 public:
     static CHIP_ERROR InitMatter(const char * appName);
-    static void app_init();
+    static void AppInit();
 
 private:
     static CHIP_ERROR InitOpenThread(void);
