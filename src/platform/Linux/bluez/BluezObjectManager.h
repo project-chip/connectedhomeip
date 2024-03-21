@@ -86,6 +86,9 @@ private:
     void NotifyAdapterRemoved(BluezAdapter1 * aAdapter);
     void RemoveAdapterSubscriptions(BluezAdapter1 * aAdapter);
 
+    using NotificationsDelegates = std::vector<BluezObjectManagerAdapterNotificationsDelegate *>;
+    NotificationsDelegates GetDeviceNotificationsDelegates(BluezDevice1 * device);
+
     void OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * aObj);
     void OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject * aObj);
     void OnInterfacePropertiesChanged(GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface,

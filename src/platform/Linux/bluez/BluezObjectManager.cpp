@@ -46,11 +46,6 @@ const char * GetAdapterObjectPath(BluezAdapter1 * aAdapter)
     return g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aAdapter));
 }
 
-bool IsDeviceOnAdapter(BluezDevice1 * aDevice, std::string_view aAdapterPath)
-{
-    return bluez_device1_get_adapter(aDevice) == aAdapterPath;
-}
-
 } // namespace
 
 CHIP_ERROR BluezObjectManager::Init()
@@ -175,6 +170,23 @@ CHIP_ERROR BluezObjectManager::SetupDBusConnection()
     return CHIP_NO_ERROR;
 }
 
+BluezObjectManager::NotificationsDelegates BluezObjectManager::GetDeviceNotificationsDelegates(BluezDevice1 * device)
+{
+    const char * deviceAdapterPath = bluez_device1_get_adapter(device);
+    NotificationsDelegates delegates;
+
+    std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
+    for (auto & [adapterPath, delegate] : mSubscriptions)
+    {
+        if (adapterPath == deviceAdapterPath)
+        {
+            delegates.push_back(delegate);
+        }
+    }
+
+    return delegates;
+}
+
 void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * aObj)
 {
     GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(reinterpret_cast<BluezObject *>(aObj)));
@@ -187,13 +199,9 @@ void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * 
     GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
     if (device)
     {
-        std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
-        for (auto & [adapterPath, delegate] : mSubscriptions)
+        for (auto delegate : GetDeviceNotificationsDelegates(device.get()))
         {
-            if (IsDeviceOnAdapter(device.get(), adapterPath))
-            {
-                delegate->OnDeviceAdded(*device.get());
-            }
+            delegate->OnDeviceAdded(*device.get());
         }
     }
 }
@@ -211,13 +219,9 @@ void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject 
     GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
     if (device)
     {
-        std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
-        for (auto & [adapterPath, delegate] : mSubscriptions)
+        for (auto delegate : GetDeviceNotificationsDelegates(device.get()))
         {
-            if (IsDeviceOnAdapter(device.get(), adapterPath))
-            {
-                delegate->OnDeviceRemoved(*device.get());
-            }
+            delegate->OnDeviceRemoved(*device.get());
         }
     }
 }
@@ -228,13 +232,9 @@ void BluezObjectManager::OnInterfacePropertiesChanged(GDBusObjectManagerClient *
     GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
     if (device)
     {
-        std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
-        for (auto & [adapterPath, delegate] : mSubscriptions)
+        for (auto delegate : GetDeviceNotificationsDelegates(device.get()))
         {
-            if (IsDeviceOnAdapter(device.get(), adapterPath))
-            {
-                delegate->OnDevicePropertyChanged(*device.get(), aChangedProps, aInvalidatedProps);
-            }
+            delegate->OnDevicePropertyChanged(*device.get(), aChangedProps, aInvalidatedProps);
         }
     }
 }
