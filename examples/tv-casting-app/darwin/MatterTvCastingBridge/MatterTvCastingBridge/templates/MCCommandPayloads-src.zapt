@@ -9,10 +9,7 @@
 #import "../NSStringSpanConversion.h"
 
 #include <app/data-model/Decode.h>
-#include <lib/core/TLV.h>
 #include <app/data-model/ListLargeSystemExtensions.h>
-#include <lib/support/CodeUtils.h>
-#include <system/TLVPacketBufferBackingStore.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -42,7 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_commands}}
 
 {{#*inline "completeImpl"}}
-{{#if (isSupported cluster command=command isForCommandPayload=true)}}
 @implementation MC{{cluster}}Cluster{{command}}Params
 - (instancetype)init
 {
@@ -51,9 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     {{>init_struct_member label=label type=type cluster=parent.parent.name}}
 {{/zcl_command_arguments}}
-{{#if (or (isStrEqual source "client")
-          (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
-{{/if}}
 {{#if (isStrEqual source "client")}}
 {{/if}}
   }
@@ -76,13 +69,6 @@ NS_ASSUME_NONNULL_BEGIN
   NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_command_arguments}}{{asStructPropertyName label}}:%@; {{/zcl_command_arguments}}>", NSStringFromClass([self class]) {{#zcl_command_arguments}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_command_arguments}}];
   return descriptionString;
 }
-{{#zcl_command_arguments}}
-{{#if (and includeRenamedProperties
-           (hasOldName ../cluster command=../command commandField=(asStructPropertyName label)))}}
-
-{{> renamed_struct_field_impl cluster=parent.parent.name type=type newName=label oldName=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
-{{/if}}
-{{/zcl_command_arguments}}
 
 {{#if (isStrEqual source "client")}}
 
@@ -128,23 +114,11 @@ NS_ASSUME_NONNULL_BEGIN
 }
 {{/if}}
 @end
-{{/if}}
 {{/inline}}
-
-{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
 {{> completeImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                  command=(asUpperCamelCase name preserveAcronyms=true)
                  includeRenamedProperties=false}}
 
-{{#if (or (not (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name)))
-          (not (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatCommandNameRemapping parent.name name))))}}
-{{/if}}
-
-{{else}}
-{{> completeImpl cluster=(compatClusterNameRemapping parent.name)
-                 command=(compatCommandNameRemapping parent.name name)
-                 includeRenamedProperties=true}}
-{{/if}}
 {{/zcl_commands}}
 {{/if}}
 {{/zcl_clusters}}

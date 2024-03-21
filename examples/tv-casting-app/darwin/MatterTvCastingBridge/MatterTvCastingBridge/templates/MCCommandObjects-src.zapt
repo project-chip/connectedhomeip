@@ -21,14 +21,12 @@
 @end
 
 {{#zcl_clusters}}
-{{#if (isSupported (asUpperCamelCase name))}}
 {{#if (isInConfigList name "MatterCastingClusters")}}
 
 // {{asUpperCamelCase name}} cluster:
 
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
-{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command
 - (void)invoke:(id)request
                  context:(void * _Nullable)context
@@ -81,8 +79,6 @@
 @end
 
 {{/if}}
-{{/if}}
 {{/zcl_commands}}
-{{/if}}
 {{/if}}
 {{/zcl_clusters}}

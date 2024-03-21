@@ -9,7 +9,6 @@
 #define MCClusterObjects_h
 
 {{#zcl_clusters}}
-{{#if (isSupported (asUpperCamelCase name))}}
 {{#if (isInConfigList name "MatterCastingClusters")}}
 
 // {{asUpperCamelCase name}} cluster:
@@ -20,28 +19,23 @@
 
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
-{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 
 /**
  * @brief Returns non-nil pointer to MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command if supported, nil otherwise.
  */
 - (MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command * _Nullable){{asMethodName name}}Command;
 {{/if}}
-{{/if}}
 {{/zcl_commands}}
 
 // {{asUpperCamelCase name}} cluster attributes:
 {{#zcl_attributes_server}}
-{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 
 /**
  * @brief Returns non-nil pointer to MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Attribute if supported, nil otherwise.
  */
 - (MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Attribute * _Nullable){{asMethodName name}}Attribute;
-{{/if}}
 {{/zcl_attributes_server}}
 @end
-{{/if}}
 {{/if}}
 {{/zcl_clusters}}
 

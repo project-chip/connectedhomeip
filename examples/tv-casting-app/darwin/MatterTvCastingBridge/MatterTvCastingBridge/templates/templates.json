@@ -11,7 +11,6 @@
         "darwin/Framework/CHIP/templates/helper.js"
     ],
     "resources": {
-        "availability-data": "../../../../../../src/darwin/Framework/CHIP/templates/availability.yaml",
         "config-data": "config-data.yaml"
     },
     "override": "../../../../../../src/app/zap-templates/common/override.js",
