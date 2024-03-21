@@ -36,9 +36,12 @@ Work In Progress
 
 -   [Daily Fail Summary](tools/daily_fail_summary.md)
 -   Spellcheck
-    -   Uses [rojopolis/spellcheck-github-actions](https://github.com/marketplace/actions/github-spellcheck-action#configuration), a PySpelling-based
-        spellchecker
+    -   Uses
+        [rojopolis/spellcheck-github-actions](https://github.com/marketplace/actions/github-spellcheck-action#configuration),
+        a PySpelling-based spellchecker
     -   This tool utilizes the definitions in .spellcheck.yml and
-        .github/.wordlist.txt to check all documentation files. .spellcheck.yml defines the settings while .workdlist.txt is a dictionary of words to skip checking (brand names, techincal jargon, acronyms)
+        .github/.wordlist.txt to check all documentation files. .spellcheck.yml
+        defines the settings while .workdlist.txt is a dictionary of words to
+        skip checking (brand names, techincal jargon, acronyms)
 
 ## General Improvement Ideas
