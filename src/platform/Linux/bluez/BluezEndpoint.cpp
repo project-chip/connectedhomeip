@@ -300,12 +300,12 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 }
 
 /// Update the table of open BLE connections whenever a new device is spotted or its attributes have changed.
-void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
+void BluezEndpoint::UpdateConnectionTable(BluezDevice1 & aDevice)
 {
-    const char * objectPath      = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(apDevice));
+    const char * objectPath      = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
     BluezConnection * connection = GetBluezConnection(objectPath);
 
-    if (connection != nullptr && !bluez_device1_get_connected(apDevice))
+    if (connection != nullptr && !bluez_device1_get_connected(&aDevice))
     {
         ChipLogDetail(DeviceLayer, "Bluez disconnected");
         BLEManagerImpl::CHIPoBluez_ConnectionClosed(connection);
@@ -318,22 +318,22 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 * apDevice)
 
     if (connection == nullptr)
     {
-        HandleNewDevice(apDevice);
+        HandleNewDevice(aDevice);
     }
 }
 
-void BluezEndpoint::HandleNewDevice(BluezDevice1 * device)
+void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
 {
-    VerifyOrReturn(bluez_device1_get_connected(device));
-    VerifyOrReturn(!mIsCentral || bluez_device1_get_services_resolved(device));
+    VerifyOrReturn(bluez_device1_get_connected(&aDevice));
+    VerifyOrReturn(!mIsCentral || bluez_device1_get_services_resolved(&aDevice));
 
-    const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(device));
+    const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
     BluezConnection * conn  = GetBluezConnection(objectPath);
     VerifyOrReturn(conn == nullptr,
                    ChipLogError(DeviceLayer, "FAIL: Connection already tracked: conn=%p device=%s path=%s", conn,
                                 conn->GetPeerAddress(), objectPath));
 
-    conn                       = chip::Platform::New<BluezConnection>(*this, device);
+    conn                       = chip::Platform::New<BluezConnection>(*this, aDevice);
     mpPeerDevicePath           = g_strdup(objectPath);
     mConnMap[mpPeerDevicePath] = conn;
 
@@ -342,17 +342,17 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 * device)
     BLEManagerImpl::HandleNewConnection(conn);
 }
 
-void BluezEndpoint::OnDeviceAdded(BluezDevice1 * device)
+void BluezEndpoint::OnDeviceAdded(BluezDevice1 & device)
 {
     HandleNewDevice(device);
 }
 
-void BluezEndpoint::OnDevicePropertyChanged(BluezDevice1 * device, GVariant * changedProps, const char * const * invalidatedProps)
+void BluezEndpoint::OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps, const char * const * invalidatedProps)
 {
     UpdateConnectionTable(device);
 }
 
-void BluezEndpoint::OnDeviceRemoved(BluezDevice1 * device)
+void BluezEndpoint::OnDeviceRemoved(BluezDevice1 & device)
 {
     // Handling device removal is not necessary because disconnection is already handled
     // in the OnDevicePropertyChanged() - we are checking for the "Connected" property.

@@ -192,7 +192,7 @@ void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * 
         {
             if (IsDeviceOnAdapter(device.get(), adapterPath))
             {
-                delegate->OnDeviceAdded(device.get());
+                delegate->OnDeviceAdded(*device.get());
             }
         }
     }
@@ -216,7 +216,7 @@ void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject 
         {
             if (IsDeviceOnAdapter(device.get(), adapterPath))
             {
-                delegate->OnDeviceRemoved(device.get());
+                delegate->OnDeviceRemoved(*device.get());
             }
         }
     }
@@ -233,7 +233,7 @@ void BluezObjectManager::OnInterfacePropertiesChanged(GDBusObjectManagerClient *
         {
             if (IsDeviceOnAdapter(device.get(), adapterPath))
             {
-                delegate->OnDevicePropertyChanged(device.get(), aChangedProps, aInvalidatedProps);
+                delegate->OnDevicePropertyChanged(*device.get(), aChangedProps, aInvalidatedProps);
             }
         }
     }

@@ -40,9 +40,9 @@ class BluezObjectManagerAdapterNotificationsDelegate
 {
 public:
     virtual ~BluezObjectManagerAdapterNotificationsDelegate() {}
-    virtual void OnDeviceAdded(BluezDevice1 * device)                                                                           = 0;
-    virtual void OnDevicePropertyChanged(BluezDevice1 * device, GVariant * changedProps, const char * const * invalidatedProps) = 0;
-    virtual void OnDeviceRemoved(BluezDevice1 * device)                                                                         = 0;
+    virtual void OnDeviceAdded(BluezDevice1 & device)                                                                           = 0;
+    virtual void OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps, const char * const * invalidatedProps) = 0;
+    virtual void OnDeviceRemoved(BluezDevice1 & device)                                                                         = 0;
 };
 
 class BluezObjectManager

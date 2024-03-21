@@ -81,9 +81,9 @@ public:
     void CancelConnect();
 
     // Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
-    void OnDeviceAdded(BluezDevice1 * device) override;
-    void OnDevicePropertyChanged(BluezDevice1 * device, GVariant * changedProps, const char * const * invalidatedProps) override;
-    void OnDeviceRemoved(BluezDevice1 * device) override;
+    void OnDeviceAdded(BluezDevice1 & device) override;
+    void OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps, const char * const * invalidatedProps) override;
+    void OnDeviceRemoved(BluezDevice1 & device) override;
 
 private:
     CHIP_ERROR SetupEndpointBindings();
@@ -94,8 +94,8 @@ private:
     BluezGattCharacteristic1 * CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName, const char * aUUID,
                                                         const char * const * aFlags);
 
-    void HandleNewDevice(BluezDevice1 * aDevice);
-    void UpdateConnectionTable(BluezDevice1 * aDevice);
+    void HandleNewDevice(BluezDevice1 & aDevice);
+    void UpdateConnectionTable(BluezDevice1 & aDevice);
     BluezConnection * GetBluezConnection(const char * aPath);
     BluezConnection * GetBluezConnectionViaDevice();
 

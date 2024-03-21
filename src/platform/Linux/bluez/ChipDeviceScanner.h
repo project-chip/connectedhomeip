@@ -79,9 +79,9 @@ public:
     CHIP_ERROR StopScan();
 
     /// Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
-    void OnDeviceAdded(BluezDevice1 * device) override;
-    void OnDevicePropertyChanged(BluezDevice1 * device, GVariant * changedProps, const char * const * invalidatedProps) override;
-    void OnDeviceRemoved(BluezDevice1 * device) override {}
+    void OnDeviceAdded(BluezDevice1 & device) override;
+    void OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps, const char * const * invalidatedProps) override;
+    void OnDeviceRemoved(BluezDevice1 & device) override {}
 
 private:
     enum ChipDeviceScannerState

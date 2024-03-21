@@ -188,15 +188,15 @@ CHIP_ERROR ChipDeviceScanner::StopScanImpl()
     return CHIP_NO_ERROR;
 }
 
-void ChipDeviceScanner::OnDeviceAdded(BluezDevice1 * device)
+void ChipDeviceScanner::OnDeviceAdded(BluezDevice1 & device)
 {
-    ReportDevice(*device);
+    ReportDevice(device);
 }
 
-void ChipDeviceScanner::OnDevicePropertyChanged(BluezDevice1 * device, GVariant * changedProps,
+void ChipDeviceScanner::OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps,
                                                 const char * const * invalidatedProps)
 {
-    ReportDevice(*device);
+    ReportDevice(device);
 }
 
 void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
