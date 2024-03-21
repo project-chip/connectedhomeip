@@ -41,7 +41,7 @@ Work In Progress
         a PySpelling-based spellchecker
     -   This tool utilizes the definitions in .spellcheck.yml and
         .github/.wordlist.txt to check all documentation files. .spellcheck.yml
-        defines the settings while .workdlist.txt is a dictionary of words to
-        skip checking (brand names, techincal jargon, acronyms)
+        defines the settings while .worklist.txt is a dictionary of words to
+        skip checking (brand names, technical jargon, acronyms)
 
 ## General Improvement Ideas
