@@ -53,6 +53,7 @@ shared_library("jni") {
 
   deps = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common",
+    "${chip_root}/src/app/data-model:heap",
     "${chip_root}/src/app/server/java:jni",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
