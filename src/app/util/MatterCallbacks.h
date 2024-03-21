@@ -41,7 +41,7 @@ public:
 
     /// This callback is called on attribute operations:
     /// - for reads and writes
-    /// - both befor and after attribute read/writes
+    /// - both before and after attribute read/writes
     ///
     /// NOTE: PostRead is only called on read success.
     virtual void AttributeOperation(OperationType operation, OperationOrder order, const chip::app::ConcreteAttributePath & path) {}
