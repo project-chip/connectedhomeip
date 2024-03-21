@@ -86,15 +86,9 @@ Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool a
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
-
-    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
-                                                          DataModelCallbacks::OperationOrder::Pre, aPath);
-
+    MatterPreAttributeReadCallback(aPath);
     ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReportIBs, aEncoderState));
-
-    DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Read,
-                                                          DataModelCallbacks::OperationOrder::Post, aPath);
-
+    MatterPostAttributeReadCallback(aPath);
     return CHIP_NO_ERROR;
 }
 
@@ -1001,6 +995,9 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
 }; // namespace reporting
 } // namespace app
 } // namespace chip
+
+void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
 
 // TODO: MatterReportingAttributeChangeCallback should just live in libCHIP,
 // instead of being in ember-compatibility-functions.  It does not depend on any
