@@ -31,7 +31,6 @@ extern "C" {
 #include "sl_event_handler.h"
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
-#include "sl_system_init.h"
 void soc_pll_config(void);
 }
 
@@ -49,8 +48,6 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 CHIP_ERROR SilabsPlatform::Init(void)
 {
     mButtonCallback = nullptr;
-
-    sl_system_init();
 
     // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
     NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
