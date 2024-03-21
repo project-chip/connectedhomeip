@@ -155,26 +155,28 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-void application_start(void * unused)
-{
-    CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
-    if (err != CHIP_NO_ERROR)
-        appError(err);
+namespace {
+    void application_start(void * unused)
+    {
+        CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
+        if (err != CHIP_NO_ERROR)
+            appError(err);
 
-    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+        gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+        chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Credentials::Silabs::GetSilabsDacProvider());
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        // Initialize device attestation config
+        SetDeviceAttestationCredentialsProvider(Credentials::Silabs::GetSilabsDacProvider());
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    SILABS_LOG("Starting App Task");
-    err = AppTask::GetAppTask().StartAppTask();
-    if (err != CHIP_NO_ERROR)
-        appError(err);
+        SILABS_LOG("Starting App Task");
+        err = AppTask::GetAppTask().StartAppTask();
+        if (err != CHIP_NO_ERROR)
+            appError(err);
 
-    vTaskDelete(main_Task);
+        vTaskDelete(main_Task);
+    }
 }
 
 void SilabsMatterConfig::AppInit()
