@@ -148,24 +148,14 @@ std::string GetDomainFromHostName(const char * hostnameWithDomain)
 {
     std::string hostname = std::string(hostnameWithDomain);
 
-    // Find the last occurence of '.'
-    size_t last_pos = hostname.find_last_of(".");
+    // Find the first occurence of '.'
+    size_t first_pos = hostname.find(".");
 
-    // The last occurence of the dot should be the last character in the hostname with domain.
-    VerifyOrReturnValue((last_pos != std::string::npos && (last_pos == strlen(hostnameWithDomain) - 1)), std::string());
+    // if not found, return empty string
+    VerifyOrReturnValue(first_pos != std::string::npos, std::string());
 
-    // Get a substring without last '.'
-    std::string substring = hostname.substr(0, last_pos);
-
-    // Find the last occurence of '.' in the substring created above.
-    size_t pos = substring.find_last_of(".");
-    if (pos != std::string::npos)
-    {
-        // Return the domain name between the last 2 occurences of '.' including the trailing dot'.'.
-        return std::string(hostname.substr(pos + 1, last_pos));
-    }
-
-    return std::string();
+    // Get a substring after the first occurence of '.' to the end of the string
+    return hostname.substr(first_pos + 1, hostname.size());
 }
 
 /**
