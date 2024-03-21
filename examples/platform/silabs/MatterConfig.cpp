@@ -177,7 +177,8 @@ void application_start(void * unused)
 
     vTaskDelete(main_Task);
 }
-}
+} // namespace
+
 
 void SilabsMatterConfig::AppInit()
 {
