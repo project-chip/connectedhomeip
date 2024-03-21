@@ -182,7 +182,7 @@ CHIP_ERROR StartSrpTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
 {
     VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeoutInMSecs), SrpTimerExpiredCallback,
-                                          reinterpret_cast<void *>(ctx));
+                                                 reinterpret_cast<void *>(ctx));
 }
 
 /**
@@ -194,7 +194,6 @@ void CancelSrpTimer(ResolveContext * ctx)
 {
     DeviceLayer::SystemLayer().CancelTimer(SrpTimerExpiredCallback, reinterpret_cast<void *>(ctx));
 }
-
 
 Global<MdnsContexts> MdnsContexts::sInstance;
 
@@ -261,7 +260,7 @@ CHIP_ERROR Browse(BrowseHandler * sdCtx, uint32_t interfaceId, const char * type
     ChipLogProgress(Discovery, "Browsing for: %s on domain %s", StringOrNullMarker(type), kSrpDot);
 
     auto sdRefSrp = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    err = DNSServiceBrowse(&sdRefSrp, kBrowseFlags, interfaceId, type, kSrpDot, OnBrowse, sdCtx);
+    err           = DNSServiceBrowse(&sdRefSrp, kBrowseFlags, interfaceId, type, kSrpDot, OnBrowse, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     return MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
@@ -323,9 +322,8 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
         }
         else if (domainName.compare(kLocalDot) == 0)
         {
-            ChipLogProgress(
-                Discovery,
-                "Mdns: Resolve completed on the local domain. Starting a timer for the srp resolve to come back");
+            ChipLogProgress(Discovery,
+                            "Mdns: Resolve completed on the local domain. Starting a timer for the srp resolve to come back");
 
             // Usually the resolution on the local domain is quicker than on the srp domain. We would like to give the
             // resolution on the srp domain around 250 millisecs more to give it a chance to resolve before finalizing
@@ -383,7 +381,7 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
         if (!sdCtx->isResolveRequested)
         {
             GetAddrInfo(sdCtx);
-            sdCtx->isResolveRequested        = true;
+            sdCtx->isResolveRequested = true;
         }
     }
 }
@@ -403,7 +401,7 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     auto sdRefSrp = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    err = DNSServiceResolve(&sdRefSrp, kResolveFlags, interfaceId, name, type, kSrpDot, OnResolve, sdCtx);
+    err           = DNSServiceResolve(&sdRefSrp, kResolveFlags, interfaceId, name, type, kSrpDot, OnResolve, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     auto retval = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);

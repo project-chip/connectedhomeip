@@ -458,12 +458,12 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
                                std::shared_ptr<uint32_t> && consumerCounterToUse) :
     browseThatCausedResolve(browseCausingResolve)
 {
-    type            = ContextType::Resolve;
-    context         = cbContext;
-    callback        = cb;
-    protocol        = GetProtocol(cbAddressType);
-    instanceName    = instanceNameToResolve;
-    consumerCounter = std::move(consumerCounterToUse);
+    type               = ContextType::Resolve;
+    context            = cbContext;
+    callback           = cb;
+    protocol           = GetProtocol(cbAddressType);
+    instanceName       = instanceNameToResolve;
+    consumerCounter    = std::move(consumerCounterToUse);
     hasSrpTimerStarted = false;
 }
 
@@ -471,16 +471,17 @@ ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::In
                                const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
     browseThatCausedResolve(nullptr)
 {
-    type            = ContextType::Resolve;
-    context         = delegate;
-    callback        = nullptr;
-    protocol        = GetProtocol(cbAddressType);
-    instanceName    = instanceNameToResolve;
-    consumerCounter = std::move(consumerCounterToUse);
+    type               = ContextType::Resolve;
+    context            = delegate;
+    callback           = nullptr;
+    protocol           = GetProtocol(cbAddressType);
+    instanceName       = instanceNameToResolve;
+    consumerCounter    = std::move(consumerCounterToUse);
     hasSrpTimerStarted = false;
 }
 
-ResolveContext::~ResolveContext() {
+ResolveContext::~ResolveContext()
+{
     if (this->hasSrpTimerStarted)
     {
         CancelSrpTimer(this);
@@ -576,13 +577,13 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     }
 
     std::map<std::pair<uint32_t, std::string>, InterfaceInfo>::iterator iter = interfaces.begin();
-	while (iter != interfaces.end())
-	{
-		std::pair<uint32_t, std::string> key = iter->first;
+    while (iter != interfaces.end())
+    {
+        std::pair<uint32_t, std::string> key = iter->first;
         if (key.first == interfaceIndex)
         {
-            auto & interface                              = interfaces[key];
-            auto & ips                                    = interface.addresses;
+            auto & interface = interfaces[key];
+            auto & ips       = interface.addresses;
 
             // Some interface may not have any ips, just ignore them.
             if (ips.size() == 0)
