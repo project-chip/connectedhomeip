@@ -19,7 +19,6 @@
 #pragma once
 
 #include <DeviceEnergyManagementDelegateImpl.h>
-// #include <DeviceEnergyManagementManufacturerImpl.h>
 #include <app/clusters/energy-evse-server/energy-evse-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>

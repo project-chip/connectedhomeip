@@ -24,21 +24,6 @@
 
 using chip::Protocols::InteractionModel::Status;
 
-#if 0
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/EventLogging.h>
-
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::DataModel;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::EnergyEvse;
-using namespace chip::app::Clusters::EnergyEvse::Attributes;
-
-using chip::app::LogEvent;
-using chip::Protocols::InteractionModel::Status;
-#endif
 
 /**
  * @brief   Helper function to get current timestamp in Epoch format

@@ -29,7 +29,8 @@ using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 using chip::Optional;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
-#if 1
+
+#ifdef  DELEGATE_TEST_DATA
 #include "DeviceEnergyManagementDelegateImpl_TestData.cpp"
 #else
 DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() {}
@@ -103,13 +104,8 @@ Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
  */
 Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause)
 {
-    // DataModel::Nullable<Structs::ForecastStruct::Type> forecast = GetForecast();
-
-    ChipLogDetail(AppServer, "xxxxxxxxxxx if(null)");
-
     if (mForecast.IsNull())
     {
-        ChipLogDetail(AppServer, "xxxxxxxxxxx it is null");
         return Status::Failure;
     }
 
@@ -381,15 +377,10 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum state)
     ChipLogDetail(AppServer, "mOptOutState was %d changed to %d ", static_cast<int>(mOptOutState), static_cast<int>(state));
     mOptOutState = state;
 
-
-
-    ChipLogDetail(AppServer, "MMMMMMMMMMMMMMMMMM  if (mForecast.IsNull())");
     if (mForecast.IsNull())
     {
-        ChipLogDetail(AppServer, "MMMMMMMMMMMMMMMMMM  it is null !");
+        ChipLogDetail(AppServer, "mForecast is null !");
     }
-
-
 
     return CHIP_NO_ERROR;
 }

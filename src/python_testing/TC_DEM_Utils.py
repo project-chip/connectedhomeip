@@ -54,7 +54,7 @@ class DEMBaseTestHelper:
     async def send_start_time_adjust_request_command(self, requestedStartTime: int,
                                             cause: Clusters.Objects.DeviceEnergyManagement.Enums.CauseEnum,
                                             endpoint: int = None, timedRequestTimeoutMs: int = 3000,
-                                            expected_status: Status = Status.Failure):
+                                            expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.DeviceEnergyManagement.Commands.StartTimeAdjustRequest(
                 requestedStartTime=requestedStartTime,

@@ -32,9 +32,6 @@ using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
 static DeviceEnergyManagementDelegate * sDeviceEnergyManagementDelegate = nullptr;
 
-#define DELEGATE_TEST_DATA        // TODO: comment out if not needed
-
-
 
 #ifdef  DELEGATE_TEST_DATA
 //################## PowerAdjustmentCapability
@@ -191,8 +188,7 @@ void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> &
     uint32_t chipEpoch = 0;
 
     CHIP_ERROR ce = UtilsGetEpochTS(chipEpoch);
-    ChipLogProgress(Support, "@@@@@@@@@@@@@@@@@@@@@@@@ ce=%s  epoch = %d",
-                         (ce != CHIP_NO_ERROR)? "Err":"Good", chipEpoch);
+    ChipLogProgress(Support, "ce=%s  epoch = %d", (ce != CHIP_NO_ERROR)? "Err":"Good", chipEpoch);
 
     forecast.startTime         = static_cast<uint32_t>(chipEpoch);       // planned start time, in UTC, for the entire Forecast.
 

@@ -64,12 +64,6 @@ CHIP_ERROR DeviceEnergyManagementManufacturer::Init()
 {
     /* Manufacturers should modify this to do any custom initialisation */
 
-// TODO:  not need for such a thing in DEM?     dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(this));
-
-    /*
-     * This is an example implementation for manufacturers to consider
-     */
-
     /* Once the system is initialised then check to see if the state was restored
      * (e.g. after a power outage), and if the Enable timer check needs to be started
      */
@@ -84,9 +78,10 @@ CHIP_ERROR DeviceEnergyManagementManufacturer::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-void SetTestEventTrigger_zzzzzzzzzz()
+void SetTestEventTrigger_PowerAdjustment()
 {
-    ChipLogProgress(Support, "[zzzzzzzzzz-handle] L-%d", __LINE__ );
+    ChipLogProgress(Support, "[PowerAdjustment-handle] L-%d", __LINE__ );
+    // TODO: implement
 }
 
 void SetTestEventTrigger_StartTimeAdjustment()
@@ -95,43 +90,8 @@ void SetTestEventTrigger_StartTimeAdjustment()
 
     DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
 
-    //     virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast() override;
     sForecast = dg->GetForecast();
-    // sDeviceEnergyManagementTestEventSaveData.forecast = dg->GetForecast();
-
-#if 0 // TODO:
-    if (!sForecast.IsNull())
-    {
-        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d sForecast.forecastId = %d", __LINE__,  sForecast.Value().forecastId);
-        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d sForecast.startTime = %d", __LINE__ , sForecast.Value().startTime);
-        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d sForecast.endTime = %d", __LINE__, sForecast.Value().endTime );
-        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d sForecast.isPauseable = %s", __LINE__, sForecast.Value().isPauseable? "T":"F" );
-#if 0 // TODO:
-        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d [optional/nullable] sForecast.earliestStartTime = %d", __LINE__,
-                                     sForecast.Value().earliestStartTime.HasValue()?
-                                        (!sForecast.Value().earliestStartTime.IsNull()?  sForecast.Value().earliestStartTime.Value().Value() : 555555)
-                                        : 666666);
-        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d [optional] sForecast.latestEndTime = %d", __LINE__,
-                                     sForecast.Value().latestEndTime.HasValue()?  sForecast.Value().latestEndTime.Value() : 666666);
-#endif
-    }
-#endif
     ForecastTestSetup_TP3b(sForecast);
-
-    uint32_t chipEpoch = 0;
-    CHIP_ERROR ce = UtilsGetEpochTS(chipEpoch);
-    ChipLogProgress(Support, "ce=%s  epoch = %d", (ce != CHIP_NO_ERROR)? "Err":"Good", chipEpoch);
-
-
-    Status s = dg->StartTimeAdjustRequest(chipEpoch + 100000, AdjustmentCauseEnum::kLocalOptimization);
-    if (s != Status::Success)
-    {
-        ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d StartTimeAdjustRequest() Failed", __LINE__ );
-    }
-
-    // DataModel::Nullable<Structs::ForecastStruct::Type>  newForecast = dg->GetForecast();
-    // TODO: compare new/old forcasts? No that's done at the python level.
-
 }
 
 void SetTestEventTrigger_UserOptOutOptimization( OptOutStateEnum optOutState)
@@ -140,11 +100,7 @@ void SetTestEventTrigger_UserOptOutOptimization( OptOutStateEnum optOutState)
 
     DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
     sOptOutState = dg->GetOptOutState();
-
-    // ChipLogProgress(Support, "[UserOptOutOptimization-Test-Event] ");
     dg->SetOptOutState(optOutState);
-
-    // TODO: ??
 }
 
 void SetTestEventTrigger_PowerAdjustRequest()
@@ -153,10 +109,7 @@ void SetTestEventTrigger_PowerAdjustRequest()
 
     DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
     sPowerAdjustmentCapability = dg->GetPowerAdjustmentCapability();
-
-
-    
-// TODO:     const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause
+    // TODO: implement
 }
 
 
@@ -164,14 +117,11 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
 {
     DeviceEnergyManagementTrigger trigger = static_cast<DeviceEnergyManagementTrigger>(eventTrigger);
 
- ChipLogProgress(Support, "[PowerAdjustment-Test-Event] => zzzzzzzzz-%d", __LINE__);
- ChipLogProgress(Support, "[PowerAdjustment-Test-Event] => zzzzzzzzz-%d - trigger=0x%lux", __LINE__, (uint64_t)trigger);
- 
     switch (trigger)
     {
     case DeviceEnergyManagementTrigger::kPowerAdjustment:
         ChipLogProgress(Support, "[PowerAdjustment-Test-Event] => Create PowerAdjustment struct");
-        SetTestEventTrigger_zzzzzzzzzz();
+        SetTestEventTrigger_PowerAdjustment();
         break;
     case DeviceEnergyManagementTrigger::kPowerAdjustmentClear:
         ChipLogProgress(Support, "[PowerAdjustmentClear-Test-Event] => Clear PowerAdjustment struct");

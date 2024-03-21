@@ -18,6 +18,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.interaction_model import Status
 from chip.clusters.Types import NullValue
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -52,13 +53,13 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
             TestStep("4b", "TH reads OptOutState attribute. Verify value is 0x01 (LocalOptOut)"),
             TestStep("5", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
             TestStep("5a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            # TestStep("5b", "TH reads Forecast attribute. Value has to be unchanged from step 3b."),
-            # TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear."),
-            # TestStep("6a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            # TestStep("6b", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
-            # TestStep("7", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization. Verify Command response is SUCCESS."),
-            # TestStep("7a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            # TestStep("7b", "TH reads Forecast attribute. Value has to include EarliestStartTime=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Local Optimization."),
+            TestStep("5b", "TH reads Forecast attribute. Value has to be unchanged from step 3b."),
+            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Test Event Clear."),
+            TestStep("6a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            TestStep("6b", "TH reads OptOutState attribute. Verify value is 0x00 (NoOptOut)"),
+            TestStep("7", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization. Verify Command response is SUCCESS."),
+            TestStep("7a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            TestStep("7b", "TH reads Forecast attribute. Value has to include EarliestStartTime=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Local Optimization."),
             # TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event"),
             # TestStep("8a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
             # TestStep("8b", "TH reads OptOutState attribute. Verify value is 0x01 (LocalOptOut)"),
@@ -136,13 +137,50 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
         self.step("4b")
         await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kLocalOptOut)
 
-# TestStep("5", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
         self.step("5")
-        await self.send_start_time_adjust_request_command(requestedStartTime=forecast.EarliestStartTime,
-                                            cause = Clusters.Objects.DeviceEnergyManagement.Enums.CauseEnum.kLocalOptimization)
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast.earliestStartTime,
+                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
+                                            expected_status = Status.Failure)
 
         self.step("5a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
+
+        self.step("5b")
+        forecast2 = await self.read_dem_attribute_expect_success(attribute="Forecast")
+        logger.info(f"Forecast: {forecast2}")
+        asserts.assert_equal(forecast, forecast2,
+                             f"Expected same forcast {forecast} to be == {forecast2}")
+
+        self.step("6")
+        await self.send_test_event_trigger_user_opt_out_clear_all()
+
+        self.step("6a")
+        await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
+
+        self.step("6b")
+        await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kNoOptOut)
+
+        self.step("7")
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast.earliestStartTime,
+                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization)
+
+        self.step("7a")
+        await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
+
+        self.step("7b")
+        forecast3 = await self.read_dem_attribute_expect_success(attribute="Forecast")
+        logger.info(f"Forecast: {forecast3}")
+        asserts.assert_equal(forecast3.earliestStartTime, forecast3.startTime, 
+                             f"Expected earliestStartTime {forecast3.earliestStartTime} to be == startTime {forecast3.startTime}")
+        asserts.assert_greater_equal(forecast3.latestEndTime, forecast3.endTime,
+                             f"Expected latestEndTime {forecast3.latestEndTime} to be >= endTime {forecast3.endTime}")
+        asserts.assert_equal(forecast3.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization, 
+                             f"Expected forecastUpdateReason {forecast3.forecastUpdateReason} to be == LocalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization}")
+
+
+
+
+
 
 if __name__ == "__main__":
     default_matter_test_main()
