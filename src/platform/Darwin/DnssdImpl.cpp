@@ -32,8 +32,12 @@ using namespace chip::Dnssd::Internal;
 
 namespace {
 
-// The extra time in milliseconds that we will wait for the resolution on the open thread domain to complete.
-constexpr uint16_t kOpenThreadTimeoutInMsec = 250;
+constexpr char kLocalDot[] = "local.";
+
+constexpr char kSrpDot[] = "default.service.arpa.";
+
+// The extra time in milliseconds that we will wait for the resolution on the srp domain to complete.
+constexpr uint16_t kSrpTimeoutInMsec = 250;
 
 constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
 constexpr DNSServiceFlags kBrowseFlags          = kDNSServiceFlagsShareConnection;
@@ -146,56 +150,65 @@ std::string GetDomainFromHostName(const char * hostnameWithDomain)
 
     // Find the last occurence of '.'
     size_t last_pos = hostname.find_last_of(".");
-    if (last_pos != std::string::npos)
-    {
-        // Get a substring without last '.'
-        std::string substring = hostname.substr(0, last_pos);
 
-        // Find the last occurence of '.' in the substring created above.
-        size_t pos = substring.find_last_of(".");
-        if (pos != std::string::npos)
-        {
-            // Return the domain name between the last 2 occurences of '.' including the trailing dot'.'.
-            return std::string(hostname.substr(pos + 1, last_pos));
-        }
+    // The last occurence of the dot should be the last character in the hostname with domain.
+    VerifyOrReturnValue((last_pos != std::string::npos && (last_pos == strlen(hostnameWithDomain) - 1)), std::string());
+
+    // Get a substring without last '.'
+    std::string substring = hostname.substr(0, last_pos);
+
+    // Find the last occurence of '.' in the substring created above.
+    size_t pos = substring.find_last_of(".");
+    if (pos != std::string::npos)
+    {
+        // Return the domain name between the last 2 occurences of '.' including the trailing dot'.'.
+        return std::string(hostname.substr(pos + 1, last_pos));
     }
+
     return std::string();
 }
 
-Global<MdnsContexts> MdnsContexts::sInstance;
-
-namespace {
-
 /**
- * @brief Callback that is called when the timeout for resolving on the kOpenThreadDot domain has expired.
+ * @brief Callback that is called when the timeout for resolving on the kSrpDot domain has expired.
  *
  * @param[in] systemLayer The system layer.
  * @param[in] callbackContext The context passed to the timer callback.
  */
-void OpenThreadTimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
+void SrpTimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
-    ChipLogProgress(Discovery, "Mdns: Timer expired for resolve to complete on the open thread domain.");
+    ChipLogProgress(Discovery, "Mdns: Timer expired for resolve to complete on the srp domain.");
     auto sdCtx = static_cast<ResolveContext *>(callbackContext);
     VerifyOrDie(sdCtx != nullptr);
-
-    if (sdCtx->hasOpenThreadTimerStarted)
-    {
-        sdCtx->Finalize();
-    }
+    sdCtx->Finalize();
 }
 
 /**
- * @brief Starts a timer to wait for the resolution on the kOpenThreadDot domain to happen.
+ * @brief Starts a timer to wait for the resolution on the kSrpDot domain to happen.
  *
  * @param[in] timeoutSeconds The timeout in seconds.
  * @param[in] ResolveContext The resolve context.
  */
-void StartOpenThreadTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
+CHIP_ERROR StartSrpTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
 {
-    VerifyOrReturn(ctx != nullptr, ChipLogError(Discovery, "Can't schedule open thread timer since context is null"));
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeoutInMSecs), OpenThreadTimerExpiredCallback,
+    VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeoutInMSecs), SrpTimerExpiredCallback,
                                           reinterpret_cast<void *>(ctx));
 }
+
+/**
+ * @brief Cancels the timer that was started to wait for the resolution on the kSrpDot domain to happen.
+ *
+ * @param[in] ResolveContext The resolve context.
+ */
+void CancelSrpTimer(ResolveContext * ctx)
+{
+    DeviceLayer::SystemLayer().CancelTimer(SrpTimerExpiredCallback, reinterpret_cast<void *>(ctx));
+}
+
+
+Global<MdnsContexts> MdnsContexts::sInstance;
+
+namespace {
 
 static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType err, const char * name, const char * type,
                        const char * domain, void * context)
@@ -248,17 +261,17 @@ CHIP_ERROR Browse(BrowseHandler * sdCtx, uint32_t interfaceId, const char * type
     auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
-    // We will browse on both the local domain and the open thread domain.
+    // We will browse on both the local domain and the srp domain.
     ChipLogProgress(Discovery, "Browsing for: %s on domain %s", StringOrNullMarker(type), kLocalDot);
 
     auto sdRefLocal = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
     err             = DNSServiceBrowse(&sdRefLocal, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
-    ChipLogProgress(Discovery, "Browsing for: %s on domain %s", StringOrNullMarker(type), kOpenThreadDot);
+    ChipLogProgress(Discovery, "Browsing for: %s on domain %s", StringOrNullMarker(type), kSrpDot);
 
-    DNSServiceRef sdRefOpenThread = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    err = DNSServiceBrowse(&sdRefOpenThread, kBrowseFlags, interfaceId, type, kOpenThreadDot, OnBrowse, sdCtx);
+    auto sdRefSrp = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
+    err = DNSServiceBrowse(&sdRefSrp, kBrowseFlags, interfaceId, type, kSrpDot, OnBrowse, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     return MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
@@ -307,25 +320,38 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     {
         VerifyOrReturn(sdCtx->HasAddress(), sdCtx->Finalize(kDNSServiceErr_BadState));
 
-        if (domainName.compare(kOpenThreadDot) == 0)
+        if (domainName.compare(kSrpDot) == 0)
         {
-            ChipLogProgress(Discovery, "Mdns: Resolve completed on the open thread domain.");
+            ChipLogProgress(Discovery, "Mdns: Resolve completed on the srp domain.");
+
+            // Cancel the timer if one has been started
+            if (sdCtx->hasSrpTimerStarted)
+            {
+                CancelSrpTimer(sdCtx);
+            }
             sdCtx->Finalize();
         }
         else if (domainName.compare(kLocalDot) == 0)
         {
             ChipLogProgress(
                 Discovery,
-                "Mdns: Resolve completed on the local domain. Starting a timer for the open thread resolve to come back");
+                "Mdns: Resolve completed on the local domain. Starting a timer for the srp resolve to come back");
 
-            // Usually the resolution on the local domain is quicker than on the open thread domain. We would like to give the
-            // resolution on the open thread domain around 250 millisecs more to give it a chance to resolve before finalizing
+            // Usually the resolution on the local domain is quicker than on the srp domain. We would like to give the
+            // resolution on the srp domain around 250 millisecs more to give it a chance to resolve before finalizing
             // the resolution.
-            if (!sdCtx->hasOpenThreadTimerStarted)
+            if (!sdCtx->hasSrpTimerStarted)
             {
-                // Schedule a timer to allow the resolve on OpenThread domain to complete.
-                StartOpenThreadTimer(kOpenThreadTimeoutInMsec, sdCtx);
-                sdCtx->hasOpenThreadTimerStarted = true;
+                // Schedule a timer to allow the resolve on Srp domain to complete.
+                CHIP_ERROR error = StartSrpTimer(kSrpTimeoutInMsec, sdCtx);
+
+                // If the timer fails to start, finalize the context and return.
+                if (error != CHIP_NO_ERROR)
+                {
+                    sdCtx->Finalize();
+                    return;
+                }
+                sdCtx->hasSrpTimerStarted = true;
             }
         }
     }
@@ -368,7 +394,6 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
         {
             GetAddrInfo(sdCtx);
             sdCtx->isResolveRequested        = true;
-            sdCtx->hasOpenThreadTimerStarted = false;
         }
     }
 }
@@ -382,13 +407,13 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
     auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
-    // Similar to browse, will try to resolve using both the local domain and the open thread domain.
+    // Similar to browse, will try to resolve using both the local domain and the srp domain.
     auto sdRefLocal = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
     err             = DNSServiceResolve(&sdRefLocal, kResolveFlags, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
-    auto sdRefOpenThread = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
-    err = DNSServiceResolve(&sdRefOpenThread, kResolveFlags, interfaceId, name, type, kOpenThreadDot, OnResolve, sdCtx);
+    auto sdRefSrp = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
+    err = DNSServiceResolve(&sdRefSrp, kResolveFlags, interfaceId, name, type, kSrpDot, OnResolve, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     auto retval = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
