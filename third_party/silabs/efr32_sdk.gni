@@ -258,6 +258,7 @@ template("efr32_sdk") {
     }
     if (use_rs9116 || use_SiWx917) {
       _include_dirs += [
+        # TODO efr32_sdk should not need a header from ${examples_plat_dir}
         "${examples_plat_dir}/wifi",
         "${examples_plat_dir}/wifi/rs911x",
         "${examples_plat_dir}/wifi/rs911x/hal",
