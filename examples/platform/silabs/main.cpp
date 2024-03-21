@@ -17,16 +17,15 @@
  *    limitations under the License.
  */
 #include "sl_component_catalog.h"
-#include <MatterConfig.h>
-#include "sl_system_kernel.h"
 #include "sl_system_init.h"
+#include "sl_system_kernel.h"
+#include <MatterConfig.h>
 
 int main(void)
 {
-  sl_system_init();
-
-  // Initialize the application. For example, create periodic timer(s) or
-  // task(s) if the kernel is present.
-  SilabsMatterConfig::app_init();
-
+    sl_system_init();
+ 
+    // Initialize the application. For example, create periodic timer(s) or
+    // task(s) if the kernel is present.
+    SilabsMatterConfig::app_init();
 }
