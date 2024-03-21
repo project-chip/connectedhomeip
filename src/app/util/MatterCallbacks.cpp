@@ -93,9 +93,7 @@ DataModelCallbacks * DataModelCallbacks::GetInstance()
 
 DataModelCallbacks * DataModelCallbacks::SetInstance(DataModelCallbacks * newInstance)
 {
-    DataModelCallbacks * old = gInstance;
-    gInstance                = newInstance;
-    return old;
+    return std::exchange(gInstance, newInstance);
 }
 
 } // namespace chip
