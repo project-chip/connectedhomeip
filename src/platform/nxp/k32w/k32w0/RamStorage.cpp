@@ -70,8 +70,6 @@ CHIP_ERROR RamStorageKey::Delete()
 
 CHIP_ERROR RamStorage::Init(uint16_t aInitialSize, bool extendedSearch)
 {
-    CHIP_ERROR err;
-
     mBuffer         = getRamBuffer(mPdmId, aInitialSize, extendedSearch);
     mExtendedSearch = extendedSearch;
 
