@@ -63,10 +63,10 @@ bool btn0_pressed = false;
 extern "C" {
 #include "sl_net.h"
 #include "sl_si91x_host_interface.h"
+#include "sl_si91x_trng.h"
 #include "sl_wifi.h"
 #include "sl_wifi_callback_framework.h"
 #include "wfx_host_events.h"
-#include "sl_si91x_trng.h"
 #define TRNGKEY_SIZE 4
 } // extern "C"
 
