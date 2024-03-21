@@ -27,8 +27,14 @@
 #include <string>
 #include <vector>
 
+constexpr char kLocalDot[] = "local.";
+
+constexpr char kOpenThreadDot[] = "default.service.arpa.";
+
 namespace chip {
 namespace Dnssd {
+
+std::string GetDomainFromHostName(const char * hostname);
 
 enum class ContextType
 {
@@ -227,11 +233,13 @@ struct InterfaceInfo
 struct ResolveContext : public GenericContext
 {
     DnssdResolveCallback callback;
-    std::map<uint32_t, InterfaceInfo> interfaces;
+    std::map<std::pair<uint32_t, std::string>, InterfaceInfo> interfaces;
     DNSServiceProtocol protocol;
     std::string instanceName;
+    bool isResolveRequested = false;
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
+    bool hasOpenThreadTimerStarted = false;
 
     // browseCausingResolve can be null.
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
@@ -244,7 +252,7 @@ struct ResolveContext : public GenericContext
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
-    CHIP_ERROR OnNewAddress(uint32_t interfaceId, const struct sockaddr * address);
+    CHIP_ERROR OnNewAddress(const std::pair<uint32_t, std::string> interfaceKey, const struct sockaddr * address);
     bool HasAddress();
 
     void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,
@@ -258,7 +266,7 @@ private:
      * Returns true if information was reported, false if not (e.g. if there
      * were no IP addresses, etc).
      */
-    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
+    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, std::string domainName);
 };
 
 } // namespace Dnssd
