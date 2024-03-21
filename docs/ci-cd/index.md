@@ -35,5 +35,8 @@ Work In Progress
 ## Tools
 
 -   [Daily Fail Summary](tools/daily_fail_summary.md)
+-   Spellcheck
+    -   Currently uses spellcheck-github-actions, a PySpelling-based spellchecker.
+    -   This tool utilizes the definitions in .spellcheck.yml and .github/.wordlist.txt to check all documentation files
 
 ## General Improvement Ideas
