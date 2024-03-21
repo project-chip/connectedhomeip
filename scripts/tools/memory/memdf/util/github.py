@@ -175,9 +175,6 @@ class Gh:
         try:
             assert self.ghapi
 
-            # TODO: custom artifact download?
-            ar = self.ghapi.actions.get_artifact(artifact_id)
-
             # It seems like github artifact download is at least partially broken
             # (see https://github.com/project-chip/connectedhomeip/issues/32656)
             #
