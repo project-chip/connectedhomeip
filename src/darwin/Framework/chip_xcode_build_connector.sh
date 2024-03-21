@@ -25,18 +25,13 @@
 #      but is all uppper). Variables defined herein and used locally are lower-case
 #
 
-here=$(cd "${0%/*}" && pwd)
-me=${0##*/}
-
-CHIP_ROOT=$(cd "$here/../../.." && pwd)
-
-die() {
-    echo "$me: *** ERROR: $*"
-    exit 1
-}
+CHIP_ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
 
 # lotsa debug output :-)
 set -ex
+
+# We only have work to do for the `installapi` and `build` phases
+[[ "$ACTION" == installhdrs ]] && exit 0
 
 # helpful debugging, save off environment that Xcode gives us, can source it to
 #  retry/repro failures from a bash terminal
@@ -191,7 +186,7 @@ find_in_ancestors() {
 
 # actual build stuff
 {
-    cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
+    cd "$CHIP_ROOT"
 
     if ENV=$(find_in_ancestors chip_xcode_build_connector_env.sh 2>/dev/null); then
         . "$ENV"

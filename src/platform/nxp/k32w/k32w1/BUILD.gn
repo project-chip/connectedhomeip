@@ -30,6 +30,8 @@ if (chip_crypto == "platform") {
 }
 
 static_library("nxp_platform") {
+  defines = [ "CHIP_DEVICE_K32W1=1" ]
+
   sources = [
     "../../../SingletonConfigurationManager.cpp",
     "../common/BLEManagerCommon.cpp",
@@ -65,7 +67,7 @@ static_library("nxp_platform") {
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
     "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
-    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w1/DefaultTestEventTriggerDelegate.h",
     "${chip_root}/src/platform/nxp/k32w/k32w1/SMU2Manager.h",
   ]
 
@@ -107,7 +109,7 @@ static_library("nxp_platform") {
       ]
 
       if (chip_convert_dac_private_key == 1) {
-        defines = [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
+        defines += [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
       }
     }
 

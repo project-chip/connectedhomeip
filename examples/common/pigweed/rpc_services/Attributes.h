@@ -18,12 +18,14 @@
 
 #pragma once
 
-#include "app/util/attribute-storage.h"
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
+
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>

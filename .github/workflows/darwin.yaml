@@ -26,14 +26,25 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
-jobs:
-    darwin:
-        name: Build Darwin
 
+jobs:
+    framework:
+        name: Build framework
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
-
+        strategy:
+            matrix:
+                options: # We don't need a full matrix
+                    - flavor: macos-release-availability
+                      arguments: -sdk macosx -configuration Release   OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new'
+                    - flavor: ios-release
+                      arguments: -sdk iphoneos -configuration Release OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                    - flavor: ios-debug
+                      arguments: -sdk iphoneos -configuration Debug   OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                    - flavor: tvos-debug
+                      arguments: -sdk appletvos -configuration Debug  OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                    - flavor: watchos-debug
+                      arguments: -sdk watchos -configuration Debug    OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -43,57 +54,41 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: darwin
+                bootstrap-log-name: bootstrap-logs-framework-${{ matrix.options.flavor }}
             - name: Block zap-cli from being used
-              # xcodebuild is NOT expected to require zap-cli
-              run: scripts/run_in_build_env.sh 'D=$(dirname $(which zap-cli)) && mv $D/zap-cli $D/zap-cli.moved'
-            - name: Validate zap-cli is NOT available
-              # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
-              run: scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
-            - name: Run watchOS Build Debug
+              run: |
+                # Framework builds are NOT expected to require zap-cli
+                scripts/run_in_build_env.sh 'D=$(dirname $(which zap-cli)) && mv $D/zap-cli $D/zap-cli.moved'
+                # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
+                scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
+            - name: Build
               working-directory: src/darwin/Framework
-              # Disable availability annotations, since we are not building a system
-              # Matter.framework.
-              run: xcodebuild -target "Matter" -sdk watchos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
-            - name: Run tvOS Build Debug
-              working-directory: src/darwin/Framework
-              # Disable availability annotations, since we are not building a system
-              # Matter.framework.
-              run: xcodebuild -target "Matter" -sdk appletvos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
-            - name: Run iOS Build Debug
-              working-directory: src/darwin/Framework
-              # Disable availability annotations, since we are not building a system
-              # Matter.framework.
-              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
-            - name: Run iOS Build Release
-              working-directory: src/darwin/Framework
-              # Disable availability annotations, since we are not building a system
-              # Matter.framework.
-              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Release GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
-            - name: Clean Build
-              run: xcodebuild clean
-              working-directory: src/darwin/Framework
-            - name: Delete Defaults
-              run: defaults delete com.apple.dt.xctest.tool
-              continue-on-error: true
-            - name: Run macOS Build
-              # Enable -Werror by hand here, because the Xcode config can't
-              # enable it for various reasons.  Keep whatever Xcode settings
-              # for OTHER_CFLAGS exist by using ${inherited}.
-              #
-              # Enable -Wconversion by hand as well, because it seems to not be
-              # enabled by default in the Xcode config.
-              #
-              # Disable availability annotations, since we are not building a system
-              # Matter.framework.
-              run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
-              working-directory: src/darwin/Framework
-            - name: Clean Build
-              run: xcodebuild clean
-              working-directory: src/darwin/Framework
-            - name: Make zap-cli work again
-              run: scripts/run_in_build_env.sh 'D=$(dirname $(which zap-cli.moved)) && mv $D/zap-cli.moved $D/zap-cli'
-            - name: Validate zap-cli is again available
-              run: scripts/run_in_build_env.sh 'zap-cli --version'
+              run: xcodebuild -target "Matter" ${{ matrix.options.arguments }}
+
+    tests:
+        name: Run framework tests
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: macos-latest
+        strategy:
+            matrix:
+                options: # We don't need a full matrix
+                    - flavor: asan
+                      arguments: -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES
+                    - flavor: asan-global-storage
+                      arguments: -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES
+                      defines: MTR_PER_CONTROLLER_STORAGE_ENABLED=0
+                    - flavor: tsan
+                      arguments: -enableThreadSanitizer YES
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Environment
+              run: brew install python@3.9
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: darwin
+                bootstrap-log-name: bootstrap-logs-framework-${{ matrix.options.flavor }}
             - name: Build example All Clusters Server
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
@@ -103,40 +98,57 @@ jobs:
             - name: Build example OTA Requestor
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0
-            - name: Delete Defaults
-              run: defaults delete com.apple.dt.xctest.tool
-              continue-on-error: true
             - name: Run Framework Tests
               # For now disable unguarded-availability-new warnings because we
               # internally use APIs that we are annotating as only available on
               # new enough versions.  Maybe we should change out deployment
               # target versions instead?
+              working-directory: src/darwin/Framework
               run: |
                   mkdir -p /tmp/darwin/framework-tests
-                  ../../../out/debug/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
+                  echo "This is a simple log" > /tmp/darwin/framework-tests/end_user_support_log.txt
+                  ../../../out/debug/chip-all-clusters-app --interface-id -1 --end_user_support_log /tmp/darwin/framework-tests/end_user_support_log.txt > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 --dac_provider ../../../credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json --product-id 32768 --discriminator 3839 --secured-device-port 5539 --KVS /tmp/chip-all-clusters-app-kvs2 > >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid-err.log >&2) &
+
+                  export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
+
                   # Disable BLE (CHIP_IS_BLE=NO) because the app does not have the permission to use it and that may crash the CI.
-
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'> >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
-                  # And the same thing, but with MTR_PER_CONTROLLER_STORAGE_ENABLED turned off, so we test that it does not break for now.
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1 MTR_PER_CONTROLLER_STORAGE_ENABLED=0' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-controller-storage.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-controller-storage-err.log >&2)
-                  # And the same thing, but with MTR_NO_AVAILABILITY not turned on.  This requires -Wno-unguarded-availability-new to avoid availability errors.
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited}' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations-err.log >&2)
-
-                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1' > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
-              working-directory: src/darwin/Framework
-            - name: Build Matter TV Casting Bridge
-              run: |
-                  xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
-              working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
+                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx ${{ matrix.options.arguments }} \
+                    OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1 ${{ matrix.options.defines }}' \
+                    > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
             - name: Collect crash logs
               run: |
                   mkdir -p /tmp/darwin/framework-tests
                   find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
               uses: actions/upload-artifact@v4
-              if: ${{ failure() && !env.ACT }}
+              if: failure() && !env.ACT
               with:
-                  name: darwin-framework-test-logs
+                  name: darwin-framework-test-logs-${{ matrix.options.flavor }}
                   path: /tmp/darwin/framework-tests
                   retention-days: 5
+
+    tv-casting-bridge:
+        name: Build TV Casting Bridge example
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: macos-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Environment
+              run: brew install python@3.9
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: darwin
+            - name: Build
+              working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
+              run: xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
+
+    darwin:
+        name: Build Darwin # Matches the previous monolithic build that's marked "required" for PRs
+        needs: [ framework, tests ]
+        runs-on: macos-latest
+        steps:
+            - name: Done
+              run: 'true' # nothing to do
