@@ -258,7 +258,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 void CommandHandler::Close()
 {
     mSuppressResponse = false;
-    mpResponder = nullptr;
+    mpResponder       = nullptr;
     MoveToState(State::AwaitingDestruction);
 
     // We must finish all async work before we can shut down a CommandHandler. The actual CommandHandler MUST finish their work
