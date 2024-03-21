@@ -47,6 +47,10 @@ declare_args() {
   # Configure chip logging to output through pigweed logging.
   chip_use_pw_logging = false
 
+  # Enable logging of node Id in exchange context log messages.
+  # Will cause increase in code size and is therefore disabled by default.
+  chip_exchange_node_id_logging = false
+
   # Configure chip logging to output through external logging implementation.
   # External code will need to provide implementation for CHIP log output
   # function (LogV), which is defined in "src/platform/logging/LogV.h".
