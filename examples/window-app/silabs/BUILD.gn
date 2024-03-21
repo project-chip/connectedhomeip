@@ -33,17 +33,14 @@ assert(current_os == "freertos")
 
 project_dir = "${chip_root}/examples/window-app"
 silabs_project_dir = "${project_dir}/silabs"
-examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 if (wifi_soc) {
   import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
-  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 } else {
   import("${efr32_sdk_build_root}/efr32_sdk.gni")
-  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 }
 
-import("${examples_common_plat_dir}/args.gni")
+import("${examples_plat_dir}/args.gni")
 
 declare_args() {
   # Dump memory usage at link time.
@@ -53,16 +50,16 @@ declare_args() {
 if (wifi_soc) {
   siwx917_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_plat_dir}/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
     include_dirs = [
       "${chip_root}/src/platform/silabs/SiWx917",
       "${silabs_project_dir}/include",
-      "${examples_plat_dir}",
+      "${examples_plat_dir}/wifi",
       "${chip_root}/src/lib",
-      "${examples_common_plat_dir}",
+      "${examples_plat_dir}",
     ]
 
     defines = []
@@ -76,30 +73,21 @@ if (wifi_soc) {
 } else {
   efr32_sdk("sdk") {
     sources = [
-      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${examples_plat_dir}/FreeRTOSConfig.h",
       "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
 
     include_dirs = [
       "${chip_root}/src/platform/silabs/efr32",
       "${silabs_project_dir}/include",
-      "${examples_plat_dir}",
+      "${examples_plat_dir}/efr32",
       "${chip_root}/src/lib",
-      "${examples_common_plat_dir}",
+      "${examples_plat_dir}",
     ]
 
     if (use_wf200) {
       # TODO efr32_sdk should not need a header from this location
-      include_dirs += [ "${examples_plat_dir}/wf200" ]
-    }
-
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${chip_root}/src/platform/silabs/efr32/rs911x",
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
+      include_dirs += [ "${examples_plat_dir}/wifi/wf200" ]
     }
   }
 }
@@ -114,7 +102,7 @@ silabs_executable("window_app") {
   defines = []
 
   sources = [
-    "${examples_common_plat_dir}/main.cpp",
+    "${examples_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/WindowManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -130,11 +118,11 @@ silabs_executable("window_app") {
   ]
 
   if (wifi_soc) {
-    deps += [ "${examples_plat_dir}:siwx917-common" ]
+    deps += [ "${examples_plat_dir}/wifi/siwx917:siwx917-common" ]
   } else {
-    deps += [ "${examples_plat_dir}:efr32-common" ]
+    deps += [ "${examples_plat_dir}/efr32:efr32-common" ]
   }
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 

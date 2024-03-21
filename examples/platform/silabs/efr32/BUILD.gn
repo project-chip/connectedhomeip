@@ -63,12 +63,12 @@ if (chip_enable_wifi) {
   import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
   if (use_rs9116) {
-    import("rs911x/rs911x.gni")
+    import("${examples_plat_dir}/wifi/rs911x/rs911x.gni")
   } else if (use_SiWx917) {
-    import("rs911x/rs9117.gni")
+    import("${examples_plat_dir}/wifi/rs911x/rs9117.gni")
   }
   if (use_wf200) {
-    import("wf200/wf200.gni")
+    import("${examples_plat_dir}/wifi/wf200/wf200.gni")
   }
 }
 

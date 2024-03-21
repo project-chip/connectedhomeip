@@ -81,7 +81,7 @@ declare_args() {
   # Multi-chip OTA
   chip_enable_multi_ota_requestor = false
 }
-examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/silabs"
 silabs_plat_efr32_wifi_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -144,7 +144,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}",
 
       #TODO: Added this as include files because of spi_multiplexing.h file. we will remove it after the cleanup.
-      "${examples_plat_dir}",
+      "${examples_plat_dir}/efr32",
       "${efr32_sdk_root}/util/plugin/security_manager/",
       "${efr32_sdk_root}/hardware/kit/common/bsp",
       "${efr32_sdk_root}/hardware/board/inc",
@@ -249,11 +249,20 @@ template("efr32_sdk") {
         # network_manager component
         "${wifi_sdk_root}/components/service/network_manager/inc",
 
+        # trng component
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/inc",
+
         "${wifi_sdk_root}/components/protocol/wifi/si91x",
       ]
     }
     if (use_rs9116 || use_SiWx917) {
-      _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
+      _include_dirs += [
+        "${examples_plat_dir}/wifi",
+        "${examples_plat_dir}/wifi/rs911x",
+        "${examples_plat_dir}/wifi/rs911x/hal",
+        "${chip_root}/src/platform/silabs/rs911x",
+      ]
     }
     if (silabs_family != "mgm24") {
       _include_dirs += [
@@ -914,6 +923,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/secure_link/sl_wfx_secure_link.c",
         "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/sl_wfx.c",
       ]
+    }
+
+    if (use_SiWx917) {
+      sources += [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c" ]
     }
 
     if (silabs_family == "efr32mg12") {

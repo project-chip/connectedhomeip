@@ -22,7 +22,7 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+examples_plat_dir = "${chip_root}/examples/platform/silabs"
 
 declare_args() {
   # Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled
@@ -538,7 +538,7 @@ template("siwx917_sdk") {
 
     public_configs = [
       ":${sdk_target_name}_config",
-      "${examples_plat_dir}:siwx917-common-config",
+      "${examples_plat_dir}/wifi/siwx917:siwx917-common-config",
     ]
   }
 }

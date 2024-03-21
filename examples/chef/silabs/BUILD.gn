@@ -35,10 +35,9 @@ assert(current_os == "freertos")
 
 chef_project_dir = "${chip_root}/examples/chef"
 efr32_project_dir = "${chef_project_dir}/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
-examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+examples_plat_dir = "${chip_root}/examples/platform/silabs"
 app_data_model = "${efr32_project_dir}:chef-comon"
-import("${examples_plat_dir}/args.gni")
+import("${examples_plat_dir}/efr32/args.gni")
 
 declare_args() {
   # Dump memory usage at link time.
@@ -54,20 +53,20 @@ chip_data_model("chef-common") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_common_plat_dir}/FreeRTOSConfig.h",
+    "${examples_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
     "${chip_root}/src/platform/silabs/efr32",
     "${efr32_project_dir}/include",
-    "${examples_plat_dir}",
+    "${examples_plat_dir}/efr32",
     "${chip_root}/src/lib",
-    "${examples_common_plat_dir}",
+    "${examples_plat_dir}",
   ]
 
   if (use_wf200) {
     # TODO efr32_sdk should not need a header from this location
-    include_dirs += [ "${examples_plat_dir}/wf200" ]
+    include_dirs += [ "${examples_plat_dir}/efr32/wf200" ]
   }
 
   defines = []
@@ -113,8 +112,8 @@ silabs_executable("chef_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_common_plat_dir}/PigweedLogger.cpp",
-      "${examples_common_plat_dir}/Rpc.cpp",
+      "${examples_plat_dir}/PigweedLogger.cpp",
+      "${examples_plat_dir}/Rpc.cpp",
     ]
 
     deps += [
@@ -132,7 +131,7 @@ silabs_executable("chef_app") {
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
-      "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
+      "${examples_plat_dir}/pw_sys_io:pw_sys_io_silabs",
     ]
 
     deps += pw_build_LINK_DEPS
@@ -143,7 +142,7 @@ silabs_executable("chef_app") {
     ]
   }
 
-  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 
