@@ -46,8 +46,12 @@ public:
     /// NOTE: PostRead is only called on read success.
     virtual void AttributeOperation(OperationType operation, OperationOrder order, const chip::app::ConcreteAttributePath & path) {}
 
-    /// This callback is called once the message has been determined to be a command, and
-    /// before the command is dispatched to the receiver.
+    /// This callback is called once for every command dispatch, before the dispatch is actually
+    /// done towards the receiver.
+    ///
+    /// This method is called once for every CommandDataIB (i.e. it may be called several times
+    /// in the case of batch invoke, where a single `InvokeRequestMessage` may contain several
+    /// CommandDataIB entries).
     ///
     /// Returning an error here will prevent the command to be dispatched further
     virtual CHIP_ERROR PreCommandReceived(const chip::app::ConcreteCommandPath & commandPath,
