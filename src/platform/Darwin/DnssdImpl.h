@@ -27,14 +27,16 @@
 #include <string>
 #include <vector>
 
-constexpr char kLocalDot[] = "local.";
-
-constexpr char kOpenThreadDot[] = "default.service.arpa.";
-
 namespace chip {
 namespace Dnssd {
 
+struct BrowseWithDelegateContext;
+struct RegisterContext;
+struct ResolveContext;
+
 std::string GetDomainFromHostName(const char * hostname);
+
+void CancelSrpTimer(ResolveContext * ctx);
 
 enum class ContextType
 {
@@ -61,10 +63,6 @@ struct GenericContext
 private:
     CHIP_ERROR FinalizeInternal(const char * errorStr, CHIP_ERROR err);
 };
-
-struct BrowseWithDelegateContext;
-struct RegisterContext;
-struct ResolveContext;
 
 class MdnsContexts
 {
@@ -239,7 +237,7 @@ struct ResolveContext : public GenericContext
     bool isResolveRequested = false;
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
-    bool hasOpenThreadTimerStarted = false;
+    bool hasSrpTimerStarted = false;
 
     // browseCausingResolve can be null.
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
@@ -252,7 +250,7 @@ struct ResolveContext : public GenericContext
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
-    CHIP_ERROR OnNewAddress(const std::pair<uint32_t, std::string> interfaceKey, const struct sockaddr * address);
+    CHIP_ERROR OnNewAddress(const std::pair<uint32_t, std::string> & interfaceKey, const struct sockaddr * address);
     bool HasAddress();
 
     void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,
@@ -266,7 +264,7 @@ private:
      * Returns true if information was reported, false if not (e.g. if there
      * were no IP addresses, etc).
      */
-    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, std::string domainName);
+    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
 };
 
 } // namespace Dnssd
