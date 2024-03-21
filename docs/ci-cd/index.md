@@ -36,8 +36,11 @@ Work In Progress
 
 -   [Daily Fail Summary](tools/daily_fail_summary.md)
 -   Spellcheck
-    -   Currently uses rojopolis/spellcheck-github-actions, a PySpelling-based spellchecker.
-    -   This tool utilizes the definitions in .spellcheck.yml and .github/.wordlist.txt to check all documentation files
-    -   Previously an additional spellchecker from reviewdog was used with default settings. This was removed as a redundancy.
+    -   Currently uses rojopolis/spellcheck-github-actions, a PySpelling-based
+        spellchecker.
+    -   This tool utilizes the definitions in .spellcheck.yml and
+        .github/.wordlist.txt to check all documentation files
+    -   Previously an additional spellchecker from reviewdog was used with
+        default settings. This was removed as a redundancy.
 
 ## General Improvement Ideas
