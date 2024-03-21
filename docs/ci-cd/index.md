@@ -38,5 +38,6 @@ Work In Progress
 -   Spellcheck
     -   Currently uses spellcheck-github-actions, a PySpelling-based spellchecker.
     -   This tool utilizes the definitions in .spellcheck.yml and .github/.wordlist.txt to check all documentation files
+    -   Previously an additional spellchecker from reviewdog was used with default settings. This was removed as a redundancy.
 
 ## General Improvement Ideas
