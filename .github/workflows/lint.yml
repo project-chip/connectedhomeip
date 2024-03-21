@@ -29,7 +29,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:39
+            image: ghcr.io/project-chip/chip-build:41
 
         steps:
             - name: Checkout
@@ -97,14 +97,13 @@ jobs:
                      --known-failure app/CommandSenderLegacyCallback.h \
                      --known-failure app/data-model/ListLargeSystemExtensions.h \
                      --known-failure app/ReadHandler.h \
+                     --known-failure app/reporting/reporting.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
                      --known-failure app/TestEventTriggerDelegate.h \
                      --known-failure app/util/af.h \
-                     --known-failure app/util/af-types.h \
                      --known-failure app/util/attribute-storage.cpp \
                      --known-failure app/util/attribute-storage.h \
-                     --known-failure app/util/attribute-storage-null-handling.h \
                      --known-failure app/util/attribute-table.cpp \
                      --known-failure app/util/attribute-table.h \
                      --known-failure app/util/binding-table.cpp \
@@ -113,12 +112,12 @@ jobs:
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \
                      --known-failure app/util/ember-compatibility-functions.cpp \
+                     --known-failure app/util/ember-compatibility-functions.h \
                      --known-failure app/util/endpoint-config-api.h \
                      --known-failure app/util/generic-callbacks.h \
                      --known-failure app/util/generic-callback-stubs.cpp \
                      --known-failure app/util/im-client-callbacks.h \
                      --known-failure app/util/MatterCallbacks.h \
-                     --known-failure app/util/odd-sized-integers.h \
                      --known-failure app/util/util.cpp \
                      --known-failure app/util/util.h \
                      --known-failure app/WriteHandler.h \

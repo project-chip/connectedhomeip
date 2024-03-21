@@ -167,6 +167,28 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     completion(MTRDeviceControllerId, nil);
 }
 
+- (void)downloadLogWithController:(id)controller
+                           nodeId:(NSNumber *)nodeId
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                       completion:(void (^)(NSString * _Nullable url, NSError * _Nullable error))completion
+{
+    (void) controller;
+    __auto_type sharedController = sController;
+    if (sharedController) {
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:nodeId controller:sharedController];
+        [device downloadLogOfType:type
+                          timeout:timeout
+                            queue:dispatch_get_main_queue()
+                       completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                           completion([url absoluteString], error);
+                       }];
+    } else {
+        NSLog(@"Failed to get shared controller");
+        completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+    }
+}
+
 - (void)readAttributeWithController:(id)controller
                              nodeId:(uint64_t)nodeId
                          endpointId:(NSNumber * _Nullable)endpointId
@@ -1863,6 +1885,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         @(MTRAttributeIDTypeClusterOnOffAttributeOnOffID), ^{
             return [onOffCluster readAttributeOnOffWithParams:nil];
         }, @(NO));
+}
+
+- (void)test016_DownloadLog
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Download EndUserSupport log"];
+
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport
+                      timeout:10
+                        queue:queue
+                   completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                       NSLog(@"downloadLogOfType: url: %@, error: %@", url, error);
+                       XCTAssertNil(error);
+
+                       NSError * readError;
+                       NSString * fileContent = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&readError];
+                       XCTAssertNil(readError);
+                       XCTAssertEqualObjects(fileContent, @"This is a simple log\n");
+                       [expectation fulfill];
+                   }];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)test900_SubscribeClusterStateCache

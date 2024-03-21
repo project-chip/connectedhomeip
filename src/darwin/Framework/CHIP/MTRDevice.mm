@@ -352,22 +352,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_performScheduledTimeUpdate
 {
-    os_unfair_lock_lock(&self->_timeSyncLock);
+    std::lock_guard lock(_timeSyncLock);
     // Device needs to still be reachable
     if (self.state != MTRDeviceStateReachable) {
         MTR_LOG_DEBUG("%@ Device is not reachable, canceling Device Time Updates.", self);
-        os_unfair_lock_unlock(&self->_timeSyncLock);
         return;
     }
     // Device must not be invalidated
     if (!self.timeUpdateScheduled) {
         MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
-        os_unfair_lock_unlock(&self->_timeSyncLock);
         return;
     }
     self.timeUpdateScheduled = NO;
     [self _updateDeviceTimeAndScheduleNextUpdate];
-    os_unfair_lock_unlock(&self->_timeSyncLock);
 }
 
 - (NSArray<NSNumber *> *)_endpointsWithTimeSyncClusterServer
@@ -504,7 +501,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 #endif
 
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
@@ -517,8 +514,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (setUpSubscription) {
         [self _setupSubscription];
     }
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)invalidate
@@ -579,11 +574,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Return YES if there's a valid delegate AND subscription is expected to report value
 - (BOOL)_subscriptionAbleToReport
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    auto state = _state;
-    os_unfair_lock_unlock(&self->_lock);
-    return (delegate != nil) && (state == MTRDeviceStateReachable);
+    return (delegate != nil) && (_state == MTRDeviceStateReachable);
 }
 
 - (BOOL)_callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
@@ -667,41 +660,35 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleSubscriptionError:(NSError *)error
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
     _unreportedEvents = nil;
 
     [self _changeState:MTRDeviceStateUnreachable];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_handleResubscriptionNeeded
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     [self _changeState:MTRDeviceStateUnknown];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_handleSubscriptionReset
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
     // if there is no delegate then also do not retry
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
     if (!delegate) {
         // NOTE: Do not log anythig here: we have been invalidated, and the
         // Matter stack might already be torn down.
-        os_unfair_lock_unlock(&self->_lock);
         return;
     }
 
     // don't schedule multiple retries
     if (self.reattemptingSubscription) {
         MTR_LOG_DEFAULT("%@ already reattempting subscription", self);
-        os_unfair_lock_unlock(&self->_lock);
         return;
     }
 
@@ -722,8 +709,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _reattemptSubscriptionNowIfNeeded];
         os_unfair_lock_unlock(&self->_lock);
     });
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_reattemptSubscriptionNowIfNeeded
@@ -740,7 +725,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleUnsolicitedMessageFromPublisher
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     [self _changeState:MTRDeviceStateReachable];
 
@@ -759,8 +744,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // ReadClient how did we get this notification and if we _do_ have an active
     // ReadClient, this call or _setupSubscription would be no-ops.
     [self _reattemptSubscriptionNowIfNeeded];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_markDeviceAsUnreachableIfNotSusbcribed
@@ -776,7 +759,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleReportBegin
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
+
     _receivingReport = YES;
     if (_state != MTRDeviceStateReachable) {
         _receivingPrimingReport = YES;
@@ -784,12 +768,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     } else {
         _receivingPrimingReport = NO;
     }
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_handleReportEnd
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
     _receivingReport = NO;
     _receivingPrimingReport = NO;
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
@@ -805,7 +788,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         });
     }
 #endif
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 // assume lock is held
@@ -824,12 +806,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
     [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 #ifdef DEBUG
@@ -843,7 +823,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     NSDate * oldEstimatedStartTime = _estimatedStartTime;
     // Combine with previous unreported events, if they exist
@@ -937,14 +917,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         // save unreported events
         _unreportedEvents = reportToReturn;
     }
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (NSDictionary<MTRClusterPath *, NSNumber *> *)_getCachedDataVersions
 {
     NSMutableDictionary<MTRClusterPath *, NSNumber *> * dataVersions = [NSMutableDictionary dictionary];
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
+
     for (MTRAttributePath * path in _readCache) {
         NSDictionary * dataValue = _readCache[path];
         NSNumber * dataVersionNumber = dataValue[MTRDataVersionKey];
@@ -958,7 +937,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }
     MTR_LOG_INFO("%@ _getCachedDataVersions dataVersions count: %lu readCache count: %lu", self, static_cast<unsigned long>(dataVersions.count), static_cast<unsigned long>(_readCache.count));
-    os_unfair_lock_unlock(&self->_lock);
 
     return dataVersions;
 }
@@ -1083,11 +1061,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            os_unfair_lock_lock(&self->_lock);
                            self->_currentReadClient = nullptr;
                            self->_currentSubscriptionCallback = nullptr;
-                           os_unfair_lock_unlock(&self->_lock);
+
                            dispatch_async(self.queue, ^{
                                // OnDone
                                [self _handleSubscriptionReset];
                            });
+                           os_unfair_lock_unlock(&self->_lock);
                        },
                        ^(void) {
                            MTR_LOG_DEFAULT("%@ got unsolicited message from publisher", self);
@@ -1781,11 +1760,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    [_deviceController downloadLogFromNodeWithID:_nodeID
-                                            type:type
-                                         timeout:timeout
-                                           queue:queue
-                                      completion:completion];
+    auto * baseDevice = [self newBaseDevice];
+    [baseDevice downloadLogOfType:type
+                          timeout:timeout
+                            queue:queue
+                       completion:completion];
 }
 
 #pragma mark - Cache management
@@ -1855,18 +1834,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)_performScheduledExpirationCheck
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     self.expirationCheckScheduled = NO;
     [self _checkExpiredExpectedValues];
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 // Get attribute value dictionary for an attribute path from the right cache
 - (NSDictionary<NSString *, id> *)_attributeValueDictionaryForAttributePath:(MTRAttributePath *)attributePath
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     // First check expected value cache
     NSArray * expectedValue = _expectedValueCache[attributePath];
@@ -1876,8 +1853,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // expired - purge and fall through
             _expectedValueCache[attributePath] = nil;
         } else {
-            os_unfair_lock_unlock(&self->_lock);
-
             // not yet expired - return result
             return expectedValue[MTRDeviceExpectedValueFieldValueIndex];
         }
@@ -1886,16 +1861,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // Then check read cache
     NSDictionary<NSString *, id> * cachedAttributeValue = _readCache[attributePath];
     if (cachedAttributeValue) {
-        os_unfair_lock_unlock(&self->_lock);
-
         return cachedAttributeValue;
     } else {
         // TODO: when not found in cache, generated default values should be used
         MTR_LOG_INFO("%@ _attributeValueDictionaryForAttributePath: could not find cached attribute values for attribute %@", self,
             attributePath);
     }
-
-    os_unfair_lock_unlock(&self->_lock);
 
     return nil;
 }
@@ -2024,7 +1995,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
 {
     MTR_LOG_INFO("%@ setAttributeValues count: %lu reportChanges: %d", self, static_cast<unsigned long>(attributeValues.count), reportChanges);
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     if (reportChanges) {
         [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeValues]];
@@ -2040,8 +2011,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     if ([self _isCachePrimedWithInitialConfigurationData]) {
         _delegateDeviceCachePrimedCalled = YES;
     }
-
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (BOOL)deviceCachePrimed
@@ -2166,7 +2135,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     MTR_LOG_INFO(
         "%@ Setting expected values %@ with expiration time %f seconds from now", self, values, [expirationTime timeIntervalSinceNow]);
 
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
 
     // _getAttributesToReportWithNewExpectedValues will log attribute paths reported
     NSArray * attributesToReport = [self _getAttributesToReportWithNewExpectedValues:values
@@ -2175,24 +2144,22 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self _reportAttributes:attributesToReport];
 
     [self _checkExpiredExpectedValues];
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)removeExpectedValuesForAttributePaths:(NSArray<MTRAttributePath *> *)attributePaths
                               expectedValueID:(uint64_t)expectedValueID
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
+
     for (MTRAttributePath * attributePath in attributePaths) {
         [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
     }
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)removeExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID
 {
-    os_unfair_lock_lock(&self->_lock);
+    std::lock_guard lock(_lock);
     [self _removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
-    os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_removeExpectedValueForAttributePath:(MTRAttributePath *)attributePath expectedValueID:(uint64_t)expectedValueID
