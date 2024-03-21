@@ -58,7 +58,6 @@ jobs:
                       build                             \
                   "
             - name: Run all tests
-            # Enabling the tests.
               run: |
                   src/test_driver/esp32/run_qemu_image.py \
                     --verbose                             \
