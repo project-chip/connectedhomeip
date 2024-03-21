@@ -17,6 +17,10 @@
 
 #include "BluezObjectManager.h"
 
+#include <algorithm>
+#include <memory>
+#include <string_view>
+
 #include <gio/gio.h>
 #include <glib-object.h>
 #include <glib.h>
@@ -34,6 +38,20 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+namespace {
+
+const char * GetAdapterObjectPath(BluezAdapter1 * aAdapter)
+{
+    return g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aAdapter));
+}
+
+bool IsDeviceOnAdapter(BluezDevice1 * aDevice, std::string_view aAdapterPath)
+{
+    return bluez_device1_get_adapter(aDevice) == aAdapterPath;
+}
+
+} // namespace
 
 CHIP_ERROR BluezObjectManager::Init()
 {
@@ -94,6 +112,23 @@ BluezAdapter1 * BluezObjectManager::GetAdapter(const char * aAdapterAddress)
     return nullptr;
 }
 
+CHIP_ERROR BluezObjectManager::SubscribeDeviceNotifications(BluezAdapter1 * aAdapter,
+                                                            BluezObjectManagerAdapterNotificationsDelegate * aDelegate)
+{
+    std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
+    mSubscriptions.emplace_back(GetAdapterObjectPath(aAdapter), aDelegate);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BluezObjectManager::UnsubscribeDeviceNotifications(BluezAdapter1 * aAdapter,
+                                                              BluezObjectManagerAdapterNotificationsDelegate * aDelegate)
+{
+    std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
+    const auto item = std::make_pair(std::string(GetAdapterObjectPath(aAdapter)), aDelegate);
+    mSubscriptions.erase(std::remove(mSubscriptions.begin(), mSubscriptions.end(), item), mSubscriptions.end());
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR BluezObjectManager::SetupAdapter(BluezAdapter1 * aAdapter)
 {
     // Make sure the adapter is powered on.
@@ -105,6 +140,32 @@ CHIP_ERROR BluezObjectManager::SetupAdapter(BluezAdapter1 * aAdapter)
     return CHIP_NO_ERROR;
 }
 
+void BluezObjectManager::NotifyAdapterAdded(BluezAdapter1 * aAdapter)
+{
+    unsigned int adapterId = 0;
+    sscanf(GetAdapterObjectPath(aAdapter), BLUEZ_PATH "/hci%u", &adapterId);
+    // Notify the application that new adapter has been just added
+    BLEManagerImpl::NotifyBLEAdapterAdded(adapterId, bluez_adapter1_get_address(aAdapter));
+}
+
+void BluezObjectManager::NotifyAdapterRemoved(BluezAdapter1 * aAdapter)
+{
+    unsigned int adapterId = 0;
+    sscanf(GetAdapterObjectPath(aAdapter), BLUEZ_PATH "/hci%u", &adapterId);
+    // Notify the application that the adapter is no longer available
+    BLEManagerImpl::NotifyBLEAdapterRemoved(adapterId, bluez_adapter1_get_address(aAdapter));
+}
+
+void BluezObjectManager::RemoveAdapterSubscriptions(BluezAdapter1 * aAdapter)
+{
+    std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
+    const auto adapterPath = GetAdapterObjectPath(aAdapter);
+    // Remove all device notification subscriptions for the given adapter
+    mSubscriptions.erase(std::remove_if(mSubscriptions.begin(), mSubscriptions.end(),
+                                        [adapterPath](const auto & subscription) { return subscription.first == adapterPath; }),
+                         mSubscriptions.end());
+}
+
 CHIP_ERROR BluezObjectManager::SetupDBusConnection()
 {
     GAutoPtr<GError> err;
@@ -112,6 +173,70 @@ CHIP_ERROR BluezObjectManager::SetupDBusConnection()
     VerifyOrReturnError(mConnection != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: Get D-Bus system bus: %s", err->message));
     return CHIP_NO_ERROR;
+}
+
+void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * aObj)
+{
+    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(reinterpret_cast<BluezObject *>(aObj)));
+    if (adapter)
+    {
+        NotifyAdapterAdded(adapter.get());
+        return;
+    }
+
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
+    if (device)
+    {
+        std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
+        for (auto & [adapterPath, delegate] : mSubscriptions)
+        {
+            if (IsDeviceOnAdapter(device.get(), adapterPath))
+            {
+                delegate->OnDeviceAdded(device.get());
+            }
+        }
+    }
+}
+
+void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject * aObj)
+{
+    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(reinterpret_cast<BluezObject *>(aObj)));
+    if (adapter)
+    {
+        RemoveAdapterSubscriptions(adapter.get());
+        NotifyAdapterRemoved(adapter.get());
+        return;
+    }
+
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
+    if (device)
+    {
+        std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
+        for (auto & [adapterPath, delegate] : mSubscriptions)
+        {
+            if (IsDeviceOnAdapter(device.get(), adapterPath))
+            {
+                delegate->OnDeviceRemoved(device.get());
+            }
+        }
+    }
+}
+
+void BluezObjectManager::OnInterfacePropertiesChanged(GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface,
+                                                      GVariant * aChangedProps, const char * const * aInvalidatedProps)
+{
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
+    if (device)
+    {
+        std::lock_guard<std::mutex> lock(mSubscriptionsMutex);
+        for (auto & [adapterPath, delegate] : mSubscriptions)
+        {
+            if (IsDeviceOnAdapter(device.get(), adapterPath))
+            {
+                delegate->OnDevicePropertyChanged(device.get(), aChangedProps, aInvalidatedProps);
+            }
+        }
+    }
 }
 
 CHIP_ERROR BluezObjectManager::SetupObjectManager()
@@ -127,6 +252,23 @@ CHIP_ERROR BluezObjectManager::SetupObjectManager()
         nullptr /* destroy notify */, nullptr /* cancellable */, &err.GetReceiver()));
     VerifyOrReturnError(mObjectManager, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: Get D-Bus object manager client: %s", err->message));
+
+    g_signal_connect(mObjectManager.get(), "object-added",
+                     G_CALLBACK(+[](GDBusObjectManager * mgr, GDBusObject * obj, BluezObjectManager * self) {
+                         return self->OnObjectAdded(mgr, obj);
+                     }),
+                     this);
+    g_signal_connect(mObjectManager.get(), "object-removed",
+                     G_CALLBACK(+[](GDBusObjectManager * mgr, GDBusObject * obj, BluezObjectManager * self) {
+                         return self->OnObjectRemoved(mgr, obj);
+                     }),
+                     this);
+    g_signal_connect(mObjectManager.get(), "interface-proxy-properties-changed",
+                     G_CALLBACK(+[](GDBusObjectManagerClient * mgr, GDBusObjectProxy * obj, GDBusProxy * iface, GVariant * changed,
+                                    const char * const * invalidated, BluezObjectManager * self) {
+                         return self->OnInterfacePropertiesChanged(mgr, obj, iface, changed, invalidated);
+                     }),
+                     this);
 
     return CHIP_NO_ERROR;
 }

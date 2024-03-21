@@ -65,7 +65,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BluezEndpoint
+class BluezEndpoint : public BluezObjectManagerAdapterNotificationsDelegate
 {
 public:
     BluezEndpoint(BluezObjectManager & aObjectManager) : mObjectManager(aObjectManager) {}
@@ -79,6 +79,11 @@ public:
 
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
+
+    // Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
+    void OnDeviceAdded(BluezDevice1 * device) override;
+    void OnDevicePropertyChanged(BluezDevice1 * device, GVariant * changedProps, const char * const * invalidatedProps) override;
+    void OnDeviceRemoved(BluezDevice1 * device) override;
 
 private:
     CHIP_ERROR SetupEndpointBindings();
@@ -98,12 +103,6 @@ private:
     gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
     gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
     gboolean BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv);
-
-    void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject);
-    void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject);
-    void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
-                                               GDBusProxy * aInterface, GVariant * aChangedProperties,
-                                               const char * const * aInvalidatedProps);
 
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
