@@ -166,7 +166,7 @@ void SilabsMatterConfig::app_init()
 
     // Should never get here.
     chip::Platform::MemoryShutdown();
-    SILABS_LOG("vTaskStartScheduler() failed");
+    SILABS_LOG("Start Scheduler Failed");
     appError(CHIP_ERROR_INTERNAL);
 }
 
