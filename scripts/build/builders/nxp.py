@@ -100,10 +100,10 @@ class NxpBuilder(GnBuilder):
             args.append('chip_with_low_power=1 chip_logging=false')
             if self.board == NxpBoard.K32W0:
                 args.append('chip_pw_tokenizer_logging=false chip_with_OM15082=0')
-        
+
         if self.smu2:
             args.append('use_smu2_static=true use_smu2_dynamic=true')
-        
+
         if self.enable_factory_data:
             args.append('chip_with_factory_data=1')
 
