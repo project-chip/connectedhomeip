@@ -1208,7 +1208,7 @@ menu "CHIP Device Layer"
             bool "Enable BLE Extended Announcement"
             default n
             help
-                Enable BLE Extended Announcement.
+                Enable BLE Extended Announcement.To be used with CHIP_DISCOVERY_TIMEOUT_SECS for extended announcement duration.
 
     endmenu
 
