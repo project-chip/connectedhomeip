@@ -163,7 +163,7 @@ void TestCreation(nlTestSuite * inSuite, void * inContext)
     IncrementalResolver resolver;
 
     NL_TEST_ASSERT(inSuite, !resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
+    NL_TEST_ASSERT(inSuite, !resolver.IsActiveBrowseParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
     NL_TEST_ASSERT(
         inSuite,
@@ -183,7 +183,7 @@ void TestInactiveResetOnInitError(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestHostName.Serialized(), srvRecord) != CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, !resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
+    NL_TEST_ASSERT(inSuite, !resolver.IsActiveBrowseParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
 }
 
@@ -199,7 +199,7 @@ void TestStartOperational(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestOperationalName.Serialized(), srvRecord) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
+    NL_TEST_ASSERT(inSuite, !resolver.IsActiveBrowseParse());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveOperationalParse());
     NL_TEST_ASSERT(inSuite,
                    resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
@@ -218,7 +218,7 @@ void TestStartCommissionable(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestCommissionableNode.Serialized(), srvRecord) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
+    NL_TEST_ASSERT(inSuite, resolver.IsActiveBrowseParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
     NL_TEST_ASSERT(inSuite,
                    resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
@@ -237,7 +237,7 @@ void TestStartCommissioner(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestCommissionerNode.Serialized(), srvRecord) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
-    NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
+    NL_TEST_ASSERT(inSuite, resolver.IsActiveBrowseParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
     NL_TEST_ASSERT(inSuite,
                    resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
@@ -336,7 +336,7 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestCommissionableNode.Serialized(), srvRecord) == CHIP_NO_ERROR);
 
     // once initialized, parsing should be ready however no IP address is available
-    NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
+    NL_TEST_ASSERT(inSuite, resolver.IsActiveBrowseParse());
     NL_TEST_ASSERT(inSuite,
                    resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
@@ -414,10 +414,10 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ipAddress[1] == addr);
 
     // parsed txt data for discovered nodes
-    NL_TEST_ASSERT(inSuite, nodeData.commissionData.longDiscriminator == 22345);
-    NL_TEST_ASSERT(inSuite, nodeData.commissionData.vendorId == 321);
-    NL_TEST_ASSERT(inSuite, nodeData.commissionData.productId == 654);
-    NL_TEST_ASSERT(inSuite, strcmp(nodeData.commissionData.deviceName, "mytest") == 0);
+    NL_TEST_ASSERT(inSuite, nodeData.nodeData.longDiscriminator == 22345);
+    NL_TEST_ASSERT(inSuite, nodeData.nodeData.vendorId == 321);
+    NL_TEST_ASSERT(inSuite, nodeData.nodeData.productId == 654);
+    NL_TEST_ASSERT(inSuite, strcmp(nodeData.nodeData.deviceName, "mytest") == 0);
 }
 
 const nlTest sTests[] = {

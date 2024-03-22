@@ -36,7 +36,7 @@ namespace Controller {
  *   to maintain a list of DiscoveredNodes and providing the implementation
  *   of the template GetDiscoveredNodes() function.
  */
-class DLL_EXPORT AbstractDnssdDiscoveryController : public Dnssd::CommissioningResolveDelegate
+class DLL_EXPORT AbstractDnssdDiscoveryController : public Dnssd::DiscoverNodeDelegate
 {
 public:
     explicit AbstractDnssdDiscoveryController(Dnssd::Resolver * resolver = nullptr) : mDNSResolver(resolver) {}

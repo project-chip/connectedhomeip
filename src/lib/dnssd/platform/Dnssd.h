@@ -289,7 +289,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
  *
  */
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface,
-                            CommissioningResolveDelegate * delegate);
+                            DiscoverNodeDelegate * delegate);
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 /**

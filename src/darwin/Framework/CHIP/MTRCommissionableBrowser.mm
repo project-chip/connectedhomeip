@@ -49,7 +49,7 @@ constexpr char kBleKey[] = "BLE";
 @implementation MTRCommissionableBrowserResult
 @end
 
-class CommissionableBrowserInternal : public CommissioningResolveDelegate,
+class CommissionableBrowserInternal : public DiscoverNodeDelegate,
                                       public DnssdBrowseDelegate
 #if CONFIG_NETWORK_LAYER_BLE
     ,
@@ -144,12 +144,12 @@ public:
         mDiscoveredResults = discoveredResultsCopy;
     }
 
-    /////////// CommissioningResolveDelegate Interface /////////
+    /////////// DiscoverNodeDelegate Interface /////////
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
     {
         assertChipStackLockedByCurrentThread();
 
-        auto & commissionData = nodeData.commissionData;
+        auto & commissionData = nodeData.nodeData;
         auto key = [NSString stringWithUTF8String:commissionData.instanceName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
             // It should not happens.

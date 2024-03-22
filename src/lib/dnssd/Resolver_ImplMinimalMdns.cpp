@@ -215,7 +215,7 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
             continue;
         }
 
-        CHIP_ERROR err = resolver.InitializeParsing(data.GetName(), srv);
+        CHIP_ERROR err = resolver.InitializeParsing(data.GetName(), data.GetTtlSeconds(), srv);
         if (err != CHIP_NO_ERROR)
         {
             // Receiving records that we do not need to parse is normal:
@@ -285,8 +285,7 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override;
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) override;
     CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
@@ -384,19 +383,20 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             resolver->ResetToInactive();
             continue;
         }
+        DiscoveredNodeData nodeData;
+
+        CHIP_ERROR err = resolver->Take(nodeData);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+            continue;
+        }
 
         // SUCCESS. Call the delegates
-        if (resolver->IsActiveCommissionParse())
+        if (resolver->GetCurrentType() != IncrementalResolver::ServiceNameType::kInvalid)
         {
             MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
-            DiscoveredNodeData nodeData;
-
-            CHIP_ERROR err = resolver->Take(nodeData);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
-                continue;
-            }
+            
 
             // TODO: Ideally commissioning delegates should be aware of the
             //       node types they receive, however they are currently not
@@ -412,10 +412,16 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             case IncrementalResolver::ServiceNameType::kCommissioner:
                 discoveredNodeIsRelevant = mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionerNode);
                 mActiveResolves.CompleteCommissioner(nodeData);
+                nodeData.nodeType = DiscoveryType::kCommissionerNode;
                 break;
             case IncrementalResolver::ServiceNameType::kCommissionable:
                 discoveredNodeIsRelevant = mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionableNode);
                 mActiveResolves.CompleteCommissionable(nodeData);
+                nodeData.nodeType = DiscoveryType::kCommissionableNode;
+                break;
+            case IncrementalResolver::ServiceNameType::kOperational:
+                discoveredNodeIsRelevant = true;
+                nodeData.nodeType = DiscoveryType::kOperational;
                 break;
             default:
                 ChipLogError(Discovery, "Unexpected type for commission data parsing");
@@ -436,21 +442,19 @@ void MinMdnsResolver::AdvancePendingResolverStates()
                 }
             }
         }
-        else if (resolver->IsActiveOperationalParse())
+        if (resolver->GetCurrentType() == IncrementalResolver::ServiceNameType::kOperational)
         {
             MATTER_TRACE_SCOPE("Active operational delegate call", "MinMdnsResolver");
-            ResolvedNodeData nodeData;
+            ResolvedNodeData nodeResolvedData;
 
-            CHIP_ERROR err = resolver->Take(nodeData);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
-            }
+            nodeResolvedData.resolutionData = nodeData.resolutionData;
+            MakeInstanceName(nodeData.nodeData.instanceName, Operational::kInstanceNameMaxLength + 1, 
+                                                    nodeResolvedData.operationalData.peerId);
 
-            mActiveResolves.Complete(nodeData.operationalData.peerId);
+            mActiveResolves.Complete(nodeResolvedData.operationalData.peerId);
             if (mOperationalDelegate != nullptr)
             {
-                mOperationalDelegate->OnOperationalNodeResolved(nodeData);
+                mOperationalDelegate->OnOperationalNodeResolved(nodeResolvedData);
             }
             else
             {
@@ -685,20 +689,12 @@ void MinMdnsResolver::ExpireIncrementalResolvers()
     }
 }
 
-CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context)
+CHIP_ERROR MinMdnsResolver::StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
 {
     // minmdns currently supports only one discovery context at a time so override the previous context
     SetDiscoveryContext(&context);
 
-    return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
-}
-
-CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context)
-{
-    // minmdns currently supports only one discovery context at a time so override the previous context
-    SetDiscoveryContext(&context);
-
-    return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
+    return BrowseNodes(type, filter);
 }
 
 CHIP_ERROR MinMdnsResolver::StopDiscovery(DiscoveryContext & context)

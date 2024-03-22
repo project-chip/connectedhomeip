@@ -126,7 +126,7 @@ void TestSingleBrowseAddRemove(nlTestSuite * inSuite, void * inContext)
 
     // once complete, nothing to schedule
     Dnssd::DiscoveredNodeData data;
-    data.commissionData.longDiscriminator = 1234;
+    data.nodeData.longDiscriminator = 1234;
     attempts.CompleteCommissionable(data);
     NL_TEST_ASSERT(inSuite, !attempts.GetTimeUntilNextExpectedResponse().HasValue());
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduled().HasValue());
@@ -375,7 +375,7 @@ void TestCombination(nlTestSuite * inSuite, void * inContext)
     attempts.Complete(MakePeerId(2));
     attempts.Complete(MakePeerId(1));
     Dnssd::DiscoveredNodeData data;
-    data.commissionData.longDiscriminator = 1234;
+    data.nodeData.longDiscriminator = 1234;
     attempts.CompleteCommissionable(data);
 
     NL_TEST_ASSERT(inSuite, !attempts.GetTimeUntilNextExpectedResponse().HasValue());
