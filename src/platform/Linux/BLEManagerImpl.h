@@ -185,10 +185,12 @@ private:
 
     void DriveBLEState();
     BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
-    static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
     void InitiateScan(BleScanState scanType);
-    static void HandleScannerTimer(chip::System::Layer *, void * appState);
     void CleanScanConfig();
+
+    static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
+    static void HandleScanTimer(chip::System::Layer *, void * appState);
+    static void HandleConnectTimer(chip::System::Layer *, void * appState);
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
