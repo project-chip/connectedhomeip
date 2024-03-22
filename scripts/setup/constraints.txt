@@ -419,3 +419,9 @@ wheel==0.38.4 ; sys_platform == "linux"
 # The following packages are considered to be unsafe in a requirements file:
 # pip
 # setuptools
+#
+# Manual edits:
+# Higher versions depend on proto-plus, which break
+# nanopb code generation (due to name conflict of the 'proto' module)
+google-api-core==2.17.0
+
