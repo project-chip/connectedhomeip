@@ -1179,7 +1179,6 @@ responder
 RestrictedEvent
 retargeting
 reusability
-reviewdog
 reviwed
 rfid
 rfids
@@ -1188,7 +1187,6 @@ riscv
 rloc
 rmw
 rodata
-rojopolis
 Rollershade
 rootfs
 RPC
@@ -1537,7 +1535,6 @@ WindowCoveringGoToLiftPercentage
 WiseMCU
 wlan
 wmm
-wordlist
 WPA
 wpan
 wra
