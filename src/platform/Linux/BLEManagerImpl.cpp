@@ -257,7 +257,8 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
                       apEvent->Platform.BLEAdapter.mAdapterAddress);
         if (apEvent->Platform.BLEAdapter.mAdapterId == mAdapterId)
         {
-            // TODO: Handle adapter added
+            mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+            DriveBLEState();
         }
         break;
     case DeviceEventType::kPlatformLinuxBLEAdapterRemoved:
@@ -265,7 +266,21 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
                       apEvent->Platform.BLEAdapter.mAdapterAddress);
         if (apEvent->Platform.BLEAdapter.mAdapterId == mAdapterId)
         {
-            // TODO: Handle adapter removed
+            // Shutdown all BLE operations and release resources
+            mDeviceScanner.Shutdown();
+            mBLEAdvertisement.Shutdown();
+            mEndpoint.Shutdown();
+            // Drop reference to the adapter
+            mAdapter.reset();
+            // Clear all flags related to BlueZ BLE operations
+            mFlags.Clear(Flags::kBluezAdapterAvailable);
+            mFlags.Clear(Flags::kBluezBLELayerInitialized);
+            mFlags.Clear(Flags::kAdvertisingConfigured);
+            mFlags.Clear(Flags::kAppRegistered);
+            mFlags.Clear(Flags::kAdvertising);
+            CleanScanConfig();
+            // Indicate that the adapter is no longer available
+            err = BLE_ERROR_ADAPTER_UNAVAILABLE;
         }
         break;
     case DeviceEventType::kPlatformLinuxBLECentralConnected:
@@ -339,9 +354,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-        DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
+        DisableBLEService(err);
         mFlags.Clear(Flags::kControlOpInProgress);
     }
 }
@@ -675,9 +688,23 @@ void BLEManagerImpl::DriveBLEState()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        DisableBLEService(err);
+    }
+}
+
+void BLEManagerImpl::DisableBLEService(CHIP_ERROR err)
+{
+    ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+    // Stop all timers if the error is other than BLE adapter unavailable. In case of BLE adapter
+    // beeing unavailable, we will keep timers running, as the adapter might become available in
+    // the nearest future (e.g. BlueZ restart due to crash). By doing that we will ensure that BLE
+    // adapter reappearance will not extend timeouts for the ongoing operations.
+    if (err != BLE_ERROR_ADAPTER_UNAVAILABLE)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
     }
 }
 

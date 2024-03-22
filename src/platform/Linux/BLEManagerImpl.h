@@ -184,6 +184,7 @@ private:
     };
 
     void DriveBLEState();
+    void DisableBLEService(CHIP_ERROR err);
     BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     void InitiateScan(BleScanState scanType);
     void CleanScanConfig();
