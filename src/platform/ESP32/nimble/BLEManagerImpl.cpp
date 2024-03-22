@@ -1021,15 +1021,19 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     {
         deviceIdInfo.SetVendorId(0);
         deviceIdInfo.SetProductId(0);
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-        deviceIdInfo.SetAdditionalDataFlag(false);
-#endif
         deviceIdInfo.SetExtendedAnnouncementFlag(true);
     }
 #endif
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    deviceIdInfo.SetAdditionalDataFlag(true);
+    if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
+    {
+        deviceIdInfo.SetAdditionalDataFlag(true);
+    }
+    else
+    {
+        deviceIdInfo.SetAdditionalDataFlag(false);
+    }
 #endif
 
     VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(advData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
