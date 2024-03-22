@@ -1035,7 +1035,7 @@ static NSString * const sDataVersionKey = @"dataVersion";
     MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kTimeToWaitBeforeMarkingUnreachableAfterSettingUpSubscription * NSEC_PER_SEC)), self.queue, ^{
         MTRDevice * strongSelf = weakSelf.strongObject;
-        if ( strongSelf != nil ) {
+        if (strongSelf != nil) {
             os_unfair_lock_lock(&strongSelf->_lock);
             [strongSelf _markDeviceAsUnreachableIfNotSusbcribed];
             os_unfair_lock_unlock(&strongSelf->_lock);
