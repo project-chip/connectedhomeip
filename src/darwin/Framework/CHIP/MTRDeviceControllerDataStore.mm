@@ -131,17 +131,19 @@ static bool IsValidCATNumber(id _Nullable value)
                                                  securityLevel:MTRStorageSecurityLevelSecure
                                                    sharingType:MTRStorageSharingTypeNotShared] retain];
         }
-s });
+        resumptionNodeList = [_storageDelegate controller:_controller
+                                              valueForKey:sResumptionNodeListKey
+                                            securityLevel:MTRStorageSecurityLevelSecure
+                                              sharingType:MTRStorageSharingTypeNotShared];
+    });
     if (resumptionNodeList != nil) {
         if (![resumptionNodeList isKindOfClass:[NSArray class]]) {
             MTR_LOG_ERROR("List of CASE resumption node IDs is not an array");
-            [resumptionNodeList autorelease];
             return nil;
         }
         for (id value in resumptionNodeList) {
             if (!IsValidNodeIDNumber(value)) {
                 MTR_LOG_ERROR("Resumption node ID contains invalid value: %@", value);
-                [resumptionNodeList autorelease];
                 return nil;
             }
         }
@@ -149,8 +151,7 @@ s });
     } else {
         _nodesWithResumptionInfo = [[NSMutableArray alloc] init];
     }
-
-    [resumptionNodeList autorelease];
+    
     return self;
 }
 
@@ -252,11 +253,10 @@ s });
     }
 
     if (![data isKindOfClass:[NSData class]]) {
-        [data autorelease];
         return nil;
     }
 
-    return [data autorelease];
+    return data;
 }
 
 - (nullable MTRCASESessionResumptionInfo *)_findResumptionInfoWithKey:(nullable NSString *)key
@@ -281,11 +281,10 @@ s });
     }
 
     if (![resumptionInfo isKindOfClass:[MTRCASESessionResumptionInfo class]]) {
-        [resumptionInfo autorelease];
         return nil;
     }
 
-    return [resumptionInfo autorelease];
+    return resumptionInfo;
 }
 
 #pragma - Attribute Cache utility
@@ -327,11 +326,10 @@ s });
     }
 
     if (![data isKindOfClass:expectedClass]) {
-        [data autorelease];
         return nil;
     }
 
-    return [data autorelease];
+    return data;
 }
 
 - (BOOL)_storeAttributeCacheValue:(id)value forKey:(NSString *)key
