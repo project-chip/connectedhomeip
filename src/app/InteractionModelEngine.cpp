@@ -32,6 +32,7 @@
 #include <app/AppConfig.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
+#include <app/util/ember-compatibility-functions.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
@@ -389,7 +390,11 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
     mReportingEngine.ResetReadHandlerTracker(&apReadObj);
 
     mReadHandlers.ReleaseObject(&apReadObj);
+    TryToResumeSubscriptions();
+}
 
+void InteractionModelEngine::TryToResumeSubscriptions()
+{
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     if (!mSubscriptionResumptionScheduled && HasSubscriptionsToResume())
     {
@@ -398,8 +403,10 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
         mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
             System::Clock::Seconds32(timeTillNextSubscriptionResumptionSecs), ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
+        ChipLogProgress(InteractionModel, "Schedule subscription resumption when failing to establish session, Retries: %" PRIu32,
+                        mNumSubscriptionResumptionRetries);
     }
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 }
 
 Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -1990,6 +1997,12 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 uint32_t InteractionModelEngine::ComputeTimeSecondsTillNextSubscriptionResumption()
 {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    if (mSubscriptionResumptionRetrySecondsOverride > 0)
+    {
+        return static_cast<uint32_t>(mSubscriptionResumptionRetrySecondsOverride);
+    }
+#endif
     if (mNumSubscriptionResumptionRetries > CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)
     {
         return CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_RETRY_INTERVAL_SECS;

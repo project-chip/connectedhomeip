@@ -22,6 +22,8 @@ import android.util.Log
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ControllerParams
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
+import chip.devicecontroller.ICDCheckInDelegate
+import chip.devicecontroller.ICDClientInfo
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
 import chip.platform.ChipMdnsCallbackImpl
@@ -48,12 +50,34 @@ object ChipClient {
 
     if (!this::chipDeviceController.isInitialized) {
       chipDeviceController =
-        ChipDeviceController(ControllerParams.newBuilder().setControllerVendorId(VENDOR_ID).build())
+        ChipDeviceController(
+          ControllerParams.newBuilder()
+            .setControllerVendorId(VENDOR_ID)
+            .setEnableServerInteractions(true)
+            .build()
+        )
 
       // Set delegate for attestation trust store for device attestation verifier.
       // It will replace the default attestation trust store.
       chipDeviceController.setAttestationTrustStoreDelegate(
         ExampleAttestationTrustStoreDelegate(chipDeviceController)
+      )
+
+      chipDeviceController.setICDCheckInDelegate(
+        object : ICDCheckInDelegate {
+          override fun onCheckInComplete(info: ICDClientInfo) {
+            Log.d(TAG, "onCheckInComplete : $info")
+          }
+
+          override fun onKeyRefreshNeeded(info: ICDClientInfo): ByteArray? {
+            Log.d(TAG, "onKeyRefreshNeeded : $info")
+            return null
+          }
+
+          override fun onKeyRefreshDone(errorCode: Long) {
+            Log.d(TAG, "onKeyRefreshDone : $errorCode")
+          }
+        }
       )
     }
 
@@ -69,7 +93,10 @@ object ChipClient {
           AndroidBleManager(context),
           PreferencesKeyValueStoreManager(context),
           PreferencesConfigurationManager(context),
-          NsdManagerServiceResolver(context),
+          NsdManagerServiceResolver(
+            context,
+            NsdManagerServiceResolver.NsdManagerResolverAvailState()
+          ),
           NsdManagerServiceBrowser(context),
           ChipMdnsCallbackImpl(),
           DiagnosticDataProviderImpl(context)

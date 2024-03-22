@@ -36,7 +36,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 3
+          value: 4
           constraints:
               type: int16u
 

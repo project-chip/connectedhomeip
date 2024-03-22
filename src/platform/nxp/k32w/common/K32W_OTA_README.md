@@ -48,7 +48,6 @@ public:
 
     CHIP_ERROR Process(ByteSpan & block);
     void RegisterDescriptorCallback(ProcessDescriptor callback);
-
 protected:
     virtual CHIP_ERROR ProcessInternal(ByteSpan & block) = 0;
 };

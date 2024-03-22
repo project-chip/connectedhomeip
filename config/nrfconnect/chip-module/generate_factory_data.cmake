@@ -48,14 +48,25 @@ string(APPEND script_args "--hw_ver ${CONFIG_CHIP_DEVICE_HARDWARE_VERSION}\n")
 string(APPEND script_args "--hw_ver_str \"${CONFIG_CHIP_DEVICE_HARDWARE_VERSION_STRING}\"\n")
 
 # check if Rotating Device Id Unique Id should be generated
-if(NOT CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID)
-    if(NOT DEFINED CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID)
-        message(FATAL_ERROR "CHIP_DEVICE_ROTATING_DEVICE_UID was not provided. To generate it use CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID=y")
+if(CONFIG_CHIP_ROTATING_DEVICE_ID)
+    if(NOT CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID)
+        if(NOT DEFINED CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID)
+            message(FATAL_ERROR "CHIP_DEVICE_ROTATING_DEVICE_UID was not provided. To generate it use CONFIG_CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID=y")
+        else()
+            string(APPEND script_args "--rd_uid \"${CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID}\"\n")
+        endif()
     else()
-        string(APPEND script_args "--rd_uid \"${CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID}\"\n")
+        string(APPEND script_args "--generate_rd_uid\n")
     endif()
-else()
-    string(APPEND script_args "--generate_rd_uid\n")
+endif()
+
+if(CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED OR CONFIG_CHIP_FACTORY_DATA_GENERATE_CD)
+    find_program(chip_cert_exe NAMES chip-cert REQUIRED)
+    string(APPEND script_args "--chip_cert_path ${chip_cert_exe}\n")
+endif()
+
+if(CONFIG_CHIP_FACTORY_DATA_GENERATE_CD)
+    string(APPEND script_args "--gen_cd\n")
 endif()
 
 # for development purpose user can use default certs instead of generating or providing them
@@ -77,10 +88,8 @@ elseif(CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_USER)
     string(APPEND script_args "--dac_cert \"${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT}\"\n")
     string(APPEND script_args "--dac_key \"${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY}\"\n")
     string(APPEND script_args "--pai_cert \"${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT}\"\n")
-else()
-    find_program(chip_cert_exe NAMES chip-cert REQUIRED)
-    string(APPEND script_args "--gen_cd\n")
-    string(APPEND script_args "--chip_cert_path ${chip_cert_exe}\n")
+elseif(CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED)
+    string(APPEND script_args "--gen_certs\n")
 endif()
 
 # add Password-Authenticated Key Exchange parameters
@@ -90,20 +99,20 @@ string(APPEND script_args "--discriminator ${CONFIG_CHIP_DEVICE_DISCRIMINATOR}\n
 string(APPEND script_args "--passcode ${CONFIG_CHIP_DEVICE_SPAKE2_PASSCODE}\n")
 string(APPEND script_args "--include_passcode\n")
 string(APPEND script_args "--overwrite\n")
-string(APPEND script_args "--product_finish ${CONFIG_CHIP_DEVICE_PRODUCT_FINISH}\n")
+# check if spake2 verifier should be generated using script
+if(NOT CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER)
+    # Spake2 verifier should be provided using kConfig
+    string(APPEND script_args "--spake2_verifier \"${CONFIG_CHIP_DEVICE_SPAKE2_TEST_VERIFIER}\"\n")
+endif()
 
+# Product appearance
+string(APPEND script_args "--product_finish ${CONFIG_CHIP_DEVICE_PRODUCT_FINISH}\n")
 if(CONFIG_CHIP_DEVICE_PRODUCT_COLOR)
     string(APPEND script_args "--product_color ${CONFIG_CHIP_DEVICE_PRODUCT_COLOR}\n")
 endif()
 
 if(CONFIG_CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES)
     string(APPEND script_args "--generate_onboarding\n")
-endif()
-
-# check if spake2 verifier should be generated using script
-if(NOT CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER)
-    # Spake2 verifier should be provided using kConfig
-    string(APPEND script_args "--spake2_verifier \"${CONFIG_CHIP_DEVICE_SPAKE2_TEST_VERIFIER}\"\n")
 endif()
 
 if(CONFIG_CHIP_DEVICE_ENABLE_KEY)

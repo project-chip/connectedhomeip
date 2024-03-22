@@ -20,6 +20,7 @@
 #import <XCTest/XCTest.h>
 
 #import "MTRDeviceTestDelegate.h"
+#import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
 #import "MTRTestDeclarations.h"
@@ -1082,6 +1083,19 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [controller.controllerDataStore storeAttributeValues:testAttributes forNodeID:@(1002)];
     [controller.controllerDataStore storeAttributeValues:testAttributes forNodeID:@(1003)];
 
+    MTRDeviceClusterData * testClusterData1 = [[MTRDeviceClusterData alloc] init];
+    testClusterData1.dataVersion = @(1);
+    MTRDeviceClusterData * testClusterData2 = [[MTRDeviceClusterData alloc] init];
+    testClusterData2.dataVersion = @(2);
+    MTRDeviceClusterData * testClusterData3 = [[MTRDeviceClusterData alloc] init];
+    testClusterData3.dataVersion = @(3);
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * testClusterData = @{
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(1)] : testClusterData1,
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)] : testClusterData2,
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(3)] : testClusterData3,
+    };
+    [controller.controllerDataStore storeClusterData:testClusterData forNodeID:@(1001)];
+
     // Check values are written and can be fetched
     NSArray * dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1001)];
     XCTAssertEqual(dataStoreValues.count, 9);
@@ -1123,6 +1137,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         }
     }
 
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(1001)];
+    for (MTRClusterPath * path in testClusterData) {
+        XCTAssertEqualObjects(testClusterData[path].dataVersion, dataStoreClusterData[path].dataVersion);
+    }
+
     [controller.controllerDataStore clearStoredAttributesForNodeID:@(1001)];
     dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1001)];
     XCTAssertEqual(dataStoreValues.count, 0);
@@ -1138,6 +1157,38 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertEqual(dataStoreValues.count, 0);
     dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1003)];
     XCTAssertEqual(dataStoreValues.count, 0);
+
+    // Test MTRDeviceControllerDataStore _pruneEmptyStoredAttributesBranches
+    //  - Clear cache
+    //  - Store an attribute
+    //  - Manually delete it from the test storage delegate
+    //  - Call _pruneEmptyStoredAttributesBranches
+    [controller.controllerDataStore clearAllStoredAttributes];
+
+    NSArray * testAttribute = @[
+        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(1)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(111) } },
+    ];
+    [controller.controllerDataStore storeAttributeValues:testAttribute forNodeID:@(2001)];
+
+    // store is async, so remove on the same queue to ensure order
+    dispatch_sync(_storageQueue, ^{
+        NSString * testAttributeValueKey = [controller.controllerDataStore _attributeValueKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1) attributeID:@(1)];
+        [storageDelegate controller:controller removeValueForKey:testAttributeValueKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
+    [controller.controllerDataStore unitTestPruneEmptyStoredAttributesBranches];
+
+    // Now check the indexes are pruned
+    NSString * testAttributeIndexKey = [controller.controllerDataStore _attributeIndexKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1)];
+    id testAttributeIndex = [storageDelegate controller:controller valueForKey:testAttributeIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testAttributeIndex);
+    NSString * testClusterIndexKey = [controller.controllerDataStore _clusterIndexKeyForNodeID:@(2001) endpointID:@(1)];
+    id testClusterIndex = [storageDelegate controller:controller valueForKey:testClusterIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testClusterIndex);
+    NSString * testEndpointIndexKey = [controller.controllerDataStore _endpointIndexKeyForNodeID:@(2001)];
+    id testEndpointIndex = [storageDelegate controller:controller valueForKey:testEndpointIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testEndpointIndex);
+    id testNodeIndex = [storageDelegate controller:controller valueForKey:@"attrCacheNodeIndex" securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testNodeIndex);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);

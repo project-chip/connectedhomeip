@@ -1086,7 +1086,7 @@ class TestStep:
                 break
 
             received_value = received_response.get('value')
-            if not self.is_attribute and not self.is_event and not (self.command in ANY_COMMANDS_LIST):
+            if not self.is_attribute and not self.is_event and self.command not in ANY_COMMANDS_LIST:
                 expected_name = value.get('name')
                 if expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
@@ -1173,7 +1173,7 @@ class TestStep:
                 continue
 
             received_value = received_response.get(default_target)
-            if not self.is_attribute and not self.is_event and not (self.command in ANY_COMMANDS_LIST):
+            if not self.is_attribute and not self.is_event and self.command not in ANY_COMMANDS_LIST:
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(

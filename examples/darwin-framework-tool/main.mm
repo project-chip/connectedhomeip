@@ -22,6 +22,7 @@
 
 #include "commands/bdx/Commands.h"
 #include "commands/common/Commands.h"
+#include "commands/configuration/Commands.h"
 #include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/interactive/Commands.h"
@@ -46,6 +47,7 @@ int main(int argc, const char * argv[])
         registerCommandsPayload(commands);
         registerClusterOtaSoftwareUpdateProviderInteractive(commands);
         registerCommandsStorage(commands);
+        registerCommandsConfiguration(commands);
         registerClusters(commands);
         return commands.Run(argc, (char **) argv);
     }

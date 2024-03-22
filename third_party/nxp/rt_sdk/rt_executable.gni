@@ -20,7 +20,7 @@ import("${build_root}/toolchain/flashable_executable.gni")
 template("rt_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
   objcopy_image_name = output_base_name + ".hex"
-  objcopy_image_format = "srec"
+  objcopy_image_format = "ihex"
   objcopy = "arm-none-eabi-objcopy"
 
   # Copy flashing dependencies to the output directory so that the output

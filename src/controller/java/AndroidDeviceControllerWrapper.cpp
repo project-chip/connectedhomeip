@@ -104,7 +104,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
     jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds,
     bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
-    bool skipAttestationCertificateValidation, CHIP_ERROR * errInfoOnFailure)
+    bool skipAttestationCertificateValidation, jstring countryCode, bool enableServerInteractions, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -207,11 +207,30 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
     wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
 
-    CommissioningParameters params = wrapper->mAutoCommissioner.GetCommissioningParameters();
+    CommissioningParameters params = wrapper->GetCommissioningParameters();
     params.SetFailsafeTimerSeconds(failsafeTimerSeconds);
     params.SetAttemptWiFiNetworkScan(attemptNetworkScanWiFi);
     params.SetAttemptThreadNetworkScan(attemptNetworkScanThread);
     params.SetSkipCommissioningComplete(skipCommissioningComplete);
+
+    if (countryCode != nullptr)
+    {
+        JniUtfString countryCodeJniString(env, countryCode);
+        if (countryCodeJniString.size() != kCountryCodeBufferLen)
+        {
+            *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+            return nullptr;
+        }
+
+        MutableCharSpan copiedCode(wrapper->mCountryCode);
+        if (CopyCharSpanToMutableCharSpan(countryCodeJniString.charSpan(), copiedCode) != CHIP_NO_ERROR)
+        {
+            *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+            return nullptr;
+        }
+        params.SetCountryCode(copiedCode);
+    }
+
     wrapper->UpdateCommissioningParameters(params);
 
     CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
@@ -332,6 +351,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.controllerNOC  = nocSpan;
     }
 
+    initParams.enableServerInteractions  = enableServerInteractions;
+    setupParams.enableServerInteractions = enableServerInteractions;
+
     *errInfoOnFailure = DeviceControllerFactory::GetInstance().Init(initParams);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
@@ -373,6 +395,11 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), ipkSpan, compressedFabricIdSpan);
 
     wrapper->getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
+
+    auto engine       = chip::app::InteractionModelEngine::GetInstance();
+    *errInfoOnFailure = wrapper->mCheckInDelegate.Init(&wrapper->mICDClientStorage, engine);
+    *errInfoOnFailure = wrapper->mCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
+                                                      &wrapper->mICDClientStorage, &wrapper->mCheckInDelegate, engine);
 
     memset(ipkBuffer.data(), 0, ipkBuffer.size());
 
@@ -526,6 +553,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateCommissioningParameters(const c
 {
     // this will wipe out any custom attestationNonce and csrNonce that was being used.
     // however, Android APIs don't allow these to be set to custom values today.
+    mCommissioningParameter = params;
     return mAutoCommissioner.SetCommissioningParameters(params);
 }
 
@@ -661,6 +689,11 @@ CHIP_ERROR AndroidDeviceControllerWrapper::FinishOTAProvider()
 #endif
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::SetICDCheckInDelegate(jobject checkInDelegate)
+{
+    return mCheckInDelegate.SetDelegate(checkInDelegate);
+}
+
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -749,6 +782,7 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
 
     // For ICD
     mUserActiveModeTriggerHint = info.icd.userActiveModeTriggerHint;
+    memset(mUserActiveModeTriggerInstructionBuffer, 0x00, kUserActiveModeTriggerInstructionBufferLen);
     CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction, mUserActiveModeTriggerInstruction);
 
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),

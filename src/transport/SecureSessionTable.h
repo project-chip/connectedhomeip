@@ -183,7 +183,7 @@ private:
         template <typename CompareFunc>
         void Sort(CompareFunc func)
         {
-            Sorting::BubbleSort(mSessionList.begin(), mSessionList.size(), func);
+            Sorting::InsertionSort(mSessionList.begin(), mSessionList.size(), func);
         }
 
         const ScopedNodeId & GetSessionEvictionHint() const { return mSessionEvictionHint; }

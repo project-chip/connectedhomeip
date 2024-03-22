@@ -30,6 +30,7 @@ from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.rw61x import RW61XApp, RW61XBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
@@ -703,6 +704,25 @@ def BuildMW320Target():
     return target
 
 
+def BuildRW61XTarget():
+    target = BuildTarget('rw61x', RW61XBuilder)
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('all-clusters-app', app=RW61XApp.ALL_CLUSTERS, release=True),
+        TargetPart('thermostat', app=RW61XApp.THERMOSTAT, release=True),
+        TargetPart('laundry-washer', app=RW61XApp.LAUNDRY_WASHER, release=True),
+    ])
+
+    target.AppendModifier(name="ota", enable_ota=True)
+    target.AppendModifier(name="wifi", enable_wifi=True)
+    target.AppendModifier(name="thread", enable_thread=True)
+    target.AppendModifier(name="factory-data", enable_factory_data=True)
+    target.AppendModifier(name="matter-shell", enable_shell=True)
+
+    return target
+
+
 def BuildGenioTarget():
     target = BuildTarget('genio', GenioBuilder)
     target.AppendFixedTargets([TargetPart('lighting-app', app=GenioApp.LIGHT)])
@@ -783,6 +803,7 @@ BUILD_TARGETS = [
     BuildHostTestRunnerTarget(),
     BuildIMXTarget(),
     BuildInfineonTarget(),
+    BuildRW61XTarget(),
     BuildK32WTarget(),
     BuildMbedTarget(),
     BuildMW320Target(),

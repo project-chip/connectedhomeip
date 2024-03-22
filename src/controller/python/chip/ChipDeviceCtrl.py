@@ -174,7 +174,7 @@ class CommissionableNode(discovery.CommissionableNode):
 class DeviceProxyWrapper():
     ''' Encapsulates a pointer to OperationalDeviceProxy on the c++ side that needs to be
         freed when DeviceProxyWrapper goes out of scope. There is a potential issue where
-        if this is copied around that a double free will occure, but how this is used today
+        if this is copied around that a double free will occur, but how this is used today
         that is not an issue that needs to be accounted for and it will become very apparent
         if that happens.
     '''
@@ -923,7 +923,7 @@ class ChipDeviceControllerBase():
                           suppressResponse: typing.Union[None, bool] = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive
-        the response. If a valid responseType is passed in, that will be used to deserialize the object. If not,
+        the response. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
         the type will be automatically deduced from the metadata received over the wire.
 
         timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
@@ -931,7 +931,7 @@ class ChipDeviceControllerBase():
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
 
         Returns:
-            - command respone. The type of the response is defined by the command.
+            - command response. The type of the response is defined by the command.
         Raises:
             - InteractionModelError on error
         '''
@@ -956,7 +956,7 @@ class ChipDeviceControllerBase():
                                 suppressResponse: typing.Optional[bool] = None):
         '''
         Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
-        the responses. If a valid responseType is passed in, that will be used to deserialize the object. If not,
+        the responses. If a valid responseType is passed in, that will be used to de-serialize the object. If not,
         the type will be automatically deduced from the metadata received over the wire.
 
         nodeId: Target's Node ID
@@ -1024,7 +1024,7 @@ class ChipDeviceControllerBase():
             to the XYZ attribute on the test cluster to endpoint 1
 
         Returns:
-            - [AttributeStatus] (list - one for each pth)
+            - [AttributeStatus] (list - one for each path)
         '''
         self.CheckIsActive()
 
@@ -1321,17 +1321,17 @@ class ChipDeviceControllerBase():
                                     To get notified on attribute change use SetAttributeUpdateCallback on the returned
                                     SubscriptionTransaction. This is used to set a callback function, which is a callable of
                                     type Callable[[TypedAttributePath, SubscriptionTransaction], None]
-                                    Get the attribute value from the change path using GetAttribute on the SubscriptionTransasction
+                                    Get the attribute value from the change path using GetAttribute on the SubscriptionTransaction
                                     You can await changes in the main loop using a trigger mechanism from the callback.
                                     ex. queue.SimpleQueue
 
-            - read request: AsyncReadTransation.ReadResponse.attributes.
+            - read request: AsyncReadTransaction.ReadResponse.attributes.
                             This is of type AttributeCache.attributeCache (Attribute.py),
                             which is a dict mapping endpoints to a list of Cluster (ClusterObjects.py) classes
                             (dict[int, List[Cluster]])
-                            Access as ret[endpoint_id][<Cluster class>][<Attribute class>]
-                            Ex. To access the OnTime attribute from the OnOff cluster on EP 1
-                            ret[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
+                            Access as returned_object[endpoint_id][<Cluster class>][<Attribute class>]
+                            Ex. To access the OnTime attribute from the OnOff cluster on endpoint 1
+                            returned_object[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
 
         Raises:
             - InteractionModelError (chip.interaction_model) on error
@@ -1399,7 +1399,7 @@ class ChipDeviceControllerBase():
                                     Callable[[EventReadResult, SubscriptionTransaction], None]
                                     You can await events using a trigger mechanism in the callback. ex. queue.SimpleQueue
 
-            - read request: AsyncReadTransation.ReadResponse.events.
+            - read request: AsyncReadTransaction.ReadResponse.events.
                             This is a List[ClusterEvent].
 
         Raises:
@@ -1878,7 +1878,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetTrustedTimeSource(self, nodeId: int, endpoint: int):
-        ''' Set the trusetd time source nodeId to set during commissioning. This must be a node on the commissioner fabric.'''
+        ''' Set the trusted time source nodeId to set during commissioning. This must be a node on the commissioner fabric.'''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTrustedTimeSource(nodeId, endpoint)
@@ -1993,7 +1993,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
 
     def __init__(self, operationalKey: p256keypair.P256Keypair, noc: bytes,
                  icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: str = None):
-        '''Creates a controller without autocommissioner.
+        '''Creates a controller without AutoCommissioner.
 
         The allocated controller uses the noc, icac, rcac and ipk instead of the default,
         random generated certificates / keys. Which is suitable for creating a controller

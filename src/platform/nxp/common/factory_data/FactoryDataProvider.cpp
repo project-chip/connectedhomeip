@@ -21,20 +21,6 @@
 #include <lib/support/Base64.h>
 #include <lib/support/Span.h>
 
-#ifndef FACTORY_DATA_PROVIDER_ENABLE_TESTS
-#define FACTORY_DATA_PROVIDER_RUN_TESTS 0
-#endif
-
-#if FACTORY_DATA_PROVIDER_RUN_TESTS
-#include <credentials/CertificationDeclaration.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <credentials/examples/ExampleDACs.h>
-#include <credentials/examples/ExamplePAI.h>
-#endif
-
 #include "FactoryDataProvider.h"
 
 #include <cctype>
@@ -315,42 +301,28 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
     return err;
 }
 
-void FactoryDataProvider::FactoryDataProviderRunTests(void)
+CHIP_ERROR FactoryDataProvider::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
 {
-#if FACTORY_DATA_PROVIDER_RUN_TESTS
-    static const ByteSpan kExpectedDacPublicKey = DevelopmentCerts::kDacPublicKey;
-    constexpr uint8_t kExampleDigest[]          = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12,
-                                                    0x13, 0x14, 0x15, 0x16, 0x17, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25,
-                                                    0x26, 0x27, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
+    uint8_t productFinish;
+    uint16_t length = 0;
+    auto err        = SearchForId(FactoryDataId::kProductFinish, &productFinish, sizeof(productFinish), length);
+    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
-    // Sign using the example attestation private key
-    P256ECDSASignature da_signature;
-    MutableByteSpan out_sig_span(da_signature.Bytes(), da_signature.Capacity());
-    CHIP_ERROR err = SignWithDeviceAttestationKey(ByteSpan{ kExampleDigest }, out_sig_span);
-    assert(err == CHIP_NO_ERROR);
+    *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(productFinish);
 
-    assert(out_sig_span.size() == kP256_ECDSA_Signature_Length_Raw);
-    da_signature.SetLength(out_sig_span.size());
+    return CHIP_NO_ERROR;
+}
 
-    // Get DAC from the provider
-    uint8_t dac_cert_buf[kMaxDERCertLength];
-    MutableByteSpan dac_cert_span(dac_cert_buf);
+CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    uint8_t color;
+    uint16_t length = 0;
+    auto err        = SearchForId(FactoryDataId::kProductPrimaryColor, &color, sizeof(color), length);
+    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_ERROR_NOT_IMPLEMENTED);
 
-    memset(dac_cert_span.data(), 0, dac_cert_span.size());
-    err = GetDeviceAttestationCert(dac_cert_span);
-    assert(err == CHIP_NO_ERROR);
+    *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(color);
 
-    // Extract public key from DAC, prior to signature verification
-    P256PublicKey dac_public_key;
-    err = ExtractPubkeyFromX509Cert(dac_cert_span, dac_public_key);
-    assert(err == CHIP_NO_ERROR);
-    assert(dac_public_key.Length() == kExpectedDacPublicKey.size());
-    assert(0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
-
-    // Verify round trip signature
-    err = dac_public_key.ECDSA_validate_msg_signature(&kExampleDigest[0], sizeof(kExampleDigest), da_signature);
-    assert(err == CHIP_NO_ERROR);
-#endif
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

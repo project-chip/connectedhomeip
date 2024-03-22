@@ -21,6 +21,10 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/CHIPCryptoPALPSA.h>
+#endif
+
 #include <fprotect.h>
 #include <pm_config.h>
 #include <system/SystemError.h>

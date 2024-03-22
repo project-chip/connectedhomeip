@@ -47,6 +47,7 @@ static_library("cluster-objects") {
 
   public_deps = [
     ":ids",
+    "${chip_root}/src/app:events",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/util:types",

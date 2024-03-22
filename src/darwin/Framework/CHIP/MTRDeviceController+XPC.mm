@@ -220,6 +220,10 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
                  forSelector:@selector(readAttributeCacheWithController:nodeId:endpointId:clusterId:attributeId:completion:)
                argumentIndex:0
                      ofReply:YES];
+    [xpcInterface setClasses:GetXPCAllowedClasses()
+                 forSelector:@selector(downloadLogWithController:nodeId:type:timeout:completion:)
+               argumentIndex:0
+                     ofReply:YES];
     return xpcInterface;
 }
 

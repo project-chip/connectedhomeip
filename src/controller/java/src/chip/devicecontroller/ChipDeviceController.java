@@ -151,6 +151,11 @@ public class ChipDeviceController {
     finishOTAProvider(deviceControllerPtr);
   }
 
+  /** Set the delegate of ICD check in */
+  public void setICDCheckInDelegate(ICDCheckInDelegate delegate) {
+    setICDCheckInDelegate(deviceControllerPtr, new ICDCheckInDelegateWrapper(delegate));
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -451,6 +456,15 @@ public class ChipDeviceController {
 
   public void unpairDeviceCallback(long deviceId, UnpairDeviceCallback callback) {
     unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
+  }
+
+  /**
+   * This function stops a pairing or commissioning process that is in progress.
+   *
+   * @param deviceId The remote device Id.
+   */
+  public void stopDevicePairing(long deviceId) {
+    stopDevicePairing(deviceControllerPtr, deviceId);
   }
 
   /**
@@ -1335,10 +1349,12 @@ public class ChipDeviceController {
   /**
    * Extract skid from paa cert.
    *
-   * @param paaCert The product attestation authority (PAA) cert
-   * @return The subject key identifier (SKID)
+   * <p>This method was deprecated. Please use {@link DeviceAttestation.extractSkidFromPaaCert}.
    */
-  public native byte[] extractSkidFromPaaCert(byte[] paaCert);
+  @Deprecated
+  public byte[] extractSkidFromPaaCert(byte[] paaCert) {
+    return DeviceAttestation.extractSkidFromPaaCert(paaCert);
+  }
 
   /**
    * Generates a new PASE verifier for the given setup PIN code.
@@ -1425,6 +1441,9 @@ public class ChipDeviceController {
 
   private native void finishOTAProvider(long deviceControllerPtr);
 
+  private native void setICDCheckInDelegate(
+      long deviceControllerPtr, ICDCheckInDelegateWrapper delegate);
+
   private native void pairDevice(
       long deviceControllerPtr,
       long deviceId,
@@ -1473,6 +1492,8 @@ public class ChipDeviceController {
 
   private native void unpairDeviceCallback(
       long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
+
+  private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
