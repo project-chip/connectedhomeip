@@ -187,16 +187,16 @@ BluezObjectManager::NotificationsDelegates BluezObjectManager::GetDeviceNotifica
     return delegates;
 }
 
-void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * aObj)
+void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, BluezObject * aObj)
 {
-    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(reinterpret_cast<BluezObject *>(aObj)));
+    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(aObj));
     if (adapter)
     {
         NotifyAdapterAdded(adapter.get());
         return;
     }
 
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(aObj));
     if (device)
     {
         for (auto delegate : GetDeviceNotificationsDelegates(device.get()))
@@ -206,9 +206,9 @@ void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * 
     }
 }
 
-void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject * aObj)
+void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, BluezObject * aObj)
 {
-    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(reinterpret_cast<BluezObject *>(aObj)));
+    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(aObj));
     if (adapter)
     {
         RemoveAdapterSubscriptions(adapter.get());
@@ -216,7 +216,7 @@ void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject 
         return;
     }
 
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(aObj));
     if (device)
     {
         for (auto delegate : GetDeviceNotificationsDelegates(device.get()))
@@ -226,10 +226,10 @@ void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject 
     }
 }
 
-void BluezObjectManager::OnInterfacePropertiesChanged(GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface,
+void BluezObjectManager::OnInterfacePropertiesChanged(GDBusObjectManagerClient * aMgr, BluezObject * aObj, GDBusProxy * aIface,
                                                       GVariant * aChangedProps, const char * const * aInvalidatedProps)
 {
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(aObj));
     if (device)
     {
         for (auto delegate : GetDeviceNotificationsDelegates(device.get()))
@@ -255,18 +255,19 @@ CHIP_ERROR BluezObjectManager::SetupObjectManager()
 
     g_signal_connect(mObjectManager.get(), "object-added",
                      G_CALLBACK(+[](GDBusObjectManager * mgr, GDBusObject * obj, BluezObjectManager * self) {
-                         return self->OnObjectAdded(mgr, obj);
+                         return self->OnObjectAdded(mgr, reinterpret_cast<BluezObject *>(obj));
                      }),
                      this);
     g_signal_connect(mObjectManager.get(), "object-removed",
                      G_CALLBACK(+[](GDBusObjectManager * mgr, GDBusObject * obj, BluezObjectManager * self) {
-                         return self->OnObjectRemoved(mgr, obj);
+                         return self->OnObjectRemoved(mgr, reinterpret_cast<BluezObject *>(obj));
                      }),
                      this);
     g_signal_connect(mObjectManager.get(), "interface-proxy-properties-changed",
                      G_CALLBACK(+[](GDBusObjectManagerClient * mgr, GDBusObjectProxy * obj, GDBusProxy * iface, GVariant * changed,
                                     const char * const * invalidated, BluezObjectManager * self) {
-                         return self->OnInterfacePropertiesChanged(mgr, obj, iface, changed, invalidated);
+                         return self->OnInterfacePropertiesChanged(mgr, reinterpret_cast<BluezObject *>(obj), iface, changed,
+                                                                   invalidated);
                      }),
                      this);
 
