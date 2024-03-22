@@ -113,7 +113,7 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     mReady = false;
     Platform::CopyString(mCurrentInstance, state.GetInstanceName());
     mPendingConsent = true;
-    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
+    char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1];
     Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingIdString,
                                         sizeof(rotatingIdString));
 
@@ -182,10 +182,10 @@ void CommissionerDiscoveryController::InternalOk()
         return;
     }
 
-    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+    char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
     Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
                                         sizeof(rotatingIdString));
-    CharSpan rotatingIdSpan = CharSpan(rotatingIdString, sizeof(rotatingIdString));
+    CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
     if (targetAppCount > 0)
@@ -360,10 +360,10 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         //    - if CommissionerPasscode, then call new UX method to show passcode, send CDC
         if (passcode == 0 && client->GetCommissionerPasscode() && client->GetCdPort() != 0)
         {
-            char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+            char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
             Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
                                                 sizeof(rotatingIdString));
-            CharSpan rotatingIdSpan = CharSpan(rotatingIdString, sizeof(rotatingIdString));
+            CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
 
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
