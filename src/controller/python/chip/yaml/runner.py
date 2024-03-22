@@ -377,7 +377,10 @@ class AttributeChangeAccumulator:
         self._expected_attribute = expected_attribute
         self._output_queue = output_queue
 
-    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+    def __call__(self, path: Union[TypedAttributePath, AttributePath], transaction: SubscriptionTransaction):
+        # We are not interested in untyped (e.g. vendor specific) attributes
+        if not isinstance(path, TypedAttributePath):
+            return
         if path.AttributeType == self._expected_attribute:
             data = transaction.GetAttribute(path)
             result = _ActionResult(status=_ActionStatus.SUCCESS, response=path.AttributeType(data))
