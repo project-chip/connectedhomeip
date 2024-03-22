@@ -125,19 +125,23 @@ static bool IsValidCATNumber(id _Nullable value)
 
     __block id resumptionNodeList;
     dispatch_sync(_storageDelegateQueue, ^{
-        resumptionNodeList = [_storageDelegate controller:_controller
-                                              valueForKey:sResumptionNodeListKey
-                                            securityLevel:MTRStorageSecurityLevelSecure
-                                              sharingType:MTRStorageSharingTypeNotShared];
-    });
+        @autoreleasepool {
+            resumptionNodeList = [[_storageDelegate controller:_controller
+                                                   valueForKey:sResumptionNodeListKey
+                                                 securityLevel:MTRStorageSecurityLevelSecure
+                                                   sharingType:MTRStorageSharingTypeNotShared] retain];
+        }
+s    });
     if (resumptionNodeList != nil) {
         if (![resumptionNodeList isKindOfClass:[NSArray class]]) {
             MTR_LOG_ERROR("List of CASE resumption node IDs is not an array");
+            [resumptionNodeList autorelease];
             return nil;
         }
         for (id value in resumptionNodeList) {
             if (!IsValidNodeIDNumber(value)) {
                 MTR_LOG_ERROR("Resumption node ID contains invalid value: %@", value);
+                [resumptionNodeList autorelease];
                 return nil;
             }
         }
@@ -145,6 +149,8 @@ static bool IsValidCATNumber(id _Nullable value)
     } else {
         _nodesWithResumptionInfo = [[NSMutableArray alloc] init];
     }
+    
+    [resumptionNodeList autorelease];
     return self;
 }
 
@@ -233,10 +239,12 @@ static bool IsValidCATNumber(id _Nullable value)
 {
     __block id data;
     dispatch_sync(_storageDelegateQueue, ^{
-        data = [_storageDelegate controller:_controller
-                                valueForKey:sLastLocallyUsedNOCKey
-                              securityLevel:MTRStorageSecurityLevelSecure
-                                sharingType:MTRStorageSharingTypeNotShared];
+        @autoreleasepool {
+            data = [[_storageDelegate controller:_controller
+                                     valueForKey:sLastLocallyUsedNOCKey
+                                   securityLevel:MTRStorageSecurityLevelSecure
+                                     sharingType:MTRStorageSharingTypeNotShared] retain];
+        }
     });
 
     if (data == nil) {
@@ -244,10 +252,11 @@ static bool IsValidCATNumber(id _Nullable value)
     }
 
     if (![data isKindOfClass:[NSData class]]) {
+        [data autorelease];
         return nil;
     }
 
-    return data;
+    return [data autorelease];
 }
 
 - (nullable MTRCASESessionResumptionInfo *)_findResumptionInfoWithKey:(nullable NSString *)key
@@ -259,10 +268,12 @@ static bool IsValidCATNumber(id _Nullable value)
 
     __block id resumptionInfo;
     dispatch_sync(_storageDelegateQueue, ^{
-        resumptionInfo = [_storageDelegate controller:_controller
-                                          valueForKey:key
-                                        securityLevel:MTRStorageSecurityLevelSecure
-                                          sharingType:MTRStorageSharingTypeNotShared];
+        @autoreleasepool {
+            resumptionInfo = [[_storageDelegate controller:_controller
+                                               valueForKey:key
+                                             securityLevel:MTRStorageSecurityLevelSecure
+                                               sharingType:MTRStorageSharingTypeNotShared] retain];
+        }
     });
 
     if (resumptionInfo == nil) {
@@ -270,10 +281,11 @@ static bool IsValidCATNumber(id _Nullable value)
     }
 
     if (![resumptionInfo isKindOfClass:[MTRCASESessionResumptionInfo class]]) {
+        [resumptionInfo autorelease];
         return nil;
     }
 
-    return resumptionInfo;
+    return [resumptionInfo autorelease];
 }
 
 #pragma - Attribute Cache utility
@@ -304,20 +316,22 @@ static bool IsValidCATNumber(id _Nullable value)
 - (id)_fetchAttributeCacheValueForKey:(NSString *)key expectedClass:(Class)expectedClass;
 {
     id data;
-    data = [_storageDelegate controller:_controller
-                            valueForKey:key
-                          securityLevel:MTRStorageSecurityLevelSecure
-                            sharingType:MTRStorageSharingTypeNotShared];
-
+    @autoreleasepool {
+        data = [[_storageDelegate controller:_controller
+                                 valueForKey:key
+                               securityLevel:MTRStorageSecurityLevelSecure
+                                 sharingType:MTRStorageSharingTypeNotShared] retain];
+    }
     if (data == nil) {
         return nil;
     }
 
     if (![data isKindOfClass:expectedClass]) {
+        [data autorelease];
         return nil;
     }
 
-    return data;
+    return [data autorelease];
 }
 
 - (BOOL)_storeAttributeCacheValue:(id)value forKey:(NSString *)key
