@@ -102,14 +102,6 @@ public:
         kWiFiAPMode_OnDemand_NoStationProvision = 5,
     };
 
-    enum ThreadMode
-    {
-        kThreadMode_NotSupported          = 0,
-        kThreadMode_ApplicationControlled = 1,
-        kThreadMode_Disabled              = 2,
-        kThreadMode_Enabled               = 3,
-    };
-
     enum WiFiStationState
     {
         kWiFiStationState_NotConnected,
@@ -192,10 +184,7 @@ public:
     void SetWiFiAPIdleTimeout(System::Clock::Timeout val);
 
     // Thread Methods
-    ThreadMode GetThreadMode();
-    CHIP_ERROR SetThreadMode(ThreadMode val);
     bool IsThreadEnabled();
-    bool IsThreadApplicationControlled();
     ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
     bool IsThreadAttached();
@@ -417,24 +406,9 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWiFiStatsCounters();
 }
 
-inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()
-{
-    return static_cast<ImplClass *>(this)->_GetThreadMode();
-}
-
-inline CHIP_ERROR ConnectivityManager::SetThreadMode(ThreadMode val)
-{
-    return static_cast<ImplClass *>(this)->_SetThreadMode(val);
-}
-
 inline bool ConnectivityManager::IsThreadEnabled()
 {
     return static_cast<ImplClass *>(this)->_IsThreadEnabled();
-}
-
-inline bool ConnectivityManager::IsThreadApplicationControlled()
-{
-    return static_cast<ImplClass *>(this)->_IsThreadApplicationControlled();
 }
 
 inline ConnectivityManager::ThreadDeviceType ConnectivityManager::GetThreadDeviceType()
