@@ -91,15 +91,15 @@ struct ChipDevicePlatformEvent
         } BLEIndicationReceived;
         struct
         {
-            bool mIsSuccess;
+            CHIP_ERROR mError;
         } BLEPeripheralRegisterAppComplete;
         struct
         {
-            bool mIsSuccess;
+            CHIP_ERROR mError;
         } BLEPeripheralAdvStartComplete;
         struct
         {
-            bool mIsSuccess;
+            CHIP_ERROR mError;
         } BLEPeripheralAdvStopComplete;
     };
 };

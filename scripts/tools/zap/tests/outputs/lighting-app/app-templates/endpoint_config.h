@@ -1210,5 +1210,5 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 // Array of parent endpoints for each endpoint
 #define FIXED_PARENT_ENDPOINTS                                                                                                     \
     {                                                                                                                              \
-        0, 0                                                                                                                       \
+        kInvalidEndpointId, kInvalidEndpointId                                                                                     \
     }

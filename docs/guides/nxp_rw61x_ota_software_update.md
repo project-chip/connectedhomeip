@@ -87,7 +87,8 @@ J-Link > erase 0x8000000, 0x88a0000
 ```
 
 -   Using MCUXPresso, import the `mcuboot_opensource` demo example from the SDK
-    previously downloaded.
+    previously downloaded. The example can be found under the `ota_examples`
+    folder.
     ![mcuboot_demo](../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_demo.PNG)
 -   Before building the demo example, it should be specified that the
     application to be run by the bootloader is monolithic. As a result, only one
@@ -100,7 +101,20 @@ Right click on the Project -> Properties -> C/C++ Build -> Settings -> Tool Sett
 
 ![rw610_mcuboot_monolithic](../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_monolithic_app.PNG)
 
--   Build the demo example project and program it to the target board.
+-   Build the demo example project.
+
+```
+Right click on the Project -> Build Project
+```
+
+-   Program the demo example to the target board.
+
+```
+Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select elf file
+```
+
+Note : The mcuboot binary is loaded in flash at address 0x8000000.
+
 -   To run the flashed demo, either press the reset button of the device or use
     the debugger IDE of MCUXpresso. If it runs successfully, the following logs
     will be displayed on the terminal :
@@ -161,14 +175,14 @@ user@ubuntu: python3 imgtool.py sign --key ~/Desktop/SDK_RW612/boards/rdrw612bga
 
 Notes :
 
--   If internal SDK is used instead, the key can be found in :
-    "`~/Desktop/SDK_RW612/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem`".
--   The arguments `slot-size` and `max-sectors` should be adjusted to the size
-    of the partitions reserved for the primary and the secondary applications.
-    (By default the size considered is 4.4 MB)
+-   The arguments `slot-size` and `max-sectors` are aligned with the size of the
+    partitions reserved for the primary and the secondary applications. (By
+    default the size considered is 4.4 MB for each application). If the size of
+    these partitions are modified, the `slot-size` and `max-sectors` should be
+    adjusted accordingly.
 -   In this example, the image is signed with the private key provided by the
     SDK as an example
-    (`/path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem`),
+    (`SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-priv.pem`),
     MCUBoot is built with its corresponding public key which would be used to
     verify the integrity of the image. It is possible to generate a new pair of
     keys using the following commands. This procedure should be done prior to
@@ -187,7 +201,7 @@ user@ubuntu: python3 imgtool.py getpub -k priv_key.pem
 ```
 
 -   The extracted public key can then be copied to the
-    `/path_to_sdk/middleware/mcuboot_opensource/boot/nxp_mcux_sdk/keys/sign-rsa2048-pub.c`,
+    `SDK_RW612/boards/rdrw612bga/ota_examples/mcuboot_opensource/keys/sign-rsa2048-pub.c`,
     given as a value to the rsa_pub_key[] array.
 
 The resulting output is the signed binary of the application version "1.0".

@@ -77,7 +77,7 @@ public:
     BluezAdapter1 * GetAdapter() const { return mAdapter.get(); }
 
     CHIP_ERROR RegisterGattApplication();
-    GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mpRoot; }
+    GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
@@ -126,16 +126,18 @@ private:
     char * mpServicePath = nullptr;
 
     // Objects (interfaces) subscribed to by this service
-    GDBusObjectManager * mpObjMgr = nullptr;
+    GAutoPtr<GDBusObjectManager> mObjMgr;
     GAutoPtr<BluezAdapter1> mAdapter;
 
     // Objects (interfaces) published by this service
-    GDBusObjectManagerServer * mpRoot = nullptr;
-    BluezGattService1 * mpService     = nullptr;
-    BluezGattCharacteristic1 * mpC1   = nullptr;
-    BluezGattCharacteristic1 * mpC2   = nullptr;
+    GAutoPtr<GDBusObjectManagerServer> mRoot;
+    GAutoPtr<BluezGattService1> mService;
+    GAutoPtr<BluezGattCharacteristic1> mC1;
+    GAutoPtr<BluezGattCharacteristic1> mC2;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     // additional data characteristics
-    BluezGattCharacteristic1 * mpC3 = nullptr;
+    GAutoPtr<BluezGattCharacteristic1> mC3;
+#endif
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
     GAutoPtr<GCancellable> mConnectCancellable;

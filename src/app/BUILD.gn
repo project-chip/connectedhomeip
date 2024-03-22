@@ -189,6 +189,13 @@ static_library("interaction-model") {
     "reporting/ReportSchedulerImpl.h",
     "reporting/SynchronizedReportSchedulerImpl.cpp",
     "reporting/SynchronizedReportSchedulerImpl.h",
+
+    # TODO: reporting header is part of interaction-model, however actual implementation depends
+    #       on generated code as subscriptions depend on attribute data versioning to determine
+    #       when "data changed" reports should be sent.
+    #
+    #       This breaks having `.h` and `.cpp` based off the same compilation unit and
+    #       should ideally be cleaned up.
     "reporting/reporting.h",
   ]
 
@@ -202,6 +209,8 @@ static_library("interaction-model") {
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:observer",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:static-support",
@@ -310,6 +319,7 @@ static_library("app") {
     ":interaction-model",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",

@@ -47,6 +47,18 @@ CHIP_ERROR AdapterIterator::Initialize()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AdapterIterator::Shutdown()
+{
+    // Release resources on the glib thread to synchronize with potential signal handlers
+    // attached to the manager client object that may run on the glib thread.
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](AdapterIterator * self) {
+            self->mManager.reset();
+            return CHIP_NO_ERROR;
+        },
+        this);
+}
+
 bool AdapterIterator::Advance()
 {
     for (; mIterator != BluezObjectList::end(); ++mIterator)

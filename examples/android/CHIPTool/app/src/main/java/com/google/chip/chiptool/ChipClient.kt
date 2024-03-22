@@ -22,6 +22,8 @@ import android.util.Log
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ControllerParams
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
+import chip.devicecontroller.ICDCheckInDelegate
+import chip.devicecontroller.ICDClientInfo
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
 import chip.platform.ChipMdnsCallbackImpl
@@ -59,6 +61,23 @@ object ChipClient {
       // It will replace the default attestation trust store.
       chipDeviceController.setAttestationTrustStoreDelegate(
         ExampleAttestationTrustStoreDelegate(chipDeviceController)
+      )
+
+      chipDeviceController.setICDCheckInDelegate(
+        object : ICDCheckInDelegate {
+          override fun onCheckInComplete(info: ICDClientInfo) {
+            Log.d(TAG, "onCheckInComplete : $info")
+          }
+
+          override fun onKeyRefreshNeeded(info: ICDClientInfo): ByteArray? {
+            Log.d(TAG, "onKeyRefreshNeeded : $info")
+            return null
+          }
+
+          override fun onKeyRefreshDone(errorCode: Long) {
+            Log.d(TAG, "onKeyRefreshDone : $errorCode")
+          }
+        }
       )
     }
 

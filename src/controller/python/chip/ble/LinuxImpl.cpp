@@ -111,11 +111,9 @@ public:
         {
             mCompleteCallback(mContext);
         }
-
-        delete this;
     }
 
-    virtual void OnScanError(CHIP_ERROR error) override
+    void OnScanError(CHIP_ERROR error) override
     {
         if (mErrorCallback)
         {
@@ -133,10 +131,10 @@ private:
 
 } // namespace
 
-extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeoutMs,
-                                            ScannerDelegateImpl::DeviceScannedCallback scanCallback,
-                                            ScannerDelegateImpl::ScanCompleteCallback completeCallback,
-                                            ScannerDelegateImpl::ScanErrorCallback errorCallback)
+extern "C" void * pychip_ble_scanner_start(PyObject * context, void * adapter, uint32_t timeoutMs,
+                                           ScannerDelegateImpl::DeviceScannedCallback scanCallback,
+                                           ScannerDelegateImpl::ScanCompleteCallback completeCallback,
+                                           ScannerDelegateImpl::ScanErrorCallback errorCallback)
 {
     std::unique_ptr<ScannerDelegateImpl> delegate =
         std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback, errorCallback);
@@ -150,4 +148,10 @@ extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, 
     VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr);
 
     return delegate.release();
+}
+
+extern "C" void pychip_ble_scanner_delete(void * scanner)
+{
+    chip::DeviceLayer::StackLock lock;
+    delete static_cast<ScannerDelegateImpl *>(scanner);
 }

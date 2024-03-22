@@ -232,13 +232,9 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
         }
     }
 
-    [_metricsDataCollection setValue:data forKey:metricsKey];
-
-    // If the event is a begin or end event, implicitly emit a corresponding instant event
-    if (event.type() == MetricEvent::Type::kBeginEvent || event.type() == MetricEvent::Type::kEndEvent) {
-        MetricEvent instantEvent(MetricEvent::Type::kInstantEvent, event.key());
-        data = [[MTRMetricData alloc] initWithMetricEvent:instantEvent];
-        metricsKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetric(instantEvent)];
+    // If this is a Begin event, capture only the first instance of it to account for the largest duration
+    // spent on the event. For the remaining events, capture the the most recent event
+    if (event.type() != MetricEvent::Type::kBeginEvent || ![_metricsDataCollection valueForKey:metricsKey]) {
         [_metricsDataCollection setValue:data forKey:metricsKey];
     }
 }
