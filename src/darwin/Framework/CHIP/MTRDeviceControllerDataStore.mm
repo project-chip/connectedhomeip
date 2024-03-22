@@ -149,7 +149,7 @@ s    });
     } else {
         _nodesWithResumptionInfo = [[NSMutableArray alloc] init];
     }
-    
+
     [resumptionNodeList autorelease];
     return self;
 }
