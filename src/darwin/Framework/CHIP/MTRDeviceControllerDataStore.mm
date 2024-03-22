@@ -151,7 +151,7 @@ static bool IsValidCATNumber(id _Nullable value)
     } else {
         _nodesWithResumptionInfo = [[NSMutableArray alloc] init];
     }
-    
+
     return self;
 }
 
