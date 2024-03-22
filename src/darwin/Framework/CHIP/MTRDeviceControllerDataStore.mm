@@ -126,10 +126,10 @@ static bool IsValidCATNumber(id _Nullable value)
     __block id resumptionNodeList;
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
-            resumptionNodeList = [[_storageDelegate controller:_controller
-                                                   valueForKey:sResumptionNodeListKey
-                                                 securityLevel:MTRStorageSecurityLevelSecure
-                                                   sharingType:MTRStorageSharingTypeNotShared] retain];
+            resumptionNodeList = [_storageDelegate controller:_controller
+                                                  valueForKey:sResumptionNodeListKey
+                                                securityLevel:MTRStorageSecurityLevelSecure
+                                                  sharingType:MTRStorageSharingTypeNotShared];
         }
         resumptionNodeList = [_storageDelegate controller:_controller
                                               valueForKey:sResumptionNodeListKey
@@ -241,10 +241,10 @@ static bool IsValidCATNumber(id _Nullable value)
     __block id data;
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
-            data = [[_storageDelegate controller:_controller
-                                     valueForKey:sLastLocallyUsedNOCKey
-                                   securityLevel:MTRStorageSecurityLevelSecure
-                                     sharingType:MTRStorageSharingTypeNotShared] retain];
+            data = [_storageDelegate controller:_controller
+                                    valueForKey:sLastLocallyUsedNOCKey
+                                  securityLevel:MTRStorageSecurityLevelSecure
+                                    sharingType:MTRStorageSharingTypeNotShared];
         }
     });
 
@@ -269,10 +269,10 @@ static bool IsValidCATNumber(id _Nullable value)
     __block id resumptionInfo;
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
-            resumptionInfo = [[_storageDelegate controller:_controller
-                                               valueForKey:key
-                                             securityLevel:MTRStorageSecurityLevelSecure
-                                               sharingType:MTRStorageSharingTypeNotShared] retain];
+            resumptionInfo = [_storageDelegate controller:_controller
+                                              valueForKey:key
+                                            securityLevel:MTRStorageSecurityLevelSecure
+                                              sharingType:MTRStorageSharingTypeNotShared];
         }
     });
 
@@ -316,10 +316,10 @@ static bool IsValidCATNumber(id _Nullable value)
 {
     id data;
     @autoreleasepool {
-        data = [[_storageDelegate controller:_controller
-                                 valueForKey:key
-                               securityLevel:MTRStorageSecurityLevelSecure
-                                 sharingType:MTRStorageSharingTypeNotShared] retain];
+        data = [_storageDelegate controller:_controller
+                                valueForKey:key
+                              securityLevel:MTRStorageSecurityLevelSecure
+                                sharingType:MTRStorageSharingTypeNotShared];
     }
     if (data == nil) {
         return nil;
