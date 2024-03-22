@@ -29,37 +29,6 @@ config:
         defaultValue: "hex:1111111122222222"
 
 tests:
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/30196
-    - label: "Precondition: Commission TH and DUT on Thread network "
-      verification: |
-          ./chip-tool pairing ble-thread 0x12344321 <operationalDataset> <setup-pin-code> <discriminator>
-
-          [1698660637.937566][6429:6431] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-          [1698660637.937644][6429:6431] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1698660637.937705][6429:6431] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          [1698660637.937750][6429:6431] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1698660637.937812][6429:6431] CHIP:CTL: Performing next commissioning step 'Cleanup'
-          [1698660637.937863][6429:6431] CHIP:DIS: Closing all BLE connections
-          [1698660637.937911][6429:6431] CHIP:IN: Clearing BLE pending packets.
-          [1698660637.938582][6429:6431] CHIP:BLE: Auto-closing end point's BLE connection.
-          [1698660637.938645][6429:6431] CHIP:DL: Closing BLE GATT connection (con 0xffff9c034bb0)
-          [1698660637.938805][6429:6430] CHIP:DL: BluezDisconnect peer=F7:D4:24:D2:4A:1F
-          [1698660638.365208][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: MarkForEviction Type:1 LSID:62220
-          [1698660638.365311][6429:6431] CHIP:SC: SecureSession[0xffff9400f900, LSID:62220]: State change 'kActive' --> 'kPendingEviction'
-          [1698660638.365440][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: Released - Type:1 LSID:62220
-          [1698660638.365529][6429:6431] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
-          [1698660638.365598][6429:6431] CHIP:TOO: Device commissioning completed with success
-          [1698660638.365873][6429:6431] CHIP:DMG: ICR moving to [AwaitingDe]
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
-
     - label:
           "Step 1: TH sends ScanNetworks command to the DUT with the SSID field
           omitted and the Breadcrumb field set to 1"
