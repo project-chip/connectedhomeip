@@ -113,9 +113,9 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     mReady = false;
     Platform::CopyString(mCurrentInstance, state.GetInstanceName());
     mPendingConsent = true;
-    char rotatingIdString[RotatingDeviceId::kHexMaxLength];
+    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
     Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingIdString,
-                                        RotatingDeviceId::kHexMaxLength);
+                                        sizeof(rotatingIdString));
 
     ChipLogDetail(Controller,
                   "------PROMPT USER: %s is requesting permission to cast to this TV, approve? [" ChipLogFormatMEI
@@ -182,10 +182,10 @@ void CommissionerDiscoveryController::InternalOk()
         return;
     }
 
-    char rotatingIdString[RotatingDeviceId::kHexMaxLength] = "";
+    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
     Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
-                                        RotatingDeviceId::kHexMaxLength);
-    CharSpan rotatingIdSpan = CharSpan(rotatingIdString, RotatingDeviceId::kHexMaxLength);
+                                        sizeof(rotatingIdString));
+    CharSpan rotatingIdSpan = CharSpan(rotatingIdString, sizeof(rotatingIdString));
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
     if (targetAppCount > 0)
@@ -360,10 +360,10 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         //    - if CommissionerPasscode, then call new UX method to show passcode, send CDC
         if (passcode == 0 && client->GetCommissionerPasscode() && client->GetCdPort() != 0)
         {
-            char rotatingIdString[RotatingDeviceId::kHexMaxLength] = "";
+            char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
             Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
-                                                RotatingDeviceId::kHexMaxLength);
-            CharSpan rotatingIdSpan = CharSpan(rotatingIdString, RotatingDeviceId::kHexMaxLength);
+                                                sizeof(rotatingIdString));
+            CharSpan rotatingIdSpan = CharSpan(rotatingIdString, sizeof(rotatingIdString));
 
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
