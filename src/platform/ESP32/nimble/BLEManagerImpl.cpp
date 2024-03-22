@@ -1021,6 +1021,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     {
         deviceIdInfo.SetVendorId(0);
         deviceIdInfo.SetProductId(0);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+        deviceIdInfo.SetAdditionalDataFlag(false);
+#endif
         deviceIdInfo.SetExtendedAnnouncementFlag(true);
     }
 #endif
