@@ -131,7 +131,7 @@ static bool IsValidCATNumber(id _Nullable value)
                                                  securityLevel:MTRStorageSecurityLevelSecure
                                                    sharingType:MTRStorageSharingTypeNotShared] retain];
         }
-s    });
+s });
     if (resumptionNodeList != nil) {
         if (![resumptionNodeList isKindOfClass:[NSArray class]]) {
             MTR_LOG_ERROR("List of CASE resumption node IDs is not an array");
