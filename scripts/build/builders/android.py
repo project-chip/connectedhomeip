@@ -358,6 +358,7 @@ class AndroidBuilder(Builder):
             gn_args["target_cpu"] = self.board.TargetCpuName()
             gn_args["android_ndk_root"] = os.environ["ANDROID_NDK_HOME"]
             gn_args["android_sdk_root"] = os.environ["ANDROID_HOME"]
+            gn_args["chip_build_test_static_libraries"] = False
 
             if self.options.pw_command_launcher:
                 gn_args["pw_command_launcher"] = self.options.pw_command_launcher
