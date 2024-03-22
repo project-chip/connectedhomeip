@@ -427,6 +427,38 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
     });
 }
 
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    MTR_LOG_DEBUG("Downloading log ...");
+
+    __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
+        if (error != nil) {
+            completion(nil, error);
+            return;
+        }
+
+        [handle.proxy downloadLogWithController:self.controllerID
+                                         nodeId:self.nodeID
+                                           type:type
+                                        timeout:timeout
+                                     completion:^(NSString * _Nullable url, NSError * _Nullable error) {
+                                         dispatch_async(queue, ^{
+                                             MTR_LOG_DEBUG("Download log");
+                                             completion([NSURL URLWithString:url], error);
+                                             // The following captures the proxy handle in the closure so that the
+                                             // handle won't be released prior to block call.
+                                             __auto_type handleRetainer = handle;
+                                             (void) handleRetainer;
+                                         });
+                                     }];
+    };
+
+    [self fetchProxyHandleWithQueue:queue completion:workBlock];
+}
+
 - (void)fetchProxyHandleWithQueue:(dispatch_queue_t)queue completion:(MTRFetchProxyHandleCompletion)completion
 {
     if (self.controllerID != nil) {

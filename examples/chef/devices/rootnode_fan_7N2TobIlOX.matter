@@ -1638,22 +1638,26 @@ endpoint 1 {
   }
 
   server cluster FanControl {
-    ram      attribute fanMode default = 0;
+    persist  attribute fanMode default = 0;
     ram      attribute fanModeSequence default = 2;
-    ram      attribute percentSetting default = 0;
-    ram      attribute percentCurrent default = 0;
-    ram      attribute speedMax default = 1;
-    ram      attribute speedSetting default = 0;
-    ram      attribute speedCurrent default = 0;
-    ram      attribute rockSupport default = 0x00;
-    ram      attribute rockSetting default = 0x00;
-    ram      attribute windSupport default = 0x00;
-    ram      attribute windSetting default = 0x00;
+    persist  attribute percentSetting default = 0x00;
+    ram      attribute percentCurrent default = 0x00;
+    ram      attribute speedMax default = 100;
+    persist  attribute speedSetting default = 0x00;
+    persist  attribute speedCurrent default = 0;
+    ram      attribute rockSupport default = 0x03;
+    persist  attribute rockSetting default = 0x00;
+    ram      attribute windSupport default = 0x03;
+    persist  attribute windSetting default = 0x00;
+    persist  attribute airflowDirection default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x3F;
     ram      attribute clusterRevision default = 1;
+
+    handle command Step;
   }
 }
 

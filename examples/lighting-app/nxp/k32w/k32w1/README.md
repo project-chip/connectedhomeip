@@ -22,18 +22,17 @@ into an existing Matter network and can be controlled by this network.
 -   [Device UI](#device-ui)
 -   [Building](#building)
     -   [SMU2](#smu2-memory)
+    -   [LED PWM](#led-pwm)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing](#flashing)
     -   [Flashing the NBU image](#flashing-the-nbu-image)
     -   [Flashing the host image](#flashing-the-host-image)
 -   [Debugging](#debugging)
 -   [OTA](#ota)
-
     -   [Convert srec into sb3 file](#convert-srec-into-sb3-file)
     -   [Convert sb3 into ota file](#convert-sb3-into-ota-file)
     -   [Running OTA](#running-ota)
     -   [Known issues](#known-issues)
-
 -   [Running RPC console](#running-rpc-console)
 
 </hr>
@@ -136,8 +135,9 @@ In order to build the Matter example, we recommend using a Linux distribution
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w1
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w1$ gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=true chip_crypto=\"platform\""
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w1$ gn gen out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w1$ ninja -C out/debug
 ```
 
@@ -154,10 +154,10 @@ memory. When compiling with OpenThread FTD support (`chip_openthread_ftd=true`)
 and with `use_smu2_static=true`, the following components are placed in `SMU2`
 memory:
 
--   `gImageProcessor` from `OTAImageProcessorImpl.cpp`.
--   `gApplicationProcessor` from `OTAHooks.cpp`.
--   `Server::sServer` from `Server.cpp`.
--   `ThreadStackManagerImpl::sInstance` from `ThreadStackManagerImpl.cpp`.
+-   `gImageProcessor` from OTAImageProcessorImpl.cpp.
+-   `gApplicationProcessor` from OTAHooks.cpp.
+-   `Server::sServer` from Server.cpp.
+-   `ThreadStackManagerImpl::sInstance` from ThreadStackManagerImpl.cpp.
 
 These instances and global variables are placed in `SMU2` memory through name
 matching in the application linker script. They should not be changed or, if
@@ -170,6 +170,17 @@ successful commissioning process until a factory reset is initiated. This way,
 the OpenThread buffers will be dynamically allocated instead of statically,
 freeing some `SRAM`. To enable this feature compile with OpenThread FTD support
 (`chip_openthread_ftd=true`) and with `use_smu2_dynamic=true`.
+
+### LED PWM
+
+In the default configuration, the onboard RGB LED pins are configured as GPIO
+pins. In order to enable the dimming feature, the pins need to be configured in
+PWM mode and synced with channels of the `TPM` (Timer PWM Module). To enable
+this feature, compile the application with: `chip_config_dimmable_led=true`
+
+If the feature is enabled, the LED brightness can be controlled using **Level
+control** cluster
+[commands](../../../../../docs/guides/chip_tool_guide.md#step-7-control-application-data-model-clusters).
 
 ## Manufacturing data
 
@@ -195,7 +206,7 @@ path -
 [K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK)
 can be used for updating the `NBU/radio` core:
 
--   Section 2.4 – Get Software – install `SPSDK` (Secure Provisioning Command
+-   Section 2.5 – Get Software – install `SPSDK` (Secure Provisioning Command
     Line Tool)
 -   Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding
     .sb3 file found in the SDK package at path
@@ -298,7 +309,7 @@ In `OTAP` application
     the image only for the CM33 core
 -   keep other settings at default values
 
-### Convert sb3 into ota file
+### Convert `sb3` into `ota` file
 
 In order to build an OTA image, use NXP wrapper over the standard tool
 `src/app/ota_image_tool.py`:

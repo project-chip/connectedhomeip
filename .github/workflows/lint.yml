@@ -29,7 +29,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:35
+            image: ghcr.io/project-chip/chip-build:41
 
         steps:
             - name: Checkout
@@ -97,14 +97,13 @@ jobs:
                      --known-failure app/CommandSenderLegacyCallback.h \
                      --known-failure app/data-model/ListLargeSystemExtensions.h \
                      --known-failure app/ReadHandler.h \
+                     --known-failure app/reporting/reporting.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
                      --known-failure app/TestEventTriggerDelegate.h \
                      --known-failure app/util/af.h \
-                     --known-failure app/util/af-types.h \
                      --known-failure app/util/attribute-storage.cpp \
                      --known-failure app/util/attribute-storage.h \
-                     --known-failure app/util/attribute-storage-null-handling.h \
                      --known-failure app/util/attribute-table.cpp \
                      --known-failure app/util/attribute-table.h \
                      --known-failure app/util/binding-table.cpp \
@@ -113,12 +112,11 @@ jobs:
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \
                      --known-failure app/util/ember-compatibility-functions.cpp \
+                     --known-failure app/util/ember-compatibility-functions.h \
                      --known-failure app/util/endpoint-config-api.h \
                      --known-failure app/util/generic-callbacks.h \
                      --known-failure app/util/generic-callback-stubs.cpp \
                      --known-failure app/util/im-client-callbacks.h \
-                     --known-failure app/util/MatterCallbacks.h \
-                     --known-failure app/util/odd-sized-integers.h \
                      --known-failure app/util/util.cpp \
                      --known-failure app/util/util.h \
                      --known-failure app/WriteHandler.h \
@@ -267,12 +265,11 @@ jobs:
               run: |
                   git grep -I -n 'emberAfWriteAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/af.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)examples/common/pigweed/rpc_services/Attributes.h' ':(exclude)src/app/util/attribute-table.h' ':(exclude)src/app/util/ember-compatibility-functions.cpp' && exit 1 || exit 0
 
-            # Run python Linter (flake8) and verify python files
-            # ignore some style errors, restyler should do that
-            - name: Check for errors using flake8 Python linter
+            # Run ruff python linter
+            - name: Check for errors using ruff Python linter
               if: always()
               run: |
-                  flake8 --extend-ignore=E501,W391
+                  ruff check
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,

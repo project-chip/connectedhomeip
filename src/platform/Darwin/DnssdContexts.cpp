@@ -30,12 +30,6 @@ namespace {
 
 constexpr uint8_t kDnssdKeyMaxSize          = 32;
 constexpr uint8_t kDnssdTxtRecordMaxEntries = 20;
-constexpr char kLocalDot[]                  = "local.";
-
-bool IsLocalDomain(const char * domain)
-{
-    return strcmp(kLocalDot, domain) == 0;
-}
 
 std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
 {
@@ -252,6 +246,7 @@ void MdnsContexts::Delete(GenericContext * context)
     {
         DNSServiceRefDeallocate(context->serviceRef);
     }
+
     chip::Platform::Delete(context);
 }
 
@@ -388,7 +383,6 @@ void BrowseContext::OnBrowseAdd(const char * name, const char * type, const char
     ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
-    VerifyOrReturn(IsLocalDomain(domain));
     auto service = GetService(name, type, protocol, interfaceId);
     services.push_back(service);
 }
@@ -399,7 +393,6 @@ void BrowseContext::OnBrowseRemove(const char * name, const char * type, const c
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
     VerifyOrReturn(name != nullptr);
-    VerifyOrReturn(IsLocalDomain(domain));
 
     services.erase(std::remove_if(services.begin(), services.end(),
                                   [name, type, interfaceId](const DnssdService & service) {
@@ -443,8 +436,6 @@ void BrowseWithDelegateContext::OnBrowseAdd(const char * name, const char * type
     ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
-    VerifyOrReturn(IsLocalDomain(domain));
-
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     auto service  = GetService(name, type, protocol, interfaceId);
     delegate->OnBrowseAdd(service);
@@ -456,7 +447,6 @@ void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * t
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
     VerifyOrReturn(name != nullptr);
-    VerifyOrReturn(IsLocalDomain(domain));
 
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     auto service  = GetService(name, type, protocol, interfaceId);
@@ -468,27 +458,35 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
                                std::shared_ptr<uint32_t> && consumerCounterToUse) :
     browseThatCausedResolve(browseCausingResolve)
 {
-    type            = ContextType::Resolve;
-    context         = cbContext;
-    callback        = cb;
-    protocol        = GetProtocol(cbAddressType);
-    instanceName    = instanceNameToResolve;
-    consumerCounter = std::move(consumerCounterToUse);
+    type               = ContextType::Resolve;
+    context            = cbContext;
+    callback           = cb;
+    protocol           = GetProtocol(cbAddressType);
+    instanceName       = instanceNameToResolve;
+    consumerCounter    = std::move(consumerCounterToUse);
+    hasSrpTimerStarted = false;
 }
 
 ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
                                const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
     browseThatCausedResolve(nullptr)
 {
-    type            = ContextType::Resolve;
-    context         = delegate;
-    callback        = nullptr;
-    protocol        = GetProtocol(cbAddressType);
-    instanceName    = instanceNameToResolve;
-    consumerCounter = std::move(consumerCounterToUse);
+    type               = ContextType::Resolve;
+    context            = delegate;
+    callback           = nullptr;
+    protocol           = GetProtocol(cbAddressType);
+    instanceName       = instanceNameToResolve;
+    consumerCounter    = std::move(consumerCounterToUse);
+    hasSrpTimerStarted = false;
 }
 
-ResolveContext::~ResolveContext() {}
+ResolveContext::~ResolveContext()
+{
+    if (this->hasSrpTimerStarted)
+    {
+        CancelSrpTimer(this);
+    }
+}
 
 void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
@@ -536,7 +534,16 @@ void ResolveContext::DispatchSuccess()
 
     for (auto interfaceIndex : priorityInterfaceIndices)
     {
-        if (TryReportingResultsForInterfaceIndex(static_cast<uint32_t>(interfaceIndex)))
+        if (TryReportingResultsForInterfaceIndex(interfaceIndex))
+        {
+            if (needDelete)
+            {
+                MdnsContexts::GetInstance().Delete(this);
+            }
+            return;
+        }
+
+        if (TryReportingResultsForInterfaceIndex(interfaceIndex))
         {
             if (needDelete)
             {
@@ -548,7 +555,8 @@ void ResolveContext::DispatchSuccess()
 
     for (auto & interface : interfaces)
     {
-        if (TryReportingResultsForInterfaceIndex(interface.first))
+        auto interfaceId = interface.first.first;
+        if (TryReportingResultsForInterfaceIndex(interfaceId))
         {
             break;
         }
@@ -568,35 +576,44 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
         return false;
     }
 
-    auto & interface = interfaces[interfaceIndex];
-    auto & ips       = interface.addresses;
-
-    // Some interface may not have any ips, just ignore them.
-    if (ips.size() == 0)
+    std::map<std::pair<uint32_t, std::string>, InterfaceInfo>::iterator iter = interfaces.begin();
+    while (iter != interfaces.end())
     {
-        return false;
-    }
+        std::pair<uint32_t, std::string> key = iter->first;
+        if (key.first == interfaceIndex)
+        {
+            auto & interface = interfaces[key];
+            auto & ips       = interface.addresses;
 
-    ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interfaceIndex);
+            // Some interface may not have any ips, just ignore them.
+            if (ips.size() == 0)
+            {
+                return false;
+            }
 
-    auto & service = interface.service;
-    auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
-    if (nullptr == callback)
-    {
-        auto delegate = static_cast<CommissioningResolveDelegate *>(context);
-        DiscoveredNodeData nodeData;
-        service.ToDiscoveredNodeData(addresses, nodeData);
-        delegate->OnNodeDiscovered(nodeData);
-    }
-    else
-    {
-        callback(context, &service, addresses, CHIP_NO_ERROR);
-    }
+            ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interfaceIndex);
 
-    return true;
+            auto & service = interface.service;
+            auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
+            if (nullptr == callback)
+            {
+                auto delegate = static_cast<CommissioningResolveDelegate *>(context);
+                DiscoveredNodeData nodeData;
+                service.ToDiscoveredNodeData(addresses, nodeData);
+                delegate->OnNodeDiscovered(nodeData);
+            }
+            else
+            {
+                callback(context, &service, addresses, CHIP_NO_ERROR);
+            }
+
+            return true;
+        }
+    }
+    return false;
 }
 
-CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)
+CHIP_ERROR ResolveContext::OnNewAddress(const std::pair<uint32_t, std::string> & interfaceKey, const struct sockaddr * address)
 {
     // If we don't have any information about this interfaceId, just ignore the
     // address, since it won't be usable anyway without things like the port.
@@ -604,7 +621,9 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
     // on the system, because the hostnames we are looking up all end in
     // ".local".  In other words, we can get regular DNS results in here, not
     // just DNS-SD ones.
-    if (interfaces.find(interfaceId) == interfaces.end())
+    auto interfaceId = interfaceKey.first;
+
+    if (interfaces.find(interfaceKey) == interfaces.end())
     {
         return CHIP_NO_ERROR;
     }
@@ -627,7 +646,7 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
         return CHIP_NO_ERROR;
     }
 
-    interfaces[interfaceId].addresses.push_back(ip);
+    interfaces[interfaceKey].addresses.push_back(ip);
 
     return CHIP_NO_ERROR;
 }
@@ -709,7 +728,15 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
-    interfaces.insert(std::make_pair(interfaceId, std::move(interface)));
+    std::string domainFromHostname = GetDomainFromHostName(hostnameWithDomain);
+    if (domainFromHostname.empty())
+    {
+        ChipLogError(Discovery, "Mdns: No domain set in hostname %s", hostnameWithDomain);
+        return;
+    }
+
+    std::pair<uint32_t, std::string> interfaceKey = std::make_pair(interfaceId, domainFromHostname);
+    interfaces.insert(std::make_pair(std::move(interfaceKey), std::move(interface)));
 }
 
 bool ResolveContext::HasInterface()

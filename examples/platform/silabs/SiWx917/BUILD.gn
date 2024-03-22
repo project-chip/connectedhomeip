@@ -219,8 +219,8 @@ source_set("siwx917-common") {
     "${silabs_plat_si91x_wifi_dir}/ethernetif.cpp",
     "${silabs_plat_si91x_wifi_dir}/lwip_netif.cpp",
     "${silabs_plat_si91x_wifi_dir}/wfx_notify.cpp",
-    "SiWx917/sl_wifi_if.c",
-    "SiWx917/wfx_rsi_host.c",
+    "SiWx917/sl_wifi_if.cpp",
+    "SiWx917/wfx_rsi_host.cpp",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {

@@ -37,13 +37,23 @@
 #define CHIP_PLAT_SAVE_NVM_DATA_ON_IDLE 1
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include "ot_platform_common.h"
+#define BUFFER_LOG_SIZE 256
+
+/*
+ * If the developer has specified a size for integer keys RAM buffer
+ * partition, use it. Othewise use the default.
+ */
+#ifndef CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT
+#define CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT (4 * 2048)
 #endif
 
-#define BUFFER_LOG_SIZE 256
-#define CHIP_CONFIG_RAM_BUFFER_KEY_INT_SIZE 4 * 2048
-#define CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE 4 * 5000
+/*
+ * If the developer has specified a size for string keys RAM buffer
+ * partition, use it. Othewise use the default.
+ */
+#ifndef CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING
+#define CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING (4 * 5000)
+#endif
 
 #ifndef NVM_ID_CHIP_CONFIG_DATA_KEY_INT
 #define NVM_ID_CHIP_CONFIG_DATA_KEY_INT 0xf104
@@ -74,21 +84,21 @@ typedef struct
 {
     uint16_t chipConfigRamBufferLen;
     uint16_t padding;
-    uint8_t chipConfigRamBuffer[CHIP_CONFIG_RAM_BUFFER_KEY_INT_SIZE];
+    uint8_t chipConfigRamBuffer[CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT];
 } ChipConfigRamStructKeyInt;
 
 typedef struct
 {
     uint16_t chipConfigRamBufferLen;
     uint16_t padding;
-    uint8_t chipConfigRamBuffer[CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE];
+    uint8_t chipConfigRamBuffer[CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING];
 } ChipConfigRamStructKeyString;
 
 /* File system containing only integer keys */
 static ChipConfigRamStructKeyInt chipConfigRamStructKeyInt;
 static ramBufferDescriptor ramDescrKeyInt = {
     .ramBufferLen    = &chipConfigRamStructKeyInt.chipConfigRamBufferLen,
-    .ramBufferMaxLen = CHIP_CONFIG_RAM_BUFFER_KEY_INT_SIZE,
+    .ramBufferMaxLen = CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT,
     .pRamBuffer      = &chipConfigRamStructKeyInt.chipConfigRamBuffer[0],
 };
 
@@ -96,7 +106,7 @@ static ramBufferDescriptor ramDescrKeyInt = {
 static ChipConfigRamStructKeyString chipConfigRamStructKeyString;
 static ramBufferDescriptor ramDescrKeyString = {
     .ramBufferLen    = &chipConfigRamStructKeyString.chipConfigRamBufferLen,
-    .ramBufferMaxLen = CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE,
+    .ramBufferMaxLen = CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING,
     .pRamBuffer      = &chipConfigRamStructKeyString.chipConfigRamBuffer[0],
 };
 
@@ -109,8 +119,8 @@ NVM_RegisterDataSet((void *) &chipConfigRamStructKeyString, 1, sizeof(chipConfig
                     NVM_ID_CHIP_CONFIG_DATA_KEY_STRING, gNVM_MirroredInRam_c);
 
 #elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_LITTLEFS)
-const char mt_key_int_file_name[]    = "mt_key_int";
-const char mt_key_str_file_name[]    = "mt_key_str";
+const char * mt_key_int_file_name    = "mt_key_int";
+const char * mt_key_str_file_name    = "mt_key_str";
 #if CHIP_PLAT_SAVE_NVM_DATA_ON_IDLE
 static bool mt_key_int_save_in_flash = false;
 static bool mt_key_str_save_in_flash = false;
@@ -140,7 +150,7 @@ int NXPConfig::SaveIntKeysToFS(void)
     err_len = ramStorageSavetoFlash(mt_key_int_file_name, &chipConfigRamStructKeyInt.chipConfigRamBuffer[0],
                                     chipConfigRamStructKeyInt.chipConfigRamBufferLen);
 
-    assert(err_len <= CHIP_CONFIG_RAM_BUFFER_KEY_INT_SIZE);
+    assert(err_len <= CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT);
     assert(err_len >= 0);
 #endif
 
@@ -156,7 +166,7 @@ int NXPConfig::SaveStringKeysToFS(void)
     int err_len;
 #if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_NVM_FWK)
     err_len = -1;
-    NvSaveOnIdle(&chipConfigRamStructKeyInt, false);
+    NvSaveOnIdle(&chipConfigRamStructKeyString, false);
 
 #elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_LITTLEFS)
     err_len                  = -2;
@@ -168,7 +178,7 @@ int NXPConfig::SaveStringKeysToFS(void)
     err_len = ramStorageSavetoFlash(mt_key_str_file_name, &chipConfigRamStructKeyString.chipConfigRamBuffer[0],
                                     chipConfigRamStructKeyString.chipConfigRamBufferLen);
 
-    assert(err_len <= CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE);
+    assert(err_len <= CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING);
     assert(err_len >= 0);
 #endif
 
@@ -207,14 +217,14 @@ CHIP_ERROR NXPConfig::Init()
 #elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_LITTLEFS)
         /* Try to load the ot dataset in RAM */
         err_len = ramStorageReadFromFlash(mt_key_int_file_name, &chipConfigRamStructKeyInt.chipConfigRamBuffer[0],
-                                          CHIP_CONFIG_RAM_BUFFER_KEY_INT_SIZE);
-        assert(err_len <= CHIP_CONFIG_RAM_BUFFER_KEY_INT_SIZE);
+                                          CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT);
+        assert(err_len <= CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT);
         assert(err_len >= 0);
         chipConfigRamStructKeyInt.chipConfigRamBufferLen = (uint16_t) err_len;
 
         err_len = ramStorageReadFromFlash(mt_key_str_file_name, &chipConfigRamStructKeyString.chipConfigRamBuffer[0],
-                                          CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE);
-        assert(err_len <= CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE);
+                                          CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING);
+        assert(err_len <= CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING);
         assert(err_len >= 0);
         chipConfigRamStructKeyString.chipConfigRamBufferLen = (uint16_t) err_len;
 
@@ -240,7 +250,9 @@ CHIP_ERROR NXPConfig::ReadConfigValue(Key key, bool & val)
     SuccessOrExit(err = MapRamStorageStatus(status));
     val = tempVal;
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValue bool = %u", val);
+#endif
 
 exit:
     return err;
@@ -258,7 +270,9 @@ CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint32_t & val)
     SuccessOrExit(err = MapRamStorageStatus(status));
     val = tempVal;
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValue uint32_t = %lu", val);
+#endif
 
 exit:
     return err;
@@ -276,7 +290,9 @@ CHIP_ERROR NXPConfig::ReadConfigValue(Key key, uint64_t & val)
     SuccessOrExit(err = MapRamStorageStatus(status));
     val = tempVal;
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValue uint64_t = " ChipLogFormatX64, ChipLogValueX64(val));
+#endif
 
 exit:
     return err;
@@ -292,7 +308,9 @@ CHIP_ERROR NXPConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, si
     status = ramStorageGet(&ramDescrKeyInt, (uint8_t *) &key, sizeof(Key), 0, (uint8_t *) buf, &sizeToRead);
     SuccessOrExit(err = MapRamStorageStatus(status));
     outLen = sizeToRead;
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValueStr lenRead = %u", outLen);
+#endif
 
 exit:
     return err;
@@ -313,7 +331,9 @@ CHIP_ERROR NXPConfig::ReadConfigValueBin(const char * keyString, uint8_t * buf, 
     status = ramStorageGet(&ramDescrKeyString, (const uint8_t *) keyString, strlen(keyString), 0, (uint8_t *) buf, &sizeToRead);
     SuccessOrExit(err = MapRamStorageStatus(status));
     outLen = sizeToRead;
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "ReadConfigValueStr lenRead = %u", outLen);
+#endif
 
 exit:
     return err;
@@ -339,7 +359,9 @@ CHIP_ERROR NXPConfig::WriteConfigValue(Key key, bool val)
     (void) err_len;
     DBG_PRINTF("WriteConfigValue: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
@@ -359,7 +381,9 @@ CHIP_ERROR NXPConfig::WriteConfigValue(Key key, uint32_t val)
     (void) err_len;
     DBG_PRINTF("WriteConfigValue: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
@@ -379,7 +403,9 @@ CHIP_ERROR NXPConfig::WriteConfigValue(Key key, uint64_t val)
     (void) err_len;
     DBG_PRINTF("WriteConfigValue64: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
@@ -404,7 +430,9 @@ CHIP_ERROR NXPConfig::WriteConfigValueStr(Key key, const char * str, size_t strL
     (void) err_len;
     DBG_PRINTF("WriteConfigValueStr: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
@@ -429,7 +457,9 @@ CHIP_ERROR NXPConfig::WriteConfigValueBin(const char * keyString, const uint8_t 
     (void) err_len;
     DBG_PRINTF("WriteConfigValueBin: MT write %d\r\n", err_len);
 
+#if (DEBUG_NVM > 0)
     ChipLogProgress(DeviceLayer, "WriteConfigValue done");
+#endif
 
 exit:
     return err;
@@ -499,11 +529,26 @@ CHIP_ERROR NXPConfig::FactoryResetConfig(void)
         ClearConfigValue(key);
     }
 
+    // Clear RebootCount, TotalOperationalHours, UpTime counters during factory reset
+    for (Key key = kMinConfigKey_ChipCounter; key <= (kMinConfigKey_ChipCounter + 3); key++)
+    {
+        ClearConfigValue(key);
+    }
+
     /* Reset the key string file system as it contains on data that needs to be erased when doing a factoryreset */
     FLib_MemSet((void *) &chipConfigRamStructKeyString, 0, sizeof(chipConfigRamStructKeyString));
 
+#if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_NVM_FWK)
+    /*
+     * Save to flash now. System is restarting and there is no more time to
+     * wait for the idle task to save the data.
+     */
+    NvSyncSave(&chipConfigRamStructKeyString, false);
+    NvSyncSave(&chipConfigRamStructKeyInt, false);
+#else
     SaveStringKeysToFS();
     SaveIntKeysToFS();
+#endif
     DBG_PRINTF("FactoryResetConfig done\r\n");
 
     return CHIP_NO_ERROR;
@@ -569,12 +614,14 @@ void NXPConfig::RunSystemIdleTask(void)
             err_len = ramStorageSavetoFlash(mt_key_int_file_name, &chipConfigRamStructKeyInt.chipConfigRamBuffer[0],
                                             chipConfigRamStructKeyInt.chipConfigRamBufferLen);
 
-            assert(err_len <= CHIP_CONFIG_RAM_BUFFER_KEY_INT_SIZE);
+            assert(err_len <= CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT);
             assert(err_len >= 0);
 
             INFO_PRINTF("int mt write %d bytes / %d \r\n", err_len, chipConfigRamStructKeyInt.chipConfigRamBufferLen);
 #if 0
-            int len = ramStorageReadFromFlash(mt_key_int_file_name, &chipConfigRamStructKeyInt.chipConfigRamBuffer[0], CHIP_CONFIG_RAM_BUFFER_KEY_INT_SIZE);
+            int len = ramStorageReadFromFlash(mt_key_int_file_name,
+                &chipConfigRamStructKeyInt.chipConfigRamBuffer[0],
+                CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_INT);
             INFO_PRINTF("mt read after write %d\r\n", len);
 #endif
         }
@@ -591,12 +638,14 @@ void NXPConfig::RunSystemIdleTask(void)
             err_len = ramStorageSavetoFlash(mt_key_str_file_name, &chipConfigRamStructKeyString.chipConfigRamBuffer[0],
                                             chipConfigRamStructKeyString.chipConfigRamBufferLen);
 
-            assert(err_len <= CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE);
+            assert(err_len <= CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING);
             assert(err_len >= 0);
 
             INFO_PRINTF("str mt write %d bytes / %d \r\n", err_len, chipConfigRamStructKeyString.chipConfigRamBufferLen);
 #if 0
-            int len = ramStorageReadFromFlash(mt_key_str_file_name, &chipConfigRamStructKeyString.chipConfigRamBuffer[0], CHIP_CONFIG_RAM_BUFFER_KEY_STRING_SIZE);
+            int len = ramStorageReadFromFlash(mt_key_str_file_name,
+                &chipConfigRamStructKeyString.chipConfigRamBuffer[0],
+                CONFIG_CHIP_NVM_RAMBUFFER_SIZE_KEY_STRING);
             INFO_PRINTF("mt read after write %d\r\n", len);
 #endif
         }
