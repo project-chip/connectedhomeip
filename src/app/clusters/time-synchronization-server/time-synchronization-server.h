@@ -61,12 +61,12 @@ enum class TimeState : uint8_t
  */
 enum class TimeSyncEventFlag : uint8_t
 {
-    kNone            = 0,
-    kDSTTableEmpty   = 1,
-    kDSTStatus       = 2,
-    kTimeZoneStatus  = 4,
-    kTimeFailure     = 8,
-    kMissingTTSource = 16,
+    kNone            = 0x0,
+    kDSTTableEmpty   = 0x1,
+    kDSTStatus       = 0x2,
+    kTimeZoneStatus  = 0x4,
+    kTimeFailure     = 0x8,
+    kMissingTTSource = 0x10,
 };
 
 void SetDefaultDelegate(Delegate * delegate);
@@ -109,7 +109,7 @@ public:
 
     TimeState UpdateTimeZoneState();
     TimeState UpdateDSTOffsetState();
-    TimeSyncEventFlag GetEventFlag(void);
+    BitMask<TimeSyncEventFlag> GetEventFlag(void);
     void ClearEventFlag(TimeSyncEventFlag flag);
 
     // Fabric Table delegate functions
@@ -123,6 +123,8 @@ public:
     // ReadClient::Callback functions
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
     void OnDone(ReadClient * apReadClient) override;
+
+    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
 #endif
 
     // Platform event handler functions
@@ -143,7 +145,7 @@ private:
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     static TimeSynchronizationServer sTimeSyncInstance;
-    TimeSyncEventFlag mEventFlag = TimeSyncEventFlag::kNone;
+    BitMask<TimeSyncEventFlag> mEventFlag;
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
@@ -166,7 +168,6 @@ private:
 
     // Called when the platform is set up - attempts to get time using the recommended source list in the spec.
     void AttemptToGetTime();
-    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
     // Attempts to get fallback NTP from the delegate (last available source)
     // If successful, the function will set mGranulatiry and the time source
     // If unsuccessful, it will emit a TimeFailure event.

@@ -214,6 +214,7 @@ static bool emitTimeFailureEvent(EndpointId ep)
     // TODO: re-schedule event for after min 1hr if no time is still available
     // https://github.com/project-chip/connectedhomeip/issues/27200
     ChipLogProgress(Zcl, "Emit TimeFailure event [ep=%d]", ep);
+    GetDelegate()->NotifyTimeFailure();
     return true;
 }
 
@@ -355,6 +356,7 @@ void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
             SetUTCTime(kRootEndpointId, mTimeReadInfo->utcTime.Value(), ourGranularity, TimeSourceEnum::kNodeTimeCluster);
         if (err == CHIP_NO_ERROR)
         {
+            mTimeReadInfo = nullptr;
             return;
         }
     }
@@ -503,6 +505,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(const DataModel::Null
     {
         AttemptToGetTime();
     }
+    GetDelegate()->TrustedTimeSourceAvailabilityChanged(!mTrustedTimeSource.IsNull(), mGranularity);
     return err;
 }
 
@@ -627,7 +630,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         }
         if (emit)
         {
-            mEventFlag = TimeSyncEventFlag::kTimeZoneStatus;
+            mEventFlag.Set(TimeSyncEventFlag::kTimeZoneStatus);
         }
     }
     return mTimeSyncDataProvider.StoreTimeZone(GetTimeZone());
@@ -848,7 +851,7 @@ TimeState TimeSynchronizationServer::UpdateTimeZoneState()
     }
     if (activeTzIndex != 0)
     {
-        auto newTimeZoneList   = tzList.SubSpan(activeTzIndex);
+        auto newTimeZoneList = tzList.SubSpan(activeTzIndex);
         VerifyOrReturnValue(mTimeSyncDataProvider.StoreTimeZone(newTimeZoneList) == CHIP_NO_ERROR, TimeState::kInvalid);
         VerifyOrReturnValue(LoadTimeZone() == CHIP_NO_ERROR, TimeState::kInvalid);
         return TimeState::kChanged;
@@ -905,7 +908,7 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
     }
     if (activeDstIndex > 0)
     {
-        auto newDstOffsetList   = dstList.SubSpan(activeDstIndex);
+        auto newDstOffsetList = dstList.SubSpan(activeDstIndex);
         VerifyOrReturnValue(mTimeSyncDataProvider.StoreDSTOffset(newDstOffsetList) == CHIP_NO_ERROR, TimeState::kInvalid);
         VerifyOrReturnValue(LoadDSTOffset() == CHIP_NO_ERROR, TimeState::kInvalid);
         return TimeState::kChanged;
@@ -913,15 +916,14 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
     return TimeState::kActive;
 }
 
-TimeSyncEventFlag TimeSynchronizationServer::GetEventFlag()
+BitMask<TimeSyncEventFlag> TimeSynchronizationServer::GetEventFlag()
 {
     return mEventFlag;
 }
 
 void TimeSynchronizationServer::ClearEventFlag(TimeSyncEventFlag flag)
 {
-    uint8_t eventFlag = to_underlying(mEventFlag) ^ to_underlying(flag);
-    mEventFlag        = static_cast<TimeSyncEventFlag>(eventFlag);
+    mEventFlag.Clear(flag);
 }
 
 void TimeSynchronizationServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
@@ -1121,8 +1123,6 @@ bool emberAfTimeSynchronizationClusterSetTrustedTimeSourceCallback(
         Structs::TrustedTimeSourceStruct::Type ts = { commandObj->GetAccessingFabricIndex(), timeSource.Value().nodeID,
                                                       timeSource.Value().endpoint };
         tts.SetNonNull(ts);
-        // TODO: schedule a utctime read from this time source and emit event only on failure to get time
-        emitTimeFailureEvent(commandPath.mEndpointId);
     }
     else
     {
@@ -1159,7 +1159,7 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
         return true;
     }
 
-    if (to_underlying(TimeSynchronizationServer::Instance().GetEventFlag()) & to_underlying(TimeSyncEventFlag::kTimeZoneStatus))
+    if (TimeSynchronizationServer::Instance().GetEventFlag().Has(TimeSyncEventFlag::kTimeZoneStatus))
     {
         TimeSynchronizationServer::Instance().ClearEventFlag(TimeSyncEventFlag::kTimeZoneStatus);
         emitTimeZoneStatusEvent(commandPath.mEndpointId);

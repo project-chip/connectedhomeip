@@ -37,6 +37,8 @@ public:
     CHIP_ERROR UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
                                           chip::Callback::Callback<OnFallbackNTPCompletion> * callback) override;
     void UTCTimeAvailabilityChanged(uint64_t time) override;
+    void TrustedTimeSourceAvailabilityChanged(bool available, GranularityEnum granularity) override;
+    void NotifyTimeFailure() override;
 };
 
 } // namespace TimeSynchronization

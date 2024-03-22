@@ -78,3 +78,13 @@ void DefaultTimeSyncDelegate::UTCTimeAvailabilityChanged(uint64_t time)
 {
     // placeholder implementation
 }
+
+void DefaultTimeSyncDelegate::TrustedTimeSourceAvailabilityChanged(bool available, GranularityEnum granularity)
+{
+    // placeholder implementation
+}
+
+void DefaultTimeSyncDelegate::NotifyTimeFailure()
+{
+    // placeholder implementation
+}
