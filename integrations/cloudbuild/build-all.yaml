@@ -6,7 +6,7 @@ steps:
           - "--init"
           - "--recursive"
       id: Submodules
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -21,7 +21,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -85,7 +85,7 @@ steps:
               --target k32w-shell
               build
               --create-archives /workspace/artifacts/
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:

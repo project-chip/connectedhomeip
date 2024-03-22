@@ -935,6 +935,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         if (attributesFromCache.count) {
             [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
         }
+        NSDictionary * clusterData = [_controllerDataStore getStoredClusterDataForNodeID:nodeID];
+        MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), deviceToReturn);
+        if (clusterData.count) {
+            [deviceToReturn setClusterData:clusterData];
+        }
     }
 
     return deviceToReturn;
