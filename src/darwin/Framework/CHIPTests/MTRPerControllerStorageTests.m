@@ -20,6 +20,7 @@
 #import <XCTest/XCTest.h>
 
 #import "MTRDeviceTestDelegate.h"
+#import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
 #import "MTRTestDeclarations.h"
@@ -1082,6 +1083,19 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [controller.controllerDataStore storeAttributeValues:testAttributes forNodeID:@(1002)];
     [controller.controllerDataStore storeAttributeValues:testAttributes forNodeID:@(1003)];
 
+    MTRDeviceClusterData * testClusterData1 = [[MTRDeviceClusterData alloc] init];
+    testClusterData1.dataVersion = @(1);
+    MTRDeviceClusterData * testClusterData2 = [[MTRDeviceClusterData alloc] init];
+    testClusterData2.dataVersion = @(2);
+    MTRDeviceClusterData * testClusterData3 = [[MTRDeviceClusterData alloc] init];
+    testClusterData3.dataVersion = @(3);
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * testClusterData = @{
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(1)] : testClusterData1,
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)] : testClusterData2,
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(3)] : testClusterData3,
+    };
+    [controller.controllerDataStore storeClusterData:testClusterData forNodeID:@(1001)];
+
     // Check values are written and can be fetched
     NSArray * dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1001)];
     XCTAssertEqual(dataStoreValues.count, 9);
@@ -1121,6 +1135,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         } else if ([path.endpoint isEqualToNumber:@(2)] && [path.cluster isEqualToNumber:@(1)] && [path.attribute isEqualToNumber:@(3)]) {
             XCTAssertEqualObjects(value, @(213));
         }
+    }
+
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(1001)];
+    for (MTRClusterPath * path in testClusterData) {
+        XCTAssertEqualObjects(testClusterData[path].dataVersion, dataStoreClusterData[path].dataVersion);
     }
 
     [controller.controllerDataStore clearStoredAttributesForNodeID:@(1001)];
