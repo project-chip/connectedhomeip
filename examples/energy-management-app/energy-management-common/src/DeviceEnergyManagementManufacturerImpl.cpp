@@ -94,6 +94,18 @@ void SetTestEventTrigger_StartTimeAdjustment()
     ForecastTestSetup_TP3b(sForecast);
 }
 
+void SetTestEventTrigger_StartTimeAdjustmentClear()
+{
+    ChipLogProgress(Support, "[StartTimeAdjustmentClear-handle] L-%d", __LINE__ );
+
+    DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
+
+    if (CHIP_NO_ERROR != dg->SetForecast(sForecast))
+    {
+        ChipLogProgress(Support, "[StartTimeAdjustmentClear-handle] L-%d Failed to restore forecast!", __LINE__ );
+    }
+}
+
 void SetTestEventTrigger_UserOptOutOptimization( OptOutStateEnum optOutState)
 {
     ChipLogProgress(Support, "[UserOptOutOptimization-handle] L-%d", __LINE__ );
@@ -145,7 +157,7 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         break;
     case DeviceEnergyManagementTrigger::kStartTimeAdjustmentClear:
         ChipLogProgress(Support, "[StartTimeAdjustmentClear-Test-Event] => Clear StartTimeAdjustment forecast");
-        // TODO call implementation
+        SetTestEventTrigger_StartTimeAdjustmentClear();
         break;
     case DeviceEnergyManagementTrigger::kPausable:
         ChipLogProgress(Support, "[Pausable-Test-Event] => Create Pausable forecast");

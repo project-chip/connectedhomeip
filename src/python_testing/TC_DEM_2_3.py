@@ -60,23 +60,23 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
             TestStep("7", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime from Forecast, Cause=LocalOptimization. Verify Command response is SUCCESS."),
             TestStep("7a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
             TestStep("7b", "TH reads Forecast attribute. Value has to include EarliestStartTime=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Local Optimization."),
-            # TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event"),
-            # TestStep("8a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            # TestStep("8b", "TH reads OptOutState attribute. Verify value is 0x01 (LocalOptOut)"),
-            # TestStep("8c", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
-            # TestStep("9", "TH sends StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime) from Forecast, Cause=GridOptimization. Verify Command response is SUCCESS."),
-            # TestStep("9a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            # TestStep("9b", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime=EndTime, and ForecastUpdateReason=Grid Optimization"),
-            # TestStep("10", "TH sends CancelRequest. Verify Command response is SUCCESS."),
-            # TestStep("10a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            # TestStep("10b", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
-            # TestStep("11", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime-1 from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
-            # TestStep("11a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            # TestStep("11b", "TH reads Forecast attribute. Value has to include StartTime and EndTime unchanged from step 10b"),
-            # TestStep("12", "TH sends StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime)+1 from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
-            # TestStep("12a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
-            # TestStep("12b", "TH reads Forecast attribute. Value has to include StartTime and EndTime unchanged from step 10b"),
-            # TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Start Time Adjustment Test Event Clear."),
+            TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event"),
+            TestStep("8a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            TestStep("8b", "TH reads OptOutState attribute. Verify value is 0x01 (LocalOptOut)"),
+            TestStep("8c", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
+            TestStep("9", "TH sends StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime) from Forecast, Cause=GridOptimization. Verify Command response is SUCCESS."),
+            TestStep("9a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            TestStep("9b", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime=EndTime, and ForecastUpdateReason=Grid Optimization"),
+            TestStep("10", "TH sends CancelRequest. Verify Command response is SUCCESS."),
+            TestStep("10a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            TestStep("10b", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
+            TestStep("11", "TH sends StartTimeAdjustRequest with RequestedStartTime=EarliestStartTime-1 from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
+            TestStep("11a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            TestStep("11b", "TH reads Forecast attribute. Value has to include StartTime and EndTime unchanged from step 10b"),
+            TestStep("12", "TH sends StartTimeAdjustRequest with RequestedStartTime=StartTime+(LatestEndTime-EndTime)+1 from Forecast, Cause=LocalOptimization. Verify Command response is FAILURE."),
+            TestStep("12a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+            TestStep("12b", "TH reads Forecast attribute. Value has to include StartTime and EndTime unchanged from step 10b"),
+            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Start Time Adjustment Test Event Clear."),
         ]
 
         return steps
@@ -178,8 +178,96 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
                              f"Expected forecastUpdateReason {forecast3.forecastUpdateReason} to be == LocalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization}")
 
 
+        self.step("8")
+        await self.send_test_event_trigger_user_opt_out_local()
+
+        self.step("8a")
+        await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
+
+        self.step("8b")
+        await self.check_dem_attribute("OptOutState", Clusters.DeviceEnergyManagement.Enums.OptOutStateEnum.kLocalOptOut)
+
+# TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for User Opt-out Local Optimization Test Event"),
+# TestStep("8a", "TH reads ESAState attribute. Verify value is 0x01 (Online)"),
+# TestStep("8b", "TH reads OptOutState attribute. Verify value is 0x01 (LocalOptOut)"),
+# TestStep("8c", "TH reads Forecast attribute. Value has to include EarliestStartTime<=StartTime, LatestEndTime>=EndTime, and ForecastUpdateReason=Internal Optimization"),
+        self.step("8c")
+        forecast4 = await self.read_dem_attribute_expect_success(attribute="Forecast")
+        logger.info(f"Forecast: {forecast4}")
+        asserts.assert_less_equal(forecast4.earliestStartTime, forecast4.startTime, 
+                             f"Expected earliestStartTime {forecast4.earliestStartTime} to be <= startTime {forecast4.startTime}")
+# TODO: asserts.assert_equal(forecast4.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization, 
+#                      f"Expected forecastUpdateReason {forecast4.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
 
 
+        self.step("9")
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast4.startTime+forecast4.latestEndTime - forecast4.endTime,
+                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization)
+
+        self.step("9a")
+        await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
+
+        self.step("9b")
+        forecast5 = await self.read_dem_attribute_expect_success(attribute="Forecast")
+        logger.info(f"Forecast: {forecast5}")
+        asserts.assert_less_equal(forecast5.earliestStartTime, forecast5.startTime, 
+                             f"Expected earliestStartTime {forecast5.earliestStartTime} to be <= startTime {forecast5.startTime}")
+        asserts.assert_equal(forecast5.latestEndTime, forecast5.endTime,
+                             f"Expected latestEndTime {forecast5.latestEndTime} to be == endTime {forecast5.endTime}")
+        asserts.assert_equal(forecast5.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization,
+                             f"Expected forecastUpdateReason {forecast5.forecastUpdateReason} to be == GridOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization}")
+
+
+        self.step("10")
+        await self.send_cancel_request_command()
+
+        self.step("10a")
+        await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
+
+        self.step("10b")
+        forecast6 = await self.read_dem_attribute_expect_success(attribute="Forecast")
+        logger.info(f"Forecast: {forecast6}")
+        asserts.assert_less_equal(forecast6.earliestStartTime, forecast6.startTime, 
+                             f"Expected earliestStartTime {forecast6.earliestStartTime} to be <= startTime {forecast6.startTime}")
+        asserts.assert_greater_equal(forecast6.latestEndTime, forecast6.endTime,
+                             f"Expected latestEndTime {forecast6.latestEndTime} to be >= endTime {forecast6.endTime}")
+        asserts.assert_equal(forecast6.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
+                             f"Expected forecastUpdateReason {forecast6.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
+
+
+        self.step("11")
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast6.earliestStartTime - 1,
+                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
+                                            expected_status = Status.Failure)
+        self.step("11a")
+        await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
+
+        self.step("11b")
+        forecast7 = await self.read_dem_attribute_expect_success(attribute="Forecast")
+        logger.info(f"Forecast: {forecast7}")
+        asserts.assert_equal(forecast6.startTime, forecast7.startTime, 
+                             f"Expected old startTime {forecast6.startTime} to be == startTime {forecast7.startTime}")
+        asserts.assert_equal(forecast6.endTime, forecast7.endTime,
+                             f"Expected old endTime {forecast6.endTime} to be == endTime {forecast7.endTime}")
+
+
+        self.step("12")
+        await self.send_start_time_adjust_request_command(requestedStartTime=forecast7.startTime+(forecast7.latestEndTime-forecast7.endTime)+1,
+                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
+                                            expected_status = Status.Failure)
+        self.step("12a")
+        await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
+
+        self.step("12b")
+        forecast8 = await self.read_dem_attribute_expect_success(attribute="Forecast")
+        logger.info(f"Forecast: {forecast8}")
+        asserts.assert_equal(forecast7.startTime, forecast8.startTime, 
+                             f"Expected old startTime {forecast7.startTime} to be == startTime {forecast8.startTime}")
+        asserts.assert_equal(forecast7.endTime, forecast8.endTime,
+                             f"Expected old endTime {forecast7.endTime} to be == endTime {forecast8.endTime}")
+
+        self.step("13")
+        await self.send_test_event_trigger_start_time_adjustment_clear()
 
 
 if __name__ == "__main__":
