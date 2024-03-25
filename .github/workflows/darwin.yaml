@@ -31,7 +31,7 @@ jobs:
     framework:
         name: Build framework
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-13
+        runs-on: macos-14
         strategy:
             matrix:
                 options: # We don't need a full matrix
@@ -66,7 +66,7 @@ jobs:
     tests:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-13
+        runs-on: macos-14
         strategy:
             matrix:
                 options: # We don't need a full matrix
@@ -127,7 +127,7 @@ jobs:
     tv-casting-bridge:
         name: Build TV Casting Bridge example
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-13
+        runs-on: macos-14
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -142,7 +142,7 @@ jobs:
     darwin:
         name: Build Darwin # Matches the previous monolithic build that's marked "required" for PRs
         needs: [ framework, tests ]
-        runs-on: macos-13
+        runs-on: macos-14
         steps:
             - name: Done
               run: 'true' # nothing to do
