@@ -38,7 +38,7 @@ runs:
         attempt_limit: 3
         attempt_delay: 2000
         with: |
-          key: ${{ runner.os }}-${{ inputs.platform }}-${{ steps.bootstrap-cache-key.outputs.hash}}
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ inputs.platform }}-${{ steps.bootstrap-cache-key.outputs.hash}}
           path: |
               .environment
               build_overrides/pigweed_environment.gni
