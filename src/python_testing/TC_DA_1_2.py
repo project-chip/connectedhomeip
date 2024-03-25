@@ -324,6 +324,8 @@ class TC_DA_1_2(MatterBaseTest):
             asserts.assert_equal(dac_pid, origin_pid, "Origin Product ID in the CD does not match the Product ID in the DAC")
             if pai_pid:
                 asserts.assert_equal(pai_pid, origin_pid, "Origin Product ID in the CD does not match the Product ID in the PAI")
+        else:
+            self.mark_current_step_skipped()
 
         self.step("7.3")
         if not has_origin_vid:
@@ -332,6 +334,8 @@ class TC_DA_1_2(MatterBaseTest):
             asserts.assert_in(dac_pid, product_id_array, "Product ID from the DAC is not present in the PID list in the CD")
             if pai_pid:
                 asserts.assert_in(pai_pid, product_id_array, "Product ID from the PAI is not present in the PID list in the CD")
+        else:
+            self.mark_current_step_skipped()
 
         self.step(8)
         has_paa_list = 11 in cd.keys()
@@ -341,6 +345,8 @@ class TC_DA_1_2(MatterBaseTest):
             asserts.assert_equal(len(akids), 1, "PAI requires exactly one AuthorityKeyIdentifier")
             paa_authority_list = cd[11]
             asserts.assert_in(akids[0], paa_authority_list, "PAI AKID not found in the authority list")
+        else:
+            self.mark_current_step_skipped()
 
         self.step(9)
         signature_cd = bytes(signer_info['signature'])
@@ -374,6 +380,8 @@ class TC_DA_1_2(MatterBaseTest):
                 int(decoded[4], 16)
             except ValueError:
                 asserts.fail("Firmware is not an octet string")
+        else:
+            self.mark_current_step_skipped()
 
         self.step(12)
         proxy = self.default_controller.GetConnectedDeviceSync(self.dut_node_id, False)
