@@ -116,8 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 {{/inline}}
 {{> completeImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
-                 command=(asUpperCamelCase name preserveAcronyms=true)
-                 includeRenamedProperties=false}}
+                 command=(asUpperCamelCase name preserveAcronyms=true)}}
 
 {{/zcl_commands}}
 {{/if}}
