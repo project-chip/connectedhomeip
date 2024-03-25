@@ -1,5 +1,5 @@
 steps:
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,7 +22,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -43,7 +43,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -64,7 +64,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -86,7 +86,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -139,7 +139,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:36"
+    - name: "ghcr.io/project-chip/chip-build-vscode:41"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
