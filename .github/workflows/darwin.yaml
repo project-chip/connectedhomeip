@@ -31,7 +31,7 @@ jobs:
     framework:
         name: Build framework
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-latest
+        runs-on: macos-13
         strategy:
             matrix:
                 options: # We don't need a full matrix
@@ -48,8 +48,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup Environment
-              run: brew install python@3.9
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -71,7 +69,8 @@ jobs:
     tests:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-latest
+        needs: [ framework ] # serialize to avoid running to many parallel macos runners
+        runs-on: macos-13
         strategy:
             matrix:
                 options: # We don't need a full matrix
@@ -85,8 +84,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup Environment
-              run: brew install python@3.9
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -120,6 +117,7 @@ jobs:
                     OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1 ${{ matrix.options.defines }}' \
                     > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
             - name: Collect crash logs
+              if: failure() && !env.ACT
               run: |
                   mkdir -p /tmp/darwin/framework-tests
                   find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
@@ -134,12 +132,11 @@ jobs:
     tv-casting-bridge:
         name: Build TV Casting Bridge example
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-latest
+        needs: [ framework ] # serialize to avoid running to many parallel macos runners
+        runs-on: macos-13
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup Environment
-              run: brew install python@3.9
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -147,11 +144,3 @@ jobs:
             - name: Build
               working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
               run: xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
-
-    darwin:
-        name: Build Darwin # Matches the previous monolithic build that's marked "required" for PRs
-        needs: [ framework, tests ]
-        runs-on: macos-latest
-        steps:
-            - name: Done
-              run: 'true' # nothing to do
