@@ -235,7 +235,7 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
 
     for (int networkIndex = 0; networkIndex < kMaxNetworks; networkIndex++)
     {
-        if (mStagingNetwork[networkIndex].Matches(networkId)))
+        if (mStagingNetwork[networkIndex].Matches(networkId))
         {
             foundNetwork = true;
             outNetworkIndex = networkIndex;
@@ -323,6 +323,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
+    bool foundNetwork = false;
 
     const auto & network = mStagingNetwork;
     // Check if network does not contain a matching entry
