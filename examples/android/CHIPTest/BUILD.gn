@@ -43,9 +43,6 @@ shared_library("jni") {
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/nlfaultinjection:nlfaultinjection",
   ]
-  assert(chip_build_test_static_libraries == false,
-         "Test static libraries should not be built for Android")
-  print("Building CHIPTest for Android XXX:", chip_build_test_static_libraries)
 
   cflags = [ "-Wconversion" ]
 
