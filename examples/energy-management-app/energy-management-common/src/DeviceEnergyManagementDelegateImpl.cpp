@@ -411,37 +411,42 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Struc
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum state)
+CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newValue)
 {
-    // TODO see Issue #31147
-    ChipLogDetail(AppServer, "mOptOutState was %d changed to %d ", static_cast<int>(mOptOutState), static_cast<int>(state));
-    mOptOutState = state;
+    OptOutStateEnum oldValue = mOptOutState;
 
-    if (mForecast.IsNull())
+    mOptOutState = newValue;
+    if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mForecast is null !");
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        ChipLogDetail(AppServer, "mOptOutState updated to %d", static_cast<int>(mOptOutState));
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, OptOutState::Id);
     }
-#if 1 // TODO: not sure if this should be included. If it is then test 2_3 5b, fails !
-    switch (state)
+
+    if (!mForecast.IsNull())
     {
-    case OptOutStateEnum::kOptOut:
-        mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
-        break;
-    // case OptOutStateEnum::kNoOptOut:
-    //     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kLocalOptimization;
-    // break;
-    // case OptOutStateEnum::kLocalOptOut:
-    //     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kLocalOptimization;
-    // break;
-    // case OptOutStateEnum::kGridOptOut:
-    //     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kGridOptimization;
-    // break;
-    default:
-        ChipLogDetail(AppServer, "Bad state %d", static_cast<int>(state));
-        return CHIP_ERROR_INVALID_ARGUMENT;
-        break;
+        switch (mForecast.Value().forecastUpdateReason)
+        {
+        case ForecastUpdateReasonEnum::kInternalOptimization:
+            // We don't need to redo a forecast since its internal already
+            break;
+        case ForecastUpdateReasonEnum::kLocalOptimization:
+            if (mOptOutState == OptOutStateEnum::kOptOut)
+                || (mOptOutState == OptOutStateEnum::kLocalOptOut)
+                {
+                    // Generate a new forecast with Internal Optimization
+                    // TODO
+                }
+            break;
+        case ForecastUpdateReasonEnum::kGridOptimization:
+            if (mOptOutState == OptOutStateEnum::kOptOut)
+                || (mOptOutState == OptOutStateEnum::kGridOptOut)
+                {
+                    // Generate a new forecast with Internal Optimization
+                    // TODO
+                }
+            break;
+        }
     }
-#endif
+
     return CHIP_NO_ERROR;
 }
