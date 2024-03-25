@@ -49,16 +49,15 @@ static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogProgress(Test, "JNI_OnLoad() called");
-
     JNIEnv * env;
+    ChipLogProgress(Test, "JNI_OnLoad() called");
 
     sJVM = jvm;
     err  = AndroidChipPlatformJNI_OnLoad(jvm, reserved);
     SuccessOrExit(err);
 
-    env = JniReferences::GetInstance().GetEnvForCurrentThread();
     // Get a JNI environment object.
+    env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     ChipLogProgress(Test, "Loading Java class references.");
@@ -255,8 +254,8 @@ static nl_test_output_logger_t jni_test_logger = {
 extern "C" JNIEXPORT jint Java_com_tcl_chip_chiptest_TestEngine_runTest(JNIEnv * env, jclass clazz)
 {
     nlTestSetLogger(&jni_test_logger);
-    // TODO [PW_MIGRATION] Remove NLUnit tests call after migration
     chip::DeviceLayer::StackLock lock;
+    // TODO [PW_MIGRATION] Remove NLUnit tests call after migration
     jint ret = RunRegisteredUnitTests();
     ret += chip::test::RunAllTests();
 

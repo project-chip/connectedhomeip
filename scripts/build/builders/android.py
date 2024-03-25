@@ -603,7 +603,7 @@ class AndroidBuilder(Builder):
                     self.output_dir, "outputs", "apk", "debug", "app-debug.apk"
                 ),
                 "CHIPController.jar": os.path.join(
-                    self.output_dir, "lib/third_party/connectedhomeip/src/controller/java/CHIPController.jar",
+                    self.output_dir, "lib", "src/controller/java/CHIPController.jar"
                 ),
                 "libMatterTlv.jar": os.path.join(
                     self.output_dir, "lib", "src/controller/java/libMatterTlv.jar"
@@ -626,13 +626,13 @@ class AndroidBuilder(Builder):
                     "lib",
                     "src/controller/java/CHIPClusterID.jar",
                 ),
-                "jni/%s/libCHIPTest.so"
+                "jni/%s/libCHIPController.so"
                 % self.board.AbiName(): os.path.join(
                     self.output_dir,
                     "lib",
                     "jni",
                     self.board.AbiName(),
-                    "libCHIPTest.so",
+                    "libCHIPController.so",
                 ),
                 "jni/%s/libc++_shared.so"
                 % self.board.AbiName(): os.path.join(
