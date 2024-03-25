@@ -69,37 +69,39 @@ CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
     size_t valueLen = 0;
 
     auto & kvs = PersistedStorage::KeyValueStoreMgr();
-    
+
     for (int networkIndex = 0; networkIndex < kMaxNetworks; networkIndex++)
     {
-        SuccessOrExit(err = IgnoreNotFound(kvs.Get(kWiFiSSIDKeyName, network[networkIndex].ssid, sizeof(network[networkIndex].ssid), &valueLen)));
+        SuccessOrExit(err = IgnoreNotFound(
+                          kvs.Get(kWiFiSSIDKeyName, network[networkIndex].ssid, sizeof(network[networkIndex].ssid), &valueLen)));
         if (valueLen != 0)
         {
             network[networkIndex].ssidLen = valueLen;
 
-            err = kvs.Get(kWiFiCredentialsKeyName, network[networkIndex].credentials, sizeof(network[networkIndex].credentials), &valueLen);
-    #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+            err = kvs.Get(kWiFiCredentialsKeyName, network[networkIndex].credentials, sizeof(network[networkIndex].credentials),
+                          &valueLen);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
             if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
-                SuccessOrExit(
-                    err = kvs.Get(kWifiNetworkIdentityKeyName, network[networkIndex].networkIdentity, sizeof(network[networkIndex].networkIdentity), &valueLen));
+                SuccessOrExit(err = kvs.Get(kWifiNetworkIdentityKeyName, network[networkIndex].networkIdentity,
+                                            sizeof(network[networkIndex].networkIdentity), &valueLen));
                 VerifyOrExit(valueLen > 0, err = CHIP_ERROR_INTEGRITY_CHECK_FAILED);
                 network[networkIndex].networkIdentityLen = valueLen;
 
-                SuccessOrExit(
-                    err = kvs.Get(kWifiClientIdentityKeyName, network[networkIndex].clientIdentity, sizeof(network[networkIndex].clientIdentity), &valueLen));
+                SuccessOrExit(err = kvs.Get(kWifiClientIdentityKeyName, network[networkIndex].clientIdentity,
+                                            sizeof(network[networkIndex].clientIdentity), &valueLen));
                 VerifyOrExit(valueLen > 0, err = CHIP_ERROR_INTEGRITY_CHECK_FAILED);
                 network.[networkIndex].clientIdentityLen = valueLen;
 
                 P256SerializedKeypair serializedKeypair;
-                SuccessOrExit(err = kvs.Get(kWifiClientIdentityKeypairKeyName, serializedKeypair.Bytes(), serializedKeypair.Capacity(),
-                                            &valueLen));
+                SuccessOrExit(err = kvs.Get(kWifiClientIdentityKeypairKeyName, serializedKeypair.Bytes(),
+                                            serializedKeypair.Capacity(), &valueLen));
                 serializedKeypair.SetLength(valueLen);
                 network[networkIndex].clientIdentityKeypair = Platform::MakeShared<P256Keypair>();
                 SuccessOrExit(err = network[networkIndex].clientIdentityKeypair->Deserialize(serializedKeypair));
             }
             else
-    #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
             {
                 SuccessOrExit(err);
                 network[networkIndex].credentialsLen = valueLen;
@@ -130,14 +132,14 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
     for (int networkIndex = 0; networkIndex < currentNetId; networkIndex++)
     {
         ReturnErrorOnFailure(kvs.Put(kWiFiSSIDKeyName, mStagingNetwork[networkIndex].ssid, mStagingNetwork[networkIndex].ssidLen));
-    #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
         if (mStagingNetwork[networkIndex].UsingPDC())
         {
             ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWiFiCredentialsKeyName)));
-            ReturnErrorOnFailure(
-                kvs.Put(kWifiNetworkIdentityKeyName, mStagingNetwork[networkIndex].networkIdentity, mStagingNetwork[networkIndex].networkIdentityLen));
-            ReturnErrorOnFailure(
-                kvs.Put(kWifiClientIdentityKeyName, mStagingNetwork[networkIndex].clientIdentity, mStagingNetwork[networkIndex].clientIdentityLen));
+            ReturnErrorOnFailure(kvs.Put(kWifiNetworkIdentityKeyName, mStagingNetwork[networkIndex].networkIdentity,
+                                         mStagingNetwork[networkIndex].networkIdentityLen));
+            ReturnErrorOnFailure(kvs.Put(kWifiClientIdentityKeyName, mStagingNetwork[networkIndex].clientIdentity,
+                                         mStagingNetwork[networkIndex].clientIdentityLen));
 
             P256SerializedKeypair serializedKeypair;
             ReturnErrorOnFailure(mStagingNetwork[networkIndex].clientIdentityKeypair->Serialize(serializedKeypair));
@@ -149,10 +151,11 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
             ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiNetworkIdentityKeyName)));
             ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiClientIdentityKeyName)));
             ReturnErrorOnFailure(IgnoreNotFound(kvs.Delete(kWifiClientIdentityKeypairKeyName)));
-    #else  // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#else  // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
         {
-    #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-            ReturnErrorOnFailure(kvs.Put(kWiFiCredentialsKeyName, mStagingNetwork[networkIndex].credentials, mStagingNetwork[networkIndex].credentialsLen));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+            ReturnErrorOnFailure(kvs.Put(kWiFiCredentialsKeyName, mStagingNetwork[networkIndex].credentials,
+                                         mStagingNetwork[networkIndex].credentialsLen));
         }
     }
 
@@ -185,14 +188,16 @@ Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, 
     outNetworkIndex = 0;
 
     VerifyOrReturnError(currentNetId < kMaxNetworks, Status::kBoundsExceeded);
-    VerifyOrReturnError(mStagingNetwork[currentNetId].Empty() || mStagingNetwork[currentNetId].Matches(ssid), Status::kBoundsExceeded);
+    VerifyOrReturnError(mStagingNetwork[currentNetId].Empty() || mStagingNetwork[currentNetId].Matches(ssid),
+                        Status::kBoundsExceeded);
 
     // Do the check before setting the values, so the data is not updated on error.
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork[currentNetId].credentials), Status::kOutOfRange);
     VerifyOrReturnError(!ssid.empty() && ssid.size() <= sizeof(mStagingNetwork[currentNetId].ssid), Status::kOutOfRange);
 
     memcpy(mStagingNetwork[currentNetId].credentials, credentials.data(), credentials.size());
-    mStagingNetwork[currentNetId].credentialsLen = static_cast<decltype(mStagingNetwork[currentNetId].credentialsLen)>(credentials.size());
+    mStagingNetwork[currentNetId].credentialsLen =
+        static_cast<decltype(mStagingNetwork[currentNetId].credentialsLen)>(credentials.size());
 
     memcpy(mStagingNetwork[currentNetId].ssid, ssid.data(), ssid.size());
     mStagingNetwork[currentNetId].ssidLen = static_cast<decltype(mStagingNetwork[currentNetId].ssidLen)>(ssid.size());
@@ -228,7 +233,7 @@ void LinuxWiFiDriver::ShiftNetworkAfterRemove()
 Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
-    outNetworkIndex = 0;
+    outNetworkIndex   = 0;
     bool foundNetwork = false;
 
     VerifyOrReturnError(currentNetId != 0, Status::kBoundsExceeded);
@@ -237,7 +242,7 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
     {
         if (mStagingNetwork[networkIndex].Matches(networkId))
         {
-            foundNetwork = true;
+            foundNetwork    = true;
             outNetworkIndex = networkIndex;
             break;
         }
@@ -256,7 +261,7 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
 bool LinuxWiFiDriver::StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex)
 {
     WiFiNetwork tempNetwork[kMaxNetworks];
-    int count = 0;
+    int count      = 0;
     int indexCount = 0;
 
     if (foundNetworkAtIndex < 0 || index == foundNetworkAtIndex)
@@ -298,7 +303,7 @@ bool LinuxWiFiDriver::StartReorderingEntries(uint8_t index, int8_t foundNetworkA
 
 Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
-    bool foundNetwork = false;
+    bool foundNetwork          = false;
     int8_t foundNetworkAtIndex = -1;
     outDebugText.reduce_size(0);
 
@@ -307,7 +312,7 @@ Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutabl
     {
         if (mStagingNetwork[networkIndex].Matches(networkId))
         {
-            foundNetwork = true;
+            foundNetwork        = true;
             foundNetworkAtIndex = networkIndex;
             break;
         }
@@ -323,7 +328,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
-    bool foundNetwork = false;
+    bool foundNetwork       = false;
 
     const auto & network = mStagingNetwork;
     // Check if network does not contain a matching entry
@@ -331,7 +336,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     {
         if (network[networkIndex].Matches(networkId))
         {
-            foundNetwork = true;
+            foundNetwork          = true;
             connectedNetworkIndex = networkIndex;
             break;
         }
@@ -341,18 +346,23 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     if (network.UsingPDC())
     {
-        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork (PDC) '%.*s'", network[connectedNetworkIndex].ssidLen, network[connectedNetworkIndex].ssid);
+        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork (PDC) '%.*s'", network[connectedNetworkIndex].ssidLen,
+                        network[connectedNetworkIndex].ssid);
         err = ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
-            ByteSpan(network[connectedNetworkIndex].ssid, network[connectedNetworkIndex].ssidLen), ByteSpan(network[connectedNetworkIndex].networkIdentity, network[connectedNetworkIndex].networkIdentityLen),
-            ByteSpan(network[connectedNetworkIndex].clientIdentity, network[connectedNetworkIndex].clientIdentityLen), *network[connectedNetworkIndex].clientIdentityKeypair, callback);
+            ByteSpan(network[connectedNetworkIndex].ssid, network[connectedNetworkIndex].ssidLen),
+            ByteSpan(network[connectedNetworkIndex].networkIdentity, network[connectedNetworkIndex].networkIdentityLen),
+            ByteSpan(network[connectedNetworkIndex].clientIdentity, network[connectedNetworkIndex].clientIdentityLen),
+            *network[connectedNetworkIndex].clientIdentityKeypair, callback);
     }
     else
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     {
-        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%.*s'", network[connectedNetworkIndex].ssidLen, network[connectedNetworkIndex].ssid);
+        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%.*s'", network[connectedNetworkIndex].ssidLen,
+                        network[connectedNetworkIndex].ssid);
 
-        err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(network[connectedNetworkIndex].ssid, network[connectedNetworkIndex].ssidLen),
-                                                            ByteSpan(network[connectedNetworkIndex].credentials, network[connectedNetworkIndex].credentialsLen), callback);
+        err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(
+            ByteSpan(network[connectedNetworkIndex].ssid, network[connectedNetworkIndex].ssidLen),
+            ByteSpan(network[connectedNetworkIndex].credentials, network[connectedNetworkIndex].credentialsLen), callback);
     }
 
 exit:
@@ -382,7 +392,7 @@ size_t LinuxWiFiDriver::WiFiNetworkIterator::Count()
     size_t count = 0;
     for (int networkIndex = 0; networkIndex < kMaxNetworks; networkIndex++)
     {
-        if(!driver->mStagingNetwork[networkIndex].Empty())
+        if (!driver->mStagingNetwork[networkIndex].Empty())
         {
             count++;
         }
@@ -396,12 +406,13 @@ bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     {
         return false;
     }
-    memcpy(item.networkID, driver->mStagingNetwork[networkIteratorIndex].ssid, driver->mStagingNetwork[networkIteratorIndex].ssidLen);
+    memcpy(item.networkID, driver->mStagingNetwork[networkIteratorIndex].ssid,
+           driver->mStagingNetwork[networkIteratorIndex].ssidLen);
     item.networkIDLen = driver->mStagingNetwork[networkIteratorIndex].ssidLen;
     item.connected    = false;
     if (networkIteratorIndex == (kMaxNetworks - 1))
     {
-        exhausted         = true;
+        exhausted            = true;
         networkIteratorIndex = 0;
     }
 
@@ -428,19 +439,22 @@ CHIP_ERROR LinuxWiFiDriver::AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan ne
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     outStatus      = Status::kUnknownError;
-    VerifyOrExit(mStagingNetwork[currentNetId].Empty() || mStagingNetwork[currentNetId].Matches(ssid), outStatus = Status::kBoundsExceeded);
+    VerifyOrExit(mStagingNetwork[currentNetId].Empty() || mStagingNetwork[currentNetId].Matches(ssid),
+                 outStatus = Status::kBoundsExceeded);
 
     VerifyOrExit(!ssid.empty() && ssid.size() <= sizeof(WiFiNetwork::ssid), outStatus = Status::kOutOfRange);
     VerifyOrExit(!networkIdentity.empty() && networkIdentity.size() <= sizeof(WiFiNetwork::networkIdentity),
                  outStatus = Status::kOutOfRange);
-    VerifyOrExit(!clientIdentityNetworkIndex.HasValue() || (clientIdentityNetworkIndex.Value() == 0 && mStagingNetwork[currentNetId].UsingPDC()),
+    VerifyOrExit(!clientIdentityNetworkIndex.HasValue() ||
+                     (clientIdentityNetworkIndex.Value() == 0 && mStagingNetwork[currentNetId].UsingPDC()),
                  outStatus = Status::kOutOfRange);
 
     {
         WiFiNetwork network = mStagingNetwork; // update a copy first in case of errors
 
         memcpy(network[currentNetId].ssid, ssid.data(), network[currentNetId].ssidLen = ssid.size());
-        memcpy(network[currentNetId].networkIdentity, networkIdentity.data(), network[currentNetId].networkIdentityLen = networkIdentity.size());
+        memcpy(network[currentNetId].networkIdentity, networkIdentity.data(),
+               network[currentNetId].networkIdentityLen = networkIdentity.size());
 
         // If an existing client identity is being reused, we would need to copy it here,
         // but since we're only supporting a single network we simply don't overwrite it.
@@ -456,7 +470,9 @@ CHIP_ERROR LinuxWiFiDriver::AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan ne
 
         network[currentNetId].credentialsLen = 0;
 
-        SuccessOrExit(err = CopySpanToMutableSpan(ByteSpan(network[currentNetId].clientIdentity, network[currentNetId].clientIdentityLen), outClientIdentity));
+        SuccessOrExit(
+            err = CopySpanToMutableSpan(ByteSpan(network[currentNetId].clientIdentity, network[currentNetId].clientIdentityLen),
+                                        outClientIdentity));
         currentNetId++;
         mStagingNetwork = network;
         outNetworkIndex = currentNetId;
@@ -472,14 +488,17 @@ CHIP_ERROR LinuxWiFiDriver::GetNetworkIdentity(uint8_t networkIndex, MutableByte
 {
     VerifyOrReturnError(!mStagingNetwork[currentNetId].Empty() && networkIndex == 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStagingNetwork[currentNetId].UsingPDC(), CHIP_ERROR_INVALID_ARGUMENT);
-    return CopySpanToMutableSpan(ByteSpan(mStagingNetwork[currentNetId].networkIdentity, mStagingNetwork[currentNetId].networkIdentityLen), outNetworkIdentity);
+    return CopySpanToMutableSpan(
+        ByteSpan(mStagingNetwork[currentNetId].networkIdentity, mStagingNetwork[currentNetId].networkIdentityLen),
+        outNetworkIdentity);
 }
 
 CHIP_ERROR LinuxWiFiDriver::GetClientIdentity(uint8_t networkIndex, MutableByteSpan & outClientIdentity)
 {
     VerifyOrReturnError(!mStagingNetwork[currentNetId].Empty() && networkIndex == 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mStagingNetwork[currentNetId].UsingPDC(), CHIP_ERROR_INVALID_ARGUMENT);
-    return CopySpanToMutableSpan(ByteSpan(mStagingNetwork[currentNetId].clientIdentity, mStagingNetwork[currentNetId].clientIdentityLen), outClientIdentity);
+    return CopySpanToMutableSpan(
+        ByteSpan(mStagingNetwork[currentNetId].clientIdentity, mStagingNetwork[currentNetId].clientIdentityLen), outClientIdentity);
 }
 
 CHIP_ERROR LinuxWiFiDriver::SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,

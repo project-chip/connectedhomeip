@@ -73,7 +73,7 @@ public:
 
     private:
         LinuxWiFiDriver * driver;
-        bool exhausted = false;
+        bool exhausted               = false;
         uint8_t networkIteratorIndex = 0;
     };
 
@@ -150,7 +150,7 @@ private:
         Platform::SharedPtr<Crypto::P256Keypair> clientIdentityKeypair;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
-    uint8_t currentNetId = 0;
+    uint8_t currentNetId          = 0;
     uint8_t connectedNetworkIndex = 0;
     WiFiNetwork mSavedNetwork[kMaxNetworks];
     WiFiNetwork mStagingNetwork[kMaxNetworks];
