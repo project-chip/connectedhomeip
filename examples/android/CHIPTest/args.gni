@@ -20,8 +20,6 @@ import("//build_overrides/pigweed.gni")
 
 chip_project_config_include_dirs = [ "${chip_root}/config/standalone" ]
 
-chip_build_libshell = true
-
 chip_build_test_static_libraries = false
 
 chip_build_tests = true
