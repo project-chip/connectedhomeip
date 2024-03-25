@@ -27,7 +27,7 @@ from cryptography.hazmat._oid import ExtensionOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec, utils
 from ecdsa.curves import curve_by_name
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, hex_from_bytes, type_matches
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, hex_from_bytes, type_matches, TestStep
 from mobly import asserts
 from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
@@ -103,6 +103,67 @@ def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> tuple(
 
 
 class TC_DA_1_2(MatterBaseTest):
+    def steps_TC_DA_1_2(self):
+        return [TestStep(0, "Commission DUT if not done", is_commissioning=True),
+                TestStep(1, "TH1 generates 32-byte AttestationNonce", ""),
+                TestStep(2, "TH1 sends AttestationRequest Command with a random 32 bytes AttestationNonce` to the DUT."),
+                TestStep(
+                    "3a", "", "Verify that the DUT generates the Attestation Information and that it is sent to TH1 using AttestationResponse Command"),
+                TestStep("3b", "TH1 sends CertificateChainRequest Command with CertificateType field set to DACCertificate (1) to DUT to obtain DAC"),
+                TestStep("3c", "TH1 saves DAC certificate",
+                         "DUT responds with CertificateChainResponse the DAC certificate in X.509v3 format with size ⇐ 600 bytes"),
+                TestStep("3d", "TH1 sends CertificateChainRequest Command with CertificateType field set to PAICertificate (2) to DUT to obtain PAI",
+                         "DUT responds with CertificateChainResponse the PAI certificate in X.509v3 format with size ⇐ 600 bytes"),
+                TestStep("3e", "TH1 saves PAI certificate", ""),
+                TestStep("4a", "TH1 Reads the VendorID attribute of the Basic Information cluster and saves it as `basic_info_vendor_id`"),
+                TestStep("4b", "TH1 Reads the ProductID attribute of the Basic Information cluster and saves it as `basic_info_product_id`"),
+                TestStep(5, "Extract the attestation_elements_message structure fields from the AttestationResponse Command received by TH1 from DUT"),
+                TestStep(6, "Verify that the DUT generated the AttestationResponse has the following fields: AttestationElements, AttestationSignature"),
+                TestStep(7, "Read the attestation_elements_message structure fields"),
+                TestStep(8, "", "Verify that the attestation_elements_message structure fields satisfy the following conditions:"),
+                TestStep("8.1", "", "AttestationElements field size should not be greater than RESP_MAX(900 bytes)"),
+                TestStep("8.2", "", "certification_declaration is present and is an octet string representation CMS-format certification declaration, as described in section 6.3.1"),
+                TestStep("8.3", "", ("Verify the following for contents of the CD:\n"
+                                     "\n"
+                                     "* format_version = 1\n"
+                                     "* The vendor_id field matches the one saved as `basic_info_vendor_id` saved earlier\n"
+                                     "* The product_id_array field contains the value of basic_info_product_id saved earlier\n"
+                                     "* device_type_id has a value between 0 and (2^31 - 1)\n"
+                                     "* certificate_id has a length of 19\n"
+                                     "* security level = 0\n"
+                                     "* security_information = 0\n"
+                                     "* version_number is an integer in range 0..65535\n"
+                                     "* certification_type has a value between 1..2\n")),
+                TestStep(
+                    "8.4", "", "Confirm that both the fields dac_origin_vendor_id and dac_origin_product_id are present in Certification Declaration"),
+                TestStep(
+                    "8.5", "", "Or confirm both the fields dac_origin_vendor_id and dac_origin_product_id are not present in the Certification Declaration"),
+                TestStep("8.6", "", ("If the Certification Declaration has both the dac_origin_vendor_id and the dac_origin_product_id fields then check for the following conditions:\n"
+                                     "\n"
+                                     "* The Vendor ID (VID) in the DAC subject and PAI subject are the same as the dac_origin_vendor_id field in the Certification Declaration.\n"
+                                     "* The Product ID (PID) in the DAC subject is same as the dac_origin_product_id field in the Certification Declaration.\n"
+                                     "* If it is present in the PAI certificate, the Product ID (PID) in the subject is same as the dac_origin_product_id field in the Certification Declaration.\n")),
+                TestStep("8.7", "", ("If the Certification Declaration has neither the dac_origin_vendor_id nor the dac_origin_product_id fields then check for the following conditions:\n"
+                                     "\n"
+                                     "* The Vendor ID (VID) in the DAC subject and PAI subject are the same as the vendor_id field in the Certification Declaration.\n"
+                                     "* The Product ID (PID) subject DN in the DAC is contained in the product_id_array field in the Certification Declaration.\n"
+                                     "* If it is present in the PAI certificate, the Product ID (PID) in the subject is contained in the product_id_array field in the Certification Declaration.\n")),
+                TestStep("8.8", "", ("If the Certification Declaration has authorized_paa_list then check for the following conditions:\n"
+                                     "\n"
+                                     "* The authority key id extension of the PAI certificate matches the one found in the authorized_paa_list\n")),
+                TestStep("8.9", "", "Verify that the certification_declaration CMS enveloped can be verified with the well-known Certification Declaration public key used to originally sign the Certification Declaration\n"),
+                TestStep(9, "", ("* attestation_nonce is present in the attestation_elements_message structure\n"
+                                 "* attestation_nonce value matches the AttestationNonce field value sent in the AttestationRequest Command sent by the commissioner\n"
+                                 "* attestation_nonce is a 32 byte-long octet string\n")),
+                TestStep(10, "", ("* firmware_information is optional, may be present\n"
+                                  "* if firmware_information field is present it is a octet string\n")),
+                TestStep(11, "", "Using Crypto_Verify cryptographic primitive, validate that the AttestationSignature from the AttestationResponse Command is valid if verified against a message constructed by concatenating AttestationElements with the attestation challenge associated with the secure session over which the AttestationResponse was obtained, using the subject public key found in the DAC."),
+                TestStep(12, "TH1 sends AttestationRequest Command with Invalid AttestationNonce (size > 32 bytes) as the field to the DUT.",
+                         "Verify DUT responds w/ status INVALID_COMMAND(0x85)"),
+                TestStep(13, "TH1 sends AttestationRequest Command with invalid AttestationNonce (size < 32 bytes) as the field to the DUT.",
+                         "Verify that the DUT reports an INVALID_COMMAND error"),
+                ]
+
     @async_test_body
     async def test_TC_DA_1_2(self):
         is_ci = self.check_pics('PICS_SDK_CI_ONLY')
@@ -116,26 +177,27 @@ class TC_DA_1_2(MatterBaseTest):
 
         cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
 
-        self.print_step(0, "Commissioning, already done")
+        # Commissioning - done
+        self.step(0)
 
         opcreds = Clusters.Objects.OperationalCredentials
         basic = Clusters.Objects.BasicInformation
 
-        self.print_step(1, "Generate 32-byte nonce")
+        self.step(1)
         nonce = random.randbytes(32)
 
-        self.print_step(2, "Send AttestationRequest")
+        self.step(2)
         attestation_resp = await self.send_single_cmd(cmd=opcreds.Commands.AttestationRequest(attestationNonce=nonce))
 
-        self.print_step("3a", "Verify AttestationResponse is correct type")
+        self.step("3a")
         asserts.assert_true(type_matches(attestation_resp, opcreds.Commands.AttestationResponse),
                             "DUT returned invalid response to AttestationRequest")
 
-        self.print_step("3b", "Send CertificateChainRequest for DAC")
+        self.step("3b")
         type = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
         dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
 
-        self.print_step("3c", "Verify DAC is x509v3 and <= 600 bytes")
+        self.step("3c")
         asserts.assert_true(type_matches(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_dac = dac_resp.certificate
@@ -147,7 +209,7 @@ class TC_DA_1_2(MatterBaseTest):
             asserts.assert_true(False, "Unable to parse certificate from CertificateChainResponse")
         asserts.assert_equal(parsed_dac.version, x509.Version.v3, "DUT returned incorrect certificate type")
 
-        self.print_step("3d", "Send CertificateChainRequest for PAI and verifies PAI is x509v3 and <= 600 bytes")
+        self.step("3d")
         type = opcreds.Enums.CertificateChainTypeEnum.kPAICertificate
         pai_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
         asserts.assert_true(type_matches(pai_resp, opcreds.Commands.CertificateChainResponse),
@@ -161,33 +223,33 @@ class TC_DA_1_2(MatterBaseTest):
             asserts.assert_true(False, "Unable to parse certificate from CertificateChainResponse")
         asserts.assert_equal(parsed_pai.version, x509.Version.v3, "DUT returned incorrect certificate type")
 
-        self.print_step("3e", "TH1 saves PAI")
+        self.step("3e")
         # already saved above
 
-        self.print_step("4a", "Read VendorID from basic info")
+        self.step("4a")
         basic_info_vendor_id = await self.read_single_attribute_check_success(basic, basic.Attributes.VendorID)
 
-        self.print_step("4b", "Read ProductID from basic info")
+        self.step("4b")
         basic_info_product_id = await self.read_single_attribute_check_success(basic, basic.Attributes.ProductID)
 
-        self.print_step(5, "Extract the attestation_elements_message")
+        self.step(5)
         elements = attestation_resp.attestationElements
 
-        self.print_step(6, "Verify the AttestationResponse has the following fields")
+        self.step(6)
         # OK, it's a bit weird that we're doing this after extracting the elements already, but sure.
         # We type checked earlier, but let's grab the signature here.
         signature_attestation_raw = attestation_resp.attestationSignature
 
-        self.print_step(7, "Read the attestation_elements_message structure fields")
+        self.step(7)
         # Already done
 
-        self.print_step(8, "Verify that the attestation_elements_message structure fields satisfy the following conditions")
+        self.step(8)
         # Not sure why this is a separate step, but I'm ready...let's check.
 
-        self.print_step("8.1", "Verify attestation elements size is < = 900 bytes")
+        self.step("8.1")
         asserts.assert_less_equal(len(elements), 900, "AttestationElements field is more than 900 bytes")
 
-        self.print_step("8.2", "Verify certification declaration is present and follows spec format")
+        self.step("8.2")
         decoded = TLVReader(elements).get()["Any"]
         # Certification declaration is tag 1
         asserts.assert_in(1, decoded.keys(), "CD is not present in the attestation elements")
@@ -244,7 +306,7 @@ class TC_DA_1_2(MatterBaseTest):
         algo_id = dict(signer_info['signatureAlgorithm'])
         asserts.assert_equal(algo_id['algorithm'], id_ecdsa_with_sha256, "Incorrect signature algorithm")
 
-        self.print_step("8.3", "Verify mandatory cd contents")
+        self.step("8.3")
         # First, lets parse it
         cd = TLVReader(cd_tlv).get()["Any"]
         format_version = cd[0]
@@ -272,19 +334,19 @@ class TC_DA_1_2(MatterBaseTest):
         else:
             asserts.assert_in(certification_type, [1, 2], "Certification type is out of range")
 
-        self.print_step("8.4", "Confirm that both dac_origin_vendor_id and dac_origin_product_id are present")
+        self.step("8.4")
         if not is_ci and pics_origin_vid:
             asserts.assert_in(9, cd.keys(), "Origin vendor ID not found in cert")
             asserts.assert_in(10, cd.keys(), "Origin product ID not found in cert")
 
-        self.print_step("8.5", "Confirm that neither dac_origin_vendor_id nor dac_origin_product_id are present")
+        self.step("8.5")
         if not is_ci and not pics_origin_vid:
             asserts.assert_not_in(9, cd.keys(), "Origin vendor ID found in cert")
             asserts.assert_not_in(10, cd.keys(), "Origin product ID found in cert")
 
         dac_vid, dac_pid, pai_vid, pai_pid = parse_ids_from_certs(parsed_dac, parsed_pai)
 
-        self.print_step("8.6", "Check origin PID/VID against DAC and PAI")
+        self.step("8.6")
         has_origin_vid = 9 in cd.keys()
         has_origin_pid = 10 in cd.keys()
         if not is_ci and has_origin_vid != pics_origin_vid:
@@ -305,7 +367,7 @@ class TC_DA_1_2(MatterBaseTest):
             if pai_pid:
                 asserts.assert_equal(pai_pid, origin_pid, "Origin Product ID in the CD does not match the Product ID in the PAI")
 
-        self.print_step("8.7", "Check CD PID/VID against DAC and PAI")
+        self.step("8.7")
         if not has_origin_vid:
             asserts.assert_equal(dac_vid, vendor_id, "Vendor ID in the CD does not match the Vendor ID in the DAC")
             asserts.assert_equal(pai_vid, vendor_id, "Vendor ID in the CD does not match the Vendor ID in the PAI")
@@ -313,7 +375,7 @@ class TC_DA_1_2(MatterBaseTest):
             if pai_pid:
                 asserts.assert_in(pai_pid, product_id_array, "Product ID from the PAI is not present in the PID list in the CD")
 
-        self.print_step("8.8", "Check PAAs")
+        self.step("8.8")
         has_paa_list = 11 in cd.keys()
         if not is_ci and pics_paa_list != has_paa_list:
             asserts.fail("PAA list does not match PICS")
@@ -324,7 +386,7 @@ class TC_DA_1_2(MatterBaseTest):
             paa_authority_list = cd[11]
             asserts.assert_in(akids[0], paa_authority_list, "PAI AKID not found in the authority list")
 
-        self.print_step("8.9", "Check signature")
+        self.step("8.9")
         signature_cd = bytes(signer_info['signature'])
         certs = {}
         for filename in os.listdir(cd_cert_dir):
@@ -343,13 +405,13 @@ class TC_DA_1_2(MatterBaseTest):
         except InvalidSignature:
             asserts.fail("Failed to verify CD signature against known CD public key")
 
-        self.print_step(9, "Verify nonce")
+        self.step(9)
         asserts.assert_in(2, decoded.keys(), "Attestation nonce is not present in the attestation elements")
         returned_nonce = decoded[2]
         asserts.assert_equal(returned_nonce, nonce, "Returned attestation nonce does not match request nonce")
         asserts.assert_equal(len(returned_nonce), 32, "Returned nonce is incorrect size")
 
-        self.print_step(10, "Verify firmware")
+        self.step(10)
         has_firmware_information = 4 in decoded.keys()
         if not is_ci and has_firmware_information != pics_firmware_info:
             asserts.fail("PICS for firmware information does not match returned value")
@@ -359,7 +421,7 @@ class TC_DA_1_2(MatterBaseTest):
             except ValueError:
                 asserts.fail("Firmware is not an octet string")
 
-        self.print_step(11, "Verify that the signature for the attestation response is valid")
+        self.step(11)
         proxy = self.default_controller.GetConnectedDeviceSync(self.dut_node_id, False)
         asserts.assert_equal(len(proxy.attestationChallenge), 16, "Attestation challenge is the wrong length")
         attestation_tbs = elements + proxy.attestationChallenge
@@ -375,7 +437,7 @@ class TC_DA_1_2(MatterBaseTest):
         parsed_dac.public_key().verify(signature=signature_attestation, data=attestation_tbs,
                                        signature_algorithm=ec.ECDSA(hashes.SHA256()))
 
-        self.print_step(12, "Send AttestationRequest with nonce > 32 bytes")
+        self.step(12)
         nonce = random.randbytes(33)
         try:
             await self.send_single_cmd(cmd=opcreds.Commands.AttestationRequest(attestationNonce=nonce))
@@ -383,7 +445,7 @@ class TC_DA_1_2(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Received incorrect error from AttestationRequest command")
 
-        self.print_step(13, "Send AttestationRequest with nonce < 32 bytes")
+        self.step(13)
         nonce = random.randbytes(31)
         try:
             await self.send_single_cmd(cmd=opcreds.Commands.AttestationRequest(attestationNonce=nonce))
