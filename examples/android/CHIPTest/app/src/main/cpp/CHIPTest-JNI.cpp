@@ -169,9 +169,9 @@ static void onLog(const char * fmt, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID method;
-    jstring strObj = NULL;
+    jstring strObj        = NULL;
     jclass sTestEngineCls = NULL;
-    char str[512]  = { 0 };
+    char str[512]         = { 0 };
     va_list args;
 
     ChipLogProgress(Test, "Received onLog");
