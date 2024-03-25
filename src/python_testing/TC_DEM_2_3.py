@@ -139,8 +139,8 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
 
         self.step("5")
         await self.send_start_time_adjust_request_command(requestedStartTime=forecast.earliestStartTime,
-                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
-                                            expected_status = Status.Failure)
+                                                          cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
+                                                          expected_status=Status.Failure)
 
         self.step("5a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
@@ -162,7 +162,7 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
 
         self.step("7")
         await self.send_start_time_adjust_request_command(requestedStartTime=forecast.earliestStartTime,
-                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization)
+                                                          cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization)
 
         self.step("7a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
@@ -170,13 +170,12 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
         self.step("7b")
         forecast3 = await self.read_dem_attribute_expect_success(attribute="Forecast")
         logger.info(f"Forecast: {forecast3}")
-        asserts.assert_equal(forecast3.earliestStartTime, forecast3.startTime, 
+        asserts.assert_equal(forecast3.earliestStartTime, forecast3.startTime,
                              f"Expected earliestStartTime {forecast3.earliestStartTime} to be == startTime {forecast3.startTime}")
         asserts.assert_greater_equal(forecast3.latestEndTime, forecast3.endTime,
-                             f"Expected latestEndTime {forecast3.latestEndTime} to be >= endTime {forecast3.endTime}")
-        asserts.assert_equal(forecast3.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization, 
+                                     f"Expected latestEndTime {forecast3.latestEndTime} to be >= endTime {forecast3.endTime}")
+        asserts.assert_equal(forecast3.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization,
                              f"Expected forecastUpdateReason {forecast3.forecastUpdateReason} to be == LocalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kLocalOptimization}")
-
 
         self.step("8")
         await self.send_test_event_trigger_user_opt_out_local()
@@ -194,15 +193,14 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
         self.step("8c")
         forecast4 = await self.read_dem_attribute_expect_success(attribute="Forecast")
         logger.info(f"Forecast: {forecast4}")
-        asserts.assert_less_equal(forecast4.earliestStartTime, forecast4.startTime, 
-                             f"Expected earliestStartTime {forecast4.earliestStartTime} to be <= startTime {forecast4.startTime}")
-# TODO: asserts.assert_equal(forecast4.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization, 
+        asserts.assert_less_equal(forecast4.earliestStartTime, forecast4.startTime,
+                                  f"Expected earliestStartTime {forecast4.earliestStartTime} to be <= startTime {forecast4.startTime}")
+# TODO: asserts.assert_equal(forecast4.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
 #                      f"Expected forecastUpdateReason {forecast4.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
-
 
         self.step("9")
         await self.send_start_time_adjust_request_command(requestedStartTime=forecast4.startTime+forecast4.latestEndTime - forecast4.endTime,
-                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization)
+                                                          cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization)
 
         self.step("9a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
@@ -210,13 +208,12 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
         self.step("9b")
         forecast5 = await self.read_dem_attribute_expect_success(attribute="Forecast")
         logger.info(f"Forecast: {forecast5}")
-        asserts.assert_less_equal(forecast5.earliestStartTime, forecast5.startTime, 
-                             f"Expected earliestStartTime {forecast5.earliestStartTime} to be <= startTime {forecast5.startTime}")
+        asserts.assert_less_equal(forecast5.earliestStartTime, forecast5.startTime,
+                                  f"Expected earliestStartTime {forecast5.earliestStartTime} to be <= startTime {forecast5.startTime}")
         asserts.assert_equal(forecast5.latestEndTime, forecast5.endTime,
                              f"Expected latestEndTime {forecast5.latestEndTime} to be == endTime {forecast5.endTime}")
         asserts.assert_equal(forecast5.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization,
                              f"Expected forecastUpdateReason {forecast5.forecastUpdateReason} to be == GridOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kGridOptimization}")
-
 
         self.step("10")
         await self.send_cancel_request_command()
@@ -227,41 +224,39 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
         self.step("10b")
         forecast6 = await self.read_dem_attribute_expect_success(attribute="Forecast")
         logger.info(f"Forecast: {forecast6}")
-        asserts.assert_less_equal(forecast6.earliestStartTime, forecast6.startTime, 
-                             f"Expected earliestStartTime {forecast6.earliestStartTime} to be <= startTime {forecast6.startTime}")
+        asserts.assert_less_equal(forecast6.earliestStartTime, forecast6.startTime,
+                                  f"Expected earliestStartTime {forecast6.earliestStartTime} to be <= startTime {forecast6.startTime}")
         asserts.assert_greater_equal(forecast6.latestEndTime, forecast6.endTime,
-                             f"Expected latestEndTime {forecast6.latestEndTime} to be >= endTime {forecast6.endTime}")
+                                     f"Expected latestEndTime {forecast6.latestEndTime} to be >= endTime {forecast6.endTime}")
         asserts.assert_equal(forecast6.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
                              f"Expected forecastUpdateReason {forecast6.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
 
-
         self.step("11")
         await self.send_start_time_adjust_request_command(requestedStartTime=forecast6.earliestStartTime - 1,
-                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
-                                            expected_status = Status.Failure)
+                                                          cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
+                                                          expected_status=Status.Failure)
         self.step("11a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
 
         self.step("11b")
         forecast7 = await self.read_dem_attribute_expect_success(attribute="Forecast")
         logger.info(f"Forecast: {forecast7}")
-        asserts.assert_equal(forecast6.startTime, forecast7.startTime, 
+        asserts.assert_equal(forecast6.startTime, forecast7.startTime,
                              f"Expected old startTime {forecast6.startTime} to be == startTime {forecast7.startTime}")
         asserts.assert_equal(forecast6.endTime, forecast7.endTime,
                              f"Expected old endTime {forecast6.endTime} to be == endTime {forecast7.endTime}")
 
-
         self.step("12")
         await self.send_start_time_adjust_request_command(requestedStartTime=forecast7.startTime+(forecast7.latestEndTime-forecast7.endTime)+1,
-                                            cause = Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
-                                            expected_status = Status.Failure)
+                                                          cause=Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kLocalOptimization,
+                                                          expected_status=Status.Failure)
         self.step("12a")
         await self.check_dem_attribute("ESAState", Clusters.DeviceEnergyManagement.Enums.ESAStateEnum.kOnline)
 
         self.step("12b")
         forecast8 = await self.read_dem_attribute_expect_success(attribute="Forecast")
         logger.info(f"Forecast: {forecast8}")
-        asserts.assert_equal(forecast7.startTime, forecast8.startTime, 
+        asserts.assert_equal(forecast7.startTime, forecast8.startTime,
                              f"Expected old startTime {forecast7.startTime} to be == startTime {forecast8.startTime}")
         asserts.assert_equal(forecast7.endTime, forecast8.endTime,
                              f"Expected old endTime {forecast7.endTime} to be == endTime {forecast8.endTime}")
