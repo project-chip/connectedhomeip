@@ -39,6 +39,10 @@ void soc_pll_config(void);
 #include "silabs_utils.h"
 #endif
 
+#ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
+#include "SEGGER_SYSVIEW.h"
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
@@ -63,6 +67,11 @@ CHIP_ERROR SilabsPlatform::Init(void)
 #if SILABS_LOG_ENABLED
     silabsInitLog();
 #endif
+
+#ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
+    SEGGER_SYSVIEW_Conf();
+#endif
+
     return CHIP_NO_ERROR;
 }
 
