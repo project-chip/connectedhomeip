@@ -86,7 +86,7 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
         {
             jmethodID onDeviceAttestationCompletedMethod;
             JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate.ObjectRef(), "onDeviceAttestationCompleted",
-                                                    "(JLchip/devicecontroller/AttestationInfo;I)V",
+                                                    "(JLchip/devicecontroller/AttestationInfo;J)V",
                                                     &onDeviceAttestationCompletedMethod);
             VerifyOrReturn(onDeviceAttestationCompletedMethod != nullptr,
                            ChipLogError(Controller, "Could not find deviceAttestation completed method"));

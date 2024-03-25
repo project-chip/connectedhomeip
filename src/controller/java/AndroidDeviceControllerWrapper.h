@@ -86,7 +86,8 @@ public:
     }
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
-    void CallJavaMethod(const char * methodName, jint argument);
+    void CallJavaIntMethod(const char * methodName, jint argument);
+    void CallJavaLongMethod(const char * methodName, jlong argument);
     CHIP_ERROR InitializeOperationalCredentialsIssuer();
 
     /**
