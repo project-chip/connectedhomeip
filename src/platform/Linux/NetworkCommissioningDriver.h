@@ -29,6 +29,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
+static constexpr uint8_t kMaxNetworks = CHIP_CONFIG_MAX_WIFI_NETWORK;
+
 template <typename T>
 class LinuxScanResponseIterator : public Iterator<T>
 {
@@ -82,7 +84,7 @@ public:
     void Shutdown() override;
 
     // WirelessDriver
-    uint8_t GetMaxNetworks() override { return 1; }
+    uint8_t GetMaxNetworks() override { return kMaxNetworks; }
     uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
     uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
 
@@ -147,11 +149,14 @@ private:
         Platform::SharedPtr<Crypto::P256Keypair> clientIdentityKeypair;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
-
-    WiFiNetwork mSavedNetwork;
-    WiFiNetwork mStagingNetwork;
+    uint8_t currentNetId = 0;
+    uint8_t connectedNetworkIndex = 0;
+    WiFiNetwork mSavedNetwork[kMaxNetworks];
+    WiFiNetwork mStagingNetwork[kMaxNetworks];
     // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
     bool mIs5gSupported = false;
+    bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
+    void ShiftNetworkAfterRemove();
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
