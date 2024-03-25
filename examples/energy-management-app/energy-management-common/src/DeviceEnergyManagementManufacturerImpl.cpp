@@ -17,15 +17,14 @@
  */
 
 #include "app/clusters/device-energy-management-server/device-energy-management-server.h"
-#include <DeviceEnergyManagementManufacturerImpl.h>
+#include "utils.h"
 #include <DeviceEnergyManagementDelegateImpl.h>
-#include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
+#include <DeviceEnergyManagementManufacturerImpl.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/util/attribute-storage.h>
-#include "utils.h"
-
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -39,7 +38,7 @@ using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 // TODO: refactor, once the best approach is clear
 extern void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> & nullableForecast);
 
-static DataModel::Nullable<Structs::ForecastStruct::Type>  sForecast;
+static DataModel::Nullable<Structs::ForecastStruct::Type> sForecast;
 static OptOutStateEnum sOptOutState = OptOutStateEnum::kNoOptOut;
 
 struct DeviceEnergyManagementTestEventSaveData
@@ -47,16 +46,16 @@ struct DeviceEnergyManagementTestEventSaveData
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast;
 };
 
-static PowerAdjustmentCapability::TypeInfo::Type  sPowerAdjustmentCapability;
+static PowerAdjustmentCapability::TypeInfo::Type sPowerAdjustmentCapability;
 
 struct DeviceEnergyManagementTestEventPowerAdjustRequest
 {
-    int64_t  power;
+    int64_t power;
     uint32_t duration;
     AdjustmentCauseEnum cause;
 };
 
-static DeviceEnergyManagementTestEventSaveData    sDeviceEnergyManagementTestEventSaveData;
+static DeviceEnergyManagementTestEventSaveData sDeviceEnergyManagementTestEventSaveData;
 
 DeviceEnergyManagementDelegate * DeviceEnergyManagementManufacturer::sDelegate = nullptr;
 
@@ -80,13 +79,13 @@ CHIP_ERROR DeviceEnergyManagementManufacturer::Shutdown()
 
 void SetTestEventTrigger_PowerAdjustment()
 {
-    ChipLogProgress(Support, "[PowerAdjustment-handle] L-%d", __LINE__ );
+    ChipLogProgress(Support, "[PowerAdjustment-handle] L-%d", __LINE__);
     // TODO: implement
 }
 
 void SetTestEventTrigger_StartTimeAdjustment()
 {
-    ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d", __LINE__ );
+    ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d", __LINE__);
 
     DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
 
@@ -96,34 +95,33 @@ void SetTestEventTrigger_StartTimeAdjustment()
 
 void SetTestEventTrigger_StartTimeAdjustmentClear()
 {
-    ChipLogProgress(Support, "[StartTimeAdjustmentClear-handle] L-%d", __LINE__ );
+    ChipLogProgress(Support, "[StartTimeAdjustmentClear-handle] L-%d", __LINE__);
 
     DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
 
     if (CHIP_NO_ERROR != dg->SetForecast(sForecast))
     {
-        ChipLogProgress(Support, "[StartTimeAdjustmentClear-handle] L-%d Failed to restore forecast!", __LINE__ );
+        ChipLogProgress(Support, "[StartTimeAdjustmentClear-handle] L-%d Failed to restore forecast!", __LINE__);
     }
 }
 
-void SetTestEventTrigger_UserOptOutOptimization( OptOutStateEnum optOutState)
+void SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum optOutState)
 {
-    ChipLogProgress(Support, "[UserOptOutOptimization-handle] L-%d", __LINE__ );
+    ChipLogProgress(Support, "[UserOptOutOptimization-handle] L-%d", __LINE__);
 
     DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
-    sOptOutState = dg->GetOptOutState();
+    sOptOutState                        = dg->GetOptOutState();
     dg->SetOptOutState(optOutState);
 }
 
 void SetTestEventTrigger_PowerAdjustRequest()
 {
-    ChipLogProgress(Support, "[PowerAdjustRequest-handle] L-%d", __LINE__ );
+    ChipLogProgress(Support, "[PowerAdjustRequest-handle] L-%d", __LINE__);
 
     DeviceEnergyManagementDelegate * dg = DeviceEnergyManagementManufacturer::GetDelegate();
-    sPowerAdjustmentCapability = dg->GetPowerAdjustmentCapability();
+    sPowerAdjustmentCapability          = dg->GetPowerAdjustmentCapability();
     // TODO: implement
 }
-
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
 {
@@ -137,7 +135,7 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         break;
     case DeviceEnergyManagementTrigger::kPowerAdjustmentClear:
         ChipLogProgress(Support, "[PowerAdjustmentClear-Test-Event] => Clear PowerAdjustment struct");
-	    SetTestEventTrigger_PowerAdjustRequest();
+        SetTestEventTrigger_PowerAdjustRequest();
         break;
     case DeviceEnergyManagementTrigger::kUserOptOutLocalOptimization:
         ChipLogProgress(Support, "[UserOptOutLocalOptimization-Test-Event] => Set User opt-out Local Optimization");

@@ -29,8 +29,7 @@ using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 using chip::Optional;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
-
-#ifdef  DELEGATE_TEST_DATA
+#ifdef DELEGATE_TEST_DATA
 #include "DeviceEnergyManagementDelegateImpl_TestData.cpp"
 #else
 DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() {}
@@ -117,15 +116,15 @@ Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t req
 
     switch (cause)
     {
-        case AdjustmentCauseEnum::kLocalOptimization:
-            mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kLocalOptimization;
+    case AdjustmentCauseEnum::kLocalOptimization:
+        mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kLocalOptimization;
         break;
-        case AdjustmentCauseEnum::kGridOptimization:
-            mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kGridOptimization;
+    case AdjustmentCauseEnum::kGridOptimization:
+        mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kGridOptimization;
         break;
-        default:
-            ChipLogDetail(AppServer, "Bad cause %d", static_cast<int>(cause));
-            return Status::Failure;
+    default:
+        ChipLogDetail(AppServer, "Bad cause %d", static_cast<int>(cause));
+        return Status::Failure;
         break;
     }
 
@@ -254,12 +253,12 @@ Status DeviceEnergyManagementDelegate::CancelRequest()
         return Status::Failure;
     }
 
-    mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kInternalOptimization;
+    mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
 
     /* TODO:
-    *  Cancel the effects of any previous adjustment request commands, and re-evaluate its forecast
-    *  for intended operation ignoring those previous requests.
-    */
+     *  Cancel the effects of any previous adjustment request commands, and re-evaluate its forecast
+     *  for intended operation ignoring those previous requests.
+     */
 
     return status;
 }
@@ -426,21 +425,21 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum state)
 #if 1 // TODO: not sure if this should be included. If it is then test 2_3 5b, fails !
     switch (state)
     {
-        case OptOutStateEnum::kOptOut:
-            mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kInternalOptimization;
+    case OptOutStateEnum::kOptOut:
+        mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
         break;
-        // case OptOutStateEnum::kNoOptOut:
-        //     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kLocalOptimization;
-        // break;
-        // case OptOutStateEnum::kLocalOptOut:
-        //     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kLocalOptimization;
-        // break;
-        // case OptOutStateEnum::kGridOptOut:
-        //     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kGridOptimization;
-        // break;
-        default:
-            ChipLogDetail(AppServer, "Bad state %d", static_cast<int>(state));
-            return CHIP_ERROR_INVALID_ARGUMENT;
+    // case OptOutStateEnum::kNoOptOut:
+    //     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kLocalOptimization;
+    // break;
+    // case OptOutStateEnum::kLocalOptOut:
+    //     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kLocalOptimization;
+    // break;
+    // case OptOutStateEnum::kGridOptOut:
+    //     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kGridOptimization;
+    // break;
+    default:
+        ChipLogDetail(AppServer, "Bad state %d", static_cast<int>(state));
+        return CHIP_ERROR_INVALID_ARGUMENT;
         break;
     }
 #endif

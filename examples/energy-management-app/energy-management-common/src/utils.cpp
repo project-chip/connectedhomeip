@@ -16,11 +16,10 @@
  *    limitations under the License.
  */
 
-
-#include <utils.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
+#include <utils.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -31,7 +30,6 @@ using namespace chip::app::Clusters::EnergyEvse::Attributes;
 
 using chip::app::LogEvent;
 using chip::Protocols::InteractionModel::Status;
-
 
 /**
  * @brief   Helper function to get current timestamp in Epoch format

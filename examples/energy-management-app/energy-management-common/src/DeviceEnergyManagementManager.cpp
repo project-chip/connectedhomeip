@@ -27,9 +27,10 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-DeviceEnergyManagementManager::DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature) :
+DeviceEnergyManagementManager::DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate,
+                                                             Feature aFeature) :
     DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature),
-    mDelegate( &aDelegate)
+    mDelegate(&aDelegate)
 {
     mDEMManufacturer = new DeviceEnergyManagementManufacturer(this, &aDelegate);
 }

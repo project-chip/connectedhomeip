@@ -24,8 +24,7 @@
 #include <app/util/config.h>
 #include <cstring>
 
-#define DELEGATE_TEST_DATA        // TODO: comment out if not needed
-
+#define DELEGATE_TEST_DATA // TODO: comment out if not needed
 
 using chip::Protocols::InteractionModel::Status;
 namespace chip {

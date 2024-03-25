@@ -24,7 +24,6 @@
 
 using chip::Protocols::InteractionModel::Status;
 
-
 /**
  * @brief   Helper function to get current timestamp in Epoch format
  *

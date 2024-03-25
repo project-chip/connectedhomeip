@@ -46,7 +46,7 @@ public:
     DeviceEnergyManagementDelegate * GetDelegate() { return mDelegate; };
 
 private:
-    DeviceEnergyManagementDelegate     * mDelegate;
+    DeviceEnergyManagementDelegate * mDelegate;
     DeviceEnergyManagementManufacturer * mDEMManufacturer;
 };
 

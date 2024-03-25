@@ -31,18 +31,18 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 class DeviceEnergyManagementManufacturer
 {
 private:
-    DeviceEnergyManagementManager  * mInstance;
+    DeviceEnergyManagementManager * mInstance;
     static DeviceEnergyManagementDelegate * sDelegate;
 
 public:
     DeviceEnergyManagementManufacturer() = delete;
-    DeviceEnergyManagementManufacturer(DeviceEnergyManagementManager * aInstance, DeviceEnergyManagementDelegate * delegate)
-        : mInstance(aInstance)
+    DeviceEnergyManagementManufacturer(DeviceEnergyManagementManager * aInstance, DeviceEnergyManagementDelegate * delegate) :
+        mInstance(aInstance)
     {
         DeviceEnergyManagementManufacturer::sDelegate = delegate;
     }
 
-    DeviceEnergyManagementManager  * GetInstance()  { return mInstance; }
+    DeviceEnergyManagementManager * GetInstance() { return mInstance; }
 
     /**
      * @brief   Called at start up to apply hardware settings
@@ -55,7 +55,6 @@ public:
     CHIP_ERROR Shutdown();
 
     static DeviceEnergyManagementDelegate * GetDelegate() { return sDelegate; }
-
 };
 
 } // namespace Clusters
