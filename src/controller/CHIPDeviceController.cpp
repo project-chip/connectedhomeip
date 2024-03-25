@@ -392,6 +392,7 @@ DeviceCommissioner::DeviceCommissioner() :
     mOnDeviceConnectionRetryCallback(OnDeviceConnectionRetryFn, this),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
+    mDACChainRevocationStatusVerificationCallback(OnDACChainRevocationStatusVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {}
 
@@ -877,7 +878,8 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (mCommissioningStage != CommissioningStage::kAttestationVerification)
+    if (mCommissioningStage != CommissioningStage::kAttestationVerification &&
+        mCommissioningStage != CommissioningStage::kAttestationRevocationCheck)
     {
         ChipLogError(Controller, "Commissioning is not attestation verification phase");
         return CHIP_ERROR_INCORRECT_STATE;
@@ -1147,13 +1149,68 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(
     }
     else
     {
+        {
+            ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");
+            commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+        }
+    }
+}
+
+void DeviceCommissioner::OnDACChainRevocationStatusVerification(
+    void * context, const Credentials::DeviceAttestationVerifier::AttestationInfo & info, AttestationVerificationResult result)
+{
+    MATTER_TRACE_SCOPE("OnDACChainRevocationStatusVerification", "DeviceCommissioner");
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+
+    if (!commissioner->mDeviceBeingCommissioned)
+    {
+        ChipLogError(Controller, "Device attestation verification result received when we're not commissioning a device");
+        return;
+    }
+
+    auto & params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
+    Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
+
+    if (result != AttestationVerificationResult::kSuccess)
+    {
+        CommissioningDelegate::CommissioningReport report;
+        report.Set<AttestationErrorInfo>(result);
+        if (result == AttestationVerificationResult::kNotImplemented)
+        {
+            ChipLogError(Controller,
+                         "Failed in verifying 'DAC Chain Revocation Status' command received from the device due to default "
+                         "DeviceAttestationVerifier Class not being overridden by a real implementation.");
+            commissioner->CommissioningStageComplete(CHIP_ERROR_NOT_IMPLEMENTED, report);
+            return;
+        }
+
+        ChipLogError(Controller,
+                     "Failed in verifying 'DAC Chain Revocation Status' command received from the device: err %hu. Look at "
+                     "AttestationVerificationResult enum to understand the errors",
+                     static_cast<uint16_t>(result));
+        // Go look at AttestationVerificationResult enum in src/credentials/attestation_verifier/DeviceAttestationVerifier.h to
+        // understand the errors.
+
+        // If a device attestation status delegate is installed, delegate handling of failure to the client and let them decide on
+        // whether to proceed further or not.
+        if (deviceAttestationDelegate)
+        {
+            commissioner->ExtendArmFailSafeForDeviceAttestation(info, result);
+        }
+        else
+        {
+            commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
+        }
+    }
+    else
+    {
         if (deviceAttestationDelegate && deviceAttestationDelegate->ShouldWaitAfterDeviceAttestation())
         {
             commissioner->ExtendArmFailSafeForDeviceAttestation(info, result);
         }
         else
         {
-            ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");
+            ChipLogProgress(Controller, "Successfully validated 'DAC Chain Revocation Status' command received from the device.");
             commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
         }
     }
@@ -1301,6 +1358,18 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const Credentials::Device
     mDeviceAttestationVerifier->VerifyAttestationInformation(info, &mDeviceAttestationInformationVerificationCallback);
 
     // TODO: Validate Firmware Information
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DeviceCommissioner::ValidateDACChainRevocationStatus(const Credentials::DeviceAttestationVerifier::AttestationInfo & info)
+{
+    MATTER_TRACE_SCOPE("ValidateDACChainRevocationStatus", "DeviceCommissioner");
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeviceAttestationVerifier != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mDeviceAttestationVerifier->ValidateDACChainRevocationStatus(info, &mDACChainRevocationStatusVerificationCallback);
 
     return CHIP_NO_ERROR;
 }
@@ -2920,6 +2989,31 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         if (ValidateAttestationInfo(info) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error validating attestation information");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+    }
+    break;
+    case CommissioningStage::kAttestationRevocationCheck: {
+        ChipLogProgress(Controller, "Verifying device's DAC chain revocation status");
+        if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() ||
+            !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue() ||
+            !params.GetRemoteVendorId().HasValue() || !params.GetRemoteProductId().HasValue())
+        {
+            ChipLogError(Controller, "Missing attestation certificates");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
+
+        DeviceAttestationVerifier::AttestationInfo info(
+            params.GetAttestationElements().Value(),
+            proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge(),
+            params.GetAttestationSignature().Value(), params.GetPAI().Value(), params.GetDAC().Value(),
+            params.GetAttestationNonce().Value(), params.GetRemoteVendorId().Value(), params.GetRemoteProductId().Value());
+
+        if (ValidateDACChainRevocationStatus(info) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Error validating device's DAC chain revocation status");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }

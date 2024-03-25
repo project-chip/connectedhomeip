@@ -386,6 +386,9 @@ public:
                                                            const Crypto::P256PublicKey & dacPublicKey,
                                                            const ByteSpan & csrNonce) = 0;
 
+    virtual void ValidateDACChainRevocationStatus(const AttestationInfo & info,
+                                                  Callback::Callback<OnAttestationInformationVerification> * onCompletion) = 0;
+
     /**
      * @brief Get the trust store used for the attestation verifier.
      *

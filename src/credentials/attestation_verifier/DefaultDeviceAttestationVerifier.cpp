@@ -607,6 +607,16 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     return CHIP_NO_ERROR;
 }
 
+void DefaultDACVerifier::ValidateDACChainRevocationStatus(const AttestationInfo & info,
+                                                          Callback::Callback<OnAttestationInformationVerification> * onCompletion)
+{
+    AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
+
+    // TODO
+
+    onCompletion->mCall(onCompletion->mContext, info, attestationError);
+}
+
 bool CsaCdKeysTrustStore::IsCdTestKey(const ByteSpan & kid) const
 {
     return kid.data_equal(ByteSpan{ gTestCdPubkeyKid });

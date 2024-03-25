@@ -606,6 +606,14 @@ public:
 
     /**
      * @brief
+     *   This function validates the revocation status of the DAC Chain sent by the device.
+     *
+     * @param[in] info Structure contatining all the required information for validating the device attestation.
+     */
+    CHIP_ERROR ValidateDACChainRevocationStatus(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
+
+    /**
+     * @brief
      * Sends CommissioningStepComplete report to the commissioning delegate. Function will fill in current step.
      * @params[in] err      error from the current step
      * @params[in] report   report to send. Current step will be filled in automatically
@@ -884,6 +892,9 @@ private:
     static void OnDeviceAttestationInformationVerification(void * context,
                                                            const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
                                                            Credentials::AttestationVerificationResult result);
+    static void OnDACChainRevocationStatusVerification(void * context,
+                                                       const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
+                                                       Credentials::AttestationVerificationResult result);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                            const ByteSpan & rcac, Optional<IdentityProtectionKeySpan> ipk,
@@ -1017,6 +1028,8 @@ private:
 
     chip::Callback::Callback<Credentials::DeviceAttestationVerifier::OnAttestationInformationVerification>
         mDeviceAttestationInformationVerificationCallback;
+    chip::Callback::Callback<Credentials::DeviceAttestationVerifier::OnAttestationInformationVerification>
+        mDACChainRevocationStatusVerificationCallback;
 
     chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;

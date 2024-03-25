@@ -69,6 +69,13 @@ public:
         (void) csrNonce;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    void ValidateDACChainRevocationStatus(const AttestationInfo & info,
+                                          Callback::Callback<OnAttestationInformationVerification> * onCompletion) override
+    {
+        (void) info;
+        (void) onCompletion;
+    }
 };
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before
