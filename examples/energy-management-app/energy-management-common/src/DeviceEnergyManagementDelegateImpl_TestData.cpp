@@ -193,7 +193,7 @@ void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> &
     forecast.startTime         = static_cast<uint32_t>(chipEpoch);       // planned start time, in UTC, for the entire Forecast.
 
     // earliest start time, in UTC, that the entire Forecast can be shifted to. null value indicates that it can be started immediately.
-    forecast.earliestStartTime = Optional<DataModel::Nullable<uint32_t>> {DataModel::Nullable<uint32_t>{chipEpoch}}; 
+    forecast.earliestStartTime = Optional<DataModel::Nullable<uint32_t>> {DataModel::Nullable<uint32_t>{chipEpoch}};
     forecast.endTime           = static_cast<uint32_t>(chipEpoch * 3);   // planned end time, in UTC, for the entire Forecast.
     forecast.latestEndTime     = Optional<uint32_t> (static_cast<uint32_t>(chipEpoch * 3));  // latest end time, in UTC, for the entire Forecast
 }
@@ -210,8 +210,8 @@ namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
-//DeviceEnergyManagementDelegateImpl::DeviceEnergyManagementDelegateImpl() 
-DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() 
+//DeviceEnergyManagementDelegateImpl::DeviceEnergyManagementDelegateImpl()
+DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate()
 {
     if (nullptr == sDeviceEnergyManagementDelegate)
     {

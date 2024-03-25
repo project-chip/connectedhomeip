@@ -241,23 +241,23 @@ Status DeviceEnergyManagementDelegate::RequestConstraintBasedForecast(
 Status DeviceEnergyManagementDelegate::CancelRequest()
 {
     Status status = Status::Success;
-    
+
     if (mForecast.IsNull())
     {
         ChipLogDetail(AppServer, "Cancelling on a Null forecast!");
-        return Status::Failure; 
+        return Status::Failure;
     }
 
     if (mForecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization)
     {
         ChipLogDetail(AppServer, "Bad Cancel when ESA ForecastUpdateReason was already Internal Optimization!");
-        return Status::Failure; 
+        return Status::Failure;
     }
 
     mForecast.Value().forecastUpdateReason   = ForecastUpdateReasonEnum::kInternalOptimization;
 
     /* TODO:
-    *  Cancel the effects of any previous adjustment request commands, and re-evaluate its forecast 
+    *  Cancel the effects of any previous adjustment request commands, and re-evaluate its forecast
     *  for intended operation ignoring those previous requests.
     */
 

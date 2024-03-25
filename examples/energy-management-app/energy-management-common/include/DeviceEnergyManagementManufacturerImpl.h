@@ -38,7 +38,7 @@ public:
     DeviceEnergyManagementManufacturer() = delete;
     DeviceEnergyManagementManufacturer(DeviceEnergyManagementManager * aInstance, DeviceEnergyManagementDelegate * delegate)
         : mInstance(aInstance)
-    { 
+    {
         DeviceEnergyManagementManufacturer::sDelegate = delegate;
     }
 
