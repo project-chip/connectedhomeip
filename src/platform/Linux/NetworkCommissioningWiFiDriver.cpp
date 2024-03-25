@@ -349,7 +349,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     else
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     {
-        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%.*s'", network.ssidLen, network.ssid);
+        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%.*s'", network[connectedNetworkIndex].ssidLen, network[connectedNetworkIndex].ssid);
 
         err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(network[connectedNetworkIndex].ssid, network[connectedNetworkIndex].ssidLen),
                                                             ByteSpan(network[connectedNetworkIndex].credentials, network[connectedNetworkIndex].credentialsLen), callback);
@@ -415,6 +415,7 @@ bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
             item.connected = true;
         }
     }
+    networkIteratorIndex++;
 
     return true;
 }

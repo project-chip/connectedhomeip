@@ -74,6 +74,7 @@ public:
     private:
         LinuxWiFiDriver * driver;
         bool exhausted = false;
+        uint8_t networkIteratorIndex = 0;
     };
 
     void Set5gSupport(bool is5gSupported) { mIs5gSupported = is5gSupported; }
