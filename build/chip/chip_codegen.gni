@@ -31,10 +31,6 @@ template("_chip_build_time_codegen") {
   _name = target_name
   _generator = invoker.generator
 
-  config("${_name}_config") {
-    include_dirs = [ target_gen_dir ]
-  }
-
   pw_python_action("${_name}_generate") {
     script = "${chip_root}/scripts/codegen.py"
 
@@ -123,10 +119,6 @@ template("_chip_build_time_codegen") {
 template("_chip_build_time_zapgen") {
   _name = target_name
   _generator = invoker.generator
-
-  config("${_name}_config") {
-    include_dirs = [ "${target_gen_dir}/zapgen/" ]
-  }
 
   assert(_generator == "app-templates")
 
@@ -225,6 +217,9 @@ template("_chip_build_time_zapgen") {
 #   generator
 #     Name of the generator to use (e.g. java-jni, java-class, cpp-app)
 #
+#     outputs MUST share the same directory prefix (e.g. 'app/' or 'tlv/meta'
+#     or 'jni')
+#
 #   outputs
 #     Explicit names of the expected outputs. Enforced to validate that
 #     expected outputs are generated when processing input files.
@@ -265,7 +260,17 @@ template("_chip_build_time_zapgen") {
 #    ]
 #  }
 #
+# Guarantees a target named "${target_name}_generate" exists and contains all
+# generated files (this works even in the case of using a pre-generated directory
+# by using a copy target to import pre-generated data)
+#
 template("chip_codegen") {
+  _name = target_name
+
+  config("${_name}_config") {
+    include_dirs = [ target_gen_dir ]
+  }
+
   if (chip_code_pre_generated_directory == "") {
     _chip_build_time_codegen(target_name) {
       forward_variables_from(invoker,
@@ -279,8 +284,6 @@ template("chip_codegen") {
                              ])
     }
   } else {
-    _name = target_name
-
     not_needed(invoker, [ "options" ])
 
     # This constructs a path like:
@@ -292,8 +295,21 @@ template("chip_codegen") {
         string_replace(rebase_path(invoker.input, chip_root), ".matter", "") +
         "/codegen/" + invoker.generator
 
-    config("${_name}_config") {
-      include_dirs = [ "${_generation_dir}" ]
+    # Generation in this case just involves some files copying
+    copy("${_name}_generate") {
+      sources = []
+
+      foreach(name, invoker.outputs) {
+        sources += [ "${_generation_dir}/${name}" ]
+      }
+
+      # NOTE: we assume ALL outputs have a common subdir. This is generally the case with
+      #       paths like "app/callback-stub.cpp" and "app/PluginApplicationCallbacks.h"
+      _outputs = invoker.outputs
+      _dir_name = get_path_info(_outputs[0], "dir")
+      outputs = [ "${target_gen_dir}/${_dir_name}/{{source_file_part}}" ]
+
+      public_configs = [ ":${_name}_config" ]
     }
 
     source_set(_name) {
@@ -302,13 +318,13 @@ template("chip_codegen") {
       if (defined(invoker.public_configs)) {
         public_configs += invoker.public_configs
       }
+      sources = get_target_outputs(":${_name}_generate")
 
       forward_variables_from(invoker, [ "deps" ])
-
-      sources = []
-      foreach(name, invoker.outputs) {
-        sources += [ "${_generation_dir}/${name}" ]
+      if (!defined(deps)) {
+        deps = []
       }
+      deps += [ ":${_name}_generate" ]
     }
   }
 }
@@ -327,6 +343,9 @@ template("chip_codegen") {
 #     Explicit names of the expected outputs. Enforced to validate that
 #     expected outputs are generated when processing input files.
 #
+#     outputs MUST share the same directory prefix (e.g. 'app/' or 'tlv/meta'
+#     or 'jni')
+#
 #   deps, public_configs
 #     Forwarded to the resulting source set
 #
@@ -352,18 +371,28 @@ template("chip_codegen") {
 #
 # Example usage:
 #
-#  chip_codegen("java-jni-generate") {
-#    input = "controller-clusters.matter"
-#    generator = "java-jni"
+# chip_zapgen("controller-clusters-zap") {
+#     input = "controller-clusters.zap"
+#     generator = "app-templates"
 #
-#    outputs = [
-#       "jni/IdentifyClient-ReadImpl.cpp",
-#       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
-#       # ... more to follow
-#    ]
-#  }
+#     outputs = [
+#       "zap-generated/access.h",
+#       "zap-generated/gen_config.h",
+#       "zap-generated/endpoint_config.h",
+#     ]
+# }
+#
+# Guarantees a target named "${target_name}_generate" exists and contains all
+# generated files (this works even in the case of using a pre-generated directory
+# by using a copy target to import pre-generated data)
 #
 template("chip_zapgen") {
+  _name = target_name
+
+  config("${_name}_config") {
+    include_dirs = [ "${target_gen_dir}/zapgen/" ]
+  }
+
   if (chip_code_pre_generated_directory == "") {
     _chip_build_time_zapgen(target_name) {
       forward_variables_from(invoker,
@@ -376,8 +405,6 @@ template("chip_zapgen") {
                              ])
     }
   } else {
-    _name = target_name
-
     # This contstructs a path like:
     #  FROM all-clusters-app.zap (inside examples/all-clusters-app/all-clusters-common/)
     #  USING "cpp-app" for generator:
@@ -386,10 +413,6 @@ template("chip_zapgen") {
         chip_code_pre_generated_directory + "/" +
         string_replace(rebase_path(invoker.input, chip_root), ".zap", "") +
         "/zap/" + invoker.generator
-
-    config("${_name}_config") {
-      include_dirs = [ "${_generation_dir}" ]
-    }
 
     # Pick up only the headers and mark them available to use
     # Specifically controller seems to require header files but NOT cpp (does)
@@ -429,6 +452,23 @@ template("chip_zapgen") {
       public_deps = [ ":${_name}_headers" ]
     }
 
+    # Generation in this case just involves some files copying
+    copy("${_name}_generate") {
+      sources = []
+
+      foreach(name, invoker.outputs) {
+        sources += [ "${_generation_dir}/${name}" ]
+      }
+
+      # NOTE: we assume ALL outputs have a common subdir. This is generally the case with
+      #       paths like "app/callback-stub.cpp" and "app/PluginApplicationCallbacks.h"
+      _outputs = invoker.outputs
+      _dir_name = get_path_info(_outputs[0], "dir")
+      outputs = [ "${target_gen_dir}/zapgen/${_dir_name}/{{source_file_part}}" ]
+
+      public_configs = [ ":${_name}_config" ]
+    }
+
     source_set(_name) {
       forward_variables_from(invoker,
                              [
@@ -440,10 +480,12 @@ template("chip_zapgen") {
       }
       public_configs += [ ":${_name}_config" ]
 
-      sources = []
-      foreach(name, invoker.outputs) {
-        sources += [ "${_generation_dir}/${name}" ]
+      if (!defined(public_deps)) {
+        public_deps = []
       }
+      public_deps += [ ":${_name}_generate" ]
+
+      sources = get_target_outputs(":${_name}_generate")
 
       # Ugly, but references WILL reference back into main code.
       check_includes = false

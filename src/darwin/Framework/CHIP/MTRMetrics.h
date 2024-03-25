@@ -21,6 +21,32 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ * Representation of metric data corresponding to a metric event.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRMetricData : NSObject
+
+/**
+ * Value for the metric data. The value may be nil depending on the event emitted.
+ */
+@property (nonatomic, nullable, readonly, copy) NSNumber * value;
+
+/**
+ * Error code for the metric data. This value, when not nil, holds the error code value
+ * of the operation associated with the event. Interpretation of the error code value
+ * dependents on the metric being emitted.
+ */
+@property (nonatomic, nullable, readonly, copy) NSNumber * errorCode;
+
+/**
+ * Duration of event associated with the metric. This value may be nil depending on
+ * the event emitted. When not nil, the value of duration is of type NSTimeInterval.
+ */
+@property (nonatomic, nullable, readonly, copy) NSNumber * duration;
+
+@end
+
+/**
  * A representation of a collection of metrics data for an operation.
  */
 MTR_NEWLY_AVAILABLE
@@ -30,18 +56,23 @@ MTR_NEWLY_AVAILABLE
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
+ * @brief Returns a unique identifier for the object
+ */
+@property (nonatomic, readonly, copy) NSUUID * uniqueIdentifier;
+
+/**
  * @brief Returns the names of all the metrics data items collected.
  */
 @property (nonatomic, readonly, copy) NSArray<NSString *> * allKeys;
 
 /**
- * @brief Returns metric object corresponding to the metric identified by its key
+ * @brief Returns metric data corresponding to the metric identified by its key.
  *
  * @param [in] key Name of the metric
  *
- * @return An object containing the metric data, nil if key is invalid
+ * @return An object containing the metric data, nil if key is invalid.
  */
-- (nullable id)valueForKey:(NSString *)key;
+- (nullable MTRMetricData *)metricDataForKey:(NSString *)key;
 
 @end
 

@@ -21,7 +21,6 @@ package chip.platform;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager.MulticastLock;
-import android.os.Handler;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import java.util.concurrent.Executors;
@@ -38,9 +37,8 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
   private final long callbackHandle;
   private final long contextHandle;
   private final ChipMdnsCallback chipMdnsCallback;
-  private final Runnable timeoutRunnable;
   private final MulticastLock multicastLock;
-  private final Handler mainThreadHandler;
+  private final ScheduledFuture<?> resolveTimeoutExecutor;
 
   @Nullable
   private final NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
@@ -53,18 +51,16 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
       final long callbackHandle,
       final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback,
-      final Runnable timeoutRunnable,
       final MulticastLock multicastLock,
-      final Handler mainThreadHandler,
+      final ScheduledFuture<?> resolveTimeoutExecutor,
       final NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState) {
     this.nsdManager = nsdManager;
     this.targetServiceInfo = targetServiceInfo;
     this.callbackHandle = callbackHandle;
     this.contextHandle = contextHandle;
     this.chipMdnsCallback = chipMdnsCallback;
-    this.timeoutRunnable = timeoutRunnable;
     this.multicastLock = multicastLock;
-    this.mainThreadHandler = mainThreadHandler;
+    this.resolveTimeoutExecutor = resolveTimeoutExecutor;
     this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
   }
 
@@ -101,16 +97,9 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
 
       if (stopDiscoveryRunnable.cancel(false)) {
         nsdManager.stopServiceDiscovery(this);
-        if (multicastLock.isHeld()) {
-          multicastLock.release();
-        }
       }
 
-      if (nsdManagerResolverAvailState != null) {
-        nsdManagerResolverAvailState.acquireResolver();
-      }
-
-      resolveService(service, callbackHandle, contextHandle, chipMdnsCallback, timeoutRunnable);
+      resolveService(service, callbackHandle, contextHandle, chipMdnsCallback);
     } else {
       Log.d(TAG, "onServiceFound: found service not a target for resolution, ignoring " + service);
     }
@@ -120,8 +109,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
       NsdServiceInfo serviceInfo,
       final long callbackHandle,
       final long contextHandle,
-      final ChipMdnsCallback chipMdnsCallback,
-      Runnable timeoutRunnable) {
+      final ChipMdnsCallback chipMdnsCallback) {
     this.nsdManager.resolveService(
         serviceInfo,
         new NsdManager.ResolveListener() {
@@ -152,7 +140,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                 nsdManagerResolverAvailState.signalFree();
               }
             }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
+            resolveTimeoutExecutor.cancel(false);
           }
 
           @Override
@@ -188,7 +176,7 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                 nsdManagerResolverAvailState.signalFree();
               }
             }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
+            resolveTimeoutExecutor.cancel(false);
           }
         });
   }

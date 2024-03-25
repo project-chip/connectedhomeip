@@ -45,7 +45,7 @@
 #include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #endif
 
-#include "BLEManagerImpl.h"
+#include <src/platform/nxp/k32w/k32w0/BLEManagerImpl.h>
 
 #include "Keyboard.h"
 #include "LED.h"
@@ -452,6 +452,7 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
             button_event.Handler = ResetActionEventHandler;
         }
 #endif
+
 #if CHIP_ENABLE_LIT
         if (button_action == USER_ACTIVE_MODE_TRIGGER_PUSH)
         {

@@ -169,7 +169,10 @@ dispatch_queue_t PlatformManagerImpl::GetWorkQueue()
 {
     if (mWorkQueue == nullptr)
     {
-        mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        mWorkQueue =
+            dispatch_queue_create(CHIP_CONTROLLER_QUEUE,
+                                  dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL,
+                                                                          QOS_CLASS_USER_INITIATED, QOS_MIN_RELATIVE_PRIORITY));
         dispatch_suspend(mWorkQueue);
         dispatch_queue_set_specific(mWorkQueue, &sPlatformManagerKey, this, nullptr);
         mIsWorkQueueSuspended = true;

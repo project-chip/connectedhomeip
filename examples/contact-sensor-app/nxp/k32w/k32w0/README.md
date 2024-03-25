@@ -40,9 +40,7 @@ network.
     -   [OTA Testing](#ota-testing)
     -   [Known issues ota](#known-issues-ota)
 -   [Low power](#low-power)
-
-    -   [Known issues power](#known-issues-low-power)
-
+    -   [Known issues low power](#known-issues-low-power)
 -   [Removing SSBL Upgrade region](#removing-ssbl-upgrade-region)
 
     </hr>
@@ -222,7 +220,7 @@ Start building the application:
 
 ```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ ninja -C out/debug
 ```
 
@@ -247,6 +245,16 @@ set to 1.
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
 running oscillator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
+
+K32W0x1 supports antenna diversity feature, which is a technique that maximizes
+the performance of an antenna system, allowing the radio signal to be switched
+between two antennas that have very low correlation between their received
+signals. Typically, this is achieved by spacing two antennas around 0.25
+wavelengths apart or by using 2 orthogonal types of polarization. This is
+controlled by software. K32W0x1 provides an output (`ADO`) on one of `DIO7`,
+`DIO9` or `DIO19` and optionally its complement (`ADE`) on `DIO6` that can be
+used to control an antenna switch. In order to use this feature, user must set
+`use_antenna_diversity` to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 (run automatically) install the recommanded packages (python version > 3, pip3,

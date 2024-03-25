@@ -55,7 +55,6 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Pool.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <messaging/ExchangeMgr.h>
@@ -766,7 +765,12 @@ public:
     // onSuccess nor onFailure will be called.
     bool ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                            Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
-                           OnExtendFailsafeFailure onFailure);
+                           OnExtendFailsafeFailure onFailure)
+    {
+        // If this method is called directly by a client, assume it's fire-and-forget (not a commissioning stage)
+        return ExtendArmFailSafeInternal(proxy, step, armFailSafeTimeout, commandTimeout, onSuccess, onFailure,
+                                         /* fireAndForget = */ true);
+    }
 
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
@@ -909,7 +913,7 @@ private:
     static void OnDisarmFailsafe(void * context,
                                  const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnDisarmFailsafeFailure(void * context, CHIP_ERROR error);
-    void DisarmDone();
+    void CleanupDoneAfterError();
     static void OnArmFailSafeExtendedForDeviceAttestation(
         void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error);
@@ -958,14 +962,19 @@ private:
     CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
+    bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
+                                   Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
+                                   OnExtendFailsafeFailure onFailure, bool fireAndForget);
+
     template <typename RequestObjectT>
     CHIP_ERROR SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
                                         CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                                         CommandResponseFailureCallback failureCb, EndpointId endpoint,
-                                        Optional<System::Clock::Timeout> timeout);
+                                        Optional<System::Clock::Timeout> timeout = NullOptional, bool fireAndForget = false);
     void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
                                       app::AttributePathParams * readPaths, size_t readPathsSize);
     void CancelCommissioningInteractions();
+    void CancelCASECallbacks();
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     void ParseCommissioningInfo();

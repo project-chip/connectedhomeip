@@ -20,7 +20,10 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+
+using namespace chip::Tracing::DarwinFramework;
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
@@ -118,10 +121,15 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
 {
     MTR_LOG_DEFAULT("DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
+    MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, error);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
     if (strongDelegate && mQueue && strongController) {
+
+        // Always collect the metrics to avoid unbounded growth of the stats in the collector
+        MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshot:TRUE];
+
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
             [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
             dispatch_async(mQueue, ^{
@@ -133,8 +141,6 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
 
                 // If the client implements the metrics delegate, prefer that over others
                 if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
-                    // Create a snapshot and clear for next operation
-                    MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshot:TRUE];
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
                 } else {
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];

@@ -29,16 +29,7 @@ typedef const char * MetricKey;
 /**
  * List of supported metric keys
  */
-constexpr MetricKey kMetricDiscoveryOverBLE      = "disc-over-ble";
-constexpr MetricKey kMetricDiscoveryOnNetwork    = "disc-on-nw";
-constexpr MetricKey kMetricPASESession           = "pase-session";
-constexpr MetricKey kMetricPASESessionPair       = "pase-session-pair";
-constexpr MetricKey kMetricPASESessionBLE        = "pase-session-ble";
-constexpr MetricKey kMetricAttestationResult     = "attestation-result";
-constexpr MetricKey kMetricAttestationOverridden = "attestation-overridden";
-constexpr MetricKey kMetricCASESession           = "case-session";
-constexpr MetricKey kMetricCASESessionEstState   = "case-conn-est";
-constexpr MetricKey kMetricWiFiRSSI              = "wifi_rssi";
+constexpr MetricKey kMetricWiFiRSSI = "wifi_rssi";
 
 } // namespace Tracing
 } // namespace chip

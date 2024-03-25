@@ -171,7 +171,7 @@ static_library("interaction-model") {
     "PendingResponseTrackerImpl.h",
     "ReadClient.h",  # TODO: cpp is only included conditionally. Needs logic
                      # fixing
-    "RequiredPrivilege.cpp",
+    "ReadPrepareParams.h",
     "RequiredPrivilege.h",
     "StatusResponse.cpp",
     "StatusResponse.h",
@@ -189,8 +189,17 @@ static_library("interaction-model") {
     "reporting/ReportSchedulerImpl.h",
     "reporting/SynchronizedReportSchedulerImpl.cpp",
     "reporting/SynchronizedReportSchedulerImpl.h",
+
+    # TODO: reporting header is part of interaction-model, however actual implementation depends
+    #       on generated code as subscriptions depend on attribute data versioning to determine
+    #       when "data changed" reports should be sent.
+    #
+    #       This breaks having `.h` and `.cpp` based off the same compilation unit and
+    #       should ideally be cleaned up.
     "reporting/reporting.h",
   ]
+
+  deps = [ "${chip_root}/src/app:events" ]
 
   public_deps = [
     ":app_config",
@@ -200,6 +209,8 @@ static_library("interaction-model") {
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:observer",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:static-support",
@@ -229,7 +240,6 @@ static_library("interaction-model") {
       "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
       "dynamic_server/DynamicDispatcher.cpp",
-      "util/privilege-constants.h",
       "util/privilege-storage.cpp",
       "util/privilege-storage.h",
     ]
@@ -243,6 +253,18 @@ static_library("interaction-model") {
   }
 }
 
+source_set("events") {
+  sources = [
+    "EventHeader.h",
+    "EventLoggingTypes.h",
+  ]
+
+  deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+  ]
+}
+
 # Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
 # This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
 static_library("app") {
@@ -250,6 +272,7 @@ static_library("app") {
 
   sources = [
     "AttributeAccessInterface.cpp",
+    "AttributeAccessInterfaceCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePersistenceProvider.h",
@@ -296,6 +319,7 @@ static_library("app") {
     ":interaction-model",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",

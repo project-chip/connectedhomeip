@@ -48,8 +48,8 @@ template("bt_ble_target") {
       #edgefast_bluetooth
       "${rt_sdk_root}/middleware/edgefast_bluetooth/include",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting",
+      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/configs",
 
       #ethermind
       "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/include",
@@ -106,6 +106,15 @@ template("bt_ble_target") {
       defines += [ "HAL_UART_DMA_ENABLE=1" ]
       bt_ble_include_dirs +=
           [ "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux" ]
+    }
+
+    if (is_sdk_2_15) {
+      bt_ble_include_dirs += [
+        #sdk hook for fatfs config file required for ethermind include files
+        "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/fatfs/config",
+      ]
+    } else {
+      bt_ble_include_dirs += [ "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/configs" ]
     }
 
     defines += [
@@ -215,9 +224,8 @@ template("bt_ble_target") {
       deps = []
     }
 
-    # Adding a dependency to platform_buildconfig to make sure that the file platform_buildconfig.h is generated first
-    # In fact depending on the build order, issue could happen if the file platform_buildconfig.h is not generated before building rand32.cpp
-    deps += [ "${chip_root}/src/platform:platform_buildconfig" ]
+    defines =
+        [ "vApplicationMallocFailedHook=vApplicationMallocFailedHookBTBLE" ]
 
     if (!defined(public_configs)) {
       public_configs = []

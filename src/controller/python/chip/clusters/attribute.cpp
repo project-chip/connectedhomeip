@@ -472,6 +472,22 @@ PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, ui
     return ToPyChipError(err);
 }
 
+void pychip_ReadClient_GetSubscriptionTimeoutMs(ReadClient * pReadClient, uint32_t * milliSec)
+{
+    VerifyOrDie(pReadClient != nullptr);
+
+    Optional<System::Clock::Timeout> duration = pReadClient->GetSubscriptionTimeout();
+
+    // The return value of GetSubscriptionTimeout cannot be 0
+    // so milliSec=0 can be considered as the subscription has been abnormal.
+    *milliSec = 0;
+    if (duration.HasValue())
+    {
+        System::Clock::Milliseconds32 msec = std::chrono::duration_cast<System::Clock::Milliseconds32>(duration.Value());
+        *milliSec                          = msec.count();
+    }
+}
+
 PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
                                    DeviceProxy * device, uint8_t * readParamsBuf, void ** attributePathsFromPython,
                                    size_t numAttributePaths, void ** dataversionFiltersFromPython, size_t numDataversionFilters,
@@ -561,11 +577,22 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
             params.mKeepSubscriptions         = pyParams.keepSubscriptions;
             callback->SetAutoResubscribe(pyParams.autoResubscribe);
 
-            dataVersionFilters.release();
-            attributePaths.release();
-            eventPaths.release();
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            if (!pyParams.autoResubscribe)
+            {
+                // We want to allow certain kinds of spec-invalid subscriptions so we
+                // can test how the server reacts to them.
+                err = readClient->SendSubscribeRequestWithoutValidation(params);
+            }
+            else
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+            {
+                dataVersionFilters.release();
+                attributePaths.release();
+                eventPaths.release();
 
-            err = readClient->SendAutoResubscribeRequest(std::move(params));
+                err = readClient->SendAutoResubscribeRequest(std::move(params));
+            }
             SuccessOrExit(err);
         }
         else

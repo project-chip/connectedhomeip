@@ -160,10 +160,15 @@ ALLOW: Dict[str, Set[str]] = {
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
     'src/tracing/json/json_tracing.h': {'fstream', 'unordered_map'},
 
+    # esp32 tracing
+    'src/tracing/esp32_trace/esp32_tracing.h': {'unordered_map'},
+
     # Not intended for embedded clients
     'src/app/PendingResponseTrackerImpl.h': {'unordered_set'},
 
     # Not intended for embedded clients
+    'src/lib/core/TLVVectorWriter.cpp': {'vector'},
+    'src/lib/core/TLVVectorWriter.h': {'vector'},
     'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream', 'string', 'vector'},
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
     'src/lib/support/jsontlv/TlvToJson.h': {'string'},

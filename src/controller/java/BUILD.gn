@@ -41,6 +41,8 @@ shared_library("jni") {
     "AndroidCallbacks-JNI.cpp",
     "AndroidCallbacks.cpp",
     "AndroidCallbacks.h",
+    "AndroidCheckInDelegate.cpp",
+    "AndroidCheckInDelegate.h",
     "AndroidClusterExceptions.cpp",
     "AndroidClusterExceptions.h",
     "AndroidCommissioningWindowOpener.cpp",
@@ -63,6 +65,7 @@ shared_library("jni") {
     "CHIPAttributeTLVValueDecoder.h",
     "CHIPDeviceController-JNI.cpp",
     "CHIPEventTLVValueDecoder.h",
+    "DeviceAttestation-JNI.cpp",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
     "GroupDeviceProxy.h",
@@ -365,11 +368,7 @@ kotlin_library("kotlin_matter_controller") {
 
   output_name = "KotlinMatterController.jar"
 
-  deps = [
-    ":java",
-    ":tlv",
-    "${chip_root}/third_party/java_deps:annotation",
-  ]
+  deps = [ ":java" ]
 
   sources = [
     "src/matter/controller/CompletionListenerAdapter.kt",
@@ -400,7 +399,6 @@ kotlin_library("kotlin_matter_controller") {
 
   if (matter_enable_java_compilation) {
     deps += [
-      "${chip_root}/third_party/java_deps:json",
       "${chip_root}/third_party/java_deps:kotlin-stdlib",
       "${chip_root}/third_party/java_deps:kotlinx-coroutines-core-jvm",
       "${chip_root}/third_party/java_deps/stub_src",
@@ -455,14 +453,18 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/CommissioningWindowStatus.java",
     "src/chip/devicecontroller/ConnectionFailureException.java",
     "src/chip/devicecontroller/ControllerParams.java",
+    "src/chip/devicecontroller/DeviceAttestation.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
     "src/chip/devicecontroller/ExtendableInvokeCallback.java",
     "src/chip/devicecontroller/ExtendableInvokeCallbackJni.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
+    "src/chip/devicecontroller/ICDCheckInDelegate.java",
+    "src/chip/devicecontroller/ICDCheckInDelegateWrapper.java",
     "src/chip/devicecontroller/ICDClientInfo.java",
     "src/chip/devicecontroller/ICDDeviceInfo.java",
     "src/chip/devicecontroller/ICDRegistrationInfo.java",
@@ -474,6 +476,7 @@ android_library("java") {
     "src/chip/devicecontroller/OTAProviderDelegate.java",
     "src/chip/devicecontroller/OpenCommissioningCallback.java",
     "src/chip/devicecontroller/OperationalKeyConfig.java",
+    "src/chip/devicecontroller/PairingHintBitmap.java",
     "src/chip/devicecontroller/PaseVerifierParams.java",
     "src/chip/devicecontroller/ReportCallback.java",
     "src/chip/devicecontroller/ReportCallbackJni.java",

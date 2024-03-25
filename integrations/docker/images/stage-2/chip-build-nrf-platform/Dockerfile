@@ -7,7 +7,7 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} as build
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=v2.5.0
+ARG NCS_REVISION=v2.6.0
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR /opt/NordicSemiconductor/nRF5_tools
@@ -16,14 +16,14 @@ RUN set -x \
     | tar zxvf - \
     && tar xvf JLink_Linux_V780c_x86_64.tgz \
     && rm JLink_Linux_V780c_x86_64.* \
-    && curl --location https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz --output zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
-    && tar xvf zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
-    && zephyr-sdk-0.16.1/setup.sh -t arm-zephyr-eabi \
+    && curl --location https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.5/zephyr-sdk-0.16.5_linux-x86_64_minimal.tar.xz --output zephyr-sdk-0.16.5_linux-x86_64_minimal.tar.xz \
+    && tar xvf zephyr-sdk-0.16.5_linux-x86_64_minimal.tar.xz \
+    && zephyr-sdk-0.16.5/setup.sh -t arm-zephyr-eabi \
     && : # last line
 
 WORKDIR /opt/NordicSemiconductor/nrfconnect
 RUN set -x \
-    && python3 -m pip install -U --no-cache-dir west==1.1.0 \
+    && python3 -m pip install -U --no-cache-dir west==1.2.0 \
     && west init -m https://github.com/nrfconnect/sdk-nrf --mr "$NCS_REVISION" \
     && west config update.narrow true \
     && west config update.fetch smart \
@@ -63,6 +63,6 @@ ENV LD_LIBRARY_PATH=${NRF5_TOOLS_ROOT}/JLink_Linux_V780c_x86_64:${LD_LIBRARY_PAT
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
-ENV ZEPHYR_SDK_INSTALL_DIR=${NRF5_TOOLS_ROOT}/zephyr-sdk-0.16.1
+ENV ZEPHYR_SDK_INSTALL_DIR=${NRF5_TOOLS_ROOT}/zephyr-sdk-0.16.5
 ENV ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 ENV ZEPHYR_TOOLCHAIN_PATH=${ZEPHYR_SDK_INSTALL_DIR}/arm-zephyr-eabi

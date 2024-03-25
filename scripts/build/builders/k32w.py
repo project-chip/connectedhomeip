@@ -111,7 +111,9 @@ class K32WBuilder(GnBuilder):
         args = []
 
         if self.low_power:
-            args.append('chip_with_low_power=1')
+            args.append('chip_with_low_power=1 chip_logging=false')
+            if self.board == K32WBoard.K32W0:
+                args.append('chip_pw_tokenizer_logging=false chip_with_OM15082=0')
         else:
             args.append('chip_with_low_power=0')
 

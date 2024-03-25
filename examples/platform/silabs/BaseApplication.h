@@ -27,12 +27,11 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/AppDelegate.h>
 #include <app/util/config.h>
 #include <ble/BLEEndPoint.h>
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -97,7 +96,7 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR if no errors
      */
-    CHIP_ERROR StartAppTask(TaskFunction_t taskFunction);
+    CHIP_ERROR StartAppTask(osThreadFunc_t taskFunction);
 
     /**
      * @brief Links the application specific led to the baseApplication context
@@ -185,7 +184,7 @@ protected:
      *
      * @param xTimer timer that finished
      */
-    static void FunctionTimerEventHandler(TimerHandle_t xTimer);
+    static void FunctionTimerEventHandler(osTimerId_t xTimer);
 
     /**
      * @brief Timer Event processing function
@@ -210,7 +209,7 @@ protected:
      *
      * @param xTimer timer that finished
      */
-    static void LightTimerEventHandler(TimerHandle_t xTimer);
+    static void LightTimerEventHandler(osTimerId_t xTimer);
 
     /**
      * @brief Updates device LEDs

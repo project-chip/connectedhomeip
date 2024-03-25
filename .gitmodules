@@ -54,16 +54,16 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13xx_26xx,bouffalolab,esp32,k32w,infineon,qpg,cc32xx
+	platforms = ameba,cc13xx_26xx,bouffalolab,esp32,infineon,qpg,cc32xx
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
 	branch  = int/CHIPSE_Release
-	platforms = k32w
+	platforms = nxp
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
 	url = https://github.com/NXP/ot-nxp.git
-	platforms = k32w
+	platforms = nxp
 [submodule "third_party/openthread/ot-qorvo"]
 	path = third_party/openthread/ot-qorvo
 	url = https://github.com/openthread/ot-qorvo.git

@@ -17,13 +17,15 @@
 
 #pragma once
 
-#include <string>
+#include <cstdint>
 
 #include <gio/gio.h>
 
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
+#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -46,7 +48,8 @@ namespace Internal {
 class AdapterIterator
 {
 public:
-    ~AdapterIterator();
+    AdapterIterator() = default;
+    ~AdapterIterator() { Shutdown(); }
 
     /// Moves to the next DBUS interface.
     ///
@@ -65,7 +68,9 @@ public:
 
 private:
     /// Sets up the DBUS manager and loads the list
-    static CHIP_ERROR Initialize(AdapterIterator * self);
+    CHIP_ERROR Initialize();
+    /// Destroys the DBUS manager
+    CHIP_ERROR Shutdown();
 
     /// Loads the next value in the list.
     ///
@@ -73,9 +78,9 @@ private:
     /// iterate through.
     bool Advance();
 
-    GDBusObjectManager * mManager = nullptr; // DBus connection
-    GList * mObjectList           = nullptr; // listing of objects on the bus
-    GList * mCurrentListItem      = nullptr; // current item viewed in the list
+    GAutoPtr<GDBusObjectManager> mManager;
+    BluezObjectList mObjectList;
+    BluezObjectIterator mIterator;
     // Data valid only if Next() returns true
     GAutoPtr<BluezAdapter1> mCurrentAdapter;
 };

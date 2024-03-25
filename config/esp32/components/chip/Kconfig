@@ -271,6 +271,12 @@ menu "CHIP Core"
                 Opens the commissioning window automatically at application boot time if
                 the node is not yet commissioned.
 
+        config ENABLE_SNTP_TIME_SYNC
+            bool "Enable SNTP time synchronization"
+            default n
+            help
+                Enable this option to enable SNTP time synchronization
+
     endmenu # "System Options"
 
     menu "Security Options"
@@ -960,6 +966,16 @@ menu "CHIP Device Layer"
            default n
            help
                This option enables the system statistics to be sent to the insights cloud.
+
+      config MAX_PERMIT_LIST_SIZE
+           int "Set permit list size for Insights traces"
+           range 5 30
+           depends on ESP_INSIGHTS_ENABLED
+           default 20
+           help
+               Maximum number of group entries that can be included in the permit list for reporting
+               the traces to insights.
+
     endmenu
 
 

@@ -3,7 +3,7 @@ description: Bootstrap cache
 runs:
   using: "composite"
   steps:
-    - uses: Wandalen/wretry.action@v1.3.0
+    - uses: Wandalen/wretry.action@v1.4.10
       name: Bootstrap cache
       continue-on-error: true
       with:
