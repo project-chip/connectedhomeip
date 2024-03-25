@@ -215,15 +215,15 @@ converted to an encrypted blob. This blob will overwrite the DAC private key in
 factory data and will be imported in the `SSS` at initialization, by the factory
 data provider instance.
 
-The application will check at initialization whether the DAC private key has been
-converted or not and convert it if needed. However, the conversion process should be
-done at manufacturing time for security reasons.
+The application will check at initialization whether the DAC private key has
+been converted or not and convert it if needed. However, the conversion process
+should be done at manufacturing time for security reasons.
 
 There is no need for an extra binary.
 
-- Write factory data binary.
-- Build the application with `chip_with_factory_data=1` set.
-- Write the application to the board and use it as usual.
+-   Write factory data binary.
+-   Build the application with `chip_with_factory_data=1` set.
+-   Write the application to the board and use it as usual.
 
 Factory data should now contain a corresponding encrypted blob instead of the
 DAC private key.
