@@ -215,26 +215,15 @@ converted to an encrypted blob. This blob will overwrite the DAC private key in
 factory data and will be imported in the `SSS` at initialization, by the factory
 data provider instance.
 
-The conversion process shall happen at manufacturing time and should be run one
-time only:
+The application will check at initialization whether the DAC private key has been
+converted or not and convert it if needed. However, the conversion process should be
+done at manufacturing time for security reasons.
 
--   Write factory data binary.
--   Build the application with
-    `chip_with_factory_data=1 chip_convert_dac_private_key=1` set.
--   Write the application to the board and let it run.
+There is no need for an extra binary.
 
-After the conversion process:
-
--   Make sure the application is built with `chip_with_factory_data=1`, but
-    without `chip_convert_dac_private_key` arg, since conversion already
-    happened.
--   Write the application to the board.
-
-If you are using Jlink, you can see a conversion script example in:
-
-```shell
-./scripts/tools/nxp/factory_data_generator/k32w1/example_convert_dac_private_key.jlink
-```
+- Write factory data binary.
+- Build the application with `chip_with_factory_data=1` set.
+- Write the application to the board and use it as usual.
 
 Factory data should now contain a corresponding encrypted blob instead of the
 DAC private key.
@@ -250,6 +239,9 @@ python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLz
 
 Please note that `--dac_key` now points to a binary file that contains the
 encrypted blob.
+
+The user can use the DAC private in plain text instead of using the `SSS`
+by adding the following gn argument `chip_use_plain_dac_key=true`.
 
 ### 6.2 RW61X
 
