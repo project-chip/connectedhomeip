@@ -31,6 +31,7 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/UnitTest.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/android/AndroidChipPlatform-JNI.h>
 
 #include <nlunit-test.h>
@@ -257,6 +258,7 @@ extern "C" JNIEXPORT jint Java_com_tcl_chip_chiptest_TestEngine_runTest(JNIEnv *
 {
     nlTestSetLogger(&jni_test_logger);
     // TODO [PW_MIGRATION] Remove NLUnit tests call after migration
+    chip::DeviceLayer::StackLock lock;
     jint ret = RunRegisteredUnitTests();
     ret += chip::test::RunAllTests();
 
