@@ -129,15 +129,12 @@ class TC_DA_1_2(MatterBaseTest):
                 TestStep("6.7", "Verify CD security_information", "security_information = 0"),
                 TestStep("6.8", "Verify CD version_number", "version_number is an integer in range 0..65535"),
                 TestStep("6.9", "Verify CD certification_type", "certification_type has a value between 1..2"),
-                TestStep(
-                    "7.1", "", "Confirm that both the fields dac_origin_vendor_id and dac_origin_product_id are present in Certification Declaration"),
-                TestStep(
-                    "7.2", "", "Or confirm both the fields dac_origin_vendor_id and dac_origin_product_id are not present in the Certification Declaration"),
-                TestStep("7.3", "If the Certification Declaration has both the dac_origin_vendor_id and the dac_origin_product_id fields, verify dac_origin fields",
+                TestStep("7.1", "", "If the dac_origin_vendor_id is present in the CD, confirm the dac_origin_product_id is also present. If the dac_origin_vendor_id is not present in the CD, confirm the dac_origin_product_id is also not present."),
+                TestStep("7.2", "If the Certification Declaration has both the dac_origin_vendor_id and the dac_origin_product_id fields, verify dac_origin fields",
                          ("* The Vendor ID (VID) in the DAC subject and PAI subject are the same as the dac_origin_vendor_id field in the Certification Declaration.\n"
                           "* The Product ID (PID) in the DAC subject is same as the dac_origin_product_id field in the Certification Declaration.\n"
                           "* If it is present in the PAI certificate, the Product ID (PID) in the subject is same as the dac_origin_product_id field in the Certification Declaration.\n")),
-                TestStep("7.4", "If the Certification Declaration has neither the dac_origin_vendor_id nor the dac_origin_product_id fields, verify the vendor_id and product_id_array fields",
+                TestStep("7.3", "If the Certification Declaration has neither the dac_origin_vendor_id nor the dac_origin_product_id fields, verify the vendor_id and product_id_array fields",
                          ("* The Vendor ID (VID) in the DAC subject and PAI subject are the same as the vendor_id field in the Certification Declaration.\n"
                           "* The Product ID (PID) subject DN in the DAC is contained in the product_id_array field in the Certification Declaration.\n"
                           "* If it is present in the PAI certificate, the Product ID (PID) in the subject is contained in the product_id_array field in the Certification Declaration.\n")),
@@ -159,14 +156,6 @@ class TC_DA_1_2(MatterBaseTest):
     @async_test_body
     async def test_TC_DA_1_2(self):
         is_ci = self.check_pics('PICS_SDK_CI_ONLY')
-        # These PICS will be ignored on the CI because we're going to test a bunch of combos
-        pics_origin_pid = self.check_pics('MCORE.DA.CERTDECL_ORIGIN_PRODUCTID')
-        pics_origin_vid = self.check_pics('MCORE.DA.CERTDECL_ORIGIN_VENDORID')
-        pics_paa_list = self.check_pics('MCORE.DA.CERTDECL_AUTH_PAA')
-        pics_firmware_info = self.check_pics('MCORE.DA.ATTESTELEMENT_FW_INFO')
-        if pics_origin_pid != pics_origin_vid:
-            asserts.fail("MCORE.DA.CERTDECL_ORIGIN_PRODUCTID and MCORE.DA.CERTDECL_ORIGIN_VENDORID PICS codes must match")
-
         cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
 
         # Commissioning - done
@@ -318,28 +307,14 @@ class TC_DA_1_2(MatterBaseTest):
             asserts.assert_in(certification_type, [1, 2], "Certification type is out of range")
 
         self.step("7.1")
-        if not is_ci and pics_origin_vid:
-            asserts.assert_in(9, cd.keys(), "Origin vendor ID not found in cert")
-            asserts.assert_in(10, cd.keys(), "Origin product ID not found in cert")
-
-        self.step("7.2")
-        if not is_ci and not pics_origin_vid:
-            asserts.assert_not_in(9, cd.keys(), "Origin vendor ID found in cert")
-            asserts.assert_not_in(10, cd.keys(), "Origin product ID found in cert")
-
         dac_vid, dac_pid, pai_vid, pai_pid = parse_ids_from_certs(parsed_dac, parsed_pai)
 
         has_origin_vid = 9 in cd.keys()
         has_origin_pid = 10 in cd.keys()
-        if not is_ci and has_origin_vid != pics_origin_vid:
-            asserts.fail("Origin VID in CD does not match PICS")
-        if not is_ci and has_origin_pid and not pics_origin_pid:
-            asserts.fail("Origin PID in CD does not match PICS")
         if has_origin_pid != has_origin_vid:
             asserts.fail("Found one of origin PID or VID in CD but not both")
 
-        # If this is the CI, ignore the PICS, we're going to try many cases.
-        self.step("7.3")
+        self.step("7.2")
         if has_origin_vid:
             origin_vid = cd[9]
             origin_pid = cd[10]
@@ -350,7 +325,7 @@ class TC_DA_1_2(MatterBaseTest):
             if pai_pid:
                 asserts.assert_equal(pai_pid, origin_pid, "Origin Product ID in the CD does not match the Product ID in the PAI")
 
-        self.step("7.4")
+        self.step("7.3")
         if not has_origin_vid:
             asserts.assert_equal(dac_vid, vendor_id, "Vendor ID in the CD does not match the Vendor ID in the DAC")
             asserts.assert_equal(pai_vid, vendor_id, "Vendor ID in the CD does not match the Vendor ID in the PAI")
@@ -360,8 +335,6 @@ class TC_DA_1_2(MatterBaseTest):
 
         self.step(8)
         has_paa_list = 11 in cd.keys()
-        if not is_ci and pics_paa_list != has_paa_list:
-            asserts.fail("PAA list does not match PICS")
 
         if has_paa_list:
             akids = [ext.value.key_identifier for ext in parsed_pai.extensions if ext.oid == ExtensionOID.AUTHORITY_KEY_IDENTIFIER]
@@ -396,8 +369,6 @@ class TC_DA_1_2(MatterBaseTest):
 
         self.step(11)
         has_firmware_information = 4 in decoded.keys()
-        if not is_ci and has_firmware_information != pics_firmware_info:
-            asserts.fail("PICS for firmware information does not match returned value")
         if has_firmware_information:
             try:
                 int(decoded[4], 16)
