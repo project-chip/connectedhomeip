@@ -395,7 +395,7 @@ class AndroidBuilder(Builder):
                 gn_gen += ["--root=%s" % rootName]
             elif exampleName is not None:
                 gn_gen += ["--root=%s/examples/%s/android/" %
-                        (self.root, exampleName)]
+                           (self.root, exampleName)]
 
             if self.board.IsIde():
                 gn_gen += [
