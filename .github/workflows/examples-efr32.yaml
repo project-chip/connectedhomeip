@@ -59,7 +59,6 @@ jobs:
         timeout-minutes: 30
         run: |
           scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
-          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4164A --slc_generate --docker
           rm -rf ./out/
       - name: Build some BRD4187C variants (1)
         run: |
@@ -115,6 +114,7 @@ jobs:
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
                 --target efr32-brd4338a-light-wifi-917_soc-skip_rps_generation \
+                --target efr32-brd4338a-lock-wifi-917_soc-skip_rps_generation \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
