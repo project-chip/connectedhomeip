@@ -190,7 +190,10 @@ BluezObjectManager::NotificationsDelegates BluezObjectManager::GetDeviceNotifica
 void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, BluezObject * aObj)
 {
     GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(aObj));
-    if (adapter)
+    // Verify that the adapter is properly initialized - the class property must be set.
+    // BlueZ can export adapter objects on the bus before it is fully initialized. Such
+    // adapter objects are not usable and must be ignored.
+    if (adapter && bluez_adapter1_get_class(adapter.get()) != 0)
     {
         NotifyAdapterAdded(adapter.get());
         return;
@@ -229,6 +232,18 @@ void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, BluezObject 
 void BluezObjectManager::OnInterfacePropertiesChanged(GDBusObjectManagerClient * aMgr, BluezObject * aObj, GDBusProxy * aIface,
                                                       GVariant * aChangedProps, const char * const * aInvalidatedProps)
 {
+    uint32_t classValue = 0;
+    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(aObj));
+    // When the adapter's readonly class property is set, it means that the adapter has been
+    // fully initialized and is ready to be used. It's most likely that the adapter has been
+    // previously ignored in the OnObjectAdded callback, so now we can notify the application
+    // about the new adapter.
+    if (adapter && g_variant_lookup(aChangedProps, "Class", "u", &classValue) && classValue != 0)
+    {
+        NotifyAdapterAdded(adapter.get());
+        return;
+    }
+
     GAutoPtr<BluezDevice1> device(bluez_object_get_device1(aObj));
     if (device)
     {
