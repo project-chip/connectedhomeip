@@ -30,7 +30,16 @@ using namespace ::chip::DeviceLayer;
 
 LOG_MODULE_REGISTER(runner, CONFIG_MATTER_LOG_LEVEL);
 
-extern "C" int main(void)
+extern "C" {
+void console_init(void) {}
+
+int console_putchar(const char * chr)
+{
+    LOG_RAW(chr);
+    return 0;
+}
+
+int main(void)
 {
     VerifyOrDie(settings_subsys_init() == 0);
 
@@ -40,4 +49,5 @@ extern "C" int main(void)
     LOG_INF("CHIP test status: %d", status);
 
     _exit(status);
+}
 }
