@@ -224,12 +224,11 @@ CHIP_ERROR RemoveDeviceEndpoint(Device * dev)
     {
         if (gDevices[index] == dev)
         {
-            EndpointId ep   = emberAfClearDynamicEndpoint(index);
-            gDevices[index] = NULL;
-            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
-            UNUSED_VAR(ep);
+            [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
+            gDevices[index]                = NULL;
+            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             return CHIP_NO_ERROR;
         }
     }
@@ -597,12 +596,12 @@ void AppTask::UpdateClusterState(void)
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update OnOff fail: %x", status);
+        LOG_ERR("Update OnOff fail: %x", to_underlying(status));
     }
     uint8_t setLevel = sAppTask.mPwmRgbBlueLed.GetLevel();
     status           = Clusters::LevelControl::Attributes::CurrentLevel::Set(kExampleEndpointId, setLevel);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update CurrentLevel fail: %x", status);
+        LOG_ERR("Update CurrentLevel fail: %x", to_underlying(status));
     }
 }

@@ -94,7 +94,7 @@ OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
  */
 BOOT_RESUME_STACK_SIZE = 1024;
 
-STACK_SIZE             = (4096);
+STACK_SIZE             = DEFINED(__stack_size__) ? __stack_size__ : 0x01000;
 
 MEM_RAM0_BASE          = 0x4000400;
 MEM_RAM0_SIZE          = 0x0015c00;
@@ -130,9 +130,10 @@ MEMORY
 {
   Flash640 (rx)     : ORIGIN = m_app_start, LENGTH = m_app_size
   
-  SCRATCH_RAM(rwx)  : ORIGIN = 0x4000000, LENGTH = 0x400   /* 1K bytes (alias SCRATCH_RAM) */
-  RAM0 (rwx)        : ORIGIN = 0x4000400,  LENGTH = 0x0015c00   /* 87K bytes (alias RAM) */
-  RAM1 (rwx)        : ORIGIN = 0x4020000,  LENGTH = 0x10000     /* 64K bytes (alias RAM2) */
+  SCRATCH_RAM(rwx)  : ORIGIN = 0x4000000,   LENGTH = 0x400        /* 1K bytes (alias SCRATCH_RAM) */
+  RAM0 (rwx)        : ORIGIN = 0x4000400,   LENGTH = 0x0015BE0    /* [87K - 32] bytes (alias RAM) */
+  reserved (rwx)    : ORIGIN = 0x4015FE0,   LENGTH = 0x20         /* 32 bytes (reserved for ROM code) */
+  RAM1 (rwx)        : ORIGIN = 0x4020000,   LENGTH = 0x10000      /* 64K bytes (alias RAM2) */
 }
 
 /* Define a symbol for the top of each memory region */
@@ -431,6 +432,7 @@ SECTIONS
     PROVIDE(_scratch_buf_end = __scratch_area_top__);
 
     __StackLimit = _vStackTop - STACK_SIZE;
+    ASSERT(__StackLimit >= _end_heap, "Stack and heap spaces are overlapping!")
 
     __MATTER_FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
     __MATTER_FACTORY_DATA_SIZE = m_factory_data_size;

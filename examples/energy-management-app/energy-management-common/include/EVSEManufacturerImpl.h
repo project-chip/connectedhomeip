@@ -21,6 +21,7 @@
 #include <DeviceEnergyManagementManager.h>
 #include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseManager.h>
+#include <PowerTopologyDelegate.h>
 
 using chip::Protocols::InteractionModel::Status;
 namespace chip {
@@ -37,10 +38,11 @@ class EVSEManufacturer
 public:
     EVSEManufacturer(EnergyEvseManager * aEvseInstance,
                      ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * aEPMInstance,
-                     DeviceEnergyManagementManager * aDEMInstance)
+                     PowerTopology::PowerTopologyInstance * aPTInstance, DeviceEnergyManagementManager * aDEMInstance)
     {
         mEvseInstance = aEvseInstance;
         mEPMInstance  = aEPMInstance;
+        mPTInstance   = aPTInstance;
         mDEMInstance  = aDEMInstance;
     }
     EnergyEvseManager * GetEvseInstance() { return mEvseInstance; }
@@ -60,6 +62,15 @@ public:
         if (mEPMInstance)
         {
             return mEPMInstance->GetDelegate();
+        }
+        return nullptr;
+    }
+
+    PowerTopology::PowerTopologyDelegate * GetPTDelegate()
+    {
+        if (mPTInstance)
+        {
+            return mPTInstance->GetDelegate();
         }
         return nullptr;
     }
@@ -92,6 +103,11 @@ public:
      * @brief   Allows a client application to initialise the Accuracy, Measurement types etc
      */
     CHIP_ERROR InitializePowerMeasurementCluster();
+
+    /**
+     * @brief   Allows a client application to initialise the PowerSource cluster
+     */
+    CHIP_ERROR InitializePowerSourceCluster();
 
     /**
      * @brief   Allows a client application to send in power readings into the system
@@ -164,6 +180,7 @@ public:
 private:
     EnergyEvseManager * mEvseInstance;
     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * mEPMInstance;
+    PowerTopology::PowerTopologyInstance * mPTInstance;
     DeviceEnergyManagementManager * mDEMInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;

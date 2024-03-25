@@ -54,12 +54,17 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0099" name="Energy EVSE" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0099" name="Energy EVSE"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="EEVSE" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PREF" name="ChargingPreferences" summary="EVSE supports storing user charging preferences">
@@ -395,7 +400,6 @@ Davis, CA 95616, USA
   </attributes>
   <commands>
     <command id="0x00" name="GetTargetsResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
@@ -405,11 +409,11 @@ Davis, CA 95616, USA
         <constraint type="maxCount" value="7"/>
       </field>
     </command>
-    <command id="0x01" name="Disable" response="Y">
+    <command id="0x01" name="Disable" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
     </command>
-    <command id="0x02" name="EnableCharging" response="Y">
+    <command id="0x02" name="EnableCharging" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="ChargingEnabledUntil" type="epoch-s" default="null">
@@ -425,7 +429,7 @@ Davis, CA 95616, USA
         <constraint type="min" value="0"/>
       </field>
     </command>
-    <command id="0x03" name="EnableDischarging" response="Y">
+    <command id="0x03" name="EnableDischarging" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="V2X"/>
@@ -439,11 +443,11 @@ Davis, CA 95616, USA
         <constraint type="min" value="0"/>
       </field>
     </command>
-    <command id="0x04" name="StartDiagnostics" response="Y">
+    <command id="0x04" name="StartDiagnostics" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <optionalConform/>
     </command>
-    <command id="0x05" name="SetTargets" response="Y">
+    <command id="0x05" name="SetTargets" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
@@ -454,13 +458,13 @@ Davis, CA 95616, USA
         <constraint type="maxCount" value="7"/>
       </field>
     </command>
-    <command id="0x06" name="GetTargets" response="GetTargetsResponse">
+    <command id="0x06" name="GetTargets" direction="commandToServer" response="GetTargetsResponse">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </command>
-    <command id="0x07" name="ClearTargets" response="Y">
+    <command id="0x07" name="ClearTargets" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="PREF"/>

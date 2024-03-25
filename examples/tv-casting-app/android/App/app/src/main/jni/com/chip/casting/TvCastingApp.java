@@ -599,6 +599,9 @@ public class TvCastingApp {
 
   public native boolean onOff_toggle(ContentApp contentApp, Object responseHandler);
 
+  public native boolean messages_presentMessages(
+      ContentApp contentApp, String messageText, Object responseHandler);
+
   static {
     System.loadLibrary("TvCastingApp");
   }

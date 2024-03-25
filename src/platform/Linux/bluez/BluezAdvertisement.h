@@ -26,15 +26,15 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
+#include "BluezEndpoint.h"
 #include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-class BluezEndpoint;
 
 class BluezAdvertisement
 {
@@ -64,6 +64,9 @@ public:
     ///
     /// BLE advertising is stopped asynchronously. Application will be notified of
     /// completion via a call to BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete().
+    ///
+    /// It is also possible that the advertising is released by BlueZ. In that case,
+    /// the application will be notified by BLEManagerImpl::NotifyBLEPeripheralAdvReleased().
     CHIP_ERROR Stop();
 
 private:
@@ -79,15 +82,15 @@ private:
     CHIP_ERROR StopImpl();
 
     // Objects (interfaces) used by LE advertisement
-    GDBusObjectManagerServer * mpRoot = nullptr;
-    BluezAdapter1 * mpAdapter         = nullptr;
-    BluezLEAdvertisement1 * mpAdv     = nullptr;
+    GAutoPtr<GDBusObjectManagerServer> mRoot;
+    GAutoPtr<BluezAdapter1> mAdapter;
+    GAutoPtr<BluezLEAdvertisement1> mAdv;
 
     bool mIsInitialized = false;
     bool mIsAdvertising = false;
 
-    char * mpAdvPath  = nullptr;
-    char * mpAdvUUID  = nullptr;
+    char mAdvPath[64] = ""; // D-Bus path of the advertisement object
+    char mAdvUUID[64] = ""; // UUID of the service to be advertised
     char mAdvName[32] = "";
 };
 

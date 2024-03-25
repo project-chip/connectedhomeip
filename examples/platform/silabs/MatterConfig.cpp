@@ -18,6 +18,7 @@
  */
 
 #include "AppConfig.h"
+#include "BaseApplication.h"
 #include "OTAConfig.h"
 #include <MatterConfig.h>
 
@@ -41,9 +42,9 @@
 #include "MemMonitoring.h"
 #endif
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #include "wfx_rsi.h"
-#endif /* SIWX_917 */
+#endif /* SLI_SI91X_MCU_INTERFACE */
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -52,7 +53,7 @@ using namespace ::chip::DeviceLayer;
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
 // opaque keystore
-#if CHIP_CRYPTO_PLATFORM && !(defined(SIWX_917))
+#if CHIP_CRYPTO_PLATFORM && !(defined(SLI_SI91X_MCU_INTERFACE))
 #include <platform/silabs/efr32/Efr32PsaOperationalKeystore.h>
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
@@ -228,7 +229,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
-#if CHIP_CRYPTO_PLATFORM && !(defined(SIWX_917))
+#if CHIP_CRYPTO_PLATFORM && !(defined(SLI_SI91X_MCU_INTERFACE))
     // When building with EFR32 crypto, use the opaque key store
     // instead of the default (insecure) one.
     gOperationalKeystore.Init();
@@ -254,6 +255,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+    initParams.appDelegate = &BaseApplication::sAppDelegate;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
 
@@ -285,13 +289,14 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 #endif                           // SL_WFX_USE_SECURE_LINK
 #endif                           /* WF200_WIFI */
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
     sl_status_t status;
     if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
     {
+        SILABS_LOG("wfx_wifi_rsi_init failed with status: %x", status);
         ReturnErrorOnFailure((CHIP_ERROR) status);
     }
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 
     return CHIP_NO_ERROR;
 }
@@ -302,11 +307,7 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 // ================================================================================
 extern "C" void vApplicationIdleHook(void)
 {
-#if SIWX_917 && CHIP_CONFIG_ENABLE_ICD_SERVER
-    if (ConnectivityMgr().IsWiFiStationConnected())
-    {
-        // Let the M4 sleep once commissioning is done and device is in idle state
-        sl_wfx_host_si91x_sleep_wakeup();
-    }
+#if SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
+    sl_wfx_host_si91x_sleep_wakeup();
 #endif
 }

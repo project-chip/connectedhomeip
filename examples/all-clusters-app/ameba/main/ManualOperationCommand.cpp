@@ -79,6 +79,7 @@ static void RegisterManualOperationCommands()
         { &ManualRVCCommandHandler, "rvc", " Usage: manual rvc <subcommand>" },
         { &ManualRefrigeratorAlarmCommandHandler, "refalm", " Usage: manual refalm <subcommand>" },
         { &ManualDishWasherAlarmCommandHandler, "dishalm", " Usage: manual dishalm <subcommand>" },
+        { &ManualOvenCavityOperationalStateCommandHandler, "oven-opstate", " Usage: manual dishalm <subcommand>" },
     };
 
     static const shell_command_t sManualOperationalStateSubCommands[] = {
@@ -123,6 +124,14 @@ static void RegisterManualOperationCommands()
         { &ManualDishWasherAlarmSetLowerCommandHandler, "lower", "lower Usage: manual dishalm lower" },
     };
 
+    static const shell_command_t sManualOvenCavityOperationalStateSubCommands[] = {
+        { &ManualOvenCavityOperationalStateCommandHelpHandler, "help", "Usage: manual oven-opstate <subcommand>" },
+        { &ManualOvenCavityOperationalStateSetStateCommandHandler, "set-state",
+          "set-state Usage: manual oven-opstate set-state <state>" },
+        { &ManualOvenCavityOperationalStateSetErrorCommandHandler, "set-error",
+          "set-error Usage: manual oven-opstate set-error <error>" },
+    };
+
     static const shell_command_t sManualOperationCommand = { &ManualOperationCommandHandler, "manual",
                                                              "Manual Operation commands. Usage: manual <subcommand>" };
 
@@ -139,6 +148,8 @@ static void RegisterManualOperationCommands()
                                                                    ArraySize(sManualRefrigeratorAlarmStateSubCommands));
     sShellManualDishWasherAlarmStateSubCommands.RegisterCommands(sManualDishWasherAlarmSubCommands,
                                                                  ArraySize(sManualDishWasherAlarmSubCommands));
+    sShellManualOvenCavityOperationalStateSubCommands.RegisterCommands(sManualOvenCavityOperationalStateSubCommands,
+                                                                       ArraySize(sManualOvenCavityOperationalStateSubCommands));
 
     Engine::Root().RegisterCommands(&sManualOperationCommand, 1);
 }

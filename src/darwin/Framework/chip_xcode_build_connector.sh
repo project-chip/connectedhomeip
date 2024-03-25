@@ -25,18 +25,13 @@
 #      but is all uppper). Variables defined herein and used locally are lower-case
 #
 
-here=$(cd "${0%/*}" && pwd)
-me=${0##*/}
-
-CHIP_ROOT=$(cd "$here/../../.." && pwd)
-
-die() {
-    echo "$me: *** ERROR: $*"
-    exit 1
-}
+CHIP_ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
 
 # lotsa debug output :-)
 set -ex
+
+# We only have work to do for the `installapi` and `build` phases
+[[ "$ACTION" == installhdrs ]] && exit 0
 
 # helpful debugging, save off environment that Xcode gives us, can source it to
 #  retry/repro failures from a bash terminal
@@ -98,6 +93,7 @@ declare -a args=(
     'chip_build_tests=false'
     'chip_enable_wifi=false'
     'chip_enable_python_modules=false'
+    'chip_device_config_enable_dynamic_mrp_config=true'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages
     'chip_disable_platform_kvs=true'
     'enable_fuzz_test_targets=false'
@@ -132,19 +128,19 @@ esac
     )
 }
 
-[[ $CHIP_IS_ASAN == YES ]] && {
+[[ $CHIP_IS_ASAN == YES || $ENABLE_ADDRESS_SANITIZER == YES ]] && {
     args+=(
         'is_asan=true'
     )
 }
 
-[[ $CHIP_IS_UBSAN == YES ]] && {
+[[ $CHIP_IS_UBSAN == YES || $ENABLE_UNDEFINED_BEHAVIOR_SANITIZER == YES ]] && {
     args+=(
         'is_ubsan=true'
     )
 }
 
-[[ $CHIP_IS_TSAN == YES ]] && {
+[[ $CHIP_IS_TSAN == YES || $ENABLE_THREAD_SANITIZER == YES ]] && {
     args+=(
         'is_tsan=true'
         # The system stats stuff races on the stats in various ways,
@@ -190,7 +186,7 @@ find_in_ancestors() {
 
 # actual build stuff
 {
-    cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
+    cd "$CHIP_ROOT"
 
     if ENV=$(find_in_ancestors chip_xcode_build_connector_env.sh 2>/dev/null); then
         . "$ENV"

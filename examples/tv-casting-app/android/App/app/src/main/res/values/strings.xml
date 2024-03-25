@@ -34,4 +34,7 @@
     <string name="matter_discovery_message_discovering_text">Casting Players on-network:</string>
     <string name="matter_discovery_message_stopped_text">Discovery Stopped</string>
     <string name="matter_connection_next_button_text">Next</string>
+    <string name="matter_action_selector_text">Select an action</string>
+    <string name="matter_select_content_launcher_launch_url_button_text">Content Launcher Launch URL</string>
+    <string name="matter_disconnect_text">Disconnect from Casting Player</string>
 </resources>

@@ -34,15 +34,11 @@ samples so you can see the experience end to end.
 
 A Casting Client (e.g. a mobile phone app) is expected to be a Matter
 Commissionable Node and a `CastingPlayer` (i.e. a TV) is expected to be a Matter
-Commissioner. In the context of the
-[Matter Video Player architecture](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc),
-a `CastingPlayer` would map to
-[Casting "Video" Player](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction).
-The `CastingPlayer` is expected to be hosting one or more `Endpoints` (some of
-which can represent
-[Content Apps](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction)
-in the Matter Video Player architecture) that support one or more Matter Media
-`Clusters`.
+Commissioner. In the context of the Matter Video Player architecture, a
+`CastingPlayer` would map to Casting "Video" Player. The `CastingPlayer` is
+expected to be hosting one or more `Endpoints` (some of which can represent
+Content Apps in the Matter Video Player architecture) that support one or more
+Matter Media `Clusters`.
 
 The steps to start a casting session are:
 
@@ -80,6 +76,8 @@ consume each platform's specific libraries. The libraries MUST be built with the
 client's specific values for `CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and
 `CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID` updated in the
 [CHIPProjectAppConfig.h](tv-casting-common/include/CHIPProjectAppConfig.h) file.
+Other values like the `CHIP_DEVICE_CONFIG_DEVICE_NAME` may be updated as well to
+correspond to the client being built.
 
 ### Initialize the Casting Client
 
@@ -91,10 +89,10 @@ A Casting Client must first initialize the Matter SDK and define the following
 `DataProvider` objects for the the Matter Casting library to use throughout the
 client's lifecycle:
 
-1.  **Rotating Device Identifier** - Refer to the Matter specification for
-    details on how to generate the
-    [Rotating Device Identifier](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/rendezvous/DeviceDiscovery.adoc#245-rotating-device-identifier)).
-    Then, instantiate a `DataProvider` object as described below.
+1.  **Rotating Device Identifier** - "This unique per-device identifier SHALL
+    consist of a randomly-generated 128-bit or longer octet string." Refer to
+    the Matter specification for more details. Instantiate a `DataProvider`
+    object as described below to provide this identifier.
 
     On Linux, define a `RotatingDeviceIdUniqueIdProvider` to provide the Casting
     Client's `RotatingDeviceIdUniqueId`, by implementing a
@@ -152,10 +150,13 @@ client's lifecycle:
     ```
 
 2.  **Commissioning Data** - This object contains the passcode, discriminator,
-    etc which identify the app and are provided to the `CastingPlayer` during
-    the commissioning process. Refer to the Matter specification's
-    [Onboarding Payload](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/qr_code/OnboardingPayload.adoc#ref_OnboardingPayload)
-    section for details on commissioning data.
+    etc. which identify the app and are provided to the `CastingPlayer` during
+    the commissioning process. "A Passcode SHALL be included as a 27-bit
+    unsigned integer, which serves as proof of possession during commissioning."
+    "A Discriminator SHALL be included as a 12-bit unsigned integer, which SHALL
+    match the value which a device advertises during commissioning." Refer to
+    the Matter specification's "Onboarding Payload" section for more details on
+    commissioning data.
 
     On Linux, define a function `InitCommissionableDataProvider` to initialize
     initialize a `LinuxCommissionableDataProvider` that can provide the required
@@ -217,9 +218,8 @@ client's lifecycle:
 3.  **Device Attestation Credentials** - This object contains the
     `DeviceAttestationCertificate`, `ProductAttestationIntermediateCertificate`,
     etc. and implements a way to sign messages when called upon by the Matter TV
-    Casting Library as part of the
-    [Device Attestation process](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/device_attestation/Device_Attestation_Specification.adoc)
-    during commissioning.
+    Casting Library as part of the Matter Device Attestation process during
+    commissioning.
 
     On Linux, implement a define a `dacProvider` to provide the Casting Client's
     Device Attestation Credentials, by implementing a
@@ -487,8 +487,8 @@ potentially skipping the longer commissioning process and instead, simply
 re-establishing the CASE session. This cache can be cleared by calling the
 `ClearCache` API on the `CastingApp`, say when the user signs out of the app.
 See API and its documentation for [Linux](tv-casting-common/core/CastingApp.h),
-Android and
-[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
+[Android](android/App/app/src/main/jni/com/matter/casting/core/CastingApp.java)
+and [iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
 
 ### Discover Casting Players
 
@@ -702,10 +702,9 @@ Each `CastingPlayer` object created during
 [Discovery](#discover-casting-players) contains information such as
 `deviceName`, `vendorId`, `productId`, etc. which can help the user pick the
 right `CastingPlayer`. A Casting Client can attempt to connect to the
-`selectedCastingPlayer` using
-[Matter User Directed Commissioning (UDC)](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/rendezvous/UserDirectedCommissioning.adoc).
-The Matter TV Casting library locally caches information required to reconnect
-to a `CastingPlayer`, once the Casting client has been commissioned by it. After
+`selectedCastingPlayer` using Matter User Directed Commissioning (UDC). The
+Matter TV Casting library locally caches information required to reconnect to a
+`CastingPlayer`, once the Casting client has been commissioned by it. After
 that, the Casting client is able to skip the full UDC process by establishing
 CASE with the `CastingPlayer` directly. Once connected, the `CastingPlayer`
 object will contain the list of available Endpoints on that `CastingPlayer`.
@@ -743,6 +742,60 @@ targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler,
 ...
 ```
 
+On Android, the Casting Client may call `verifyOrEstablishConnection` on the
+`CastingPlayer` object it wants to connect to.
+
+```java
+private static final long MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
+
+EndpointFilter desiredEndpointFilter = new EndpointFilter();
+desiredEndpointFilter.vendorId = DESIRED_ENDPOINT_VENDOR_ID;
+
+MatterError err = targetCastingPlayer.verifyOrEstablishConnection(
+                      MIN_CONNECTION_TIMEOUT_SEC,
+                      desiredEndpointFilter,
+                      new MatterCallback<Void>() {
+                        @Override
+                        public void handle(Void v) {
+                          Log.i(
+                              TAG,
+                              "Connected to CastingPlayer with deviceId: "
+                                  + targetCastingPlayer.getDeviceId());
+                          getActivity()
+                              .runOnUiThread(
+                                  () -> {
+                                    connectionFragmentStatusTextView.setText(
+                                        "Connected to Casting Player with device name: "
+                                            + targetCastingPlayer.getDeviceName()
+                                            + "\n\n");
+                                    connectionFragmentNextButton.setEnabled(true);
+                                  });
+                        }
+                      },
+                      new MatterCallback<MatterError>() {
+                        @Override
+                        public void handle(MatterError err) {
+                          Log.e(TAG, "CastingPLayer connection failed: " + err);
+                          getActivity()
+                              .runOnUiThread(
+                                  () -> {
+                                    connectionFragmentStatusTextView.setText(
+                                        "Casting Player connection failed due to: " + err + "\n\n");
+                                  });
+                        }
+                      });
+
+if (err.hasError())
+{
+    getActivity()
+        .runOnUiThread(
+            () -> {
+                connectionFragmentStatusTextView.setText(
+                    "Casting Player connection failed due to: " + err + "\n\n");
+            });
+}
+```
+
 On iOS, the Casting Client may call `verifyOrEstablishConnection` on the
 `MCCastingPlayer` object it wants to connect to and handle any `NSErrors` that
 may happen in the process.
@@ -777,6 +830,8 @@ func connect(selectedCastingPlayer: MCCastingPlayer?) {
 ### Select an Endpoint on the Casting Player
 
 _{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp) |
+[Android](android/App/app/src/main/java/com/matter/casting/ContentLauncherLaunchURLExampleFragment.java)
+|
 [iOS](darwin/TvCasting/TvCasting/MCContentLauncherLaunchURLExampleViewModel.swift)}_
 
 On a successful connection with a `CastingPlayer`, a Casting Client may select
@@ -800,6 +855,34 @@ if (it != endpoints.end())
     // The desired endpoint is endpoints[index]
     unsigned index = (unsigned int) std::distance(endpoints.begin(), it);
     ...
+}
+```
+
+On Android, it can select an `Endpoint` as shown below.
+
+```java
+private static final Integer SAMPLE_ENDPOINT_VID = 65521;
+
+private Endpoint selectEndpoint()
+{
+    Endpoint endpoint = null;
+    if(selectedCastingPlayer != null)
+    {
+        List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
+        if (endpoints == null)
+        {
+            Log.e(TAG, "No Endpoints found on CastingPlayer");
+        }
+        else
+        {
+            endpoint = endpoints
+                    .stream()
+                    .filter(e -> SAMPLE_ENDPOINT_VID.equals(e.getVendorId()))
+                    .findFirst()
+                    .get();
+        }
+    }
+    return endpoint;
 }
 ```
 
@@ -1045,11 +1128,8 @@ vendorIDAttribute!.read(nil) { context, before, after, err in
 
 ### Subscriptions
 
-_{Complete Attribute subscription examples:
-[Linux](linux/simple-app-helper.cpp)}_
-
-_{Complete Attribute Read examples: [Linux](linux/simple-app-helper.cpp) |
-[iOS](darwin/TvCasting/TvCasting/MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift)}_
+_{Complete Attribute subscription examples: [Linux](linux/simple-app-helper.cpp)
+|[iOS](darwin/TvCasting/TvCasting/MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift)}_
 
 A Casting Client may subscribe to an attribute on an `Endpoint` of the
 `CastingPlayer` to get data reports when the attributes change.

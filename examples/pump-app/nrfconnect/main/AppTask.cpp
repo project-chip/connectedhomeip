@@ -41,6 +41,13 @@
 #include "OTAUtil.h"
 #endif
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+#include "MigrationManager.h"
+#endif
+#endif
+
 #include <dk_buttons_and_leds.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -77,6 +84,9 @@ bool sHaveBLEConnections   = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
+#endif
 } // namespace
 
 namespace LedConsts {
@@ -191,10 +201,23 @@ CHIP_ERROR AppTask::Init()
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    initParams.operationalKeystore = &sPSAOperationalKeystore;
+#endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
+
+#ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+    err = MoveOperationalKeysFromKvsToIts(sLocalInitData.mServerInitParams->persistentStorageDelegate,
+                                          sLocalInitData.mServerInitParams->operationalKeystore);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("MoveOperationalKeysFromKvsToIts() failed");
+        return err;
+    }
+#endif
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -573,97 +596,97 @@ void AppTask::UpdateClusterState()
     status = OnOff::Attributes::OnOff::Set(kOnOffClusterEndpoint, onOffState);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", to_underlying(status));
     }
 
     int16_t maxPressure = PumpMgr().GetMaxPressure();
     status              = PumpConfigurationAndControl::Attributes::MaxPressure::Set(kPccClusterEndpoint, maxPressure);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %x", to_underlying(status));
     }
 
     uint16_t maxSpeed = PumpMgr().GetMaxSpeed();
     status            = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(kPccClusterEndpoint, maxSpeed);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %x", to_underlying(status));
     }
 
     uint16_t maxFlow = PumpMgr().GetMaxFlow();
     status           = PumpConfigurationAndControl::Attributes::MaxFlow::Set(kPccClusterEndpoint, maxFlow);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %x", to_underlying(status));
     }
 
     int16_t minConstPress = PumpMgr().GetMinConstPressure();
     status                = PumpConfigurationAndControl::Attributes::MinConstPressure::Set(kPccClusterEndpoint, minConstPress);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %x", to_underlying(status));
     }
 
     int16_t maxConstPress = PumpMgr().GetMaxConstPressure();
     status                = PumpConfigurationAndControl::Attributes::MaxConstPressure::Set(kPccClusterEndpoint, maxConstPress);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %x", to_underlying(status));
     }
 
     int16_t minCompPress = PumpMgr().GetMinCompPressure();
     status               = PumpConfigurationAndControl::Attributes::MinCompPressure::Set(kPccClusterEndpoint, minCompPress);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %x", to_underlying(status));
     }
 
     int16_t maxCompPress = PumpMgr().GetMaxCompPressure();
     status               = PumpConfigurationAndControl::Attributes::MaxCompPressure::Set(kPccClusterEndpoint, maxCompPress);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %x", to_underlying(status));
     }
 
     uint16_t minConstSpeed = PumpMgr().GetMinConstSpeed();
     status                 = PumpConfigurationAndControl::Attributes::MinConstSpeed::Set(kPccClusterEndpoint, minConstSpeed);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %x", to_underlying(status));
     }
 
     uint16_t maxConstSpeed = PumpMgr().GetMaxConstSpeed();
     status                 = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Set(kPccClusterEndpoint, maxConstSpeed);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %x", to_underlying(status));
     }
 
     uint16_t minConstFlow = PumpMgr().GetMinConstFlow();
     status                = PumpConfigurationAndControl::Attributes::MinConstFlow::Set(kPccClusterEndpoint, minConstFlow);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %x", to_underlying(status));
     }
 
     uint16_t maxConstFlow = PumpMgr().GetMaxConstFlow();
     status                = PumpConfigurationAndControl::Attributes::MaxConstFlow::Set(kPccClusterEndpoint, maxConstFlow);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %x", to_underlying(status));
     }
 
     int16_t minConstTemp = PumpMgr().GetMinConstTemp();
     status               = PumpConfigurationAndControl::Attributes::MinConstTemp::Set(kPccClusterEndpoint, minConstTemp);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %x", to_underlying(status));
     }
 
     int16_t maxConstTemp = PumpMgr().GetMaxConstTemp();
     status               = PumpConfigurationAndControl::Attributes::MaxConstTemp::Set(kPccClusterEndpoint, maxConstTemp);
     if (status != Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %x", to_underlying(status));
     }
 }

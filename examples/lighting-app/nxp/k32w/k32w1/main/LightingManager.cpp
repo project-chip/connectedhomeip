@@ -19,6 +19,10 @@
 
 #include "LightingManager.h"
 
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+#include "LED_Dimmer.h"
+#endif
+
 #include "AppTask.h"
 #include "FreeRTOS.h"
 
@@ -29,6 +33,8 @@ LightingManager LightingManager::sLight;
 int LightingManager::Init()
 {
     mState = kState_On;
+
+    mLevel = kLevel_Max;
 
     return 0;
 }
@@ -44,24 +50,48 @@ void LightingManager::SetState(bool state)
     mState = state ? kState_On : kState_Off;
 }
 
+void LightingManager::SetDimLevel(uint8_t level)
+{
+    mLevel = level;
+}
+
 bool LightingManager::IsTurnedOff()
 {
     return (mState == kState_Off) ? true : false;
 }
 
-bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
+uint8_t LightingManager::GetDimLevel()
+{
+    return mLevel;
+}
+
+bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t kValue)
 {
     bool action_initiated = false;
+    State_t current_state;
 
     if (mState == kState_On && aAction == TURNOFF_ACTION)
     {
         action_initiated = true;
-        mState           = kState_Off;
+        current_state    = kState_Off;
     }
     else if (mState == kState_Off && aAction == TURNON_ACTION)
     {
         action_initiated = true;
-        mState           = kState_On;
+        current_state    = kState_On;
+    }
+
+    else if (aAction == DIM_ACTION && kValue != mLevel)
+    {
+        action_initiated = true;
+        if (kValue == 1)
+        {
+            current_state = kState_Off;
+        }
+        else
+        {
+            current_state = kState_On;
+        }
     }
 
     if (action_initiated)
@@ -70,9 +100,20 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
         {
             mActionInitiated_CB(aAction, aActor);
         }
+
+        if (aAction == TURNON_ACTION || aAction == TURNOFF_ACTION)
+        {
+            SetState(current_state == kState_On);
+        }
+        else if (aAction == DIM_ACTION)
+        {
+            mState = current_state;
+            SetDimLevel(kValue);
+        }
+
         if (mActionCompleted_CB)
         {
-            mActionCompleted_CB(aAction);
+            mActionCompleted_CB(aAction, kValue);
         }
     }
 

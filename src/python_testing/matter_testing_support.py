@@ -60,6 +60,7 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.tracing import TracingContext
+from global_attribute_ids import GlobalAttributeIds
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
@@ -345,6 +346,12 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         pass
 
+    def show_prompt(self,
+                    msg: str,
+                    placeholder: Optional[str] = None,
+                    default_value: Optional[str] = None) -> None:
+        pass
+
 
 @dataclass
 class MatterTestConfig:
@@ -412,6 +419,9 @@ class ClusterMapper:
             return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
 
     def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
+        global_attrs = [item.value for item in GlobalAttributeIds]
+        if attribute_id in global_attrs:
+            return f"Attribute {GlobalAttributeIds(attribute_id).to_name()} {attribute_id}, 0x{attribute_id:04X}"
         mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
         if not mapping:
             return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
@@ -1014,16 +1024,24 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step(step)
         self.mark_current_step_skipped()
 
-    def skip_all_remaining_steps(self, starting_step):
+    def skip_all_remaining_steps(self, starting_step_number):
         ''' Skips all remaining test steps starting with provided starting step
 
-            starting_step must be provided, and is not derived intentionally. By providing argument
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally. By providing argument
                 test is more deliberately identifying where test skips are starting from, making
                 it easier to validate against the test plan for correctness.
         '''
-        last_step = len(self.get_test_steps(self.current_test_info.name)) + 1
-        for index in range(starting_step, last_step):
-            self.skip_step(index)
+        steps = self.get_test_steps(self.current_test_info.name)
+        for idx, step in enumerate(steps):
+            if step.test_plan_number == starting_step_number:
+                starting_step_idx = idx
+                break
+        else:
+            asserts.fail("skip_all_remaining_steps was provided with invalid starting_step_num")
+        remaining = steps[starting_step_idx:]
+        for step in remaining:
+            self.skip_step(step.test_plan_number)
 
     def step(self, step: typing.Union[int, str]):
         test_name = self.current_test_info.name
@@ -1078,6 +1096,28 @@ class MatterBaseTest(base_test.BaseTestClass):
             info.filter_value = setup_payload.long_discriminator
 
         return info
+
+    def wait_for_user_input(self,
+                            prompt_msg: str,
+                            input_msg: str = "Press Enter when done.\n",
+                            prompt_msg_placeholder: str = "Submit anything to continue",
+                            default_value: str = "y") -> str:
+        """Ask for user input and wait for it.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt. Indicates what is expected from the user.
+            input_msg (str, optional): Prompt for input function, used when running tests manually. Defaults to "Press Enter when done.\n".
+            prompt_msg_placeholder (str, optional): TH UI prompt input placeholder. Defaults to "Submit anything to continue".
+            default_value (str, optional): TH UI prompt default value. Defaults to "y".
+
+        Returns:
+            str: User input
+        """
+        if self.runner_hook:
+            self.runner_hook.show_prompt(msg=prompt_msg,
+                                         placeholder=prompt_msg_placeholder,
+                                         default_value=default_value)
+        return input(input_msg)
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):

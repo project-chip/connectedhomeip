@@ -129,7 +129,7 @@ public class Clusters {
   public static final long ClusterId_ApplicationBasic = 0x0000050D;
   public static final long ClusterId_AccountLogin = 0x0000050E;
   public static final long ClusterId_TestCluster = 0xFFF1FC05;
-  public static final long ClusterId_Messaging = 0x00000703;
+  public static final long ClusterId_Messaging = 0x00000097;
   public static final long ClusterId_ApplianceIdentification = 0x00000B00;
   public static final long ClusterId_MeterIdentification = 0x00000B01;
   public static final long ClusterId_ApplianceEventsAndAlert = 0x00000B02;

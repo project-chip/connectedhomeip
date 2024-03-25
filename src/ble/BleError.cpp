@@ -55,6 +55,9 @@ bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 #if !CHIP_CONFIG_SHORT_ERROR_STR
     switch (err.AsInteger())
     {
+    case BLE_ERROR_ADAPTER_UNAVAILABLE.AsInteger():
+        desc = "BLE adapter unavailable";
+        break;
     case BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK.AsInteger():
         desc = "No chip over BLE connection received callback set";
         break;

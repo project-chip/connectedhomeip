@@ -22,7 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <app/GlobalAttributes.h>
-#include <app/att-storage.h>
+#include <app/util/att-storage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
@@ -52,7 +52,7 @@ extern bool emberAfEndpointIndexIsEnabled(uint16_t index);
 namespace chip {
 namespace app {
 
-AttributePathExpandIterator::AttributePathExpandIterator(ObjectList<AttributePathParams> * aAttributePath)
+AttributePathExpandIterator::AttributePathExpandIterator(SingleLinkedListNode<AttributePathParams> * aAttributePath)
 {
     mpAttributePath = aAttributePath;
 

@@ -30,8 +30,6 @@
 
 namespace chip {
 
-class OperationalSessionSetupPoolDelegate;
-
 struct CASESessionManagerConfig
 {
     CASEClientInitParams sessionInitParams;

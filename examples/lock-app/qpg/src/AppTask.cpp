@@ -625,7 +625,7 @@ void AppTask::UpdateClusterState(void)
             Protocols::InteractionModel::Status status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
             if (status != Protocols::InteractionModel::Status::Success)
             {
-                ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
+                ChipLogError(NotSpecified, "ERR: updating DoorLock %x", to_underlying(status));
             }
         }
         else

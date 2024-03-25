@@ -112,7 +112,7 @@ struct CommonResolutionData
 
     bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
     {
-        // If either sleepy interval (Idle - SII, Active - SAI) has a value and that value is greater
+        // If either session interval (Idle - SII, Active - SAI) has a value and that value is greater
         // than the value passed to this function, then the peer device will be treated as if it is
         // a Sleepy End Device (SED)
         return (mrpRetryIntervalIdle.HasValue() && (mrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
@@ -207,18 +207,18 @@ inline constexpr size_t kMaxPairingInstructionLen = 128;
 /// Data that is specific to commisionable/commissioning node discovery
 struct CommissionNodeData
 {
-    char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
+    size_t rotatingIdLen                                      = 0;
+    uint32_t deviceType                                       = 0;
     uint16_t longDiscriminator                                = 0;
     uint16_t vendorId                                         = 0;
     uint16_t productId                                        = 0;
-    uint8_t commissioningMode                                 = 0;
-    uint32_t deviceType                                       = 0;
-    char deviceName[kMaxDeviceNameLen + 1]                    = {};
-    uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
-    size_t rotatingIdLen                                      = 0;
     uint16_t pairingHint                                      = 0;
-    char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+    uint8_t commissioningMode                                 = 0;
     uint8_t commissionerPasscode                              = 0;
+    uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
+    char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
+    char deviceName[kMaxDeviceNameLen + 1]                    = {};
+    char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
 
     CommissionNodeData() {}
 

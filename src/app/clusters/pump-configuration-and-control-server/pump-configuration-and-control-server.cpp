@@ -26,11 +26,14 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PumpConfigurationAndControl;
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -232,7 +235,7 @@ bool HasFeature(EndpointId endpoint, Feature feature)
 {
     bool hasFeature;
     uint32_t featureMap;
-    hasFeature = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    hasFeature = (Attributes::FeatureMap::Get(endpoint, &featureMap) == Status::Success);
 
     return hasFeature ? ((featureMap & to_underlying(feature)) != 0) : false;
 }

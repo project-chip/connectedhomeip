@@ -98,10 +98,13 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 
 #include "wfx_msgs.h"
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include "sl_si91x_types.h"
 #include "sl_status.h"
 #include "sl_wifi_constants.h"
+
+#include "rsi_common_apis.h"
+#include "sl_wifi_device.h"
 
 #define SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS 1000
 #endif
@@ -358,14 +361,18 @@ void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 void wfx_ipv6_notify(int got_ip);
 
-#if !(SIWX_917 | EXP_BOARD)
+#if !(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 void * wfx_rsi_alloc_pkt(void);
 #endif
 
 #ifdef RS911X_WIFI
 /* RSI Power Save */
 #if SL_ICD_ENABLED
+#if SLI_SI917
+sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
+#else
 sl_status_t wfx_power_save();
+#endif /* SLI_SI917 */
 #endif /* SL_ICD_ENABLED */
 /* RSI for LWIP */
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
@@ -379,7 +386,7 @@ void sl_wfx_host_gpio_init(void);
 sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 #endif
 
-#if (SIWX_917 | EXP_BOARD)
+#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
 sl_status_t sl_si91x_driver_send_data_packet(sl_si91x_queue_type_t queue_type, sl_wifi_buffer_t * buffer, uint32_t wait_time);
 sl_status_t sl_si91x_allocate_command_buffer(sl_wifi_buffer_t ** host_buffer, void ** buffer, uint32_t requested_buffer_size,

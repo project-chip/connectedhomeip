@@ -209,7 +209,6 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_GRPKEY_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_LCFG_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_OPCREDS_3_7",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
-        "Test_TC_OPSTATE_2_4",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_SMOKECO_2_2",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_SMOKECO_2_3",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_SMOKECO_2_4",  # darwin-framework-tool does not currently support reading or subscribing to Events
@@ -237,6 +236,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "TestGroupKeyManagementCluster.yaml",  # chip-repl does not support EqualityCommands (2023-08-04)
         "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in chip-repl
+        "Test_TC_ICDM_3_4.yaml",           # chip-repl does not support ICD registration
         "Test_TC_S_2_2.yaml",              # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
@@ -265,6 +265,10 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_RVCCLEANM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_BINFO_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "TestDiagnosticLogs.yaml",          # chip-repl does not implement a BDXTransferServerDelegate
+        "Test_TC_EEVSEM_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_EEVSEM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_EEVSEM_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_EEVSEM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "TestDiagnosticLogsDownloadCommand.yaml",  # chip-repl does not implement the bdx download command
     }
 
@@ -309,6 +313,8 @@ def target_for_name(name: str):
         return TestTarget.LIT_ICD
     if name.startswith("Test_TC_MWOCTRL_") or name.startswith("Test_TC_MWOM_"):
         return TestTarget.MWO
+    if name.startswith("Test_TC_RVCRUNM_") or name.startswith("Test_TC_RVCCLEANM_") or name.startswith("Test_TC_RVCOPSTATE_"):
+        return TestTarget.RVC
     return TestTarget.ALL_CLUSTERS
 
 

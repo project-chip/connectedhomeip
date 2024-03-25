@@ -47,9 +47,6 @@
 
 #pragma once
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 #include <stdint.h>
 
 #include <ble/BleConfig.h>
@@ -226,7 +223,8 @@ public:
     enum
     {
         kState_NotInitialized = 0,
-        kState_Initialized    = 1
+        kState_Initialized    = 1,
+        kState_Disconnecting  = 2
     } mState; ///< [READ-ONLY] Current state
 
     // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
@@ -243,6 +241,7 @@ public:
                     chip::System::Layer * systemLayer);
     CHIP_ERROR Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
                     BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
+    void IndicateBleClosing();
     void Shutdown();
 
     CHIP_ERROR CancelBleIncompleteConnection();

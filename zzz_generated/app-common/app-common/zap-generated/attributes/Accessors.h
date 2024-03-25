@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
+#include <app/util/ember-strings.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -2112,11 +2113,6 @@ Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint16_t valu
 
 namespace PowerTopology {
 namespace Attributes {
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, uint16_t * value); // int16u

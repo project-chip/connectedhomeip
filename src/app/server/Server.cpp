@@ -24,6 +24,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
 #include <app/util/DataModelHandler.h>
+#include <app/util/ember-compatibility-functions.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BLEEndPoint.h>
@@ -313,7 +314,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .groupDataProvider = mGroupsProvider,
-            .mrpLocalConfig    = GetLocalMRPConfig(),
+            // Don't provide an MRP local config, so each CASE initiation will use
+            // the then-current value.
+            .mrpLocalConfig = NullOptional,
         },
         .clientPool            = &mCASEClientPool,
         .sessionSetupPool      = &mSessionSetupPool,
@@ -436,7 +439,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         }
         break;
     case DeviceEventType::kServerReady:
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
         // Only Trigger Check-In messages if we are not in the middle of a commissioning.
         // This check is only necessary for the first commissioiner since the kServerReady event
         // is triggered once we join the network.
@@ -445,7 +448,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         {
             mICDManager.TriggerCheckInMessages();
         }
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         ResumeSubscriptions();
 #endif

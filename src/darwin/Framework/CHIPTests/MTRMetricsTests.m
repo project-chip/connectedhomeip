@@ -49,11 +49,15 @@
 
 - (void)test001_TestAllKeys
 {
-    MTRMetrics * metrics = [MTRMetrics new];
-    [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
-    [metrics setValue:@"metricsCounter2" forKey:@"com.matter.metrics.counter2"];
-    [metrics setValue:@"metricsCounter3" forKey:@"com.matter.metrics.counter3"];
-    [metrics setValue:@"metricsCounter4" forKey:@"com.matter.metrics.counter4"];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:4];
+    MTRMetricData * metricData1 = [MTRMetricData new];
+    MTRMetricData * metricData2 = [MTRMetricData new];
+    MTRMetricData * metricData3 = [MTRMetricData new];
+    MTRMetricData * metricData4 = [MTRMetricData new];
+    [metrics setMetricData:metricData1 forKey:@"com.matter.metrics.counter1"];
+    [metrics setMetricData:metricData2 forKey:@"com.matter.metrics.counter2"];
+    [metrics setMetricData:metricData3 forKey:@"com.matter.metrics.counter3"];
+    [metrics setMetricData:metricData4 forKey:@"com.matter.metrics.counter4"];
 
     NSArray<NSString *> * keys = [metrics allKeys];
     XCTAssertTrue([keys count] == 4);
@@ -63,69 +67,74 @@
     XCTAssertTrue([keys containsObject:@"com.matter.metrics.counter4"]);
     XCTAssertFalse([keys containsObject:@"com.matter.metrics.counter5"]);
 }
+
 - (void)test002_TestOneKey
 {
-    MTRMetrics * metrics = [MTRMetrics new];
-    [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:1];
+    MTRMetricData * metricData1 = [MTRMetricData new];
+    [metrics setMetricData:metricData1 forKey:@"com.matter.metrics.counter1"];
 
     NSArray<NSString *> * keys = [metrics allKeys];
     XCTAssertTrue([keys count] == 1);
     XCTAssertTrue([keys containsObject:@"com.matter.metrics.counter1"]);
 }
 
-- (void)test003_TestMultipleKeys
+- (void)test003_TestValueForKey
 {
-    MTRMetrics * metrics = [MTRMetrics new];
-    [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
-    [metrics setValue:@"metricsCounter2" forKey:@"com.matter.metrics.counter2"];
-    [metrics setValue:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil] forKey:@"com.matter.metrics.counter3"];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:1];
+    MTRMetricData * metricData1 = [MTRMetricData new];
+    [metrics setMetricData:metricData1 forKey:@"com.matter.metrics.counter1"];
 
-    NSArray<NSString *> * keys = [metrics allKeys];
-    XCTAssertTrue([keys count] == 3);
-    XCTAssertTrue([keys containsObject:@"com.matter.metrics.counter1"]);
-    XCTAssertTrue([keys containsObject:@"com.matter.metrics.counter2"]);
-    XCTAssertTrue([keys containsObject:@"com.matter.metrics.counter3"]);
-    XCTAssertFalse([keys containsObject:@"com.matter.metrics.counter4"]);
+    XCTAssertEqualObjects([metrics metricDataForKey:@"com.matter.metrics.counter1"], metricData1);
 }
 
-- (void)test004_TestValueForKey
+- (void)test004_TestMultipleValueForKeys
 {
-    MTRMetrics * metrics = [MTRMetrics new];
-    [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:3];
+    MTRMetricData * metricData1 = [MTRMetricData new];
+    MTRMetricData * metricData2 = [MTRMetricData new];
+    MTRMetricData * metricData3 = [MTRMetricData new];
+    [metrics setMetricData:metricData1 forKey:@"com.matter.metrics.counter1"];
+    [metrics setMetricData:metricData2 forKey:@"com.matter.metrics.counter2"];
+    [metrics setMetricData:metricData3 forKey:@"com.matter.metrics.counter3"];
 
-    XCTAssertEqualObjects([metrics valueForKey:@"com.matter.metrics.counter1"], @"metricsCounter1");
+    XCTAssertEqualObjects([metrics metricDataForKey:@"com.matter.metrics.counter1"], metricData1);
+    XCTAssertEqualObjects([metrics metricDataForKey:@"com.matter.metrics.counter2"], metricData2);
+    XCTAssertEqualObjects([metrics metricDataForKey:@"com.matter.metrics.counter3"], metricData3);
+    XCTAssertNotEqualObjects([metrics metricDataForKey:@"com.matter.metrics.counter3"], metricData2);
 }
 
-- (void)test005_TestMultipleValueForKeys
+- (void)test005_TestValueRemoval
 {
-    MTRMetrics * metrics = [MTRMetrics new];
-    [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
-    [metrics setValue:@"metricsCounter2" forKey:@"com.matter.metrics.counter2"];
-    [metrics setValue:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil] forKey:@"com.matter.metrics.counter3"];
-
-    XCTAssertEqualObjects([metrics valueForKey:@"com.matter.metrics.counter1"], @"metricsCounter1");
-    XCTAssertEqualObjects([metrics valueForKey:@"com.matter.metrics.counter2"], @"metricsCounter2");
-    XCTAssertEqualObjects([metrics valueForKey:@"com.matter.metrics.counter3"], [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]);
-}
-
-- (void)test006_TestValueRemoval
-{
-    MTRMetrics * metrics = [MTRMetrics new];
-    [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
-    [metrics setValue:@"metricsCounter2" forKey:@"com.matter.metrics.counter2"];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:2];
+    MTRMetricData * metricData1 = [MTRMetricData new];
+    MTRMetricData * metricData2 = [MTRMetricData new];
+    [metrics setMetricData:metricData1 forKey:@"com.matter.metrics.counter1"];
+    [metrics setMetricData:metricData2 forKey:@"com.matter.metrics.counter2"];
 
     NSArray<NSString *> * keys = [metrics allKeys];
     XCTAssertTrue([keys count] == 2);
 
-    [metrics setValue:nil forKey:@"com.matter.metrics.counter2"];
+    [metrics setMetricData:nil forKey:@"com.matter.metrics.counter2"];
     keys = [metrics allKeys];
     XCTAssertTrue([keys count] == 1);
     XCTAssertTrue([keys containsObject:@"com.matter.metrics.counter1"]);
     XCTAssertFalse([keys containsObject:@"com.matter.metrics.counter2"]);
+    XCTAssertEqualObjects([metrics metricDataForKey:@"com.matter.metrics.counter1"], metricData1);
+    XCTAssertNotEqualObjects([metrics metricDataForKey:@"com.matter.metrics.counter1"], metricData2);
 
-    [metrics setValue:nil forKey:@"com.matter.metrics.counter1"];
+    [metrics setMetricData:nil forKey:@"com.matter.metrics.counter1"];
     keys = [metrics allKeys];
     XCTAssertTrue([keys count] == 0);
+}
+
+- (void)test006_TestUniqueIdentifier
+{
+    MTRMetrics * metrics1 = [[MTRMetrics alloc] initWithCapacity:1];
+    MTRMetrics * metrics2 = [[MTRMetrics alloc] initWithCapacity:1];
+    XCTAssertNotNil(metrics1.uniqueIdentifier);
+    XCTAssertNotNil(metrics2.uniqueIdentifier);
+    XCTAssertNotEqualObjects(metrics1.uniqueIdentifier, metrics2.uniqueIdentifier);
 }
 
 @end

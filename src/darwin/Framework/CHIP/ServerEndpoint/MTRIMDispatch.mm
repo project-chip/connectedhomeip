@@ -18,8 +18,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/att-storage.h>
-#include <app/util/af-enums.h>
+#include <app/util/att-storage.h>
+
 #include <app/util/af-types.h>
 #include <app/util/privilege-storage.h>
 #include <lib/core/Optional.h>

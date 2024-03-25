@@ -136,10 +136,11 @@ $ echo '{"Name":"TemperatureMeasurement","NewValue":1800}' > /tmp/chip_air_quali
 
 ### Trigger Humidity change event
 
-Generate event `RelativeHumidityMeasurement`, to change the temperate value.
+Generate event `RelativeHumidityMeasurement`, to change the relative humidity
+value (6000 for 60,0 %).
 
 ```
-$ echo '{"Name":"RelativeHumidityMeasurement","NewValue":60}' > /tmp/chip_air_quality_fifo_<PID>
+$ echo '{"Name":"RelativeHumidityMeasurement","NewValue":6000}' > /tmp/chip_air_quality_fifo_<PID>
 ```
 
 ### Trigger concentration change event
@@ -164,4 +165,29 @@ value.
 
 ```
 $ echo '{"Name":"NitrogenDioxideConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `Pm1ConcentrationMeasurement`, to change the PM1 value.
+
+```
+echo '{"Name":"Pm1ConcentrationMeasurement","NewValue":1}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `Pm25ConcentrationMeasurement`, to change the PM2.5 value.
+
+```
+echo '{"Name":"Pm25ConcentrationMeasurement","NewValue":2.5}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `Pm10ConcentrationMeasurement`, to change the PM10 value.
+
+```
+echo '{"Name":"Pm10ConcentrationMeasurement","NewValue":10}' > /tmp/chip_air_quality_fifo_<PID>
+```
+
+Generate event `TotalVolatileOrganicCompoundsConcentrationMeasurement`, to
+change the TVOC value.
+
+```
+$ echo '{"Name":"TotalVolatileOrganicCompoundsConcentrationMeasurement","NewValue":100}' > /tmp/chip_air_quality_fifo_<PID>
 ```

@@ -17,22 +17,22 @@
 
 #include <app/util/privilege-storage.h>
 
-int MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
+chip::Access::Privilege MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
 {
-    return kMatterAccessPrivilegeAdminister;
+    return chip::Access::Privilege::kAdminister;
 }
 
-int MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
+chip::Access::Privilege MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
 {
-    return kMatterAccessPrivilegeAdminister;
+    return chip::Access::Privilege::kAdminister;
 }
 
-int MatterGetAccessPrivilegeForInvokeCommand(chip::ClusterId cluster, chip::CommandId command)
+chip::Access::Privilege MatterGetAccessPrivilegeForInvokeCommand(chip::ClusterId cluster, chip::CommandId command)
 {
-    return kMatterAccessPrivilegeAdminister;
+    return chip::Access::Privilege::kAdminister;
 }
 
-int MatterGetAccessPrivilegeForReadEvent(chip::ClusterId cluster, chip::EventId event)
+chip::Access::Privilege MatterGetAccessPrivilegeForReadEvent(chip::ClusterId cluster, chip::EventId event)
 {
-    return kMatterAccessPrivilegeAdminister;
+    return chip::Access::Privilege::kAdminister;
 }

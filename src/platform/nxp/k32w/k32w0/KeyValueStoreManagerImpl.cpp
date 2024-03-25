@@ -37,10 +37,53 @@ namespace PersistedStorage {
 constexpr size_t kMaxNumberOfKeys  = 200;
 constexpr size_t kMaxKeyValueBytes = 255;
 
-Internal::RamStorage KeyValueStoreManagerImpl::sKeysStorage   = { kNvmId_KvsKeys };
-Internal::RamStorage KeyValueStoreManagerImpl::sValuesStorage = { kNvmId_KvsValues };
+Internal::RamStorage KeyValueStoreManagerImpl::sKeysStorage         = { kNvmId_KvsKeys };
+Internal::RamStorage KeyValueStoreManagerImpl::sValuesStorage       = { kNvmId_KvsValues };
+Internal::RamStorage KeyValueStoreManagerImpl::sSubscriptionStorage = { kNvmId_KvsSubscription };
+Internal::RamStorage KeyValueStoreManagerImpl::sGroupsStorage       = { kNvmId_KvsGroups };
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
+
+#if CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+static CHIP_ERROR MoveKeysAndValues();
+#endif // CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+
+static inline bool IsKeyRelatedToGroups(const char * key)
+{
+    std::string _key(key);
+    if (_key.find("f/") != 0)
+        return false;
+
+    return (_key.find("/g") != std::string::npos) || (_key.find("/k/") != std::string::npos);
+}
+
+static inline bool IsKeyRelatedToSubscriptions(const char * key)
+{
+    std::string _key(key);
+    return _key.find("g/su") == 0;
+}
+
+static Internal::RamStorage * GetValStorage(const char * key)
+{
+    Internal::RamStorage * storage = nullptr;
+
+    storage = IsKeyRelatedToSubscriptions(key) ? &KeyValueStoreManagerImpl::sSubscriptionStorage
+                                               : &KeyValueStoreManagerImpl::sValuesStorage;
+    storage = IsKeyRelatedToGroups(key) ? &KeyValueStoreManagerImpl::sGroupsStorage : storage;
+
+    return storage;
+}
+
+static Internal::RamStorage * GetKeyStorage(const char * key)
+{
+    Internal::RamStorage * storage = nullptr;
+
+    storage = IsKeyRelatedToSubscriptions(key) ? &KeyValueStoreManagerImpl::sSubscriptionStorage
+                                               : &KeyValueStoreManagerImpl::sKeysStorage;
+    storage = IsKeyRelatedToGroups(key) ? &KeyValueStoreManagerImpl::sGroupsStorage : storage;
+
+    return storage;
+}
 
 uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
 {
@@ -54,7 +97,7 @@ uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
     {
         uint16_t keyStringSize = kMaxKeyValueBytes;
         pdmInternalId          = Internal::RamStorageKey::GetInternalId(kKeyId_KvsKeys, keyId);
-        err = KeyValueStoreManagerImpl::sKeysStorage.Read(pdmInternalId, 0, (uint8_t *) keyString, &keyStringSize);
+        err                    = GetKeyStorage(key)->Read(pdmInternalId, 0, (uint8_t *) keyString, &keyStringSize);
 
         if (err == CHIP_NO_ERROR)
         {
@@ -76,17 +119,36 @@ uint16_t GetStringKeyId(const char * key, uint16_t * freeId)
 CHIP_ERROR KeyValueStoreManagerImpl::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = sKeysStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
+
+    err = sKeysStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Cannot init KVS keys storage with id: %d. Error: %s", kNvmId_KvsKeys, ErrorStr(err));
     }
-    // Set values storage to a big RAM buffer size as a temporary fix for TC-RR-1.1.
-    err = sValuesStorage.Init(kKVS_RamBufferSize, true);
+
+    err = sValuesStorage.Init(Internal::RamStorage::kRamBufferInitialSize, true);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Cannot init KVS values storage with id: %d. Error: %s", kNvmId_KvsValues, ErrorStr(err));
     }
+
+    err = sSubscriptionStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "Cannot init KVS subscription storage with id: %d. Error: %s", kNvmId_KvsSubscription,
+                        ErrorStr(err));
+    }
+
+    err = sGroupsStorage.Init(Internal::RamStorage::kRamBufferInitialSize, true);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "Cannot init KVS groups storage with id: %d. Error: %s", kNvmId_KvsGroups, ErrorStr(err));
+    }
+
+#if CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+    ChipLogProgress(DeviceLayer, "Moving some keys to dedicated storage");
+    MoveKeysAndValues();
+#endif /* CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE */
 
     return err;
 }
@@ -105,10 +167,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     if (keyId < kMaxNumberOfKeys)
     {
-        // This is the ID of the actual data
+        /* Use kKeyId_KvsValues as base key id for all keys. */
         pdmInternalId = Internal::RamStorageKey::GetInternalId(kKeyId_KvsValues, keyId);
         ChipLogProgress(DeviceLayer, "KVS, get the value of Matter key [%s] with PDM id: %i", key, pdmInternalId);
-        err              = KeyValueStoreManagerImpl::sValuesStorage.Read(pdmInternalId, 0, (uint8_t *) value, &valueSize);
+        err              = GetValStorage(key)->Read(pdmInternalId, 0, (uint8_t *) value, &valueSize);
         *read_bytes_size = valueSize;
     }
     else
@@ -140,11 +202,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
         keyId  = freeKeyId;
     }
 
+    /* Use kKeyId_KvsValues as base key id for all keys. */
     pdmInternalId = Internal::RamStorageKey::GetInternalId(kKeyId_KvsValues, keyId);
     ChipLogProgress(DeviceLayer, "KVS, save in flash the value of the Matter key [%s] with PDM id: %i", key, pdmInternalId);
 
-    err = sValuesStorage.Write(pdmInternalId, (uint8_t *) value, value_size);
-
+    err = GetValStorage(key)->Write(pdmInternalId, (uint8_t *) value, value_size);
     /* save the 'key' in flash such that it can be retrieved later on */
     if (err == CHIP_NO_ERROR)
     {
@@ -154,7 +216,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
             ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with PDM id: %i and length %d", key, pdmInternalId,
                             strlen(key) + 1);
 
-            err = sKeysStorage.Write(pdmInternalId, (uint8_t *) key, strlen(key) + 1);
+            err = GetKeyStorage(key)->Write(pdmInternalId, (uint8_t *) key, strlen(key) + 1);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the Matter key [%s] with PDM id: %i", key,
@@ -188,16 +250,17 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
         pdmInternalId = Internal::RamStorageKey::GetInternalId(kKeyId_KvsKeys, keyId);
 
         ChipLogProgress(DeviceLayer, "KVS, delete from flash the Matter key [%s] with PDM id: %i", key, pdmInternalId);
-        err = sKeysStorage.Delete(pdmInternalId, -1);
+        err = GetKeyStorage(key)->Delete(pdmInternalId, -1);
 
         /* also delete the 'key string' from flash */
         if (err == CHIP_NO_ERROR)
         {
+            /* Use kKeyId_KvsValues as base key id for all keys. */
             pdmInternalId = Internal::RamStorageKey::GetInternalId(kKeyId_KvsValues, keyId);
             ChipLogProgress(DeviceLayer, "KVS, delete from flash the value of the Matter key [%s] with PDM id: %i", key,
                             pdmInternalId);
 
-            err = sValuesStorage.Delete(pdmInternalId, -1);
+            err = GetValStorage(key)->Delete(pdmInternalId, -1);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer,
@@ -220,6 +283,8 @@ void KeyValueStoreManagerImpl::FactoryResetStorage(void)
 {
     sKeysStorage.OnFactoryReset();
     sValuesStorage.OnFactoryReset();
+    sSubscriptionStorage.OnFactoryReset();
+    sGroupsStorage.OnFactoryReset();
 }
 
 void KeyValueStoreManagerImpl::ConvertError(CHIP_ERROR & err)
@@ -229,6 +294,54 @@ void KeyValueStoreManagerImpl::ConvertError(CHIP_ERROR & err)
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 }
+
+#if CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
+static CHIP_ERROR MoveToDedicatedStorage(const char * key, uint8_t * buffer, uint16_t len, uint16_t keyId, uint16_t valId)
+{
+    ReturnErrorOnFailure(GetKeyStorage(key)->Write(keyId, (uint8_t *) key, strlen(key) + 1));
+
+    ReturnErrorOnFailure(KeyValueStoreManagerImpl::sValuesStorage.Read(valId, 0, buffer, &len));
+    ReturnErrorOnFailure(GetValStorage(key)->Write(valId, buffer, len));
+
+    ReturnErrorOnFailure(KeyValueStoreManagerImpl::sKeysStorage.Delete(keyId, -1));
+    ReturnErrorOnFailure(KeyValueStoreManagerImpl::sValuesStorage.Delete(valId, -1));
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR MoveKeysAndValues()
+{
+    uint16_t len                = 1024; // Should be enough for Matter keys
+    uint16_t keyId              = 0;
+    uint16_t valId              = 0;
+    uint16_t keySize            = kMaxKeyValueBytes;
+    char key[kMaxKeyValueBytes] = { 0 };
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+
+    buffer.Calloc(len);
+    ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+
+    for (uint8_t id = 0; id < kMaxNumberOfKeys; id++)
+    {
+        keySize = kMaxKeyValueBytes;
+        keyId   = Internal::RamStorageKey::GetInternalId(kKeyId_KvsKeys, id);
+        valId   = Internal::RamStorageKey::GetInternalId(kKeyId_KvsValues, id);
+
+        auto err = KeyValueStoreManagerImpl::sKeysStorage.Read(keyId, 0, (uint8_t *) key, &keySize);
+        if (err == CHIP_NO_ERROR)
+        {
+            if (!IsKeyRelatedToGroups(key) && !IsKeyRelatedToSubscriptions(key))
+                continue;
+
+            err = MoveToDedicatedStorage(key, buffer.Get(), len, keyId, valId);
+            VerifyOrDo(err != CHIP_NO_ERROR, ChipLogProgress(DeviceLayer, "Key [%s] was moved successfully", key));
+            VerifyOrDo(err == CHIP_NO_ERROR, ChipLogProgress(DeviceLayer, "Error in moving key [%s] to dedicated storage", key));
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+#endif // CONFIG_CHIP_K32W0_KVS_MOVE_KEYS_TO_SPECIFIC_STORAGE
 
 } // namespace PersistedStorage
 } // namespace DeviceLayer

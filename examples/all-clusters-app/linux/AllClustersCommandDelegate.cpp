@@ -19,18 +19,20 @@
 #include "AllClustersCommandDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/att-storage.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
+#include <app/util/att-storage.h>
 #include <platform/PlatformManager.h>
 
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
+#include <operational-state-delegate-impl.h>
 #include <oven-modes.h>
+#include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
 
 using namespace chip;
@@ -178,6 +180,12 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         {
             self->OnAirQualityChange(static_cast<uint32_t>(jsonAirQualityEnum.asUInt()));
         }
+    }
+    else if (name == "OperationalStateChange")
+    {
+        std::string device    = self->mJsonValue["Device"].asString();
+        std::string operation = self->mJsonValue["Operation"].asString();
+        self->OnOperationalStateChange(device, operation, self->mJsonValue["Param"]);
     }
     else
     {
@@ -432,6 +440,54 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
     else
     {
         ChipLogDetail(NotSpecified, "Invalid mode type : %s", type.c_str());
+        return;
+    }
+}
+
+void AllClustersAppCommandHandler::OnOperationalStateChange(std::string device, std::string operation, Json::Value param)
+{
+    OperationalState::Instance * operationalStateInstance = nullptr;
+    if (device == "Generic")
+    {
+        operationalStateInstance = OperationalState::GetOperationalStateInstance();
+    }
+    else if (device == "Oven")
+    {
+        operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid device type : %s", device.c_str());
+        return;
+    }
+
+    if (operation == "Start" || operation == "Resume")
+    {
+        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    }
+    else if (operation == "Pause")
+    {
+        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    }
+    else if (operation == "Stop")
+    {
+        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    }
+    else if (operation == "OnFault")
+    {
+
+        uint8_t event_id = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
+        if (!param.isNull())
+        {
+            event_id = to_underlying(static_cast<OperationalState::ErrorStateEnum>(param.asUInt()));
+        }
+
+        OperationalState::GenericOperationalError err(event_id);
+        operationalStateInstance->OnOperationalErrorDetected(err);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Invalid operation : %s", operation.c_str());
         return;
     }
 }

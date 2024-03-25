@@ -68,7 +68,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_BIG_ENDIAN_TARGET=${chip_target_is_big_endian}",
     "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE=${chip_tlv_validate_char_string_on_write}",
     "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ=${chip_tlv_validate_char_string_on_read}",
-    "CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED=${chip_enable_sending_batch_commands}",
+    "CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS=${chip_enable_sending_batch_commands}",
   ]
 
   visibility = [ ":chip_config_header" ]
@@ -113,9 +113,14 @@ source_set("encoding") {
 source_set("types") {
   sources = [
     "CHIPSafeCasts.h",
+    "CHIPVendorIdentifiers.hpp",
+    "DataModelTypes.h",
     "Global.h",
+    "GroupId.h",
     "InPlace.h",
+    "NodeId.h",
     "Optional.h",
+    "PasscodeId.h",
     "ReferenceCounted.h",
     "Unchecked.h",
   ]
@@ -138,12 +143,8 @@ static_library("core") {
     "CHIPKeyIds.h",
     "CHIPPersistentStorageDelegate.h",
     "ClusterEnums.h",
-    "DataModelTypes.h",
-    "GroupId.h",
-    "NodeId.h",
     "OTAImageHeader.cpp",
     "OTAImageHeader.h",
-    "PasscodeId.h",
     "PeerId.h",
     "ScopedNodeId.h",
     "TLV.h",
@@ -185,4 +186,18 @@ static_library("core") {
     "${chip_root}/src/inet",
     "${chip_root}/src/system",
   ]
+}
+
+static_library("vectortlv") {
+  output_name = "libVectorTlv"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [
+    "TLVVectorWriter.cpp",
+    "TLVVectorWriter.h",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [ ":core" ]
 }

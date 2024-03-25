@@ -7488,9 +7488,6 @@
           Scenes:
               # New scenes bits not stable yet.
               - SceneTableSize
-          FanControl:
-              # New Fan Control bits not stable yet.
-              - AirflowDirection
           RVCCleanMode:
               # People are trying to deprecate this one
               - OnMode
@@ -7498,9 +7495,6 @@
               # People are trying to deprecate this one
               - OnMode
       commands:
-          FanControl:
-              # Not stable yet
-              - Step
           DoorLock:
               # Not stable yet
               - UnboltDoor
@@ -7508,11 +7502,6 @@
               # Disallowed in the spec, but present in our XML?
               - Start
               - Stop
-      enums:
-          FanControl:
-              # Not stable yet.
-              - StepDirectionEnum
-              - AirflowDirectionEnum
       enum values:
           DoorLock:
               # Not stable yet
@@ -7544,11 +7533,6 @@
               # here.
               Feature:
                   - Unbolt
-          FanControl:
-              # Not stable yet
-              Feature:
-                  - Step
-                  - AirflowDirection
           RVCRunMode:
               Feature:
                   # People are trying to deprecate this one
@@ -8543,6 +8527,36 @@
 
 - release: "Future"
   versions: "future"
+  introduced:
+      attributes:
+          FanControl:
+              - AirflowDirection
+      commands:
+          FanControl:
+              - Step
+      command fields:
+          FanControl:
+              Step:
+                  - direction
+                  - wrap
+                  - lowestOff
+      enums:
+          FanControl:
+              - StepDirectionEnum
+              - AirflowDirectionEnum
+      enum values:
+          FanControl:
+              StepDirectionEnum:
+                  - Increase
+                  - Decrease
+              AirflowDirectionEnum:
+                  - Forward
+                  - Reverse
+      bitmap values:
+          FanControl:
+              Feature:
+                  - Step
+                  - AirflowDirection
   provisional:
       clusters:
           # Targeting Spring 2024 Matter release

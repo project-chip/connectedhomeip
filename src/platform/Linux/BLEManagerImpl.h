@@ -92,9 +92,10 @@ public:
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
 
-    static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate);
-    static void NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate);
-    static void NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate);
+    static void NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error);
+    static void NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error);
+    static void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
+    static void NotifyBLEPeripheralAdvReleased();
 
 private:
     // ===== Members that implement the BLEManager internal interface.
@@ -133,6 +134,7 @@ private:
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
+    void CheckNonConcurrentBleClosing() override;
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 

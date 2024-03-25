@@ -21,8 +21,5 @@ config("config") {
 
 chip_data_model("microwave-oven-common") {
   zap_file = "microwave-oven-app.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/microwave-oven-app/zap-generated"
   is_server = true
 }

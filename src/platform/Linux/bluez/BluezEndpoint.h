@@ -74,28 +74,18 @@ public:
     CHIP_ERROR Init(bool aIsCentral, const char * apBleAddr);
     void Shutdown();
 
-    BluezAdapter1 * GetAdapter() const { return mpAdapter; }
+    BluezAdapter1 * GetAdapter() const { return mAdapter.get(); }
 
     CHIP_ERROR RegisterGattApplication();
-    GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mpRoot; }
+    GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
 
 private:
-    struct ConnectParams
-    {
-        ConnectParams(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice) : mEndpoint(aEndpoint), mpDevice(apDevice) {}
-        ~ConnectParams() = default;
-
-        const BluezEndpoint & mEndpoint;
-        BluezDevice1 * mpDevice;
-        uint16_t mNumRetries = 0;
-    };
-
     CHIP_ERROR StartupEndpointBindings();
 
-    void SetupAdapter();
+    CHIP_ERROR SetupAdapter();
     void SetupGattServer(GDBusConnection * aConn);
     void SetupGattService();
 
@@ -122,8 +112,7 @@ private:
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
-    static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
-    static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
+    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice);
 
     bool mIsCentral     = false;
     bool mIsInitialized = false;
@@ -137,17 +126,18 @@ private:
     char * mpServicePath = nullptr;
 
     // Objects (interfaces) subscribed to by this service
-    GDBusObjectManager * mpObjMgr = nullptr;
-    BluezAdapter1 * mpAdapter     = nullptr;
-    BluezDevice1 * mpDevice       = nullptr;
+    GAutoPtr<GDBusObjectManager> mObjMgr;
+    GAutoPtr<BluezAdapter1> mAdapter;
 
     // Objects (interfaces) published by this service
-    GDBusObjectManagerServer * mpRoot = nullptr;
-    BluezGattService1 * mpService     = nullptr;
-    BluezGattCharacteristic1 * mpC1   = nullptr;
-    BluezGattCharacteristic1 * mpC2   = nullptr;
+    GAutoPtr<GDBusObjectManagerServer> mRoot;
+    GAutoPtr<BluezGattService1> mService;
+    GAutoPtr<BluezGattCharacteristic1> mC1;
+    GAutoPtr<BluezGattCharacteristic1> mC2;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     // additional data characteristics
-    BluezGattCharacteristic1 * mpC3 = nullptr;
+    GAutoPtr<BluezGattCharacteristic1> mC3;
+#endif
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
     GAutoPtr<GCancellable> mConnectCancellable;

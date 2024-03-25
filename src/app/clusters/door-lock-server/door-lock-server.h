@@ -307,7 +307,7 @@ private:
     bool findUserIndexByCredential(chip::EndpointId endpointId, CredentialTypeEnum credentialType, chip::ByteSpan credentialData,
                                    uint16_t & userIndex, uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo);
 
-    chip::Protocols::InteractionModel::Status
+    chip::Protocols::InteractionModel::ClusterStatusCode
     createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId, uint16_t userIndex,
                const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
@@ -479,7 +479,7 @@ private:
     bool engageLockout(chip::EndpointId endpointId);
 
     static void sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                    chip::Protocols::InteractionModel::Status status);
+                                    chip::Protocols::InteractionModel::ClusterStatusCode status);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands

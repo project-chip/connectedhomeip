@@ -48,6 +48,4 @@ typedef struct
 #define INTERRUPT_PIN PIN(A, 7)
 #define SLEEP_CONFIRM_PIN PIN(A, 5) /* Exp hdr 7 */
 #endif
-
-#define NETWORK_INTERFACE_VALID(x) (x == SL_NET_DEFAULT_WIFI_CLIENT_INTERFACE) || (x == SL_NET_DEFAULT_WIFI_AP_INTERFACE)
 #endif /* _RSI_BOARD_CONFIGURATION_H_ */
