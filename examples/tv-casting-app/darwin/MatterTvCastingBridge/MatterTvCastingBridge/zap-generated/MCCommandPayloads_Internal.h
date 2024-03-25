@@ -1,8 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,16 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "sl_component_catalog.h"
-#include "sl_system_init.h"
-#include "sl_system_kernel.h"
-#include <MatterConfig.h>
 
-int main(void)
-{
-    sl_system_init();
+#import "MCCommandPayloads.h"
 
-    // Initialize the application. For example, create periodic timer(s) or
-    // task(s) if the kernel is present.
-    SilabsMatterConfig::AppInit();
-}
+#import "../MCErrorUtils.h"
+
+#import <Foundation/Foundation.h>
+#include <any>
+
+#ifndef MCCommandPayloads_Internal_h
+#define MCCommandPayloads_Internal_h
+
+@interface MCAbstractPayload ()
+- (std::any)getCppRequestFromObjCRequest;
+- (CHIP_ERROR)setObjCResponseFromCppResponse:(std::any)cppDecodableStruct;
+@end
+
+#endif /* MCCommandPayloads_Internal_h */

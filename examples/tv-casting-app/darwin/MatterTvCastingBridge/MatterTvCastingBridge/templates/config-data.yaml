@@ -30,7 +30,3 @@ MatterCastingClusters:
     - On/Off
     - Target Navigator
     - Wake on LAN
-
-# The commands currently implemented for Matter Casting in MCCommandObjects.h/mm. We will ZAP generate this file in the next PR.
-MatterCastingImplementedCommands:
-    - LaunchURL
