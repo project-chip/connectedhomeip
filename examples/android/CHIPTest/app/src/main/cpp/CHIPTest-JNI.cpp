@@ -44,7 +44,6 @@ JavaVM * sJVM;
 
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
-// static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName);
 
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
