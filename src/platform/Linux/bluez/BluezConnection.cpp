@@ -34,7 +34,6 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "BluezEndpoint.h"
-#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -89,7 +88,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
     }
     else
     {
-        for (BluezObject & object : BluezObjectList(aEndpoint.mObjMgr.get()))
+        for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
         {
             BluezGattService1 * service = bluez_object_get_gatt_service1(&object);
             if (service != nullptr)
@@ -106,7 +105,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         VerifyOrExit(mService, ChipLogError(DeviceLayer, "FAIL: NULL service in %s", __func__));
 
-        for (BluezObject & object : BluezObjectList(aEndpoint.mObjMgr.get()))
+        for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
         {
             BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(&object);
             if (char1 != nullptr)
