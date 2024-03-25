@@ -103,6 +103,9 @@ def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> tuple(
 
 
 class TC_DA_1_2(MatterBaseTest):
+    def desc_TC_DA_1_2(self):
+        return "Device Attestation Request Validation [DUT - Commissionee]"
+
     def steps_TC_DA_1_2(self):
         return [TestStep(0, "Commission DUT if not done", is_commissioning=True),
                 TestStep(1, "TH1 generates 32-byte AttestationNonce and saves as `nonce", ""),
