@@ -58,6 +58,9 @@
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY 20
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 20
 
+// For casting, we need to allow for more binding table entries
+#define MATTER_BINDING_TABLE_SIZE 64
+
 // Enable some test-only interaction model APIs.
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
 
