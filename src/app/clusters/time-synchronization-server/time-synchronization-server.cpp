@@ -659,7 +659,7 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
     size_t items;
     VerifyOrReturnError(CHIP_NO_ERROR == dstL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
-    if (items > CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE)
+    if (items > mDstOffsetObj.dstOffsetList.size())
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
@@ -778,7 +778,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
     if (!(status == Status::Success || status == Status::UnsupportedAttribute))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
-        return CHIP_IM_GLOBAL_STATUS(Failure);
+        return StatusIB(status).ToChipError();
     }
     return CHIP_NO_ERROR;
 }
