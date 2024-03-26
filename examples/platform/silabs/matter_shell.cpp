@@ -16,11 +16,19 @@
  */
 
 #include "matter_shell.h"
+#include "sl_component_catalog.h"
 #include <ChipShellCollection.h>
 #include <FreeRTOS.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
 #include <task.h>
+#ifdef SL_CATALOG_CLI_PRESENT
+#include "sl_cli.h"
+#include "sl_cli_config.h"
+#include "sli_cli_io.h"
+static char sSilabsTXCLI[SL_CLI_OUTPUT_BUFFER_SIZE];
+static constexpr uint16_t sSilabsTXCLILenght = SL_CLI_OUTPUT_BUFFER_SIZE;
+#endif
 
 using namespace ::chip;
 using chip::Shell::Engine;
@@ -68,6 +76,82 @@ void WaitForShellActivity()
 {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 }
+
+#ifdef SL_CATALOG_CLI_PRESENT
+
+CHIP_ERROR cmd_silabs_dispatch(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    char buff[SL_CLI_INPUT_BUFFER_SIZE] = { 0 };
+    char * buff_ptr                     = buff;
+    int i                               = 0;
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (i = 0; i < argc; i++)
+    {
+        size_t arg_len = strlen(argv[i]);
+
+        /* Make sure that the next argument won't overflow the buffer */
+        VerifyOrExit(buff_ptr + arg_len < buff + kMaxLineLength, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        strncpy(buff_ptr, argv[i], arg_len);
+        buff_ptr += arg_len;
+
+        /* Make sure that there is enough buffer for a space char */
+        if (buff_ptr + sizeof(char) < buff + kMaxLineLength)
+        {
+            strncpy(buff_ptr, " ", sizeof(char));
+            buff_ptr++;
+        }
+    }
+    buff_ptr = 0;
+    sl_cli_handle_input(sl_cli_default_handle, buff);
+exit:
+    return error;
+}
+
+static const Shell::shell_command_t cmds_silabs_root = { &cmd_silabs_dispatch, "silabs", "Dispatch Silicon Labs CLI command" };
+
+void cmd_silabs_init()
+{
+    // Register the root otcli command with the top-level shell.
+    Engine::Root().RegisterCommands(&cmds_silabs_root, 1);
+}
+
+extern "C" int sli_cli_io_printf(const char * format, ...)
+{
+    va_list argptr;
+    int rval = 0;
+    va_start(argptr, format);
+    rval = vsnprintf(sSilabsTXCLI, sSilabsTXCLILenght, format, argptr);
+    va_end(argptr);
+
+    if (rval >= 0 && rval < sSilabsTXCLILenght)
+    {
+        chip::Shell::streamer_write(chip::Shell::streamer_get(), (const char *) sSilabsTXCLI, rval);
+        // Line feed correction
+        uint16_t size = strlen(sSilabsTXCLI);
+        if (size < 2)
+        {
+            return 0;
+        }
+        if (sSilabsTXCLI[size - 1] == '\n' && sSilabsTXCLI[size - 2] != '\r')
+        {
+            chip::Shell::streamer_write(chip::Shell::streamer_get(), (const char *) "\r", 2);
+        }
+        else if (sSilabsTXCLI[size - 1] == '\r' && sSilabsTXCLI[size - 2] != '\n')
+        {
+            chip::Shell::streamer_write(chip::Shell::streamer_get(), (const char *) "\n", 2);
+        }
+
+        return 0;
+    }
+    return SL_STATUS_FAIL;
+}
+
+#endif // SL_CATALOG_CLI_PRESENT
 
 void startShellTask()
 {
