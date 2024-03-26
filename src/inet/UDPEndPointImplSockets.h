@@ -65,10 +65,7 @@ private:
 public:
     using MulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &, bool /* join */);
 
-    static void SetMulticastGroupHandler(MulticastGroupHandler handler)
-    {
-        sMulticastGroupHandler = handler;
-    }
+    static void SetMulticastGroupHandler(MulticastGroupHandler handler) { sMulticastGroupHandler = handler; }
 
 private:
     static MulticastGroupHandler sMulticastGroupHandler;

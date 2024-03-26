@@ -21,8 +21,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/Zephyr/InetUtils.h>
+#include <platform/internal/BLEManager.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
@@ -35,8 +35,8 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
 using namespace ::chip::Inet;
