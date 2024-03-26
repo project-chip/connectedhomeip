@@ -624,27 +624,27 @@ public:
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-    static void TestCheckInWouldBeSentAtActiveModeVerifier(nlTestSuite * aSuite, void * aContext)
+    static void TestShouldCheckInMsgsBeSentAtActiveModeFunction(nlTestSuite * aSuite, void * aContext)
     {
         TestContext * ctx = static_cast<TestContext *>(aContext);
 
         // Test 1 - Has no ActiveSubscription & no persisted subscription
         ctx->mSubInfoProvider.SetHasActiveSubscription(false);
         ctx->mSubInfoProvider.SetHasPersistedSubscription(false);
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11));
 
         // Test 2 - Has no active subscription & a persisted subscription
         ctx->mSubInfoProvider.SetHasActiveSubscription(false);
         ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
-        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11)));
+        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11)));
 
         // Test 3 - Has an active subscription & a persisted subscription
         ctx->mSubInfoProvider.SetHasActiveSubscription(true);
         ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
-        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11)));
+        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11)));
     }
 #else
-    static void TestCheckInWouldBeSentAtActiveModeVerifier(nlTestSuite * aSuite, void * aContext)
+    static void TestShouldCheckInMsgsBeSentAtActiveModeFunction(nlTestSuite * aSuite, void * aContext)
     {
         TestContext * ctx = static_cast<TestContext *>(aContext);
 
@@ -652,44 +652,44 @@ public:
         ctx->mSubInfoProvider.SetHasActiveSubscription(false);
         ctx->mSubInfoProvider.SetHasPersistedSubscription(false);
         ctx->mICDManager.mIsBootUpResumeSubscriptionExecuted = false;
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11));
 
         // Test 2 - Has no active subscription and a persisted subscription at boot up
         ctx->mSubInfoProvider.SetHasActiveSubscription(false);
         ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
         ctx->mICDManager.mIsBootUpResumeSubscriptionExecuted = false;
-        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11)));
+        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11)));
 
         // Test 3 - Has an active subscription and a persisted subscription during normal operations
         ctx->mSubInfoProvider.SetHasActiveSubscription(true);
         ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
         ctx->mICDManager.mIsBootUpResumeSubscriptionExecuted = true;
-        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11)));
+        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11)));
 
         // Test 4 - Has no active subscription and a persisted subscription during normal operations
         ctx->mSubInfoProvider.SetHasActiveSubscription(false);
         ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
         ctx->mICDManager.mIsBootUpResumeSubscriptionExecuted = true;
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11));
     }
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #else
-    static void TestCheckInWouldBeSentAtActiveModeVerifier(nlTestSuite * aSuite, void * aContext)
+    static void TestShouldCheckInMsgsBeSentAtActiveModeFunction(nlTestSuite * aSuite, void * aContext)
     {
         TestContext * ctx = static_cast<TestContext *>(aContext);
 
         // Test 1 - Has an active subscription
         ctx->mSubInfoProvider.SetHasActiveSubscription(true);
         NL_TEST_ASSERT(aSuite,
-                       ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11) == false);
+                       ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11) == false);
 
         // Test 2 - Has no active subscription
         ctx->mSubInfoProvider.SetHasActiveSubscription(false);
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11));
 
         // Test 3 - Make sure that the persisted subscription has no impact
         ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
-        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11));
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 };
@@ -709,7 +709,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
     NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
     NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
-    NL_TEST_DEF("TestCheckInWouldBeSentAtActiveModeVerifier", TestICDManager::TestCheckInWouldBeSentAtActiveModeVerifier),
+    NL_TEST_DEF("TestShouldCheckInMsgsBeSentAtActiveModeFunction", TestICDManager::TestShouldCheckInMsgsBeSentAtActiveModeFunction),
     NL_TEST_SENTINEL(),
 };
 

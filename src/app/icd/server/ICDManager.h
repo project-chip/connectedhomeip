@@ -89,7 +89,7 @@ public:
      *         false No Check-In messages would be sent
      */
 
-    using RegistrationVerificationFunction = bool(FabricIndex aFabricIndex, NodeId subjectID);
+    using ShouldCheckInMsgsBeSentFunction = bool(FabricIndex aFabricIndex, NodeId subjectID);
 
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
@@ -137,7 +137,7 @@ public:
      *
      * @param[in] algo Verifier function to use to determine if we need to send check-in messages
      */
-    void TriggerCheckInMessages(const std::function<RegistrationVerificationFunction> & verifier);
+    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     /**
@@ -190,28 +190,18 @@ protected:
 
 private:
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    /**
-     * @brief Verifier to determine if a Check-In message would be sent on transition to ActiveMode
-     *
-     * @param aFabricIndex client fabric index
-     * @param subjectID client subject ID
-     * @return true  Check-In message would be sent on transition to ActiveMode.
-     * @return false Device has an active subscription with the subjectID.
-     *               Device is trying to resume inactive subscriptions with the client. See CHIP_CONFIG_PERSIST_SUBSCRIPTIONS and
-     *               CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-     */
-    bool CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex, NodeId subjectID);
+    bool ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID);
 
     /**
      * @brief Function checks if at least one client registration would require a Check-In message
      *
-     * @param[in] RegistrationVerifier  function to use to determine if a Check-In message would be sent for a given registration
+     * @param[in] function  function to use to determine if a Check-In message would be sent for a given registration
      *
      * @return true At least one registration would require an Check-In message if we were entering ActiveMode.
      * @return false None of the registration would require a Check-In message either because there are no registration or
      * because they all have associated subscriptions.
      */
-    bool CheckInMessagesWouldBeSent(std::function<RegistrationVerificationFunction> RegistrationVerifier);
+    bool CheckInMessagesWouldBeSent(std::function<ShouldCheckInMsgsBeSentFunction> function);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     KeepActiveFlags mKeepActiveFlags{ 0 };
