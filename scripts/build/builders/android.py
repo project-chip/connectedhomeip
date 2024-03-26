@@ -353,17 +353,18 @@ class AndroidBuilder(Builder):
             if not self._runner.dry_run:
                 self.validate_build_environment()
 
+            exampleName = self.app.ExampleName()
             gn_args = {}
             gn_args["target_os"] = "android"
             gn_args["target_cpu"] = self.board.TargetCpuName()
             gn_args["android_ndk_root"] = os.environ["ANDROID_NDK_HOME"]
             gn_args["android_sdk_root"] = os.environ["ANDROID_HOME"]
-            gn_args["chip_build_test_static_libraries"] = False
+            if exampleName == "chip-test":
+                gn_args["chip_build_test_static_libraries"] = False
 
             if self.options.pw_command_launcher:
                 gn_args["pw_command_launcher"] = self.options.pw_command_launcher
 
-            exampleName = self.app.ExampleName()
             if exampleName == "chip-test":
                 gn_args["chip_build_tests"] = True
             if self.profile != AndroidProfile.DEBUG:
