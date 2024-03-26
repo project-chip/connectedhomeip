@@ -406,7 +406,7 @@ void BrowseContext::OnBrowseRemove(const char * name, const char * type, const c
     domainNames.erase(std::remove_if(domainNames.begin(), domainNames.end(),
                                      [name, type, interfaceId](const auto & domainName) {
                                          return strcmp(domainName.first.mName, name) == 0 && domainName.first.mType == type &&
-                                          domainName.first.mInterface == chip::Inet::InterfaceId(interfaceId);
+                                             domainName.first.mInterface == chip::Inet::InterfaceId(interfaceId);
                                      }),
                       domainNames.end());
 
