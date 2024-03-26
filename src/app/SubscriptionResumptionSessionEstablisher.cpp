@@ -92,7 +92,7 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
     InteractionModelEngine * imEngine                                  = InteractionModelEngine::GetInstance();
 
     // Decrement the number of subscriptions to resume
-    imEngine->DecrementNumSubscriptionToResume();
+    imEngine->DecrementNumSubscriptionsToResume();
 
     if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, subscriptionInfo.mAttributePaths.AllocatedSize(),
                                                  subscriptionInfo.mEventPaths.AllocatedSize()))
@@ -130,7 +130,7 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
                  error.Format());
 
     // Decrement the number of subscriptions to resume
-    imEngine->DecrementNumSubscriptionToResume();
+    imEngine->DecrementNumSubscriptionsToResume();
 
     auto * subscriptionResumptionStorage = imEngine->GetSubscriptionResumptionStorage();
     if (!subscriptionResumptionStorage)

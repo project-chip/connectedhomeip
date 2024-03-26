@@ -24,7 +24,7 @@ buildconfig_header("icd-server-buildconfig") {
 
   if (chip_enable_icd_lit || chip_enable_icd_checkin ||
       chip_enable_icd_user_active_mode_trigger) {
-    assert(chip_enable_icd_lit)
+    assert(chip_enable_icd_server)
   }
 
   if (chip_enable_icd_lit) {
