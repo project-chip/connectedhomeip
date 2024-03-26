@@ -105,6 +105,7 @@ ti_simplelink_executable("all-clusters-app") {
     ":sysconfig",
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
   ]
 
   if (chip_openthread_ftd) {

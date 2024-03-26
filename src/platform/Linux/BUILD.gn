@@ -79,10 +79,10 @@ static_library("Linux") {
     "${chip_root}/src/setup_payload",
   ]
 
-  if (!chip_use_external_logging) {
-    sources += [ "Logging.cpp" ]
-    deps += [ "${chip_root}/src/platform/logging:headers" ]
-  }
+  # if (!chip_use_external_logging) {
+  #   sources += [ "Logging.cpp" ]
+  #   deps += [ "${chip_root}/src/platform/logging:headers" ]
+  # }
 
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]

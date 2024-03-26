@@ -172,7 +172,10 @@ rt_executable("laundry-washer") {
     "${common_example_dir}/matter_cli/source/AppMatterCli.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/src/platform/logging:default",
+  ]
 
   sources += [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",

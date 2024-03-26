@@ -30,7 +30,6 @@ static_library("mbed") {
     "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "MbedConfig.cpp",
     "MbedEventTimeout.cpp",
     "NetworkCommissioningDriver.h",

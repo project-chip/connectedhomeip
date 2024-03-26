@@ -41,7 +41,6 @@ static_library("qpg") {
     "FactoryDataProvider.cpp",
     "FactoryDataProvider.h",
     "InetPlatformConfig.h",
-    "Logging.cpp",
     "OTAImageProcessorImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",

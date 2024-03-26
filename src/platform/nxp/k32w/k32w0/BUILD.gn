@@ -46,7 +46,6 @@ static_library("nxp_platform") {
     "K32W0Config.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "NFCManagerImpl.cpp",
     "NFCManagerImpl.h",
     "PlatformManagerImpl.cpp",

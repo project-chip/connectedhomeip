@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
 import("lib.gni")
 
 static_library("lib") {
@@ -36,6 +37,12 @@ static_library("lib") {
   # See src/lib/lib.gni for declaration of this build arg.
   if (chip_build_controller) {
     public_deps += [ "${chip_root}/src/controller" ]
+  }
+
+  if (chip_device_platform == "darwin") {
+    public_deps += [ "${chip_root}/src/platform/logging:stdio" ]
+  } else {
+    public_deps += [ "${chip_root}/src/platform/logging:default" ]
   }
 
   # Only include the shell if it is being used. The shell is

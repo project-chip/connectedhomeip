@@ -35,7 +35,6 @@ static_library("cc13x2_26x2") {
     "../DiagnosticDataProviderImpl.cpp",
     "../DiagnosticDataProviderImpl.h",
     "../KeyValueStoreManagerImpl.cpp",
-    "../Logging.cpp",
     "../PlatformManagerImpl.cpp",
     "../Random.c",
     "BlePlatformConfig.h",

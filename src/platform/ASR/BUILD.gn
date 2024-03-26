@@ -44,7 +44,6 @@ static_library("ASR") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "LwIPCoreLock.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningWiFiDriver.cpp",
