@@ -230,7 +230,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     if (!IsOutOfWriterSpaceError(err))
                     {
                         ChipLogError(DataManagement,
-                            "Fail to retrieve data, roll back and encode status on clusterId: "ChipLogFormatMEI " ,attributeId: " ChipLogFormatMEI, 
+                            "Fail to retrieve data, roll back and encode status on clusterId: "ChipLogFormatMEI " ,attributeId: " ChipLogFormatMEI,
                             "err = %" CHIP_ERROR_FORMAT, ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId), err.Format());
                         // Try to encode our error as a status response.
                         err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
