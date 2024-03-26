@@ -182,9 +182,9 @@ protected:
      * @brief Function Timer finished callback function
      *        Post an FunctionEventHandler event
      *
-     * @param xTimer timer that finished
+     * @param timerCbArg argument to the timer callback function assigned at timer creation
      */
-    static void FunctionTimerEventHandler(osTimerId_t xTimer);
+    static void FunctionTimerEventHandler(void * timerCbArg);
 
     /**
      * @brief Timer Event processing function
@@ -207,9 +207,9 @@ protected:
      * @brief Light Timer finished callback function
      *        Calls LED processing function
      *
-     * @param xTimer timer that finished
+     * @param timerCbArg argument to the timer callback function assigned at timer creation
      */
-    static void LightTimerEventHandler(osTimerId_t xTimer);
+    static void LightTimerEventHandler(void * timerCbArg);
 
     /**
      * @brief Updates device LEDs

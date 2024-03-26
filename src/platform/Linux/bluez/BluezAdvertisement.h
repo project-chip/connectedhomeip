@@ -46,10 +46,10 @@ public:
     static constexpr ServiceDataFlags kServiceDataNone                 = 0;
     static constexpr ServiceDataFlags kServiceDataExtendedAnnouncement = 1 << 0;
 
-    BluezAdvertisement() = default;
+    BluezAdvertisement(BluezEndpoint & aEndpoint) : mEndpoint(aEndpoint) {}
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, const char * aAdvName);
+    CHIP_ERROR Init(BluezAdapter1 * apAdapter, const char * aAdvUUID, const char * aAdvName);
     CHIP_ERROR SetupServiceData(ServiceDataFlags aFlags);
     CHIP_ERROR SetIntervals(AdvertisingIntervals aAdvIntervals);
     void Shutdown();
@@ -81,8 +81,7 @@ private:
     void StopDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR StopImpl();
 
-    // Objects (interfaces) used by LE advertisement
-    GAutoPtr<GDBusObjectManagerServer> mRoot;
+    BluezEndpoint & mEndpoint;
     GAutoPtr<BluezAdapter1> mAdapter;
     GAutoPtr<BluezLEAdvertisement1> mAdv;
 

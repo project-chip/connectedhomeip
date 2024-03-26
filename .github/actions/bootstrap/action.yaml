@@ -5,9 +5,56 @@ inputs:
     description: "Platform name"
     required: false
     default: none
+  bootstrap-log-name:
+    description: "Bootstrap log name"
+    required: false
+    default: bootstrap-logs-${{ github.job }}
+outputs:
+  cache-hit:
+    description: "Bootstrap environment was restored from cache"
+    value: ${{ fromJSON(steps.bootstrap-cache.outputs.outputs).cache-hit }} # retry returns all outputs in `outputs`
+
 runs:
   using: "composite"
   steps:
-    - name: Bootstrap
+    - name: Calculate bootstrap cache key
+      id: bootstrap-cache-key
       shell: bash
-      run: bash scripts/bootstrap.sh -p all,${{ inputs.platform }}
+      run: |
+        # Calculate bootstrap cache key
+        # In addition to the various setup files, the work directory matters as well,
+        # because the bootstrapped Pigweed environment contains absolute paths.
+        FILES_HASH="${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}"
+        FINAL_HASH="$(echo "$PWD:$FILES_HASH" | shasum -a 256 | cut -d' ' -f1)"
+        echo "Calculated bootstrap cache key for '$PWD': $FINAL_HASH"
+        echo "hash=$FINAL_HASH" >> "$GITHUB_OUTPUT"
+
+    - uses: Wandalen/wretry.action@v1.4.10
+      name: Bootstrap from cache
+      id: bootstrap-cache
+      continue-on-error: true
+      with:
+        action: buildjet/cache@v4
+        attempt_limit: 3
+        attempt_delay: 2000
+        with: |
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ inputs.platform }}-${{ steps.bootstrap-cache-key.outputs.hash}}
+          path: |
+              .environment
+              build_overrides/pigweed_environment.gni
+
+    - name: Run bootstrap
+      if: fromJSON(steps.bootstrap-cache.outputs.outputs).cache-hit != 'true'
+      env:
+        PW_NO_CIPD_CACHE_DIR: Y
+      shell: bash
+      run: source scripts/bootstrap.sh -p all,${{ inputs.platform }}
+
+    - name: Uploading bootstrap logs
+      uses: actions/upload-artifact@v4
+      if: always() && !env.ACT && fromJSON(steps.bootstrap-cache.outputs.outputs).cache-hit != 'true'
+      with:
+        name: ${{ inputs.bootstrap-log-name }}
+        path: |
+          .environment/gn_out/.ninja_log
+          .environment/pigweed-venv/*.log
