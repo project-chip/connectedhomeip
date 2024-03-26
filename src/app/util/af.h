@@ -137,12 +137,6 @@ chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
 uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
 
 /**
- * Returns the index of a given endpoint; Does not ignore disabled endpoints.
- * Will return 0xFFFF if this is not a valid endpoint id.
- */
-uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
-
-/**
  *  @brief Returns the index of the given endpoint in the list of all endpoints that might support the given cluster server.
  *
  * Returns kEmberInvalidEndpointIndex if the given endpoint does not support the
@@ -189,34 +183,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::C
  */
 uint16_t emberAfFixedEndpointCount(void);
 
-/**
- *@brief Returns true if type is signed, false otherwise.
- */
-bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
-
 /** @} END Attribute Storage */
-
-/** @name Miscellaneous */
-// @{
-
-/** @brief Returns true if a given ZCL data type is a list type. */
-bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
-
-/**
- * @brief Simple integer comparison function.
- * Compares two values of a known length as integers.
- * Signed integer comparison are supported for numbers with length of
- * 4 (bytes) or less.
- * The integers are in native endianness.
- *
- * @return -1, if val1 is smaller
- *          0, if they are the same or if two negative numbers with length
- *          greater than 4 is being compared
- *          1, if val2 is smaller.
- */
-int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber);
-
-/** @} END Miscellaneous */
 
 /** @} END addtogroup */
 
