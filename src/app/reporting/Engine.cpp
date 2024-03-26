@@ -211,8 +211,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 if (encodeState.AllowPartialData() && IsOutOfWriterSpaceError(err))
                 {
                     ChipLogDetail(DataManagement,
-                        "Encoding is out of space, and partial data allowed, save the encode state for report chunking on clusterId: " ChipLogFormatMEI " ,attributeId: " ChipLogFormatMEI,
-                        ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId));
+                                  "Encoding is out of space, and partial data allowed, save the encode state for report chunking "
+                                  "on clusterId: " ChipLogFormatMEI " ,attributeId: " ChipLogFormatMEI,
+                                  ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId));
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
                     // The expectation is that RetrieveClusterData has already reset attributeReportIBs to a good state (rolled
                     // back any partially-written AttributeReportIB instances, reset its error status).  Since AllowPartialData()
@@ -230,8 +231,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     if (!IsOutOfWriterSpaceError(err))
                     {
                         ChipLogError(DataManagement,
-                            "Fail to retrieve data, roll back and encode status on clusterId: "ChipLogFormatMEI " ,attributeId: " ChipLogFormatMEI,
-                            "err = %" CHIP_ERROR_FORMAT, ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId), err.Format());
+                                     "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
+                                     " ,attributeId: " ChipLogFormatMEI,
+                                     "err = %" CHIP_ERROR_FORMAT, ChipLogValueMEI(pathForRetrieval.mClusterId),
+                                     ChipLogValueMEI(pathForRetrieval.mAttributeId), err.Format());
                         // Try to encode our error as a status response.
                         err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
                         if (err != CHIP_NO_ERROR)
@@ -244,8 +247,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     else
                     {
                         ChipLogDetail(DataManagement,
-                            "Encoding is out of space, roll back on clusterId: "ChipLogFormatMEI " , attributeId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
-                            ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId), err.Format());
+                                      "Encoding is out of space, roll back on clusterId: " ChipLogFormatMEI
+                                      " , attributeId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
+                                      ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
+                                      err.Format());
                     }
                 }
             }
