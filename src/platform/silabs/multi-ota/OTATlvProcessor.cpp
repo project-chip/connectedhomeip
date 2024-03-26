@@ -31,7 +31,17 @@ using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
+typedef enum
+{
+    APPLICATION,
+    BOOTLOADER,
+    FACTORY_DATA,
+    WIFI_917_NCP_TA,
+    WIFI_917_SOC_TA, /* This is used as scan result and start */
+    WIFI_917_NCP_COMBINED
+} OTAImageType;
+
+#if SL_MATTER_ENABLE_OTA_ENCRYPTION
 constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
 #endif
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
@@ -57,7 +67,6 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
             }
         }
     }
-
     return status;
 }
 
