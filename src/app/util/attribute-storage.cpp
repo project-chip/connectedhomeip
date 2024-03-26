@@ -41,6 +41,13 @@ using chip::Protocols::InteractionModel::Status;
 //     util/config.h -> zap-generated/endpoint_config.h
 #include <app-common/zap-generated/callback.h>
 
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
+#define EM_BIG_ENDIAN true
+#else
+#define EM_BIG_ENDIAN false
+#endif
+
+
 using namespace chip;
 using namespace chip::app;
 
