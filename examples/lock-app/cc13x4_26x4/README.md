@@ -57,20 +57,20 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 -   Download and install [SysConfig][sysconfig]. This can be done simply with
     the following commands.
 
-   ```
-    $ cd ~
-    $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.18.1.3343/sysconfig-1.18.1_3343-setup.run
-    $ chmod +x sysconfig-1.18.1_3343-setup.run
-    $ ./sysconfig-1.18.1_3343-setup.run
-    ```
+````
+ $ cd ~
+ $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.18.1.3343/sysconfig-1.18.1_3343-setup.run
+ $ chmod +x sysconfig-1.18.1_3343-setup.run
+ $ ./sysconfig-1.18.1_3343-setup.run
+ ```
 
 -   Run the bootstrap script to setup the build environment.
 
-    ```
-    $ cd ~/connectedhomeip
-    $ source ./scripts/bootstrap.sh
+ ```
+ $ cd ~/connectedhomeip
+ $ source ./scripts/bootstrap.sh
 
-    ```
+ ```
 
 ### Compilation
 
@@ -79,35 +79,35 @@ Ninja to build the executable.
 
 -   Activate the build environment with the repository activate script.
 
-    ```
-    $ cd ~/connectedhomeip
-    $ source ./scripts/activate.sh
+ ```
+ $ cd ~/connectedhomeip
+ $ source ./scripts/activate.sh
 
-    ```
+ ```
 
 -   Run the build to produce a default executable. By default on Linux both the
-    TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
-    home directory, and you must provide the absolute path to them. For example
-   `/home/username/ti/sysconfig_1.18.1`. On Windows the default directory is
-    `C:\ti`. Take note of this install path, as it will be used in the next
-    step.
+ TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
+ home directory, and you must provide the absolute path to them. For example
+`/home/username/ti/sysconfig_1.18.1`. On Windows the default directory is
+ `C:\ti`. Take note of this install path, as it will be used in the next
+ step.
 
-    ```
-    $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
-    OR
-    $ cd ~/connectedhomeip/examples/lock-app/cc13x4_26x4
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\""
-    $ ninja -C out/debug
+ ```
+ $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
+ OR
+ $ cd ~/connectedhomeip/examples/lock-app/cc13x4_26x4
+ $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\""
+ $ ninja -C out/debug
 
-    ```
+ ```
 
-    If you would like to define arguments on the command line you may add them
-    to the GN call.
+ If you would like to define arguments on the command line you may add them
+ to the GN call.
 
 
-    ```
-    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
-    ```
+ ```
+ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
+ ```
 
 ## Programming
 
@@ -213,9 +213,10 @@ Getting Started Guide][matter-e2e-faq].
 Commission the device onto the Matter network. Run the following command on the
 CHIP tool:
 
-```
+````
 
-./chip-tool pairing ble-thread <nodeID - e.g. 1> hex:<complete dataset from starting the OTBR> 20202021 3840
+./chip-tool pairing ble-thread <nodeID - e.g. 1>
+hex:<complete dataset from starting the OTBR> 20202021 3840
 
 ```
 
@@ -232,8 +233,9 @@ message on the CHIP tool output:
 
 ```
 
-[1677648218.370754][39785:39790] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-[1677648218.370821][39785:39790] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+[1677648218.370754][39785:39790] CHIP:CTL: Received CommissioningComplete
+response, errorCode=0 [1677648218.370821][39785:39790] CHIP:CTL: Successfully
+finished commissioning step 'SendComplete'
 
 ```
 
@@ -248,9 +250,15 @@ Commissioning complete, notify platform driver to persist network credentials.
 **Step 2** The example Doorlock cluster operations have the following format:
 
 ```
-./chip-tool doorlock   <attribute-name> <attribute-values> <destination-id> <endpoint-id-ignored-for-group-commands>
-./chip-tool doorlock set-user <OperationType> <UserIndex> <UserName> <UserUniqueId> <UserStatus> <UserType> <CredentialRule> <destination-id> <endpoint-id-ignored-for-group-commands>
-./chip-tool <doorlock set-credential> <OperationType> <Credential> <CredentialData> <UserIndex> <UserStatus> <UserType> <destination-id> <endpoint-id-ignored-for-group-commands>
+
+./chip-tool doorlock <attribute-name> <attribute-values> <destination-id>
+<endpoint-id-ignored-for-group-commands> ./chip-tool doorlock set-user
+<OperationType> <UserIndex> <UserName> <UserUniqueId> <UserStatus> <UserType>
+<CredentialRule> <destination-id> <endpoint-id-ignored-for-group-commands>
+./chip-tool <doorlock set-credential> <OperationType> <Credential>
+<CredentialData> <UserIndex> <UserStatus> <UserType> <destination-id>
+<endpoint-id-ignored-for-group-commands>
+
 ```
 
 Send commands to the lock-app. Here are some example commands:
@@ -258,26 +266,38 @@ Send commands to the lock-app. Here are some example commands:
 Set a new user "`TST`" with user index of 1 with a default pin of 123456
 
 ```
-./chip-tool doorlock set-user 0 1 `TST` 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
-./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
+
+./chip-tool doorlock set-user 0 1 `TST` 6452 1 0 0 1 1
+--timedInteractionTimeoutMs 1000 ./chip-tool doorlock set-credential 0 '{
+"credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1
+--timedInteractionTimeoutMs 1000
+
 ```
 
 Require a pin mode for lock operations:
 
 ```
+
 ./chip-tool doorlock write require-pinfor-remote-operation 1 1 1
+
 ```
 
 Lock the Door
 
 ```
-./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+
+./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode
+123456
+
 ```
 
 Unlock the door
 
 ```
-./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+
+./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode
+123456
+
 ```
 
 ### Provisioning
@@ -324,3 +344,4 @@ Additionally, we welcome any feedback.
     https://www.ti.com/wireless-connectivity/thread/design-development.html
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH
+```
