@@ -178,7 +178,7 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            if (!CheckInWouldBeSentAtActiveModeVerifier(entry.fabricIndex, entry.monitoredSubject))
+            if (!ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
             }
@@ -208,9 +208,9 @@ void ICDManager::SendCheckInMsgs()
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
-bool ICDManager::CheckInMessagesWouldBeSent(std::function<RegistrationVerificationFunction> RegistrationVerifier)
+bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsgsBeSentFunction> shouldCheckInMsgsBeSentFunction &)
 {
-    VerifyOrReturnValue(RegistrationVerifier, false);
+    VerifyOrReturnValue(shouldCheckInMsgsBeSentFunction, false);
 
     for (const auto & fabricInfo : *mFabricTable)
     {
@@ -240,7 +240,7 @@ bool ICDManager::CheckInMessagesWouldBeSent(std::function<RegistrationVerificati
             }
 
             // At least one registration would require a Check-In message
-            VerifyOrReturnValue(!RegistrationVerifier(entry.fabricIndex, entry.monitoredSubject), true);
+            VerifyOrReturnValue(!shouldCheckInMsgsBeSentFunction(entry.fabricIndex, entry.monitoredSubject), true);
         }
     }
 
@@ -249,7 +249,7 @@ bool ICDManager::CheckInMessagesWouldBeSent(std::function<RegistrationVerificati
 }
 
 /**
- * CheckInWouldBeSentAtActiveModeVerifier is used to determine if a Check-In message is required for a given registration.
+ * ShouldCheckInMsgsBeSentAtActiveModeFunction is used to determine if a Check-In message is required for a given registration.
  * Due to how the ICD Check-In use-case interacts with the persistent subscription and subscription timeout resumption,
  * having a single implementation of the function renders the implematention very difficult to understand and maintain.
  * Because of this, each valid feature combination has its own implementation of the verifier.
@@ -266,7 +266,7 @@ bool ICDManager::CheckInMessagesWouldBeSent(std::function<RegistrationVerificati
  * @return true Returns true if the fabricIndex and subjectId combination does not have an active or a persisted subscription.
  * @return false Returns false if the fabricIndex and subjectId combination has an active or persisted subscription.
  */
-bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex, NodeId subjectID)
+bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID)
 {
     return !(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID) ||
              mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID));
@@ -291,7 +291,7 @@ bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex
  *               If the boot up susbscription has not been completed,
  *               if the fabricIndex and subjectId combination has a persisted subscription.
  */
-bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex, NodeId subjectID)
+bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID)
 {
     bool wouldSendCheckIn = !(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID));
 
@@ -314,13 +314,13 @@ bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex
  * @return true Returns true if the fabricIndex and subjectId combination does not have an active subscription.
  * @return false Returns false if the fabricIndex and subjectId combination has an active subscription.
  */
-bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex, NodeId subjectID)
+bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID)
 {
     return !(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID));
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-void ICDManager::TriggerCheckInMessages(const std::function<RegistrationVerificationFunction> & verifier)
+void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier)
 {
     VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
 
@@ -390,8 +390,8 @@ void ICDManager::UpdateOperationState(OperationalState state)
         mOperationalState = OperationalState::IdleMode;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-        std::function<RegistrationVerificationFunction> verifier =
-            std::bind(&ICDManager::CheckInWouldBeSentAtActiveModeVerifier, this, std::placeholders::_1, std::placeholders::_2);
+        std::function<ShouldCheckInMsgsBeSentFunction> verifier =
+            std::bind(&ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction, this, std::placeholders::_1, std::placeholders::_2);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
