@@ -211,7 +211,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 if (encodeState.AllowPartialData() && IsOutOfWriterSpaceError(err))
                 {
                     ChipLogDetail(DataManagement,
-                                  "List does not fit in packet, chunk between list items for clusterId: " ChipLogFormatMEI ", attributeId: " ChipLogFormatMEI,
+                                  "List does not fit in packet, chunk between list items for clusterId: " ChipLogFormatMEI
+                                  ", attributeId: " ChipLogFormatMEI,
                                   ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId));
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
                     // The expectation is that RetrieveClusterData has already reset attributeReportIBs to a good state (rolled
@@ -231,9 +232,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     {
                         ChipLogError(DataManagement,
                                      "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
-                                     ", attributeId: " ChipLogFormatMEI
-                                     "err = %" CHIP_ERROR_FORMAT, ChipLogValueMEI(pathForRetrieval.mClusterId),
-                                     ChipLogValueMEI(pathForRetrieval.mAttributeId), err.Format());
+                                     ", attributeId: " ChipLogFormatMEI "err = %" CHIP_ERROR_FORMAT,
+                                     ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
+                                     err.Format());
                         // Try to encode our error as a status response.
                         err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
                         if (err != CHIP_NO_ERROR)
