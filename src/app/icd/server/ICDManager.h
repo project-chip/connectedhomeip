@@ -138,10 +138,20 @@ public:
      * @param[in] algo Verifier function to use to determine if we need to send check-in messages
      */
     void TriggerCheckInMessages(const std::function<RegistrationVerificationFunction> & verifier);
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    /**
+     * @brief Set mSubCheckInBootCheckExecuted to true
+     *        Function allows the InteractionModelEngine to notify the ICDManager that the boot up subscription resumption has been
+     *        completed.
+     */
+    void SetBootUpResumeSubscriptionExecuted() { mIsBootUpResumeSubscriptionExecuted = true; };
+#endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
+    bool GetIsBootUpResumeSubscriptionExecuted() { return mIsBootUpResumeSubscriptionExecuted; };
 #endif
 
     // Implementation of ICDListener functions.
@@ -212,6 +222,9 @@ private:
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+#if !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    bool mIsBootUpResumeSubscriptionExecuted = false;
+#endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
     Messaging::ExchangeManager * mExchangeManager  = nullptr;

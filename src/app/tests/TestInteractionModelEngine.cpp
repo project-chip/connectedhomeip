@@ -24,6 +24,7 @@
 
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
@@ -34,6 +35,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/UnitTestContext.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
@@ -82,6 +84,7 @@ public:
     static void TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry(nlTestSuite * apSuite, void * apContext);
     static void TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries(nlTestSuite * apSuite, void * apContext);
     static void TestSubjectHasActiveSubscriptionSubWithCAT(nlTestSuite * apSuite, void * apContext);
+    static void TestDecrementNumSubscriptionToResume(nlTestSuite * apSuite, void * apContext);
 };
 
 int TestInteractionModelEngine::GetAttributePathListLength(SingleLinkedListNode<AttributePathParams> * apAttributePathParamsList)
@@ -682,6 +685,63 @@ void TestInteractionModelEngine::TestSubscriptionResumptionTimer(nlTestSuite * a
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
+void TestInteractionModelEngine::TestDecrementNumSubscriptionToResume(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                       = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    InteractionModelEngine * engine         = InteractionModelEngine::GetInstance();
+    constexpr uint8_t kNumberOfSubsToResume = 5;
+    uint8_t numberOfSubsRemaining           = kNumberOfSubsToResume;
+
+    err = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    ICDManager manager;
+    engine->SetICDManager(&manager);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+    // Set number of subs
+    engine->mNumOfSubscriptionToResume = kNumberOfSubsToResume;
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    // Verify mIsBootUpResumeSubscriptionExecuted has not been set
+    NL_TEST_ASSERT(apSuite, !manager.GetIsBootUpResumeSubscriptionExecuted());
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+    // Decrease number of subs by 1
+    numberOfSubsRemaining--;
+    engine->DecrementNumSubscriptionToResume();
+    NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionToResume);
+
+    // Decrease to 0 subs remaining
+    while (numberOfSubsRemaining > 0)
+    {
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+        // Verify mIsBootUpResumeSubscriptionExecuted has not been set
+        NL_TEST_ASSERT(apSuite, !manager.GetIsBootUpResumeSubscriptionExecuted());
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+        numberOfSubsRemaining--;
+        engine->DecrementNumSubscriptionToResume();
+        NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionToResume);
+    }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    // Verify mIsBootUpResumeSubscriptionExecuted has been set
+    NL_TEST_ASSERT(apSuite, manager.GetIsBootUpResumeSubscriptionExecuted());
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+    // Make sure we don't rollover / go negative
+    engine->DecrementNumSubscriptionToResume();
+    NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionToResume);
+
+    // Clean up
+#if CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    engine->SetICDManager(nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+}
+
 } // namespace app
 } // namespace chip
 
@@ -703,6 +763,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsSingleEntry),
                 NL_TEST_DEF("TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionMultipleSubsMultipleEntries),
                 NL_TEST_DEF("TestSubjectHasActiveSubscriptionSubWithCAT", chip::app::TestInteractionModelEngine::TestSubjectHasActiveSubscriptionSubWithCAT),
+                NL_TEST_DEF("TestDecrementNumSubscriptionToResume", chip::app::TestInteractionModelEngine::TestDecrementNumSubscriptionToResume),
                 NL_TEST_SENTINEL()
         };
 // clang-format on

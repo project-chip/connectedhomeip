@@ -332,6 +332,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                                  &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::app::InteractionModelEngine::GetInstance()->SetICDManager(&mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     // ICD Init needs to be after data model init and InteractionModel Init
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -452,7 +456,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         ResumeSubscriptions();
-#endif
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         break;
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     case DeviceEventType::kThreadConnectivityChange:
@@ -524,9 +528,9 @@ void Server::RejoinExistingMulticastGroups()
 bool Server::CheckInWouldBeSentAtBootVerifier(FabricIndex aFabricIndex, NodeId subjectID)
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // At least one registration has a persisted entry. Do not send Check-In message.
-    // This is to cover the use-case where the subscription resumption feature is used with the Check-In message.
-    VerifyOrReturnValue(!chip::app::InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(aFabricIndex, subjectID),
+    // If at least one registration has a persisted entry, do not send Check-In message.
+    // The resumption of the persisted subscription will serve the same function a check-in would have served.
+    VerifyOrReturnValue(!app::InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(aFabricIndex, subjectID),
                         false);
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
@@ -576,6 +580,9 @@ void Server::Shutdown()
 
     chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mCommissioningWindowManager.Shutdown();
     mMessageCounterManager.Shutdown();
     mExchangeMgr.Shutdown();

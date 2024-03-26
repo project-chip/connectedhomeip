@@ -90,15 +90,21 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
     AutoDeleteEstablisher establisher(static_cast<SubscriptionResumptionSessionEstablisher *>(context));
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
     InteractionModelEngine * imEngine                                  = InteractionModelEngine::GetInstance();
+
+    // Decrement the number of subscriptions to resume
+    imEngine->DecrementNumSubscriptionToResume();
+
     if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, subscriptionInfo.mAttributePaths.AllocatedSize(),
                                                  subscriptionInfo.mEventPaths.AllocatedSize()))
     {
+        // TODO - Should we keep the subscription here?
         ChipLogProgress(InteractionModel, "no resource for subscription resumption");
         return;
     }
     ReadHandler * readHandler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
     if (readHandler == nullptr)
     {
+        // TODO - Should we keep the subscription here?
         ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
         return;
     }
@@ -118,10 +124,15 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
                                                                              CHIP_ERROR error)
 {
     AutoDeleteEstablisher establisher(static_cast<SubscriptionResumptionSessionEstablisher *>(context));
+    InteractionModelEngine * imEngine                                  = InteractionModelEngine::GetInstance();
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
     ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
                  error.Format());
-    auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
+
+    // Decrement the number of subscriptions to resume
+    imEngine->DecrementNumSubscriptionToResume();
+
+    auto * subscriptionResumptionStorage = imEngine->GetSubscriptionResumptionStorage();
     if (!subscriptionResumptionStorage)
     {
         ChipLogError(DataManagement, "Failed to get subscription resumption storage");

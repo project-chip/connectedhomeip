@@ -48,10 +48,10 @@ namespace {
 constexpr uint16_t kMaxTestClients      = 2;
 constexpr FabricIndex kTestFabricIndex1 = 1;
 constexpr FabricIndex kTestFabricIndex2 = kMaxValidFabricIndex;
-constexpr uint64_t kClientNodeId11      = 0x100001;
-constexpr uint64_t kClientNodeId12      = 0x100002;
-constexpr uint64_t kClientNodeId21      = 0x200001;
-constexpr uint64_t kClientNodeId22      = 0x200002;
+constexpr NodeId kClientNodeId11        = 0x100001;
+constexpr NodeId kClientNodeId12        = 0x100002;
+constexpr NodeId kClientNodeId21        = 0x200001;
+constexpr NodeId kClientNodeId22        = 0x200002;
 
 constexpr uint8_t kKeyBuffer1a[] = {
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
@@ -80,13 +80,15 @@ public:
     TestSubscriptionsInfoProvider() = default;
     ~TestSubscriptionsInfoProvider(){};
 
-    void SetReturnValue(bool value) { mReturnValue = value; };
+    void SetHasActiveSubscription(bool value) { mHasActiveSubscription = value; };
+    void SetHasPersistedSubscription(bool value) { mHasPersistedSubscription = value; };
 
-    bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subject) { return mReturnValue; };
-    bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subject) { return mReturnValue; };
+    bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasActiveSubscription; };
+    bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasPersistedSubscription; };
 
 private:
-    bool mReturnValue = false;
+    bool mHasActiveSubscription    = false;
+    bool mHasPersistedSubscription = false;
 };
 
 class TestContext : public chip::Test::AppContext
@@ -197,7 +199,8 @@ public:
         ctx->mICDManager.SetTestFeatureMapValue(0x07);
 
         // Set that there are no matching subscriptions
-        ctx->mSubInfoProvider.SetReturnValue(false);
+        ctx->mSubInfoProvider.SetHasActiveSubscription(false);
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(false);
 
         // Set New durations for test case
         Milliseconds32 oldActiveModeDuration = icdConfigData.GetActiveModeDuration();
@@ -276,7 +279,8 @@ public:
         ctx->mICDManager.SetTestFeatureMapValue(0x07);
 
         // Set that there are not matching subscriptions
-        ctx->mSubInfoProvider.SetReturnValue(true);
+        ctx->mSubInfoProvider.SetHasActiveSubscription(true);
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
 
         // Set New durations for test case
         Milliseconds32 oldActiveModeDuration = icdConfigData.GetActiveModeDuration();
@@ -617,6 +621,77 @@ public:
         // confirm the promised time is 20000 since the device is already planing to stay active longer than the requested time
         NL_TEST_ASSERT(aSuite, stayActivePromisedMs == 20000);
     }
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    static void TestCheckInWouldBeSentAtActiveModeVerifier(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        // Test 1 - Has no ActiveSubscription & no persisted subscription
+        ctx->mSubInfoProvider.SetHasActiveSubscription(false);
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(false);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+
+        // Test 2 - Has no active subscription & a persisted subscription
+        ctx->mSubInfoProvider.SetHasActiveSubscription(false);
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
+        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11)));
+
+        // Test 3 - Has an active subscription & a persisted subscription
+        ctx->mSubInfoProvider.SetHasActiveSubscription(true);
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
+        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11)));
+    }
+#else
+    static void TestCheckInWouldBeSentAtActiveModeVerifier(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        // Test 1 - Has no active subscription and no persisted subscription at boot up
+        ctx->mSubInfoProvider.SetHasActiveSubscription(false);
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(false);
+        ctx->mICDManager.mIsBootUpResumeSubscriptionExecuted = false;
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+
+        // Test 2 - Has no active subscription and a persisted subscription at boot up
+        ctx->mSubInfoProvider.SetHasActiveSubscription(false);
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
+        ctx->mICDManager.mIsBootUpResumeSubscriptionExecuted = false;
+        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11)));
+
+        // Test 3 - Has an active subscription and a persisted subscription during normal operations
+        ctx->mSubInfoProvider.SetHasActiveSubscription(true);
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
+        ctx->mICDManager.mIsBootUpResumeSubscriptionExecuted = true;
+        NL_TEST_ASSERT(aSuite, !(ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11)));
+
+        // Test 4 - Has no active subscription and a persisted subscription during normal operations
+        ctx->mSubInfoProvider.SetHasActiveSubscription(false);
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
+        ctx->mICDManager.mIsBootUpResumeSubscriptionExecuted = true;
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+    }
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#else
+    static void TestCheckInWouldBeSentAtActiveModeVerifier(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        // Test 1 - Has an active subscription
+        ctx->mSubInfoProvider.SetHasActiveSubscription(true);
+        NL_TEST_ASSERT(aSuite,
+                       ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11) == false);
+
+        // Test 2 - Has no active subscription
+        ctx->mSubInfoProvider.SetHasActiveSubscription(false);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+
+        // Test 3 - Make sure that the persisted subscription has no impact
+        ctx->mSubInfoProvider.SetHasPersistedSubscription(true);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.CheckInWouldBeSentAtActiveModeVerifier(kTestFabricIndex1, kClientNodeId11));
+    }
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 };
 
 } // namespace app
@@ -634,6 +709,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
     NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
     NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
+    NL_TEST_DEF("TestCheckInWouldBeSentAtActiveModeVerifier", TestICDManager::TestCheckInWouldBeSentAtActiveModeVerifier),
     NL_TEST_SENTINEL(),
 };
 
