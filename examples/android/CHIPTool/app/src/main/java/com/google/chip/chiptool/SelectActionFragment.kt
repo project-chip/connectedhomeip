@@ -24,6 +24,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -83,6 +86,11 @@ class SelectActionFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
 
     if (savedInstanceState != null) return
+    val dialogText = requireArguments().getString(DIALOG_TEXT_KEY)
+    dialogText?.let {
+      AlertDialog.Builder(requireContext()).setMessage(it)
+        .setPositiveButton(android.R.string.ok) { _, _ -> }.create().show()
+    }
     if (hasLocationPermission()) return
 
     val permissionRequest =
@@ -251,6 +259,23 @@ class SelectActionFragment : Fragment() {
 
   companion object {
 
-    @JvmStatic fun newInstance() = SelectActionFragment()
+    private const val DIALOG_TEXT_KEY = "dialogText"
+
+    @JvmStatic fun newInstance() = newInstance(null)
+
+    /**
+     * Create a SelectActionFragment.
+     *
+     * @param dialogText text to show in a dialog immediately after the fragment is displayed.
+     */
+    @JvmStatic fun newInstance(dialogText: String?): SelectActionFragment {
+      return SelectActionFragment().apply {
+        val bundle = Bundle(1)
+        dialogText?.let {
+          bundle.putString(DIALOG_TEXT_KEY, it)
+        }
+        arguments = bundle
+      }
+    }
   }
 }

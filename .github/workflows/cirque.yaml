@@ -85,6 +85,14 @@ jobs:
                   key: ${{ runner.os }}-cirque-${{ steps.cirque-bootstrap-cache-key.outputs.val }}
                   restore-keys: ${{ runner.os }}-cirque-
                   path: ${{ env.GITHUB_CACHE_PATH }}
+
+            - name: Build Android CHIPTool (x86 only)
+              timeout-minutes: 15
+              run: |
+                  integrations/docker/images/chip-build-android/run.sh \
+                    ./scripts/run_in_build_env.sh \
+                      "./scripts/build/build_examples.py --no-log-timestamps --target android-x86-chip-tool build"
+
             - name: Cirque Bootstrap
               run: |
                   integrations/docker/images/stage-2/chip-build-cirque/run.sh \
