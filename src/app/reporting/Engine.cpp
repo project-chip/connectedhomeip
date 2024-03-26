@@ -248,7 +248,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     {
                         ChipLogDetail(DataManagement,
                                       "Next attribute value does not fit in packet, roll back on clusterId: " ChipLogFormatMEI
-                                      " , attributeId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
+                                      ", attributeId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
                                       ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
                                       err.Format());
                     }
