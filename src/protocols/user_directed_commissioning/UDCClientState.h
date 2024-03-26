@@ -43,13 +43,24 @@ enum class UDCClientProcessingState : uint8_t
 
 using PeerAddress = ::chip::Transport::PeerAddress;
 
+enum class TargetAppCheckState : uint8_t
+{
+    kNotInitialized,
+    kAppNotFound,
+    kAppFoundPasscodeReturned,
+    kAppFoundNoPasscode,
+};
+
 /**
  * Represents information in the TargetAppList of the Identification Declaration message
  */
 struct TargetAppInfo
 {
-    uint16_t vendorId  = 0;
-    uint16_t productId = 0;
+    uint16_t vendorId              = 0;
+    uint16_t productId             = 0;
+    TargetAppCheckState checkState = TargetAppCheckState::kNotInitialized;
+    uint32_t passcode              = 0;
+    bool foundApp                  = false;
 };
 
 /**
@@ -112,23 +123,36 @@ public:
     {
         if (index < mNumTargetAppInfos)
         {
-            info.vendorId  = mTargetAppInfos[index].vendorId;
-            info.productId = mTargetAppInfos[index].productId;
+            info.vendorId   = mTargetAppInfos[index].vendorId;
+            info.productId  = mTargetAppInfos[index].productId;
+            info.checkState = mTargetAppInfos[index].checkState;
+            info.passcode   = mTargetAppInfos[index].passcode;
+            info.foundApp   = mTargetAppInfos[index].foundApp;
             return true;
         }
         return false;
+    }
+    void SetTargetAppInfoState(uint8_t index, TargetAppCheckState checkState)
+    {
+        if (index < mNumTargetAppInfos)
+        {
+            mTargetAppInfos[index].checkState = checkState;
+        }
     }
     uint8_t GetNumTargetAppInfos() const { return mNumTargetAppInfos; }
 
     bool AddTargetAppInfo(TargetAppInfo vid)
     {
-        if (mNumTargetAppInfos >= sizeof(mTargetAppInfos))
+        if (mNumTargetAppInfos >= kMaxTargetAppInfos)
         {
             // already at max
             return false;
         }
-        mTargetAppInfos[mNumTargetAppInfos].vendorId  = vid.vendorId;
-        mTargetAppInfos[mNumTargetAppInfos].productId = vid.productId;
+        mTargetAppInfos[mNumTargetAppInfos].vendorId   = vid.vendorId;
+        mTargetAppInfos[mNumTargetAppInfos].productId  = vid.productId;
+        mTargetAppInfos[mNumTargetAppInfos].checkState = TargetAppCheckState::kNotInitialized;
+        mTargetAppInfos[mNumTargetAppInfos].passcode   = 0;
+        mTargetAppInfos[mNumTargetAppInfos].foundApp   = false;
         mNumTargetAppInfos++;
         return true;
     }
@@ -185,6 +209,7 @@ public:
         mExpirationTime             = System::Clock::kZero;
         mUDCClientProcessingState   = UDCClientProcessingState::kNotInitialized;
         mCachedCommissionerPasscode = 0;
+        mNumTargetAppInfos          = 0;
     }
 
 private:
@@ -200,7 +225,7 @@ private:
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
     uint16_t mPairingHint                                         = 0;
 
-    constexpr static size_t kMaxTargetAppInfos = 10;
+    constexpr static size_t kMaxTargetAppInfos = CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS;
     uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
     TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
 
