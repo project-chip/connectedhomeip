@@ -619,7 +619,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -859,7 +859,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -921,7 +921,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -985,7 +985,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediate1 = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                  rootCertificate:root
-                                                           intermediatePublicKey:intermediateKeys1.publicKey
+                                                           intermediatePublicKey:[intermediateKeys1.copyPublicKey autorelease]
                                                                         issuerID:nil
                                                                         fabricID:nil
                                                                            error:nil];
@@ -996,7 +996,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediate2 = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                  rootCertificate:root
-                                                           intermediatePublicKey:intermediateKeys2.publicKey
+                                                           intermediatePublicKey:[intermediateKeys2.copyPublicKey autorelease]
                                                                         issuerID:nil
                                                                         fabricID:nil
                                                                            error:nil];
@@ -1060,7 +1060,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -1103,7 +1103,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
@@ -1114,7 +1114,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:intermediateKeys
                                                            signingCertificate:intermediate
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
                                                                      fabricID:@123
                                                                        nodeID:@456
                                                         caseAuthenticatedTags:nil
@@ -1178,7 +1178,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
                                                                      fabricID:@123
                                                                        nodeID:@456
                                                         caseAuthenticatedTags:nil
@@ -1228,7 +1228,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:rootKeys
                                                            signingCertificate:root
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
                                                                      fabricID:@123
                                                                        nodeID:@456
                                                         caseAuthenticatedTags:nil
@@ -1272,7 +1272,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
                                                                        issuerID:nil
                                                                        fabricID:@111
                                                                           error:nil];
@@ -1283,7 +1283,7 @@ static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, N
 
     __auto_type * operational = [MTRCertificates createOperationalCertificate:intermediateKeys
                                                            signingCertificate:intermediate
-                                                         operationalPublicKey:operationalKeys.publicKey
+                                                         operationalPublicKey:[operationalKeys.copyPublicKey autorelease]
                                                                      fabricID:@123
                                                                        nodeID:@456
                                                         caseAuthenticatedTags:nil

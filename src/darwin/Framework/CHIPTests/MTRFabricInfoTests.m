@@ -160,7 +160,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
 
     __auto_type * intermediate = [MTRCertificates createIntermediateCertificate:rootKeys
                                                                 rootCertificate:root
-                                                          intermediatePublicKey:intermediateKeys.publicKey
+                                                          intermediatePublicKey:[intermediateKeys.copyPublicKey autorelease]
                                                                        issuerID:nil
                                                                        fabricID:nil
                                                                           error:nil];
