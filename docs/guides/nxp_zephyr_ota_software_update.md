@@ -125,12 +125,20 @@ Refer to those two files for more information:
 -   [MCUBoot Config used for the application](https://github.com/zephyrproject-rtos/zephyr/blob/main/modules/Kconfig.mcuboot)
 
 When an OTA image is received it can either be marked as permanent or as a test,
-The Kconfig `CONFIG_CHIP_OTA_REQUEST_UPGRADE_TYPE` can choose one of those configurations (Defined in `/config/nxp/chip-module/Kconfig`):
+The Kconfig `CONFIG_CHIP_OTA_REQUEST_UPGRADE_TYPE` can choose one of those
+configurations (Defined in `/config/nxp/chip-module/Kconfig`):
 
--   `CONFIG_CHIP_OTA_REQUEST_UPGRADE_PERMANENT`: From the next reboot, this image will be run permanently.
--   `CONFIG_CHIP_OTA_REQUEST_UPGRADE_TEST`: The image will be run on the next reboot, but it will be reverted if it doesn't get confirmed. The image needs to confirm itself to become permanent.
+-   `CONFIG_CHIP_OTA_REQUEST_UPGRADE_PERMANENT`: From the next reboot, this
+    image will be run permanently.
+-   `CONFIG_CHIP_OTA_REQUEST_UPGRADE_TEST`: The image will be run on the next
+    reboot, but it will be reverted if it doesn't get confirmed. The image needs
+    to confirm itself to become permanent.
 
-By default, the upgrade type used is `CONFIG_CHIP_OTA_REQUEST_UPGRADE_TEST`, and OTA image confirms itself during the initialization stage after the fundamental parts of the application are initialized properly to make sure this new image boots correctly. This confirmation is done by `chip::NXP::App::OTARequestorInitiator::HandleSelfTest()`.
+By default, the upgrade type used is `CONFIG_CHIP_OTA_REQUEST_UPGRADE_TEST`, and
+OTA image confirms itself during the initialization stage after the fundamental
+parts of the application are initialized properly to make sure this new image
+boots correctly. This confirmation is done by
+`chip::NXP::App::OTARequestorInitiator::HandleSelfTest()`.
 
 JLink can be used to flash the mixed binary at the base address 0x8000000, using
 the command :
