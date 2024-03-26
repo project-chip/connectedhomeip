@@ -45,3 +45,12 @@ source_set("data-model") {
     "${chip_root}/src/protocols/interaction_model",
   ]
 }
+
+# Provides extensions that use heap and should be
+# used for systems that are not as constrained as
+# embedded systems typically are
+source_set("heap") {
+  sources = [ "ListLargeSystemExtensions.h" ]
+
+  deps = [ ":data-model" ]
+}

@@ -564,7 +564,7 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
         else
         {
             ChipLogError(DataManagement,
-                         "Error when calling MatterPreCommandReceivedCallback for Endpoint=%u Cluster=" ChipLogFormatMEI
+                         "Error when calling PreCommandReceived for Endpoint=%u Cluster=" ChipLogFormatMEI
                          " Command=" ChipLogFormatMEI " : %" CHIP_ERROR_FORMAT,
                          mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId), err.Format());
             continue;
