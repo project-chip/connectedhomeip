@@ -210,6 +210,7 @@ static_library("interaction-model") {
     ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/app/util:callbacks",

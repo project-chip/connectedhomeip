@@ -365,8 +365,10 @@ bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabric
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
-    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+    // Verify that we were able t0 allocate an iterator. If not, assume we have a persisted subscription.
+    VerifyOrReturnValue(iterator, true);
 
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
     while (iterator->Next(subscriptionInfo))
     {
         // TODO(#31873): Persistent subscription only stores the NodeID for now. We cannot check if the CAT matches
@@ -1924,22 +1926,22 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     // future improvements: https://github.com/project-chip/connectedhomeip/issues/25439
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator           = mpSubscriptionResumptionStorage->IterateSubscriptions();
-    int subscriptionsToResume = 0;
-    uint16_t minInterval      = 0;
+    auto * iterator            = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    mNumOfSubscriptionToResume = 0;
+    uint16_t minInterval       = 0;
     while (iterator->Next(subscriptionInfo))
     {
-        subscriptionsToResume++;
+        mNumOfSubscriptionToResume++;
         minInterval = std::max(minInterval, subscriptionInfo.mMinInterval);
     }
     iterator->Release();
 
-    if (subscriptionsToResume)
+    if (mNumOfSubscriptionToResume)
     {
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         mSubscriptionResumptionScheduled = true;
 #endif
-        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", subscriptionsToResume, minInterval);
+        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", mNumOfSubscriptionToResume, minInterval);
         ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds16(minInterval),
                                                                                            ResumeSubscriptionsTimerCallback, this));
     }
@@ -2060,6 +2062,25 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
     return foundSubscriptionToResume;
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+void InteractionModelEngine::DecrementNumSubscriptionToResume()
+{
+    VerifyOrReturn(mNumOfSubscriptionToResume > 0);
+#if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    VerifyOrDie(mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+    mNumOfSubscriptionToResume--;
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    if (!mNumOfSubscriptionToResume)
+    {
+        mICDManager->SetBootUpResumeSubscriptionExecuted();
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+}
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 } // namespace app
 } // namespace chip

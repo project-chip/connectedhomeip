@@ -105,6 +105,10 @@ void ICDManager::Shutdown()
     mFabricTable     = nullptr;
     mSubInfoProvider = nullptr;
     mICDSenderPool.ReleaseAll();
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    mIsBootUpResumeSubscriptionExecuted = false;
+#endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 }
 
@@ -152,6 +156,7 @@ void ICDManager::SendCheckInMsgs()
 
         ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
                                  mSymmetricKeystore);
+
         if (table.IsEmpty())
         {
             continue;
@@ -173,8 +178,7 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            bool active = mSubInfoProvider->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
-            if (active)
+            if (!CheckInWouldBeSentAtActiveModeVerifier(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
             }
@@ -244,17 +248,77 @@ bool ICDManager::CheckInMessagesWouldBeSent(std::function<RegistrationVerificati
     return false;
 }
 
+/**
+ * CheckInWouldBeSentAtActiveModeVerifier is used to determine if a Check-In message is required for a given registration.
+ * Due to how the ICD Check-In use-case interacts with the persistent subscription and subscription timeout resumption,
+ * having a single implementation of the function renders the implematention very difficult to understand and maintain.
+ * Because of this, each valid feature combination has its own implementation of the verifier.
+ */
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+/**
+ * @brief Implementation for when the persistant subscription and subscription timeout resumption feature are present.
+ *        Verifier checks that there no active or persisted subscriptions for a given fabricIndex or subjectID.
+ *
+ * @param aFabricIndex
+ * @param subjectID subjectID to check. Can be an opperationnal node id or a CAT
+ *
+ * @return true Returns true if the fabricIndex and subjectId combination does not have an active or a persisted subscription.
+ * @return false Returns false if the fabricIndex and subjectId combination has an active or persisted subscription.
+ */
 bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex, NodeId subjectID)
 {
-    VerifyOrReturnValue(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID), true);
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // If at least one registration has a persisted entry, do not send Check-In message.
-    // The resumption of the persisted subscription will serve the same function a check-in would have served.
-    VerifyOrReturnValue(mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID), true);
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    return false;
+    return !(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID) ||
+             mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID));
 }
+#else
+/**
+ * @brief Implementation for when the persistant subscription is present without the  subscription timeout resumption feature.
+ *        Verifier checks that there no active subscriptions. If the boot up subscription resumption has been completed,
+ *        verifier also checks if there are persisted subscriptions.
+ *
+ * @note The persistent subscriptions feature tries to resume subscriptions at the highest min interval
+ *       of all the persisted subscriptions. As such, it is possible for the ICD to return to Idle Mode
+ *       until the timer elaspses. We do not when to send Check-In message to clients with persisted subscriptions
+ *       until we have tried to resubscribe.
+ *
+ * @param aFabricIndex
+ * @param subjectID subjectID to check. Can be an opperationnal node id or a CAT
+ *
+ * @return true Returns true if the fabricIndex and subjectId combination does not have an active subscription.
+ *              If the boot up susbscription has not been completed, there must not be a persisted subscription either.
+ * @return false Returns false if the fabricIndex and subjectId combination has an active subscription.
+ *               If the boot up susbscription has not been completed,
+ *               if the fabricIndex and subjectId combination has a persisted subscription.
+ */
+bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex, NodeId subjectID)
+{
+    bool wouldSendCheckIn = !(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID));
+
+    if (!mIsBootUpResumeSubscriptionExecuted)
+    {
+        wouldSendCheckIn = wouldSendCheckIn && !mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID);
+    }
+
+    return wouldSendCheckIn;
+}
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#else
+/**
+ * @brief Implementation for when neither the persistant subscription and subscription timeout resumption feature are present.
+ *        Verifier checks that there no active sbuscriptions for a given fabricIndex and subjectId combination.
+ *
+ * @param aFabricIndex
+ * @param subjectID subjectID to check. Can be an opperationnal node id or a CAT
+ *
+ * @return true Returns true if the fabricIndex and subjectId combination does not have an active subscription.
+ * @return false Returns false if the fabricIndex and subjectId combination has an active subscription.
+ */
+bool ICDManager::CheckInWouldBeSentAtActiveModeVerifier(FabricIndex aFabricIndex, NodeId subjectID)
+{
+    return !(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID));
+}
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 void ICDManager::TriggerCheckInMessages(const std::function<RegistrationVerificationFunction> & verifier)
 {

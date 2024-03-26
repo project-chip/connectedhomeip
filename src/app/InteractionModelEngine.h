@@ -50,6 +50,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/ReportScheduler.h>
 #include <app/util/attribute-metadata.h>
@@ -68,6 +69,10 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/CASESessionManager.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDManager.h> // nogncheck
+#endif                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 namespace chip {
 namespace app {
@@ -129,6 +134,10 @@ public:
                     SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
 
     void Shutdown();
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    void SetICDManager(ICDManager * manager) { mICDManager = manager; };
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
 
@@ -319,6 +328,10 @@ public:
     bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    void DecrementNumSubscriptionToResume();
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
@@ -605,6 +618,10 @@ private:
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ICDManager * mICDManager = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     ObjectPool<CommandResponseSender, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandResponderObjs;
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
@@ -663,12 +680,15 @@ private:
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    int8_t mNumOfSubscriptionToResume = 0;
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool HasSubscriptionsToResume();
     uint32_t ComputeTimeSecondsTillNextSubscriptionResumption();
     uint32_t mNumSubscriptionResumptionRetries = 0;
     bool mSubscriptionResumptionScheduled      = false;
-#endif
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
     FabricTable * mpFabricTable;
 
