@@ -278,10 +278,18 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
     {
         if (GetInstance().mpScanCallback != nullptr)
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([]() {
-                GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
-                GetInstance().mpScanCallback = nullptr;
-            });
+            if (mScanResponseIter.Count() == 0)
+            {
+                DeviceLayer::SystemLayer().ScheduleLambda([]() {
+                    GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kNetworkNotFound, CharSpan(), nullptr);
+                    GetInstance().mpScanCallback = nullptr;
+                });
+            } else {
+                DeviceLayer::SystemLayer().ScheduleLambda([]() {
+                    GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                    GetInstance().mpScanCallback = nullptr;
+                });
+            }
         }
     }
     else
