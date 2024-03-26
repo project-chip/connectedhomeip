@@ -41,7 +41,6 @@ static_library("Zephyr") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SysHeapMalloc.h",

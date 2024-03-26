@@ -55,6 +55,7 @@ shared_library("jni") {
     "${chip_root}/examples/tv-casting-app/tv-casting-common",
     "${chip_root}/src/app/server/java:jni",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/inipp",
   ]
 

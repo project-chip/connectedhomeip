@@ -81,6 +81,7 @@ shared_library("jni") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
   ]
 
   if (matter_enable_tlv_decoder_api) {

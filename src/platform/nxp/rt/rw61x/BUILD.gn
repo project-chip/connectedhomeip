@@ -65,7 +65,6 @@ static_library("nxp_platform") {
     "../../common/DiagnosticDataProviderImpl.h",
     "../../common/KeyValueStoreManagerImpl.cpp",
     "../../common/KeyValueStoreManagerImpl.h",
-    "../../common/Logging.cpp",
     "../../common/NXPConfig.h",
     "../../common/NetworkProvisioningServerImpl.h",
     "../../common/PlatformManagerImpl.h",

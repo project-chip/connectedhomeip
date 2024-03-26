@@ -49,6 +49,7 @@ executable("chip-im-initiator") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]
@@ -73,6 +74,7 @@ executable("chip-im-responder") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
+    "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]

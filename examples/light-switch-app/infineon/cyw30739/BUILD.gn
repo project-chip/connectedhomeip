@@ -61,6 +61,7 @@ cyw30739_executable("light_switch_app") {
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform/logging:default",
   ]
 
   include_dirs = [ "include" ]

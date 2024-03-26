@@ -22,11 +22,6 @@ import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
-declare_args() {
-  # Build monolithic test library.
-  chip_monolithic_tests = false
-}
-
 # chip_root relative to root_build_dir for macro-prefix-map.
 # "/." avoids trailing "/" in result when chip_root is "//"
 build_relative_chip_root = rebase_path("${chip_root}/.", root_build_dir)

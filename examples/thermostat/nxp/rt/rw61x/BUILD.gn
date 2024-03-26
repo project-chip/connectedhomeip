@@ -168,7 +168,10 @@ rt_executable("thermostat") {
     "${common_example_dir}/matter_cli/source/AppMatterCli.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/src/platform/logging:default",
+  ]
 
   if (chip_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]

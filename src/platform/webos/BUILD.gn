@@ -86,7 +86,6 @@ static_library("webos") {
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "MainLoop.cpp",
     "MainLoop.h",
     "NetworkCommissioningDriver.h",

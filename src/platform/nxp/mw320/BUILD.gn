@@ -43,7 +43,6 @@ static_library("mw320") {
     "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "MW320Config.cpp",
     "MW320Config.h",
     "NetworkCommissioningDriver.h",
