@@ -209,7 +209,7 @@ Getting Started Guide][matter-e2e-faq].
 Commission the light device onto the Matter network. Run the following command
 on the CHIP tool:
 
-````
+```
 
 ./chip-tool pairing ble-thread <nodeID - e.g. 1>
 hex:<complete dataset from starting the OTBR> 20202021 3840
@@ -301,5 +301,4 @@ Additionally, we welcome any feedback.
     https://www.ti.com/wireless-connectivity/thread/design-development.html
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH
-```
-````
+

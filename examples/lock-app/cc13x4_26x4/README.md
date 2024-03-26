@@ -57,7 +57,7 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 -   Download and install [SysConfig][sysconfig]. This can be done simply with
     the following commands.
 
-````
+```
  $ cd ~
  $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.18.1.3343/sysconfig-1.18.1_3343-setup.run
  $ chmod +x sysconfig-1.18.1_3343-setup.run
@@ -213,7 +213,7 @@ Getting Started Guide][matter-e2e-faq].
 Commission the device onto the Matter network. Run the following command on the
 CHIP tool:
 
-````
+```
 
 ./chip-tool pairing ble-thread <nodeID - e.g. 1>
 hex:<complete dataset from starting the OTBR> 20202021 3840
