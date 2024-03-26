@@ -418,7 +418,14 @@ static void ShutdownOnExit()
     return [NSArray arrayWithArray:fabricList];
 }
 
-- (BOOL)startControllerFactory:(MTRDeviceControllerFactoryParams *)startupParams error:(NSError * __autoreleasing *)error;
+- (BOOL)startControllerFactory:(MTRDeviceControllerFactoryParams *)startupParams error:(NSError * __autoreleasing *)error
+{
+    return [self _startControllerFactory:startupParams startingController:NO error:error];
+}
+
+- (BOOL)_startControllerFactory:(MTRDeviceControllerFactoryParams *)startupParams
+             startingController:(BOOL)startingController
+                          error:(NSError * __autoreleasing *)error
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
@@ -536,8 +543,10 @@ static void ShutdownOnExit()
         // state is brought up live on factory init, and not when it comes time
         // to actually start a controller, and does not actually clean itself up
         // until its refcount (which starts as 0) goes to 0.
-        _controllerFactory->RetainSystemState();
-        _controllerFactory->ReleaseSystemState();
+        if (!startingController) {
+            _controllerFactory->RetainSystemState();
+            _controllerFactory->ReleaseSystemState();
+        }
 
         self->_advertiseOperational = startupParams.shouldStartServer;
         self->_running = YES;
@@ -598,11 +607,6 @@ static void ShutdownOnExit()
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    if (![self checkIsRunning:error]) {
-        MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
-        return nil;
-    }
-
     id<MTRDeviceControllerStorageDelegate> _Nullable storageDelegate;
     dispatch_queue_t _Nullable storageDelegateQueue;
     NSUUID * uniqueIdentifier;
@@ -624,7 +628,26 @@ static void ShutdownOnExit()
         otaProviderDelegateQueue = nil;
     } else {
         MTR_LOG_ERROR("Unknown kind of startup params: %@", startupParams);
+        if (error != nil) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
         return nil;
+    }
+
+    if (![self isRunning]) {
+        if (storageDelegate != nil) {
+            MTR_LOG_DEFAULT("Auto-starting Matter controller factory in per-controller storage mode");
+            auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
+            if (![self _startControllerFactory:params startingController:YES error:error]) {
+                return nil;
+            }
+        } else {
+            MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
+            if (error != nil) {
+                *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+            }
+            return nil;
+        }
     }
 
     if (_usingPerControllerStorage && storageDelegate == nil) {
