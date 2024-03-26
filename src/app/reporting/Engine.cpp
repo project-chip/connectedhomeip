@@ -247,7 +247,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     else
                     {
                         ChipLogDetail(DataManagement,
-                                      "Encoding is out of space, roll back on clusterId: " ChipLogFormatMEI
+                                      "Next attribute value does not fit in packet, roll back on clusterId: " ChipLogFormatMEI
                                       " , attributeId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
                                       ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId),
                                       err.Format());
