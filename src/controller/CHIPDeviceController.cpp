@@ -1201,24 +1201,39 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
 void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
 {
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Command response callback with null context. Ignoring"));
-
-    if (commissioner->mCommissioningStage != CommissioningStage::kICDRegistration)
-    {
-        return;
-    }
-
-    if (commissioner->mDeviceBeingCommissioned == nullptr)
-    {
-        return;
-    }
+    VerifyOrExit(commissioner != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(commissioner->mCommissioningStage == CommissioningStage::kICDRegistration, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(commissioner->mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (commissioner->mPairingDelegate != nullptr)
     {
         commissioner->mPairingDelegate->OnICDRegistrationComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
                                                                   data.ICDCounter);
     }
+
+exit:
+    CommissioningDelegate::CommissioningReport report;
+    commissioner->CommissioningStageComplete(err, report);
+}
+
+void DeviceCommissioner::OnICDManagementStayActiveResponse(
+    void * context, const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data)
+{
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrExit(commissioner != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(commissioner->mCommissioningStage == CommissioningStage::kICDSendStayActive, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(commissioner->mDeviceBeingCommissioned != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (commissioner->mPairingDelegate != nullptr)
+    {
+        commissioner->mPairingDelegate->OnICDStayActiveComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
+                                                                data.promisedActiveDuration);
+    }
+
+exit:
     CommissioningDelegate::CommissioningReport report;
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
@@ -1854,7 +1869,8 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::Exchange
 {
     // CASE session established.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForStayActive ||
+                commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(commissioner->mDeviceBeingCommissioned->GetDeviceId() == sessionHandle->GetPeer().GetNodeId());
     commissioner->CancelCASECallbacks(); // ensure all CASE callbacks are unregistered
 
@@ -1867,7 +1883,8 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const Scope
 {
     // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForStayActive ||
+                commissioner->mCommissioningStage == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(commissioner->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
     commissioner->CancelCASECallbacks(); // ensure all CASE callbacks are unregistered
 
@@ -1908,7 +1925,8 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
                  ChipLogValueScopedNodeId(peerId), error.Format(), retryTimeout.count());
 
     auto self = static_cast<DeviceCommissioner *>(context);
-    VerifyOrDie(self->mCommissioningStage == CommissioningStage::kFindOperational);
+    VerifyOrDie(self->GetCommissioningStage() == CommissioningStage::kFindOperationalForStayActive ||
+                self->GetCommissioningStage() == CommissioningStage::kFindOperationalForCommissioningComplete);
     VerifyOrDie(self->mDeviceBeingCommissioned->GetDeviceId() == peerId.GetNodeId());
 
     // We need to do the fail-safe arming over the PASE session.
@@ -1936,7 +1954,7 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
     }
 
     // A false return is fine; we don't want to make the fail-safe shorter here.
-    self->ExtendArmFailSafeInternal(commissioneeDevice, CommissioningStage::kFindOperational, failsafeTimeout,
+    self->ExtendArmFailSafeInternal(commissioneeDevice, self->GetCommissioningStage(), failsafeTimeout,
                                     MakeOptional(kMinimumCommissioningStepTimeout), OnExtendFailsafeForCASERetrySuccess,
                                     OnExtendFailsafeForCASERetryFailure, /* fireAndForget = */ true);
 }
@@ -3180,13 +3198,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-    case CommissioningStage::kICDSendStayActive: {
-        // TODO(#24259): Send StayActiveRequest once server supports this.
-        CommissioningStageComplete(CHIP_NO_ERROR);
-    }
-    break;
-    case CommissioningStage::kFindOperational: {
-        // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
+    case CommissioningStage::kEvictPreviousCaseSessions: {
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
 
         // If we ever had a commissioned device with this node ID before, we may
@@ -3196,7 +3208,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // clearing the ones associated with our fabric index is good enough and
         // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
         mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
-
+        CommissioningStageComplete(CHIP_NO_ERROR);
+        return;
+    }
+    case CommissioningStage::kFindOperationalForStayActive:
+    case CommissioningStage::kFindOperationalForCommissioningComplete: {
+        // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
+        auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
                                                                &mOnDeviceConnectionFailureCallback
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -3206,7 +3224,31 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         );
     }
     break;
+    case CommissioningStage::kICDSendStayActive: {
+        if (!(params.GetICDStayActiveDurationMsec().HasValue()))
+        {
+            ChipLogProgress(Controller, "Skipping kICDSendStayActive");
+            CommissioningStageComplete(CHIP_NO_ERROR);
+            return;
+        }
+
+        // StayActive Command happens over CASE Connection
+        IcdManagement::Commands::StayActiveRequest::Type request;
+        request.stayActiveDuration = params.GetICDStayActiveDurationMsec().Value();
+        ChipLogError(Controller, "Send ICD StayActive with Duration %u", request.stayActiveDuration);
+        CHIP_ERROR err =
+            SendCommissioningCommand(proxy, request, OnICDManagementStayActiveResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send IcdManagement.StayActive command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
+    }
+    break;
     case CommissioningStage::kSendComplete: {
+        // CommissioningComplete command happens over the CASE connection.
         GeneralCommissioning::Commands::CommissioningComplete::Type request;
         CHIP_ERROR err =
             SendCommissioningCommand(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint, timeout);

@@ -123,7 +123,6 @@ private:
     bool mNeedsDST = false;
 
     bool mNeedIcdRegistration = false;
-
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;
     uint16_t mDACLen = 0;

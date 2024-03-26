@@ -921,6 +921,10 @@ private:
     static void OnICDManagementRegisterClientResponse(
         void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
 
+    static void
+    OnICDManagementStayActiveResponse(void * context,
+                                      const app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType & data);
+
     /**
      * @brief
      *   This function processes the CSR sent by the device.
