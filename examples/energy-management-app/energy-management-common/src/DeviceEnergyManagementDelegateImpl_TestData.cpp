@@ -44,9 +44,9 @@ static Structs::SlotStruct::Type gSlot[2]{
     static_cast<uint32_t>(450), // elapsedSlotTime
     static_cast<uint32_t>(560), // remainingSlotTime
 
-    Optional<bool>(true),                           // slotIsPauseable
-    Optional<uint32_t>(static_cast<uint32_t>(670)), // minPauseDuration
-    Optional<uint32_t>(static_cast<uint32_t>(780)), // maxPauseDuration
+    Optional<bool>{true},                           // slotIsPauseable
+    Optional<uint32_t>{static_cast<uint32_t>(670)}, // minPauseDuration
+    Optional<uint32_t>{static_cast<uint32_t>(780)}, // maxPauseDuration
     Optional<uint16_t>{ 0 },                        // manufacturerESAState;
     Optional<int64_t>{ 1 },                         // nominalPower;
     Optional<int64_t>{ 2 },                         // minPower;
@@ -159,15 +159,13 @@ void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> &
     }
 
     Structs::ForecastStruct::Type & forecast = nullableForecast.Value();
-    ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d xxForecast.startTime = %d", __LINE__, forecast.startTime);
-    ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d xxForecast.endTime = %d", __LINE__, forecast.endTime);
     ChipLogProgress(Support, "[StartTimeAdjustment-handle] L-%d xxForecast.isPauseable = %s", __LINE__,
                     forecast.isPauseable ? "T" : "F");
 
     uint32_t chipEpoch = 0;
 
     CHIP_ERROR ce = UtilsGetEpochTS(chipEpoch);
-    ChipLogProgress(Support, "ce=%s  epoch = %d", (ce != CHIP_NO_ERROR) ? "Err" : "Good", chipEpoch);
+    ChipLogProgress(Support, "ce=%s", (ce != CHIP_NO_ERROR) ? "Err" : "Good");
 
     forecast.startTime = static_cast<uint32_t>(chipEpoch); // planned start time, in UTC, for the entire Forecast.
 

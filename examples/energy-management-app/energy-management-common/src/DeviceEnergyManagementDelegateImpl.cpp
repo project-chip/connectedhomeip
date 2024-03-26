@@ -29,9 +29,7 @@ using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 using chip::Optional;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
-#ifdef DELEGATE_TEST_DATA
-#include "DeviceEnergyManagementDelegateImpl_TestData.cpp"
-#else
+#ifndef DELEGATE_TEST_DATA
 DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() {}
 #endif
 
