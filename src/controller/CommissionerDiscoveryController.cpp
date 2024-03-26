@@ -114,8 +114,13 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     Platform::CopyString(mCurrentInstance, state.GetInstanceName());
     mPendingConsent = true;
     char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1];
-    Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingIdString,
-                                        sizeof(rotatingIdString));
+    CHIP_ERROR err = Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingIdString,
+                                                         sizeof(rotatingIdString));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "On UDC: could not convert rotating id to hex");
+        rotatingIdString[0] = '\0';
+    }
 
     ChipLogDetail(Controller,
                   "------PROMPT USER: %s is requesting permission to cast to this TV, approve? [" ChipLogFormatMEI
@@ -182,10 +187,16 @@ void CommissionerDiscoveryController::InternalOk()
         return;
     }
 
-    char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-    Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
-                                        sizeof(rotatingIdString));
-    CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
+    char rotatingIdBuffer[Dnssd::kMaxRotatingIdLen * 2];
+    size_t rotatingIdLength = client->GetRotatingIdLength();
+    CHIP_ERROR err =
+        Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, rotatingIdBuffer, sizeof(rotatingIdBuffer));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "UX InternalOk: could not convert rotating id to hex");
+        return;
+    }
+    CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
     uint8_t targetAppCount = client->GetNumTargetAppInfos();
     if (targetAppCount > 0)
@@ -360,10 +371,16 @@ void CommissionerDiscoveryController::InternalHandleContentAppPasscodeResponse()
         //    - if CommissionerPasscode, then call new UX method to show passcode, send CDC
         if (passcode == 0 && client->GetCommissionerPasscode() && client->GetCdPort() != 0)
         {
-            char rotatingIdString[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-            Encoding::BytesToUppercaseHexString(client->GetRotatingId(), client->GetRotatingIdLength(), rotatingIdString,
-                                                sizeof(rotatingIdString));
-            CharSpan rotatingIdSpan = CharSpan(rotatingIdString, strlen(rotatingIdString));
+            char rotatingIdBuffer[Dnssd::kMaxRotatingIdLen * 2];
+            size_t rotatingIdLength = client->GetRotatingIdLength();
+            CHIP_ERROR err = Encoding::BytesToUppercaseHexBuffer(client->GetRotatingId(), rotatingIdLength, rotatingIdBuffer,
+                                                                 sizeof(rotatingIdBuffer));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "UX Ok - HandleContentAppPasscodeResponse: could not convert rotating id to hex");
+                return;
+            }
+            CharSpan rotatingIdSpan(rotatingIdBuffer, 2 * rotatingIdLength);
 
             // first step of commissioner passcode
             ChipLogError(AppServer, "UX Ok: commissioner passcode, sending CDC");
