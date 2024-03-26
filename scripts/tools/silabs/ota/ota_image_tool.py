@@ -63,7 +63,9 @@ class TAG:
     APPLICATION = 1
     BOOTLOADER = 2
     FACTORY_DATA = 3
-
+    WIFI_917_NCP_TA = 4
+    WIFI_917_SOC_COMBINED = 5
+    WIFI_917_NCP_COMBINED = 6
 
 def write_to_temp(path: str, payload: bytearray):
     with open(path, "wb") as _handle:
