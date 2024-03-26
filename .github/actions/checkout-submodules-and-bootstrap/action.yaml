@@ -26,21 +26,14 @@ runs:
       with:
         platform: ${{ inputs.platform }}
         extra-parameters: ${{ inputs.extra-submodule-parameters }}
-    - name: Bootstrap Cache
-      uses: ./.github/actions/bootstrap-cache
     - name: Bootstrap
       uses: ./.github/actions/bootstrap
-      env:
-        PW_NO_CIPD_CACHE_DIR: Y
       with:
         platform: ${{ inputs.platform }}
+        bootstrap-log-name: ${{ inputs.bootstrap-log-name }}
     - name: Dump disk info after checkout submodule & Bootstrap
       shell: bash
       run: scripts/dump_diskspace_info.sh
-    - name: Upload Bootstrap Logs
-      uses: ./.github/actions/upload-bootstrap-logs
-      with:
-        bootstrap-log-name: ${{ inputs.bootstrap-log-name }}
     - name: Work around TSAN ASLR issues
       if: runner.os == 'Linux' && !env.ACT
       shell: bash

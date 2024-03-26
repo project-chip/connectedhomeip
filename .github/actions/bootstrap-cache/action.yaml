@@ -1,5 +1,5 @@
 name: Bootstrap cache
-description: Bootstrap cache
+description: Bootstrap cache (deprecated)
 runs:
   using: "composite"
   steps:
