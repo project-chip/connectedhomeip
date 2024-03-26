@@ -34,3 +34,24 @@ DataModelCallbacks * DataModelCallbacks::SetInstance(DataModelCallbacks * newIns
 }
 
 } // namespace chip
+
+/// Strong-link callbacks for backwards compatibiltiy error reporting
+///
+/// We used to have these as __attribute__(weak) linkage in previous releases, so
+/// we define these as non-weak now so that we get compile errors in case anyone tries
+/// to link with them on the assumption they work (because they do not anymore)
+///
+/// TODO(future): we should be able to remove these once we assume everyone is updated
+///               to the latest code.
+void MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+CHIP_ERROR MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::Access::SubjectDescriptor & subjectDescriptor)
+{
+    return CHIP_NO_ERROR;
+}
+void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                       const chip::Access::SubjectDescriptor & subjectDescriptor)
+{}
