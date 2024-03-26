@@ -27,6 +27,7 @@
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <system/SystemLayer.h>
 
+#include "BluezObjectManager.h"
 #include "Types.h"
 
 namespace chip {
@@ -55,7 +56,7 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner()                                      = default;
+    ChipDeviceScanner(BluezObjectManager & aObjectManager) : mObjectManager(aObjectManager) {}
     ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
     ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
@@ -107,8 +108,9 @@ private:
     /// so that it can be re-discovered if it's still advertising.
     void RemoveDevice(BluezDevice1 & device);
 
-    GAutoPtr<GDBusObjectManager> mManager;
+    BluezObjectManager & mObjectManager;
     GAutoPtr<BluezAdapter1> mAdapter;
+
     ChipDeviceScannerDelegate * mDelegate  = nullptr;
     unsigned long mObjectAddedSignal       = 0;
     unsigned long mPropertiesChangedSignal = 0;

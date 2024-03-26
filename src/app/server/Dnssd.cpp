@@ -38,6 +38,11 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/TimeSource.h>
 
+#include <algorithm>
+
+using namespace chip;
+using namespace chip::DeviceLayer;
+
 namespace chip {
 namespace app {
 namespace {
@@ -165,6 +170,21 @@ void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
 }
 #endif
 
+void DnssdServer::GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac)
+{
+    if (ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
+    {
+        // Only generate a fallback "MAC" once, so we don't keep constantly changing our host name.
+        if (std::all_of(std::begin(mFallbackMAC), std::end(mFallbackMAC), [](uint8_t v) { return v == 0; }))
+        {
+            ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
+            Crypto::DRBG_get_bytes(mFallbackMAC, sizeof(mFallbackMAC));
+        }
+        VerifyOrDie(mac.size() == sizeof(mFallbackMAC)); // kPrimaryMACAddressLength
+        memcpy(mac.data(), mFallbackMAC, sizeof(mFallbackMAC));
+    }
+}
+
 /// Set MDNS operational advertisement
 CHIP_ERROR DnssdServer::AdvertiseOperational()
 {
@@ -179,11 +199,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
 
         uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
         MutableByteSpan mac(macBuffer);
-        if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
-            Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
-        }
+        GetPrimaryOrFallbackMACAddress(mac);
 
         auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
                                        .SetPeerId(fabricInfo.GetPeerId())
@@ -224,11 +240,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     uint8_t macBuffer[DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
     MutableByteSpan mac(macBuffer);
-    if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to get primary mac address of device. Generating a random one.");
-        Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
-    }
+    GetPrimaryOrFallbackMACAddress(mac);
     advertiseParameters.SetMac(mac);
 
     uint16_t value;

@@ -645,13 +645,22 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     if (id.GetRotatingIdLength() == 0)
     {
-        char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
-        ReturnErrorOnFailure(
-            app::DnssdServer::Instance().GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
+        AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
+        uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+        MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
-        uint8_t * rotatingId = reinterpret_cast<uint8_t *>(rotatingDeviceIdHexBuffer);
-        size_t rotatingIdLen = strlen(rotatingDeviceIdHexBuffer);
-        id.SetRotatingId(rotatingId, rotatingIdLen);
+        ReturnErrorOnFailure(
+            chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan));
+        ReturnErrorOnFailure(
+            chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter));
+        additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
+
+        uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
+        MutableByteSpan rotatingDeviceIdBufferTemp(rotatingDeviceIdInternalBuffer);
+        ReturnErrorOnFailure(AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsBinary(additionalDataPayloadParams,
+                                                                                               rotatingDeviceIdBufferTemp));
+
+        id.SetRotatingId(rotatingDeviceIdInternalBuffer, RotatingDeviceId::kMaxLength);
     }
 #endif
 

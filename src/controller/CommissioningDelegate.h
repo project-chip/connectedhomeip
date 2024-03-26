@@ -54,16 +54,20 @@ enum CommissioningStage : uint8_t
     kConfigureTrustedTimeSource, ///< Configure a trusted time source if one is required and available (must be done after SendNOC)
     kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registraion informations.
     kICDRegistration,            ///< Register for ICD management
-    kICDSendStayActive,          ///< Send Keep Alive to ICD
     kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
     kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
     kFailsafeBeforeWiFiEnable,   ///< Extend the fail-safe before doing kWiFiNetworkEnable
     kFailsafeBeforeThreadEnable, ///< Extend the fail-safe before doing kThreadNetworkEnable
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
-    kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
-    kSendComplete,               ///< Send CommissioningComplete (0x30:4) command to the device
-    kCleanup,                    ///< Call delegates with status, free memory, clear timers and state
+    kEvictPreviousCaseSessions,  ///< Evict previous stale case sessions from a commissioned device with this node ID before
+    kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
+                                   ///< StayActive command
+    kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
+                                              ///< Commissioning Complete command
+    kSendComplete,                            ///< Send CommissioningComplete (0x30:4) command to the device
+    kICDSendStayActive,                       ///< Send Keep Alive to ICD
+    kCleanup,                                 ///< Call delegates with status, free memory, clear timers and state
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
     /// However, the cirque tests fail if it is earlier in the list
@@ -544,6 +548,14 @@ public:
         return *this;
     }
 
+    Optional<uint32_t> GetICDStayActiveDurationMsec() const { return mICDStayActiveDurationMsec; }
+    CommissioningParameters & SetICDStayActiveDurationMsec(uint32_t stayActiveDurationMsec)
+    {
+        mICDStayActiveDurationMsec = MakeOptional(stayActiveDurationMsec);
+        return *this;
+    }
+    void ClearICDStayActiveDurationMsec() { mICDStayActiveDurationMsec.ClearValue(); }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -610,7 +622,7 @@ private:
     Optional<NodeId> mICDCheckInNodeId;
     Optional<uint64_t> mICDMonitoredSubject;
     Optional<ByteSpan> mICDSymmetricKey;
-
+    Optional<uint32_t> mICDStayActiveDurationMsec;
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
 };
@@ -763,15 +775,18 @@ public:
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
-     * kSendNOC: none
+     * kSendNOC: None
      * kConfigureTrustedTimeSource: None
      * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkEnable: NetworkCommissioningStatusInfo if there is an error
-     * kFindOperational: OperationalNodeFoundData
+     * kEvictPreviousCaseSessions: None
+     * kFindOperationalForStayActive OperationalNodeFoundData
+     * kFindOperationalForCommissioningComplete: OperationalNodeFoundData
+     * kICDSendStayActive: CommissioningErrorInfo if there is an error
      * kSendComplete: CommissioningErrorInfo if there is an error
-     * kCleanup: none
+     * kCleanup: None
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,

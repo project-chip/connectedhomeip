@@ -154,6 +154,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         // These Optionals must have values now.
         // The commissioner will verify these values.
         params.SetICDSymmetricKey(mICDSymmetricKey.Value());
+        if (mICDStayActiveDurationMsec.HasValue())
+        {
+            params.SetICDStayActiveDurationMsec(mICDStayActiveDurationMsec.Value());
+        }
         params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
         params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
     }
@@ -463,6 +467,12 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
                     " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s",
                     ChipLogValueX64(nodeId), ChipLogValueX64(mICDCheckInNodeId.Value()),
                     ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex);
+}
+
+void PairingCommand::OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedActiveDuration)
+{
+    ChipLogProgress(chipTool, "ICD Stay Active Complete for device " ChipLogFormatX64 " / promisedActiveDuration: %u",
+                    ChipLogValueX64(deviceId), promisedActiveDuration);
 }
 
 void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
