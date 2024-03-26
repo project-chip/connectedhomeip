@@ -205,13 +205,11 @@ uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints
     return kEmberInvalidEndpointIndex;
 }
 
-
 // Returns the index of a given endpoint.  Considers disabled endpoints.
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
 {
     return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 }
-
 
 } // anonymous namespace
 
