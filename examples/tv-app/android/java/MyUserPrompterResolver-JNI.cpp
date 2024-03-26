@@ -30,10 +30,10 @@ using namespace chip;
 
 JNI_METHOD(void, OnPinCodeEntered)(JNIEnv *, jobject, jint jPinCode)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     chip::DeviceLayer::StackLock lock;
-    uint32_t pinCode = (uint32_t) jPinCode;
+    uint32_t pinCode = static_cast<uint32_t>(jPinCode);
     ChipLogProgress(Zcl, "OnPinCodeEntered %d", pinCode);
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     GetCommissionerDiscoveryController()->CommissionWithPasscode(pinCode);
 #endif
 }
@@ -67,11 +67,7 @@ JNI_METHOD(void, OnPromptDeclined)(JNIEnv *, jobject)
 
 JNI_METHOD(void, OnCommissionerPasscodeOK)(JNIEnv *, jobject)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Zcl, "OnCommissionerPasscodeOK");
-    // GetCommissionerDiscoveryController()->Ok();
-#endif
 }
 
 JNI_METHOD(void, OnCommissionerPasscodeCancel)(JNIEnv *, jobject)
