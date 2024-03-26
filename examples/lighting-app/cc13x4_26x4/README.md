@@ -301,4 +301,3 @@ Additionally, we welcome any feedback.
     https://www.ti.com/wireless-connectivity/thread/design-development.html
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH
-
