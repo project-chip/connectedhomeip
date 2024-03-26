@@ -158,7 +158,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * the startupParams.
  *
  * This method can only be used if the factory was initialized with storage.
- * When using per-controller storage, use createController.
+ * When using per-controller storage, use [MTRDeviceController initWithParameters:error:].
  */
 - (MTRDeviceController * _Nullable)createControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                               error:(NSError * __autoreleasing *)error;
@@ -172,7 +172,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * the startupParams.
  *
  * This method can only be used if the factory was initialized with storage.
- * When using per-controller storage, use createController.
+ * When using per-controller storage, use [MTRDeviceController initWithParameters:error:].
  */
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error;
