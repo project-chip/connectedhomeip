@@ -61,15 +61,15 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
   $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.18.1.3343/sysconfig-1.18.1_3343-setup.run
   $ chmod +x sysconfig-1.18.1_3343-setup.run
   $ ./sysconfig-1.18.1_3343-setup.run
-  ```
+```
 
 -   Run the bootstrap script to setup the build environment.
 
-  ```
-  $ cd ~/connectedhomeip
-  $ source ./scripts/bootstrap.sh
+```
+$ cd ~/connectedhomeip
+$ source ./scripts/bootstrap.sh
 
-  ```
+```
 
 ### Compilation
 
@@ -78,33 +78,32 @@ Ninja to build the executable.
 
 -   Activate the build environment with the repository activate script.
 
-  ```
-  $ cd ~/connectedhomeip
-  $ source ./scripts/activate.sh
+```
+$ cd ~/connectedhomeip
+$ source ./scripts/activate.sh
 
-  ```
+```
 
 -   Run the build to produce a default executable. By default on Linux both the
-  TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
-  home directory, and you must provide the absolute path to them. For example
-  `/home/username/ti/sysconfig_1.18.1`. On Windows the default directory is
-  `C:\ti`. Take note of this install path, as it will be used in the next
-  step.
+    TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
+    home directory, and you must provide the absolute path to them. For example
+    `/home/username/ti/sysconfig_1.18.1`. On Windows the default directory is
+    `C:\ti`. Take note of this install path, as it will be used in the next
+    step.
 
-  ```
-  $ cd ~/connectedhomeip/examples/lock-app/cc13x4_26x4
-  $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\""
-  $ ninja -C out/debug
+```
+$ cd ~/connectedhomeip/examples/lock-app/cc13x4_26x4
+$ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\""
+$ ninja -C out/debug
 
-  ```
+```
 
-  If you would like to define arguments on the command line you may add them
-  to the GN call.
+If you would like to define arguments on the command line you may add them to
+the GN call.
 
-
-  ```
-  gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
-  ```
+```
+gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.18.1\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
+```
 
 ## Programming
 
@@ -303,3 +302,4 @@ Additionally, we welcome any feedback.
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH
 ```
+````
