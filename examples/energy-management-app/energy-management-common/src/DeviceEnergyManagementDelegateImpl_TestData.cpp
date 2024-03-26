@@ -32,27 +32,6 @@ using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 static DeviceEnergyManagementDelegate * sDeviceEnergyManagementDelegate = nullptr;
 
 #ifdef DELEGATE_TEST_DATA
-// ################## PowerAdjustmentCapability
-
-#if 0
-void FillPowerAdjustmentCapability(PowerAdjustmentCapability::TypeInfo::Type & nullablePowerAdjustmentCapability)
-{
-    nullablePowerAdjustmentCapability.SetNull();
-    if (!nullablePowerAdjustmentCapability.IsNull())
-    {
-        ChipLogProgress(Zcl, "DEM: %s Null but nullablePowerAdjustmentCapability.HasValue",  __FUNCTION__);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "DEM: %s Null & nullablePowerAdjustmentCapability.NullValue",  __FUNCTION__);
-    }
-
-// DataModel::Nullable< DataModel::List<Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>>;
-//    DataModel::List<DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>  pac;
-//    pac.forecastId        = static_cast<uint16_t>(1234);
-//    nullablePowerAdjustmentCapability = MakeNullable(pac);
-}
-#endif
 
 // ################## Forecast
 
@@ -200,12 +179,6 @@ void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> &
         Optional<uint32_t>(static_cast<uint32_t>(chipEpoch * 3)); // latest end time, in UTC, for the entire Forecast
 }
 
-#if 0
-static void PowerAdjustmentTestSetup_TP3b( PowerAdjustmentCapability::TypeInfo::Type  & powerAdjustmentCapability)
-{
-
-}
-#endif
 
 namespace chip {
 namespace app {
@@ -222,25 +195,9 @@ DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate()
 
     BitMask<DeviceEnergyManagement::Feature> FeatureMap;
     FeatureMap.Set(DeviceEnergyManagement::Feature::kForecastAdjustment);
-    // Status status = DeviceEnergyManagement::Attributes::FeatureMap::Set(mEndpointId, FeatureMap.Raw());
-
-#if 0 // Set  UserOptOut in  ESAState for testing ?
-    {
-        DeviceEnergyManagement::ESAStateEnum esaStatus = DeviceEnergyManagement::ESAStateEnum::kUserOptOut;
-        s = DeviceEnergyManagement::Attributes::ESAState::Set(endpoint, esaStatus);
-        if (EMBER_ZCL_STATUS_SUCCESS != s)
-        {
-            ChipLogProgress(Zcl, "DEM: %s Failed to set() ESAStateEnum::kUserOptOut",  __FUNCTION__);
-            goto DEPARTURES;
-        }
-    }
-#endif
 
     FillForecast(mForecast);
     ForecastTestSetup_TP3b(mForecast);
-
-    //    FillPowerAdjustmentCapability(mPowerAdjustmentCapability);
-    //    PowerAdjustmentTestSetup_TP3b(mForecast);
 
     ChipLogProgress(Zcl, "DEM: %s Enabled Feature ForecastAdjustment", __FUNCTION__);
 

@@ -195,8 +195,8 @@ class TC_DEM_2_3(MatterBaseTest, DEMBaseTestHelper):
         logger.info(f"Forecast: {forecast4}")
         asserts.assert_less_equal(forecast4.earliestStartTime, forecast4.startTime,
                                   f"Expected earliestStartTime {forecast4.earliestStartTime} to be <= startTime {forecast4.startTime}")
-# TODO: asserts.assert_equal(forecast4.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
-#                      f"Expected forecastUpdateReason {forecast4.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
+        asserts.assert_equal(forecast4.forecastUpdateReason, Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization,
+                                  f"Expected forecastUpdateReason {forecast4.forecastUpdateReason} to be == InternalOptimization {Clusters.DeviceEnergyManagement.Enums.ForecastUpdateReasonEnum.kInternalOptimization}")
 
         self.step("9")
         await self.send_start_time_adjust_request_command(requestedStartTime=forecast4.startTime+forecast4.latestEndTime - forecast4.endTime,

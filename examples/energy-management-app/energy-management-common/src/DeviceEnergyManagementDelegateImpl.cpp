@@ -430,20 +430,24 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newVal
             // We don't need to redo a forecast since its internal already
             break;
         case ForecastUpdateReasonEnum::kLocalOptimization:
-            if (mOptOutState == OptOutStateEnum::kOptOut)
-                || (mOptOutState == OptOutStateEnum::kLocalOptOut)
-                {
-                    // Generate a new forecast with Internal Optimization
-                    // TODO
-                }
+            if ((mOptOutState == OptOutStateEnum::kOptOut)
+                || (mOptOutState == OptOutStateEnum::kLocalOptOut))
+            {
+                // Generate a new forecast with Internal Optimization
+                // TODO
+            }
             break;
         case ForecastUpdateReasonEnum::kGridOptimization:
-            if (mOptOutState == OptOutStateEnum::kOptOut)
-                || (mOptOutState == OptOutStateEnum::kGridOptOut)
-                {
-                    // Generate a new forecast with Internal Optimization
-                    // TODO
-                }
+            if ((mOptOutState == OptOutStateEnum::kOptOut)
+                || (mOptOutState == OptOutStateEnum::kGridOptOut))
+            {
+                // Generate a new forecast with Internal Optimization
+                // TODO
+            }
+            break;
+            default:
+                ChipLogDetail(AppServer, "Bad ForecastUpdateReasonEnum value of %d", static_cast<int>(mForecast.Value().forecastUpdateReason));
+                return CHIP_ERROR_BAD_REQUEST;
             break;
         }
     }
