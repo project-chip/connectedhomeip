@@ -31,7 +31,6 @@
 #define EM_BIG_ENDIAN false
 #endif
 
-
 using chip::Protocols::InteractionModel::Status;
 
 using namespace chip;
@@ -132,7 +131,6 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
     return 0;
 }
 
- 
 } // namespace
 
 Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
