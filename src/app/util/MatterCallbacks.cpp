@@ -54,4 +54,4 @@ CHIP_ERROR MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath
 }
 void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::Access::SubjectDescriptor & subjectDescriptor)
-{} // namespace chip
+{}
