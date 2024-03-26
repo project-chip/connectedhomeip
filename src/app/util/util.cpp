@@ -221,12 +221,6 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
     return 0;
 }
 
-// Zigbee spec says types between signed 8 bit and signed 64 bit
-bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
-{
-    return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
-}
-
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
     return (emberAfGetServerAttributeIndexByAttributeId(endpoint, clusterId, attributeId) != UINT16_MAX);

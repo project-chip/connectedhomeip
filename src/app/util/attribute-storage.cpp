@@ -175,6 +175,44 @@ void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
     }
 }
 
+// Zigbee spec says types between signed 8 bit and signed 64 bit
+bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
+{
+    return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
+}
+
+bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
+{
+    return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
+}
+
+uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints)
+{
+    if (endpoint == kInvalidEndpointId)
+    {
+        return kEmberInvalidEndpointIndex;
+    }
+
+    uint16_t epi;
+    for (epi = 0; epi < emberAfEndpointCount(); epi++)
+    {
+        if (emAfEndpoints[epi].endpoint == endpoint &&
+            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask.Has(EmberAfEndpointOptions::isEnabled)))
+        {
+            return epi;
+        }
+    }
+    return kEmberInvalidEndpointIndex;
+}
+
+
+// Returns the index of a given endpoint.  Considers disabled endpoints.
+uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
+{
+    return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
+}
+
+
 } // anonymous namespace
 
 // Initial configuration
@@ -354,9 +392,92 @@ bool emberAfEndpointIndexIsEnabled(uint16_t index)
     return (emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isEnabled));
 }
 
-bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
+/**
+ * @brief Simple integer comparison function.
+ * Compares two values of a known length as integers.
+ * Signed integer comparison are supported for numbers with length of
+ * 4 (bytes) or less.
+ * The integers are in native endianness.
+ *
+ * @return -1, if val1 is smaller
+ *          0, if they are the same or if two negative numbers with length
+ *          greater than 4 is being compared
+ *          1, if val2 is smaller.
+ *
+ * You can pass in val1 as NULL, which will assume that it is
+ * pointing to an array of all zeroes. This is used so that
+ * default value of NULL is treated as all zeroes.
+ */
+static int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber)
 {
-    return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
+    if (len == 0)
+    {
+        // no length means nothing to compare.  Shouldn't even happen, since len is sizeof(some-integer-type).
+        return 0;
+    }
+
+    if (signedNumber)
+    { // signed number comparison
+        if (len <= 4)
+        { // only number with 32-bits or less is supported
+            int32_t accum1 = 0x0;
+            int32_t accum2 = 0x0;
+            int32_t all1s  = -1;
+
+            for (uint16_t i = 0; i < len; i++)
+            {
+                uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+                accum1 |= j << (8 * (len - 1 - i));
+
+                uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+                accum2 |= k << (8 * (len - 1 - i));
+            }
+
+            // sign extending, no need for 32-bits numbers
+            if (len < 4)
+            {
+                if ((accum1 & (1 << (8 * len - 1))) != 0)
+                { // check sign
+                    accum1 |= all1s - ((1 << (len * 8)) - 1);
+                }
+                if ((accum2 & (1 << (8 * len - 1))) != 0)
+                { // check sign
+                    accum2 |= all1s - ((1 << (len * 8)) - 1);
+                }
+            }
+
+            if (accum1 > accum2)
+            {
+                return 1;
+            }
+            if (accum1 < accum2)
+            {
+                return -1;
+            }
+
+            return 0;
+        }
+
+        // not supported
+        return 0;
+    }
+
+    // regular unsigned number comparison
+    for (uint16_t i = 0; i < len; i++)
+    {
+        uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+        uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+
+        if (j > k)
+        {
+            return 1;
+        }
+        if (k > j)
+        {
+            return -1;
+        }
+    }
+    return 0;
 }
 
 // This function is used to call the per-cluster attribute changed callback
@@ -845,25 +966,6 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(EndpointId e
     return nullptr;
 }
 
-static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints)
-{
-    if (endpoint == kInvalidEndpointId)
-    {
-        return kEmberInvalidEndpointIndex;
-    }
-
-    uint16_t epi;
-    for (epi = 0; epi < emberAfEndpointCount(); epi++)
-    {
-        if (emAfEndpoints[epi].endpoint == endpoint &&
-            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask.Has(EmberAfEndpointOptions::isEnabled)))
-        {
-            return epi;
-        }
-    }
-    return kEmberInvalidEndpointIndex;
-}
-
 uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
 {
     VerifyOrDie(fixedClusterServerEndpointCount <= FIXED_ENDPOINT_COUNT);
@@ -978,12 +1080,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
 {
     return findIndexFromEndpoint(endpoint, true /* ignoreDisabledEndpoints */);
-}
-
-// Returns the index of a given endpoint.  Considers disabled endpoints.
-uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
-{
-    return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 }
 
 EndpointId emberAfEndpointFromIndex(uint16_t index)
