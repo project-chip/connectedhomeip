@@ -47,7 +47,6 @@ using chip::Protocols::InteractionModel::Status;
 #define EM_BIG_ENDIAN false
 #endif
 
-
 using namespace chip;
 using namespace chip::app;
 
