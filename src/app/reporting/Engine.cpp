@@ -231,7 +231,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     {
                         ChipLogError(DataManagement,
                                      "Fail to retrieve data, roll back and encode status on clusterId: " ChipLogFormatMEI
-                                     ", attributeId: " ChipLogFormatMEI,
+                                     ", attributeId: " ChipLogFormatMEI
                                      "err = %" CHIP_ERROR_FORMAT, ChipLogValueMEI(pathForRetrieval.mClusterId),
                                      ChipLogValueMEI(pathForRetrieval.mAttributeId), err.Format());
                         // Try to encode our error as a status response.
