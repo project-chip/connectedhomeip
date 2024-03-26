@@ -84,7 +84,7 @@ class MainFragment : Fragment() {
           )
         }
         MainUiState.Start -> {
-          val itemList = arrayListOf(Device.OnOffSwitch)
+          val itemList = arrayListOf(Device.OnOffSwitch, Device.DoorLock)
 
           val menuAdapter =
             MenuAdapter(
