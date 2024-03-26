@@ -30,6 +30,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <platform/NetworkCommissioning.h>
 
 #include <app/util/basic-types.h>
 
@@ -162,6 +163,9 @@ public:
     void SetDelegate(ConnectivityManagerDelegate * delegate) { mDelegate = delegate; }
     ConnectivityManagerDelegate * GetDelegate() const { return mDelegate; }
 
+    void SetDriver(chip::DeviceLayer::NetworkCommissioning::WiFiDriver * driver) { mDriver = driver; }
+    chip::DeviceLayer::NetworkCommissioning::WiFiDriver * GetDriver() const { return mDriver; }
+
     chip::Inet::EndPointManager<Inet::UDPEndPoint> & UDPEndPointManager();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -190,6 +194,9 @@ public:
     void MaintainOnDemandWiFiAP();
     System::Clock::Timeout GetWiFiAPIdleTimeout();
     void SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    CHIP_ERROR GetNetworkSSID(char * ssid);
+    CHIP_ERROR GetNetworkPassword(char * credentials);
+    CHIP_ERROR DisconnectNetwork(void);
 
     // Thread Methods
     ThreadMode GetThreadMode();
@@ -235,7 +242,8 @@ public:
     static const char * CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode);
 
 private:
-    ConnectivityManagerDelegate * mDelegate = nullptr;
+    ConnectivityManagerDelegate * mDelegate                       = nullptr;
+    chip::DeviceLayer::NetworkCommissioning::WiFiDriver * mDriver = nullptr;
 
     // ===== Members for internal use by the following friends.
 
@@ -584,6 +592,21 @@ inline void ConnectivityManager::OnWiFiScanDone()
 inline void ConnectivityManager::OnWiFiStationProvisionChange()
 {
     static_cast<ImplClass *>(this)->_OnWiFiStationProvisionChange();
+}
+
+inline CHIP_ERROR ConnectivityManager::GetNetworkSSID(char * ssid)
+{
+    return static_cast<ImplClass *>(this)->_GetNetworkSSID(ssid);
+}
+
+inline CHIP_ERROR ConnectivityManager::GetNetworkPassword(char * credentials)
+{
+    return static_cast<ImplClass *>(this)->_GetNetworkPassword(credentials);
+}
+
+inline CHIP_ERROR ConnectivityManager::DisconnectNetwork(void)
+{
+    return static_cast<ImplClass *>(this)->_DisconnectNetwork();
 }
 
 } // namespace DeviceLayer

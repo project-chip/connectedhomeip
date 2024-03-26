@@ -81,6 +81,9 @@ public:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && !CHIP_DEVICE_CONFIG_ENABLE_THREAD
     CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif
+    CHIP_ERROR _GetNetworkSSID(char * ssid);
+    CHIP_ERROR _GetNetworkPassword(char * credentials);
+    CHIP_ERROR _DisconnectNetwork(void);
     static const char * _WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode);
     static const char * _WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode);
     static const char * _WiFiStationStateToStr(ConnectivityManager::WiFiStationState state);
@@ -193,6 +196,24 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetPollingInt
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 #endif
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetNetworkSSID(char * ssid)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetNetworkPassword(char * credentials)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_DisconnectNetwork(void)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
 } // namespace Internal
 } // namespace DeviceLayer
