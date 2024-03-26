@@ -274,14 +274,6 @@ Set a new user "`TST`" with user index of 1 with a default pin of 123456
 
 ```
 
-Require a pin mode for lock operations:
-
-```
-
-./chip-tool doorlock write require-pinfor-remote-operation 1 1 1
-
-```
-
 Lock the Door
 
 ```
