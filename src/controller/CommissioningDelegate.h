@@ -775,17 +775,18 @@ public:
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
-     * kSendNOC: none
+     * kSendNOC: None
      * kConfigureTrustedTimeSource: None
      * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkEnable: NetworkCommissioningStatusInfo if there is an error
+     * kEvictPreviousCaseSessions: None
      * kFindOperationalForStayActive OperationalNodeFoundData
      * kFindOperationalForCommissioningComplete: OperationalNodeFoundData
      * kICDSendStayActive: CommissioningErrorInfo if there is an error
      * kSendComplete: CommissioningErrorInfo if there is an error
-     * kCleanup: none
+     * kCleanup: None
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
