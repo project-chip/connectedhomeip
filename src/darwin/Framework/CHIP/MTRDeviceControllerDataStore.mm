@@ -131,10 +131,6 @@ static bool IsValidCATNumber(id _Nullable value)
                                                 securityLevel:MTRStorageSecurityLevelSecure
                                                   sharingType:MTRStorageSharingTypeNotShared];
         }
-        resumptionNodeList = [_storageDelegate controller:_controller
-                                              valueForKey:sResumptionNodeListKey
-                                            securityLevel:MTRStorageSecurityLevelSecure
-                                              sharingType:MTRStorageSharingTypeNotShared];
     });
     if (resumptionNodeList != nil) {
         if (![resumptionNodeList isKindOfClass:[NSArray class]]) {
