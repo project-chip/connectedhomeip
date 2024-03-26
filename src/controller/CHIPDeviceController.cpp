@@ -2376,6 +2376,9 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
 
     if (!isICD)
     {
+        info.icd.idleModeDuration    = 0;
+        info.icd.activeModeDuration  = 0;
+        info.icd.activeModeThreshold = 0;
         return CHIP_NO_ERROR;
     }
 
@@ -2389,7 +2392,8 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         mAttributeCache->Get<IcdManagement::Attributes::ActiveModeDuration::TypeInfo>(kRootEndpointId, info.icd.activeModeDuration);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "IcdManagement.ActiveModeDuration expected, but failed to read.");
+        ChipLogError(Controller, "IcdManagement.ActiveModeDuration expected, but failed to read: %" CHIP_ERROR_FORMAT,
+                     err.Format());
         return err;
     }
 
@@ -2397,7 +2401,8 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
                                                                                          info.icd.activeModeThreshold);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "IcdManagement.ActiveModeThreshold expected, but failed to read.");
+        ChipLogError(Controller, "IcdManagement.ActiveModeThreshold expected, but failed to read: %" CHIP_ERROR_FORMAT,
+                     err.Format());
     }
 
     return err;
@@ -2690,8 +2695,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
         // See R1.1, 2.11.2 Interaction Model Limits
 
-        // Currently, we have at most 5 attributes to read in this stage.
-        app::AttributePathParams readPaths[5];
+        // Currently, we have at most 8 attributes to read in this stage.
+        app::AttributePathParams readPaths[8];
 
         // Mandatory attribute
         readPaths[numberOfAttributes++] =
