@@ -57,7 +57,7 @@
 #include <system/SystemClock.h>
 #include <vector>
 
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
 #include <app/dynamic_server/AccessControl.h>
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
 
@@ -132,7 +132,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     SuccessOrExit(err);
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::app::dynamic_server::InitAccessControl();
 #endif // CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
 
@@ -549,7 +549,7 @@ exit:
 
 JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, jobject otaProviderDelegate)
 {
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -570,7 +570,7 @@ exit:
 
 JNI_METHOD(void, finishOTAProvider)(JNIEnv * env, jobject self, jlong handle)
 {
-#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
