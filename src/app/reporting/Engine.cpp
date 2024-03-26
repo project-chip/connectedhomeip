@@ -211,8 +211,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 if (encodeState.AllowPartialData() && IsOutOfWriterSpaceError(err))
                 {
                     ChipLogDetail(DataManagement,
-                                  "List does not fit in packet, chunk between list items for clusterId: " ....
-                                  "on clusterId: " ChipLogFormatMEI ", attributeId: " ChipLogFormatMEI,
+                                  "List does not fit in packet, chunk between list items for clusterId: " ChipLogFormatMEI ", attributeId: " ChipLogFormatMEI,
                                   ChipLogValueMEI(pathForRetrieval.mClusterId), ChipLogValueMEI(pathForRetrieval.mAttributeId));
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
                     // The expectation is that RetrieveClusterData has already reset attributeReportIBs to a good state (rolled
