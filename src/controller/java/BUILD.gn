@@ -104,7 +104,7 @@ shared_library("jni") {
 
     defines += [
       "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-      "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER",
+      "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=1",
     ]
 
     deps += [ "${chip_root}/src/controller:nodatamodel" ]
