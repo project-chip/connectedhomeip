@@ -135,9 +135,9 @@ public:
     /**
      * @brief Trigger the ICDManager to send Check-In message if necessary
      *
-     * @param[in] algo Verifier function to use to determine if we need to send check-in messages
+     * @param[in] function to use to determine if we need to send check-in messages
      */
-    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier);
+    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & function);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     /**
@@ -151,7 +151,9 @@ public:
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
+#if !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     bool GetIsBootUpResumeSubscriptionExecuted() { return mIsBootUpResumeSubscriptionExecuted; };
+#endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #endif
 
     // Implementation of ICDListener functions.
@@ -201,7 +203,7 @@ private:
      * @return false None of the registration would require a Check-In message either because there are no registration or
      * because they all have associated subscriptions.
      */
-    bool CheckInMessagesWouldBeSent(std::function<ShouldCheckInMsgsBeSentFunction> function);
+    bool CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsgsBeSentFunction> & function);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     KeepActiveFlags mKeepActiveFlags{ 0 };
@@ -214,7 +216,7 @@ private:
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 #if !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     bool mIsBootUpResumeSubscriptionExecuted = false;
-#endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
     Messaging::ExchangeManager * mExchangeManager  = nullptr;

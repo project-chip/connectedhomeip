@@ -330,7 +330,7 @@ public:
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    void DecrementNumSubscriptionToResume();
+    void DecrementNumSubscriptionsToResume();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

@@ -450,9 +450,9 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         // We trigger Check-In messages before resuming subscriptions to avoid doing both.
         if (!mFailSafeContext.IsFailSafeArmed())
         {
-            std::function<chip::app::ICDManager::ShouldCheckInMsgsBeSentFunction> verifier =
-                std::bind(&Server::CheckInWouldBeSentAtBootVerifier, this, std::placeholders::_1, std::placeholders::_2);
-            mICDManager.TriggerCheckInMessages(verifier);
+            std::function<chip::app::ICDManager::ShouldCheckInMsgsBeSentFunction> function =
+                std::bind(&Server::ShouldCheckInMsgsBeSentAtBootFunction, this, std::placeholders::_1, std::placeholders::_2);
+            mICDManager.TriggerCheckInMessages(function);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
