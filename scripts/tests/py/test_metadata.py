@@ -31,7 +31,7 @@ class TestMetadataReader(unittest.TestCase):
                    discriminator=1234, py_script_path="/scripts/tests/py/simple_run_args.py", run="run1", passcode=20202021)
         
     # gets the metadata associated with each run by parsing the test script and compares it to the expected metadata values
-    def test_case1(self):
+    def test_run_metadata_parser(self):
         for actual_run in self.actual_runs_metadata:
             self.assertEqual(self.actual_runs_metadata[actual_run], self.expected_runs_metadata[actual_run])
 
