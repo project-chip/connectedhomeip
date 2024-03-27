@@ -52,7 +52,7 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 NSString * const MTRPreviousDataKey = @"previousData";
 NSString * const MTRDataVersionKey = @"dataVersion";
 
-#define kTimeToWaitBeforeMarkingUnreachableAfterSettingUpSubscription 10
+#define kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription 10
 
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
@@ -129,10 +129,30 @@ private:
 
 #pragma mark - MTRDevice
 typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
+    // Unsubscribed means we do not have a subscription and are not trying to set one up.
     MTRInternalDeviceStateUnsubscribed = 0,
+    // Subscribing means we are actively trying to establish our initial subscription (e.g. doing
+    // DNS-SD discovery, trying to establish CASE to the peer, getting priming reports, etc).
     MTRInternalDeviceStateSubscribing = 1,
-    MTRInternalDeviceStateSubscribed = 2
+    // InitialSubscriptionEstablished means we have at some point finished setting up a
+    // subscription.  That subscription may have dropped since then, but if so it's the ReadClient's
+    // responsibility to re-establish it.
+    MTRInternalDeviceStateInitalSubscriptionEstablished = 2,
 };
+
+// Utility methods for working with MTRInternalDeviceState, located near the
+// enum so it's easier to notice that they need to stay in sync.
+namespace {
+bool HadSubscriptionEstablishedOnce(MTRInternalDeviceState state)
+{
+    return state >= MTRInternalDeviceStateInitalSubscriptionEstablished;
+}
+
+bool NeedToStartSubscriptionSetup(MTRInternalDeviceState state)
+{
+    return state <= MTRInternalDeviceStateUnsubscribed;
+}
+} // anonymous namespace
 
 typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     MTRDeviceExpectedValueFieldExpirationTimeIndex = 0,
@@ -283,6 +303,7 @@ static NSString * const sDataVersionKey = @"dataVersion";
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
         _state = MTRDeviceStateUnknown;
+        _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
         _clusterData = [NSMutableDictionary dictionary];
         MTR_LOG_INFO("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
@@ -576,6 +597,10 @@ static NSString * const sDataVersionKey = @"dataVersion";
     // attempt, since we now have no delegate.
     _reattemptingSubscription = NO;
 
+    // We do not change _internalDeviceState here, because we might still have a
+    // subscription.  In that case, _internalDeviceState will update when the
+    // subscription is actually terminated.
+
     os_unfair_lock_unlock(&self->_lock);
 }
 
@@ -678,7 +703,7 @@ static NSString * const sDataVersionKey = @"dataVersion";
 
     // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
-    _internalDeviceState = MTRInternalDeviceStateSubscribed;
+    _internalDeviceState = MTRInternalDeviceStateInitalSubscriptionEstablished;
 
     // As subscription is established, check if the delegate needs to be informed
     if (!_delegateDeviceCachePrimedCalled) {
@@ -786,12 +811,13 @@ static NSString * const sDataVersionKey = @"dataVersion";
     [self _reattemptSubscriptionNowIfNeeded];
 }
 
-- (void)_markDeviceAsUnreachableIfNotSusbcribed
+- (void)_markDeviceAsUnreachableIfNeverSubscribed
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    if (_internalDeviceState >= MTRInternalDeviceStateSubscribed)
+    if (HadSubscriptionEstablishedOnce(_internalDeviceState)) {
         return;
+    }
 
     MTR_LOG_DEFAULT("%@ still not subscribed, marking the device as unreachable", self);
     [self _changeState:MTRDeviceStateUnreachable];
@@ -1025,7 +1051,7 @@ static NSString * const sDataVersionKey = @"dataVersion";
 #endif
 
     // for now just subscribe once
-    if (_internalDeviceState > MTRInternalDeviceStateUnsubscribed) {
+    if (!NeedToStartSubscriptionSetup(_internalDeviceState)) {
         return;
     }
 
@@ -1033,12 +1059,11 @@ static NSString * const sDataVersionKey = @"dataVersion";
 
     // Set up a timer to mark as not reachable if it takes too long to set up a subscription
     MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kTimeToWaitBeforeMarkingUnreachableAfterSettingUpSubscription * NSEC_PER_SEC)), self.queue, ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
         MTRDevice * strongSelf = weakSelf.strongObject;
         if (strongSelf != nil) {
-            os_unfair_lock_lock(&strongSelf->_lock);
-            [strongSelf _markDeviceAsUnreachableIfNotSusbcribed];
-            os_unfair_lock_unlock(&strongSelf->_lock);
+            std::lock_guard lock(strongSelf->_lock);
+            [strongSelf _markDeviceAsUnreachableIfNeverSubscribed];
         }
     });
 

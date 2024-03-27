@@ -60,35 +60,31 @@ for define in "${defines[@]}"; do
 done
 target_defines=[${target_defines:1}]
 
+declare target_arch=
 declare target_cpu=
-case $PLATFORM_PREFERRED_ARCH in
-    i386)
-        target_cpu=x86
-        ;;
-    x86_64)
-        target_cpu=x64
-        ;;
-    armv7)
-        target_cpu=arm
-        ;;
-    arm64)
-        target_cpu=arm64
-        ;;
-    *)
-        echo >&2
-        ;;
-esac
-
-declare target_cflags='"-target","'"$PLATFORM_PREFERRED_ARCH"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"'
+declare target_cflags=
+declare current_arch="$(uname -m)"
 
 read -r -a archs <<<"$ARCHS"
-
 for arch in "${archs[@]}"; do
-    target_cflags+=',"-arch","'"$arch"'"'
+    if [ -z "$target_arch" ] || [ "$arch" = "$current_arch" ]; then
+        target_arch="$arch"
+        case "$arch" in
+            x86_64) target_cpu="x64" ;;
+            *) target_cpu="$arch" ;;
+        esac
+    fi
+    if [ -n "$target_cflags" ]; then
+        target_cflags+=','
+    fi
+    target_cflags+='"-arch","'"$arch"'"'
 done
 
 [[ $ENABLE_BITCODE == YES ]] && {
-    target_cflags+=',"-flto"'
+    if [ -n "$target_cflags" ]; then
+        target_cflags+=','
+    fi
+    target_cflags+='"-flto"'
 }
 
 target_cflags+=',"-fno-c++-static-destructors"'
@@ -101,6 +97,8 @@ declare -a args=(
     'target_cpu="'"$target_cpu"'"'
     'target_defines='"$target_defines"
     'target_cflags=['"$target_cflags"']'
+    "mac_target_arch=\"$target_arch\""
+    "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
     'build_tv_casting_common_a=true'
 )
 
