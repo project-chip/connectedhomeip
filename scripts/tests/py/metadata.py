@@ -42,9 +42,6 @@ class Metadata:
     trace_to_testjson: str = None
     trace_toperfetto: str = None
 
-    def print(self):
-        print(repr(self))
-
 
 class Metadata_Reader:
     # This class will be initialized with
