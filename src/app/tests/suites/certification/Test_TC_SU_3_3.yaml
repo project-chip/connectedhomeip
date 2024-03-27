@@ -121,11 +121,3 @@ tests:
       verification: |
           Out of scope
       disabled: true
-
-    - label:
-          "Step 6: Perform the OTA Update from DUT using vendor specific
-          mechanism."
-      PICS: MCORE.OTA.VendorSpecific
-      verification: |
-          Use vendor specific steps to initiate OTA Update and verify that the software image is transferred from the DUT
-      disabled: true

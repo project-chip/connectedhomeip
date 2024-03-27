@@ -59,7 +59,6 @@ tests:
               - name: "Status"
                 value: 0
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/28992
     - label:
           "Step 1: TH sends a GetSetupPIN command to the DUT with test values
           provided by the product maker."

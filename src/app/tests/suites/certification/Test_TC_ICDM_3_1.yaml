@@ -36,6 +36,47 @@ tests:
       disabled: true
 
     - label:
+          "Step 0a: Preconfition 1: Read 'register-clients' by sending the
+          command below and note the check-in nodeID for the entries"
+      verification: |
+          ./chip-tool icdmanagement read registered-clients 1 0
+
+          [1704888897.027204][71644:71646] CHIP:DMG: }
+          [1704888897.027313][71644:71646] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0003 DataVersion: 852105378
+          [1704888897.027351][71644:71646] CHIP:TOO:   RegisteredClients: 1 entries
+          [1704888897.027394][71644:71646] CHIP:TOO:     [1]: {
+          [1704888897.027412][71644:71646] CHIP:TOO:       CheckInNodeID: 112233
+          [1704888897.027421][71644:71646] CHIP:TOO:       MonitoredSubject: 112233
+          [1704888897.027431][71644:71646] CHIP:TOO:       FabricIndex: 1
+          [1704888897.027440][71644:71646] CHIP:TOO:      }
+          [1704888897.027521][71644:71646] CHIP:EM: <<< [E:49337i S:30873 M:176023643 (Ack:200282364)] (S) Msg TX to 1:0000000000000001 [5BF5] [UDP:[fe80::a70c:61dc:df51:6945%enxd03745ce8f62]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label:
+          "Step 0b: Preconfition 2: Please send the 'unregister client' command
+          using the check-in nodeID received from the previous read"
+      verification: |
+          ./chip-tool icdmanagement unregister-client 112233 1 0
+
+          [1704888949.629057][71657:71659] CHIP:DMG:
+          [1704888949.629066][71657:71659] CHIP:DMG:         InteractionModelRevision = 11
+          [1704888949.629074][71657:71659] CHIP:DMG: },
+          [1704888949.629125][71657:71659] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x0
+          [1704888949.629153][71657:71659] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          "Step 0c: Preconfition 3: Verify that all entries have been
+          successfully unregistered by reading 'register-clients'"
+      verification: |
+          ./chip-tool icdmanagement read registered-clients 1 0
+          [1704889092.945869][71700:71702] CHIP:DMG: }
+          [1704889092.945955][71700:71702] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0003 DataVersion: 852105378
+          [1704889092.945989][71700:71702] CHIP:TOO:   RegisteredClients: 0 entries
+          [1704889092.946079][71700:71702] CHIP:EM: <<< [E:63454i S:39669 M:600516 (Ack:156383188)] (S)
+      disabled: true
+
+    - label:
           "Step 1: TH sends RegisterClient command. - CheckInNodeID: registering
           clients node ID - MonitoredSubject: monitored subject ID - Key: shared
           secret between the client and the ICD"
