@@ -7,8 +7,6 @@
 #include "zephyr_ws2812.h"
 #include <string.h>
 #include <stdarg.h>
-#include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(ws2812_led, CONFIG_CHIP_APP_LOG_LEVEL);
 
 /* Public APIs */
 
@@ -48,7 +46,6 @@ bool ws2812_led_set(struct ws2812_led_data *ws2812_led,
 
 	if (id < ws2812_led->led_len * 3) {
 		if (state == WS2812_LED_ON || state == WS2812_LED_OFF) {
-			LOG_INF("switch %s", state == WS2812_LED_ON ? "on" : "off");
 			switch (id % 3) {
 			case 0:
 				ws2812_led->pix[id / 3].r = (state ? 0xff : 0);
@@ -73,7 +70,6 @@ bool ws2812_led_set(struct ws2812_led_data *ws2812_led,
 			uint32_t permille = va_arg(argptr, uint32_t);
 
 			va_end(argptr);
-			LOG_INF("set %u", permille);
 			if (permille <= PERMILLE_MAX) {
 				switch (id % 3) {
 				case 0:

@@ -175,6 +175,7 @@ bool Ws2812Strip::linkHW()
 
 void Ws2812Strip::setPwmHW(size_t pwm, bool state)
 {
+    LOG_INF("PWM %u turn %s", pwm, state ? "on" : "off");
     if (!ws2812_led_set(&led_strip, pwm, state ? WS2812_LED_ON : WS2812_LED_OFF))
     {
         LOG_WRN("WS2812 LED set pwm %u failed!", pwm);
@@ -183,6 +184,7 @@ void Ws2812Strip::setPwmHW(size_t pwm, bool state)
 
 void Ws2812Strip::setPwmHW(size_t pwm, uint32_t permille)
 {
+    LOG_INF("PWM %u set %u", pwm, permille);
     if (!ws2812_led_set(&led_strip, pwm, WS2812_LED_FIXED, permille))
     {
         LOG_WRN("WS2812 LED set pwm %u to %u permille failed!", pwm, permille);
