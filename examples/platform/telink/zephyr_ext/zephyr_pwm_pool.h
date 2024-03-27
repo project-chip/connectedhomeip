@@ -11,35 +11,36 @@
 extern "C" {
 #endif
 
-#include <zephyr/kernel.h>
 #include <zephyr/drivers/pwm.h>
+#include <zephyr/kernel.h>
 
 /* Zephyr PWM device tree compatibility macro */
 
-#define PWM_DT_SPEC_GET_BY_IDX_COMPAT(node_id, prop, idx)                        \
-	PWM_DT_SPEC_GET_BY_IDX(node_id, idx)
+#define PWM_DT_SPEC_GET_BY_IDX_COMPAT(node_id, prop, idx) PWM_DT_SPEC_GET_BY_IDX(node_id, idx)
 
 /* Defines */
 
 #ifndef PERMILLE_MAX
-#define PERMILLE_MAX                         1000
+#define PERMILLE_MAX 1000
 #endif /* PERMILLE_MAX */
 
 /* Data types */
 
-enum pwm_state {
-	PWM_OFF = 0,
-	PWM_ON,
-	PWM_FIXED,
-	PWM_BLINK,
-	PWM_BREATH
+enum pwm_state
+{
+    PWM_OFF = 0,
+    PWM_ON,
+    PWM_FIXED,
+    PWM_BLINK,
+    PWM_BREATH
 };
 
-struct pwm_pool_data {
-	const struct pwm_dt_spec     *out;
-	const size_t                  out_len;
-	void                         *aux;
-	struct k_work_delayable       work;
+struct pwm_pool_data
+{
+    const struct pwm_dt_spec * out;
+    const size_t out_len;
+    void * aux;
+    struct k_work_delayable work;
 };
 
 /*
@@ -55,26 +56,19 @@ struct pwm_pool_data {
  *     };
  * };
  */
-#define PWM_POOL_DEFINE(name)                                                    \
-	struct pwm_pool_data name = {                                                \
-		.out = (const struct pwm_dt_spec []) {                                   \
-			COND_CODE_1(                                                         \
-			 DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, out)), pwms),      \
-			(DT_FOREACH_PROP_ELEM_SEP(DT_PATH_INTERNAL(DT_CHILD(name, out)),     \
-				pwms, PWM_DT_SPEC_GET_BY_IDX_COMPAT, (,))),                      \
-			())                                                                  \
-		},                                                                       \
-		.out_len = COND_CODE_1(                                                  \
-			 DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, out)), pwms),      \
-			(DT_PROP_LEN(DT_PATH_INTERNAL(DT_CHILD(name, out)), pwms)),          \
-			(0)),                                                                \
-	}
+#define PWM_POOL_DEFINE(name)                                                                                                        \
+    struct pwm_pool_data name = {                                                                                                    \
+        .out     = (const struct pwm_dt_spec[]){ COND_CODE_1(                                                                        \
+            DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, out)), pwms),                                                       \
+            (DT_FOREACH_PROP_ELEM_SEP(DT_PATH_INTERNAL(DT_CHILD(name, out)), pwms, PWM_DT_SPEC_GET_BY_IDX_COMPAT, (, ))), ()) }, \
+        .out_len = COND_CODE_1(DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, out)), pwms),                                        \
+                               (DT_PROP_LEN(DT_PATH_INTERNAL(DT_CHILD(name, out)), pwms)), (0)),                                     \
+    }
 
 /* Public APIs */
 
-bool pwm_pool_init(struct pwm_pool_data *pwm_pool);
-bool pwm_pool_set(struct pwm_pool_data *pwm_pool,
-	size_t pwm, enum pwm_state state, ...);
+bool pwm_pool_init(struct pwm_pool_data * pwm_pool);
+bool pwm_pool_set(struct pwm_pool_data * pwm_pool, size_t pwm, enum pwm_state state, ...);
 
 #ifdef __cplusplus
 }

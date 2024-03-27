@@ -30,7 +30,7 @@ private:
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
-    void LinkButtons(ButtonManager& buttonManager);
+    void LinkButtons(ButtonManager & buttonManager);
 
     static AppTask sAppTask;
 };

@@ -84,11 +84,11 @@ protected:
     void GetEvent(AppEvent * aEvent);
 
     void InitLeds();
-    virtual void LinkLeds(LedManager& ledManager);
+    virtual void LinkLeds(LedManager & ledManager);
     void InitPwms();
-    virtual void LinkPwms(PwmManager& pwmManager);
+    virtual void LinkPwms(PwmManager & pwmManager);
     void InitButtons(void);
-    virtual void LinkButtons(ButtonManager& buttonManager);
+    virtual void LinkButtons(ButtonManager & buttonManager);
 
     static void FactoryResetTimerTimeoutCallback(k_timer * timer);
     static void FactoryResetTimerEventHandler(AppEvent * aEvent);

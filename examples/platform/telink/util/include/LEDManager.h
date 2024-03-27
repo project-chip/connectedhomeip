@@ -23,21 +23,22 @@
 class LedBackend
 {
 public:
-    virtual bool linkHW() = 0;
-    virtual void setLedHW(size_t led, bool state) = 0;
+    virtual bool linkHW()                                        = 0;
+    virtual void setLedHW(size_t led, bool state)                = 0;
     virtual void setLedHW(size_t led, size_t onMs, size_t offMs) = 0;
 };
 
 class LedManager
 {
 public:
-    enum EAppLed {
+    enum EAppLed
+    {
         EAppLed_Status = 0,
         EAppLed_App0,
         EAppLed_App1,
     };
 
-    static LedManager& getInstance();
+    static LedManager & getInstance();
 
     void setLed(EAppLed appLed, bool state);
     void setLed(EAppLed appLed, size_t onMs, size_t offMs);
@@ -45,10 +46,10 @@ public:
     void linkLed(EAppLed appLed, size_t led);
     void unlinkLed(EAppLed appLed);
     void unlinkLed(size_t led);
-    void linkBackend(LedBackend &backend);
+    void linkBackend(LedBackend & backend);
 
-    LedManager(LedManager const&)      = delete;
-    void operator=(LedManager const&)  = delete;
+    LedManager(LedManager const &)     = delete;
+    void operator=(LedManager const &) = delete;
 
 private:
     struct LedLink
@@ -56,7 +57,7 @@ private:
         enum EAppLed appLed;
         size_t led;
 
-        friend bool operator< (const LedLink &lhs, const LedLink &rhs)
+        friend bool operator<(const LedLink & lhs, const LedLink & rhs)
         {
             if (lhs.appLed < rhs.appLed)
             {
@@ -75,7 +76,7 @@ private:
                 return false;
             }
         }
-        friend bool operator> (const LedLink &lhs, const LedLink &rhs)
+        friend bool operator>(const LedLink & lhs, const LedLink & rhs)
         {
             if (lhs.appLed > rhs.appLed)
             {
@@ -98,20 +99,20 @@ private:
 
     LedManager();
 
-    std::set<LedLink>    m_leds;
-    LedBackend          *m_backend;
+    std::set<LedLink> m_leds;
+    LedBackend * m_backend;
 };
 
-class LedPool: public LedBackend
+class LedPool : public LedBackend
 {
 public:
-    static LedPool& getInstance();
+    static LedPool & getInstance();
     bool linkHW();
     void setLedHW(size_t led, bool state);
     void setLedHW(size_t led, size_t onMs, size_t offMs);
 
-    LedPool(LedPool const&)         = delete;
-    void operator=(LedPool const&)  = delete;
+    LedPool(LedPool const &)        = delete;
+    void operator=(LedPool const &) = delete;
 
 private:
     LedPool(){};

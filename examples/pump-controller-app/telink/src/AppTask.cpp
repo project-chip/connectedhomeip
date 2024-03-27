@@ -112,12 +112,12 @@ void AppTask::PostStartActionRequest(int32_t actor, PumpManager::Action_t action
 
 void AppTask::UpdateClusterState() {}
 
-void AppTask::LinkLeds(LedManager& ledManager)
+void AppTask::LinkLeds(LedManager & ledManager)
 {
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     ledManager.linkLed(LedManager::EAppLed_Status, 0);
-    ledManager.linkLed(LedManager::EAppLed_App0,   1);
+    ledManager.linkLed(LedManager::EAppLed_App0, 1);
 #else
-    ledManager.linkLed(LedManager::EAppLed_App0,   0);
+    ledManager.linkLed(LedManager::EAppLed_App0, 0);
 #endif // CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 }

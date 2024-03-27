@@ -17,8 +17,8 @@
  */
 
 #include "AppTask.h"
-#include "LEDManager.h"
 #include "ButtonManager.h"
+#include "LEDManager.h"
 #include <LockManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model/Nullable.h>
@@ -226,20 +226,20 @@ void AppTask::LockStateActionHandler(AppEvent * aEvent)
     DoorLockServer::Instance().SetDoorState(kExampleEndpointId, mDoorState);
 }
 
-void AppTask::LinkButtons(ButtonManager& buttonManager)
+void AppTask::LinkButtons(ButtonManager & buttonManager)
 {
-    buttonManager.addCallback(FactoryResetButtonEventHandler,    0, true);
-    buttonManager.addCallback(ExampleActionButtonEventHandler,   1, true);
-    buttonManager.addCallback(LockJammedEventHandler,            2, true);
-    buttonManager.addCallback(LockStateEventHandler,             3, true);
+    buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
+    buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
+    buttonManager.addCallback(LockJammedEventHandler, 2, true);
+    buttonManager.addCallback(LockStateEventHandler, 3, true);
 }
 
-void AppTask::LinkLeds(LedManager& ledManager)
+void AppTask::LinkLeds(LedManager & ledManager)
 {
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     ledManager.linkLed(LedManager::EAppLed_Status, 0);
-    ledManager.linkLed(LedManager::EAppLed_App0,   1);
+    ledManager.linkLed(LedManager::EAppLed_App0, 1);
 #else
-    ledManager.linkLed(LedManager::EAppLed_App0,   0);
+    ledManager.linkLed(LedManager::EAppLed_App0, 0);
 #endif // CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 }

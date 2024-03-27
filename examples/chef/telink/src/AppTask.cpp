@@ -51,9 +51,9 @@ CHIP_ERROR AppTask::Init(void)
     return CHIP_NO_ERROR;
 }
 
-void AppTask::LinkButtons(ButtonManager& buttonManager)
+void AppTask::LinkButtons(ButtonManager & buttonManager)
 {
-    buttonManager.addCallback(FactoryResetButtonEventHandler,    0, true);
-    buttonManager.addCallback(ExampleActionButtonEventHandler,   1, true);
-    buttonManager.addCallback(StartBleAdvButtonEventHandler,     2, true);
+    buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
+    buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
+    buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
 }

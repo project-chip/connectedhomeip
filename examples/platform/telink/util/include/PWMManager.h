@@ -26,23 +26,24 @@ class PwmBackend
 public:
     virtual bool linkHW() = 0;
 
-    virtual void setPwmHW(size_t pwm, bool state) = 0;
-    virtual void setPwmHW(size_t pwm, uint32_t permille) = 0;
+    virtual void setPwmHW(size_t pwm, bool state)                     = 0;
+    virtual void setPwmHW(size_t pwm, uint32_t permille)              = 0;
     virtual void setPwmHWBlink(size_t pwm, size_t onMs, size_t offMs) = 0;
-    virtual void setPwmHWBreath(size_t pwm, size_t onMs) = 0;
+    virtual void setPwmHWBreath(size_t pwm, size_t onMs)              = 0;
 };
 
 class PwmManager
 {
 public:
-    enum EAppPwm {
+    enum EAppPwm
+    {
         EAppPwm_Indication = 0,
         EAppPwm_Red,
         EAppPwm_Green,
         EAppPwm_Blue,
     };
 
-    static PwmManager& getInstance();
+    static PwmManager & getInstance();
 
     void setPwm(EAppPwm appPwm, bool state);
     void setPwm(EAppPwm appPwm, uint32_t permille);
@@ -52,10 +53,10 @@ public:
     void linkPwm(EAppPwm appPwm, size_t pwm);
     void unlinkPwm(EAppPwm appPwm);
     void unlinkPwm(size_t pwm);
-    void linkBackend(PwmBackend &backend);
+    void linkBackend(PwmBackend & backend);
 
-    PwmManager(PwmManager const&)      = delete;
-    void operator=(PwmManager const&)  = delete;
+    PwmManager(PwmManager const &)     = delete;
+    void operator=(PwmManager const &) = delete;
 
 private:
     struct PwmLink
@@ -63,7 +64,7 @@ private:
         enum EAppPwm appPwm;
         size_t pwm;
 
-        friend bool operator< (const PwmLink &lhs, const PwmLink &rhs)
+        friend bool operator<(const PwmLink & lhs, const PwmLink & rhs)
         {
             if (lhs.appPwm < rhs.appPwm)
             {
@@ -82,7 +83,7 @@ private:
                 return false;
             }
         }
-        friend bool operator> (const PwmLink &lhs, const PwmLink &rhs)
+        friend bool operator>(const PwmLink & lhs, const PwmLink & rhs)
         {
             if (lhs.appPwm > rhs.appPwm)
             {
@@ -105,16 +106,16 @@ private:
 
     PwmManager();
 
-    std::set<PwmLink>    m_pwms;
-    PwmBackend          *m_backend;
+    std::set<PwmLink> m_pwms;
+    PwmBackend * m_backend;
 };
 
 #if CONFIG_WS2812_STRIP
 
-class Ws2812Strip: public PwmBackend
+class Ws2812Strip : public PwmBackend
 {
 public:
-    static Ws2812Strip& getInstance();
+    static Ws2812Strip & getInstance();
     bool linkHW();
 
     void setPwmHW(size_t pwm, bool state);
@@ -122,8 +123,8 @@ public:
     void setPwmHWBlink(size_t pwm, size_t onMs, size_t offMs);
     void setPwmHWBreath(size_t pwm, size_t breathMs);
 
-    Ws2812Strip(Ws2812Strip const&)     = delete;
-    void operator=(Ws2812Strip const&)  = delete;
+    Ws2812Strip(Ws2812Strip const &)    = delete;
+    void operator=(Ws2812Strip const &) = delete;
 
 private:
     Ws2812Strip(){};
@@ -131,10 +132,10 @@ private:
 
 #else
 
-class PwmPool: public PwmBackend
+class PwmPool : public PwmBackend
 {
 public:
-    static PwmPool& getInstance();
+    static PwmPool & getInstance();
     bool linkHW();
 
     void setPwmHW(size_t pwm, bool state);
@@ -142,8 +143,8 @@ public:
     void setPwmHWBlink(size_t pwm, size_t onMs, size_t offMs);
     void setPwmHWBreath(size_t pwm, size_t breathMs);
 
-    PwmPool(PwmPool const&)         = delete;
-    void operator=(PwmPool const&)  = delete;
+    PwmPool(PwmPool const &)        = delete;
+    void operator=(PwmPool const &) = delete;
 
 private:
     PwmPool(){};

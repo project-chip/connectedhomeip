@@ -63,10 +63,8 @@ CHIP_ERROR AppTask::Init(void)
 
     app::DataModel::Nullable<uint8_t> brightness;
     // Read brightness value
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(
-        kExampleEndpointId, brightness);
-    if (status == Protocols::InteractionModel::Status::Success &&
-        !brightness.IsNull())
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(kExampleEndpointId, brightness);
+    if (status == Protocols::InteractionModel::Status::Success && !brightness.IsNull())
     {
         sBrightness = brightness.Value();
     }
@@ -79,8 +77,7 @@ CHIP_ERROR AppTask::Init(void)
     if (status == Protocols::InteractionModel::Status::Success)
     {
         // Set actual state to stored before reboot
-        SetInitiateAction(storedValue ? ON_ACTION : OFF_ACTION,
-            static_cast<int32_t>(AppEvent::kEventType_Lighting), nullptr);
+        SetInitiateAction(storedValue ? ON_ACTION : OFF_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), nullptr);
     }
 
     return CHIP_NO_ERROR;
@@ -89,7 +86,7 @@ CHIP_ERROR AppTask::Init(void)
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
     Fixture_Action action = INVALID_ACTION;
-    int32_t actor              = 0;
+    int32_t actor         = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Lighting)
     {
@@ -107,7 +104,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 void AppTask::UpdateClusterState(void)
 {
     Protocols::InteractionModel::Status status;
-    bool isTurnedOn = sfixture_on;
+    bool isTurnedOn  = sfixture_on;
     uint8_t setLevel = sBrightness;
 
     // write the new on/off value
@@ -133,12 +130,9 @@ void AppTask::SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t 
         if (aAction == ON_ACTION)
         {
             sfixture_on = true;
-            PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red,
-                (((uint32_t)sLedRgb.r * 1000) / UINT8_MAX));
-            PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green,
-                (((uint32_t)sLedRgb.g * 1000) / UINT8_MAX));
-            PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue,
-                (((uint32_t)sLedRgb.b * 1000) / UINT8_MAX));
+            PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (((uint32_t) sLedRgb.r * 1000) / UINT8_MAX));
+            PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (((uint32_t) sLedRgb.g * 1000) / UINT8_MAX));
+            PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (((uint32_t) sLedRgb.b * 1000) / UINT8_MAX));
         }
         else
         {
@@ -159,7 +153,7 @@ void AppTask::SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t 
         }
         else if (sColorAction == COLOR_ACTION_HSV)
         {
-            sHSV.v = sBrightness;
+            sHSV.v  = sBrightness;
             sLedRgb = HsvToRgb(sHSV);
         }
         else
@@ -172,20 +166,20 @@ void AppTask::SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t 
     }
     else if (aAction == COLOR_ACTION_XY)
     {
-        sXY = *reinterpret_cast<XyColor_t *>(value);
+        sXY     = *reinterpret_cast<XyColor_t *>(value);
         sLedRgb = XYToRgb(sBrightness, sXY.x, sXY.y);
-        ChipLogProgress(Zcl, "XY to RGB: X: %u, Y: %u, Level: %u | R: %u, G: %u, B: %u", sXY.x, sXY.y, sBrightness,
-            sLedRgb.r, sLedRgb.g, sLedRgb.b);
+        ChipLogProgress(Zcl, "XY to RGB: X: %u, Y: %u, Level: %u | R: %u, G: %u, B: %u", sXY.x, sXY.y, sBrightness, sLedRgb.r,
+                        sLedRgb.g, sLedRgb.b);
         setRgbAction = true;
         sColorAction = COLOR_ACTION_XY;
     }
     else if (aAction == COLOR_ACTION_HSV)
     {
-        sHSV   = *reinterpret_cast<HsvColor_t *>(value);
-        sHSV.v = sBrightness;
+        sHSV    = *reinterpret_cast<HsvColor_t *>(value);
+        sHSV.v  = sBrightness;
         sLedRgb = HsvToRgb(sHSV);
-        ChipLogProgress(Zcl, "HSV to RGB: H: %u, S: %u, V: %u | R: %u, G: %u, B: %u", sHSV.h, sHSV.s, sHSV.v,
-            sLedRgb.r, sLedRgb.g, sLedRgb.b);
+        ChipLogProgress(Zcl, "HSV to RGB: H: %u, S: %u, V: %u | R: %u, G: %u, B: %u", sHSV.h, sHSV.s, sHSV.v, sLedRgb.r, sLedRgb.g,
+                        sLedRgb.b);
         setRgbAction = true;
         sColorAction = COLOR_ACTION_HSV;
     }
@@ -195,8 +189,7 @@ void AppTask::SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t 
         if (sCT.ctMireds)
         {
             sLedRgb = CTToRgb(sCT);
-            ChipLogProgress(Zcl, "ColorTemp to RGB: CT: %u | R: %u, G: %u, B: %u", sCT.ctMireds,
-                sLedRgb.r, sLedRgb.g, sLedRgb.b);
+            ChipLogProgress(Zcl, "ColorTemp to RGB: CT: %u | R: %u, G: %u, B: %u", sCT.ctMireds, sLedRgb.r, sLedRgb.g, sLedRgb.b);
             setRgbAction = true;
             sColorAction = COLOR_ACTION_CT;
         }
@@ -204,9 +197,9 @@ void AppTask::SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t 
 
     if (setRgbAction)
     {
-        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (((uint32_t)sLedRgb.r * 1000) / UINT8_MAX));
-        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (((uint32_t)sLedRgb.g * 1000) / UINT8_MAX));
-        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (((uint32_t)sLedRgb.b * 1000) / UINT8_MAX));
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (((uint32_t) sLedRgb.r * 1000) / UINT8_MAX));
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (((uint32_t) sLedRgb.g * 1000) / UINT8_MAX));
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (((uint32_t) sLedRgb.b * 1000) / UINT8_MAX));
     }
 }
 
@@ -221,9 +214,9 @@ void AppTask::PowerOnFactoryResetEventHandler(AppEvent * aEvent)
 {
     LOG_INF("Lighting App Power On Factory Reset Handler");
     sPowerOnFactoryResetTimerCnt = 1;
-    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (bool)(sPowerOnFactoryResetTimerCnt % 2));
-    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (bool)(sPowerOnFactoryResetTimerCnt % 2));
-    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (bool)(sPowerOnFactoryResetTimerCnt % 2));
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (bool) (sPowerOnFactoryResetTimerCnt % 2));
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (bool) (sPowerOnFactoryResetTimerCnt % 2));
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (bool) (sPowerOnFactoryResetTimerCnt % 2));
     k_timer_init(&sPowerOnFactoryResetTimer, PowerOnFactoryResetTimerEvent, nullptr);
     k_timer_start(&sPowerOnFactoryResetTimer, K_MSEC(kPowerOnFactoryResetIndicationTimeMs),
                   K_MSEC(kPowerOnFactoryResetIndicationTimeMs));
@@ -233,9 +226,9 @@ void AppTask::PowerOnFactoryResetTimerEvent(struct k_timer * timer)
 {
     sPowerOnFactoryResetTimerCnt++;
     LOG_INF("Lighting App Power On Factory Reset Handler %u", sPowerOnFactoryResetTimerCnt);
-    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (bool)(sPowerOnFactoryResetTimerCnt % 2));
-    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (bool)(sPowerOnFactoryResetTimerCnt % 2));
-    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (bool)(sPowerOnFactoryResetTimerCnt % 2));
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (bool) (sPowerOnFactoryResetTimerCnt % 2));
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (bool) (sPowerOnFactoryResetTimerCnt % 2));
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, (bool) (sPowerOnFactoryResetTimerCnt % 2));
     if (sPowerOnFactoryResetTimerCnt > kPowerOnFactoryResetIndicationMax)
     {
         k_timer_stop(timer);

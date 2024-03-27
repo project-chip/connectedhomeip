@@ -235,9 +235,9 @@ void SensorManager::SetColorTemperatureLight(int8_t temp)
         LOG_ERR("Couldn't set the Color Temperature Light");
     }
 
-    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, ((uint32_t)rgb.r * 1000) / 0xff);
-    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, ((uint32_t)rgb.g * 1000) / 0xff);
-    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, ((uint32_t)rgb.b * 1000) / 0xff);
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, ((uint32_t) rgb.r * 1000) / 0xff);
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, ((uint32_t) rgb.g * 1000) / 0xff);
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, ((uint32_t) rgb.b * 1000) / 0xff);
 }
 #endif // USE_COLOR_TEMPERATURE_LIGHT
 #endif // CONFIG_CHIP_USE_MARS_SENSOR

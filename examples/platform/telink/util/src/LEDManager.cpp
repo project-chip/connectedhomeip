@@ -20,16 +20,14 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(LedManager, CONFIG_CHIP_APP_LOG_LEVEL);
 
-LedManager& LedManager::getInstance()
+LedManager & LedManager::getInstance()
 {
     static LedManager instance;
 
     return instance;
 }
 
-LedManager::LedManager() : m_leds{}, m_backend(NULL)
-{
-}
+LedManager::LedManager() : m_leds{}, m_backend(NULL) {}
 
 void LedManager::setLed(EAppLed appLed, bool state)
 {
@@ -65,17 +63,14 @@ void LedManager::setLed(EAppLed appLed, size_t onMs, size_t offMs)
 
 void LedManager::linkLed(EAppLed appLed, size_t led)
 {
-    LedLink link = {
-        .appLed = appLed,
-        .led = led
-    };
+    LedLink link = { .appLed = appLed, .led = led };
 
     m_leds.insert(link);
 }
 
 void LedManager::unlinkLed(EAppLed appLed)
 {
-    for (auto it = m_leds.begin(); it != m_leds.end(); )
+    for (auto it = m_leds.begin(); it != m_leds.end();)
     {
         if (it->appLed == appLed)
         {
@@ -90,7 +85,7 @@ void LedManager::unlinkLed(EAppLed appLed)
 
 void LedManager::unlinkLed(size_t led)
 {
-    for (auto it = m_leds.begin(); it != m_leds.end(); )
+    for (auto it = m_leds.begin(); it != m_leds.end();)
     {
         if (it->led == led)
         {
@@ -103,11 +98,14 @@ void LedManager::unlinkLed(size_t led)
     }
 }
 
-void LedManager::linkBackend(LedBackend &backend)
+void LedManager::linkBackend(LedBackend & backend)
 {
-    if (backend.linkHW()) {
+    if (backend.linkHW())
+    {
         m_backend = &backend;
-    } else {
+    }
+    else
+    {
         LOG_ERR("LED backend not inited!");
     }
 }
@@ -116,7 +114,7 @@ void LedManager::linkBackend(LedBackend &backend)
 
 static LED_POOL_DEFINE(led_pool);
 
-LedPool& LedPool::getInstance()
+LedPool & LedPool::getInstance()
 {
     static LedPool instance;
 

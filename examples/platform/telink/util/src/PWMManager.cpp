@@ -20,16 +20,14 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(PwmManager, CONFIG_CHIP_APP_LOG_LEVEL);
 
-PwmManager& PwmManager::getInstance()
+PwmManager & PwmManager::getInstance()
 {
     static PwmManager instance;
 
     return instance;
 }
 
-PwmManager::PwmManager() : m_pwms{}, m_backend(NULL)
-{
-}
+PwmManager::PwmManager() : m_pwms{}, m_backend(NULL) {}
 
 void PwmManager::setPwm(EAppPwm appPwm, bool state)
 {
@@ -97,17 +95,14 @@ void PwmManager::setPwmBreath(EAppPwm appPwm, size_t BrathMs)
 
 void PwmManager::linkPwm(EAppPwm appPwm, size_t pwm)
 {
-    PwmLink link = {
-        .appPwm = appPwm,
-        .pwm = pwm
-    };
+    PwmLink link = { .appPwm = appPwm, .pwm = pwm };
 
     m_pwms.insert(link);
 }
 
 void PwmManager::unlinkPwm(EAppPwm appPwm)
 {
-    for (auto it = m_pwms.begin(); it != m_pwms.end(); )
+    for (auto it = m_pwms.begin(); it != m_pwms.end();)
     {
         if (it->appPwm == appPwm)
         {
@@ -122,7 +117,7 @@ void PwmManager::unlinkPwm(EAppPwm appPwm)
 
 void PwmManager::unlinkPwm(size_t pwm)
 {
-    for (auto it = m_pwms.begin(); it != m_pwms.end(); )
+    for (auto it = m_pwms.begin(); it != m_pwms.end();)
     {
         if (it->pwm == pwm)
         {
@@ -135,11 +130,14 @@ void PwmManager::unlinkPwm(size_t pwm)
     }
 }
 
-void PwmManager::linkBackend(PwmBackend &backend)
+void PwmManager::linkBackend(PwmBackend & backend)
 {
-    if (backend.linkHW()) {
+    if (backend.linkHW())
+    {
         m_backend = &backend;
-    } else {
+    }
+    else
+    {
         LOG_ERR("PWM backend not inited!");
     }
 }
@@ -150,7 +148,7 @@ void PwmManager::linkBackend(PwmBackend &backend)
 
 static WS2812_LED_DEFINE(led_strip);
 
-Ws2812Strip& Ws2812Strip::getInstance()
+Ws2812Strip & Ws2812Strip::getInstance()
 {
     static Ws2812Strip instance;
 
@@ -208,7 +206,7 @@ void Ws2812Strip::setPwmHWBreath(size_t pwm, size_t breathMs)
 
 static PWM_POOL_DEFINE(pwm_pool);
 
-PwmPool& PwmPool::getInstance()
+PwmPool & PwmPool::getInstance()
 {
     static PwmPool instance;
 

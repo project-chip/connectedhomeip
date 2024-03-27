@@ -27,8 +27,8 @@
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
-    bool sTurnedOn;
-    uint8_t sLevel;
+bool sTurnedOn;
+uint8_t sLevel;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -403,10 +403,8 @@ CHIP_ERROR AppTask::Init(void)
 
     app::DataModel::Nullable<uint8_t> level;
     // Read brightness value
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(
-        kExampleEndpointId, level);
-    if (status == Protocols::InteractionModel::Status::Success &&
-        !level.IsNull())
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(kExampleEndpointId, level);
+    if (status == Protocols::InteractionModel::Status::Success && !level.IsNull())
     {
         sLevel = level.Value();
     }
@@ -538,7 +536,7 @@ Protocols::InteractionModel::Status HandleReadTempMeasurementAttribute(DeviceTem
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
     Action_t action = INVALID_ACTION;
-    int32_t actor              = 0;
+    int32_t actor   = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Lighting)
     {

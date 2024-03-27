@@ -23,20 +23,20 @@
 class ButtonBackend
 {
 public:
-    virtual bool linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context) = 0;
+    virtual bool linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context) = 0;
 };
 
 class ButtonManager
 {
 public:
-    static ButtonManager& getInstance();
+    static ButtonManager & getInstance();
     void addCallback(void (*callback)(void), size_t button, bool pressed);
     void rmCallback(void (*callback)(void));
     void rmCallback(size_t button, bool pressed);
-    void linkBackend(ButtonBackend &backend);
+    void linkBackend(ButtonBackend & backend);
 
-    ButtonManager(ButtonManager const&)   = delete;
-    void operator=(ButtonManager const&)  = delete;
+    ButtonManager(ButtonManager const &)  = delete;
+    void operator=(ButtonManager const &) = delete;
 
 private:
     struct Event
@@ -45,7 +45,7 @@ private:
         bool pressed;
         void (*callback)(void);
 
-        friend bool operator< (const Event &lhs, const Event &rhs)
+        friend bool operator<(const Event & lhs, const Event & rhs)
         {
             if (lhs.button < rhs.button)
             {
@@ -72,7 +72,7 @@ private:
                 return false;
             }
         }
-        friend bool operator> (const Event &lhs, const Event &rhs)
+        friend bool operator>(const Event & lhs, const Event & rhs)
         {
             if (lhs.button > rhs.button)
             {
@@ -103,21 +103,21 @@ private:
 
     ButtonManager();
 
-    static void onButton(size_t button, bool pressed, void *buttonMgr);
+    static void onButton(size_t button, bool pressed, void * buttonMgr);
 
-    std::set<Event>    m_events;
+    std::set<Event> m_events;
 };
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
 
-class ButtonPool: public ButtonBackend
+class ButtonPool : public ButtonBackend
 {
 public:
-    static ButtonPool& getInstance();
-    bool linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context);
+    static ButtonPool & getInstance();
+    bool linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context);
 
-    ButtonPool(ButtonPool const&)         = delete;
-    void operator=(ButtonPool const&)     = delete;
+    ButtonPool(ButtonPool const &)     = delete;
+    void operator=(ButtonPool const &) = delete;
 
 private:
     ButtonPool(){};
@@ -125,14 +125,14 @@ private:
 
 #else
 
-class ButtonMatrix: public ButtonBackend
+class ButtonMatrix : public ButtonBackend
 {
 public:
-    static ButtonMatrix& getInstance();
-    bool linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context);
+    static ButtonMatrix & getInstance();
+    bool linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context);
 
-    ButtonMatrix(ButtonMatrix const&)     = delete;
-    void operator=(ButtonMatrix const&)   = delete;
+    ButtonMatrix(ButtonMatrix const &)   = delete;
+    void operator=(ButtonMatrix const &) = delete;
 
 private:
     ButtonMatrix(){};

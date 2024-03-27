@@ -20,32 +20,25 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(ButtonManager, CONFIG_CHIP_APP_LOG_LEVEL);
 
-ButtonManager& ButtonManager::getInstance()
+ButtonManager & ButtonManager::getInstance()
 {
     static ButtonManager instance;
 
     return instance;
 }
 
-ButtonManager::ButtonManager() : m_events{}
-{
-}
+ButtonManager::ButtonManager() : m_events{} {}
 
 void ButtonManager::addCallback(void (*callback)(void), size_t button, bool pressed)
 {
-    Event event =
-    {
-        .button = button,
-        .pressed = pressed,
-        .callback = callback
-    };
+    Event event = { .button = button, .pressed = pressed, .callback = callback };
 
     m_events.insert(event);
 }
 
 void ButtonManager::rmCallback(void (*callback)(void))
 {
-    for (auto it = m_events.begin(); it != m_events.end(); )
+    for (auto it = m_events.begin(); it != m_events.end();)
     {
         if (it->callback == callback)
         {
@@ -60,7 +53,7 @@ void ButtonManager::rmCallback(void (*callback)(void))
 
 void ButtonManager::rmCallback(size_t button, bool pressed)
 {
-    for (auto it = m_events.begin(); it != m_events.end(); )
+    for (auto it = m_events.begin(); it != m_events.end();)
     {
         if (it->button == button && it->pressed == pressed)
         {
@@ -73,16 +66,17 @@ void ButtonManager::rmCallback(size_t button, bool pressed)
     }
 }
 
-void ButtonManager::linkBackend(ButtonBackend &backend)
+void ButtonManager::linkBackend(ButtonBackend & backend)
 {
-    if (!backend.linkHW(onButton, this)) {
+    if (!backend.linkHW(onButton, this))
+    {
         LOG_ERR("Button backend not inited!");
     }
 }
 
-void ButtonManager::onButton(size_t button, bool pressed, void *buttonMgr)
+void ButtonManager::onButton(size_t button, bool pressed, void * buttonMgr)
 {
-    ButtonManager *buttonManager = static_cast<ButtonManager *>(buttonMgr);
+    ButtonManager * buttonManager = static_cast<ButtonManager *>(buttonMgr);
 
     for (auto it = buttonManager->m_events.begin(); it != buttonManager->m_events.end(); ++it)
     {
@@ -99,14 +93,14 @@ void ButtonManager::onButton(size_t button, bool pressed, void *buttonMgr)
 
 static KEY_POOL_DEFINE(key_pool);
 
-ButtonPool& ButtonPool::getInstance()
+ButtonPool & ButtonPool::getInstance()
 {
     static ButtonPool instance;
 
     return instance;
 }
 
-bool ButtonPool::linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context)
+bool ButtonPool::linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context)
 {
     bool result = false;
 
@@ -129,14 +123,14 @@ bool ButtonPool::linkHW(void (*on_button_change)(size_t button, bool pressed, vo
 
 static KEY_MATRIX_DEFINE(key_matrix);
 
-ButtonMatrix& ButtonMatrix::getInstance()
+ButtonMatrix & ButtonMatrix::getInstance()
 {
     static ButtonMatrix instance;
 
     return instance;
 }
 
-bool ButtonMatrix::linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context)
+bool ButtonMatrix::linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context)
 {
     bool result = false;
 

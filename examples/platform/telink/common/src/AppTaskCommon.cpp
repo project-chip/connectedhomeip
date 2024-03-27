@@ -20,9 +20,9 @@
 #include "AppTask.h"
 
 #include "BLEManagerImpl.h"
+#include "ButtonManager.h"
 #include "LEDManager.h"
 #include "PWMManager.h"
-#include "ButtonManager.h"
 
 #include "ThreadUtil.h"
 
@@ -95,7 +95,6 @@ Identify sIdentify = {
 };
 
 #endif
-
 
 #if CONFIG_CHIP_FACTORY_DATA
 // NOTE! This key is for test/certification only and should not be available in production devices!
@@ -342,14 +341,14 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
 
 void AppTaskCommon::InitLeds()
 {
-    LedManager& ledManager = LedManager::getInstance();
+    LedManager & ledManager = LedManager::getInstance();
 
     LinkLeds(ledManager);
 
     ledManager.linkBackend(LedPool::getInstance());
 }
 
-void AppTaskCommon::LinkLeds(LedManager& ledManager)
+void AppTaskCommon::LinkLeds(LedManager & ledManager)
 {
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     ledManager.linkLed(LedManager::EAppLed_Status, 0);
@@ -358,7 +357,7 @@ void AppTaskCommon::LinkLeds(LedManager& ledManager)
 
 void AppTaskCommon::InitPwms()
 {
-    PwmManager& pwmManager = PwmManager::getInstance();
+    PwmManager & pwmManager = PwmManager::getInstance();
 
     LinkPwms(pwmManager);
 
@@ -369,23 +368,23 @@ void AppTaskCommon::InitPwms()
 #endif // CONFIG_WS2812_STRIP
 }
 
-void AppTaskCommon::LinkPwms(PwmManager& pwmManager)
+void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
 {
 #if CONFIG_WS2812_STRIP
-    pwmManager.linkPwm(PwmManager::EAppPwm_Red,        0);
-    pwmManager.linkPwm(PwmManager::EAppPwm_Green,      1);
-    pwmManager.linkPwm(PwmManager::EAppPwm_Blue,       2);
+    pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
+    pwmManager.linkPwm(PwmManager::EAppPwm_Green, 1);
+    pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 2);
 #else
     pwmManager.linkPwm(PwmManager::EAppPwm_Indication, 0);
-    pwmManager.linkPwm(PwmManager::EAppPwm_Red,        1);
-    pwmManager.linkPwm(PwmManager::EAppPwm_Green,      2);
-    pwmManager.linkPwm(PwmManager::EAppPwm_Blue,       3);
+    pwmManager.linkPwm(PwmManager::EAppPwm_Red, 1);
+    pwmManager.linkPwm(PwmManager::EAppPwm_Green, 2);
+    pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 3);
 #endif // CONFIG_WS2812_STRIP
 }
 
 void AppTaskCommon::InitButtons(void)
 {
-    ButtonManager& buttonManager = ButtonManager::getInstance();
+    ButtonManager & buttonManager = ButtonManager::getInstance();
 
     LinkButtons(buttonManager);
 
@@ -396,16 +395,15 @@ void AppTaskCommon::InitButtons(void)
 #endif // CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
 }
 
-void AppTaskCommon::LinkButtons(ButtonManager& buttonManager)
+void AppTaskCommon::LinkButtons(ButtonManager & buttonManager)
 {
-    buttonManager.addCallback(FactoryResetButtonEventHandler,    0, true);
-    buttonManager.addCallback(ExampleActionButtonEventHandler,   1, true);
-    buttonManager.addCallback(StartBleAdvButtonEventHandler,     2, true);
+    buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
+    buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
+    buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
 #if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    buttonManager.addCallback(StartThreadButtonEventHandler,     3, true);
+    buttonManager.addCallback(StartThreadButtonEventHandler, 3, true);
 #endif
 }
-
 
 void AppTaskCommon::UpdateStatusLED()
 {
@@ -432,28 +430,24 @@ void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEn
     {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
-        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication,
-            kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
-        PwmManager::getInstance().setPwmBreath(PwmManager::EAppPwm_Indication,
-            kIdentifyBreatheRateMs);
+        PwmManager::getInstance().setPwmBreath(PwmManager::EAppPwm_Indication, kIdentifyBreatheRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
-        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication,
-            kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
-        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication,
-            kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyChannelChangeRateMs,
+                                              kIdentifyChannelChangeRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kFinishEffect");
-        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication,
-            kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication, kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kStopEffect");

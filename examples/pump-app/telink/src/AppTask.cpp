@@ -17,8 +17,8 @@
  */
 
 #include "AppTask.h"
-#include "PumpManager.h"
 #include "LEDManager.h"
+#include "PumpManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
@@ -144,12 +144,12 @@ void AppTask::UpdateClusterState()
             minConstFlow, maxConstFlow, minConstTemp, maxConstTemp);
 }
 
-void AppTask::LinkLeds(LedManager& ledManager)
+void AppTask::LinkLeds(LedManager & ledManager)
 {
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     ledManager.linkLed(LedManager::EAppLed_Status, 0);
-    ledManager.linkLed(LedManager::EAppLed_App0,   1);
+    ledManager.linkLed(LedManager::EAppLed_App0, 1);
 #else
-    ledManager.linkLed(LedManager::EAppLed_App0,   0);
+    ledManager.linkLed(LedManager::EAppLed_App0, 0);
 #endif // CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 }

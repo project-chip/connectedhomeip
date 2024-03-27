@@ -264,11 +264,11 @@ void WindowCovering::SetBrightness(WindowCoveringType aMoveType, uint16_t aPosit
     uint8_t brightness = PositionToBrightness(aPosition, aMoveType);
     if (aMoveType == WindowCoveringType::Lift)
     {
-        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (((uint32_t)brightness * 1000) / UINT8_MAX));
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, (((uint32_t) brightness * 1000) / UINT8_MAX));
     }
     else if (aMoveType == WindowCoveringType::Tilt)
     {
-        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (((uint32_t)brightness * 1000) / UINT8_MAX));
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, (((uint32_t) brightness * 1000) / UINT8_MAX));
     }
 }
 

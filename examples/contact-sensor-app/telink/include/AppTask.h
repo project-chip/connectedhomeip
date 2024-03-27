@@ -39,7 +39,7 @@ private:
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
-    void LinkLeds(LedManager& ledManager);
+    void LinkLeds(LedManager & ledManager);
 
     static void OnStateChanged(ContactSensorManager::State aState);
 

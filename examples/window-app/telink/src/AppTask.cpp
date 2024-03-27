@@ -128,10 +128,10 @@ void AppTask::ToggleMoveType()
     }
 }
 
-void AppTask::LinkButtons(ButtonManager& buttonManager)
+void AppTask::LinkButtons(ButtonManager & buttonManager)
 {
-    buttonManager.addCallback(FactoryResetButtonEventHandler,                0, true);
-    buttonManager.addCallback(ExampleActionButtonEventHandler,               1, true);
+    buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
+    buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
     buttonManager.addCallback(OpenActionAndToggleMoveTypeButtonEventHandler, 2, true);
-    buttonManager.addCallback(CloseActionButtonEventHandler,                 3, true);
+    buttonManager.addCallback(CloseActionButtonEventHandler, 3, true);
 }
