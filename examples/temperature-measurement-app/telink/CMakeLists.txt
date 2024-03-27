@@ -74,6 +74,8 @@ project(chip-telink-temperature-measurement-example)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
+add_compile_definitions(IDENTIFY_CLUSTER_DISABLED=1)
+
 target_compile_options(app PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fpermissive>)
 
 target_include_directories(app PRIVATE

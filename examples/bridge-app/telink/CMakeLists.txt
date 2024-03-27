@@ -72,7 +72,6 @@ target_include_directories(app PRIVATE
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/ZclCallbacks.cpp
                src/Device.cpp
                src/DeviceCallbacks.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp

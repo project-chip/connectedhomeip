@@ -79,6 +79,7 @@ bool sHaveBLEConnections    = false;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
+#ifndef IDENTIFY_CLUSTER_DISABLED
 
 void OnIdentifyTriggerEffect(Identify * identify)
 {
@@ -92,6 +93,8 @@ Identify sIdentify = {
     Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
+
+#endif
 
 
 #if CONFIG_CHIP_FACTORY_DATA

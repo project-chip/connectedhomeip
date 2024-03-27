@@ -19,14 +19,20 @@
 #pragma once
 
 #include "AppTaskCommon.h"
-#include "PWMDevice.h"
 
 class AppTask : public AppTaskCommon
 {
 public:
+    enum Action_t : uint8_t
+    {
+        ON_ACTION = 0,
+        OFF_ACTION,
+        LEVEL_ACTION,
+        INVALID_ACTION
+    };
+
     void UpdateClusterState(void);
     static void InitServer(intptr_t context);
-    PWMDevice & GetPWMDevice(void) { return mPwmRgbBlueLed; }
 
 private:
     friend AppTask & GetAppTask(void);
@@ -34,12 +40,7 @@ private:
 
     CHIP_ERROR Init(void);
 
-    static void ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor);
-
     static void LightingActionEventHandler(AppEvent * aEvent);
-
-    PWMDevice mPwmRgbBlueLed;
 
     static AppTask sAppTask;
 };

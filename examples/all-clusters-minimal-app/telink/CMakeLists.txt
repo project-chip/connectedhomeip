@@ -80,6 +80,7 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDManager.cpp
+               ${TELINK_COMMON}/util/src/PWMManager.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
