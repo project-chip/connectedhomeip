@@ -240,8 +240,8 @@ python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLz
 Please note that `--dac_key` now points to a binary file that contains the
 encrypted blob.
 
-The user can use the DAC private in plain text instead of using the `SSS`
-by adding the following gn argument `chip_use_plain_dac_key=true`.
+The user can use the DAC private in plain text instead of using the `SSS` by
+adding the following gn argument `chip_use_plain_dac_key=true`.
 
 ### 6.2 RW61X
 
