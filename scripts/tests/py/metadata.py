@@ -50,12 +50,7 @@ class Metadata_Reader:
     def __build_env_object__(self, env_file_name):
         
         with open(env_file_name) as stream:
-            try:
-                env = yaml.safe_load(stream)
-            except yaml.YAMLError as yaml_exception:
-                raise yaml_exception
-
-        return env
+            return yaml.safe_load(stream)
 
     # resolves the run arguments associated with the environment  
     def __resolve_env_vals__(self, metadata_dict):
