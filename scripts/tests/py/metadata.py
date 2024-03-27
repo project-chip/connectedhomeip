@@ -63,7 +63,7 @@ class Metadata_Reader:
                 metadata_dict[run_arg]=run_arg_val
                 continue
             
-            if run_arg_val == None:
+            if run_arg_val is None:
                 continue
 
             sub_args = run_arg_val.split('/')
@@ -77,7 +77,7 @@ class Metadata_Reader:
             # if a argument has been specified in the comment header
             # but can't be found in the env file, consider it to be
             # boolean value.
-            if run_arg_val == None:
+            if run_arg_val is None:
                 run_arg_val = True
 
             if not self.__is_run_arg_valid__(run_arg_val):
