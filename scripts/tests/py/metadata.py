@@ -80,15 +80,7 @@ class Metadata_Reader:
             if run_arg_val is None:
                 run_arg_val = True
 
-            if not self.__is_run_arg_valid__(run_arg_val):
-                raise Exception(str(run_arg_val)+" is not a valid value for "+str(run_arg))
-
             metadata_dict[run_arg] = run_arg_val
-
-
-    # determines if the defined run arguments are valid
-    def __is_run_arg_valid__(self, run_arg_val):
-        return True
 
 
     # reads the test script file and parses out the run arguments defined in the file
