@@ -86,6 +86,9 @@ public:
     NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
     void OnSessionReleased() override;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void OnSessionConnectionClosed(CHIP_ERROR conErr) override;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     /**
      *  Send a CHIP message on this exchange.
      *

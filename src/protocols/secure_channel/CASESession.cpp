@@ -419,6 +419,20 @@ void CASESession::Clear()
     mPeerNodeId   = kUndefinedNodeId;
     mFabricsTable = nullptr;
     mFabricIndex  = kUndefinedFabricIndex;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Clear the context object.
+    mTCPConnCbCtxt.appContext     = nullptr;
+    mTCPConnCbCtxt.connCompleteCb = nullptr;
+    mTCPConnCbCtxt.connClosedCb   = nullptr;
+    mTCPConnCbCtxt.connReceivedCb = nullptr;
+
+    if (mPeerConnState && mPeerConnState->mConnectionState != Transport::TCPState::kConnected)
+    {
+        // Abort the connection if the CASESession is being destroyed and the
+        // connection is in the middle of being set up.
+        mSessionManager->TCPDisconnect(mPeerConnState, true /* shouldAbort = true */);
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
 
 void CASESession::InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex)
@@ -446,7 +460,9 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
-    mDelegate = delegate;
+    mDelegate       = delegate;
+    mSessionManager = &sessionManager;
+
     ReturnErrorOnFailure(AllocateSecureSession(sessionManager, sessionEvictionHint));
 
     mValidContext.Reset();
@@ -454,6 +470,12 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
     mValidContext.mValidityPolicy = policy;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mTCPConnCbCtxt.appContext     = this;
+    mTCPConnCbCtxt.connCompleteCb = HandleConnectionAttemptComplete;
+    mTCPConnCbCtxt.connClosedCb   = HandleConnectionClosed;
+    mTCPConnCbCtxt.connReceivedCb = HandleConnectionReceived;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     return CHIP_NO_ERROR;
 }
 
@@ -497,6 +519,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
 {
     MATTER_TRACE_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
+    Transport::PeerAddress peerAddress;
 
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -516,6 +539,11 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     // This is to make sure the exchange will get closed if Init() returned an error.
     mExchangeCtxt.Emplace(*exchangeCtxt);
 
+    // Set the PeerAddress in the secure session up front to indicate the
+    // Transport Type of the session that is being set up.
+    peerAddress = mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
+    mSecureSessionHolder->AsSecureSession()->SetPeerAddress(peerAddress);
+
     // From here onwards, let's go to exit on error, as some state might have already
     // been initialized
     SuccessOrExit(err);
@@ -534,8 +562,18 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     ChipLogProgress(SecureChannel, "Initiating session on local FabricIndex %u from 0x" ChipLogFormatX64 " -> 0x" ChipLogFormatX64,
                     static_cast<unsigned>(mFabricIndex), ChipLogValueX64(mLocalNodeId), ChipLogValueX64(mPeerNodeId));
 
-    err = SendSigma1();
-    SuccessOrExit(err);
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp)
+    {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        err = sessionManager.TCPConnect(peerAddress, &mTCPConnCbCtxt, &mPeerConnState);
+        SuccessOrExit(err);
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+    }
+    else
+    {
+        err = SendSigma1();
+        SuccessOrExit(err);
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -646,6 +684,74 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 
     return CHIP_NO_ERROR;
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+void CASESession::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR err)
+{
+    char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
+    VerifyOrReturn(conn != nullptr);
+    // conn->mAppState should not be NULL. SessionManager has already checked
+    // before calling this callback.
+    VerifyOrDie(conn->mAppState != nullptr);
+
+    Transport::PeerAddress peerAddr = conn->mPeerAddr;
+    peerAddr.ToString(peerAddrBuf);
+
+    CASESession * caseSession = reinterpret_cast<CASESession *>(conn->mAppState->appContext);
+    VerifyOrReturn(caseSession != nullptr);
+
+    // Exit and disconnect if connection setup encountered an error.
+    SuccessOrExit(err);
+
+    ChipLogDetail(SecureChannel, "TCP Connection established with %s before session establishment", peerAddrBuf);
+
+    // Associate the connection with the current unauthenticated session for the
+    // CASE exchange.
+    caseSession->mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetTCPConnection(conn);
+
+    // Associate the connection with the current secure session that is being
+    // set up.
+    caseSession->mSecureSessionHolder.Get().Value()->AsSecureSession()->SetTCPConnection(conn);
+
+    // Send Sigma1 after connection is established for sessions over TCP
+    err = caseSession->SendSigma1();
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SecureChannel, "Connection establishment failed: %s", ErrorStr(err));
+
+        // Close the underlying connection
+        caseSession->mSessionManager->TCPDisconnect(conn);
+
+        caseSession->Clear();
+    }
+}
+
+void CASESession::HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+{
+    VerifyOrReturn(conn != nullptr);
+    // conn->mAppState should not be NULL. SessionManager has already checked
+    // before calling this callback.
+    VerifyOrDie(conn->mAppState != nullptr);
+
+    CASESession * caseSession = reinterpret_cast<CASESession *>(conn->mAppState->appContext);
+    VerifyOrReturn(caseSession != nullptr);
+
+    ChipLogDetail(SecureChannel, "TCP Connection for this session has closed");
+}
+
+void CASESession::HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn)
+{
+    VerifyOrReturn(conn != nullptr);
+
+    CASESession * caseSession = reinterpret_cast<CASESession *>(conn->mAppState->appContext);
+    VerifyOrReturn(caseSession != nullptr);
+
+    ChipLogDetail(SecureChannel, "Incoming TCP Connection received");
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 CHIP_ERROR CASESession::SendSigma1()
 {
@@ -2139,9 +2245,11 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_CONFIG_SLOW_CRYPTO
-    if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||
-        msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2Resume ||
-        msgType == Protocols::SecureChannel::MsgType::CASE_Sigma3)
+    if ((msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1 || msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2 ||
+         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma2Resume ||
+         msgType == Protocols::SecureChannel::MsgType::CASE_Sigma3) &&
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress().GetTransportType() !=
+            Transport::Type::kTcp)
     {
         SuccessOrExit(err = mExchangeCtxt.Value()->FlushAcks());
     }

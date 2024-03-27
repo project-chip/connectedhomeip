@@ -515,7 +515,8 @@ public:
     }
 
 private:
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * ctxt = nullptr) override;
 
     CommissionerDeclarationHandler * mCommissionerDeclarationHandler = nullptr;
 };
@@ -625,7 +626,8 @@ private:
     InstanceNameResolver * mInstanceNameResolver         = nullptr;
     UserConfirmationProvider * mUserConfirmationProvider = nullptr;
 
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * ctxt = nullptr) override;
 
     UDCClients<kMaxUDCClients> mUdcClients; // < Active UDC clients
 

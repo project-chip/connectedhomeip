@@ -57,7 +57,8 @@ public:
     MockTransportMgrDelegate(nlTestSuite * inSuite) : mSuite(inSuite) {}
     ~MockTransportMgrDelegate() override {}
 
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * transCtxt = nullptr) override
     {
         PacketHeader packetHeader;
 

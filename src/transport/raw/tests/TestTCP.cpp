@@ -23,6 +23,7 @@
 
 #include "NetworkTestHelpers.h"
 
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMem.h>
@@ -32,7 +33,9 @@
 #include <lib/support/UnitTestUtils.h>
 #include <system/SystemLayer.h>
 #include <transport/TransportMgr.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #include <nlunit-test.h>
 
@@ -62,6 +65,9 @@ namespace {
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr uint16_t kPacketSizeBytes           = static_cast<uint16_t>(sizeof(uint16_t));
+uint16_t gChipTCPPort;
+chip::Transport::AppTCPConnectionCallbackCtxt gAppTCPConnCbCtxt;
+chip::Transport::ActiveTCPConnectionState * gActiveTCPConnState = nullptr;
 
 using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 
@@ -88,7 +94,8 @@ public:
         mCallback     = callback;
         mCallbackData = callback_data;
     }
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * transCtxt = nullptr) override
     {
         PacketHeader packetHeader;
 
@@ -101,12 +108,54 @@ public:
             NL_TEST_ASSERT(mSuite, err == 0);
         }
 
+        ChipLogProgress(Inet, "Message Receive Handler called");
+
         mReceiveHandlerCallCount++;
+    }
+
+    void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override
+    {
+        chip::Transport::AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
+        VerifyOrReturn(conn != nullptr);
+
+        mHandleConnectionCompleteCalled = true;
+        appConnCbCtxt = conn->mAppState;
+        VerifyOrReturn(appConnCbCtxt != nullptr);
+
+        if (appConnCbCtxt->connCompleteCb != nullptr)
+        {
+            appConnCbCtxt->connCompleteCb(conn, conErr);
+        }
+        else
+        {
+            ChipLogProgress(Inet, "Connection established. App callback missing.");
+        }
+    }
+
+    void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override
+    {
+        chip::Transport::AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
+        VerifyOrReturn(conn != nullptr);
+
+        mHandleConnectionCloseCalled = true;
+        appConnCbCtxt = conn->mAppState;
+        VerifyOrReturn(appConnCbCtxt != nullptr);
+
+        if (appConnCbCtxt->connClosedCb != nullptr)
+        {
+            appConnCbCtxt->connClosedCb(conn, conErr);
+        }
+        else
+        {
+            ChipLogProgress(Inet, "Connection Closed. App callback missing.");
+        }
     }
 
     void InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
-        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager())
+                                      .SetAddressType(addr.Type())
+                                      .SetListenPort(gChipTCPPort));
 
         // retry a few times in case the port is somehow in use.
         // this is a WORKAROUND for flaky testing if we run tests very fast after each other.
@@ -125,7 +174,9 @@ public:
         {
             ChipLogProgress(NotSpecified, "RETRYING tcp initialization");
             chip::test_utils::SleepMillis(100);
-            err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+            err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager())
+                               .SetAddressType(addr.Type())
+                               .SetListenPort(gChipTCPPort));
         }
 
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
@@ -133,7 +184,14 @@ public:
         mTransportMgrBase.SetSessionManager(this);
         mTransportMgrBase.Init(&tcp);
 
-        mReceiveHandlerCallCount = 0;
+        mReceiveHandlerCallCount        = 0;
+        mHandleConnectionCompleteCalled = false;
+        mHandleConnectionCloseCalled    = false;
+
+        gAppTCPConnCbCtxt.appContext     = nullptr;
+        gAppTCPConnCbCtxt.connReceivedCb = nullptr;
+        gAppTCPConnCbCtxt.connCompleteCb = nullptr;
+        gAppTCPConnCbCtxt.connClosedCb   = nullptr;
     }
 
     void SingleMessageTest(TCPImpl & tcp, const IPAddress & addr)
@@ -151,7 +209,7 @@ public:
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         // Should be able to send a message to itself by just calling send.
-        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
+        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr, gChipTCPPort), std::move(buffer));
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
@@ -160,14 +218,70 @@ public:
         SetCallback(nullptr);
     }
 
-    void FinalizeMessageTest(TCPImpl & tcp, const IPAddress & addr)
+    void ConnectTest(TCPImpl & tcp, const IPAddress & addr)
+    {
+        // Connect and wait for seeing active connection
+        tcp.TCPConnect(Transport::PeerAddress::TCP(addr, gChipTCPPort), &gAppTCPConnCbCtxt, &gActiveTCPConnState);
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return tcp.HasActiveConnections(); });
+        NL_TEST_ASSERT(mSuite, tcp.HasActiveConnections() == true);
+    }
+
+    void HandleConnectCompleteCbCalledTest(TCPImpl & tcp, const IPAddress & addr)
+    {
+        // Connect and wait for seeing active connection and connection complete
+        // handler being called.
+        tcp.TCPConnect(Transport::PeerAddress::TCP(addr, gChipTCPPort), &gAppTCPConnCbCtxt, &gActiveTCPConnState);
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
+        NL_TEST_ASSERT(mSuite, mHandleConnectionCompleteCalled == true);
+    }
+
+    void HandleConnectCloseCbCalledTest(TCPImpl & tcp, const IPAddress & addr)
+    {
+        // Connect and wait for seeing active connection and connection complete
+        // handler being called.
+        tcp.TCPConnect(Transport::PeerAddress::TCP(addr, gChipTCPPort), &gAppTCPConnCbCtxt, &gActiveTCPConnState);
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
+        NL_TEST_ASSERT(mSuite, mHandleConnectionCompleteCalled == true);
+        tcp.TCPDisconnect(Transport::PeerAddress::TCP(addr, gChipTCPPort));
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
+        NL_TEST_ASSERT(mSuite, mHandleConnectionCloseCalled == true);
+    }
+
+    void DisconnectTest(TCPImpl & tcp, const IPAddress & addr)
     {
         // Disconnect and wait for seeing peer close
-        tcp.Disconnect(Transport::PeerAddress::TCP(addr));
+        tcp.TCPDisconnect(Transport::PeerAddress::TCP(addr, gChipTCPPort));
         mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
+        NL_TEST_ASSERT(mSuite, tcp.HasActiveConnections() == false);
+    }
+
+    CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
+                          Transport::ActiveTCPConnectionState ** peerConnState)
+    {
+        return mTransportMgrBase.TCPConnect(peerAddress, appState, peerConnState);
+    }
+
+    using OnTCPConnectionReceivedCallback = void (*)(void * context, chip::Transport::ActiveTCPConnectionState * conn);
+
+    using OnTCPConnectionCompleteCallback = void (*)(void * context, chip::Transport::ActiveTCPConnectionState * conn,
+                                                  CHIP_ERROR conErr);
+
+    using OnTCPConnectionClosedCallback = void (*)(void * context, chip::Transport::ActiveTCPConnectionState * conn,
+                                                CHIP_ERROR conErr);
+
+    void SetConnectionCallbacks(OnTCPConnectionCompleteCallback connCompleteCb, OnTCPConnectionClosedCallback connClosedCb,
+                                OnTCPConnectionReceivedCallback connReceivedCb)
+    {
+        mConnCompleteCb = connCompleteCb;
+        mConnClosedCb   = connClosedCb;
+        mConnReceivedCb = connReceivedCb;
     }
 
     int mReceiveHandlerCallCount = 0;
+
+    bool mHandleConnectionCompleteCalled = false;
+
+    bool mHandleConnectionCloseCalled = false;
 
 private:
     nlTestSuite * mSuite;
@@ -175,6 +289,9 @@ private:
     MessageReceivedCallback mCallback;
     void * mCallbackData;
     TransportMgrBase mTransportMgrBase;
+    OnTCPConnectionCompleteCallback mConnCompleteCb = nullptr;
+    OnTCPConnectionClosedCallback mConnClosedCb     = nullptr;
+    OnTCPConnectionReceivedCallback mConnReceivedCb = nullptr;
 };
 
 /////////////////////////// Init test
@@ -185,7 +302,8 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     TCPImpl tcp;
 
-    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(ctx.GetTCPEndPointManager()).SetAddressType(type));
+    CHIP_ERROR err =
+        tcp.Init(Transport::TcpListenParameters(ctx.GetTCPEndPointManager()).SetAddressType(type).SetListenPort(gChipTCPPort));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -212,7 +330,52 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite, ctx);
     gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
-    gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
+    gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+}
+
+void ConnectToSelfTest(nlTestSuite * inSuite, void * inContext, const IPAddress & addr)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TCPImpl tcp;
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite, ctx);
+    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+    gMockTransportMgrDelegate.ConnectTest(tcp, addr);
+    gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+}
+
+void ConnectSendMessageThenCloseTest(nlTestSuite * inSuite, void * inContext, const IPAddress & addr)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TCPImpl tcp;
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite, ctx);
+    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+    gMockTransportMgrDelegate.ConnectTest(tcp, addr);
+    gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
+    gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+}
+
+void HandleConnCompleteTest(nlTestSuite * inSuite, void * inContext, const IPAddress & addr)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TCPImpl tcp;
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite, ctx);
+    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+    gMockTransportMgrDelegate.HandleConnectCompleteCbCalledTest(tcp, addr);
+    gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
+}
+
+void HandleConnCloseTest(nlTestSuite * inSuite, void * inContext, const IPAddress & addr)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TCPImpl tcp;
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite, ctx);
+    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
+    gMockTransportMgrDelegate.HandleConnectCloseCbCalledTest(tcp, addr);
+    gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
 }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -229,6 +392,57 @@ void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
     IPAddress addr;
     IPAddress::FromString("::1", addr);
     CheckMessageTest(inSuite, inContext, addr);
+}
+
+#if INET_CONFIG_ENABLE_IPV4
+void ConnectToSelfTest4(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    ConnectToSelfTest(inSuite, inContext, addr);
+}
+
+void ConnectSendMessageThenCloseTest4(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    ConnectSendMessageThenCloseTest(inSuite, inContext, addr);
+}
+
+void HandleConnCompleteCalledTest4(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    HandleConnCompleteTest(inSuite, inContext, addr);
+}
+#endif // INET_CONFIG_ENABLE_IPV4
+
+void ConnectToSelfTest6(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    ConnectToSelfTest(inSuite, inContext, addr);
+}
+
+void ConnectSendMessageThenCloseTest6(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    ConnectSendMessageThenCloseTest(inSuite, inContext, addr);
+}
+
+void HandleConnCompleteCalledTest6(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    HandleConnCompleteTest(inSuite, inContext, addr);
+}
+
+void HandleConnCloseCalledTest6(nlTestSuite * inSuite, void * inContext)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    HandleConnCloseTest(inSuite, inContext, addr);
 }
 
 // Generates a packet buffer or a chain of packet buffers for a single message.
@@ -397,8 +611,8 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     // (The current TCPEndPoint implementation is not effectively mockable.)
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
 
-    Transport::PeerAddress lPeerAddress    = Transport::PeerAddress::TCP(addr);
-    TCPBase::ActiveConnectionState * state = tcp.FindActiveConnection(lPeerAddress);
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, gChipTCPPort);
+    ActiveTCPConnectionState * state    = tcp.FindActiveConnection(lPeerAddress);
     NL_TEST_ASSERT(inSuite, state != nullptr);
     Inet::TCPEndPoint * lEndPoint = state->mEndPoint;
     NL_TEST_ASSERT(inSuite, lEndPoint != nullptr);
@@ -449,7 +663,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 0);
 
-    gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
+    gMockTransportMgrDelegate.DisconnectTest(tcp, addr);
 }
 
 // Test Suite
@@ -460,12 +674,19 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
 static const nlTest sTests[] =
 {
 #if INET_CONFIG_ENABLE_IPV4
-    NL_TEST_DEF("Simple Init Test IPV4",        CheckSimpleInitTest4),
-    NL_TEST_DEF("Message Self Test IPV4",       CheckMessageTest4),
+    NL_TEST_DEF("Simple Init Test IPV4",                       CheckSimpleInitTest4),
+    NL_TEST_DEF("Message Self Test IPV4",                      CheckMessageTest4),
+    NL_TEST_DEF("Connect To Self IPV4",                        ConnectToSelfTest4),
+    NL_TEST_DEF("Connect, Send Message Then Close IPV4",       ConnectSendMessageThenCloseTest4),
+    NL_TEST_DEF("HandleConnectionAttemptComplete called IPV4", HandleConnCompleteCalledTest4),
 #endif
 
-    NL_TEST_DEF("Simple Init Test IPV6",        CheckSimpleInitTest6),
-    NL_TEST_DEF("Message Self Test IPV6",       CheckMessageTest6),
+    NL_TEST_DEF("Simple Init Test IPV6",                       CheckSimpleInitTest6),
+    NL_TEST_DEF("Message Self Test IPV6",                      CheckMessageTest6),
+    NL_TEST_DEF("Connect To Self IPV6",                        ConnectToSelfTest6),
+    NL_TEST_DEF("Connect, Send Message Then Close IPV6",       ConnectSendMessageThenCloseTest6),
+    NL_TEST_DEF("HandleConnectionAttemptComplete called IPV6", HandleConnCompleteCalledTest6),
+    NL_TEST_DEF("HandleConnectionClose called IPV6",           HandleConnCloseCalledTest6),
     NL_TEST_DEF("ProcessReceivedBuffer Test",   chip::Transport::TCPTest::CheckProcessReceivedBuffer),
 
     NL_TEST_SENTINEL()
@@ -487,6 +708,7 @@ static nlTestSuite sSuite =
  */
 static int Initialize(void * aContext)
 {
+    gChipTCPPort   = static_cast<uint16_t>(CHIP_PORT + chip::Crypto::GetRandU16() % 100);
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
