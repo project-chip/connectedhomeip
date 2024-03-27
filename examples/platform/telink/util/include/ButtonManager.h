@@ -17,53 +17,74 @@
 
 #pragma once
 
+#include <cstddef>
 #include <vector>
-#include <zephyr/device.h>
 
-#define STATE_HIGH 1
-#define STATE_LOW 0
-
-class Button
+class ButtonBackend
 {
 public:
-    void Configure(const gpio_dt_spec * input_button_dt, const gpio_dt_spec * output_button_dt, void (*callback)(void));
-    void Configure(const gpio_dt_spec * input_button_dt, void (*callback)(void));
-    void Poll(Button * previous);
-    void PollIRQ(const struct device * dev, uint32_t pins);
-    void SetCallback(void (*callback)(void));
-
-private:
-    int Init(void);
-    int Deinit(void);
-
-    const struct gpio_dt_spec * mInput_button;
-    const struct gpio_dt_spec * mOutput_matrix_pin;
-    int mPreviousState = STATE_LOW;
-    struct gpio_callback mButton_cb_data;
-    void (*mCallback)(void) = NULL;
+    virtual void linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context) = 0;
 };
 
 class ButtonManager
 {
 public:
-    void Init(void);
-    void Poll(void);
-    void PollIRQ(const struct device * dev, uint32_t pins);
-    void AddButton(Button & button);
-    void SetCallback(unsigned int index, void (*callback)(void));
+    static ButtonManager& getInstance();
+    void addCallback(void (*callback)(void), size_t button, bool pressed);
+    void rmCallback(void (*callback)(void));
+    void rmCallback(size_t button, bool pressed);
+    void linkBackend(ButtonBackend &backend);
+
+    ButtonManager(ButtonManager const&)   = delete;
+    void operator=(ButtonManager const&)  = delete;
 
 private:
-    std::vector<Button> mButtons;
+    struct Event
+    {
+        size_t button;
+        bool pressed;
+        void (*callback)(void);
+    };
 
-    friend ButtonManager & ButtonManagerInst(void);
+    ButtonManager();
 
-    static ButtonManager sInstance;
+    static void onButton(size_t button, bool pressed, void *buttonMgr);
+
+    std::vector<Event>    m_events;
 };
 
-/**
- * Returns the KeyManager singleton object.
- */
-inline ButtonManager & ButtonManagerInst(void)
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+
+#include <zephyr_key_pool.h>
+
+class ButtonPool: public ButtonBackend
 {
-    return ButtonManager::sInstance;
-}
+public:
+    static ButtonPool& getInstance();
+    void linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context);
+
+    ButtonPool(ButtonPool const&)         = delete;
+    void operator=(ButtonPool const&)     = delete;
+
+private:
+    ButtonPool(){};
+};
+
+#else
+
+#include <zephyr_key_matrix.h>
+
+class ButtonMatrix: public ButtonBackend
+{
+public:
+    static ButtonMatrix& getInstance();
+    void linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context);
+
+    ButtonMatrix(ButtonMatrix const&)     = delete;
+    void operator=(ButtonMatrix const&)   = delete;
+
+private:
+    ButtonMatrix(){};
+};
+
+#endif // CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE

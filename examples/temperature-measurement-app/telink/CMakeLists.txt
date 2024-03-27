@@ -74,7 +74,7 @@ project(chip-telink-temperature-measurement-example)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
-target_compile_options(app PRIVATE -fpermissive)
+target_compile_options(app PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fpermissive>)
 
 target_include_directories(app PRIVATE
                            include
@@ -83,7 +83,7 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include
-                           )
+                           ${TELINK_COMMON}/zephyr_ext)
 
 target_sources(app PRIVATE
                src/AppTask.cpp
@@ -94,7 +94,9 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
                ${TELINK_COMMON}/util/src/PWMDevice.cpp
-               ${TELINK_COMMON}/util/src/WS2812Device.cpp)
+               ${TELINK_COMMON}/util/src/WS2812Device.cpp
+               ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c)
 
 chip_configure_data_model(app
     INCLUDE_SERVER

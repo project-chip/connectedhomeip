@@ -50,24 +50,6 @@ constexpr int kFactoryResetCalcTimeout = 3000;
 constexpr int kFactoryResetTriggerCntr = 3;
 constexpr int kAppEventQueueSize       = 10;
 
-#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-const struct gpio_dt_spec sFactoryResetButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_1), gpios);
-#if APP_USE_BLE_START_BUTTON
-const struct gpio_dt_spec sBleStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_2), gpios);
-#endif
-#if APP_USE_THREAD_START_BUTTON
-const struct gpio_dt_spec sThreadStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_3), gpios);
-#endif
-#if APP_USE_EXAMPLE_START_BUTTON
-const struct gpio_dt_spec sExampleActionButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_4), gpios);
-#endif
-#else
-const struct gpio_dt_spec sButtonCol1Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col1), gpios);
-const struct gpio_dt_spec sButtonCol2Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col2), gpios);
-const struct gpio_dt_spec sButtonRow1Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row1), gpios);
-const struct gpio_dt_spec sButtonRow2Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row2), gpios);
-#endif
-
 #ifdef APP_USE_IDENTIFY_PWM
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
 constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
@@ -88,17 +70,6 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 LEDWidget sStatusLED;
-#endif
-
-Button sFactoryResetButton;
-#if APP_USE_BLE_START_BUTTON
-Button sBleAdvStartButton;
-#endif
-#if APP_USE_EXAMPLE_START_BUTTON
-Button sExampleActionButton;
-#endif
-#if APP_USE_THREAD_START_BUTTON
-Button sThreadStartButton;
 #endif
 
 k_timer sFactoryResetTimer;
@@ -369,72 +340,42 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
 
     switch (btnId)
     {
-#if APP_USE_EXAMPLE_START_BUTTON
     case kButtonId_ExampleAction:
         ExampleActionButtonEventHandler();
         break;
-#endif
     case kButtonId_FactoryReset:
         FactoryResetButtonEventHandler();
         break;
-#if APP_USE_THREAD_START_BUTTON
     case kButtonId_StartThread:
         StartThreadButtonEventHandler();
         break;
-#endif
-#if APP_USE_BLE_START_BUTTON
     case kButtonId_StartBleAdv:
         StartBleAdvButtonEventHandler();
         break;
-#endif
     }
 }
 #endif
 
 void AppTaskCommon::InitButtons(void)
 {
-#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-    sFactoryResetButton.Configure(&sFactoryResetButtonDt, FactoryResetButtonEventHandler);
-#if APP_USE_BLE_START_BUTTON
-    sBleAdvStartButton.Configure(&sBleStartButtonDt, StartBleAdvButtonEventHandler);
-#endif
-#if APP_USE_EXAMPLE_START_BUTTON
-    if (ExampleActionEventHandler)
-    {
-        sExampleActionButton.Configure(&sExampleActionButtonDt, ExampleActionButtonEventHandler);
-    }
-#endif
-#if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(&sThreadStartButtonDt, StartThreadButtonEventHandler);
-#endif
-#else
-    sFactoryResetButton.Configure(&sButtonRow1Dt, &sButtonCol1Dt, FactoryResetButtonEventHandler);
-#if APP_USE_BLE_START_BUTTON
-    sBleAdvStartButton.Configure(&sButtonRow2Dt, &sButtonCol2Dt, StartBleAdvButtonEventHandler);
-#endif
-#if APP_USE_EXAMPLE_START_BUTTON
-    if (ExampleActionEventHandler)
-    {
-        sExampleActionButton.Configure(&sButtonRow1Dt, &sButtonCol2Dt, ExampleActionButtonEventHandler);
-    }
-#endif
-#if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(&sButtonRow2Dt, &sButtonCol1Dt, StartThreadButtonEventHandler);
-#endif
-#endif
+    ButtonManager& buttonManager = ButtonManager::getInstance();
 
-    ButtonManagerInst().AddButton(sFactoryResetButton);
-#if APP_USE_BLE_START_BUTTON
-    ButtonManagerInst().AddButton(sBleAdvStartButton);
-#endif
-#if APP_USE_THREAD_START_BUTTON
-    ButtonManagerInst().AddButton(sThreadStartButton);
-#endif
-#if APP_USE_EXAMPLE_START_BUTTON
-    if (ExampleActionEventHandler)
-    {
-        ButtonManagerInst().AddButton(sExampleActionButton);
-    }
+    LinkButtons(buttonManager);
+
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+    buttonManager.linkBackend(ButtonPool::getInstance());
+#else
+    buttonManager.linkBackend(ButtonMatrix::getInstance());
+#endif // CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+}
+
+void AppTaskCommon::LinkButtons(ButtonManager& buttonManager)
+{
+    buttonManager.addCallback(FactoryResetButtonEventHandler,    0, true);
+    buttonManager.addCallback(ExampleActionButtonEventHandler,   1, true);
+    buttonManager.addCallback(StartBleAdvButtonEventHandler,     2, true);
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    buttonManager.addCallback(StartThreadButtonEventHandler,     3, true);
 #endif
 }
 
@@ -541,7 +482,6 @@ void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEn
 }
 #endif
 
-#if APP_USE_BLE_START_BUTTON
 void AppTaskCommon::StartBleAdvButtonEventHandler(void)
 {
     AppEvent event;
@@ -574,7 +514,6 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
         LOG_ERR("OpenBasicCommissioningWindow fail");
     }
 }
-#endif
 
 void AppTaskCommon::FactoryResetButtonEventHandler(void)
 {
@@ -629,7 +568,7 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-#if APP_USE_THREAD_START_BUTTON || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
     AppEvent event;
@@ -662,7 +601,6 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
 }
 #endif
 
-#if APP_USE_EXAMPLE_START_BUTTON
 void AppTaskCommon::ExampleActionButtonEventHandler(void)
 {
     AppEvent event;
@@ -682,7 +620,6 @@ void AppTaskCommon::SetExampleButtonCallbacks(EventHandler aAction_CB)
 {
     ExampleActionEventHandler = aAction_CB;
 }
-#endif
 
 void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {

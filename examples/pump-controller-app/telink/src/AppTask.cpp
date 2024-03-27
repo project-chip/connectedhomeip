@@ -34,9 +34,7 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(StartActionEventHandler);
-#endif
     InitCommonParts();
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED

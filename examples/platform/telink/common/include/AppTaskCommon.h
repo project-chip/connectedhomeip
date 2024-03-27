@@ -64,6 +64,8 @@ inline constexpr uint8_t kButtonPushEvent      = 1;
 inline constexpr uint8_t kButtonReleaseEvent   = 0;
 } // namespace
 
+class ButtonManager;
+
 class AppTaskCommon
 {
 public:
@@ -80,12 +82,8 @@ public:
     {
         kButtonId_ExampleAction = 1,
         kButtonId_FactoryReset,
-#if APP_USE_THREAD_START_BUTTON
         kButtonId_StartThread,
-#endif
-#if APP_USE_BLE_START_BUTTON
         kButtonId_StartBleAdv
-#endif
     } ButtonId;
 #endif
 
@@ -96,28 +94,25 @@ protected:
     void GetEvent(AppEvent * aEvent);
 
     void InitButtons(void);
+    void LinkButtons(ButtonManager& buttonManager);
 
     static void FactoryResetTimerTimeoutCallback(k_timer * timer);
     static void FactoryResetTimerEventHandler(AppEvent * aEvent);
     static void FactoryResetButtonEventHandler(void);
     static void FactoryResetHandler(AppEvent * aEvent);
 
-#if APP_USE_BLE_START_BUTTON
     static void StartBleAdvButtonEventHandler(void);
     static void StartBleAdvHandler(AppEvent * aEvent);
-#endif
 
-#if APP_USE_THREAD_START_BUTTON || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     static void StartThreadButtonEventHandler(void);
     static void StartThreadHandler(AppEvent * aEvent);
 #endif
 
-#if APP_USE_EXAMPLE_START_BUTTON
     static void ExampleActionButtonEventHandler(void);
 
     void SetExampleButtonCallbacks(EventHandler aAction_CB);
     EventHandler ExampleActionEventHandler;
-#endif
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 

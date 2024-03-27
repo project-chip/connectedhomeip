@@ -4,23 +4,12 @@
 		zephyr,shell-uart = &cdc_acm_uart0;
 	};
 
-	keys {
-		/delete-node/ button_1;
-		/delete-node/ button_2;
-		/delete-node/ button_3;
-		/delete-node/ button_4;
+	key_pool {
+		compatible = "gpio-keys";
 
-		key_1: button_1 {
-			gpios = <&gpiob 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_2: button_2 {
-			gpios = <&gpioc 3 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_3: button_3 {
-			gpios = <&gpioc 4 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_4: button_4 {
-			gpios = <&gpiob 3 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		inp {
+			gpios = <&gpiob 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>,
+					<&gpiob 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 		};
 	};
 

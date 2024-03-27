@@ -39,15 +39,12 @@
 		};
 	};
 
-	keys {
-		/delete-node/ button_1;
-		/delete-node/ button_4;
+	key_pool {
 		compatible = "gpio-keys";
-		key_1: button_1 {
-			gpios = <&gpiod 1 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_4: button_4 {
-			gpios = <&gpiod 3 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+
+		inp {
+			gpios = <&gpiod 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>,
+					<&gpiod 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 		};
 	};
 

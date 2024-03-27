@@ -411,9 +411,7 @@ CHIP_ERROR AppTask::Init(void)
 
     sAppTask.mPwmRgbBlueLed.SetCallbacks(ActionInitiated, ActionCompleted, nullptr);
 
-#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(LightingActionEventHandler);
-#endif
     InitCommonParts();
 
     memset(gDevices, 0, sizeof(gDevices));

@@ -102,9 +102,7 @@ CHIP_ERROR AppTask::Init(void)
     sAppTask.mPwmRgbBlueLed.SetCallbacks(ActionInitiated, ActionCompleted, nullptr);
 #endif // CONFIG_WS2812_STRIP
 
-#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(LightingActionEventHandler);
-#endif
     InitCommonParts();
 
     return CHIP_NO_ERROR;

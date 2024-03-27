@@ -47,9 +47,7 @@ Button sLockStatusChangedAction;
 
 CHIP_ERROR AppTask::Init(void)
 {
-#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(LockActionEventHandler);
-#endif
     sLockJammedAction.Configure(&sLockJammedInputDt, LockJammedEventHandler);
     sLockStatusChangedAction.Configure(&sLockStatusInputDt, LockStateEventHandler);
     ButtonManagerInst().AddButton(sLockJammedAction);
