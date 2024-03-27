@@ -21,10 +21,6 @@
 #include "AppConfig.h"
 #include "AppEventCommon.h"
 
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-#include "LEDWidget.h"
-#endif
-
 #ifdef APP_USE_IDENTIFY_PWM
 #include "PWMDevice.h"
 #endif
@@ -64,6 +60,7 @@ inline constexpr uint8_t kButtonPushEvent      = 1;
 inline constexpr uint8_t kButtonReleaseEvent   = 0;
 } // namespace
 
+class LedManager;
 class ButtonManager;
 
 class AppTaskCommon
@@ -93,6 +90,8 @@ protected:
     void DispatchEvent(AppEvent * event);
     void GetEvent(AppEvent * aEvent);
 
+    void InitLeds();
+    virtual void LinkLeds(LedManager& ledManager);
     void InitButtons(void);
     virtual void LinkButtons(ButtonManager& buttonManager);
 
@@ -122,12 +121,7 @@ protected:
     static void ActionIdentifyStateUpdateHandler(k_timer * timer);
     static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 #endif
-
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
-    static void LEDStateUpdateHandler(LEDWidget * ledWidget);
     static void UpdateStatusLED(void);
-#endif
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;

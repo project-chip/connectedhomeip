@@ -18,6 +18,7 @@
 
 #include "AppTask.h"
 #include "PumpManager.h"
+#include "LEDManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
@@ -26,10 +27,6 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 namespace {
 constexpr EndpointId kPccClusterEndpoint   = 1;
 constexpr EndpointId kOnOffClusterEndpoint = 1;
-
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-LEDWidget sPumpStateLED;
-#endif
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -39,10 +36,7 @@ CHIP_ERROR AppTask::Init(void)
     SetExampleButtonCallbacks(StartActionEventHandler);
     InitCommonParts();
 
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    sPumpStateLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios));
-    sPumpStateLED.Set(!PumpMgr().IsStopped());
-#endif
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, !PumpMgr().IsStopped());
 
     PumpMgr().Init();
     PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
@@ -63,9 +57,7 @@ void AppTask::ActionInitiated(PumpManager::Action_t action, int32_t actor)
         LOG_INF("Pump Stop Action has been initiated");
     }
 
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    sPumpStateLED.Blink(50, 50);
-#endif
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, 50, 50);
 }
 
 void AppTask::ActionCompleted(PumpManager::Action_t action, int32_t actor)
@@ -76,16 +68,12 @@ void AppTask::ActionCompleted(PumpManager::Action_t action, int32_t actor)
     if (action == PumpManager::START_ACTION)
     {
         LOG_INF("Pump Start Action has been completed");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sPumpStateLED.Set(true);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, true);
     }
     else if (action == PumpManager::STOP_ACTION)
     {
         LOG_INF("Pump Stop Action has been completed");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sPumpStateLED.Set(false);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, false);
     }
 
     if (actor == static_cast<uint8_t>(AppEvent::kEventType_Button))
@@ -154,4 +142,14 @@ void AppTask::UpdateClusterState()
             "minConstFlow = %d,\t maxConstFlow = %d\n minConstTemp = %d,\t maxConstTemp = %d",
             maxPressure, maxSpeed, maxFlow, minConstPress, maxConstPress, minCompPress, maxCompPress, minConstSpeed, maxConstSpeed,
             minConstFlow, maxConstFlow, minConstTemp, maxConstTemp);
+}
+
+void AppTask::LinkLeds(LedManager& ledManager)
+{
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    ledManager.linkLed(LedManager::EAppLed_Status, 0);
+    ledManager.linkLed(LedManager::EAppLed_App0,   1);
+#else
+    ledManager.linkLed(LedManager::EAppLed_App0,   0);
+#endif // CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 }

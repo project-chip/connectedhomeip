@@ -13,6 +13,15 @@
 		};
 	};
 
+	led_pool {
+		compatible = "gpio-leds";
+
+		out {
+			gpios = <&gpiob 1 GPIO_ACTIVE_HIGH>,
+					<&gpioe 3 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
 	pwm_leds {
 		/delete-node/ pwm_led_0;
 		/delete-node/ pwm_led_1;

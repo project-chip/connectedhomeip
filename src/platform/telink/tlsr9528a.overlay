@@ -51,6 +51,14 @@
 		};
 	};
 
+	led_pool {
+		compatible = "gpio-leds";
+
+		out {
+			gpios = <&gpioe 6 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
 };
 
 &pinctrl {

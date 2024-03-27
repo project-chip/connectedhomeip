@@ -50,6 +50,16 @@
 					<&gpioc 1 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
 		};
 	};
+
+	led_pool{
+		compatible = "gpio-leds";
+
+		out {
+			gpios = <&gpiob 6 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+
 };
 
 &pinctrl {

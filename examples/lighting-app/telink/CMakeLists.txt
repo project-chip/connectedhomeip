@@ -107,14 +107,15 @@ target_sources(app PRIVATE
                src/ZclCallbacks.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
-               ${TELINK_COMMON}/util/src/LEDWidget.cpp
+               ${TELINK_COMMON}/util/src/LEDManager.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
                ${TELINK_COMMON}/util/src/PWMDevice.cpp
                ${TELINK_COMMON}/util/src/WS2812Device.cpp
                ${TELINK_COMMON}/util/src/ColorFormat.cpp
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
-               ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c)
+               ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c)
 
 chip_configure_data_model(app
     INCLUDE_SERVER

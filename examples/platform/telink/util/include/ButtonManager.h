@@ -18,12 +18,12 @@
 #pragma once
 
 #include <cstddef>
-#include <vector>
+#include <set>
 
 class ButtonBackend
 {
 public:
-    virtual void linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context) = 0;
+    virtual bool linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context) = 0;
 };
 
 class ButtonManager
@@ -44,24 +44,77 @@ private:
         size_t button;
         bool pressed;
         void (*callback)(void);
+
+        friend bool operator< (const Event &lhs, const Event &rhs)
+        {
+            if (lhs.button < rhs.button)
+            {
+                return true;
+            }
+            else if (lhs.button > rhs.button)
+            {
+                return false;
+            }
+            else if (lhs.pressed < rhs.pressed)
+            {
+                return true;
+            }
+            else if (lhs.pressed > rhs.pressed)
+            {
+                return false;
+            }
+            else if (lhs.callback < rhs.callback)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        friend bool operator> (const Event &lhs, const Event &rhs)
+        {
+            if (lhs.button > rhs.button)
+            {
+                return true;
+            }
+            else if (lhs.button < rhs.button)
+            {
+                return false;
+            }
+            else if (lhs.pressed > rhs.pressed)
+            {
+                return true;
+            }
+            else if (lhs.pressed < rhs.pressed)
+            {
+                return false;
+            }
+            else if (lhs.callback > rhs.callback)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     };
 
     ButtonManager();
 
     static void onButton(size_t button, bool pressed, void *buttonMgr);
 
-    std::vector<Event>    m_events;
+    std::set<Event>    m_events;
 };
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-
-#include <zephyr_key_pool.h>
 
 class ButtonPool: public ButtonBackend
 {
 public:
     static ButtonPool& getInstance();
-    void linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context);
+    bool linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context);
 
     ButtonPool(ButtonPool const&)         = delete;
     void operator=(ButtonPool const&)     = delete;
@@ -72,13 +125,11 @@ private:
 
 #else
 
-#include <zephyr_key_matrix.h>
-
 class ButtonMatrix: public ButtonBackend
 {
 public:
     static ButtonMatrix& getInstance();
-    void linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context);
+    bool linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context);
 
     ButtonMatrix(ButtonMatrix const&)     = delete;
     void operator=(ButtonMatrix const&)   = delete;

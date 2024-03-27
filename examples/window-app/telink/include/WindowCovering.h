@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "LEDWidget.h"
+#include "LEDManager.h"
 #include "PWMDevice.h"
 
 #include <app/clusters/window-covering-server/window-covering-delegate.h>

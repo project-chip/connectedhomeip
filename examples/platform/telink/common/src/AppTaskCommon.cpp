@@ -20,6 +20,7 @@
 #include "AppTask.h"
 
 #include "BLEManagerImpl.h"
+#include "LEDManager.h"
 #include "ButtonManager.h"
 
 #include "ThreadUtil.h"
@@ -67,10 +68,6 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 #endif
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
-
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-LEDWidget sStatusLED;
-#endif
 
 k_timer sFactoryResetTimer;
 uint8_t sFactoryResetCntr = 0;
@@ -241,13 +238,8 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     CHIP_ERROR err;
     LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
-    // Initialize status LED
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
-    sStatusLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(system_state_led), gpios, {}));
-
+    InitLeds();
     UpdateStatusLED();
-#endif
 
     InitButtons();
 
@@ -356,6 +348,22 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
 }
 #endif
 
+void AppTaskCommon::InitLeds()
+{
+    LedManager& ledManager = LedManager::getInstance();
+
+    LinkLeds(ledManager);
+
+    ledManager.linkBackend(LedPool::getInstance());
+}
+
+void AppTaskCommon::LinkLeds(LedManager& ledManager)
+{
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    ledManager.linkLed(LedManager::EAppLed_Status, 0);
+#endif // CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+}
+
 void AppTaskCommon::InitButtons(void)
 {
     ButtonManager& buttonManager = ButtonManager::getInstance();
@@ -379,23 +387,6 @@ void AppTaskCommon::LinkButtons(ButtonManager& buttonManager)
 #endif
 }
 
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-void AppTaskCommon::UpdateLedStateEventHandler(AppEvent * aEvent)
-{
-    if (aEvent->Type == AppEvent::kEventType_UpdateLedState)
-    {
-        aEvent->UpdateLedStateEvent.LedWidget->UpdateState();
-    }
-}
-
-void AppTaskCommon::LEDStateUpdateHandler(LEDWidget * ledWidget)
-{
-    AppEvent event;
-    event.Type                          = AppEvent::kEventType_UpdateLedState;
-    event.Handler                       = UpdateLedStateEventHandler;
-    event.UpdateLedStateEvent.LedWidget = ledWidget;
-    GetAppTask().PostEvent(&event);
-}
 
 void AppTaskCommon::UpdateStatusLED()
 {
@@ -403,19 +394,18 @@ void AppTaskCommon::UpdateStatusLED()
     {
         if (sIsThreadAttached)
         {
-            sStatusLED.Blink(950, 50);
+            LedManager::getInstance().setLed(LedManager::EAppLed_Status, 950, 50);
         }
         else
         {
-            sStatusLED.Blink(100, 100);
+            LedManager::getInstance().setLed(LedManager::EAppLed_Status, 100, 100);
         }
     }
     else
     {
-        sStatusLED.Blink(50, 950);
+        LedManager::getInstance().setLed(LedManager::EAppLed_Status, 50, 950);
     }
 }
-#endif
 
 #ifdef APP_USE_IDENTIFY_PWM
 void AppTaskCommon::ActionIdentifyStateUpdateHandler(k_timer * timer)
@@ -627,9 +617,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
-#endif
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
@@ -652,9 +640,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
         sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
-#endif
         break;
     case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR

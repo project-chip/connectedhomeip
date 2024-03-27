@@ -103,6 +103,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/stubs.cpp
     ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
+    ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)

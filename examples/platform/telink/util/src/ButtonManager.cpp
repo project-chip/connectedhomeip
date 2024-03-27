@@ -40,12 +40,12 @@ void ButtonManager::addCallback(void (*callback)(void), size_t button, bool pres
         .callback = callback
     };
 
-    m_events.push_back(event);
+    m_events.insert(event);
 }
 
 void ButtonManager::rmCallback(void (*callback)(void))
 {
-    for (std::vector<Event>::iterator it = m_events.begin(); it != m_events.end(); )
+    for (auto it = m_events.begin(); it != m_events.end(); )
     {
         if (it->callback == callback)
         {
@@ -60,7 +60,7 @@ void ButtonManager::rmCallback(void (*callback)(void))
 
 void ButtonManager::rmCallback(size_t button, bool pressed)
 {
-    for (std::vector<Event>::iterator it = m_events.begin(); it != m_events.end(); )
+    for (auto it = m_events.begin(); it != m_events.end(); )
     {
         if (it->button == button && it->pressed == pressed)
         {
@@ -75,15 +75,16 @@ void ButtonManager::rmCallback(size_t button, bool pressed)
 
 void ButtonManager::linkBackend(ButtonBackend &backend)
 {
-    backend.linkHW(onButton, this);
+    if (!backend.linkHW(onButton, this)) {
+        LOG_ERR("Button backend not inited!");
+    }
 }
 
 void ButtonManager::onButton(size_t button, bool pressed, void *buttonMgr)
 {
     ButtonManager *buttonManager = static_cast<ButtonManager *>(buttonMgr);
 
-    for (std::vector<Event>::iterator it = buttonManager->m_events.begin();
-        it != buttonManager->m_events.end(); ++it)
+    for (auto it = buttonManager->m_events.begin(); it != buttonManager->m_events.end(); ++it)
     {
         if (it->button == button && it->pressed == pressed && it->callback)
         {
@@ -94,6 +95,8 @@ void ButtonManager::onButton(size_t button, bool pressed, void *buttonMgr)
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
 
+#include <zephyr_key_pool.h>
+
 static KEY_POOL_DEFINE(key_pool);
 
 ButtonPool& ButtonPool::getInstance()
@@ -103,20 +106,26 @@ ButtonPool& ButtonPool::getInstance()
     return instance;
 }
 
-void ButtonPool::linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context)
+bool ButtonPool::linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context)
 {
+    bool result = false;
+
     if (key_pool_init(&key_pool))
     {
         key_pool_set_callback(&key_pool, on_button_change, context);
         LOG_INF("Key pool inited");
+        result = true;
     }
     else
     {
         LOG_ERR("Key pool not inited!");
     }
+    return result;
 }
 
 #else
+
+#include <zephyr_key_matrix.h>
 
 static KEY_MATRIX_DEFINE(key_matrix);
 
@@ -127,17 +136,21 @@ ButtonMatrix& ButtonMatrix::getInstance()
     return instance;
 }
 
-void ButtonMatrix::linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context)
+bool ButtonMatrix::linkHW(void (*on_button_change)(size_t button, bool pressed, void *context), void *context)
 {
+    bool result = false;
+
     if (key_matrix_init(&key_matrix))
     {
         key_matrix_set_callback(&key_matrix, on_button_change, context);
         LOG_INF("Key matrix inited");
+        result = true;
     }
     else
     {
         LOG_ERR("Key matrix not inited!");
     }
+    return result;
 }
 
 #endif // CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
