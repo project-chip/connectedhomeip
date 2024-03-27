@@ -116,4 +116,3 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         }
     }
 }
-
