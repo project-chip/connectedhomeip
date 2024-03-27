@@ -746,7 +746,7 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, 
 CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
 {
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-    
+
     switch (type)
     {
         case DiscoveryType::kCommissionableNode:

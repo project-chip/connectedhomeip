@@ -396,7 +396,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         if (resolver->GetCurrentType() != IncrementalResolver::ServiceNameType::kInvalid)
         {
             MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
-            
+
 
             // TODO: Ideally commissioning delegates should be aware of the
             //       node types they receive, however they are currently not
@@ -448,7 +448,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             ResolvedNodeData nodeResolvedData;
 
             nodeResolvedData.resolutionData = nodeData.resolutionData;
-            MakeInstanceName(nodeData.nodeData.instanceName, Operational::kInstanceNameMaxLength + 1, 
+            MakeInstanceName(nodeData.nodeData.instanceName, Operational::kInstanceNameMaxLength + 1,
                                                     nodeResolvedData.operationalData.peerId);
 
             mActiveResolves.Complete(nodeResolvedData.operationalData.peerId);

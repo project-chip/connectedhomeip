@@ -315,9 +315,9 @@ struct DiscoveredNodeData
 
     void LogDetail() const
     {
-        ChipLogDetail(Discovery, "Discovered %s node:", (nodeType == DiscoveryType::kCommissionerNode) ? "Commissioner" 
-                                                : (nodeType == DiscoveryType::kCommissionableNode) ? "Commissionable" 
-                                                : (nodeType == DiscoveryType::kOperational) ? "Operational" 
+        ChipLogDetail(Discovery, "Discovered %s node:", (nodeType == DiscoveryType::kCommissionerNode) ? "Commissioner"
+                                                : (nodeType == DiscoveryType::kCommissionableNode) ? "Commissionable"
+                                                : (nodeType == DiscoveryType::kOperational) ? "Operational"
                                                 : "Unknown");
         resolutionData.LogDetail();
         nodeData.LogDetail();
