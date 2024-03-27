@@ -64,6 +64,9 @@ jobs:
             - name: Build
               working-directory: src/darwin/Framework
               run: xcodebuild -target "Matter" ${{ matrix.options.arguments }}
+            # Now restore zap-cli, so that bootstrap caching does not cache the state when it's been renamed.
+            - name: Make zap-cli work again
+              run: scripts/run_in_build_env.sh 'D=$(dirname $(which zap-cli.moved)) && mv $D/zap-cli.moved $D/zap-cli'
 
     tests:
         name: Run framework tests
