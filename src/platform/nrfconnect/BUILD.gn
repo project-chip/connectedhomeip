@@ -77,7 +77,7 @@ static_library("nrfconnect") {
     ]
   }
 
-  if (chip_enable_openthread || chip_enable_wifi){
+  if (chip_enable_openthread || chip_enable_wifi) {
     sources += [
       "../Zephyr/InetUtils.cpp",
       "../Zephyr/InetUtils.h",
