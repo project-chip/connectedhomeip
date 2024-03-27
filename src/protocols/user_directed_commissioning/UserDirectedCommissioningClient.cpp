@@ -24,6 +24,7 @@
  */
 
 #include "UserDirectedCommissioning.h"
+#include <transport/raw/Base.h>
 
 #ifdef __ZEPHYR__
 #include <zephyr/kernel.h>
@@ -235,7 +236,8 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
     return CHIP_NO_ERROR;
 }
 
-void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg)
+void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg,
+                                                        Transport::MessageTransportContext * ctxt)
 {
     char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
     source.ToString(addrBuffer);

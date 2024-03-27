@@ -89,6 +89,16 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Initialize the CHIP TCP layer.
+    err = TCPEndPointManager()->Init(SystemLayer());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "TCP initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    SuccessOrExit(err);
+#endif
+
     // TODO Perform dynamic configuration of the core CHIP objects based on stored settings.
 
     // Initialize the CHIP BLE manager.
@@ -131,6 +141,10 @@ void GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
     UDPEndPointManager()->Shutdown();
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    TCPEndPointManager()->Shutdown();
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     ChipLogError(DeviceLayer, "BLE shutdown");

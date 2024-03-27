@@ -286,6 +286,18 @@ private:
 
     void InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricIndex);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    static void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    static void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    static void HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn);
+
+    // Context to pass down when connecting to peer
+    Transport::AppTCPConnectionCallbackCtxt mTCPConnCbCtxt;
+    // Pointer to the underlying TCP connection state. Returned by the
+    // TCPConnect() method when an ActiveTCPConenctionState object is allocated.
+    Transport::ActiveTCPConnectionState * mPeerConnState = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetStopSigmaHandshakeAt(Optional<State> state) { mStopHandshakeAtState = state; }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -301,6 +313,7 @@ private:
     uint8_t mIPK[kIPKSize];
 
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
+    SessionManager * mSessionManager                     = nullptr;
 
     FabricTable * mFabricsTable = nullptr;
     FabricIndex mFabricIndex    = kUndefinedFabricIndex;

@@ -77,6 +77,12 @@ namespace chip {
 
 inline constexpr size_t kMaxBlePendingPackets = 1;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+inline constexpr size_t kMaxTcpActiveConnectionCount = CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS;
+
+inline constexpr size_t kMaxTcpPendingPackets = CHIP_CONFIG_MAX_TCP_PENDING_PACKETS;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 //
 // NOTE: Please do not alter the order of template specialization here as the logic
 //       in the Server impl depends on this.
@@ -89,6 +95,10 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if CONFIG_NETWORK_LAYER_BLE
                                               ,
                                               chip::Transport::BLE<kMaxBlePendingPackets>
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                              ,
+                                              chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
 #endif
                                               >;
 
