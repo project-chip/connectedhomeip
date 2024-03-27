@@ -1062,7 +1062,7 @@ static NSString * const sDataVersionKey = @"dataVersion";
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(kSecondsToWaitBeforeMarkingUnreachableAfterSettingUpSubscription) * static_cast<int64_t>(NSEC_PER_SEC)), self.queue, ^{
         MTRDevice * strongSelf = weakSelf.strongObject;
         if (strongSelf != nil) {
-            std::lock_guard(strongSelf->_lock);
+            std::lock_guard lock(strongSelf->_lock);
             [strongSelf _markDeviceAsUnreachableIfNeverSubscribed];
         }
     });
