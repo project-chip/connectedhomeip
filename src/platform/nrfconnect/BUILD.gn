@@ -28,8 +28,6 @@ static_library("nrfconnect") {
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
-    "../Zephyr/InetUtils.cpp",
-    "../Zephyr/InetUtils.h",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
     "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",
@@ -76,6 +74,13 @@ static_library("nrfconnect") {
     sources += [
       "DeviceInstanceInfoProviderImpl.cpp",
       "DeviceInstanceInfoProviderImpl.h",
+    ]
+  }
+
+  if (chip_enable_openthread || chip_enable_wifi){
+    sources += [
+      "../Zephyr/InetUtils.cpp",
+      "../Zephyr/InetUtils.h",
     ]
   }
 

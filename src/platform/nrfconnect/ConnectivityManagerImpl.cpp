@@ -98,6 +98,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     ReturnErrorOnFailure(InitWiFi());
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_WIFI
     UDPEndPointImplSockets::SetMulticastGroupHandler([](InterfaceId interfaceId, const IPAddress & address, bool join) {
         if (interfaceId.IsPresent())
         {
@@ -115,6 +116,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
         return CHIP_NO_ERROR;
     });
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     return CHIP_NO_ERROR;
 }
