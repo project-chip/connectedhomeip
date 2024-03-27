@@ -127,7 +127,7 @@ choice NET_TC_THREAD_TYPE
 	default NET_TC_THREAD_PREEMPTIVE
 endchoice
 
-config NET_TCP_WORK_QUEUE_THREAD_PRIO
+config NET_TCP_WORKER_PRIO
 	default -16
 
 config NET_TC_TX_THREAD_BASE_PRIO
@@ -406,6 +406,3 @@ config FLASH_SHELL
 endif # SHELL
 
 endif
-
-config NXP_FW_LOADER_MONOLITHIC
-	default y if NXP_FW_LOADER
