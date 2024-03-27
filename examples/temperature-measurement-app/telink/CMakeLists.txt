@@ -93,11 +93,12 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/util/src/LEDManager.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               ${TELINK_COMMON}/util/src/PWMDevice.cpp
+               ${TELINK_COMMON}/util/src/PWMManager.cpp
                ${TELINK_COMMON}/util/src/WS2812Device.cpp
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
-               ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c)
+               ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
+               ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c)
 
 chip_configure_data_model(app
     INCLUDE_SERVER

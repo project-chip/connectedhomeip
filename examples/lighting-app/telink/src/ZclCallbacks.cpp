@@ -18,7 +18,9 @@
 
 #include "AppTask.h"
 #include "ColorFormat.h"
-#include "PWMDevice.h"
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -30,7 +32,6 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OnOff;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
@@ -43,15 +44,15 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
         ChipLogDetail(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
-        GetAppTask().SetInitiateAction(*value ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
+        GetAppTask().SetInitiateAction(*value ? AppTask::ON_ACTION : AppTask::OFF_ACTION,
                                        static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        if (GetAppTask().GetLightingDevice().IsTurnedOn())
+        if (GetAppTask().IsTurnedOn())
         {
             ChipLogDetail(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
-            GetAppTask().SetInitiateAction(PWMDevice::LEVEL_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
+            GetAppTask().SetInitiateAction(AppTask::LEVEL_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
         }
         else
         {
@@ -81,7 +82,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             }
 
             ChipLogDetail(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_XY, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_XY, static_cast<int32_t>(AppEvent::kEventType_Lighting),
                                            (uint8_t *) &xy);
         }
         /* HSV color space */
@@ -103,14 +104,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                 hsv.s = *value;
             }
             ChipLogDetail(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_HSV, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_HSV, static_cast<int32_t>(AppEvent::kEventType_Lighting),
                                            (uint8_t *) &hsv);
         }
         /* Temperature Mireds color space */
         else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
         {
             ChipLogDetail(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
+            GetAppTask().SetInitiateAction(AppTask::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
         }
         else
         {
@@ -128,18 +129,18 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  * @param endpoint   Ver.: always
  *
  */
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-    Protocols::InteractionModel::Status status;
-    bool storedValue;
+// void emberAfOnOffClusterInitCallback(EndpointId endpoint)
+// {
+//     Protocols::InteractionModel::Status status;
+//     bool storedValue;
 
-    // Read storedValue on/off value
-    status = Attributes::OnOff::Get(1, &storedValue);
-    if (status == Protocols::InteractionModel::Status::Success)
-    {
-        // Set actual state to stored before reboot
-        GetAppTask().GetLightingDevice().Set(storedValue);
-    }
+//     // Read storedValue on/off value
+//     status = Attributes::OnOff::Get(1, &storedValue);
+//     if (status == Protocols::InteractionModel::Status::Success)
+//     {
+//         // Set actual state to stored before reboot
+//         GetAppTask().GetLightingDevice().Set(storedValue);
+//     }
 
-    GetAppTask().UpdateClusterState();
-}
+//     GetAppTask().UpdateClusterState();
+// }

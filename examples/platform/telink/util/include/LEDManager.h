@@ -38,8 +38,10 @@ public:
     };
 
     static LedManager& getInstance();
+
     void setLed(EAppLed appLed, bool state);
     void setLed(EAppLed appLed, size_t onMs, size_t offMs);
+
     void linkLed(EAppLed appLed, size_t led);
     void unlinkLed(EAppLed appLed);
     void unlinkLed(size_t led);

@@ -21,6 +21,7 @@
 
 #include "BLEManagerImpl.h"
 #include "LEDManager.h"
+#include "PWMManager.h"
 #include "ButtonManager.h"
 
 #include "ThreadUtil.h"
@@ -51,7 +52,6 @@ constexpr int kFactoryResetCalcTimeout = 3000;
 constexpr int kFactoryResetTriggerCntr = 3;
 constexpr int kAppEventQueueSize       = 10;
 
-#ifdef APP_USE_IDENTIFY_PWM
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
 constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
 constexpr uint32_t kIdentifyOkayOffRateMs       = 950;
@@ -59,9 +59,6 @@ constexpr uint32_t kIdentifyFinishOnRateMs      = 950;
 constexpr uint32_t kIdentifyFinishOffRateMs     = 50;
 constexpr uint32_t kIdentifyChannelChangeRateMs = 1000;
 constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
-
-const struct pwm_dt_spec sPwmIdentifySpecGreenLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3));
-#endif
 
 #if APP_SET_NETWORK_COMM_ENDPOINT_SEC
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
@@ -82,7 +79,7 @@ bool sHaveBLEConnections    = false;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
-#ifdef APP_USE_IDENTIFY_PWM
+
 void OnIdentifyTriggerEffect(Identify * identify)
 {
     AppTaskCommon::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
@@ -95,7 +92,7 @@ Identify sIdentify = {
     Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
-#endif
+
 
 #if CONFIG_CHIP_FACTORY_DATA
 // NOTE! This key is for test/certification only and should not be available in production devices!
@@ -241,23 +238,13 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     InitLeds();
     UpdateStatusLED();
 
+    InitPwms();
+
     InitButtons();
 
     // Initialize function button timer
     k_timer_init(&sFactoryResetTimer, &AppTask::FactoryResetTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFactoryResetTimer, this);
-
-#ifdef APP_USE_IDENTIFY_PWM
-    // Initialize PWM Identify led
-    err = GetAppTask().mPwmIdentifyLed.Init(&sPwmIdentifySpecGreenLed, kDefaultMinLevel, kDefaultMaxLevel, kDefaultMaxLevel);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Green IDENTIFY PWM Device Init fail");
-        return err;
-    }
-
-    GetAppTask().mPwmIdentifyLed.SetCallbacks(nullptr, nullptr, ActionIdentifyStateUpdateHandler);
-#endif
 
     // Initialize CHIP server
 #if CONFIG_CHIP_FACTORY_DATA
@@ -364,6 +351,23 @@ void AppTaskCommon::LinkLeds(LedManager& ledManager)
 #endif // CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 }
 
+void AppTaskCommon::InitPwms()
+{
+    PwmManager& pwmManager = PwmManager::getInstance();
+
+    LinkPwms(pwmManager);
+
+    pwmManager.linkBackend(PwmPool::getInstance());
+}
+
+void AppTaskCommon::LinkPwms(PwmManager& pwmManager)
+{
+    pwmManager.linkPwm(PwmManager::EAppPwm_Indication, 0);
+    pwmManager.linkPwm(PwmManager::EAppPwm_Red,        1);
+    pwmManager.linkPwm(PwmManager::EAppPwm_Green,      2);
+    pwmManager.linkPwm(PwmManager::EAppPwm_Blue,       3);
+}
+
 void AppTaskCommon::InitButtons(void)
 {
     ButtonManager& buttonManager = ButtonManager::getInstance();
@@ -407,70 +411,44 @@ void AppTaskCommon::UpdateStatusLED()
     }
 }
 
-#ifdef APP_USE_IDENTIFY_PWM
-void AppTaskCommon::ActionIdentifyStateUpdateHandler(k_timer * timer)
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_UpdateLedState;
-    event.Handler = UpdateIdentifyStateEventHandler;
-    GetAppTask().PostEvent(&event);
-}
-
-void AppTaskCommon::UpdateIdentifyStateEventHandler(AppEvent * aEvent)
-{
-    GetAppTask().mPwmIdentifyLed.UpdateAction();
-}
-
 void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect)
 {
-    AppEvent event;
-    event.Type = AppEvent::kEventType_IdentifyStart;
-
     switch (aEffect)
     {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
-        event.Handler = [](AppEvent *) {
-            GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
-        };
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication,
+            kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
-        event.Handler = [](AppEvent *) {
-            GetAppTask().mPwmIdentifyLed.InitiateBreatheAction(PWMDevice::kBreatheType_Both, kIdentifyBreatheRateMs);
-        };
+        PwmManager::getInstance().setPwmBreath(PwmManager::EAppPwm_Indication,
+            kIdentifyBreatheRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
-        event.Handler = [](AppEvent *) {
-            GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
-        };
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication,
+            kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
-        event.Handler = [](AppEvent *) {
-            GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
-        };
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication,
+            kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kFinishEffect");
-        event.Handler = [](AppEvent *) {
-            GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
-        };
+        PwmManager::getInstance().setPwmBlink(PwmManager::EAppPwm_Indication,
+            kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
         break;
     case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kStopEffect");
-        event.Handler = [](AppEvent *) { GetAppTask().mPwmIdentifyLed.StopAction(); };
-        event.Type    = AppEvent::kEventType_IdentifyStop;
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Indication, false);
         break;
     default:
         ChipLogProgress(Zcl, "No identifier effect");
         return;
     }
-
-    GetAppTask().PostEvent(&event);
 }
-#endif
 
 void AppTaskCommon::StartBleAdvButtonEventHandler(void)
 {

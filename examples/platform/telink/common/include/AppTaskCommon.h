@@ -21,10 +21,6 @@
 #include "AppConfig.h"
 #include "AppEventCommon.h"
 
-#ifdef APP_USE_IDENTIFY_PWM
-#include "PWMDevice.h"
-#endif
-
 #ifdef CONFIG_WS2812_STRIP
 #include "WS2812Device.h"
 #endif
@@ -61,6 +57,7 @@ inline constexpr uint8_t kButtonReleaseEvent   = 0;
 } // namespace
 
 class LedManager;
+class PwmManager;
 class ButtonManager;
 
 class AppTaskCommon
@@ -92,6 +89,8 @@ protected:
 
     void InitLeds();
     virtual void LinkLeds(LedManager& ledManager);
+    void InitPwms();
+    virtual void LinkPwms(PwmManager& pwmManager);
     void InitButtons(void);
     virtual void LinkButtons(ButtonManager& buttonManager);
 
@@ -115,12 +114,6 @@ protected:
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-#ifdef APP_USE_IDENTIFY_PWM
-    PWMDevice mPwmIdentifyLed;
-
-    static void ActionIdentifyStateUpdateHandler(k_timer * timer);
-    static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
-#endif
     static void UpdateStatusLED(void);
 
 #if CONFIG_CHIP_FACTORY_DATA

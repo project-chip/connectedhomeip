@@ -129,12 +129,12 @@ bool LedPool::linkHW()
 
     if (led_pool_init(&led_pool))
     {
-        LOG_INF("Led pool inited");
+        LOG_INF("LED pool inited");
         result = true;
     }
     else
     {
-        LOG_ERR("Led pool not inited!");
+        LOG_ERR("LED pool not inited!");
     }
     return result;
 }
@@ -143,7 +143,7 @@ void LedPool::setLedHW(size_t led, bool state)
 {
     if (!led_pool_set(&led_pool, led, state ? LED_ON : LED_OFF))
     {
-        LOG_WRN("Led pool set led %u failed!", led);
+        LOG_WRN("LED pool set led %u failed!", led);
     }
 }
 
@@ -151,6 +151,6 @@ void LedPool::setLedHW(size_t led, size_t onMs, size_t offMs)
 {
     if (!led_pool_set(&led_pool, led, LED_BLINK, K_MSEC(onMs), K_MSEC(offMs)))
     {
-        LOG_WRN("Led pool set led %u failed!", led);
+        LOG_WRN("LED pool set led %u failed!", led);
     }
 }
