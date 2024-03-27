@@ -35,7 +35,9 @@
 #include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/UDP.h>
 
 #include <inttypes.h>
@@ -48,6 +50,9 @@ namespace {
 
 // Max value for the number of EchoRequests sent.
 constexpr size_t kMaxEchoCount = 3;
+
+// Max value for the number of tcp connect attempts.
+constexpr size_t kMaxTCPConnectAttempts = 3;
 
 // The CHIP Echo interval time.
 constexpr chip::System::Clock::Timeout gEchoInterval = chip::System::Clock::Seconds16(1);
@@ -62,8 +67,20 @@ chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPen
 chip::Inet::IPAddress gDestAddr;
 chip::SessionHolder gSession;
 
+chip::Transport::AppTCPConnectionCallbackCtxt gAppTCPConnCbCtxt;
+chip::Transport::ActiveTCPConnectionState * gActiveTCPConnState = nullptr;
+
 // The last time a CHIP Echo was attempted to be sent.
 chip::System::Clock::Timestamp gLastEchoTime = chip::System::Clock::kZero;
+
+// True, if client is still connecting to the server, false otherwise.
+static bool gClientConInProgress = false;
+
+// True, once client connection to server is established.
+static bool gClientConEstablished = false;
+
+// The handle to the TCP connection to the peer.
+// static chip::Transport::ActiveTCPConnectionState * gCon = nullptr;
 
 // Count of the number of EchoRequests sent.
 uint64_t gEchoCount = 0;
@@ -73,8 +90,13 @@ uint64_t gEchoRespCount = 0;
 
 bool gUseTCP = false;
 
+uint64_t gTCPConnAttemptCount = 0;
+
 CHIP_ERROR SendEchoRequest();
 void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
+
+static void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+static void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
 
 void Shutdown()
 {
@@ -148,8 +170,9 @@ CHIP_ERROR SendEchoRequest()
     return err;
 }
 
-CHIP_ERROR EstablishSecureSession()
+CHIP_ERROR EstablishSecureSession(chip::Transport::ActiveTCPConnectionState * conn = nullptr)
 {
+    char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
     chip::Transport::PeerAddress peerAddr;
     if (gUseTCP)
     {
@@ -160,7 +183,9 @@ CHIP_ERROR EstablishSecureSession()
         peerAddr = chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, chip::Inet::InterfaceId::Null());
     }
 
-    // Attempt to connect to the peer.
+    peerAddr.ToString(peerAddrBuf);
+
+    // Establish secure session to the peer.
     CHIP_ERROR err = gSessionManager.InjectPaseSessionWithTestKey(gSession, 1, chip::kTestDeviceNodeId, 1, gFabricIndex, peerAddr,
                                                                   chip::CryptoContext::SessionRole::kInitiator);
     if (err != CHIP_NO_ERROR)
@@ -170,10 +195,91 @@ CHIP_ERROR EstablishSecureSession()
     }
     else
     {
-        printf("Establish secure session succeeded\n");
+        if (gUseTCP)
+        {
+            printf("Associating secure session with connection %p\n", conn);
+            gSession.Get().Value()->AsSecureSession()->SetTCPConnection(conn);
+        }
+
+        printf("Successfully established secure session with peer at %s\n", peerAddrBuf);
     }
 
     return err;
+}
+
+void CloseConnection()
+{
+    char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
+    chip::Transport::PeerAddress peerAddr = chip::Transport::PeerAddress::TCP(gDestAddr, CHIP_PORT);
+
+    gSessionManager.TCPDisconnect(peerAddr);
+
+    peerAddr.ToString(peerAddrBuf);
+    printf("Connection closed to peer at %s\n", peerAddrBuf);
+
+    gClientConEstablished = false;
+    gClientConInProgress  = false;
+}
+
+void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR err)
+{
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("Connection FAILED with err: %s\n", chip::ErrorStr(err));
+
+        gLastEchoTime = chip::System::SystemClock().GetMonotonicTimestamp();
+        CloseConnection();
+        gTCPConnAttemptCount++;
+        return;
+    }
+
+    err = EstablishSecureSession(conn);
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("Secure session FAILED with err: %s\n", chip::ErrorStr(err));
+
+        gLastEchoTime = chip::System::SystemClock().GetMonotonicTimestamp();
+        CloseConnection();
+        return;
+    }
+
+    gClientConEstablished = true;
+    gClientConInProgress  = false;
+}
+
+void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+{
+    CloseConnection();
+}
+
+void EstablishTCPConnection()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // Previous connection attempt underway.
+    if (gClientConInProgress)
+    {
+        return;
+    }
+
+    gClientConEstablished = false;
+
+    chip::Transport::PeerAddress peerAddr = chip::Transport::PeerAddress::TCP(gDestAddr, CHIP_PORT);
+
+    // Connect to the peer
+    err = gSessionManager.TCPConnect(peerAddr, &gAppTCPConnCbCtxt, &gActiveTCPConnState);
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("Connection FAILED with err: %s\n", chip::ErrorStr(err));
+
+        gLastEchoTime = chip::System::SystemClock().GetMonotonicTimestamp();
+        CloseConnection();
+        gTCPConnAttemptCount++;
+        return;
+    }
+
+    gClientConInProgress = true;
 }
 
 void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
@@ -236,6 +342,10 @@ int main(int argc, char * argv[])
         err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage,
                                    &gFabricTable, gSessionKeystore);
         SuccessOrExit(err);
+
+        gAppTCPConnCbCtxt.appContext     = nullptr;
+        gAppTCPConnCbCtxt.connCompleteCb = HandleConnectionAttemptComplete;
+        gAppTCPConnCbCtxt.connClosedCb   = HandleConnectionClosed;
     }
     else
     {
@@ -255,9 +365,29 @@ int main(int argc, char * argv[])
     err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    // Start the CHIP connection to the CHIP echo responder.
-    err = EstablishSecureSession();
-    SuccessOrExit(err);
+    if (gUseTCP)
+    {
+
+        while (!gClientConEstablished)
+        {
+            // For TCP transport, attempt to establish the connection to the CHIP echo responder.
+            // On Connection completion, call EstablishSecureSession(conn);
+            EstablishTCPConnection();
+
+            chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+            if (gTCPConnAttemptCount > kMaxTCPConnectAttempts)
+            {
+                ExitNow();
+            }
+        }
+    }
+    else
+    {
+        // Start the CHIP session to the CHIP echo responder.
+        err = EstablishSecureSession(nullptr);
+        SuccessOrExit(err);
+    }
 
     err = gEchoClient.Init(&gExchangeManager, gSession.Get().Value());
     SuccessOrExit(err);
@@ -274,14 +404,14 @@ int main(int argc, char * argv[])
 
     if (gUseTCP)
     {
-        gTCPManager.Disconnect(chip::Transport::PeerAddress::TCP(gDestAddr));
+        gTCPManager.TCPDisconnect(chip::Transport::PeerAddress::TCP(gDestAddr));
     }
     gTCPManager.Close();
 
     Shutdown();
 
 exit:
-    if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount))
+    if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount) || (gTCPConnAttemptCount > kMaxTCPConnectAttempts))
     {
         printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
