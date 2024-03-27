@@ -226,20 +226,20 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::Discovered
         getIpAddressForUDCRequest(selectedCommissioner->resolutionData.ipAddress, selectedCommissioner->resolutionData.numIPs);
     ReturnErrorOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
         *ipAddressToUse, selectedCommissioner->resolutionData.port, selectedCommissioner->resolutionData.interfaceId)));
-    mTargetVideoPlayerVendorId   = selectedCommissioner->commissionData.vendorId;
-    mTargetVideoPlayerProductId  = selectedCommissioner->commissionData.productId;
-    mTargetVideoPlayerDeviceType = selectedCommissioner->commissionData.deviceType;
+    mTargetVideoPlayerVendorId   = selectedCommissioner->nodeData.vendorId;
+    mTargetVideoPlayerProductId  = selectedCommissioner->nodeData.productId;
+    mTargetVideoPlayerDeviceType = selectedCommissioner->nodeData.deviceType;
     mTargetVideoPlayerNumIPs     = selectedCommissioner->resolutionData.numIPs;
     for (size_t i = 0; i < mTargetVideoPlayerNumIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
     {
         mTargetVideoPlayerIpAddress[i] = selectedCommissioner->resolutionData.ipAddress[i];
     }
     chip::Platform::CopyString(mTargetVideoPlayerDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
-                               selectedCommissioner->commissionData.deviceName);
+                               selectedCommissioner->nodeData.deviceName);
     chip::Platform::CopyString(mTargetVideoPlayerHostName, chip::Dnssd::kHostNameMaxLength + 1,
                                selectedCommissioner->resolutionData.hostName);
     chip::Platform::CopyString(mTargetVideoPlayerInstanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1,
-                               selectedCommissioner->commissionData.instanceName);
+                               selectedCommissioner->nodeData.instanceName);
     mTargetVideoPlayerPort = selectedCommissioner->resolutionData.port;
     return CHIP_NO_ERROR;
 }

@@ -743,7 +743,7 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, 
     return error;
 }
 
-CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
+CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
 {
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
