@@ -76,6 +76,7 @@ shared_library("jni") {
   deps = [
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib",
@@ -103,7 +104,7 @@ shared_library("jni") {
 
     defines += [
       "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-      "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER",
+      "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=1",
     ]
 
     deps += [ "${chip_root}/src/controller:nodatamodel" ]
