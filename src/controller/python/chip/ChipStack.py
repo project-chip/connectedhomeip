@@ -367,7 +367,7 @@ class ChipStack(object):
             return self.callbackRes
         return res
 
-    def CallAsync(self, callFunct):
+    def CallAsyncWithCallback(self, callFunct):
         '''Run a Python function on CHIP stack, and wait for the application specific response.
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.

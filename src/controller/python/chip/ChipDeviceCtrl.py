@@ -186,7 +186,7 @@ class DeviceProxyWrapper():
     def __del__(self):
         if (self._dmLib is not None and hasattr(builtins, 'chipStack') and builtins.chipStack is not None):
             # This destructor is called from any threading context, including on the Matter threading context.
-            # So, we cannot call chipStack.Call or chipStack.CallAsync which waits for the posted work to
+            # So, we cannot call chipStack.Call or chipStack.CallAsyncWithCallback which waits for the posted work to
             # actually be executed. Instead, we just post/schedule the work and move on.
             builtins.chipStack.PostTaskOnChipThread(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(self._deviceProxy))
 
@@ -437,7 +437,7 @@ class ChipDeviceControllerBase():
         self._ChipStack.commissioningCompleteEvent.clear()
 
         self.state = DCState.COMMISSIONING
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                 self.devCtrl, discriminator, setupPinCode, nodeid)
         ).raise_on_error()
@@ -449,7 +449,7 @@ class ChipDeviceControllerBase():
     def UnpairDevice(self, nodeid: int):
         self.CheckIsActive()
 
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
                 self.devCtrl, nodeid, self.cbHandleDeviceUnpairCompleteFunct)
         ).raise_on_error()
@@ -487,7 +487,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
                 self.devCtrl, setupPinCode, discriminator, nodeid)
         )
@@ -496,7 +496,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
         )
@@ -505,7 +505,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
                 self.devCtrl, setUpCode.encode("utf-8"), nodeid)
         )
@@ -724,7 +724,7 @@ class ChipDeviceControllerBase():
             Returns CommissioningParameters
         '''
         self.CheckIsActive()
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                 self.devCtrl, nodeid, timeout, iteration, discriminator, option)
         ).raise_on_error()
@@ -1860,7 +1860,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._ChipStack.commissioningCompleteEvent.clear()
         self.state = DCState.COMMISSIONING
 
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_Commission(
                 self.devCtrl, nodeid)
         )
@@ -1975,7 +1975,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                 self.devCtrl, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None, discoveryTimeoutMsec)
         )
@@ -1998,7 +1998,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
                 self.devCtrl, setupPayload, nodeid, discoveryType.value)
         )
@@ -2017,7 +2017,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
         )
@@ -2031,7 +2031,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         The NOC chain will be provided in TLV cert format."""
         self.CheckIsActive()
 
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_IssueNOCChain(
                 self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
         )
