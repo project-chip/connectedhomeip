@@ -55,7 +55,7 @@ class CompletionListenerAdapter(val listener: MatterController.CompletionListene
   override fun onICDRegistrationComplete(errorCode: Long, icdDeviceInfo: ICDDeviceInfo) =
     listener.onICDRegistrationComplete(errorCode.toUInt(), icdDeviceInfo)
 
-  override fun onError(error: Throwable) = listener.onError(error.toUInt())
+  override fun onError(error: Throwable) = listener.onError(error)
 
   override fun onCloseBleComplete() {
     logger.log(Level.INFO, "Not implemented, override the abstract function.")
