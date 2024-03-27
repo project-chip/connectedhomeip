@@ -22,6 +22,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -58,6 +59,18 @@ void PairingSession::Finish()
 {
     Transport::PeerAddress address = mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    if (address.GetTransportType() == Transport::Type::kTcp)
+    {
+        // Fetch the connection for the unauthenticated session used to set up
+        // the secure session.
+        Transport::ActiveTCPConnectionState * conn =
+            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetTCPConnection();
+
+        // Associate the connection with the secure session being activated.
+        mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn);
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
     DiscardExchange();
 

@@ -24,7 +24,9 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionHolder.h>
 #include <transport/SessionManager.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/UDP.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
