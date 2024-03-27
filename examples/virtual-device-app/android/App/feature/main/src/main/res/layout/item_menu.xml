@@ -10,15 +10,14 @@
 
         <variable
             name="item"
-            type="com.matter.virtual.device.app.feature.main.model.Menu" />
+            type="com.matter.virtual.device.app.core.common.Device" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="@{item.isDim == true ? 0.4f : 1f}"
         android:background="@drawable/menu_item_bg"
-        android:clickable="@{item.isDim == true ? false : true}"
+        android:clickable="true"
         android:focusable="true"
         android:onClick="@{() -> itemHandler.onClick(item)}">
 
@@ -35,10 +34,10 @@
                 android:layout_marginTop="@dimen/menu_item_image_margin_top"
                 android:layout_marginBottom="@dimen/menu_item_image_margin_bottom"
                 android:tint="@color/device_image_tint"
+                app:imageSrc="@{item.deviceIconResId}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:imageSrc="@{item.iconResId}" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/menu_item_title"
@@ -49,7 +48,7 @@
                 android:layout_marginEnd="@dimen/menu_item_text_margin_end"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="@{item.titleResId}"
+                android:text="@{item.deviceNameResId}"
                 android:textAlignment="viewStart"
                 android:textSize="@dimen/menu_item_title_size"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -58,4 +57,3 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 </layout>
-
