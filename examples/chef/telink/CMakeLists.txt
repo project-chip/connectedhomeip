@@ -105,6 +105,7 @@ target_sources(app PRIVATE
     ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
+    ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)

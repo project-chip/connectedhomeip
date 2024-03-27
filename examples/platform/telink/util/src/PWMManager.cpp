@@ -144,6 +144,64 @@ void PwmManager::linkBackend(PwmBackend &backend)
     }
 }
 
+#if CONFIG_WS2812_STRIP
+
+#include <zephyr_ws2812.h>
+
+static WS2812_LED_DEFINE(led_strip);
+
+Ws2812Strip& Ws2812Strip::getInstance()
+{
+    static Ws2812Strip instance;
+
+    return instance;
+}
+
+bool Ws2812Strip::linkHW()
+{
+    bool result = false;
+
+    if (ws2812_led_init(&led_strip))
+    {
+        LOG_INF("WS2812 LED inited");
+        result = true;
+    }
+    else
+    {
+        LOG_ERR("WS2812 LED not inited!");
+    }
+    return result;
+}
+
+void Ws2812Strip::setPwmHW(size_t pwm, bool state)
+{
+    if (!ws2812_led_set(&led_strip, pwm, state ? WS2812_LED_ON : WS2812_LED_OFF))
+    {
+        LOG_WRN("WS2812 LED set pwm %u failed!", pwm);
+    }
+}
+
+void Ws2812Strip::setPwmHW(size_t pwm, uint32_t permille)
+{
+    if (!ws2812_led_set(&led_strip, pwm, WS2812_LED_FIXED, permille))
+    {
+        LOG_WRN("WS2812 LED set pwm %u to %u permille failed!", pwm, permille);
+    }
+}
+
+void Ws2812Strip::setPwmHWBlink(size_t pwm, size_t onMs, size_t offMs)
+{
+    LOG_WRN("WS2812 LED setPwmHWBlink not supported");
+}
+
+void Ws2812Strip::setPwmHWBreath(size_t pwm, size_t breathMs)
+{
+
+    LOG_WRN("WS2812 LED setPwmHWBreath not supported");
+}
+
+#else
+
 #include <zephyr_pwm_pool.h>
 
 static PWM_POOL_DEFINE(pwm_pool);
@@ -202,3 +260,5 @@ void PwmPool::setPwmHWBreath(size_t pwm, size_t breathMs)
         LOG_WRN("PWM pool set pwm %u breath to %umS failed!", pwm, breathMs);
     }
 }
+
+#endif // CONFIG_WS2812_STRIP

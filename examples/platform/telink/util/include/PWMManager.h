@@ -109,6 +109,28 @@ private:
     PwmBackend          *m_backend;
 };
 
+#if CONFIG_WS2812_STRIP
+
+class Ws2812Strip: public PwmBackend
+{
+public:
+    static Ws2812Strip& getInstance();
+    bool linkHW();
+
+    void setPwmHW(size_t pwm, bool state);
+    void setPwmHW(size_t pwm, uint32_t permille);
+    void setPwmHWBlink(size_t pwm, size_t onMs, size_t offMs);
+    void setPwmHWBreath(size_t pwm, size_t breathMs);
+
+    Ws2812Strip(Ws2812Strip const&)     = delete;
+    void operator=(Ws2812Strip const&)  = delete;
+
+private:
+    Ws2812Strip(){};
+};
+
+#else
+
 class PwmPool: public PwmBackend
 {
 public:
@@ -126,3 +148,5 @@ public:
 private:
     PwmPool(){};
 };
+
+#endif // CONFIG_WS2812_STRIP
