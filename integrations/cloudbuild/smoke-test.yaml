@@ -5,11 +5,7 @@ steps:
           - "-c"
           - |
               git config --global --add safe.directory "*"
-              python scripts/checkout_submodules.py --shallow --recursive --platform esp32 
-              python scripts/checkout_submodules.py --shallow --recursive --platform nrfconnect 
-              python scripts/checkout_submodules.py --shallow --recursive --platform silabs 
-              python scripts/checkout_submodules.py --shallow --recursive --platform linux 
-              python scripts/checkout_submodules.py --shallow --recursive --platform android 
+              python scripts/checkout_submodules.py --shallow --recursive --platform esp32 nrfconnect silabs linux android 
       id: Submodules
     - name: "ghcr.io/project-chip/chip-build-vscode:41"
       # NOTE: silabs boostrap is NOT done with the rest as it requests a conflicting
