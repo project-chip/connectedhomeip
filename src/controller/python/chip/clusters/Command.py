@@ -291,7 +291,7 @@ def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLo
         ))
 
 
-def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand,
+async def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand,
                 timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
                 suppressResponse: Union[None, bool] = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
@@ -316,7 +316,7 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
 
     payloadTLV = payload.ToTLV()
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    return builtins.chipStack.Call(
+    return await builtins.chipStack.CallAsync(
         lambda: handle.pychip_CommandSender_SendCommand(
             ctypes.py_object(transaction), device,
             c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId,
