@@ -1,3 +1,4 @@
+#
 #    Copyright (c) 2022 Project CHIP Authors
 #    All rights reserved.
 #
@@ -12,12 +13,7 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-
-
-# run arguments:
-# test-runner-runs: run1
-# test-runner-run/run1/app: app/all-clusters discriminator KVS trace-to-appjson
-# test-runner-run/run1/script: storage-path commissioning-method discriminator passcode trace-to-testjson trace-to-testperfetto
+#
 
 import asyncio
 import logging
