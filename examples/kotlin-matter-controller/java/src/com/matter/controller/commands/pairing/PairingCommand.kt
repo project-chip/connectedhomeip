@@ -127,7 +127,7 @@ abstract class PairingCommand(
 
   override fun onPairingComplete(errorCode: UInt) {
     logger.log(Level.INFO, "onPairingComplete with error code: $errorCode")
-    if (errorCode != 0) {
+    if (errorCode != 0U) {
       setFailure("onPairingComplete failure")
     }
   }
@@ -138,7 +138,7 @@ abstract class PairingCommand(
 
   override fun onCommissioningComplete(nodeId: Long, errorCode: UInt) {
     logger.log(Level.INFO, "onCommissioningComplete with error code: $errorCode")
-    if (errorCode == 0) {
+    if (errorCode == 0U) {
       setSuccess()
     } else {
       setFailure("onCommissioningComplete failure")
