@@ -78,6 +78,12 @@ private:
 
 TimeFormatLocalizationAttrAccess gAttrAccess;
 
+bool HasFeature(EndpointId endpoint, Feature feature)
+{
+    uint32_t featureMap;
+    return FeatureMap::Get(endpoint, &featureMap) == Status::Success ? featureMap & to_underlying(feature) : false;
+}
+
 CHIP_ERROR TimeFormatLocalizationAttrAccess::ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder)
 {
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
@@ -202,6 +208,10 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
 
 void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 {
+    if (!HasFeature(endpoint, Feature::kCalendarFormat))
+    {
+        return;
+    }
     CalendarTypeEnum calendarType;
     CalendarTypeEnum validType;
     Status status = ActiveCalendarType::Get(endpoint, &calendarType);

@@ -208,7 +208,7 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
 
         it->Release();
 
-        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND && validLocaleCached)
         {
             // If initial value is not one of the allowed values, write the valid value it.
             status = ActiveLocale::Set(endpoint, validLocale);
