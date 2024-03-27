@@ -96,13 +96,17 @@ class CHIPToolActivity :
   }
 
   override fun onCommissioningComplete(code: Int, nodeId: Long) {
-    runOnUiThread {
-      Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
-        .show()
-    }
     DeviceIdUtil.setCommissionedNodeId(this, nodeId)
     ChipClient.getDeviceController(this).close()
     showFragment(SelectActionFragment.newInstance(), false)
+    showFragment(
+      SelectActionFragment.newInstance(
+        getString(
+          R.string.commissioning_completed,
+          code
+        )
+      ), false
+    )
   }
 
   override fun onShowDeviceAddressInput() {

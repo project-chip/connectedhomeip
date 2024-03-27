@@ -38,20 +38,7 @@ OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
-    "EchoTest"
-    "EchoOverTcpTest"
-    "FailsafeTest"
-    "MobileDeviceTest"
-    "CommissioningTest"
-    "InteractionModelTest"
-    "SplitCommissioningTest"
-    "CommissioningFailureTest"
-    "CommissioningFailureOnReportTest"
-    "PythonCommissioningTest"
-    "CommissioningWindowTest"
-    "SubscriptionResumptionTest"
-    "SubscriptionResumptionCapacityTest"
-    "SubscriptionResumptionTimeoutTest"
+    "AndroidTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
