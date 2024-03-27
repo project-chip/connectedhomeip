@@ -63,7 +63,13 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 public:
-    using MulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &, bool /* join */);
+    enum class MulticastOperation
+    {
+        kJoin,
+        kLeave
+    };
+
+    using MulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &, MulticastOperation operation);
 
     static void SetMulticastGroupHandler(MulticastGroupHandler handler) { sMulticastGroupHandler = handler; }
 
