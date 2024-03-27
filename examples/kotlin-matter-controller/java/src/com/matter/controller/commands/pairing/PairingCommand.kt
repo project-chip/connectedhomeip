@@ -125,20 +125,20 @@ abstract class PairingCommand(
     logger.log(Level.INFO, "onStatusUpdate with status: $status")
   }
 
-  override fun onPairingComplete(errorCode: Long) {
+  override fun onPairingComplete(errorCode: UInt) {
     logger.log(Level.INFO, "onPairingComplete with error code: $errorCode")
-    if (errorCode != 0L) {
+    if (errorCode != 0) {
       setFailure("onPairingComplete failure")
     }
   }
 
-  override fun onPairingDeleted(errorCode: Long) {
+  override fun onPairingDeleted(errorCode: UInt) {
     logger.log(Level.INFO, "onPairingDeleted with error code: $errorCode")
   }
 
-  override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
+  override fun onCommissioningComplete(nodeId: Long, errorCode: UInt) {
     logger.log(Level.INFO, "onCommissioningComplete with error code: $errorCode")
-    if (errorCode == 0L) {
+    if (errorCode == 0) {
       setSuccess()
     } else {
       setFailure("onCommissioningComplete failure")
@@ -154,7 +154,7 @@ abstract class PairingCommand(
     logger.log(Level.INFO, "onReadCommissioningInfo")
   }
 
-  override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Long) {
+  override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: UInt) {
     logger.log(Level.INFO, "onCommissioningStatusUpdate")
   }
 
@@ -178,7 +178,7 @@ abstract class PairingCommand(
     logger.log(Level.INFO, "onICDRegistrationInfoRequired")
   }
 
-  override fun onICDRegistrationComplete(errorCode: Long, icdDeviceInfo: ICDDeviceInfo) {
+  override fun onICDRegistrationComplete(errorCode: UInt, icdDeviceInfo: ICDDeviceInfo) {
     logger.log(
       Level.INFO,
       "onICDRegistrationComplete with errorCode: $errorCode, symmetricKey: ${icdDeviceInfo.symmetricKey.toHex()}, icdDeviceInfo: $icdDeviceInfo"
