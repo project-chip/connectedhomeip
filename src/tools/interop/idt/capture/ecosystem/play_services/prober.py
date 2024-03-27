@@ -21,7 +21,7 @@ from utils.shell import Bash, log
 
 from . import config
 
-logger = log.get_logger(__file__)
+_LOGGER = log.get_logger(__file__)
 
 
 class PlayServicesProber:
@@ -30,42 +30,48 @@ class PlayServicesProber:
         # TODO: Handle all resolved addresses
         self.platform = platform
         self.artifact_dir = artifact_dir
-        self.logger = logger
+        self.logger = _LOGGER
         self.probe_artifact = os.path.join(self.artifact_dir, "net_probes.txt")
         self.command_suffix = f" 2>&1  | tee -a {self.probe_artifact}"
-        self.target = "googlehomefoyer-pa.googleapis.com"
-        self.tracert_limit = config.foyer_prober_traceroute_limit
+        self.target = ""
+        self.tracert_limit = config.prober_traceroute_limit
 
     def run_command(self, command):
         Bash(f"{command} {self.command_suffix}", sync=True).start_command()
 
-    async def _probe_tracert_icmp_foyer(self) -> None:
+    async def _probe_tracert_icmp(self) -> None:
         self.logger.info(f"icmp traceroute to {self.target}")
         self.run_command(f"traceroute -m {self.tracert_limit} {self.target}")
 
-    async def _probe_tracert_udp_foyer(self) -> None:
+    async def _probe_tracert_udp(self) -> None:
         # TODO: Per-host-platform impl
         self.logger.info(f"udp traceroute to {self.target}")
         self.run_command(f"traceroute -m {self.tracert_limit} -U -p 443 {self.target}")
 
-    async def _probe_tracert_tcp_foyer(self) -> None:
+    async def _probe_tracert_tcp(self) -> None:
         # TODO: Per-host-platform impl
         self.logger.info(f"tcp traceroute to {self.target}")
         self.run_command(f"traceroute -m {self.tracert_limit} -T -p 443 {self.target}")
 
-    async def _probe_ping_foyer(self) -> None:
+    async def _probe_ping(self) -> None:
         self.logger.info(f"ping {self.target}")
         self.run_command(f"ping -c 4 {self.target}")
 
-    async def _probe_dns_foyer(self) -> None:
+    async def _probe_dns(self) -> None:
         self.logger.info(f"dig {self.target}")
         self.run_command(f"dig {self.target}")
 
-    async def _probe_from_phone_ping_foyer(self) -> None:
+    async def _probe_from_phone_ping(self) -> None:
         self.logger.info(f"ping {self.target} from phone")
         self.platform.run_adb_command(f"shell ping -c 4 {self.target} {self.command_suffix}")
 
     async def probe_services(self) -> None:
-        self.logger.info(f"Probing {self.target}")
-        for probe_func in [s for s in dir(self) if s.startswith('_probe')]:
-            await getattr(self, probe_func)()
+        if not os.path.exists(config.prober_urls_file_name):
+            self.logger.info("No probe targets configured")
+            return
+        with open(config.prober_urls_file_name) as urls_file:
+            for line in urls_file:
+                self.target = line
+                self.logger.info(f"Probing {self.target}")
+                for probe_func in [s for s in dir(self) if s.startswith('_probe')]:
+                    await getattr(self, probe_func)()

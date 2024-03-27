@@ -15,5 +15,8 @@
 #    limitations under the License.
 #
 
-enable_foyer_probers = True
-foyer_prober_traceroute_limit = 32
+import os
+
+enable_probers = True
+prober_traceroute_limit = 32
+prober_urls_file_name = os.path.join(os.path.dirname(__file__), "prober_urls.txt")
