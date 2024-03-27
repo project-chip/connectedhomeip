@@ -375,16 +375,31 @@ static NSString * sAttributeCacheEndpointIndexKeyPrefix = @"attrCacheEndpointInd
 
 - (nullable NSArray<NSNumber *> *)_fetchEndpointIndexForNodeID:(NSNumber *)nodeID
 {
+    if (!nodeID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return nil;
+    }
+
     return [self _fetchAttributeCacheValueForKey:[self _endpointIndexKeyForNodeID:nodeID] expectedClass:[NSArray class]];
 }
 
 - (BOOL)_storeEndpointIndex:(NSArray<NSNumber *> *)endpointIndex forNodeID:(NSNumber *)nodeID
 {
+    if (!nodeID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return NO;
+    }
+
     return [self _storeAttributeCacheValue:endpointIndex forKey:[self _endpointIndexKeyForNodeID:nodeID]];
 }
 
 - (BOOL)_deleteEndpointIndexForNodeID:(NSNumber *)nodeID
 {
+    if (!nodeID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return NO;
+    }
+
     return [self _removeAttributeCacheValueForKey:[self _endpointIndexKeyForNodeID:nodeID]];
 }
 
@@ -397,16 +412,31 @@ static NSString * sAttributeCacheClusterIndexKeyPrefix = @"attrCacheClusterIndex
 
 - (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
 {
+    if (!nodeID || !endpointID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return nil;
+    }
+
     return [self _fetchAttributeCacheValueForKey:[self _clusterIndexKeyForNodeID:nodeID endpointID:endpointID] expectedClass:[NSArray class]];
 }
 
 - (BOOL)_storeClusterIndex:(NSArray<NSNumber *> *)clusterIndex forNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
 {
+    if (!nodeID || !endpointID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return NO;
+    }
+
     return [self _storeAttributeCacheValue:clusterIndex forKey:[self _clusterIndexKeyForNodeID:nodeID endpointID:endpointID]];
 }
 
 - (BOOL)_deleteClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID
 {
+    if (!nodeID || !endpointID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return NO;
+    }
+
     return [self _removeAttributeCacheValueForKey:[self _clusterIndexKeyForNodeID:nodeID endpointID:endpointID]];
 }
 
@@ -419,16 +449,31 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
 - (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
 {
+    if (!nodeID || !endpointID || !clusterID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return nil;
+    }
+
     return [self _fetchAttributeCacheValueForKey:[self _clusterDataKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID] expectedClass:[MTRDeviceClusterData class]];
 }
 
 - (BOOL)_storeClusterData:(MTRDeviceClusterData *)clusterData forNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
 {
+    if (!nodeID || !endpointID || !clusterID || !clusterData) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return NO;
+    }
+
     return [self _storeAttributeCacheValue:clusterData forKey:[self _clusterDataKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID]];
 }
 
 - (BOOL)_deleteClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
 {
+    if (!nodeID || !endpointID || !clusterID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return NO;
+    }
+
     return [self _removeAttributeCacheValueForKey:[self _clusterDataKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID]];
 }
 
@@ -514,7 +559,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 #endif
 
         for (NSNumber * endpointID in endpointIndex) {
-            // Fetch endpoint index
+            // Fetch cluster index
             NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
 
 #if ATTRIBUTE_CACHE_VERBOSE_LOGGING
@@ -522,7 +567,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 #endif
 
             for (NSNumber * clusterID in clusterIndex) {
-                // Fetch endpoint index
+                // Fetch attribute index
                 NSArray<NSNumber *> * attributeIndex = [self _fetchAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
 
 #if ATTRIBUTE_CACHE_VERBOSE_LOGGING
@@ -580,12 +625,12 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
         NSMutableArray<NSNumber *> * endpointIndexCopy = [endpointIndex mutableCopy];
 
         for (NSNumber * endpointID in endpointIndex) {
-            // Fetch endpoint index
+            // Fetch cluster index
             NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
             NSMutableArray<NSNumber *> * clusterIndexCopy = [clusterIndex mutableCopy];
 
             for (NSNumber * clusterID in clusterIndex) {
-                // Fetch endpoint index
+                // Fetch attribute index
                 NSArray<NSNumber *> * attributeIndex = [self _fetchAttributeIndexForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
                 NSMutableArray<NSNumber *> * attributeIndexCopy = [attributeIndex mutableCopy];
 
@@ -861,6 +906,11 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 
 - (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID
 {
+    if (!nodeID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return nil;
+    }
+
     __block NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterDataToReturn = nil;
     dispatch_sync(_storageDelegateQueue, ^{
         // Fetch node index
@@ -891,7 +941,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 #endif
 
         for (NSNumber * endpointID in endpointIndex) {
-            // Fetch endpoint index
+            // Fetch cluster index
             NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
 
 #if ATTRIBUTE_CACHE_VERBOSE_LOGGING
@@ -924,6 +974,16 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID
 {
+    if (!nodeID) {
+        MTR_LOG_ERROR("%s: unexpected nil input", __func__);
+        return;
+    }
+
+    if (!clusterData.count) {
+        MTR_LOG_ERROR("%s: nothing to store", __func__);
+        return;
+    }
+
     dispatch_async(_storageDelegateQueue, ^{
         NSUInteger storeFailures = 0;
 

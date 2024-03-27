@@ -156,6 +156,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @implementation MTRDeviceClusterData
 
 static NSString * const sDataVersionKey = @"dataVersion";
+static NSString * const sAttributesKey = @"attributes";
 
 + (BOOL)supportsSecureCoding
 {
@@ -165,6 +166,19 @@ static NSString * const sDataVersionKey = @"dataVersion";
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<MTRDeviceClusterData: dataVersion %@>", _dataVersion];
+}
+
+- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary * _Nullable)attributes
+{
+    self = [super init];
+    if (self == nil) {
+        return nil;
+    }
+
+    _dataVersion = [dataVersion copy];
+    _attributes = [attributes copy];
+
+    return self;
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
@@ -180,12 +194,25 @@ static NSString * const sDataVersionKey = @"dataVersion";
         return nil;
     }
 
+    static NSSet * const sAttributeValueClasses = [NSSet setWithObjects:[NSDictionary class], [NSArray class], [NSData class], [NSString class], [NSNumber class], nil];
+    _attributes = [decoder decodeObjectOfClasses:sAttributeValueClasses forKey:sAttributesKey];
+    if (_attributes != nil && ![_attributes isKindOfClass:[NSDictionary class]]) {
+        MTR_LOG_ERROR("MTRDeviceClusterData got %@ for attributes, not NSDictionary.", _attributes);
+        return nil;
+    }
+
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:self.dataVersion forKey:sDataVersionKey];
+    [coder encodeObject:self.attributes forKey:sAttributesKey];
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [[MTRDeviceClusterData alloc] initWithDataVersion:_dataVersion attributes:_attributes];
 }
 
 @end
@@ -265,8 +292,11 @@ static NSString * const sDataVersionKey = @"dataVersion";
     NSUInteger _unitTestAttributesReportedSinceLastCheck;
 #endif
     BOOL _delegateDeviceCachePrimedCalled;
+
+    // With MTRDeviceClusterData now able to hold attribute data, the plan is to move to using it
+    // as the read cache, should testing prove attribute storage by cluster is the better solution.
     NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * _clusterData;
-    NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * _clusterDataToPersist;
+    NSMutableSet<MTRClusterPath *> * _clustersToPersist;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -810,6 +840,32 @@ static NSString * const sDataVersionKey = @"dataVersion";
     }
 }
 
+// assume lock is held
+- (NSDictionary<NSNumber *, NSDictionary *> *)_attributesForCluster:(MTRClusterPath *)clusterPath
+{
+    NSMutableDictionary * attributesToReturn = [NSMutableDictionary dictionary];
+    for (MTRAttributePath * attributePath in _readCache) {
+        if ([attributePath.endpoint isEqualToNumber:clusterPath.endpoint] && [attributePath.cluster isEqualToNumber:clusterPath.cluster]) {
+            attributesToReturn[attributePath.attribute] = _readCache[attributePath];
+        }
+    }
+    return attributesToReturn;
+}
+
+// assume lock is held
+- (NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)_clusterDataForPaths:(NSSet<MTRClusterPath *> *)clusterPaths
+{
+    NSMutableDictionary * clusterDataToReturn = [NSMutableDictionary dictionary];
+    for (MTRClusterPath * clusterPath in clusterPaths) {
+        NSNumber * dataVersion = _clusterData[clusterPath].dataVersion;
+        NSDictionary<NSNumber *, NSDictionary *> * attributes = [self _attributesForCluster:clusterPath];
+        MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:attributes];
+        clusterDataToReturn[clusterPath] = clusterData;
+    }
+
+    return clusterDataToReturn;
+}
+
 - (void)_handleReportEnd
 {
     std::lock_guard lock(_lock);
@@ -818,10 +874,11 @@ static NSString * const sDataVersionKey = @"dataVersion";
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
 
     BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
-    if (dataStoreExists && _clusterDataToPersist.count) {
-        MTR_LOG_DEFAULT("%@ Storing cluster information (data version) count: %lu", self, static_cast<unsigned long>(_clusterDataToPersist.count));
-        [_deviceController.controllerDataStore storeClusterData:_clusterDataToPersist forNodeID:_nodeID];
-        _clusterDataToPersist = nil;
+    if (dataStoreExists && _clustersToPersist.count) {
+        MTR_LOG_DEFAULT("%@ Storing cluster information (data version) count: %lu", self, static_cast<unsigned long>(_clustersToPersist.count));
+        NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self _clusterDataForPaths:_clustersToPersist];
+        [_deviceController.controllerDataStore storeClusterData:clusterData forNodeID:_nodeID];
+        _clustersToPersist = nil;
     }
 
 // For unit testing only
@@ -1914,13 +1971,26 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther
 {
-    // Attribute data-value dictionaries are equal if type and value are equal
+    // Sanity check for nil cases
+    if (!one && !theOther) {
+        return YES;
+    }
+    if ((!one && theOther) || (one && !theOther)) {
+        return NO;
+    }
+
+    // Attribute data-value dictionaries are equal if type and value are equal, and specifically, this should return true if values are both nil
     return [one[MTRTypeKey] isEqual:theOther[MTRTypeKey]] && ((one[MTRValueKey] == theOther[MTRValueKey]) || [one[MTRValueKey] isEqual:theOther[MTRValueKey]]);
 }
 
 // Utility to return data value dictionary without data version
 - (NSDictionary *)_dataValueWithoutDataVersion:(NSDictionary *)attributeValue;
 {
+    // Sanity check for nil - return the same input to fail gracefully
+    if (!attributeValue || !attributeValue[MTRTypeKey]) {
+        return attributeValue;
+    }
+
     if (attributeValue[MTRValueKey]) {
         return @{ MTRTypeKey : attributeValue[MTRTypeKey], MTRValueKey : attributeValue[MTRValueKey] };
     } else {
@@ -1929,9 +1999,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 }
 
 // Update cluster data version and also note the change, so at onReportEnd it can be persisted
-- (void)_updateDataVersion:(NSNumber *)dataVersion forClusterPath:(MTRClusterPath *)clusterPath
+- (void)_noteDataVersion:(NSNumber *)dataVersion forClusterPath:(MTRClusterPath *)clusterPath
 {
     BOOL dataVersionChanged = NO;
+    // Update data version used for subscription filtering
     MTRDeviceClusterData * clusterData = _clusterData[clusterPath];
     if (!clusterData) {
         clusterData = [[MTRDeviceClusterData alloc] init];
@@ -1944,15 +2015,24 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     if (dataVersionChanged) {
         clusterData.dataVersion = dataVersion;
 
-        // Set up for persisting if there is data store
+        // Mark cluster path as needing persistence if needed
         BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
         if (dataStoreExists) {
-            if (!_clusterDataToPersist) {
-                _clusterDataToPersist = [NSMutableDictionary dictionary];
+            if (!_clustersToPersist) {
+                _clustersToPersist = [NSMutableSet set];
             }
-            _clusterDataToPersist[clusterPath] = clusterData;
+            [_clustersToPersist addObject:clusterPath];
         }
     }
+}
+
+// Assuming data store exists, note that the cluster should be persisted at onReportEnd
+- (void)_noteAttributeChangedForClusterPath:(MTRClusterPath *)clusterPath
+{
+    if (!_clustersToPersist) {
+        _clustersToPersist = [NSMutableSet set];
+    }
+    [_clustersToPersist addObject:clusterPath];
 }
 
 // assume lock is held
@@ -1963,10 +2043,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     NSMutableArray * attributesToReport = [NSMutableArray array];
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
     BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
+#if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
     NSMutableArray * attributesToPersist;
     if (dataStoreExists) {
         attributesToPersist = [NSMutableArray array];
     }
+#endif
     for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
         NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
@@ -1998,9 +2080,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         } else {
             // First separate data version and restore data value to a form without data version
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
+            MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
             if (dataVersion) {
-                MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:attributePath.endpoint clusterID:attributePath.cluster];
-                [self _updateDataVersion:dataVersion forClusterPath:clusterPath];
+                [self _noteDataVersion:dataVersion forClusterPath:clusterPath];
 
                 // Remove data version from what we cache in memory
                 attributeDataValue = [self _dataValueWithoutDataVersion:attributeDataValue];
@@ -2009,6 +2091,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:_readCache[attributePath]];
             // Check if attribute needs to be persisted - compare only to read cache and disregard expected values
             if (dataStoreExists && readCacheValueChanged) {
+#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
+                [self _noteAttributeChangedForClusterPath:clusterPath];
+#else
                 NSDictionary * attributeResponseValueToPersist;
                 if (dataVersion) {
                     // Remove data version from what we cache in memory and storage
@@ -2019,6 +2104,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     attributeResponseValueToPersist = attributeResponseValue;
                 }
                 [attributesToPersist addObject:attributeResponseValueToPersist];
+#endif
             }
 
             // if expected values exists, purge and update read cache
@@ -2081,17 +2167,20 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     MTR_LOG_INFO("%@ report from reported values %@", self, attributePathsToReport);
 
+#if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
     if (dataStoreExists && attributesToPersist.count) {
         [_deviceController.controllerDataStore storeAttributeValues:attributesToPersist forNodeID:_nodeID];
     }
+#endif
 
     return attributesToReport;
 }
 
-- (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
+- (void)_setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
 {
-    MTR_LOG_INFO("%@ setAttributeValues count: %lu reportChanges: %d", self, static_cast<unsigned long>(attributeValues.count), reportChanges);
-    std::lock_guard lock(_lock);
+    if (!attributeValues.count) {
+        return;
+    }
 
     if (reportChanges) {
         [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeValues]];
@@ -2109,8 +2198,42 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 }
 
+- (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
+{
+    MTR_LOG_INFO("%@ setAttributeValues count: %lu reportChanges: %d", self, static_cast<unsigned long>(attributeValues.count), reportChanges);
+    std::lock_guard lock(_lock);
+    [self _setAttributeValues:attributeValues reportChanges:reportChanges];
+}
+
 - (void)setClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData
 {
+    MTR_LOG_INFO("%@ setClusterData count: %lu", self, static_cast<unsigned long>(clusterData.count));
+    if (!clusterData.count) {
+        return;
+    }
+
+    std::lock_guard lock(_lock);
+
+#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
+    // For each cluster, extract and create the attribute response-value for the read cache
+    // TODO: consider some optimization in how the read cache is structured so there's fewer conversions from this format to what's in the cache
+    for (MTRClusterPath * clusterPath in clusterData) {
+        MTRDeviceClusterData * data = clusterData[clusterPath];
+        // Build and set attributes one cluster at a time to avoid creating a ton of temporary objects at a time
+        @autoreleasepool {
+            NSMutableArray * attributeValues = [NSMutableArray array];
+            for (NSNumber * attributeID in data.attributes) {
+                MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID];
+                NSDictionary * responseValue = @{ MTRAttributePathKey : attributePath, MTRDataKey : data.attributes[attributeID] };
+                [attributeValues addObject:responseValue];
+            }
+            if (attributeValues.count) {
+                [self _setAttributeValues:attributeValues reportChanges:NO];
+            }
+        }
+    }
+#endif
+
     [_clusterData addEntriesFromDictionary:clusterData];
 }
 
