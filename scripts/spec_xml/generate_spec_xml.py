@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import glob
+import json
 import os
 import re
 import subprocess
@@ -176,12 +177,18 @@ def dump_cluster_ids(output_dir):
     title = f'|{title_id_decimal}|{title_id_hex}|{title_name}|\n'
     hashes = f'|{"-" * dec_len}|{"-" * hex_len}|{"-" * name_len}|\n'
     s = title + hashes
+    json_dict = {id: c.name for id, c in sorted(clusters.items())}
     for id, cluster in sorted(clusters.items()):
         hex_id = f'0x{id:04X}'
         s += f'|{id:<{dec_len}}|{hex_id:<{hex_len}}|{cluster.name:<{name_len}}|\n'
+
     with open(DEFAULT_DOCUMENTATION_DIR, 'w') as fout:
         fout.write(header)
         fout.write(s)
+
+    json_file = os.path.join(clusters_output_dir, 'cluster_ids.json')
+    with open(json_file, "w") as outfile:
+        json.dump(json_dict, outfile, indent=2)
 
 
 if __name__ == '__main__':
