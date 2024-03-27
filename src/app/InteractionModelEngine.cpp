@@ -336,16 +336,10 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricInd
 {
     bool isActive = false;
     mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
-        if (!handler->IsType(ReadHandler::InteractionType::Subscribe))
-        {
-            return Loop::Continue;
-        }
+        VerifyOrReturnValue(handler->IsType(ReadHandler::InteractionType::Subscribe), Loop::Continue);
 
         Access::SubjectDescriptor subject = handler->GetSubjectDescriptor();
-        if (subject.fabricIndex != aFabricIndex)
-        {
-            return Loop::Continue;
-        }
+        VerifyOrReturnValue(subject.fabricIndex == aFabricIndex, Loop::Continue);
 
         if (subject.authMode == Access::AuthMode::kCase)
         {
@@ -353,13 +347,9 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricInd
             {
                 isActive = handler->IsActiveSubscription();
 
-                // Exit loop only if isActive is set to true
-                // Otherwise keep looking for another subscription that could
-                // match the subject
-                if (isActive)
-                {
-                    return Loop::Break;
-                }
+                // Exit loop only if isActive is set to true.
+                // Otherwise keep looking for another subscription that could match the subject.
+                VerifyOrReturnValue(!isActive, Loop::Break);
             }
         }
 
@@ -371,8 +361,27 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(FabricIndex aFabricInd
 
 bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID)
 {
-    // TODO(#30281) : Implement persisted sub check and verify how persistent subscriptions affects this at ICDManager::Init
-    return false;
+    bool persistedSubMatches = false;
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    // Verify that we were able t0 allocate an iterator. If not, assume we have a persisted subscription.
+    VerifyOrReturnValue(iterator, true);
+
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+    while (iterator->Next(subscriptionInfo))
+    {
+        // TODO(#31873): Persistent subscription only stores the NodeID for now. We cannot check if the CAT matches
+        if (subscriptionInfo.mFabricIndex == aFabricIndex && subscriptionInfo.mNodeId == subjectID)
+        {
+            persistedSubMatches = true;
+            break;
+        }
+    }
+    iterator->Release();
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    return persistedSubMatches;
 }
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
@@ -1908,22 +1917,22 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     // future improvements: https://github.com/project-chip/connectedhomeip/issues/25439
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator           = mpSubscriptionResumptionStorage->IterateSubscriptions();
-    int subscriptionsToResume = 0;
-    uint16_t minInterval      = 0;
+    auto * iterator            = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    mNumOfSubscriptionToResume = 0;
+    uint16_t minInterval       = 0;
     while (iterator->Next(subscriptionInfo))
     {
-        subscriptionsToResume++;
+        mNumOfSubscriptionToResume++;
         minInterval = std::max(minInterval, subscriptionInfo.mMinInterval);
     }
     iterator->Release();
 
-    if (subscriptionsToResume)
+    if (mNumOfSubscriptionToResume)
     {
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         mSubscriptionResumptionScheduled = true;
 #endif
-        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", subscriptionsToResume, minInterval);
+        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", mNumOfSubscriptionToResume, minInterval);
         ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds16(minInterval),
                                                                                            ResumeSubscriptionsTimerCallback, this));
     }
@@ -2044,6 +2053,25 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
     return foundSubscriptionToResume;
 }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+void InteractionModelEngine::DecrementNumSubscriptionsToResume()
+{
+    VerifyOrReturn(mNumOfSubscriptionToResume > 0);
+#if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    VerifyOrDie(mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
+    mNumOfSubscriptionToResume--;
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    if (!mNumOfSubscriptionToResume)
+    {
+        mICDManager->SetBootUpResumeSubscriptionExecuted();
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+}
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 } // namespace app
 } // namespace chip

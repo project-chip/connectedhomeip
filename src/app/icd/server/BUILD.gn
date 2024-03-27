@@ -22,6 +22,11 @@ buildconfig_header("icd-server-buildconfig") {
   header = "ICDServerBuildConfig.h"
   header_dir = "app/icd/server"
 
+  if (chip_enable_icd_lit || chip_enable_icd_checkin ||
+      chip_enable_icd_user_active_mode_trigger) {
+    assert(chip_enable_icd_server)
+  }
+
   if (chip_enable_icd_lit) {
     assert(chip_enable_icd_checkin && chip_enable_icd_user_active_mode_trigger)
   }
@@ -75,7 +80,7 @@ source_set("manager") {
     ":configuration-data",
     ":notifier",
     ":observer",
-    "${chip_root}/src/app:subscription-manager",
+    "${chip_root}/src/app:subscription-info-provider",
     "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/messaging",
   ]
@@ -84,6 +89,7 @@ source_set("manager") {
     public_deps += [
       ":monitoring-table",
       ":sender",
+      "${chip_root}/src/app:app_config",
     ]
   }
 }

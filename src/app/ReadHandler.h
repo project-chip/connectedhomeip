@@ -70,6 +70,7 @@ class TestReportScheduler;
 } // namespace reporting
 
 class InteractionModelEngine;
+class TestInteractionModelEngine;
 
 /**
  *  @class ReadHandler
@@ -433,6 +434,7 @@ private:
     //
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
+    friend class TestInteractionModelEngine;
 
     // The report scheduler needs to be able to access StateFlag private functions ShouldStartReporting(), CanStartReporting(),
     // ForceDirtyState() and IsDirty() to know when to schedule a run so it is declared as a friend class.
