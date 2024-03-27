@@ -34,9 +34,10 @@
 	pwm_pool {
 		compatible = "pwm-leds";
 		out {
-			pwms = <&pwm0 2 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
-					<&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
-					<&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			/* Use blue led as indication, red & green - RGB-fixture */
+			pwms = <&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+					<&pwm0 2 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+					<&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
 		};
 	};
 };

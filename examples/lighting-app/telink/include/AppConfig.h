@@ -22,6 +22,3 @@
 
 #define APP_SET_DEVICE_INFO_PROVIDER 1
 #define APP_SET_NETWORK_COMM_ENDPOINT_SEC 0
-
-// Lighting LED config
-#define USE_RGB_PWM 0

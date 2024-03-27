@@ -19,9 +19,6 @@
 #include "AppTask.h"
 #include "ColorFormat.h"
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -120,27 +117,3 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
 }
 
-/** @brief OnOff Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-// void emberAfOnOffClusterInitCallback(EndpointId endpoint)
-// {
-//     Protocols::InteractionModel::Status status;
-//     bool storedValue;
-
-//     // Read storedValue on/off value
-//     status = Attributes::OnOff::Get(1, &storedValue);
-//     if (status == Protocols::InteractionModel::Status::Success)
-//     {
-//         // Set actual state to stored before reboot
-//         GetAppTask().GetLightingDevice().Set(storedValue);
-//     }
-
-//     GetAppTask().UpdateClusterState();
-// }
