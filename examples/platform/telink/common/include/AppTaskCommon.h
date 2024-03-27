@@ -94,7 +94,7 @@ protected:
     void GetEvent(AppEvent * aEvent);
 
     void InitButtons(void);
-    void LinkButtons(ButtonManager& buttonManager);
+    virtual void LinkButtons(ButtonManager& buttonManager);
 
     static void FactoryResetTimerTimeoutCallback(k_timer * timer);
     static void FactoryResetTimerEventHandler(AppEvent * aEvent);

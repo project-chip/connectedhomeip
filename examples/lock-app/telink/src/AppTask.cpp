@@ -40,18 +40,10 @@ LEDWidget sLockLED;
 } // namespace
 
 AppTask AppTask::sAppTask;
-static const struct gpio_dt_spec sLockJammedInputDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_5), gpios);
-static const struct gpio_dt_spec sLockStatusInputDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_6), gpios);
-Button sLockJammedAction;
-Button sLockStatusChangedAction;
 
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(LockActionEventHandler);
-    sLockJammedAction.Configure(&sLockJammedInputDt, LockJammedEventHandler);
-    sLockStatusChangedAction.Configure(&sLockStatusInputDt, LockStateEventHandler);
-    ButtonManagerInst().AddButton(sLockJammedAction);
-    ButtonManagerInst().AddButton(sLockStatusChangedAction);
     InitCommonParts();
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
@@ -254,4 +246,12 @@ void AppTask::LockStateActionHandler(AppEvent * aEvent)
 
     /* Generating Door Lock Status event */
     DoorLockServer::Instance().SetDoorState(kExampleEndpointId, mDoorState);
+}
+
+void AppTask::LinkButtons(ButtonManager& buttonManager)
+{
+    buttonManager.addCallback(FactoryResetButtonEventHandler,    0, true);
+    buttonManager.addCallback(ExampleActionButtonEventHandler,   1, true);
+    buttonManager.addCallback(LockJammedEventHandler,            2, true);
+    buttonManager.addCallback(LockStateEventHandler,             3, true);
 }
