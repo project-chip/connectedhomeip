@@ -30,10 +30,9 @@ extern "C" {
 #include "rsi_board.h"
 #include "sl_event_handler.h"
 #include "sl_si91x_button.h"
+#include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
-#include "sl_si91x_button.h"
-#include "sl_si91x_button_pin_config.h"
 void soc_pll_config(void);
 }
 
