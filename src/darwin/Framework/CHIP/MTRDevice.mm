@@ -143,9 +143,9 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
 // Utility methods for working with MTRInternalDeviceState, located near the
 // enum so it's easier to notice that they need to stay in sync.
 namespace {
-bool NoInitialSubscriptionYet(MTRInternalDeviceState state)
+bool HadSubscriptionEstablishedOnce(MTRInternalDeviceState state)
 {
-    return state < MTRInternalDeviceStateInitalSubscriptionEstablished;
+    return state >= MTRInternalDeviceStateInitalSubscriptionEstablished;
 }
 
 bool NeedToStartSubscriptionSetup(MTRInternalDeviceState state)
@@ -815,7 +815,7 @@ static NSString * const sDataVersionKey = @"dataVersion";
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    if (!NoInitialSubscriptionYet(_internalDeviceState)) {
+    if (HadSubscriptionEstablishedOnce(_internalDeviceState)) {
         return;
     }
 
