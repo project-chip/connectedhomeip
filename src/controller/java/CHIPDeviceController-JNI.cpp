@@ -161,7 +161,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryShutdown();
 }
 
-JNI_METHOD(jint, onNOCChainGeneration)
+JNI_METHOD(jlong, onNOCChainGeneration)
 (JNIEnv * env, jobject self, jlong handle, jobject controllerParams)
 {
     chip::DeviceLayer::StackLock lock;
@@ -266,7 +266,7 @@ JNI_METHOD(jint, onNOCChainGeneration)
         {
             ChipLogError(Controller, "Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
         }
-        return static_cast<jint>(err.AsInteger());
+        return static_cast<jlong>(err.AsInteger());
 #endif // JAVA_MATTER_CONTROLLER_TEST
     }
 exit:
@@ -274,7 +274,7 @@ exit:
     err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(err, ByteSpan(), ByteSpan(), ByteSpan(), ipkOptional,
                                                                                adminSubjectOptional);
 #endif // JAVA_MATTER_CONTROLLER_TEST
-    return static_cast<jint>(err.AsInteger());
+    return static_cast<jlong>(err.AsInteger());
 }
 
 JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject controllerParams)
