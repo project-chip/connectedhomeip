@@ -328,9 +328,11 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
     case kButtonId_FactoryReset:
         FactoryResetButtonEventHandler();
         break;
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     case kButtonId_StartThread:
         StartThreadButtonEventHandler();
         break;
+#endif
     case kButtonId_StartBleAdv:
         StartBleAdvButtonEventHandler();
         break;

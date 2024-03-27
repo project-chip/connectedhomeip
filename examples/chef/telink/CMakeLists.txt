@@ -97,15 +97,16 @@ target_sources(app PRIVATE
     src/AppTask.cpp
     ${TELINK_COMMON}/common/src/mainCommon.cpp
     ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
-    ${TELINK_COMMON}/util/src/PWMManager.cpp
+    ${TELINK_COMMON}/util/src/LEDManager.cpp
     ${TELINK_COMMON}/util/src/ButtonManager.cpp
     ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-    ${CHEF}/common/stubs.cpp
+    ${TELINK_COMMON}/util/src/PWMManager.cpp
     ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
+    ${CHEF}/common/stubs.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
