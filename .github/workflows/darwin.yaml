@@ -36,15 +36,15 @@ jobs:
             matrix:
                 options: # We don't need a full matrix
                     - flavor: macos-release-availability
-                      arguments: -sdk macosx -configuration Release   OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new'
+                      arguments: -sdk macosx -configuration Release   WARNING_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new'
                     - flavor: ios-release
-                      arguments: -sdk iphoneos -configuration Release OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk iphoneos -configuration Release WARNING_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
                     - flavor: ios-debug
-                      arguments: -sdk iphoneos -configuration Debug   OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk iphoneos -configuration Debug   WARNING_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
                     - flavor: tvos-debug
-                      arguments: -sdk appletvos -configuration Debug  OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk appletvos -configuration Debug  WARNING_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
                     - flavor: watchos-debug
-                      arguments: -sdk watchos -configuration Debug    OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk watchos -configuration Debug    WARNING_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
         steps:
             - name: Checkout
               uses: actions/checkout@v4
