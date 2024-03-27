@@ -419,8 +419,7 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
     }
     if (nodeData.resolutionData.port == 0)
     {
-        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s",
-                     nodeData.nodeData.instanceName);
+        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s", nodeData.nodeData.instanceName);
         return;
     }
 

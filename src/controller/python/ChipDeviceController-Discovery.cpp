@@ -110,8 +110,8 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         Json::Value jsonVal;
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen,
-                                            rotatingId, sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen, rotatingId,
+                                            sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
         jsonVal["instanceName"]       = dnsSdInfo->nodeData.instanceName;
@@ -174,8 +174,8 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
             continue;
         }
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen,
-                                            rotatingId, sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen, rotatingId,
+                                            sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
         ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->nodeData.instanceName);

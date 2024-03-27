@@ -89,10 +89,10 @@ void TestUDCServerUserConfirmationProvider(nlTestSuite * inSuite, void * inConte
     Platform::CopyString(nodeData1.nodeData.instanceName, instanceName1);
 
     Dnssd::DiscoveredNodeData nodeData2;
-    nodeData2.resolutionData.port              = 5540;
-    nodeData2.resolutionData.ipAddress[0]      = address;
-    nodeData2.resolutionData.numIPs            = 1;
-    nodeData2.nodeData.longDiscriminator = disc2;
+    nodeData2.resolutionData.port         = 5540;
+    nodeData2.resolutionData.ipAddress[0] = address;
+    nodeData2.resolutionData.numIPs       = 1;
+    nodeData2.nodeData.longDiscriminator  = disc2;
     Platform::CopyString(nodeData2.nodeData.instanceName, instanceName2);
     Platform::CopyString(nodeData2.nodeData.deviceName, deviceName2);
 

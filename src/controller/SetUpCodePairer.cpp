@@ -339,8 +339,7 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     }
 
     // The advertisement may not include a vendor id.
-    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.nodeData.vendorId) &&
-        mPayloadVendorID != nodeData.nodeData.vendorId)
+    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.nodeData.vendorId) && mPayloadVendorID != nodeData.nodeData.vendorId)
     {
         ChipLogProgress(Controller, "Discovered device does not match our vendor id.");
         return false;

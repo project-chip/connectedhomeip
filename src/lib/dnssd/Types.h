@@ -208,19 +208,19 @@ inline constexpr size_t kMaxPairingInstructionLen = 128;
 struct DnssdNodeData
 {
 
-    size_t rotatingIdLen                                      = 0;
-    uint32_t deviceType                                       = 0;
-    uint16_t longDiscriminator                                = 0;
-    uint16_t vendorId                                         = 0;
-    uint16_t productId                                        = 0;
-    uint16_t pairingHint                                      = 0;
-    uint8_t commissioningMode                                 = 0;
-    uint8_t commissionerPasscode                              = 0;
-    uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
+    size_t rotatingIdLen                  = 0;
+    uint32_t deviceType                   = 0;
+    uint16_t longDiscriminator            = 0;
+    uint16_t vendorId                     = 0;
+    uint16_t productId                    = 0;
+    uint16_t pairingHint                  = 0;
+    uint8_t commissioningMode             = 0;
+    uint8_t commissionerPasscode          = 0;
+    uint8_t rotatingId[kMaxRotatingIdLen] = {};
     bool nodeStatus; // true is ttl > 0 false id ttl = 0
     char instanceName[Operational::kInstanceNameMaxLength + 1] = {};
-    char deviceName[kMaxDeviceNameLen + 1]                    = {};
-    char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+    char deviceName[kMaxDeviceNameLen + 1]                     = {};
+    char pairingInstruction[kMaxPairingInstructionLen + 1]     = {};
 
     DnssdNodeData() {}
 
@@ -315,10 +315,11 @@ struct DiscoveredNodeData
 
     void LogDetail() const
     {
-        ChipLogDetail(Discovery, "Discovered %s node:", (nodeType == DiscoveryType::kCommissionerNode) ? "Commissioner"
-                                                : (nodeType == DiscoveryType::kCommissionableNode) ? "Commissionable"
-                                                : (nodeType == DiscoveryType::kOperational) ? "Operational"
-                                                : "Unknown");
+        ChipLogDetail(Discovery, "Discovered %s node:",
+                      (nodeType == DiscoveryType::kCommissionerNode)         ? "Commissioner"
+                          : (nodeType == DiscoveryType::kCommissionableNode) ? "Commissionable"
+                          : (nodeType == DiscoveryType::kOperational)        ? "Operational"
+                                                                             : "Unknown");
         resolutionData.LogDetail();
         nodeData.LogDetail();
     }

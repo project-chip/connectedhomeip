@@ -104,8 +104,7 @@ public:
         streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.nodeData.longDiscriminator);
         streamer_printf(streamer_get(), "   Device type: %u\r\n", nodeData.nodeData.deviceType);
         streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.nodeData.deviceName);
-        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n",
-                        static_cast<int>(nodeData.nodeData.commissioningMode));
+        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n", static_cast<int>(nodeData.nodeData.commissioningMode));
         streamer_printf(streamer_get(), "   Instance: %s\r\n", nodeData.nodeData.instanceName);
         streamer_printf(streamer_get(), "   Node Status: %d\r\n", nodeData.nodeData.nodeStatus);
         streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.nodeData.pairingHint);
@@ -276,8 +275,7 @@ void RegisterDnsCommands()
           "Browse Matter commissionable nodes. Usage: dns browse commissionable [subtype]" },
         { &BrowseCommissionerHandler, "commissioner",
           "Browse Matter commissioner nodes. Usage: dns browse commissioner [subtype]" },
-        { &BrowseOperationalHandler, "operational",
-          "Browse Matter operational nodes. Usage: dns browse operational" },
+        { &BrowseOperationalHandler, "operational", "Browse Matter operational nodes. Usage: dns browse operational" },
     };
 
     static const shell_command_t sDnsSubCommands[] = {

@@ -107,7 +107,8 @@ public:
     /// interested on, after which TXT and A/AAAA are looked for.
     ///
     /// If this function returns with error, the object will be in an inactive state.
-    CHIP_ERROR InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl, const mdns::Minimal::SrvRecord & srv);
+    CHIP_ERROR InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
+                                 const mdns::Minimal::SrvRecord & srv);
 
     /// Notify that a new record is being processed.
     /// Will handle filtering and processing of data to determine if the entry is relevant for

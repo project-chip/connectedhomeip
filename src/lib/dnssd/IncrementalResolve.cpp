@@ -137,7 +137,8 @@ SerializedQNameIterator StoredServerName::Get() const
     return SerializedQNameIterator(BytesRange(mNameBuffer, mNameBuffer + sizeof(mNameBuffer)), mNameBuffer);
 }
 
-CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl, const mdns::Minimal::SrvRecord & srv)
+CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
+                                                  const mdns::Minimal::SrvRecord & srv)
 {
     AutoInactiveResetter inactiveReset(*this);
 
@@ -164,7 +165,6 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
     }
 
     mServiceNameType = ComputeServiceNameType(name);
-
 
     switch (mServiceNameType)
     {
@@ -332,7 +332,7 @@ CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
     IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
     outputData.resolutionData = mCommonResolutionData;
-    outputData.nodeData = mSpecificResolutionData.Get<DnssdNodeData>();
+    outputData.nodeData       = mSpecificResolutionData.Get<DnssdNodeData>();
 
     ResetToInactive();
 

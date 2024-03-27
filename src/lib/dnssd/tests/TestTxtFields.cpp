@@ -305,11 +305,11 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 {
 
     if (node.nodeData.longDiscriminator != 0 || node.nodeData.vendorId != 0 || node.nodeData.productId != 0 ||
-        node.nodeData.commissioningMode != 0 || node.nodeData.deviceType != 0 ||
-        node.nodeData.rotatingIdLen != 0 || node.nodeData.pairingHint != 0 ||
-        node.resolutionData.mrpRetryIntervalIdle.HasValue() || node.resolutionData.mrpRetryIntervalActive.HasValue() ||
-        node.resolutionData.mrpRetryActiveThreshold.HasValue() || node.resolutionData.isICDOperatingAsLIT.HasValue() ||
-        node.resolutionData.supportsTcp || node.nodeData.commissionerPasscode != 0)
+        node.nodeData.commissioningMode != 0 || node.nodeData.deviceType != 0 || node.nodeData.rotatingIdLen != 0 ||
+        node.nodeData.pairingHint != 0 || node.resolutionData.mrpRetryIntervalIdle.HasValue() ||
+        node.resolutionData.mrpRetryIntervalActive.HasValue() || node.resolutionData.mrpRetryActiveThreshold.HasValue() ||
+        node.resolutionData.isICDOperatingAsLIT.HasValue() || node.resolutionData.supportsTcp ||
+        node.nodeData.commissionerPasscode != 0)
     {
         return false;
     }

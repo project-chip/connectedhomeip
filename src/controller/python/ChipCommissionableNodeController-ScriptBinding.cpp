@@ -82,8 +82,8 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
             continue;
         }
         char rotatingId[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen,
-                                            rotatingId, sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen, rotatingId,
+                                            sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissioner %d", i);
         ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->nodeData.instanceName);

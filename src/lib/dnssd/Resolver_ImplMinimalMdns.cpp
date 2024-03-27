@@ -397,7 +397,6 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         {
             MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
 
-
             // TODO: Ideally commissioning delegates should be aware of the
             //       node types they receive, however they are currently not
             //       so try to help out by only calling the delegate when an
@@ -421,7 +420,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
                 break;
             case IncrementalResolver::ServiceNameType::kOperational:
                 discoveredNodeIsRelevant = true;
-                nodeData.nodeType = DiscoveryType::kOperational;
+                nodeData.nodeType        = DiscoveryType::kOperational;
                 break;
             default:
                 ChipLogError(Discovery, "Unexpected type for commission data parsing");
@@ -449,7 +448,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
             nodeResolvedData.resolutionData = nodeData.resolutionData;
             MakeInstanceName(nodeData.nodeData.instanceName, Operational::kInstanceNameMaxLength + 1,
-                                                    nodeResolvedData.operationalData.peerId);
+                             nodeResolvedData.operationalData.peerId);
 
             mActiveResolves.Complete(nodeResolvedData.operationalData.peerId);
             if (mOperationalDelegate != nullptr)

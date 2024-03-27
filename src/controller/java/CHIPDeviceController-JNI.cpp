@@ -1916,8 +1916,8 @@ JNI_METHOD(jobject, getDiscoveredDevice)(JNIEnv * env, jobject self, jlong handl
     env->SetIntField(discoveredObj, productIdID, static_cast<jint>(data->nodeData.productId));
 
     jbyteArray jRotatingId;
-    CHIP_ERROR err = JniReferences::GetInstance().N2J_ByteArray(
-        env, data->nodeData.rotatingId, static_cast<jsize>(data->nodeData.rotatingIdLen), jRotatingId);
+    CHIP_ERROR err = JniReferences::GetInstance().N2J_ByteArray(env, data->nodeData.rotatingId,
+                                                                static_cast<jsize>(data->nodeData.rotatingIdLen), jRotatingId);
 
     if (err != CHIP_NO_ERROR)
     {

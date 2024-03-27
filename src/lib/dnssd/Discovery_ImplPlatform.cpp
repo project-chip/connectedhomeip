@@ -749,17 +749,17 @@ CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryC
 
     switch (type)
     {
-        case DiscoveryType::kCommissionableNode:
-            err = DiscoverCommissionableNodes(filter, context);
-            break;
-        case DiscoveryType::kCommissionerNode:
-            err = DiscoverCommissioners(filter, context);
-            break;
-        case DiscoveryType::kOperational:
-            err = CHIP_ERROR_NOT_IMPLEMENTED;
-            break;
-        default:
-            break;
+    case DiscoveryType::kCommissionableNode:
+        err = DiscoverCommissionableNodes(filter, context);
+        break;
+    case DiscoveryType::kCommissionerNode:
+        err = DiscoverCommissioners(filter, context);
+        break;
+    case DiscoveryType::kOperational:
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        break;
+    default:
+        break;
     }
     return err;
 }
