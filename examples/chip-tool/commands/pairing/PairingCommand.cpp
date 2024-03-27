@@ -430,6 +430,8 @@ void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioning
         ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
                         userActiveModeTriggerInstruction.c_str());
     }
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
+                    info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
 }
 
 void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounter)
@@ -464,9 +466,9 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
     ChipLogProgress(chipTool, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId));
     ChipLogProgress(chipTool,
                     "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
-                    " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s",
+                    " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s / ICDCounter %u",
                     ChipLogValueX64(nodeId), ChipLogValueX64(mICDCheckInNodeId.Value()),
-                    ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex);
+                    ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex, icdCounter);
 }
 
 void PairingCommand::OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedActiveDuration)

@@ -78,7 +78,7 @@ enum CommissioningStage : uint8_t
     kNeedsNetworkCreds,
 };
 
-enum ICDRegistrationStrategy : uint8_t
+enum class ICDRegistrationStrategy : uint8_t
 {
     kIgnore,         ///< Do not check whether the device is an ICD during commissioning
     kBeforeComplete, ///< Do commissioner self-registration or external controller registration,
@@ -699,11 +699,18 @@ struct GeneralCommissioningInfo
 struct ICDManagementClusterInfo
 {
     // Whether the ICD is capable of functioning as a LIT device.  If false, the ICD can only be a SIT device.
-    bool isLIT;
+    bool isLIT = false;
     // Whether the ICD supports the check-in protocol.  LIT devices have to support it, but SIT devices
     // might or might not.
-    bool checkInProtocolSupport;
-
+    bool checkInProtocolSupport = false;
+    // Indicate the maximum interval in seconds the server can stay in idle mode.
+    uint32_t idleModeDuration = 0;
+    // Indicate the minimum interval in milliseconds the server typically will stay in active mode after initial transition out of
+    // idle mode.
+    uint32_t activeModeDuration = 0;
+    // Indicate the minimum amount of time in milliseconds the server typically will stay active after network activity when in
+    // active mode.
+    uint16_t activeModeThreshold = 0;
     // userActiveModeTriggerHint indicates which user action(s) will trigger the ICD to switch to Active mode.
     // For a LIT: The device is required to provide a value for the bitmap.
     // For a SIT: The device may not provide a value.  In that case, none of the bits will be set.

@@ -743,7 +743,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             if (mParams.GetCheckForMatchingFabric())
             {
-                chip::NodeId nodeId = mDeviceCommissioningInfo.remoteNodeId;
+                NodeId nodeId = mDeviceCommissioningInfo.remoteNodeId;
                 if (nodeId != kUndefinedNodeId)
                 {
                     mParams.SetRemoteNodeId(nodeId);
