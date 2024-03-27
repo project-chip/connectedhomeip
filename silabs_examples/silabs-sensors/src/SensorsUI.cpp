@@ -116,8 +116,7 @@ void SensorsUI::DrawNextScreen(GLIB_Context_t * glibContext)
 #ifdef DISPLAY_ENABLED
         GLIB_clear(glibContext);
         demoUIDisplayHeader((char *) mName);
-        demoUIDisplayProtocol(DEMO_UI_PROTOCOL1, false);
-        demoUIDisplayProtocol(DEMO_UI_PROTOCOL2, false);
+        demoUIDisplayProtocols();
         GLIB_drawBitmap(glibContext, (glibContext->pDisplayGeometry->xSize - APP_BITMAP_WIDTH) / 2, glibContext->pDisplayGeometry->ySize - APP_BITMAP_HEIGHT - 5, APP_BITMAP_WIDTH, APP_BITMAP_HEIGHT,
                 (OnStateOccupancySensorBitMap));
         #if SL_LCDCTRL_MUX
@@ -142,8 +141,7 @@ void SensorsUI::DrawNextScreen(GLIB_Context_t * glibContext)
 #ifdef DISPLAY_ENABLED
         GLIB_clear(glibContext);
         demoUIDisplayHeader((char *) mName);
-        demoUIDisplayProtocol(DEMO_UI_PROTOCOL1, false);
-        demoUIDisplayProtocol(DEMO_UI_PROTOCOL2, false);
+        demoUIDisplayProtocols();
         GLIB_drawBitmap(glibContext, (glibContext->pDisplayGeometry->xSize - APP_BITMAP_WIDTH) / 2, glibContext->pDisplayGeometry->ySize - APP_BITMAP_HEIGHT - 5, APP_BITMAP_WIDTH, APP_BITMAP_HEIGHT,
                 (OnStateContactSensorBitMap));
         #if SL_LCDCTRL_MUX
