@@ -71,6 +71,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 using namespace ::chip::Messaging;
 using namespace ::chip::Controller;

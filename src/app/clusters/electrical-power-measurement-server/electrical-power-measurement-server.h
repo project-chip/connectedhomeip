@@ -29,9 +29,6 @@ namespace app {
 namespace Clusters {
 namespace ElectricalPowerMeasurement {
 
-using namespace chip::app::Clusters::ElectricalPowerMeasurement::Attributes;
-using namespace chip::app::Clusters::ElectricalPowerMeasurement::Structs;
-
 class Delegate
 {
 public:

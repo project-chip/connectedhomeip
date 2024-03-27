@@ -55,6 +55,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
 using namespace chip::Credentials;
+using namespace chip::Crypto;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {

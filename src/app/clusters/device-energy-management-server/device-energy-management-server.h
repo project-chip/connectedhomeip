@@ -34,8 +34,6 @@ namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
-using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
-
 class Delegate
 {
 public:
@@ -160,24 +158,24 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual ESATypeEnum GetESAType()                                                 = 0;
-    virtual bool GetESACanGenerate()                                                 = 0;
-    virtual ESAStateEnum GetESAState()                                               = 0;
-    virtual int64_t GetAbsMinPower()                                                 = 0;
-    virtual int64_t GetAbsMaxPower()                                                 = 0;
-    virtual PowerAdjustmentCapability::TypeInfo::Type GetPowerAdjustmentCapability() = 0;
-    virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast()         = 0;
-    virtual OptOutStateEnum GetOptOutState()                                         = 0;
+    virtual ESATypeEnum GetESAType()                                                             = 0;
+    virtual bool GetESACanGenerate()                                                             = 0;
+    virtual ESAStateEnum GetESAState()                                                           = 0;
+    virtual int64_t GetAbsMinPower()                                                             = 0;
+    virtual int64_t GetAbsMaxPower()                                                             = 0;
+    virtual Attributes::PowerAdjustmentCapability::TypeInfo::Type GetPowerAdjustmentCapability() = 0;
+    virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast()                     = 0;
+    virtual OptOutStateEnum GetOptOutState()                                                     = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
-    virtual CHIP_ERROR SetESAType(ESATypeEnum)                                                 = 0;
-    virtual CHIP_ERROR SetESACanGenerate(bool)                                                 = 0;
-    virtual CHIP_ERROR SetESAState(ESAStateEnum)                                               = 0;
-    virtual CHIP_ERROR SetAbsMinPower(int64_t)                                                 = 0;
-    virtual CHIP_ERROR SetAbsMaxPower(int64_t)                                                 = 0;
-    virtual CHIP_ERROR SetPowerAdjustmentCapability(PowerAdjustmentCapability::TypeInfo::Type) = 0;
-    virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type>)         = 0;
+    virtual CHIP_ERROR SetESAType(ESATypeEnum)                                                             = 0;
+    virtual CHIP_ERROR SetESACanGenerate(bool)                                                             = 0;
+    virtual CHIP_ERROR SetESAState(ESAStateEnum)                                                           = 0;
+    virtual CHIP_ERROR SetAbsMinPower(int64_t)                                                             = 0;
+    virtual CHIP_ERROR SetAbsMaxPower(int64_t)                                                             = 0;
+    virtual CHIP_ERROR SetPowerAdjustmentCapability(Attributes::PowerAdjustmentCapability::TypeInfo::Type) = 0;
+    virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type>)                     = 0;
 
 protected:
     EndpointId mEndpointId = 0;
