@@ -1,0 +1,224 @@
+diff --git a/examples/platform/silabs/efr32/rs911x/wfx_rsi_host.cpp b/examples/platform/silabs/efr32/rs911x/wfx_rsi_host.cpp
+index 8764c0a9dd..94642bf2e4 100644
+--- a/examples/platform/silabs/efr32/rs911x/wfx_rsi_host.cpp
++++ b/examples/platform/silabs/efr32/rs911x/wfx_rsi_host.cpp
+@@ -341,45 +341,6 @@ bool wfx_hw_ready(void)
+     return (wfx_rsi.dev_state & WFX_RSI_ST_DEV_READY) ? true : false;
+ }
+ 
+-/*********************************************************************
+- * @fn  int32_t wfx_get_ap_info(wfx_wifi_scan_result_t *ap)
+- * @brief
+- *      get the access point information
+- * @param[in]  ap: access point
+- * @return
+- *      access point information
+- ***********************************************************************/
+-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
+-{
+-    return wfx_rsi_get_ap_info(ap);
+-}
+-
+-/*********************************************************************
+- * @fn   int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t *extra_info)
+- * @brief
+- *      get the access point extra information
+- * @param[in]  extra_info:access point extra information
+- * @return
+- *      access point extra information
+- ***********************************************************************/
+-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
+-{
+-    return wfx_rsi_get_ap_ext(extra_info);
+-}
+-
+-/***************************************************************************
+- * @fn   int32_t wfx_reset_counts(){
+- * @brief
+- *      get the driver reset count
+- * @param[in]  None
+- * @return
+- *      reset count
+- *****************************************************************************/
+-int32_t wfx_reset_counts()
+-{
+-    return wfx_rsi_reset_count();
+-}
+-
+ #ifdef SL_WFX_CONFIG_SCAN
+ /*******************************************************************************
+  * @fn   bool wfx_start_scan(char *ssid, void (*callback)(wfx_wifi_scan_result_t *))
+diff --git a/examples/platform/silabs/efr32/wf200/host_if.cpp b/examples/platform/silabs/efr32/wf200/host_if.cpp
+index 041a177842..e34e464a92 100644
+--- a/examples/platform/silabs/efr32/wf200/host_if.cpp
++++ b/examples/platform/silabs/efr32/wf200/host_if.cpp
+@@ -765,7 +765,7 @@ static void wfx_wifi_hw_start(void)
+  * @param[in]  ap: access point information
+  * @return returns -1
+  **************************************************************************/
+-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
++int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
+ {
+     int32_t signal_strength;
+     SILABS_LOG("WIFI:SSID:: %s", &ap_info.ssid[0]);
+@@ -794,7 +794,7 @@ int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
+  * @param[in]  extra_info: access point extra information
+  * @return returns -1
+  **************************************************************************/
+-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
++int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
+ {
+     int32_t status;
+     status = get_all_counters();
+@@ -890,7 +890,7 @@ error_handler:
+  *    reset the count
+  * @return returns -1
+  **************************************************************************/
+-int32_t wfx_reset_counts()
++int32_t wfx_rsi_reset_count()
+ {
+     /* TODO */
+     return -1;
+diff --git a/src/platform/silabs/DiagnosticDataProviderImpl.cpp b/src/platform/silabs/DiagnosticDataProviderImpl.cpp
+index 03afa5efe2..a057a273c9 100644
+--- a/src/platform/silabs/DiagnosticDataProviderImpl.cpp
++++ b/src/platform/silabs/DiagnosticDataProviderImpl.cpp
+@@ -371,7 +371,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
+     VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+ 
+     wfx_wifi_scan_result_t ap;
+-    int32_t err = wfx_get_ap_info(&ap);
++    int32_t err = wfx_rsi_get_ap_info(&ap);
+     if (err == 0)
+     {
+         memcpy(BssId.data(), ap.bssid, bssIdSize);
+@@ -386,7 +386,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
+     using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+ 
+     wfx_wifi_scan_result_t ap;
+-    int32_t err = wfx_get_ap_info(&ap);
++    int32_t err = wfx_rsi_get_ap_info(&ap);
+     if (err == 0)
+     {
+         // TODO: Is this actually right?  Do the wfx_wifi_scan_result_t values
+@@ -406,7 +406,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
+ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
+ {
+     wfx_wifi_scan_result_t ap;
+-    int32_t err = wfx_get_ap_info(&ap);
++    int32_t err = wfx_rsi_get_ap_info(&ap);
+     if (err == 0)
+     {
+         channelNumber = ap.chan;
+@@ -418,7 +418,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
+ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
+ {
+     wfx_wifi_scan_result_t ap;
+-    int32_t err = wfx_get_ap_info(&ap);
++    int32_t err = wfx_rsi_get_ap_info(&ap);
+     if (err == 0)
+     {
+         rssi = ap.rssi;
+@@ -430,7 +430,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
+ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+ {
+     wfx_wifi_scan_ext_t extra_info;
+-    int32_t err = wfx_get_ap_ext(&extra_info);
++    int32_t err = wfx_rsi_get_ap_ext(&extra_info);
+     if (err == 0)
+     {
+         beaconLostCount = extra_info.beacon_lost_count;
+@@ -447,7 +447,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
+ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+ {
+     wfx_wifi_scan_ext_t extra_info;
+-    int32_t err = wfx_get_ap_ext(&extra_info);
++    int32_t err = wfx_rsi_get_ap_ext(&extra_info);
+     if (err == 0)
+     {
+         packetMulticastRxCount = extra_info.mcast_rx_count;
+@@ -459,7 +459,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t &
+ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+ {
+     wfx_wifi_scan_ext_t extra_info;
+-    int32_t err = wfx_get_ap_ext(&extra_info);
++    int32_t err = wfx_rsi_get_ap_ext(&extra_info);
+     if (err == 0)
+     {
+         packetMulticastTxCount = extra_info.mcast_tx_count;
+@@ -471,7 +471,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t &
+ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
+ {
+     wfx_wifi_scan_ext_t extra_info;
+-    int32_t err = wfx_get_ap_ext(&extra_info);
++    int32_t err = wfx_rsi_get_ap_ext(&extra_info);
+     if (err == 0)
+     {
+         packetUnicastRxCount = extra_info.ucast_rx_count;
+@@ -483,7 +483,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
+ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+ {
+     wfx_wifi_scan_ext_t extra_info;
+-    int32_t err = wfx_get_ap_ext(&extra_info);
++    int32_t err = wfx_rsi_get_ap_ext(&extra_info);
+     if (err == 0)
+     {
+         packetUnicastTxCount = extra_info.ucast_tx_count;
+@@ -495,7 +495,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
+ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
+ {
+     wfx_wifi_scan_ext_t extra_info;
+-    int32_t err = wfx_get_ap_ext(&extra_info);
++    int32_t err = wfx_rsi_get_ap_ext(&extra_info);
+     if (err == 0)
+     {
+         overrunCount = extra_info.overrun_count;
+@@ -507,7 +507,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
+ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+ {
+     wfx_wifi_scan_ext_t extra_info;
+-    int32_t err = wfx_get_ap_ext(&extra_info);
++    int32_t err = wfx_rsi_get_ap_ext(&extra_info);
+     if (err == 0)
+     {
+         beaconRxCount = extra_info.beacon_rx_count;
+@@ -518,7 +518,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
+ 
+ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
+ {
+-    int32_t err = wfx_reset_counts();
++    int32_t err = wfx_rsi_reset_counts();
+     if (err == 0)
+     {
+         return CHIP_NO_ERROR;
+diff --git a/src/platform/silabs/SiWx917/wifi/wfx_host_events.h b/src/platform/silabs/SiWx917/wifi/wfx_host_events.h
+index 455563e189..1ec04721f0 100644
+--- a/src/platform/silabs/SiWx917/wifi/wfx_host_events.h
++++ b/src/platform/silabs/SiWx917/wifi/wfx_host_events.h
+@@ -209,9 +209,6 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t *
+ void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
+ bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
+ bool wfx_is_sta_mode_enabled(void);
+-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
+-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
+-int32_t wfx_reset_counts();
+ 
+ void wfx_clear_wifi_provision(void);
+ sl_status_t wfx_connect_to_ap(void);
+diff --git a/src/platform/silabs/efr32/wifi/wfx_host_events.h b/src/platform/silabs/efr32/wifi/wfx_host_events.h
+index b7a7c936b8..bfa14ed110 100644
+--- a/src/platform/silabs/efr32/wifi/wfx_host_events.h
++++ b/src/platform/silabs/efr32/wifi/wfx_host_events.h
+@@ -323,9 +323,9 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
+ bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
+ bool wfx_is_sta_provisioned(void);
+ bool wfx_is_sta_mode_enabled(void);
+-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
+-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
+-int32_t wfx_reset_counts();
++int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
++int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
++int32_t wfx_rsi_reset_counts();
+ 
+ void wfx_clear_wifi_provision(void);
+ sl_status_t wfx_connect_to_ap(void);
