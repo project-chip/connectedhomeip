@@ -858,7 +858,7 @@ class ChipDeviceControllerBase():
 
         if allowPASE:
             returnDevice = c_void_p(None)
-            res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
             if res.is_success:
                 logging.info('Using PASE connection')
@@ -888,11 +888,12 @@ class ChipDeviceControllerBase():
 
         closure = DeviceAvailableClosure(eventLoop, future)
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
-        self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
+        res = await self._ChipStack.CallAsync(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
             self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback),
-            timeoutMs).raise_on_error()
+            timeoutMs)
+        res.raise_on_error()
 
-        # The callback might have been received synchronously (during self._ChipStack.Call()).
+        # The callback might have been received synchronously (during self._ChipStack.CallAsync()).
         # In that case the Future has already been set it will return immediately
         if timeoutMs is not None:
             timeout = float(timeoutMs) / 1000
@@ -1020,13 +1021,14 @@ class ChipDeviceControllerBase():
         future = eventLoop.create_future()
 
         device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
-        ClusterCommand.SendCommand(
+        res = await ClusterCommand.SendCommand(
             future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
                 EndpointId=endpoint,
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
             ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse).raise_on_error()
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
+        res.raise_on_error()
         return await future
 
     async def SendBatchCommands(self, nodeid: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
@@ -1062,10 +1064,11 @@ class ChipDeviceControllerBase():
 
         device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
 
-        ClusterCommand.SendBatchCommands(
+        res = await ClusterCommand.SendBatchCommands(
             future, eventLoop, device.deviceProxy, commands,
             timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse).raise_on_error()
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
+        res.raise_on_error()
         return await future
 
     def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Union[None, int] = None):
