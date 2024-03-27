@@ -22,7 +22,6 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
 using namespace chip::DeviceLayer;
@@ -35,8 +34,14 @@ static chip::OTAMultiImageProcessorImpl gImageProcessor;
 #endif // SL_WIFI
 
 extern "C" {
+#if SL_BTLCTRL_MUX
 #include "btl_interface.h"
 #include "sl_core.h"
+#endif // SL_BTLCTRL_MUX
+#include "em_bus.h" // For CORE_CRITICAL_SECTION
+#ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
+#include "spi_multiplex.h"
+#endif // SL_WIFI
 }
 
 namespace chip {
@@ -115,7 +120,9 @@ void OTAMultiImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload: started");
 
+#ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
     CORE_CRITICAL_SECTION(bootloader_init();)
+#endif
 
     imageProcessor->mParams.downloadedBytes = 0;
 
@@ -421,8 +428,15 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
 
+<<<<<<< HEAD
     // This reboots the device
+=======
+    // TODO: check where to put this
+    // ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
+#ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
+>>>>>>> ac92393594 (Added changes for the build errores)
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
+#endif
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ReleaseBlock()

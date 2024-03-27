@@ -46,7 +46,7 @@ uint8_t flag = RPS_HEADER;
 namespace chip {
 
 // Define static memebers
-uint8_t OTAFirmwareProcessor::mReset                                                  = false;
+//bool OTAFirmwareProcessor::mReset                                                      = false;
 uint32_t OTAFirmwareProcessor::mWriteOffset                                            = 0;
 uint16_t OTAFirmwareProcessor::writeBufOffset                                          = 0;
 uint8_t OTAFirmwareProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
@@ -109,23 +109,17 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
                     // should be set to true in HandleProcessBlock
                     if (status == SL_STATUS_FW_UPDATE_DONE)
                     {
-                        mReset = true;
+                        //mReset = true;
                     }
                     else
                     {
                         ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error %ld", status);
-                        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                        return;
+                        // TODO: add this somewhere
+                        // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+                        // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
+                        return CHIP_ERROR_CANCELLED;
                     }
                 }
-            }
-            if (err)
-            {
-                ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage() error: %ld", err);
-                // TODO: add this somewhere
-                // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
-                return CHIP_ERROR_CANCELLED;
             }
             mWriteOffset += kAlignmentBytes;
         }
@@ -147,25 +141,15 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 
 CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
 {
-    uint32_t err = SL_BOOTLOADER_OK;
-    if (err != SL_BOOTLOADER_OK)
-    {
-        ChipLogError(SoftwareUpdate, "bootloader_verifyImage() error: %ld", err);
-        // Call the OTARequestor API to reset the state
-        GetRequestorInstance()->CancelImageUpdate();
-
-        return SL_GENERIC_OTA_ERROR;
-    }
-
-    CORE_CRITICAL_SECTION(err = bootloader_setImageToBootload(mSlotId);)
-    if (err != SL_BOOTLOADER_OK)
-    {
-        ChipLogError(SoftwareUpdate, "bootloader_setImageToBootload() error: %ld", err);
-        // Call the OTARequestor API to reset the state
-        GetRequestorInstance()->CancelImageUpdate();
-        return SL_GENERIC_OTA_ERROR;
-    }
-    
+    // This reboots the device
+    // if (mReset)
+    // {
+    //     ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
+    //     // send system reset request to reset the MCU and upgrade the m4 image
+    //     ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
+    //     // Reboots the device
+    //     sl_si91x_soc_soft_reset();
+    // }  
     return CHIP_NO_ERROR;
 }
 
@@ -189,19 +173,22 @@ CHIP_ERROR OTAFirmwareProcessor::FinalizeAction()
         {
             if (status == SL_STATUS_FW_UPDATE_DONE)
             {
-                mReset = true;
+                // mReset = true;
             }
             else
             {
                 ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk sl_si91x_fwup_load() error %ld", status);
-                imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                return;
+
+                // TODO: add this somewhere
+                // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+                // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
+                return CHIP_ERROR_CANCELLED;
             }
         }
 
     }
 
-    return err ? CHIP_ERROR_WRITE_FAILED : CHIP_NO_ERROR;
+    return status ? CHIP_ERROR_CANCELLED : CHIP_NO_ERROR;
 }
 
 } // namespace chip
