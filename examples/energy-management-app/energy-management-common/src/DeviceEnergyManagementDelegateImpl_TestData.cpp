@@ -54,7 +54,7 @@ static Structs::SlotStruct::Type gSlot[2]{
     Optional<int64_t>{ 4 },                         // nominalEnergy;
 
     Optional<DataModel::List<const Structs::CostStruct::Type>>{
-        DataModel::List<const Structs::CostStruct::Type>(gCosts, 2),
+        DataModel::List<const Structs::CostStruct::Type>{gCosts, 2},
     },
 
     Optional<int64_t>{ 5 },  // minPowerAdjustment;
