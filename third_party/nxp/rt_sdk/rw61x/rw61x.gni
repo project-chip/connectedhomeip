@@ -205,7 +205,7 @@ template("rw61x_sdk_drivers") {
     libs = []
 
     if (defined(invoker.defines)) {
-      defines += invoker.defines
+      defines = invoker.defines
     } else {
       defines = []
     }
