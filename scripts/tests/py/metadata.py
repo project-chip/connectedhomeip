@@ -30,17 +30,10 @@ class Metadata:
     storage_path: str = None
     on_network_commission: str = None
     passcode: int = None
-    trace_to: str = None
-    hex_arg: str = None
     endpoint: str = None
     manual_code: str = None
-    bool_arg: str = None
     PICS: str = None
     tests: str = None
-    int_arg: str = None
-    trace_to_appjson: str = None
-    trace_to_testjson: str = None
-    trace_toperfetto: str = None
 
 
 class Metadata_Reader:
