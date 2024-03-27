@@ -5,14 +5,19 @@ steps:
           - "-c"
           - |
               git config --global --add safe.directory "*"
-              git submodule update --init --recursive
+              python scripts/checkout_submodules.py \
+                  --platform esp32       \
+                  --platform nrfconnect  \
+                  --platform silabs      \
+                  --platform linux       \
+                  --platform android
       id: Submodules
     - name: "ghcr.io/project-chip/chip-build-vscode:41"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - "-c"
-          - source ./scripts/bootstrap.sh -p all,nrfconnect
+          - source ./scripts/bootstrap.sh -p all,esp32,nrfconnect,silabs,linux,android
       id: Bootstrap
       waitFor:
           - Submodules
