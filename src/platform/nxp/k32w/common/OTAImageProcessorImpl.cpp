@@ -407,7 +407,6 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 
 void OTAImageProcessorImpl::FetchNextData(uint32_t context)
 {
-    CHIP_ERROR error      = CHIP_NO_ERROR;
     auto * imageProcessor = &OTAImageProcessorImpl::GetDefaultInstance();
     SystemLayer().ScheduleLambda([imageProcessor] {
         if (imageProcessor->mDownloader)
