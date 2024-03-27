@@ -39,7 +39,7 @@ std::string getMacAddress()
     }
 
     char macStr[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength * 2 + 1] = { 0 }; // added null char
-    if (BytesToHex(&macBuffer[0], sizeof(macBuffer), &macStr[0], sizeof(macBuffer) * 2u, chip::Encoding::HexFlags::kUppercase) !=
+    if (BytesToHex(mac.data(), mac.size(), &macStr[0], sizeof(macBuffer) * 2u, chip::Encoding::HexFlags::kUppercase) !=
         CHIP_NO_ERROR)
     {
         ChipLogProgress(Zcl, "WakeOnLanManager::getMacAddress hex conversion failed");

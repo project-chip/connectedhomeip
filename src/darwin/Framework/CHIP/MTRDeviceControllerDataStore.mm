@@ -125,10 +125,12 @@ static bool IsValidCATNumber(id _Nullable value)
 
     __block id resumptionNodeList;
     dispatch_sync(_storageDelegateQueue, ^{
-        resumptionNodeList = [_storageDelegate controller:_controller
-                                              valueForKey:sResumptionNodeListKey
-                                            securityLevel:MTRStorageSecurityLevelSecure
-                                              sharingType:MTRStorageSharingTypeNotShared];
+        @autoreleasepool {
+            resumptionNodeList = [_storageDelegate controller:_controller
+                                                  valueForKey:sResumptionNodeListKey
+                                                securityLevel:MTRStorageSecurityLevelSecure
+                                                  sharingType:MTRStorageSharingTypeNotShared];
+        }
     });
     if (resumptionNodeList != nil) {
         if (![resumptionNodeList isKindOfClass:[NSArray class]]) {
@@ -145,6 +147,7 @@ static bool IsValidCATNumber(id _Nullable value)
     } else {
         _nodesWithResumptionInfo = [[NSMutableArray alloc] init];
     }
+
     return self;
 }
 
@@ -233,10 +236,12 @@ static bool IsValidCATNumber(id _Nullable value)
 {
     __block id data;
     dispatch_sync(_storageDelegateQueue, ^{
-        data = [_storageDelegate controller:_controller
-                                valueForKey:sLastLocallyUsedNOCKey
-                              securityLevel:MTRStorageSecurityLevelSecure
-                                sharingType:MTRStorageSharingTypeNotShared];
+        @autoreleasepool {
+            data = [_storageDelegate controller:_controller
+                                    valueForKey:sLastLocallyUsedNOCKey
+                                  securityLevel:MTRStorageSecurityLevelSecure
+                                    sharingType:MTRStorageSharingTypeNotShared];
+        }
     });
 
     if (data == nil) {
@@ -259,10 +264,12 @@ static bool IsValidCATNumber(id _Nullable value)
 
     __block id resumptionInfo;
     dispatch_sync(_storageDelegateQueue, ^{
-        resumptionInfo = [_storageDelegate controller:_controller
-                                          valueForKey:key
-                                        securityLevel:MTRStorageSecurityLevelSecure
-                                          sharingType:MTRStorageSharingTypeNotShared];
+        @autoreleasepool {
+            resumptionInfo = [_storageDelegate controller:_controller
+                                              valueForKey:key
+                                            securityLevel:MTRStorageSecurityLevelSecure
+                                              sharingType:MTRStorageSharingTypeNotShared];
+        }
     });
 
     if (resumptionInfo == nil) {
@@ -304,11 +311,12 @@ static bool IsValidCATNumber(id _Nullable value)
 - (id)_fetchAttributeCacheValueForKey:(NSString *)key expectedClass:(Class)expectedClass;
 {
     id data;
-    data = [_storageDelegate controller:_controller
-                            valueForKey:key
-                          securityLevel:MTRStorageSecurityLevelSecure
-                            sharingType:MTRStorageSharingTypeNotShared];
-
+    @autoreleasepool {
+        data = [_storageDelegate controller:_controller
+                                valueForKey:key
+                              securityLevel:MTRStorageSecurityLevelSecure
+                                sharingType:MTRStorageSharingTypeNotShared];
+    }
     if (data == nil) {
         return nil;
     }

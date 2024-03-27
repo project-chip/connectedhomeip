@@ -84,7 +84,11 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 static NSString * const kErrorSessionKeystoreInit = @"Init failure while initializing session keystore";
 
 static bool sExitHandlerRegistered = false;
-static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory]; }
+static void ShutdownOnExit()
+{
+    MTR_LOG_INFO("ShutdownOnExit invoked on exit");
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+}
 
 @interface MTRDeviceControllerFactory () {
     MTRServerEndpoint * _otaProviderEndpoint;
@@ -323,6 +327,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (void)cleanupStartupObjects
 {
+    MTR_LOG_INFO("Cleaning startup objects in controller factory");
+
     // Make sure the deinit order here is the reverse of the init order in
     // startControllerFactory:
     _certificationDeclarationCertificates = nil;
@@ -562,7 +568,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         [_controllers[0] shutdown];
     }
 
-    MTR_LOG_DEBUG("Shutting down the Matter controller factory");
+    MTR_LOG_INFO("Shutting down the Matter controller factory");
     _controllerFactory->Shutdown();
 
     [self cleanupStartupObjects];

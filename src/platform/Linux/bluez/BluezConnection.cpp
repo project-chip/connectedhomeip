@@ -34,7 +34,6 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "BluezEndpoint.h"
-#include "BluezObjectList.h"
 #include "Types.h"
 
 namespace chip {
@@ -46,22 +45,22 @@ namespace {
 gboolean BluezIsServiceOnDevice(BluezGattService1 * aService, BluezDevice1 * aDevice)
 {
     const auto * servicePath = bluez_gatt_service1_get_device(aService);
-    const auto * devicePath  = g_dbus_proxy_get_object_path(G_DBUS_PROXY(aDevice));
+    const auto * devicePath  = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aDevice));
     return strcmp(servicePath, devicePath) == 0 ? TRUE : FALSE;
 }
 
 gboolean BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService1 * aService)
 {
     const auto * charPath    = bluez_gatt_characteristic1_get_service(aChar);
-    const auto * servicePath = g_dbus_proxy_get_object_path(G_DBUS_PROXY(aService));
+    const auto * servicePath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(aService));
     ChipLogDetail(DeviceLayer, "Char %s on service %s", charPath, servicePath);
     return strcmp(charPath, servicePath) == 0 ? TRUE : FALSE;
 }
 
 } // namespace
 
-BluezConnection::BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice) :
-    mDevice(reinterpret_cast<BluezDevice1 *>(g_object_ref(apDevice)))
+BluezConnection::BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 & aDevice) :
+    mDevice(reinterpret_cast<BluezDevice1 *>(g_object_ref(&aDevice)))
 {
     Init(aEndpoint);
 }
@@ -89,7 +88,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
     }
     else
     {
-        for (BluezObject & object : BluezObjectList(aEndpoint.mObjMgr.get()))
+        for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
         {
             BluezGattService1 * service = bluez_object_get_gatt_service1(&object);
             if (service != nullptr)
@@ -106,7 +105,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
         VerifyOrExit(mService, ChipLogError(DeviceLayer, "FAIL: NULL service in %s", __func__));
 
-        for (BluezObject & object : BluezObjectList(aEndpoint.mObjMgr.get()))
+        for (BluezObject & object : aEndpoint.mObjectManager.GetObjects())
         {
             BluezGattCharacteristic1 * char1 = bluez_object_get_gatt_characteristic1(&object);
             if (char1 != nullptr)
