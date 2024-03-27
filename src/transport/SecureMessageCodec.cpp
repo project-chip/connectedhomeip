@@ -37,11 +37,11 @@ using System::PacketBufferHandle;
 namespace SecureMessageCodec {
 
 CHIP_ERROR Encrypt(const CryptoContext & context, CryptoContext::ConstNonceView nonce, PayloadHeader & payloadHeader,
-                   PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf)
+                   PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, size_t inputMaxLength)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    VerifyOrReturnError(msgBuf->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(msgBuf->TotalLength() <= inputMaxLength, CHIP_ERROR_MESSAGE_TOO_LONG);
 
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
