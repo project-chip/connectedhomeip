@@ -8,7 +8,7 @@ Generally regenerate using one of:
   - ./scripts/codegen.py --output-dir docs --generator summary-markdown src/controller/data_model/controller-clusters.matter
 -->
 
-## List of currently defined clusters
+## List of currently defined ZAP clusters
 
 | Code (dec) | Code (hex) | Name                                                    |
 | ---------- | ---------- | ------------------------------------------------------- |
