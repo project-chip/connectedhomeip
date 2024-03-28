@@ -59,11 +59,12 @@ public:
 
     static constexpr uint16_t kRamBufferInitialSize = 512;
 
-    RamStorage(uint16_t aPdmId) : mPdmId(aPdmId), mBuffer(nullptr) {}
+    RamStorage(uint16_t aPdmId, const char * name) : mPdmId(aPdmId), mBuffer(nullptr), mName(name) {}
 
     CHIP_ERROR Init(uint16_t aInitialSize, bool extendedSearch = false);
     void FreeBuffer();
     Buffer * GetBuffer() const { return mBuffer; }
+    const char * GetName() const { return mName; }
     CHIP_ERROR Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength) const;
     CHIP_ERROR Write(uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength);
     CHIP_ERROR Delete(uint16_t aKey, int aIndex);
@@ -75,6 +76,7 @@ private:
 
     uint16_t mPdmId;
     Buffer * mBuffer;
+    const char * mName;
     bool mExtendedSearch;
 };
 
