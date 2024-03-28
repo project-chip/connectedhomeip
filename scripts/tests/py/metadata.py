@@ -16,24 +16,25 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 import yaml
+from typing import Optional
 
 
 @dataclass
 class Metadata:
-    py_script_path: str = None
-    run: str = None
-    app: str = None
-    factoryreset: bool = False
-    comissioning_method: str = None
-    discriminator: int = None
-    kvs: str = None
-    storage_path: str = None
-    on_network_commission: str = None
-    passcode: int = None
-    endpoint: str = None
-    manual_code: str = None
-    PICS: str = None
-    tests: str = None
+    py_script_path: Optional[str] = None
+    run: Optional[str] = None
+    app: Optional[str] = None
+    factoryreset: Optional[bool] = False
+    comissioning_method: Optional[str] = None
+    discriminator: Optional[int] = None
+    kvs: Optional[str] = None
+    storage_path: Optional[str] = None
+    on_network_commission: Optional[str] = None
+    passcode: Optional[int] = None
+    endpoint: Optional[str] = None
+    manual_code: Optional[str] = None
+    PICS: Optional[str] = None
+    tests: Optional[str] = None
 
 
 class Metadata_Reader:
