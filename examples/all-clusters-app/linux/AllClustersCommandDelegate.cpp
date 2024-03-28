@@ -24,8 +24,8 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
 #include <air-quality-instance.h>
