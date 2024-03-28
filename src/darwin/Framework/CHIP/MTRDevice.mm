@@ -859,8 +859,10 @@ static NSString * const sAttributesKey = @"attributes";
     for (MTRClusterPath * clusterPath in clusterPaths) {
         NSNumber * dataVersion = _clusterData[clusterPath].dataVersion;
         NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes = [self _attributesForCluster:clusterPath];
-        MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:attributes];
-        clusterDataToReturn[clusterPath] = clusterData;
+        if (dataVersion || attributes) {
+            MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:attributes];
+            clusterDataToReturn[clusterPath] = clusterData;
+        }
     }
 
     return clusterDataToReturn;
