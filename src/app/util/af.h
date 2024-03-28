@@ -79,11 +79,6 @@ chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId 
  */
 #define emberAfAttributeSize(metadata) ((metadata)->size)
 
-#if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-// master array of all defined endpoints
-extern EmberAfDefinedEndpoint emAfEndpoints[];
-#endif
-
 /**
  * @brief Returns parent endpoint for a given endpoint index
  */
