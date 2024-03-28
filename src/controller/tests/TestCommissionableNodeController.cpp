@@ -40,7 +40,7 @@ public:
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override {}
     CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext &) override
     {
-        if (DiscoveryType::kCommissionerNode == type) return DiscoverCommissionersStatus; 
+        if (DiscoveryType::kCommissionerNode == type) return DiscoverCommissionersStatus;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     CHIP_ERROR StopDiscovery(DiscoveryContext &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }

@@ -309,7 +309,7 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
 
     // validate data as it was passed in
     OperationalNodeData operationalData;
-    NL_TEST_ASSERT(inSuite, chip::Dnssd::ExtractIdFromInstanceName(nodeData.nodeData.instanceName, &operationalData.peerId) == 
+    NL_TEST_ASSERT(inSuite, chip::Dnssd::ExtractIdFromInstanceName(nodeData.nodeData.instanceName, &operationalData.peerId) ==
                                 CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, operationalData.peerId ==
                        PeerId().SetCompressedFabricId(0x1234567898765432LL).SetNodeId(0xABCDEFEDCBAABCDELL));
