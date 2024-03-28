@@ -258,3 +258,30 @@ void unregisterAttributeAccessOverride(chip::app::AttributeAccessInterface * att
  */
 const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                 chip::AttributeId attributeId);
+
+/**
+ * @brief Returns true if endpoint contains the ZCL server with specified id.
+ *
+ * This function returns true if
+ * the endpoint contains server of a given cluster.
+ */
+bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId);
+
+/**
+ * @brief Returns true if endpoint of given index contains the ZCL server with specified id.
+ *
+ * This function returns true if
+ * the endpoint of given index contains server of a given cluster.
+ * If this function is used with a manufacturer specific clusterId
+ * then this will return the first cluster that it finds in the Cluster table.
+ * and will not return any other clusters that share that id.
+ */
+bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
+
+/**
+ * @brief Returns true if endpoint contains the ZCL client with specified id.
+ *
+ * This function returns true if
+ * the endpoint contains client of a given cluster.
+ */
+bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId);
