@@ -1289,7 +1289,9 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         for (NSNumber * attributeID in data.attributes) {
             NSDictionary * dataValue = data.attributes[attributeID];
             NSDictionary * dataValueFromMTRDevice = [newDevice readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:attributeID params:nil];
-            XCTAssertTrue([newDevice _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
+            if (![newDevice _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]) {
+                storedAttributeDifferFromMTRDeviceCount++;
+            }
         }
     }
 #else

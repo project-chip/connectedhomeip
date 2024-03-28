@@ -165,10 +165,10 @@ static NSString * const sAttributesKey = @"attributes";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRDeviceClusterData: dataVersion %@>", _dataVersion];
+    return [NSString stringWithFormat:@"<MTRDeviceClusterData: dataVersion %@ attributes count %lu>", _dataVersion, static_cast<unsigned long>(_attributes.count)];
 }
 
-- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary * _Nullable)attributes
+- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes
 {
     self = [super init];
     if (self == nil) {
@@ -840,9 +840,9 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
-// assume lock is held
-- (NSDictionary<NSNumber *, NSDictionary *> *)_attributesForCluster:(MTRClusterPath *)clusterPath
+- (NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)_attributesForCluster:(MTRClusterPath *)clusterPath
 {
+    os_unfair_lock_assert_owner(&self->_lock);
     NSMutableDictionary * attributesToReturn = [NSMutableDictionary dictionary];
     for (MTRAttributePath * attributePath in _readCache) {
         if ([attributePath.endpoint isEqualToNumber:clusterPath.endpoint] && [attributePath.cluster isEqualToNumber:clusterPath.cluster]) {
@@ -852,13 +852,13 @@ static NSString * const sAttributesKey = @"attributes";
     return attributesToReturn;
 }
 
-// assume lock is held
 - (NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)_clusterDataForPaths:(NSSet<MTRClusterPath *> *)clusterPaths
 {
+    os_unfair_lock_assert_owner(&self->_lock);
     NSMutableDictionary * clusterDataToReturn = [NSMutableDictionary dictionary];
     for (MTRClusterPath * clusterPath in clusterPaths) {
         NSNumber * dataVersion = _clusterData[clusterPath].dataVersion;
-        NSDictionary<NSNumber *, NSDictionary *> * attributes = [self _attributesForCluster:clusterPath];
+        NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes = [self _attributesForCluster:clusterPath];
         MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:attributes];
         clusterDataToReturn[clusterPath] = clusterData;
     }
@@ -1973,9 +1973,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     // Sanity check for nil cases
     if (!one && !theOther) {
+        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect comparing two nil dictionaries", self);
         return YES;
     }
-    if ((!one && theOther) || (one && !theOther)) {
+    if (!one || !theOther) {
+        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect a dictionary to be nil: %@ %@", self, one, theOther);
         return NO;
     }
 
@@ -2001,6 +2003,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 // Update cluster data version and also note the change, so at onReportEnd it can be persisted
 - (void)_noteDataVersion:(NSNumber *)dataVersion forClusterPath:(MTRClusterPath *)clusterPath
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     BOOL dataVersionChanged = NO;
     // Update data version used for subscription filtering
     MTRDeviceClusterData * clusterData = _clusterData[clusterPath];
@@ -2018,17 +2022,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         // Mark cluster path as needing persistence if needed
         BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
         if (dataStoreExists) {
-            if (!_clustersToPersist) {
-                _clustersToPersist = [NSMutableSet set];
-            }
-            [_clustersToPersist addObject:clusterPath];
+            [self _noteChangeForClusterPath:clusterPath];
         }
     }
 }
 
 // Assuming data store exists, note that the cluster should be persisted at onReportEnd
-- (void)_noteAttributeChangedForClusterPath:(MTRClusterPath *)clusterPath
+- (void)_noteChangeForClusterPath:(MTRClusterPath *)clusterPath
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     if (!_clustersToPersist) {
         _clustersToPersist = [NSMutableSet set];
     }
@@ -2092,7 +2095,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // Check if attribute needs to be persisted - compare only to read cache and disregard expected values
             if (dataStoreExists && readCacheValueChanged) {
 #if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
-                [self _noteAttributeChangedForClusterPath:clusterPath];
+                [self _noteChangeForClusterPath:clusterPath];
 #else
                 NSDictionary * attributeResponseValueToPersist;
                 if (dataVersion) {
@@ -2178,6 +2181,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)_setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     if (!attributeValues.count) {
         return;
     }

@@ -37,9 +37,7 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 MTR_TESTABLE
 @interface MTRDeviceClusterData : NSObject <NSSecureCoding, NSCopying>
 @property (nonatomic) NSNumber * dataVersion;
-#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
-@property (nonatomic) NSDictionary<NSNumber *, NSDictionary *> * attributes; // attributeID => data-value dictionary
-#endif
+@property (nonatomic) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
 @end
 
 @interface MTRDevice ()
