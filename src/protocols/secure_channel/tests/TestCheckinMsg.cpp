@@ -33,6 +33,7 @@
 using namespace chip;
 using namespace chip::Protocols;
 using namespace chip::Protocols::SecureChannel;
+using namespace chip::Crypto;
 using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
 
 namespace chip {

@@ -34,8 +34,6 @@
 namespace chip {
 namespace TestCerts {
 
-using namespace chip::Credentials;
-
 enum TestCert
 {
     kNone      = 0,
@@ -78,9 +76,9 @@ extern CHIP_ERROR GetTestCertKeypair(TestCert certType, Crypto::P256SerializedKe
 extern CHIP_ERROR GetTestCertSKID(TestCert certType, ByteSpan & skid);
 extern CHIP_ERROR GetTestCertAKID(TestCert certType, ByteSpan & akid);
 
-extern CHIP_ERROR DecodeTestCert(ChipCertificateData & certData, TestCert certType);
-extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags,
-                               BitFlags<CertDecodeFlags> decodeFlags);
+extern CHIP_ERROR DecodeTestCert(Credentials::ChipCertificateData & certData, TestCert certType);
+extern CHIP_ERROR LoadTestCert(Credentials::ChipCertificateSet & certSet, TestCert certType,
+                               BitFlags<TestCertLoadFlags> certLoadFlags, BitFlags<Credentials::CertDecodeFlags> decodeFlags);
 
 extern const TestCert gTestCerts[];
 extern const size_t gNumTestCerts;

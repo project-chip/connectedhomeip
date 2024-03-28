@@ -37,6 +37,8 @@
 
 #include <protocols/secure_channel/Constants.h>
 
+using namespace chip::Protocols::SecureChannel;
+
 namespace chip {
 namespace app {
 

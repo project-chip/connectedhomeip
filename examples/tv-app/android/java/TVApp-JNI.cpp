@@ -49,6 +49,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::AppPlatform;
 using namespace chip::Credentials;
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_TvApp_##METHOD_NAME
 
