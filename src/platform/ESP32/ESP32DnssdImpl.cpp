@@ -211,6 +211,22 @@ CHIP_ERROR EspDnssdRemoveServices()
     return CHIP_NO_ERROR;
 }
 
+static Inet::InterfaceId GetServiceInterfaceId(esp_netif_t *esp_netif)
+{
+    if (!esp_netif)
+    {
+        // If the InterfaceId in the context and esp_netif in current result is Null,
+        // we will use the Station or Ethernet netif by default.
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        return Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
+#elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+        return Inet::InterfaceId(
+            DeviceLayer::Internal::ESP32Utils::GetNetif(DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
+#endif
+    }
+    return Inet::InterfaceId(static_cast<struct netif *>(esp_netif_get_netif_impl(esp_netif)));
+}
+
 static Inet::IPAddressType MapAddressType(mdns_ip_protocol_t ip_protocol)
 {
     switch (ip_protocol)
@@ -331,30 +347,8 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
                 ctx->mService[servicesIndex].mTextEntrySize = currentResult->txt_count;
                 ctx->mService[servicesIndex].mSubTypes      = NULL;
                 ctx->mService[servicesIndex].mSubTypeSize   = 0;
-                if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
-                {
-                    if (currentResult->esp_netif)
-                    {
-                        ctx->mService[servicesIndex].mInterface =
-                            Inet::InterfaceId(static_cast<struct netif *>(esp_netif_get_netif_impl(currentResult->esp_netif)));
-                    }
-                    else
-                    {
-                        // If the InterfaceId in the context and esp_netif in current result is Null,
-                        // we will use the Station or Ethernet netif by default.
-                        ctx->mService[servicesIndex].mInterface =
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-                            Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
-#elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-                            Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetNetif(
-                                DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
-#endif
-                    }
-                }
-                else
-                {
-                    ctx->mService[servicesIndex].mInterface = ctx->mInterfaceId;
-                }
+                ctx->mService[servicesIndex].mInterface = ctx->mInterfaceId != chip::Inet::InterfaceId::Null() ?
+                    ctx->mInterfaceId : GetServiceInterfaceId(currentResult->esp_netif);
                 if (currentResult->addr)
                 {
                     Inet::IPAddress IPAddr;
@@ -431,31 +425,8 @@ static CHIP_ERROR ParseSrvResult(ResolveContext * ctx)
         ctx->mService->mPort          = ctx->mSrvQueryResult->port;
         ctx->mService->mSubTypes      = nullptr;
         ctx->mService->mSubTypeSize   = 0;
-        if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
-        {
-            if (ctx->mSrvQueryResult->esp_netif)
-            {
-                ctx->mService->mInterface =
-                    Inet::InterfaceId(static_cast<struct netif *>(esp_netif_get_netif_impl(ctx->mSrvQueryResult->esp_netif)));
-            }
-            else
-            {
-                // If the InterfaceId in the context and esp_netif in current result is Null,
-                // we will use the Station or Ethernet netif by default.
-                ctx->mService->mInterface =
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-                    Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
-#elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-                    Inet::InterfaceId(
-                        DeviceLayer::Internal::ESP32Utils::GetNetif(DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
-#endif
-            }
-        }
-        else
-        {
-            ctx->mService->mInterface = ctx->mInterfaceId;
-        }
-
+        ctx->mService->mInterface = ctx->mInterfaceId != chip::Inet::InterfaceId::Null() ?
+            ctx->mInterfaceId : GetServiceInterfaceId(ctx->mSrvQueryResult->esp_netif);
         return CHIP_NO_ERROR;
     }
     else
