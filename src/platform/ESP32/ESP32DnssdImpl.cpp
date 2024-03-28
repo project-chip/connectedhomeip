@@ -211,7 +211,7 @@ CHIP_ERROR EspDnssdRemoveServices()
     return CHIP_NO_ERROR;
 }
 
-static Inet::InterfaceId GetServiceInterfaceId(esp_netif_t *esp_netif)
+static Inet::InterfaceId GetServiceInterfaceId(esp_netif_t * esp_netif)
 {
     if (!esp_netif)
     {
@@ -347,8 +347,9 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
                 ctx->mService[servicesIndex].mTextEntrySize = currentResult->txt_count;
                 ctx->mService[servicesIndex].mSubTypes      = NULL;
                 ctx->mService[servicesIndex].mSubTypeSize   = 0;
-                ctx->mService[servicesIndex].mInterface = ctx->mInterfaceId != chip::Inet::InterfaceId::Null() ?
-                    ctx->mInterfaceId : GetServiceInterfaceId(currentResult->esp_netif);
+                ctx->mService[servicesIndex].mInterface     = ctx->mInterfaceId != chip::Inet::InterfaceId::Null()
+                        ? ctx->mInterfaceId
+                        : GetServiceInterfaceId(currentResult->esp_netif);
                 if (currentResult->addr)
                 {
                     Inet::IPAddress IPAddr;
@@ -425,8 +426,9 @@ static CHIP_ERROR ParseSrvResult(ResolveContext * ctx)
         ctx->mService->mPort          = ctx->mSrvQueryResult->port;
         ctx->mService->mSubTypes      = nullptr;
         ctx->mService->mSubTypeSize   = 0;
-        ctx->mService->mInterface = ctx->mInterfaceId != chip::Inet::InterfaceId::Null() ?
-            ctx->mInterfaceId : GetServiceInterfaceId(ctx->mSrvQueryResult->esp_netif);
+        ctx->mService->mInterface     = ctx->mInterfaceId != chip::Inet::InterfaceId::Null()
+                ? ctx->mInterfaceId
+                : GetServiceInterfaceId(ctx->mSrvQueryResult->esp_netif);
         return CHIP_NO_ERROR;
     }
     else
