@@ -121,7 +121,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/platform/mbed/MbedEventTimeout.h': {'chrono'},
 
     'src/app/app-platform/ContentApp.h': {'list', 'string'},
-    'src/app/clusters/application-basic-server/application-basic-delegate.h': {'list'},
+    'src/app/clusters/application-basic-server/application-basic-delegate.h': {'list', 'string'},
     'src/app/clusters/application-basic-server/application-basic-server.cpp': {'list'},
     'src/app/clusters/application-launcher-server/application-launcher-delegate.h': {'list'},
     'src/app/clusters/audio-output-server/audio-output-delegate.h': {'list'},
