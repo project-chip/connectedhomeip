@@ -20,6 +20,7 @@
 
 #include <string.h>
 
+#include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
@@ -28,7 +29,6 @@
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestRegistration.h>
-#include <lib/dnssd/ServiceNaming.h>
 
 #include <nlunit-test.h>
 
@@ -309,10 +309,10 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
 
     // validate data as it was passed in
     OperationalNodeData operationalData;
-    NL_TEST_ASSERT(inSuite, chip::Dnssd::ExtractIdFromInstanceName(nodeData.nodeData.instanceName, &operationalData.peerId) ==
-                                CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, operationalData.peerId ==
-                       PeerId().SetCompressedFabricId(0x1234567898765432LL).SetNodeId(0xABCDEFEDCBAABCDELL));
+    NL_TEST_ASSERT(
+        inSuite, chip::Dnssd::ExtractIdFromInstanceName(nodeData.nodeData.instanceName, &operationalData.peerId) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   operationalData.peerId == PeerId().SetCompressedFabricId(0x1234567898765432LL).SetNodeId(0xABCDEFEDCBAABCDELL));
     NL_TEST_ASSERT(inSuite, nodeData.resolutionData.numIPs == 1);
     NL_TEST_ASSERT(inSuite, nodeData.resolutionData.port == 0x1234);
     NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcp);

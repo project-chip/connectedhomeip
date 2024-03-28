@@ -332,21 +332,18 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
     outCppDiscoveredNodeData.nodeData.vendorId =
         static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jLongDiscriminatorField));
 
-    jfieldID jVendorIdField = env->GetFieldID(jDiscoveredNodeDataClass, "vendorId", "J");
-    outCppDiscoveredNodeData.nodeData.vendorId =
-        static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jVendorIdField));
+    jfieldID jVendorIdField                    = env->GetFieldID(jDiscoveredNodeDataClass, "vendorId", "J");
+    outCppDiscoveredNodeData.nodeData.vendorId = static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jVendorIdField));
 
-    jfieldID jProductIdField = env->GetFieldID(jDiscoveredNodeDataClass, "productId", "J");
-    outCppDiscoveredNodeData.nodeData.productId =
-        static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jProductIdField));
+    jfieldID jProductIdField                    = env->GetFieldID(jDiscoveredNodeDataClass, "productId", "J");
+    outCppDiscoveredNodeData.nodeData.productId = static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jProductIdField));
 
     jfieldID jCommissioningModeField = env->GetFieldID(jDiscoveredNodeDataClass, "commissioningMode", "B");
     outCppDiscoveredNodeData.nodeData.commissioningMode =
         static_cast<uint8_t>(env->GetByteField(jDiscoveredNodeData, jCommissioningModeField));
 
-    jfieldID jDeviceTypeField = env->GetFieldID(jDiscoveredNodeDataClass, "deviceType", "J");
-    outCppDiscoveredNodeData.nodeData.deviceType =
-        static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jDeviceTypeField));
+    jfieldID jDeviceTypeField                    = env->GetFieldID(jDiscoveredNodeDataClass, "deviceType", "J");
+    outCppDiscoveredNodeData.nodeData.deviceType = static_cast<uint16_t>(env->GetLongField(jDiscoveredNodeData, jDeviceTypeField));
 
     jfieldID getDeviceNameField = env->GetFieldID(jDiscoveredNodeDataClass, "deviceName", "Ljava/lang/String;");
     jstring jDeviceName         = static_cast<jstring>(env->GetObjectField(jDiscoveredNodeData, getDeviceNameField));
@@ -369,8 +366,8 @@ CHIP_ERROR convertJDiscoveredNodeDataToCppDiscoveredNodeData(jobject jDiscovered
     jstring jPairingInstruction = static_cast<jstring>(env->GetObjectField(jDiscoveredNodeData, getPairingInstructionField));
     if (jPairingInstruction != nullptr)
     {
-        chip::Platform::CopyString(outCppDiscoveredNodeData.nodeData.pairingInstruction,
-                                   chip::Dnssd::kMaxPairingInstructionLen + 1, env->GetStringUTFChars(jPairingInstruction, 0));
+        chip::Platform::CopyString(outCppDiscoveredNodeData.nodeData.pairingInstruction, chip::Dnssd::kMaxPairingInstructionLen + 1,
+                                   env->GetStringUTFChars(jPairingInstruction, 0));
     }
 
     jfieldID jPortField                          = env->GetFieldID(jDiscoveredNodeDataClass, "port", "I");
