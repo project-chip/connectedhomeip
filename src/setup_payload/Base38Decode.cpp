@@ -23,8 +23,6 @@
 
 #include "Base38Decode.h"
 
-#include <string>
-
 namespace {
 
 static inline CHIP_ERROR decodeChar(char c, uint8_t & value)

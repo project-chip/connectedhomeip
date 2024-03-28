@@ -20,7 +20,6 @@
 #include "QRCodeSetupPayloadGenerator.h"
 #include "SetupPayload.h"
 #include <fstream>
-#include <string>
 #include <utility>
 
 #include <lib/support/CodeUtils.h>
