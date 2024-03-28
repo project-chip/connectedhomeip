@@ -168,6 +168,7 @@ struct BrowseContext : public BrowseHandler
 {
     DnssdBrowseCallback callback;
     std::vector<DnssdService> services;
+    std::vector<std::pair<DnssdService, std::string>> domainNames;
 
     BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol);
 
