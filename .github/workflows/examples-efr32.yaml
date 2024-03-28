@@ -122,7 +122,7 @@ jobs:
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
             efr32 BRD4338a lock-app \
-            out/efr32-brd4338a-lock-skip-rps-generation/matter-silabs-lighting-example.out \
+            out/efr32-brd4338a-lock-skip-rps-generation/matter-silabs-lock-example.out \
             /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
