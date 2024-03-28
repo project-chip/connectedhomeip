@@ -30,6 +30,8 @@
 
 #include <protocols/interaction_model/StatusCode.h>
 
+static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
+
 // If we have fixed number of endpoints, then max is the same.
 #ifdef FIXED_ENDPOINT_COUNT
 #define MAX_ENDPOINT_COUNT (FIXED_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
