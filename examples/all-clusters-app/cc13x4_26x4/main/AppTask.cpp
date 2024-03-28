@@ -20,7 +20,6 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include <app/server/Server.h>
-#include <app/util/af.h>
 
 #include "FreeRTOS.h"
 #include "Globals.h"

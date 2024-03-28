@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app/util/af.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>

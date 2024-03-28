@@ -24,7 +24,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/app-platform/ContentAppPlatform.h>
-#include <app/util/af.h>
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "AppTvShellCommands.h"

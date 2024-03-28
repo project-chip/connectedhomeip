@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <lib/support/TypeTraits.h>
 

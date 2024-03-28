@@ -25,7 +25,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;

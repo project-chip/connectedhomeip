@@ -18,7 +18,6 @@
 #include "DeviceApp-JNI.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>

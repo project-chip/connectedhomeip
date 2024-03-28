@@ -25,7 +25,6 @@
 #include <lib/support/CodeUtils.h>
 
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 

@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <app/util/af.h>
 
 #include <protocols/interaction_model/StatusCode.h>
 

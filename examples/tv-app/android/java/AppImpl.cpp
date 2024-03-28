@@ -30,7 +30,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <cstdio>
 #include <inttypes.h>
 #include <jni.h>

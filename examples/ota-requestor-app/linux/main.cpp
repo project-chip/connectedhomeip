@@ -22,7 +22,6 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
-#include <app/util/af.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
 
 using chip::BDXDownloader;

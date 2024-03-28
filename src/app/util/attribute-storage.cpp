@@ -21,7 +21,6 @@
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>

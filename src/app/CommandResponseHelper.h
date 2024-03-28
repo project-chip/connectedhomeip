@@ -20,7 +20,6 @@
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {

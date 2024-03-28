@@ -22,7 +22,6 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandResponseHelper.h>
-#include <app/util/af.h>
 
 namespace chip {
 namespace app {

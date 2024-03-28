@@ -28,7 +28,6 @@
 #include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
 #include <app/util/af-types.h>
-#include <app/util/af.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>

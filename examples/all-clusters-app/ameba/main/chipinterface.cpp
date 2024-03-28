@@ -34,7 +34,6 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <laundry-dryer-controls-delegate-impl.h>
 #include <laundry-washer-controls-delegate-impl.h>
 #include <lib/core/ErrorStr.h>

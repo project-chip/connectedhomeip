@@ -24,7 +24,6 @@
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 
 #include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>

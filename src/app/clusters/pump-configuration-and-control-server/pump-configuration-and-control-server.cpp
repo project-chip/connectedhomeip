@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app/util/af.h>
 #include <app/util/util.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>

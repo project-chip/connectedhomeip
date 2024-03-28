@@ -25,7 +25,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
 
 #include "laundry-washer-controls-delegate-impl.h"
 

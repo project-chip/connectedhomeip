@@ -21,7 +21,6 @@
 #include <app/CommandHandler.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/GroupDataProvider.h>

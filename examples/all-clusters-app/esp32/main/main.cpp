@@ -34,7 +34,6 @@
 #include "platform/PlatformManager.h"
 #include "shell_extension/launch.h"
 #include <app/server/OnboardingCodesUtil.h>
-#include <app/util/af.h>
 #include <binding-handler.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>

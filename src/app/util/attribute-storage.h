@@ -20,7 +20,6 @@
 // #include PLATFORM_HEADER
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>

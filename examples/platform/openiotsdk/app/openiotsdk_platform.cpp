@@ -43,7 +43,6 @@
 #ifdef USE_CHIP_DATA_MODEL
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif // USE_CHIP_DATA_MODEL
