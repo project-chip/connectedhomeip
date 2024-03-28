@@ -157,8 +157,6 @@ def dump_cluster_ids(output_dir):
         os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing'))
     sys.path.insert(0, python_testing_path)
     clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
-    device_types_output_dir = os.path.abspath(
-        os.path.join(output_dir, 'device_types'))
 
     from spec_parsing_support import build_xml_clusters
 
