@@ -45,7 +45,7 @@ class Metadata_Reader:
     def __init__(self, script_folder, env_file_name):
         self.script_folder = script_folder
         self.env = self.__build_env_object__(env_file_name)
-
+        print(env_file_name)
 
     # builds the environment object 
     def __build_env_object__(self, env_file_name):
