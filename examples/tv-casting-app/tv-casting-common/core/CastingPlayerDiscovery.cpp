@@ -83,10 +83,10 @@ void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::Discover
     CastingPlayerAttributes attributes;
     snprintf(attributes.id, kIdMaxLength + 1, "%s%u", nodeData.resolutionData.hostName, nodeData.resolutionData.port);
 
-    chip::Platform::CopyString(attributes.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1, nodeData.commissionData.deviceName);
+    chip::Platform::CopyString(attributes.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1, nodeData.nodeData.deviceName);
     chip::Platform::CopyString(attributes.hostName, chip::Dnssd::kHostNameMaxLength + 1, nodeData.resolutionData.hostName);
     chip::Platform::CopyString(attributes.instanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1,
-                               nodeData.commissionData.instanceName);
+                               nodeData.nodeData.instanceName);
 
     attributes.numIPs = (unsigned int) nodeData.resolutionData.numIPs;
     for (unsigned j = 0; j < attributes.numIPs; j++)
@@ -95,9 +95,9 @@ void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::Discover
     }
     attributes.interfaceId = nodeData.resolutionData.interfaceId;
     attributes.port        = nodeData.resolutionData.port;
-    attributes.productId   = nodeData.commissionData.productId;
-    attributes.vendorId    = nodeData.commissionData.vendorId;
-    attributes.deviceType  = nodeData.commissionData.deviceType;
+    attributes.productId   = nodeData.nodeData.productId;
+    attributes.vendorId    = nodeData.nodeData.vendorId;
+    attributes.deviceType  = nodeData.nodeData.deviceType;
 
     memory::Strong<CastingPlayer> player = std::make_shared<CastingPlayer>(attributes);
 

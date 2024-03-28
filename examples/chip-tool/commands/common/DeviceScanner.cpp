@@ -55,7 +55,7 @@ CHIP_ERROR DeviceScanner::Stop()
 
 void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
 {
-    auto & commissionData = nodeData.commissionData;
+    auto & commissionData = nodeData.nodeData;
 
     auto discriminator = commissionData.longDiscriminator;
     auto vendorId      = static_cast<VendorId>(commissionData.vendorId);

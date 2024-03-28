@@ -304,20 +304,20 @@ void TestGetCommissionerPasscode(nlTestSuite * inSuite, void * inContext)
 bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 {
 
-    if (node.commissionData.longDiscriminator != 0 || node.commissionData.vendorId != 0 || node.commissionData.productId != 0 ||
-        node.commissionData.commissioningMode != 0 || node.commissionData.deviceType != 0 ||
-        node.commissionData.rotatingIdLen != 0 || node.commissionData.pairingHint != 0 ||
-        node.resolutionData.mrpRetryIntervalIdle.HasValue() || node.resolutionData.mrpRetryIntervalActive.HasValue() ||
-        node.resolutionData.mrpRetryActiveThreshold.HasValue() || node.resolutionData.isICDOperatingAsLIT.HasValue() ||
-        node.resolutionData.supportsTcp || node.commissionData.commissionerPasscode != 0)
+    if (node.nodeData.longDiscriminator != 0 || node.nodeData.vendorId != 0 || node.nodeData.productId != 0 ||
+        node.nodeData.commissioningMode != 0 || node.nodeData.deviceType != 0 || node.nodeData.rotatingIdLen != 0 ||
+        node.nodeData.pairingHint != 0 || node.resolutionData.mrpRetryIntervalIdle.HasValue() ||
+        node.resolutionData.mrpRetryIntervalActive.HasValue() || node.resolutionData.mrpRetryActiveThreshold.HasValue() ||
+        node.resolutionData.isICDOperatingAsLIT.HasValue() || node.resolutionData.supportsTcp ||
+        node.nodeData.commissionerPasscode != 0)
     {
         return false;
     }
-    if (strcmp(node.commissionData.deviceName, "") != 0 || strcmp(node.commissionData.pairingInstruction, "") != 0)
+    if (strcmp(node.nodeData.deviceName, "") != 0 || strcmp(node.nodeData.pairingInstruction, "") != 0)
     {
         return false;
     }
-    for (uint8_t id : node.commissionData.rotatingId)
+    for (uint8_t id : node.nodeData.rotatingId)
     {
         if (id != 0)
         {
@@ -337,78 +337,78 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // Long discriminator
     strcpy(key, "D");
     strcpy(val, "840");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.longDiscriminator == 840);
-    filled.commissionData.longDiscriminator = 0;
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.longDiscriminator == 840);
+    filled.nodeData.longDiscriminator = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // vendor and product
     strcpy(key, "VP");
     strcpy(val, "123+456");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.vendorId == 123);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.productId == 456);
-    filled.commissionData.vendorId  = 0;
-    filled.commissionData.productId = 0;
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.vendorId == 123);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.productId == 456);
+    filled.nodeData.vendorId  = 0;
+    filled.nodeData.productId = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Commissioning mode
     strcpy(key, "CM");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.commissioningMode == 1);
-    filled.commissionData.commissioningMode = 0;
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.commissioningMode == 1);
+    filled.nodeData.commissioningMode = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Commissioning mode
     strcpy(key, "CP");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.commissionerPasscode == 1);
-    filled.commissionData.commissionerPasscode = 0;
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.commissionerPasscode == 1);
+    filled.nodeData.commissionerPasscode = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Device type
     strcpy(key, "DT");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.deviceType == 1);
-    filled.commissionData.deviceType = 0;
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.deviceType == 1);
+    filled.nodeData.deviceType = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Device name
     strcpy(key, "DN");
     strcpy(val, "abc");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, strcmp(filled.commissionData.deviceName, "abc") == 0);
-    memset(filled.commissionData.deviceName, 0, sizeof(filled.commissionData.deviceName));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
+    NL_TEST_ASSERT(inSuite, strcmp(filled.nodeData.deviceName, "abc") == 0);
+    memset(filled.nodeData.deviceName, 0, sizeof(filled.nodeData.deviceName));
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Rotating device id
     strcpy(key, "RI");
     strcpy(val, "1A2B");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.rotatingId[0] == 0x1A);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.rotatingId[1] == 0x2B);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.rotatingIdLen == 2);
-    filled.commissionData.rotatingIdLen = 0;
-    memset(filled.commissionData.rotatingId, 0, sizeof(filled.commissionData.rotatingId));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.rotatingId[0] == 0x1A);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.rotatingId[1] == 0x2B);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.rotatingIdLen == 2);
+    filled.nodeData.rotatingIdLen = 0;
+    memset(filled.nodeData.rotatingId, 0, sizeof(filled.nodeData.rotatingId));
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Pairing instruction
     strcpy(key, "PI");
     strcpy(val, "hint");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, strcmp(filled.commissionData.pairingInstruction, "hint") == 0);
-    memset(filled.commissionData.pairingInstruction, 0, sizeof(filled.commissionData.pairingInstruction));
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
+    NL_TEST_ASSERT(inSuite, strcmp(filled.nodeData.pairingInstruction, "hint") == 0);
+    memset(filled.nodeData.pairingInstruction, 0, sizeof(filled.nodeData.pairingInstruction));
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Pairing hint
     strcpy(key, "PH");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
-    NL_TEST_ASSERT(inSuite, filled.commissionData.pairingHint == 1);
-    filled.commissionData.pairingHint = 0;
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
+    NL_TEST_ASSERT(inSuite, filled.nodeData.pairingHint == 1);
+    filled.nodeData.pairingHint = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 }
 

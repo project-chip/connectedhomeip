@@ -209,7 +209,7 @@ CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::DiscoveredNodeData & nodeDat
     VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
 
     auto & resolutionData = nodeData.resolutionData;
-    auto & commissionData = nodeData.commissionData;
+    auto & commissionData = nodeData.nodeData;
 
     if (!chip::CanCastTo<uint8_t>(resolutionData.numIPs))
     {

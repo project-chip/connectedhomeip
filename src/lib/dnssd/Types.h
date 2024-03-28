@@ -204,29 +204,31 @@ inline constexpr size_t kMaxDeviceNameLen         = 32;
 inline constexpr size_t kMaxRotatingIdLen         = 50;
 inline constexpr size_t kMaxPairingInstructionLen = 128;
 
-/// Data that is specific to commisionable/commissioning node discovery
-struct CommissionNodeData
+/// Data that is specific to operational/commisionable/commissioning node discovery
+struct DnssdNodeData
 {
-    size_t rotatingIdLen                                      = 0;
-    uint32_t deviceType                                       = 0;
-    uint16_t longDiscriminator                                = 0;
-    uint16_t vendorId                                         = 0;
-    uint16_t productId                                        = 0;
-    uint16_t pairingHint                                      = 0;
-    uint8_t commissioningMode                                 = 0;
-    uint8_t commissionerPasscode                              = 0;
-    uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
-    char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
-    char deviceName[kMaxDeviceNameLen + 1]                    = {};
-    char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
 
-    CommissionNodeData() {}
+    size_t rotatingIdLen                  = 0;
+    uint32_t deviceType                   = 0;
+    uint16_t longDiscriminator            = 0;
+    uint16_t vendorId                     = 0;
+    uint16_t productId                    = 0;
+    uint16_t pairingHint                  = 0;
+    uint8_t commissioningMode             = 0;
+    uint8_t commissionerPasscode          = 0;
+    uint8_t rotatingId[kMaxRotatingIdLen] = {};
+    bool nodeStatus; // true is ttl > 0 false id ttl = 0
+    char instanceName[Operational::kInstanceNameMaxLength + 1] = {};
+    char deviceName[kMaxDeviceNameLen + 1]                     = {};
+    char pairingInstruction[kMaxPairingInstructionLen + 1]     = {};
+
+    DnssdNodeData() {}
 
     void Reset()
     {
         // Let constructor clear things as default
-        this->~CommissionNodeData();
-        new (this) CommissionNodeData();
+        this->~DnssdNodeData();
+        new (this) DnssdNodeData();
     }
 
     bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
@@ -300,31 +302,38 @@ struct ResolvedNodeData
 struct DiscoveredNodeData
 {
     CommonResolutionData resolutionData;
-    CommissionNodeData commissionData;
+    DnssdNodeData nodeData;
+    DiscoveryType nodeType;
 
     void Reset()
     {
         resolutionData.Reset();
-        commissionData.Reset();
+        nodeData.Reset();
+        nodeType = DiscoveryType::kUnknown;
     }
     DiscoveredNodeData() { Reset(); }
 
     void LogDetail() const
     {
-        ChipLogDetail(Discovery, "Discovered node:");
+        ChipLogDetail(Discovery, "Discovered %s node:",
+                      (nodeType == DiscoveryType::kCommissionerNode)         ? "Commissioner"
+                          : (nodeType == DiscoveryType::kCommissionableNode) ? "Commissionable"
+                          : (nodeType == DiscoveryType::kOperational)        ? "Operational"
+                                                                             : "Unknown");
         resolutionData.LogDetail();
-        commissionData.LogDetail();
+        nodeData.LogDetail();
     }
 };
 
-/// Callbacks for discovering nodes advertising non-operational status:
+/// Callbacks for discovering nodes advertising both operational and non-operational status:
 ///   - Commissioners
 ///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
 ///     connected to thread/wifi or devices with a commissioning window open)
-class CommissioningResolveDelegate
+///   - Operational nodes
+class DiscoverNodeDelegate
 {
 public:
-    virtual ~CommissioningResolveDelegate() = default;
+    virtual ~DiscoverNodeDelegate() = default;
 
     /// Called within the CHIP event loop once a node is discovered.
     ///

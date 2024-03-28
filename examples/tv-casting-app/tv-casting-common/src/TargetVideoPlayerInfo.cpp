@@ -232,6 +232,6 @@ bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * dis
         return false;
     }
 
-    return IsSameAs(discoveredNodeData->resolutionData.hostName, discoveredNodeData->commissionData.deviceName,
+    return IsSameAs(discoveredNodeData->resolutionData.hostName, discoveredNodeData->nodeData.deviceName,
                     discoveredNodeData->resolutionData.numIPs, discoveredNodeData->resolutionData.ipAddress);
 }

@@ -225,7 +225,7 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 
 } // namespace Internal
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DnssdNodeData & nodeData)
 {
     TxtFieldKey keyType = Internal::GetTxtFieldKey(key);
     switch (keyType)

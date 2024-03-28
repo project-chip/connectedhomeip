@@ -82,22 +82,22 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
             continue;
         }
         char rotatingId[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->commissionData.rotatingId, dnsSdInfo->commissionData.rotatingIdLen,
-                                            rotatingId, sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen, rotatingId,
+                                            sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissioner %d", i);
-        ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->commissionData.instanceName);
+        ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->nodeData.instanceName);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->resolutionData.hostName);
         ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->resolutionData.port);
-        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->commissionData.longDiscriminator);
-        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->commissionData.vendorId);
-        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->commissionData.productId);
-        ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->commissionData.commissioningMode);
-        ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->commissionData.deviceType);
-        ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->commissionData.deviceName);
+        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->nodeData.longDiscriminator);
+        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->nodeData.vendorId);
+        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->nodeData.productId);
+        ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->nodeData.commissioningMode);
+        ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->nodeData.deviceType);
+        ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->nodeData.deviceName);
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
-        ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->commissionData.pairingInstruction);
-        ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->commissionData.pairingHint);
+        ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->nodeData.pairingInstruction);
+        ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->nodeData.pairingHint);
         if (dnsSdInfo->resolutionData.GetMrpRetryIntervalIdle().HasValue())
         {
             ChipLogProgress(Discovery, "\tMrp Interval idle\t%u",

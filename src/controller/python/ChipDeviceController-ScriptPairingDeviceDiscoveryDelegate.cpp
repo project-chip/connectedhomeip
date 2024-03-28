@@ -24,7 +24,7 @@ namespace Controller {
 void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeData)
 {
     // Ignore nodes with closed comissioning window
-    VerifyOrReturn(nodeData.commissionData.commissioningMode != 0);
+    VerifyOrReturn(nodeData.nodeData.commissioningMode != 0);
     VerifyOrReturn(mActiveDeviceCommissioner != nullptr);
 
     const uint16_t port = nodeData.resolutionData.port;
