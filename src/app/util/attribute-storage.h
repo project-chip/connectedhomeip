@@ -243,3 +243,18 @@ bool registerAttributeAccessOverride(chip::app::AttributeAccessInterface * attrO
  * implementing AttributeAccessInterface is being destroyed).
  */
 void unregisterAttributeAccessOverride(chip::app::AttributeAccessInterface * attrOverride);
+
+/**
+ * @brief locate attribute metadata
+ *
+ * Function returns pointer to the attribute metadata structure,
+ * or NULL if attribute was not found.
+ *
+ * @param endpoint Zigbee endpoint number.
+ * @param clusterId Cluster ID of the sought cluster.
+ * @param attributeId Attribute ID of the sought attribute.
+ *
+ * @return Returns pointer to the attribute metadata location.
+ */
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                chip::AttributeId attributeId);

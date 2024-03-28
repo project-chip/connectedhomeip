@@ -37,20 +37,6 @@
 static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
 /**
- * @brief locate attribute metadata
- *
- * Function returns pointer to the attribute metadata structure,
- * or NULL if attribute was not found.
- *
- * @param endpoint Zigbee endpoint number.
- * @param clusterId Cluster ID of the sought cluster.
- * @param attributeId Attribute ID of the sought attribute.
- *
- * @return Returns pointer to the attribute metadata location.
- */
-const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                chip::AttributeId attributeId);
-/**
  * @brief Returns true if endpoint contains the ZCL server with specified id.
  *
  * This function returns true if
