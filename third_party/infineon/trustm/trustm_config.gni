@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Crypto implementation: mbedtls, openssl, boringssl, platform.
-  chip_crypto = ""
-  chip_with_se05x = 0
-  
-  # Compile mbedtls externally. Only used if chip_crypto == "mbedtls"
-  chip_external_mbedtls = false
-}
+# Configuration file
 
-assert(
-    !chip_external_mbedtls || chip_crypto == "mbedtls" || chip_crypto == "psa",
-    "Use of external mbedtls requires the mbedtls or psa crypto impl")
+declare_args() {
+  chip_trustm_da = 0
+}
