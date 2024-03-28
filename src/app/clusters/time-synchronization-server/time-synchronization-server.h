@@ -52,21 +52,7 @@ enum class TimeState : uint8_t
 {
     kInvalid = 0, // No valid offset available
     kActive  = 1, // An offset is currently being used
-    kChanged = 2, // An offset expired or changed to a new value
-    kStopped = 3, // Permanent item in use
-};
-
-/**
- * @brief Flags for tracking event types to emit.
- */
-enum class TimeSyncEventFlag : uint8_t
-{
-    kNone            = 0x0,
-    kDSTTableEmpty   = 0x1,
-    kDSTStatus       = 0x2,
-    kTimeZoneStatus  = 0x4,
-    kTimeFailure     = 0x8,
-    kMissingTTSource = 0x10,
+    kStopped = 2, // Permanent item in use
 };
 
 void SetDefaultDelegate(Delegate * delegate);
@@ -107,10 +93,24 @@ public:
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
+    /**
+     * @brief Updates time zone to the correct item from the time zone list.
+     * If the TimeState has changed from the previous state, the function will emit a TimeZoneStatus event.
+     *
+     * Returns kInvalid if an error occurrs.
+     * Otherwise, it returns kActive since there is always a default time zone available.
+     * kStopped is not used in this function.
+     */
     TimeState UpdateTimeZoneState();
+    /**
+     * @brief Updates DST offset to the correct item from the DSTOffset list.
+     * If the DST offset has changed from the previous state or value, the function will emit a DSTStatus event.
+     *
+     * Returns kInvalid if an error occurrs or the DSTOffset list is empty.
+     * Returns kActive if a DST offset is being used.
+     * Returns kStopped if no DST offset is applicable at the current time.
+     */
     TimeState UpdateDSTOffsetState();
-    BitMask<TimeSyncEventFlag> GetEventFlag(void);
-    void ClearEventFlag(TimeSyncEventFlag flag);
 
     // Fabric Table delegate functions
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
@@ -145,7 +145,8 @@ private:
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     static TimeSynchronizationServer sTimeSyncInstance;
-    BitMask<TimeSyncEventFlag> mEventFlag;
+    TimeState mTimeZoneState  = TimeState::kInvalid;
+    TimeState mDSTOffsetState = TimeState::kInvalid;
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
