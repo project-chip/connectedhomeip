@@ -237,8 +237,8 @@ static_library("interaction-model") {
   if (chip_build_controller_dynamic_server) {
     sources += [
       "clusters/ota-provider/ota-provider.cpp",
-      "dynamic_server/AccessControl.h",
       "dynamic_server/AccessControl.cpp",
+      "dynamic_server/AccessControl.h",
       "dynamic_server/DynamicDispatcher.cpp",
       "util/privilege-storage.cpp",
       "util/privilege-storage.h",

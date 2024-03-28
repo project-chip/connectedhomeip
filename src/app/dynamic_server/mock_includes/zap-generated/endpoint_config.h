@@ -15,8 +15,8 @@
  */
 #pragma once
 
-#include <lib/core/CHIPConfig.h>
 #include <app/util/endpoint-config-defines.h>
+#include <lib/core/CHIPConfig.h>
 
 // Some overrides to see that this is not used as a real "endpoint_config" that contains data
 #define GENERATED_DEFAULTS #error "Not a real codegen. This is a temporary include for dynamic-overrides only"
