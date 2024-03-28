@@ -551,8 +551,8 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     if (lastTzState != TimeState::kInvalid)
     {
         const TimeSyncDataProvider::TimeZoneStore & tzStore = GetTimeZone()[0];
-        lastTz.offset        = tzStore.timeZone.offset;
-        if (tzStore.timeZone.name.HasValue())
+        lastTz.offset                                       = tzStore.timeZone.offset;
+        if (tzStore.timeZone.name.HasValue() && sizeof(name) >= sizeof(tzStore.name))
         {
             lastTz.name.SetValue(CharSpan(name));
             memcpy(name, tzStore.name, sizeof(tzStore.name));
@@ -702,20 +702,20 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
         if (!dstItem.validUntil.IsNull() && dstItem.validStarting >= dstItem.validUntil.Value())
         {
             ReturnErrorOnFailure(LoadDSTOffset());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         // validStarting shall not be smaller than validUntil of previous entry
         if (dstItem.validStarting < lastValidUntil)
         {
             ReturnErrorOnFailure(LoadDSTOffset());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         lastValidUntil = !dstItem.validUntil.IsNull() ? dstItem.validUntil.Value() : lastValidUntil;
         // only 1 validUntil null value and shall be last in the list
         if (dstItem.validUntil.IsNull() && (i != mDstOffsetObj.validSize - 1))
         {
             ReturnErrorOnFailure(LoadDSTOffset());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
     }
 
@@ -778,7 +778,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
         return err;
     }
     GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
-    mGranularity  = granularity;
+    mGranularity  = static_cast<GranularityEnum>(to_underlying(granularity) - 1);
     Status status = TimeSource::Set(ep, source);
     if (!(status == Status::Success || status == Status::UnsupportedAttribute))
     {
@@ -932,7 +932,7 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
         // current DST has expired
         // not using DST and next DST item in the list is not active yet
         dstList[activeDstIndex].offset = 0;
-        state = TimeState::kStopped;
+        state                          = TimeState::kStopped;
     }
     else
     {
@@ -1047,7 +1047,8 @@ CHIP_ERROR TimeSynchronizationAttrAccess::ReadDSTOffset(EndpointId endpoint, Att
 CHIP_ERROR TimeSynchronizationAttrAccess::ReadLocalTime(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     DataModel::Nullable<uint64_t> localTime;
-    ReturnErrorOnFailure(TimeSynchronizationServer::Instance().GetLocalTime(endpoint, localTime));
+    VerifyOrReturnError(CHIP_NO_ERROR == TimeSynchronizationServer::Instance().GetLocalTime(endpoint, localTime),
+                        aEncoder.EncodeNull());
     ReturnErrorOnFailure(aEncoder.Encode(localTime));
     return CHIP_NO_ERROR;
 }
@@ -1131,8 +1132,7 @@ bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
         return true;
     }
 
-    if (granularity != GranularityEnum::kNoTimeGranularity &&
-        (currentGranularity == GranularityEnum::kNoTimeGranularity || granularity >= currentGranularity) &&
+    if (granularity > currentGranularity &&
         CHIP_NO_ERROR ==
             TimeSynchronizationServer::Instance().SetUTCTime(commandPath.mEndpointId, utcTime, granularity, TimeSourceEnum::kAdmin))
     {
