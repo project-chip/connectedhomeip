@@ -1,80 +1,62 @@
 / {
-	aliases {
-		system-state-led = &led_red;
-		pwm-led0 = &pwm_led0;
-		pwm-led1 = &pwm_led1;
-		pwm-led2 = &pwm_led2;
-		pwm-led3 = &pwm_led3;
-	};
-
-	pwm_leds {
-		/delete-node/ pwm_led_0;
-		pwm_led0: pwm_led_0 {
-			pwms = <&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
-			label = "PWM LED Blue";
-		};
-		pwm_led1: pwm_led_1 {
-			pwms = <&pwm0 3 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
-			label = "PWM LED Green";
-		};
-		pwm_led2: pwm_led_2 {
-			pwms = <&pwm0 2 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
-			label = "PWM LED Red";
-		};
-		pwm_led3: pwm_led_3 {
-			pwms = <&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
-			label = "PWM IDENTIFY LED Green";
-	    };
-    };
-
-	keys {
-		/delete-node/ button_1;
-		/delete-node/ button_3;
+	/* Short TL_Key3 (J5 pin 13) to ground (J3 pin 24, 26, 28, 30) */
+	key_pool {
 		compatible = "gpio-keys";
-		key_1: button_1 {
-			gpios = <&gpiod 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+
+		inp {
+			gpios = <&gpiod 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>,
+					<&gpiod 7 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 		};
-		key_2: button_2 {
-			gpios = <&gpiod 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_3: button_3 {
-			gpios = <&gpiod 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_4: button_4 {
-			gpios = <&gpiof 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+	};
+
+	key_matrix {
+		compatible = "gpio-keys";
+
+		col {
+			gpios = <&gpiod 6 GPIO_ACTIVE_HIGH>,
+					<&gpiof 6 GPIO_ACTIVE_HIGH>;
 		};
 
-		key_matrix_col1: key_matrix_col1 {
-			gpios = <&gpiod 6 GPIO_ACTIVE_HIGH>;
-		};
-		key_matrix_col2: key_matrix_col2 {
-			gpios = <&gpiof 6 GPIO_ACTIVE_HIGH>;
-		};
-		key_matrix_row1: key_matrix_row1 {
-			gpios = <&gpiod 2 GPIO_PULL_DOWN>;
-		};
-		key_matrix_row2: key_matrix_row2 {
-			gpios = <&gpiod 7 GPIO_PULL_DOWN>;
+		row {
+			gpios = <&gpiod 2 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>,
+					<&gpiod 7 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
 		};
 	};
-};
 
-&pinctrl {
-	pwm_ch0_pd0_default: pwm_ch0_pd0_default {
-		pinmux = <B9x_PINMUX_SET(B9x_PORT_D, B9x_PIN_0, B92_FUNC_PWM0)>;
+	led_pool {
+		compatible = "gpio-leds";
+
+		out {
+			gpios = <&gpioe 6 GPIO_ACTIVE_HIGH>;
+		};
 	};
-	pwm_ch1_pd1_default: pwm_ch1_pd1_default {
-		pinmux = <B9x_PINMUX_SET(B9x_PORT_D, B9x_PIN_1, B92_FUNC_PWM1)>;
-	};
-	pwm_ch2_pe2_default: pwm_ch2_pe2_default {
-		pinmux = <B9x_PINMUX_SET(B9x_PORT_E, B9x_PIN_2, B92_FUNC_PWM2)>;
-	};
-	pwm_ch3_pe0_default: pwm_ch3_pe0_default {
-		pinmux = <B9x_PINMUX_SET(B9x_PORT_E, B9x_PIN_0, B92_FUNC_PWM3)>;
+
+	pwm_pool {
+		compatible = "pwm-leds";
+		out {
+			pwms = <&pwm0 2 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+					<&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>,
+					<&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+		};
 	};
 };
 
 &pwm0 {
-	pinctrl-0 = <&pwm_ch0_pd0_default &pwm_ch1_pd1_default &pwm_ch2_pe2_default &pwm_ch3_pe0_default>;
+	/* On board RGB LEDs */
+	pinctrl-ch0 = <&pwm_ch0_pe7_default>;
+	pinctrl-ch2 = <&pwm_ch1_pd1_default>;
+	pinctrl-ch1 = <&pwm_ch2_pd0_default>;
+};
+
+&pinctrl {
+	pwm_ch0_pe7_default: pwm_ch0_pe7_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_E, B9x_PIN_7, B92_FUNC_PWM0)>;
+	};
+	pwm_ch1_pd1_default: pwm_ch1_pd1_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_D, B9x_PIN_1, B92_FUNC_PWM1)>;
+	};
+	pwm_ch2_pd0_default: pwm_ch2_pd0_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_D, B9x_PIN_0, B92_FUNC_PWM2)>;
+	};
 };
 

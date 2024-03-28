@@ -17,6 +17,7 @@
  */
 
 #include "SensorManagerCommon.h"
+#include "PWMManager.h"
 #ifdef CONFIG_CHIP_USE_MARS_SENSOR
 #include <zephyr/drivers/sensor.h>
 #endif // CONFIG_CHIP_USE_MARS_SENSOR
@@ -36,7 +37,6 @@ constexpr uint16_t kSensorBanForNextMeasurTimeout = 1000; // 1s timeout
 const struct device * const sht3xd_dev = DEVICE_DT_GET_ONE(sensirion_sht3xd);
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
-const struct device * const ws2812_dev = DEVICE_DT_GET(DT_ALIAS(led_strip));
 
 #define TEMP_LOW_LIM 0   // °C
 #define TEMP_HIGH_LIM 40 // °C
@@ -60,16 +60,6 @@ CHIP_ERROR SensorManager::Init()
 
 #ifdef USE_COLOR_TEMPERATURE_LIGHT
     RgbColor_t rgb = { 0 };
-
-    CHIP_ERROR err = sSensorManager.mWS2812Device.Init(ws2812_dev, STRIP_NUM_PIXELS(led_strip));
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("WS2812 Device Init fail");
-        return err;
-    }
-
-    sSensorManager.mWS2812Device.SetLevel(&rgb);
-    sSensorManager.mWS2812Device.Set(SET_RGB_TURN_ON);
 #endif // USE_COLOR_TEMPERATURE_LIGHT
 
     // Initialise the timer to ban sensor measurement
@@ -245,7 +235,9 @@ void SensorManager::SetColorTemperatureLight(int8_t temp)
         LOG_ERR("Couldn't set the Color Temperature Light");
     }
 
-    sSensorManager.mWS2812Device.SetLevel(&rgb);
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, ((uint32_t) rgb.r * 1000) / 0xff);
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Green, ((uint32_t) rgb.g * 1000) / 0xff);
+    PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Blue, ((uint32_t) rgb.b * 1000) / 0xff);
 }
 #endif // USE_COLOR_TEMPERATURE_LIGHT
 #endif // CONFIG_CHIP_USE_MARS_SENSOR

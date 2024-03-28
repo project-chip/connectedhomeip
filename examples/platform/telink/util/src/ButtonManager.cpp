@@ -16,203 +16,135 @@
  *    limitations under the License.
  */
 
-#include <zephyr/device.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/irq.h>
-#include <zephyr/kernel.h>
-#include <zephyr/logging/log.h>
-
-LOG_MODULE_REGISTER(ButtonManager);
-
 #include <ButtonManager.h>
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(ButtonManager, CONFIG_CHIP_APP_LOG_LEVEL);
 
-ButtonManager ButtonManager::sInstance;
-
-#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-void button_pressed(const struct device * dev, struct gpio_callback * cb, uint32_t pins);
-#endif
-
-void Button::Configure(const gpio_dt_spec * input_button_dt, const gpio_dt_spec * output_button_dt, void (*callback)(void))
+ButtonManager & ButtonManager::getInstance()
 {
-    if (!device_is_ready(input_button_dt->port))
-    {
-        LOG_ERR("Input port %s is not ready\n", input_button_dt->port->name);
-    }
+    static ButtonManager instance;
 
-    mInput_button      = input_button_dt;
-    mOutput_matrix_pin = output_button_dt;
-    mCallback          = callback;
+    return instance;
 }
 
-int Button::Init(void)
+ButtonManager::ButtonManager() : m_events{} {}
+
+void ButtonManager::addCallback(void (*callback)(void), size_t button, bool pressed)
 {
-    int ret = 0;
+    Event event = { .button = button, .pressed = pressed, .callback = callback };
 
-#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-    ret = gpio_pin_configure_dt(mInput_button, GPIO_INPUT);
-    if (ret < 0)
-    {
-        LOG_ERR("Config in pin err: %d", ret);
-        return ret;
-    }
-
-    ret = gpio_pin_interrupt_configure_dt(mInput_button, GPIO_INT_EDGE_TO_ACTIVE);
-    if (ret < 0)
-    {
-        LOG_ERR("Config irq pin err: %d", ret);
-        return ret;
-    }
-
-    gpio_init_callback(&mButton_cb_data, button_pressed, BIT(mInput_button->pin));
-    ret = gpio_add_callback(mInput_button->port, &mButton_cb_data);
-    if (ret < 0)
-    {
-        LOG_ERR("Config gpio_init_callback err: %d", ret);
-        return ret;
-    }
-#else
-
-    ret = gpio_pin_configure_dt(mOutput_matrix_pin, GPIO_OUTPUT_ACTIVE);
-    if (ret < 0)
-    {
-        LOG_ERR("Config out pin err: %d", ret);
-        return ret;
-    }
-
-    ret = gpio_pin_configure_dt(mInput_button, GPIO_INPUT);
-    if (ret < 0)
-    {
-        LOG_ERR("Config in pin err: %d", ret);
-        return ret;
-    }
-#endif
-
-    return ret;
+    m_events.insert(event);
 }
 
-int Button::Deinit(void)
+void ButtonManager::rmCallback(void (*callback)(void))
 {
-    int ret = 0;
-
-    /* Reconfigure output key pin to input */
-    ret = gpio_pin_configure_dt(mOutput_matrix_pin, GPIO_INPUT | GPIO_PULL_DOWN);
-    if (ret < 0)
+    for (auto it = m_events.begin(); it != m_events.end();)
     {
-        LOG_ERR("Reconfig out pin err: %d", ret);
-        return ret;
-    }
-
-    return ret;
-}
-
-void Button::Poll(Button * previous)
-{
-    int ret = 0;
-
-    if (previous != NULL)
-    {
-        ret = previous->Deinit();
-        assert(ret >= 0);
-    }
-
-    ret = Init();
-    assert(ret >= 0);
-
-    ret = gpio_pin_get_dt(mInput_button);
-    assert(ret >= 0);
-
-    if (ret == STATE_HIGH && ret != mPreviousState)
-    {
-        if (mCallback != NULL)
+        if (it->callback == callback)
         {
-            mCallback();
+            it = m_events.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
-
-    mPreviousState = ret;
-
-    k_msleep(10);
 }
 
-void Button::SetCallback(void (*callback)(void))
+void ButtonManager::rmCallback(size_t button, bool pressed)
 {
-    mCallback = callback;
-}
-
-void ButtonManager::AddButton(Button & button)
-{
-    mButtons.push_back(button);
-}
-
-void ButtonManager::SetCallback(unsigned int index, void (*callback)(void))
-{
-    if (mButtons.size() <= index)
+    for (auto it = m_events.begin(); it != m_events.end();)
     {
-        LOG_ERR("Wrong button index");
+        if (it->button == button && it->pressed == pressed)
+        {
+            it = m_events.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
     }
-
-    mButtons[index].SetCallback(callback);
 }
 
-void ButtonManager::Poll(void)
+void ButtonManager::linkBackend(ButtonBackend & backend)
 {
-    static Button * previous = NULL;
-
-    for (unsigned int i = 0; i < mButtons.size(); i++)
+    if (!backend.linkHW(onButton, this))
     {
-        mButtons[i].Poll(previous);
-        previous = &mButtons[i];
+        LOG_ERR("Button backend not inited!");
     }
-
-    k_msleep(10);
 }
 
-void ButtonEntry(void * param1, void * param2, void * param3)
+void ButtonManager::onButton(size_t button, bool pressed, void * buttonMgr)
 {
-    ButtonManager & sInstance = ButtonManagerInst();
+    ButtonManager * buttonManager = static_cast<ButtonManager *>(buttonMgr);
 
-    while (true)
+    for (auto it = buttonManager->m_events.begin(); it != buttonManager->m_events.end(); ++it)
     {
-        sInstance.Poll();
+        if (it->button == button && it->pressed == pressed && it->callback)
+        {
+            it->callback();
+        }
     }
 }
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-void button_pressed(const struct device * dev, struct gpio_callback * cb, uint32_t pins)
+
+#include <zephyr_key_pool.h>
+
+static KEY_POOL_DEFINE(key_pool);
+
+ButtonPool & ButtonPool::getInstance()
 {
-    ButtonManager & sInstance = ButtonManagerInst();
-    sInstance.PollIRQ(dev, pins);
+    static ButtonPool instance;
+
+    return instance;
 }
 
-void ButtonManager::PollIRQ(const struct device * dev, uint32_t pins)
+bool ButtonPool::linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context)
 {
-    for (unsigned int i = 0; i < mButtons.size(); i++)
+    bool result = false;
+
+    if (key_pool_init(&key_pool))
     {
-        mButtons[i].PollIRQ(dev, pins);
+        key_pool_set_callback(&key_pool, on_button_change, context);
+        LOG_INF("Key pool inited");
+        result = true;
     }
-}
-
-void Button::PollIRQ(const struct device * dev, uint32_t pins)
-{
-    if ((BIT(mInput_button->pin) & pins) && (mCallback != NULL) && (dev == mInput_button->port))
+    else
     {
-        mCallback();
+        LOG_ERR("Key pool not inited!");
     }
-}
-
-void Button::Configure(const gpio_dt_spec * input_button_dt, void (*callback)(void))
-{
-    if (!device_is_ready(input_button_dt->port))
-    {
-        LOG_ERR("%s is not ready\n", input_button_dt->port->name);
-    }
-
-    mInput_button = input_button_dt;
-    mCallback     = callback;
-
-    Init();
+    return result;
 }
 
 #else
-K_THREAD_DEFINE(buttonThread, 512, ButtonEntry, NULL, NULL, NULL, K_PRIO_COOP(CONFIG_NUM_COOP_PRIORITIES - 1), 0, 0);
-#endif
+
+#include <zephyr_key_matrix.h>
+
+static KEY_MATRIX_DEFINE(key_matrix);
+
+ButtonMatrix & ButtonMatrix::getInstance()
+{
+    static ButtonMatrix instance;
+
+    return instance;
+}
+
+bool ButtonMatrix::linkHW(void (*on_button_change)(size_t button, bool pressed, void * context), void * context)
+{
+    bool result = false;
+
+    if (key_matrix_init(&key_matrix))
+    {
+        key_matrix_set_callback(&key_matrix, on_button_change, context);
+        LOG_INF("Key matrix inited");
+        result = true;
+    }
+    else
+    {
+        LOG_ERR("Key matrix not inited!");
+    }
+    return result;
+}
+
+#endif // CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE

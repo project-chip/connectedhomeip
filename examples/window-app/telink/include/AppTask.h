@@ -35,6 +35,7 @@ private:
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
+    void LinkButtons(ButtonManager & buttonManager);
 
     static void OpenActionAndToggleMoveTypeButtonEventHandler(void);
     static void CloseActionButtonEventHandler(void);

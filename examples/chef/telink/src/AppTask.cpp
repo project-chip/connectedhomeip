@@ -17,6 +17,7 @@
  */
 
 #include "AppTask.h"
+#include "ButtonManager.h"
 #include <app/server/Server.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -48,4 +49,11 @@ CHIP_ERROR AppTask::Init(void)
 #endif
 
     return CHIP_NO_ERROR;
+}
+
+void AppTask::LinkButtons(ButtonManager & buttonManager)
+{
+    buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
+    buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
+    buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
 }
