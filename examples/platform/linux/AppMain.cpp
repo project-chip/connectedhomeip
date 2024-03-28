@@ -269,6 +269,12 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
+
+void ConnectivityChnagedtimerCallback(System::Layer *, void * callbackContext)
+{
+    app::DnssdServer::Instance().StartServer();
+}
+
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
@@ -278,8 +284,9 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
     else if ((event->Type == chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange))
     {
-        // Restart the server on connectivity change
-        app::DnssdServer::Instance().StartServer();
+        // Restart the server on connectivity change,because recieving a netlink router event doesn't guarantee immediate network reachablility,specially ethernet,so we daly 1200 millis to start dnssd server
+         DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1200),ConnectivityChnagedtimerCallback , nullptr);
+       
     }
 }
 
