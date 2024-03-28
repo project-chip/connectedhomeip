@@ -100,10 +100,13 @@ tests:
                     }
 
     - label:
-          "Step 2: TH binds GroupId to GroupKeySet with entries as follows: List
-          item 1: GroupId: 0x0103, GroupKeySetId: 0x01a3, List item 2: GroupId:
-          0x0104, GroupKeySetId: 0x01a4, List item 3: GroupId: 0x0105,
-          GroupKeySetId: 0x01a3"
+          "Step 2: TH binds GroupIds 0x0101 and 0x0102 with GroupKeySetID 0x01a1
+          and GroupId 0x0103 with GroupKeySetID 0x01a3 in the GroupKeyMap
+          attribute list on GroupKeyManagement cluster by writing the
+          GroupKeyMap attribute with three entries as follows: List item 1:
+          GroupId: 0x0101, GroupKeySetId: 0x01a1, List item 2: GroupId: 0x0102,
+          GroupKeySetId: 0x01a1, List item 3: GroupId: 0x0103, GroupKeySetId:
+          0x01a3"
       cluster: "Group Key Management"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
@@ -175,7 +178,7 @@ tests:
 
     - label:
           "Step 5: TH sends a AddGroup Command to the Groups cluster on Endpoint
-          PIXIT.G.ENDPOINT over CASE with the GroupID field set to 0x0101 and
+          PIXIT.G.ENDPOINT over CASE with the GroupID field set to 0x0104 and
           the GroupName set to an empty string"
       cluster: "Groups"
       endpoint: Groups.Endpoint
@@ -183,7 +186,7 @@ tests:
       arguments:
           values:
               - name: GroupID
-                value: 0x0101
+                value: 0x0104
               - name: GroupName
                 value: ""
       response:
