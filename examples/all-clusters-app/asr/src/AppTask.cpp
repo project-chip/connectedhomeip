@@ -34,6 +34,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <lega_rtos_api.h>
 #include <platform/ASR/NetworkCommissioningDriver.h>

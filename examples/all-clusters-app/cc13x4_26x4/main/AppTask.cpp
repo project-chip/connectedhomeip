@@ -23,6 +23,7 @@
 
 #include "FreeRTOS.h"
 #include "Globals.h"
+#include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <examples/platform/cc13x4_26x4/CC13X4_26X4DeviceAttestationCreds.h>
 

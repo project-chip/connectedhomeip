@@ -23,6 +23,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <app/util/ember-strings.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>

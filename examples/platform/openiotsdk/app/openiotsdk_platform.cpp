@@ -32,6 +32,7 @@
 #endif
 
 #include <DeviceInfoProviderImpl.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/openiotsdk/Logging.h>

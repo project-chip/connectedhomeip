@@ -24,6 +24,7 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Server.h>
 #include <app/util/config.h>
+#include <app/util/endpoint-config-api.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>

@@ -24,6 +24,7 @@
 
 #include "FreeRTOS.h"
 #include "Globals.h"
+#include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 

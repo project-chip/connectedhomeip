@@ -27,6 +27,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/util.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>

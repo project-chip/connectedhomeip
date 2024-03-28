@@ -21,6 +21,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/support/ZclString.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
