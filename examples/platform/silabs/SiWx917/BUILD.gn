@@ -190,6 +190,11 @@ config("silabs-wifi-config") {
   if (rs91x_wpa3_transition) {
     defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
   }
+
+  
+  if (chip_enable_multi_ota_requestor) {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
+  }
 }
 
 source_set("siwx917-common") {
