@@ -167,11 +167,10 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_ConvertDacKey()
     uint8_t * data                      = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
     uint32_t offset                     = 0;
     bool convNeeded                     = true;
-    CHIP_ERROR error                    = CHIP_NO_ERROR;
 
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_INTERNAL);
 
-    error = SSS_ExportBlob(blob, &blobSize, offset, convNeeded);
+    ReturnErrorOnFailure(SSS_ExportBlob(blob, &blobSize, offset, convNeeded));
     if (!convNeeded)
     {
         ChipLogError(DeviceLayer, "SSS: DAC private key already converted to blob");
@@ -179,7 +178,6 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_ConvertDacKey()
         return CHIP_NO_ERROR;
     }
 
-    ReturnErrorOnFailure(error);
     ChipLogError(DeviceLayer, "SSS: extracted blob from DAC private key");
 
     hal_flash_status_t status = HAL_FlashRead(kFactoryDataStart, newSize - kSssBlobMetadataLength, data);
