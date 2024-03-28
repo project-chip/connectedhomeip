@@ -22,7 +22,6 @@
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <cstdint>
 
-
 class LockManager
 {
 public:

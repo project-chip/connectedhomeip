@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPEncoding.h>

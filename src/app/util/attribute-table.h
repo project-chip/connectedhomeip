@@ -17,7 +17,6 @@
 
 #pragma once
 
-
 #include <protocols/interaction_model/StatusCode.h>
 
 /**
