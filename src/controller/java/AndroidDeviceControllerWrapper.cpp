@@ -1050,7 +1050,8 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     icdDeviceInfoObj = env->NewObject(
         icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()),
-        jUserActiveModeTriggerInstruction, static_cast<jlong>(mIdleModeDuration) ,static_cast<jlong>(mActiveModeDuration) ,static_cast<jint>(mActiveModeThreshold) , static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
+        jUserActiveModeTriggerInstruction, static_cast<jlong>(mIdleModeDuration), static_cast<jlong>(mActiveModeDuration),
+        static_cast<jint>(mActiveModeThreshold), static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
         static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()),
         static_cast<jlong>(Controller()->GetFabricId()), static_cast<jint>(Controller()->GetFabricIndex()));
 

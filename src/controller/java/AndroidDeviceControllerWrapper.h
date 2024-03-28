@@ -271,8 +271,8 @@ private:
     chip::MutableCharSpan mUserActiveModeTriggerInstruction = chip::MutableCharSpan(mUserActiveModeTriggerInstructionBuffer);
     chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerHint;
 
-    uint32_t mIdleModeDuration = 0;
-    uint32_t mActiveModeDuration = 0;
+    uint32_t mIdleModeDuration    = 0;
+    uint32_t mActiveModeDuration  = 0;
     uint16_t mActiveModeThreshold = 0;
     chip::Controller::CommissioningParameters mCommissioningParameter;
 
