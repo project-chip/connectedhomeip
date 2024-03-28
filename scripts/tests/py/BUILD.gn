@@ -25,6 +25,10 @@ pw_python_package("metadata_parser") {
     "pyproject.toml",
   ]
 
+  inputs = [
+    "env_test.yaml",
+  ]
+
   sources = [
     "__init__.py",
     "metadata.py",
