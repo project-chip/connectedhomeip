@@ -8,6 +8,12 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 
+#include "sl_component_catalog.h"
+
+#ifdef SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
+#include "sl_zigbee_debug_print.h"
+#endif // SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
 #endif
@@ -96,6 +102,8 @@ static uint8_t sCmdLineBuffer[LOG_RTT_BUFFER_SIZE];
 
 #if SILABS_LOG_ENABLED
 
+static void PrintLog(const char * msg, bool newLine = true);
+
 using namespace chip;
 
 /**
@@ -127,7 +135,7 @@ static size_t AddTimeStampAndPrefixStr(char * logBuffer, const char * prefix, si
 /**
  * Print a log message to RTT
  */
-static void PrintLog(const char * msg)
+void PrintLog(const char * msg, bool newLine)
 {
     if (sLogInitialized)
     {
@@ -135,7 +143,7 @@ static void PrintLog(const char * msg)
         sz = strlen(msg);
 
 #if SILABS_LOG_OUT_UART
-        uartLogWrite(msg, sz);
+        uartLogWrite(msg, sz, newLine);
 #elif PW_RPC_ENABLED
         PigweedLogger::putString(msg, sz);
 #else
@@ -143,13 +151,16 @@ static void PrintLog(const char * msg)
 #endif // SILABS_LOG_OUT_UART
 
 #if SILABS_LOG_OUT_RTT || PW_RPC_ENABLED
-        const char * newline = "\r\n";
-        sz                   = strlen(newline);
+        if (newLine)
+        {
+            const char * newline = "\r\n";
+            sz                   = strlen(newline);
 #if PW_RPC_ENABLED
-        PigweedLogger::putString(newline, sz);
+            PigweedLogger::putString(newline, sz);
 #else
-        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
+            SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
 #endif // PW_RPC_ENABLED
+        }
 #endif
     }
 }
@@ -206,6 +217,38 @@ extern "C" void silabsLog(const char * aFormat, ...)
 
     va_end(v);
 }
+
+#ifdef SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
+extern "C" void sli_zigbee_debug_print(uint32_t group_type, bool new_line, const char * format, ...)
+{
+    va_list v;
+
+    if (!sl_zigbee_debug_print_enabled(group_type))
+    {
+        return;
+    }
+
+    va_start(v, format);
+
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    static_assert(sizeof(formattedMsg) >
+                  kMaxTimestampStrLen + kMaxCategoryStrLen); // Greater than to at least accommodate a ending Null Character
+    // No prefix for now Since Zigbee CLI is also piped here....
+    // MATTER-3322
+    // size_t prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_SILABS, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
+    // size_t len       = vsnprintf(formattedMsg + prefixLen, sizeof formattedMsg - prefixLen, aFormat, v);
+    size_t len = vsnprintf(formattedMsg, sizeof formattedMsg, format, v);
+
+    if (len >= sizeof formattedMsg)
+    {
+        formattedMsg[sizeof formattedMsg - 1] = '\0';
+    }
+
+    PrintLog(formattedMsg, new_line);
+    va_end(v);
+}
+
+#endif // SL_CATALOG_ZIGBEE_ZCL_FRAMEWORK_CORE_PRESENT
 
 namespace chip {
 namespace DeviceLayer {

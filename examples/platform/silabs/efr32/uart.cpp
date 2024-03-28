@@ -388,7 +388,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
  * @param length number of bytes to write
  * @return int16_t Amount of bytes written or ERROR (-1)
  */
-int16_t uartLogWrite(const char * log, uint16_t length)
+int16_t uartLogWrite(const char * log, uint16_t length, bool newLine)
 {
     if (log == NULL || length < 1 || (length + 2) > UART_TX_MAX_BUF_LEN)
     {
@@ -397,8 +397,12 @@ int16_t uartLogWrite(const char * log, uint16_t length)
 
     UartTxStruct_t workBuffer;
     memcpy(workBuffer.data, log, length);
-    memcpy(workBuffer.data + length, "\r\n", 2);
-    workBuffer.length = length + 2;
+    workBuffer.length = length;
+    if (newLine)
+    {
+        memcpy(workBuffer.data + length, "\r\n", 2);
+        workBuffer.length += 2;
+    }
 
     if (xPortIsInsideInterrupt())
     {
