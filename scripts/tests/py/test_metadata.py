@@ -23,7 +23,7 @@ class TestMetadataReader(unittest.TestCase):
     def setUp(self):
 
         # build the reader object
-        self.reader=Metadata_Reader("/scripts/tests/py", "/scripts/tests/py/env_example.yaml")
+        self.reader=Metadata_Reader("/scripts/tests/py", "/scripts/tests/py/env_test.yaml")
         self.actual_runs_metadata = self.reader.get_runs_metadata()
         self.expected_runs_metadata = {}
 
