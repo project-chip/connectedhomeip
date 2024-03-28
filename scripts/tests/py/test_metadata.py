@@ -23,12 +23,12 @@ class TestMetadataReader(unittest.TestCase):
     def setUp(self):
 
         # build the reader object
-        self.reader=Metadata_Reader("/Users/runner/work/connectedhomeip/connectedhomeip/scripts/tests/py", "/Users/runner/work/connectedhomeip/connectedhomeip/scripts/tests/py/env_test.yaml")
+        self.reader=Metadata_Reader("", "env_test.yaml")
         self.actual_runs_metadata = self.reader.get_runs_metadata()
         self.expected_runs_metadata = {}
 
-        self.expected_runs_metadata["/Users/runner/work/connectedhomeip/connectedhomeip/scripts/tests/py/simple_run_args.txt+run1"] = Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-                   discriminator=1234, py_script_path="/Users/runner/work/connectedhomeip/connectedhomeip/scripts/tests/py/simple_run_args.txt", run="run1", passcode=20202021)
+        self.expected_runs_metadata["simple_run_args.txt+run1"] = Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
+                   discriminator=1234, py_script_path="simple_run_args.txt", run="run1", passcode=20202021)
         
     # gets the metadata associated with each run by parsing the test script and compares it to the expected metadata values
     def test_run_metadata_parser(self):
