@@ -144,7 +144,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                 asserts.assert_true(local_dut is NullValue, "LocalTime must be Null if the DST table is empty")
             else:
                 local_calculated = utc_dut + dst_dut[0].offset + tz_dut[0].offset
-                delta_us = abs(local_dut, local_calculated)
+                delta_us = abs(local_dut - local_calculated)
                 delta = timedelta(microseconds=delta_us)
                 toleranace = timedelta(minutes=1)
                 asserts.assert_less_equal(delta, toleranace, "Local time caluclation is not within tolerance of calculated value")
