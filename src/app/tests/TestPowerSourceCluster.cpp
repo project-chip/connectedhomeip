@@ -18,8 +18,8 @@
 
 #include "lib/support/CHIPMem.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/attribute-storage.h>
 #include <app/clusters/power-source-server/power-source-server.h>
+#include <app/util/attribute-storage.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
