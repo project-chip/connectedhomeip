@@ -114,7 +114,7 @@ static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(&sCallbacks); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
-#if !(CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+#if !(CHIP_DEVICE_CONFIG_ENABLE_WIFI && (CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET))
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif
