@@ -285,3 +285,139 @@ bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
  * the endpoint contains client of a given cluster.
  */
 bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId);
+
+/**
+ * @brief macro that returns size of attribute in bytes.
+ *
+ * @param metadata EmberAfAttributeMetadata* to consider.
+ */
+#define emberAfAttributeSize(metadata) ((metadata)->size)
+
+/**
+ * Returns the index of a given endpoint.  Will return 0xFFFF if this is not a
+ * valid endpoint id or if the endpoint is disabled.
+ */
+uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
+
+/**
+ * @brief Returns parent endpoint for a given endpoint index
+ */
+chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
+
+/**
+ *  @brief Returns the index of the given endpoint in the list of all endpoints that might support the given cluster server.
+ *
+ * Returns kEmberInvalidEndpointIndex if the given endpoint does not support the
+ * given cluster or if the given endpoint is disabled.
+ *
+ * This function always returns the same index for a given endpointId instance, fixed or dynamic.
+ *
+ * The return index for fixed endpoints will range from 0 to (fixedClusterServerEndpointCount - 1),
+ * For dynamic endpoints the indexing assumes that any dynamic endpoint could start supporting
+ * the given server cluster and their index will range from fixedClusterServerEndpointCount to
+ * (fixedClusterServerEndpointCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT - 1).
+ *
+ * For example, if a device has 4 fixed endpoints (ids 0-3) and 2 dynamic
+ * endpoints, and cluster X is supported on endpoints 1 and 3, then
+ * fixedClusterServerEndpointCount should be 2 and
+ *
+ * 1) emberAfGetClusterServerEndpointIndex(0, X) returns kEmberInvalidEndpointIndex
+ * 2) emberAfGetClusterServerEndpointIndex(1, X) returns 0
+ * 3) emberAfGetClusterServerEndpointIndex(2, X) returns kEmberInvalidEndpointIndex
+ * 4) emberAfGetClusterServerEndpointIndex(3, X) returns 1
+
+ * The Dynamic endpoints are placed after the fixed ones;
+ * therefore their return index will always be >= to fixedClusterServerEndpointCount
+ *
+ * If a dynamic endpoint, supporting cluster X, is defined to dynamic index 1 with endpoint id 7,
+ * (via emberAfSetDynamicEndpoint(1, 7, ...))
+ * then emberAfGetClusterServerEndpointIndex(7, X) returns 3 (fixedClusterServerEndpointCount{2} + DynamicEndpointIndex {1}).
+ *
+ * If now a second dynamic endpoint, also supporting cluster X, is defined to dynamic index 0
+ * with endpoint id 9  (via emberAfSetDynamicEndpoint(0, 9, ...)),
+ * emberAfGetClusterServerEndpointIndex(9, X) returns 2. (fixedClusterServerEndpointCount{2} + DynamicEndpointIndex {0}).
+ * and emberAfGetClusterServerEndpointIndex(7, X) still returns 3
+ *
+ * @param endpoint Endpoint number
+ * @param cluster Id the of the Cluster server you are interrested on
+ * @param fixedClusterServerEndpointCount The number of fixed endpoints containing this cluster server.  Typically one of the
+ MATTER_DM_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
+ */
+uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                              uint16_t fixedClusterServerEndpointCount);
+
+/**
+ * Returns the pointer to the data version storage for the given endpoint and
+ * cluster.  Can return null in the following cases:
+ *
+ * 1) There is no such endpoint.
+ * 2) There is no such server cluster on the given endpoint.
+ * 3) No storage for a data version was provided for the endpoint.
+ */
+chip::DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath);
+
+/**
+ * @brief Returns the number of pre-compiled endpoints.
+ */
+uint16_t emberAfFixedEndpointCount();
+
+namespace chip {
+namespace app {
+
+class EnabledEndpointsWithServerCluster
+{
+public:
+    EnabledEndpointsWithServerCluster(ClusterId clusterId);
+
+    // Instead of having a separate Iterator class, optimize for codesize by
+    // just reusing ourselves as our own iterator.  We could do a bit better
+    // here with C++17 and using a different type for the end iterator, but this
+    // is the best I've found with C++14 so far.
+    //
+    // This does mean that you can only iterate a given
+    // EnabledEndpointsWithServerCluster once, but that's OK given how we use it
+    // in practice.
+    EnabledEndpointsWithServerCluster & begin() { return *this; }
+    const EnabledEndpointsWithServerCluster & end() const { return *this; }
+
+    bool operator!=(const EnabledEndpointsWithServerCluster & other) const { return mEndpointIndex != mEndpointCount; }
+
+    EnabledEndpointsWithServerCluster & operator++();
+
+    EndpointId operator*() const { return emberAfEndpointFromIndex(mEndpointIndex); }
+
+private:
+    void EnsureMatchingEndpoint();
+
+    uint16_t mEndpointIndex = 0;
+    uint16_t mEndpointCount = emberAfEndpointCount();
+    ClusterId mClusterId;
+};
+
+/**
+ * @brief Sets the parent endpoint for a given endpoint
+ */
+CHIP_ERROR SetParentEndpointForEndpoint(EndpointId childEndpoint, EndpointId parentEndpoint);
+
+/**
+ * @brief Sets an Endpoint to use Flat Composition
+ */
+CHIP_ERROR SetFlatCompositionForEndpoint(EndpointId endpoint);
+
+/**
+ * @brief Sets an Endpoint to use Tree Composition
+ */
+CHIP_ERROR SetTreeCompositionForEndpoint(EndpointId endpoint);
+
+/**
+ * @brief Returns true is an Endpoint has flat composition
+ */
+bool IsFlatCompositionForEndpoint(EndpointId endpoint);
+
+/**
+ * @brief Returns true is an Endpoint has tree composition
+ */
+bool IsTreeCompositionForEndpoint(EndpointId endpoint);
+
+} // namespace app
+} // namespace chip

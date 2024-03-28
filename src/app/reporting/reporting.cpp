@@ -18,7 +18,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <platform/LockTracker.h>
 
 using namespace chip;
