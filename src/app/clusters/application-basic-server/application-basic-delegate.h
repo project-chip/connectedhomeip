@@ -21,7 +21,10 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <lib/support/CHIPMemString.h>
+
 #include <list>
+#include <string>
 
 namespace chip {
 namespace app {

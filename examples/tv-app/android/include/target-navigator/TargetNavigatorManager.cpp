@@ -17,6 +17,7 @@
 
 #include "TargetNavigatorManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/config.h>
 #include <json/json.h>
 
 using namespace std;
