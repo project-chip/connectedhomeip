@@ -186,7 +186,7 @@ class DeviceProxyWrapper():
     def __del__(self):
         if (self._dmLib is not None and hasattr(builtins, 'chipStack') and builtins.chipStack is not None):
             # This destructor is called from any threading context, including on the Matter threading context.
-            # So, we cannot call chipStack.Call or chipStack.CallAsync which waits for the posted work to
+            # So, we cannot call chipStack.Call or chipStack.CallAsyncWithCallback which waits for the posted work to
             # actually be executed. Instead, we just post/schedule the work and move on.
             builtins.chipStack.PostTaskOnChipThread(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(self._deviceProxy))
 
@@ -437,7 +437,7 @@ class ChipDeviceControllerBase():
         self._ChipStack.commissioningCompleteEvent.clear()
 
         self.state = DCState.COMMISSIONING
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                 self.devCtrl, discriminator, setupPinCode, nodeid)
         ).raise_on_error()
@@ -449,7 +449,7 @@ class ChipDeviceControllerBase():
     def UnpairDevice(self, nodeid: int):
         self.CheckIsActive()
 
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
                 self.devCtrl, nodeid, self.cbHandleDeviceUnpairCompleteFunct)
         ).raise_on_error()
@@ -487,7 +487,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionBLE(
                 self.devCtrl, setupPinCode, discriminator, nodeid)
         )
@@ -496,7 +496,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
         )
@@ -505,7 +505,7 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESession(
                 self.devCtrl, setUpCode.encode("utf-8"), nodeid)
         )
@@ -724,7 +724,7 @@ class ChipDeviceControllerBase():
             Returns CommissioningParameters
         '''
         self.CheckIsActive()
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
                 self.devCtrl, nodeid, timeout, iteration, discriminator, option)
         ).raise_on_error()
@@ -823,6 +823,56 @@ class ChipDeviceControllerBase():
 
         return DeviceProxyWrapper(returnDevice, self._dmLib)
 
+    async def GetConnectedDevice(self, nodeid, allowPASE=True, timeoutMs: int = None):
+        ''' Returns DeviceProxyWrapper upon success.'''
+        self.CheckIsActive()
+
+        if allowPASE:
+            returnDevice = c_void_p(None)
+            res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+                self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
+            if res.is_success:
+                logging.info('Using PASE connection')
+                return DeviceProxyWrapper(returnDevice)
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        class DeviceAvailableClosure():
+            def __init__(self, loop, future: asyncio.Future):
+                self._returnDevice = c_void_p(None)
+                self._returnErr = None
+                self._event_loop = loop
+                self._future = future
+
+            def _deviceAvailable(self):
+                if self._returnDevice.value is not None:
+                    self._future.set_result(self._returnDevice)
+                else:
+                    self._future.set_exception(self._returnErr.to_exception())
+
+            def deviceAvailable(self, device, err):
+                self._returnDevice = c_void_p(device)
+                self._returnErr = err
+                self._event_loop.call_soon_threadsafe(self._deviceAvailable)
+                ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
+
+        closure = DeviceAvailableClosure(eventLoop, future)
+        ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
+        self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
+            self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback),
+            timeoutMs).raise_on_error()
+
+        # The callback might have been received synchronously (during self._ChipStack.Call()).
+        # In that case the Future has already been set it will return immediately
+        if (timeoutMs):
+            timeout = float(timeoutMs) / 1000
+            await asyncio.wait_for(future, timeout=timeout)
+        else:
+            await future
+
+        return DeviceProxyWrapper(future.result(), self._dmLib)
+
     def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
         ''' Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
             receive a message, process it and send it back. This is computed based on the session type, the type of transport,
@@ -887,7 +937,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
 
         ClusterCommand.TestOnlySendBatchCommands(
             future, eventLoop, device.deviceProxy, commands,
@@ -908,7 +958,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=None)
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=None)
         ClusterCommand.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(
             future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
                 EndpointId=endpoint,
@@ -940,14 +990,15 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
-        ClusterCommand.SendCommand(
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
+        res = await ClusterCommand.SendCommand(
             future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
                 EndpointId=endpoint,
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
             ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse).raise_on_error()
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse)
+        res.raise_on_error()
         return await future
 
     async def SendBatchCommands(self, nodeid: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
@@ -981,7 +1032,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
 
         ClusterCommand.SendBatchCommands(
             future, eventLoop, device.deviceProxy, commands,
@@ -1031,7 +1082,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs)
 
         attrs = []
         for v in attributes:
@@ -1259,7 +1310,7 @@ class ChipDeviceControllerBase():
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
 
-        device = self.GetConnectedDeviceSync(nodeid)
+        device = await self.GetConnectedDevice(nodeid)
         attributePaths = [self._parseAttributePathTuple(
             v) for v in attributes] if attributes else None
         clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
@@ -1810,7 +1861,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self._ChipStack.commissioningCompleteEvent.clear()
         self.state = DCState.COMMISSIONING
 
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_Commission(
                 self.devCtrl, nodeid)
         )
@@ -1925,7 +1976,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                 self.devCtrl, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None, discoveryTimeoutMsec)
         )
@@ -1948,7 +1999,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
                 self.devCtrl, setupPayload, nodeid, discoveryType.value)
         )
@@ -1967,7 +2018,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
-        self._ChipStack.CallAsync(
+        self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
         )
@@ -1981,7 +2032,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         The NOC chain will be provided in TLV cert format."""
         self.CheckIsActive()
 
-        return self._ChipStack.CallAsync(
+        return self._ChipStack.CallAsyncWithCallback(
             lambda: self._dmLib.pychip_DeviceController_IssueNOCChain(
                 self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
         )

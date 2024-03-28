@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+import asyncio
 import builtins
 import logging
 import os
@@ -367,7 +368,44 @@ class ChipStack(object):
             return self.callbackRes
         return res
 
-    def CallAsync(self, callFunct):
+    async def CallAsync(self, callFunct, timeoutMs: int = None):
+        class AsyncSimpleCallableHandle:
+            def __init__(self, callback, loop, future):
+                self._callback = callback
+                self._loop = loop
+                self._future = future
+                self._result = None
+                self._exception = None
+
+            def _done(self):
+                if self._exception:
+                    self._future.set_exception(self._exception)
+                else:
+                    self._future.set_result(self._result)
+
+            def __call__(self):
+                try:
+                    self._result = self._callback()
+                except Exception as ex:
+                    self._exception = ex
+                self._loop.call_soon_threadsafe(self._done)
+                pythonapi.Py_DecRef(py_object(self))
+
+        loop = asyncio.get_event_loop()
+        future = loop.create_future()
+        callObj = AsyncSimpleCallableHandle(callFunct, loop, future)
+        pythonapi.Py_IncRef(py_object(callObj))
+
+        res = self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread(
+            self.cbHandleChipThreadRun, py_object(callObj))
+
+        if not res.is_success:
+            pythonapi.Py_DecRef(py_object(callObj))
+            raise res.to_exception()
+
+        return await asyncio.wait_for(future, timeoutMs / 1000 if timeoutMs else None)
+
+    def CallAsyncWithCallback(self, callFunct):
         '''Run a Python function on CHIP stack, and wait for the application specific response.
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
