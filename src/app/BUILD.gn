@@ -237,8 +237,8 @@ static_library("interaction-model") {
   if (chip_build_controller_dynamic_server) {
     sources += [
       "clusters/ota-provider/ota-provider.cpp",
-      "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
+      "dynamic_server/AccessControl.cpp",
       "dynamic_server/DynamicDispatcher.cpp",
       "util/privilege-storage.cpp",
       "util/privilege-storage.h",
@@ -250,6 +250,15 @@ static_library("interaction-model") {
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]
+
+    # TODO: ota-provided.cpp uses attribute-storage.h-defined functions, specifically
+    #       it wants to know MATTER_DM_OTA_SOFTWARE_UPDAT_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT as well
+    #       as use emberAfGetClusterServerEndpointIndex.
+    #
+    #       DynamicDispatcher.cpp overrides these, however due to attribute-storage.h being a
+    #       codegen-dependent file, we need additional include paths during compilation
+
+    public_configs += [ "${chip_root}/src/app/dynamic_server:mock-codegen-includes" ]
   }
 }
 
