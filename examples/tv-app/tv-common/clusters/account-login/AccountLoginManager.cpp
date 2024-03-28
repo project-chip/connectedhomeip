@@ -19,6 +19,7 @@
 #include "AccountLoginManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
+#include <app/util/config.h>
 
 using namespace std;
 using namespace chip::app::Clusters::AccountLogin;
