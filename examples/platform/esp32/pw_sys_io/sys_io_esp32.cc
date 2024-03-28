@@ -29,6 +29,7 @@
 #include <cinttypes>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #define ECHO_TEST_TXD (CONFIG_EXAMPLE_UART_TXD)
 #define ECHO_TEST_RXD (CONFIG_EXAMPLE_UART_RXD)

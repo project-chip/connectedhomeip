@@ -45,6 +45,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::AppPlatform;

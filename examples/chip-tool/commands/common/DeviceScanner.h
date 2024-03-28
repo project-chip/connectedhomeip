@@ -25,6 +25,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/dnssd/platform/Dnssd.h>
 
+#include <string>
 #include <unordered_map>
 #include <vector>
 

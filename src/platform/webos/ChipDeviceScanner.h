@@ -23,6 +23,7 @@
 
 #include <glib.h>
 #include <memory>
+#include <string>
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>

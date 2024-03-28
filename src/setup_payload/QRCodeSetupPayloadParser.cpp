@@ -26,6 +26,7 @@
 
 #include <memory>
 #include <string.h>
+#include <string>
 #include <vector>
 
 #include <lib/core/CHIPCore.h>

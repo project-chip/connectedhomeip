@@ -77,6 +77,7 @@
 
 #include <atomic>
 #include <dns_sd.h>
+#include <string>
 
 #import <os/lock.h>
 

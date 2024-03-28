@@ -17,7 +17,6 @@
 
 #pragma once
 
-// #include PLATFORM_HEADER
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/config.h>

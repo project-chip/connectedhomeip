@@ -28,6 +28,8 @@
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
+#include <string>
+
 using namespace ::chip;
 using namespace ::chip::Controller;
 

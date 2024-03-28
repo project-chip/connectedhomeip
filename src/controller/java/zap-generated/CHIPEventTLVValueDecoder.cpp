@@ -28,6 +28,8 @@
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/TypeTraits.h>
 
+#include <string>
+
 namespace chip {
 
 jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)

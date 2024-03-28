@@ -31,6 +31,8 @@
 #include "ChipDeviceScanner.h"
 #include <luna-service2/lunaservice.h>
 
+#include <string>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

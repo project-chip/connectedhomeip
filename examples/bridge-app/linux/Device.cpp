@@ -22,6 +22,8 @@
 #include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <string>
+
 using namespace chip::app::Clusters::Actions;
 
 Device::Device(const char * szDeviceName, std::string szLocation)

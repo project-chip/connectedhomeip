@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/content-launch-server/content-launch-server.h>
+#include <string>
 #include <vector>
 
 using chip::CharSpan;

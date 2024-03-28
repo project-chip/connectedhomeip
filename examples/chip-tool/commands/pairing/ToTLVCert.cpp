@@ -21,6 +21,8 @@
 #include <credentials/CHIPCert.h>
 #include <lib/support/Base64.h>
 
+#include <string>
+
 constexpr char kBase64Header[]    = "base64:";
 constexpr size_t kBase64HeaderLen = ArraySize(kBase64Header) - 1;
 

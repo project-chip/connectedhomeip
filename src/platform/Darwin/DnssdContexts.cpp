@@ -23,6 +23,8 @@
 
 #include <net/if.h>
 
+#include <string>
+
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
 

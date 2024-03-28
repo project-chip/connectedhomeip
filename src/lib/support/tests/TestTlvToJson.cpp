@@ -25,6 +25,8 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
+#include <string>
+
 namespace {
 
 using namespace chip::Encoding;

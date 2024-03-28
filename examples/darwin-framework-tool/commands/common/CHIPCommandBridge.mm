@@ -26,6 +26,9 @@
 
 #include "MTRError_Utils.h"
 
+#include <map>
+#include <string>
+
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;

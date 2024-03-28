@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <json/json.h>
+#include <string>
 
 namespace chip {
 std::string PrettyPrintJsonString(const std::string & jsonString)

@@ -30,6 +30,7 @@
 #include <lib/support/CHIPMem.h>
 
 #include <cassert>
+#include <string>
 #include <vector>
 
 uint16_t ScreenFontHeight;

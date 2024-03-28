@@ -24,6 +24,8 @@
 #import <setup_payload/QRCodeSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
 
+#include <string>
+
 @implementation MTRQRCodeSetupPayloadParser {
     NSString * _base38Representation;
     chip::QRCodeSetupPayloadParser * _chipQRCodeSetupPayloadParser;

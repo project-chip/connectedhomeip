@@ -24,6 +24,8 @@
 #include <lib/support/jsontlv/ElementTypes.h>
 #include <lib/support/jsontlv/TlvToJson.h>
 
+#include <string>
+
 namespace chip {
 
 namespace {

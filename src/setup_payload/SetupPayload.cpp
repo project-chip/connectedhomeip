@@ -29,6 +29,7 @@
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
+#include <string>
 #include <utility>
 
 namespace chip {

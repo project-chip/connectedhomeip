@@ -24,6 +24,8 @@
 #import "setup_payload/QRCodeSetupPayloadGenerator.h"
 #import <setup_payload/SetupPayload.h>
 
+#include <string>
+
 @implementation MTROptionalQRCodeInfo
 @end
 

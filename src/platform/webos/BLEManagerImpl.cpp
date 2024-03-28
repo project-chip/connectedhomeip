@@ -32,6 +32,7 @@
 
 #include <cassert>
 #include <iomanip>
+#include <string>
 #include <type_traits>
 #include <utility>
 

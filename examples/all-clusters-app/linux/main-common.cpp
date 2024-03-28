@@ -60,6 +60,8 @@
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;

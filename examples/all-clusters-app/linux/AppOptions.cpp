@@ -21,6 +21,8 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 
+#include <string>
+
 using namespace chip::ArgParser;
 
 using chip::ArgParser::OptionDef;

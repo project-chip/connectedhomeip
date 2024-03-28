@@ -24,6 +24,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>
 
+#include <string>
+
 #include "JsonParser.h"
 
 namespace {

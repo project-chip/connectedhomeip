@@ -18,6 +18,7 @@
 #include "MessagesManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <string>
 #include <vector>
 
 using namespace std;

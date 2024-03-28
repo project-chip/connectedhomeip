@@ -20,6 +20,7 @@
 #include <iomanip>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <sstream>
+#include <string>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>

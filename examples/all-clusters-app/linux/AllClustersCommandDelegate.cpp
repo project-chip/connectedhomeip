@@ -36,6 +36,8 @@
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;

@@ -22,6 +22,8 @@
 #include <logging/logging.h>
 #include <platform/logging/LogV.h>
 
+#include <string>
+
 #include <editline.h>
 
 constexpr char kInteractiveModePrompt[] = "Stop and restart stack: [Ctrl+_] & [Ctrl+^] \nQuit Interactive: 'quit()'\n>>> ";

@@ -27,6 +27,8 @@
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;

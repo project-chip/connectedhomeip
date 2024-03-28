@@ -36,6 +36,8 @@
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <string>
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

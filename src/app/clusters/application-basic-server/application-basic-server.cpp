@@ -36,6 +36,7 @@
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #include <list>
+#include <string>
 
 using namespace chip;
 using namespace chip::app::Clusters;

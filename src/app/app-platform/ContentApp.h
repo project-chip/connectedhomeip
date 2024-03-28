@@ -36,6 +36,8 @@
 #include <controller/CHIPDeviceController.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <string>
+
 namespace chip {
 namespace AppPlatform {
 

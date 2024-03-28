@@ -5,6 +5,8 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 
+#include <string>
+
 namespace chip {
 namespace app {
 namespace Clusters {

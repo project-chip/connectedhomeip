@@ -23,6 +23,7 @@
 
 #include <deque>
 #include <mutex>
+#include <string>
 
 constexpr uint16_t kDefaultWebSocketServerPort                 = 9002;
 constexpr uint16_t kMaxMessageBufferLen                        = 8192;
