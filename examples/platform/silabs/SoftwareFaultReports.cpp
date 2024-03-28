@@ -22,6 +22,7 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 
