@@ -27,6 +27,7 @@
 #import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceTestDelegate.h"
+#import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
@@ -2870,8 +2871,13 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     NSUInteger attributesReportedWithFirstSubscription = [device unitTestAttributesReportedSinceLastCheck];
 
+#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
+    NSDictionary * dataStoreClusterDataAfterFirstSubscription = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertTrue(dataStoreClusterDataAfterFirstSubscription.count > 0);
+#else
     NSArray * dataStoreValuesAfterFirstSubscription = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
     XCTAssertTrue(dataStoreValuesAfterFirstSubscription.count > 0);
+#endif
 
     // Now remove device, resubscribe, and see that it succeeds
     [sController removeDevice:device];
