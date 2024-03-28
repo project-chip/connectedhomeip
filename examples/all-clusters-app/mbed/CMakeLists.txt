@@ -75,9 +75,11 @@ target_sources(${APP_TARGET} PRIVATE
                ${ENERGY_MANAGEMENT_COMMON}/src/ElectricalPowerMeasurementDelegate.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
-
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl_TestData.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManufacturerImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/utils.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}

@@ -164,7 +164,7 @@ void ForecastTestSetup_TP3b(DataModel::Nullable<Structs::ForecastStruct::Type> &
 
     uint32_t chipEpoch = 0;
 
-    CHIP_ERROR ce = UtilsGetEpochTS(chipEpoch);
+     [[maybe_unused]] CHIP_ERROR ce = UtilsGetEpochTS(chipEpoch);
     ChipLogProgress(Support, "ce=%s", (ce != CHIP_NO_ERROR) ? "Err" : "Good");
 
     forecast.startTime = static_cast<uint32_t>(chipEpoch); // planned start time, in UTC, for the entire Forecast.

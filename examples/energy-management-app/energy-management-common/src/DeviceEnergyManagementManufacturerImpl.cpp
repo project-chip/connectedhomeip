@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
-#include "app/clusters/device-energy-management-server/device-energy-management-server.h"
 #include "utils.h"
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManufacturerImpl.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/device-energy-management-server/device-energy-management-server.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/util/attribute-storage.h>
 

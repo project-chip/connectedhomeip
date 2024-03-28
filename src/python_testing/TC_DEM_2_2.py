@@ -19,7 +19,7 @@ import logging
 
 import chip.clusters as Clusters
 from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
+# from mobly import asserts    # commented out as not used and causes build failure when lint-ing
 from TC_DEM_Utils import DEMBaseTestHelper
 
 logger = logging.getLogger(__name__)
