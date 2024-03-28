@@ -409,7 +409,8 @@ void BrowseContext::OnBrowseRemove(const char * name, const char * type, const c
     services.erase(std::remove_if(services.begin(), services.end(),
                                   [name, type, interfaceId, domain](const auto & service) {
                                       return strcmp(name, service.first.mName) == 0 && type == GetFullType(&service.first) &&
-                                          service.first.mInterface == chip::Inet::InterfaceId(interfaceId) && strcmp(domain, service.second.c_str()) == 0;
+                                          service.first.mInterface == chip::Inet::InterfaceId(interfaceId) &&
+                                          strcmp(domain, service.second.c_str()) == 0;
                                   }),
                    services.end());
 }
