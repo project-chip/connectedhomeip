@@ -26,9 +26,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NSDictionary<NSString *, id> * MTRDeviceResponseValueDictionary;
-typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
-
 /**
  * Handler for read attribute response, write attribute response, invoke command response and reports.
  *
@@ -99,7 +96,7 @@ typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
  *
  *                MTRDataKey : Data-value NSDictionary object.
  */
-typedef void (^MTRDeviceResponseHandler)(NSArray<MTRDeviceResponseValueDictionary> * _Nullable values, NSError * _Nullable error);
+typedef void (^MTRDeviceResponseHandler)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error);
 
 /**
  * Handler for -subscribeWithQueue: attribute and event reports

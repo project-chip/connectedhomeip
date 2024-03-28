@@ -188,6 +188,7 @@ static NSString * const sAttributesKey = @"attributes";
     return [NSString stringWithFormat:@"<MTRDeviceClusterData: dataVersion %@ attributes count %lu>", _dataVersion, static_cast<unsigned long>(_attributes.count)];
 }
 
+// Attributes dictionary is: attributeID => data-value dictionary
 - (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes
 {
     self = [super init];
@@ -884,7 +885,10 @@ static NSString * const sAttributesKey = @"attributes";
     NSMutableDictionary * clusterDataToReturn = [NSMutableDictionary dictionary];
     for (MTRClusterPath * clusterPath in clusterPaths) {
         NSNumber * dataVersion = _clusterData[clusterPath].dataVersion;
-        NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes = [self _attributesForCluster:clusterPath];
+        NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes = nil;
+#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
+        attributes = [self _attributesForCluster:clusterPath];
+#endif
         if (dataVersion || attributes) {
             MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:attributes];
             clusterDataToReturn[clusterPath] = clusterData;

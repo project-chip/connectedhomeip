@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MTRAsyncWorkQueue;
 
+typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
+
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
 // Whether to store attributes by cluster instead of as individual entries for each attribute
