@@ -36,7 +36,7 @@ echo
 echo "Storage Space Used By Key Directories:"
 for directory in "${listOfDirectories[@]}"; do
     if [ -d "$directory" ]; then
-        du -d1 -h "$directory" | sort -h
+        du -d1 -h "$directory" | grep '^[[:space:]]*[0-9.]*[MG][[:space:]]' | sort -rh
         echo
     fi
 done
