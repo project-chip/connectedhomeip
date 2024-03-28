@@ -17,6 +17,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/util/attribute-metadata.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip::app;

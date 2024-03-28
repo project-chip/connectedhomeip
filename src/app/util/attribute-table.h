@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <app/util/attribute-metadata.h>
+#include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 /**
