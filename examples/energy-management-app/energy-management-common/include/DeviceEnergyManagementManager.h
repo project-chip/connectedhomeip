@@ -27,15 +27,13 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+class DeviceEnergyManagementManufacturer;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
+
 class DeviceEnergyManagementManager : public Instance
 {
 public:
-    DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature) :
-        DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature)
-    {
-        mDelegate = &aDelegate;
-    }
+    DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature);
 
     // Delete copy constructor and assignment operator.
     DeviceEnergyManagementManager(const DeviceEnergyManagementManager &)             = delete;
@@ -49,6 +47,7 @@ public:
 
 private:
     DeviceEnergyManagementDelegate * mDelegate;
+    DeviceEnergyManagementManufacturer * mDEMManufacturer;
 };
 
 } // namespace Clusters

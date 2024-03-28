@@ -27,8 +27,11 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 
 using chip::Optional;
-using namespace chip::app;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
+
+#ifndef DELEGATE_TEST_DATA
+DeviceEnergyManagementDelegate::DeviceEnergyManagementDelegate() {}
+#endif
 
 /**
  * @brief Delegate handler for PowerAdjustRequest
@@ -98,25 +101,38 @@ Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
  */
 Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause)
 {
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = GetForecast();
-
-    if (forecast.IsNull())
+    if (mForecast.IsNull())
     {
         return Status::Failure;
     }
 
-    uint32_t duration = forecast.Value().endTime - forecast.Value().startTime; // the current entire forecast duration
+    uint32_t duration = mForecast.Value().endTime - mForecast.Value().startTime; // the current entire forecast duration
 
     /* Modify start time and end time */
-    forecast.Value().startTime = requestedStartTime;
-    forecast.Value().endTime   = requestedStartTime + duration;
+    mForecast.Value().startTime = requestedStartTime;
+    mForecast.Value().endTime   = requestedStartTime + duration;
 
-    SetForecast(forecast); // This will increment forecast ID
+    switch (cause)
+    {
+    case AdjustmentCauseEnum::kLocalOptimization:
+        mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kLocalOptimization;
+        break;
+    case AdjustmentCauseEnum::kGridOptimization:
+        mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kGridOptimization;
+        break;
+    default:
+        ChipLogDetail(AppServer, "Bad cause %d", static_cast<int>(cause));
+        return Status::Failure;
+        break;
+    }
+
+    SetForecast(mForecast); // This will increment forecast ID
 
     // TODO: callback to the appliance to notify it of a new start time
 
     return Status::Success;
 }
+
 /**
  * @brief Delegate handler for Pause Request
  *
@@ -221,8 +237,27 @@ Status DeviceEnergyManagementDelegate::RequestConstraintBasedForecast(
  */
 Status DeviceEnergyManagementDelegate::CancelRequest()
 {
-    Status status = Status::UnsupportedCommand; // Status::Success;
-    // TODO: implement the behaviour above
+    Status status = Status::Success;
+
+    if (mForecast.IsNull())
+    {
+        ChipLogDetail(AppServer, "Cancelling on a Null forecast!");
+        return Status::Failure;
+    }
+
+    if (mForecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization)
+    {
+        ChipLogDetail(AppServer, "Bad Cancel when ESA ForecastUpdateReason was already Internal Optimization!");
+        return Status::Failure;
+    }
+
+    mForecast.Value().forecastUpdateReason = ForecastUpdateReasonEnum::kInternalOptimization;
+
+    /* TODO:
+     *  Cancel the effects of any previous adjustment request commands, and re-evaluate its forecast
+     *  for intended operation ignoring those previous requests.
+     */
+
     return status;
 }
 
@@ -265,6 +300,7 @@ DataModel::Nullable<Structs::ForecastStruct::Type> DeviceEnergyManagementDelegat
 
 OptOutStateEnum DeviceEnergyManagementDelegate::GetOptOutState()
 {
+    ChipLogDetail(AppServer, "mOptOutState %d", static_cast<int>(mOptOutState));
     return mOptOutState;
 }
 
@@ -361,6 +397,58 @@ DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(PowerAdjustmentCapa
 CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type> forecast)
 {
     // TODO see Issue #31147
+    if (forecast.IsNull())
+    {
+        mForecast.SetNull();
+    }
+    else
+    {
+        mForecast = forecast;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetOptOutState(OptOutStateEnum newValue)
+{
+    OptOutStateEnum oldValue = mOptOutState;
+
+    mOptOutState = newValue;
+    if (oldValue != newValue)
+    {
+        ChipLogDetail(AppServer, "mOptOutState updated to %d", static_cast<int>(mOptOutState));
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, OptOutState::Id);
+    }
+
+    if (!mForecast.IsNull())
+    {
+        switch (mForecast.Value().forecastUpdateReason)
+        {
+        case ForecastUpdateReasonEnum::kInternalOptimization:
+            // We don't need to redo a forecast since its internal already
+            break;
+        case ForecastUpdateReasonEnum::kLocalOptimization:
+            if ((mOptOutState == OptOutStateEnum::kOptOut)
+                || (mOptOutState == OptOutStateEnum::kLocalOptOut))
+            {
+                // Generate a new forecast with Internal Optimization
+                // TODO
+            }
+            break;
+        case ForecastUpdateReasonEnum::kGridOptimization:
+            if ((mOptOutState == OptOutStateEnum::kOptOut)
+                || (mOptOutState == OptOutStateEnum::kGridOptOut))
+            {
+                // Generate a new forecast with Internal Optimization
+                // TODO
+            }
+            break;
+            default:
+                ChipLogDetail(AppServer, "Bad ForecastUpdateReasonEnum value of %d", static_cast<int>(mForecast.Value().forecastUpdateReason));
+                return CHIP_ERROR_BAD_REQUEST;
+            break;
+        }
+    }
 
     return CHIP_NO_ERROR;
 }

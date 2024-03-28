@@ -24,6 +24,8 @@
 #include <app/util/config.h>
 #include <cstring>
 
+#define DELEGATE_TEST_DATA // TODO: comment out if not needed
+
 using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
@@ -36,6 +38,7 @@ namespace DeviceEnergyManagement {
 class DeviceEnergyManagementDelegate : public DeviceEnergyManagement::Delegate
 {
 public:
+    DeviceEnergyManagementDelegate();
     virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause) override;
     virtual Status CancelPowerAdjustRequest() override;
     virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) override;
@@ -70,6 +73,7 @@ public:
     virtual CHIP_ERROR SetAbsMaxPower(int64_t) override;
     virtual CHIP_ERROR SetPowerAdjustmentCapability(Attributes::PowerAdjustmentCapability::TypeInfo::Type) override;
     virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type>) override;
+    virtual CHIP_ERROR SetOptOutState(OptOutStateEnum) override;
 
 private:
     ESATypeEnum mEsaType;
