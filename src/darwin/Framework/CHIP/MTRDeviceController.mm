@@ -40,6 +40,7 @@
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
+#import "MTRMetricsCollector.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
@@ -610,10 +611,18 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     MATTER_LOG_METRIC(kMetricDeviceProductID, [payload.productID unsignedIntValue]);
 }
 
+- (void)preparePASESessionMetric:(chip::NodeId)nodeId
+{
+    self->_deviceControllerDelegateBridge->SetDeviceNodeID(nodeId);
+    MATTER_LOG_METRIC_BEGIN(kMetricSetupPASESession);
+}
+
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
+    [[MTRMetricsCollector sharedInstance] resetMetrics];
+
     // Track overall commissioning
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
     emitMetricForSetupPayload(payload);
@@ -623,7 +632,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
 
     auto block = ^BOOL {
-        // Track just this portion of overall PASE setup
+        // Track work until end of scope
         MATTER_LOG_METRIC_SCOPE(kMetricSetupWithPayload, errorCode);
 
         // Try to get a QR code if possible (because it has a better
@@ -633,12 +642,17 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             pairingCode = [payload manualEntryCode];
         }
         if (pairingCode == nil) {
-            return ![MTRDeviceController checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorSetupCodeGen error:error];
+            errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+            return ![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error];
         }
 
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(nodeId);
+
+        [self preparePASESessionMetric:nodeId];
         errorCode = self->_cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
+        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
@@ -654,6 +668,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                             newNodeID:(NSNumber *)newNodeID
                                                 error:(NSError * __autoreleasing *)error
 {
+    [[MTRMetricsCollector sharedInstance] resetMetrics];
+
     // Track overall commissioning
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
     emitMetricForSetupPayload(payload);
@@ -663,7 +679,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
 
     auto block = ^BOOL {
-        // Track just this portion of overall PASE setup
+        // Track work until end of scope
         MATTER_LOG_METRIC_SCOPE(kMetricSetupWithDiscovered, errorCode);
 
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
@@ -675,7 +691,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             auto pinCode = static_cast<uint32_t>(payload.setupPasscode.unsignedLongValue);
             params.Value().SetSetupPINCode(pinCode);
 
+            [self preparePASESessionMetric:nodeId];
             errorCode = self->_cppCommissioner->EstablishPASEConnection(nodeId, params.Value());
+            VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
         } else {
             // Try to get a QR code if possible (because it has a better
             // discriminator, etc), then fall back to manual code if that fails.
@@ -684,7 +702,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                 pairingCode = [payload manualEntryCode];
             }
             if (pairingCode == nil) {
-                return ![MTRDeviceController checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorSetupCodeGen error:error];
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return ![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error];
             }
 
             for (id key in discoveredDevice.interfaces) {
@@ -693,9 +712,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                     continue;
                 }
 
+                [self preparePASESessionMetric:nodeId];
                 errorCode = self->_cppCommissioner->EstablishPASEConnection(
                     nodeId, [pairingCode UTF8String], chip::Controller::DiscoveryType::kDiscoveryNetworkOnly, resolutionData);
                 if (CHIP_NO_ERROR != errorCode) {
+                    MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode);
                     break;
                 }
             }
@@ -1616,6 +1637,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
+    [[MTRMetricsCollector sharedInstance] resetMetrics];
+
     // Track overall commissioning
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
 
@@ -1624,7 +1647,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
 
     auto block = ^BOOL {
-        // Track just this portion of overall PASE setup
+        // Track work until end of scope
         MATTER_LOG_METRIC_SCOPE(kMetricPairDevice, errorCode);
 
         std::string manualPairingCode;
@@ -1636,7 +1659,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error], NO);
 
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
+
+        [self preparePASESessionMetric:deviceID];
         errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
+        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
@@ -1653,6 +1680,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
+    [[MTRMetricsCollector sharedInstance] resetMetrics];
+
     // Track overall commissioning
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
 
@@ -1661,7 +1690,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
 
     auto block = ^BOOL {
-        // Track just this portion of overall PASE setup
+        // Track work until end of scope
         MATTER_LOG_METRIC_SCOPE(kMetricPairDevice, errorCode);
 
         chip::Inet::IPAddress addr;
@@ -1671,7 +1700,11 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
 
         auto params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
+
+        [self preparePASESessionMetric:deviceID];
         errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, params);
+        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
@@ -1684,6 +1717,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
+    [[MTRMetricsCollector sharedInstance] resetMetrics];
+
     // Track overall commissioning
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissioning);
     emitMetricForSetupPayload([MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:nil]);
@@ -1693,11 +1728,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
 
     auto block = ^BOOL {
-        // Track just this portion of overall PASE setup
+        // Track work until end of scope
         MATTER_LOG_METRIC_SCOPE(kMetricPairDevice, errorCode);
 
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
+
+        [self preparePASESessionMetric:deviceID];
         errorCode = self->_cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
+        VerifyOrDo(errorCode != CHIP_NO_ERROR, MATTER_LOG_METRIC_END(kMetricSetupPASESession, errorCode));
+
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
