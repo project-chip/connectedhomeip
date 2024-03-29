@@ -235,7 +235,8 @@ struct InterfaceKey
     inline bool operator<(const InterfaceKey & other) const
     {
         return (this->interfaceId < other.interfaceId) ||
-            ((this->interfaceId == other.interfaceId) && (this->hostname < other.hostname));
+            ((this->interfaceId == other.interfaceId) && (this->hostname < other.hostname)) ||
+            ((this->interfaceId == other.interfaceId) && (this->hostname == other.hostname) && (this->isSRPResult < other.isSRPResult));
     }
 
     uint32_t interfaceId;
@@ -245,7 +246,7 @@ struct InterfaceKey
 
 struct ResolveContextWithType
 {
-    ResolveContextWithType()  = default;
+    ResolveContextWithType()  = delete;
     ~ResolveContextWithType() = default;
 
     ResolveContext * const context;
@@ -266,8 +267,8 @@ struct ResolveContext : public GenericContext
     bool shouldStartSRPTimerForResolve = false;
     bool isSRPTimerRunning            = false;
 
-    ResolveContextWithType resolveContextWithSRPType;
-    ResolveContextWithType resolveContextWithNonSRPType;
+    ResolveContextWithType resolveContextWithSRPType = {this , true};
+    ResolveContextWithType resolveContextWithNonSRPType = {this, false};
 
     // browseCausingResolve can be null.
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,

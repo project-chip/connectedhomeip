@@ -465,8 +465,7 @@ void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * t
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
                                const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
                                std::shared_ptr<uint32_t> && consumerCounterToUse) :
-    browseThatCausedResolve(browseCausingResolve),
-    resolveContextWithSRPType({ this, true }), resolveContextWithNonSRPType({ this, false })
+    browseThatCausedResolve(browseCausingResolve)
 {
     type            = ContextType::Resolve;
     context         = cbContext;
@@ -478,8 +477,7 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
 
 ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
                                const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
-    browseThatCausedResolve(nullptr),
-    resolveContextWithSRPType({ this, true }), resolveContextWithNonSRPType({ this, false })
+    browseThatCausedResolve(nullptr)
 {
     type            = ContextType::Resolve;
     context         = delegate;
@@ -556,7 +554,7 @@ void ResolveContext::DispatchSuccess()
     for (auto & interface : interfaces)
     {
         if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname,
-                                                 interface.first.isSRPTypeRequested))
+                                                 interface.first.isSRPResult))
         {
             break;
         }
@@ -568,7 +566,7 @@ void ResolveContext::DispatchSuccess()
     }
 }
 
-bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPType)
+bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResolve)
 {
     if (interfaceIndex == 0)
     {
@@ -576,7 +574,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
         return false;
     }
 
-    InterfaceKey interfaceKey = { interfaceIndex, hostname, isSRPType };
+    InterfaceKey interfaceKey = { interfaceIndex, hostname, isSRPResolve };
     auto & interface          = interfaces[interfaceKey];
     auto & ips                = interface.addresses;
 
@@ -607,26 +605,12 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
 
 bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex)
 {
-    if (interfaceIndex == 0)
-    {
-        // Not actually an interface we have.
-        return false;
-    }
-
     for (auto & interface : interfaces)
     {
         if (interface.first.interfaceId == interfaceIndex)
         {
-            auto & ips = interface.second.addresses;
-
-            // Some interface may not have any ips, just ignore them.
-            if (ips.size() == 0)
-            {
-                continue;
-            }
-
             if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname,
-                                                     interface.first.isSRPTypeRequested))
+                                                     interface.first.isSRPResult))
             {
                 return true;
             }
@@ -750,7 +734,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
-    InterfaceKey interfaceKey = { interfaceId, hostnameWithDomain, isSRPType };
+    InterfaceKey interfaceKey = { interfaceId, hostnameWithDomain, isFromSRPResolve };
     interfaces.insert(std::make_pair(std::move(interfaceKey), std::move(interface)));
 }
 
