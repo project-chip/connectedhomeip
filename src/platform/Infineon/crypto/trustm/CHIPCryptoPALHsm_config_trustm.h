@@ -25,7 +25,7 @@
 /*
  * Enable trustm for Generate EC Key
  */
-#define ENABLE_TRUSTM_GENERATE_EC_KEY       1 
+#define ENABLE_TRUSTM_GENERATE_EC_KEY       1
 
 /*
  * Enable ECDSA Verify using trustm

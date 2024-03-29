@@ -53,7 +53,7 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
 {
 #if !ENABLE_TRUSTM_HMAC_SHA256
     return HMAC_SHA256_h(key, key_length, message, message_length, out_buffer, out_length);
-#else    
+#else
     CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
     optiga_lib_status_t return_status = OPTIGA_LIB_BUSY;
 
@@ -94,7 +94,7 @@ exit:
         trustm_close();
     }
     return error;
-#endif    
+#endif
 }
 
 CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,

@@ -117,7 +117,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     }
     error = CHIP_NO_ERROR;
     return error;
-#else    
+#else
     uint8_t pubkey[128]               = {
         0,
     };
@@ -127,7 +127,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     optiga_key_usage_t key_usage;
     uint16_t keyid;
 
-    if (key_target == ECPKeyTarget::ECDH) {   
+    if (key_target == ECPKeyTarget::ECDH) {
         keyid = TRUSTM_ECDH_OID_KEY;
 
         // Trust M ECC 256 Key Gen
@@ -198,7 +198,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P
     } else {
         return_status = trustm_ecdsa_sign(OPTIGA_KEY_ID_E0F0, digest, digest_length, signature_trustm, &signature_trustm_len);
     }
-    
+
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, ByteSpan{ signature_trustm, signature_trustm_len }, out_raw_sig_span);
@@ -238,16 +238,16 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     const uint8_t * const rem_pubKey = Uint8::to_const_uchar(remote_public_key);
     const size_t rem_pubKeyLen       = remote_public_key.Length();
-    
+
     uint8_t remote_key[68];
     uint8_t header[3] = {0x03, 0x42, 0x00};
 
     memcpy(remote_key, &header, 3);
     memcpy(remote_key+3, rem_pubKey, rem_pubKeyLen);
 
-    return_status = trustm_ecdh_derive_secret(OPTIGA_KEY_ID_E100, (uint8_t*)remote_key, (uint16_t)rem_pubKeyLen+3, 
-                       out_secret.Bytes(), (uint8_t)secret_length); 
-    
+    return_status = trustm_ecdh_derive_secret(OPTIGA_KEY_ID_E100, (uint8_t*)remote_key, (uint16_t)rem_pubKeyLen+3,
+                       out_secret.Bytes(), (uint8_t)secret_length);
+
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL) ;
 
     exit:
@@ -256,7 +256,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
             trustm_close();
         }
         return out_secret.SetLength(secret_length);
-#endif       
+#endif
 }
 
 CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
@@ -264,7 +264,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, si
 {
 #if !ENABLE_TRUSTM_ECDSA_VERIFY
     return ECDSA_validate_hash_signature_H(this, hash, hash_length, signature);
-#else    
+#else
     CHIP_ERROR error                                          = CHIP_ERROR_INTERNAL;
     optiga_lib_status_t return_status                         = OPTIGA_LIB_BUSY;
     uint8_t signature_trustm[kMax_ECDSA_Signature_Length_Der] = { 0 };
@@ -317,7 +317,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     /* Set the private key trustm_magic_no */
     bbuf.Put(mKeypair.mBytes, kP256_PrivateKey_Length);
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
-  
+
     output.SetLength(bbuf.Needed());
 
     return CHIP_NO_ERROR;
@@ -412,7 +412,7 @@ exit:
         trustm_close();
     }
     return error;
-#endif    
+#endif
 }
 
 static void add_tlv(uint8_t * buf, size_t buf_index, uint8_t tag, size_t len, uint8_t * val)
@@ -523,7 +523,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
     // TLV data is created by copying from backwards. move it to start of buffer.
     data_to_hash_len = (data_to_hash_len - buffer_index);
     memmove(data_to_hash, (data_to_hash + buffer_index), data_to_hash_len);
-    
+
     //Hash to get the digest
     memset(&digest[0], 0, sizeof(digest));
     error = Hash_SHA256(data_to_hash, data_to_hash_len, digest);
@@ -533,7 +533,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
     trustm_Open();
 
     // Sign on hash
-    return_status = trustm_ecdsa_sign(OPTIGA_KEY_ID_E0F2, digest, digest_length, 
+    return_status = trustm_ecdsa_sign(OPTIGA_KEY_ID_E0F2, digest, digest_length,
                         signature_trustm, &signature_len);
 
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL) ;
