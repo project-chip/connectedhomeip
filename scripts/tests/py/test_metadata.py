@@ -18,23 +18,24 @@ from metadata import Metadata_Reader
 
 
 class TestMetadataReader(unittest.TestCase):
-    # build the test Metadata_Reader object
-    #defines expected arguments associated with runs
+
     def setUp(self):
 
         # build the reader object
-        self.reader=Metadata_Reader("", "env_test.yaml")
-        self.actual_runs_metadata = self.reader.get_runs_metadata()
-        self.expected_runs_metadata = {}
+        self.reader=Metadata_Reader( "/scripts/tests/py/env_test.yaml")
+          
 
-        self.expected_runs_metadata["simple_run_args.txt+run1"] = Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-                   discriminator=1234, py_script_path="simple_run_args.txt", run="run1", passcode=20202021)
+    def test_parse_single_run(self):
+
+        expected_runs_metadata = {}
+
+        expected_runs_metadata["/scripts/tests/py/simple_run_args.txt"] = Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
+                   discriminator=1234, py_script_path="/scripts/tests/py/simple_run_args.txt", run="run1", passcode=20202021)
         
-    # gets the metadata associated with each run by parsing the test script and compares it to the expected metadata values
-    def test_run_metadata_parser(self):
-        for actual_run in self.actual_runs_metadata:
-            self.assertEqual(self.actual_runs_metadata[actual_run], self.expected_runs_metadata[actual_run])
-
+        
+        for run in expected_runs_metadata:
+            self.assertEqual(self.reader.parse_script(run)[0], expected_runs_metadata[run])
+    
     
 if __name__=="__main__":
     unittest.main()
