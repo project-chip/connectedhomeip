@@ -29,6 +29,7 @@ namespace chip {
 namespace Controller {
 
 using namespace chip::app::Clusters;
+using namespace chip::Crypto;
 using chip::app::DataModel::MakeNullable;
 using chip::app::DataModel::NullNullable;
 

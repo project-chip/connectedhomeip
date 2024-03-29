@@ -77,6 +77,7 @@ using namespace chip::System;
 using namespace chip::Transport;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters;
+using namespace chip::Crypto;
 
 namespace chip {
 namespace Controller {

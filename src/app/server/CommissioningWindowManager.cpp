@@ -31,6 +31,7 @@
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
+using namespace chip::Crypto;
 
 using AdministratorCommissioning::CommissioningWindowStatusEnum;
 using chip::app::DataModel::MakeNullable;

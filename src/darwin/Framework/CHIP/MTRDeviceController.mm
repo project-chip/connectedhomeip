@@ -998,7 +998,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                                     salt:(NSData *)salt
                                                    error:(NSError * __autoreleasing *)error
 {
-    chip::Spake2pVerifier verifier;
+    chip::Crypto::Spake2pVerifier verifier;
     CHIP_ERROR err = verifier.Generate(iterations.unsignedIntValue, AsByteSpan(salt), setupPasscode.unsignedIntValue);
 
     MATTER_LOG_METRIC_SCOPE(kMetricPASEVerifierForSetupCode, err);

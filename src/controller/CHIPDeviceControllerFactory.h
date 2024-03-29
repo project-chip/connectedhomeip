@@ -120,7 +120,7 @@ struct FactoryInitParams
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
     FabricTable * fabricTable                                          = nullptr;
-    OperationalKeystore * operationalKeystore                          = nullptr;
+    Crypto::OperationalKeystore * operationalKeystore                  = nullptr;
     Credentials::OperationalCertificateStore * opCertStore             = nullptr;
     SessionResumptionStorage * sessionResumptionStorage                = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
