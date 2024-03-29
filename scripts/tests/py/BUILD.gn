@@ -33,6 +33,8 @@ pw_python_package("metadata_parser") {
   sources = [
     "__init__.py",
     "metadata.py",
+    "env_test.yaml",
+    "simple_run_args.txt",
   ]
 
 
