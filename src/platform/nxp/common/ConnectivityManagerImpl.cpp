@@ -133,7 +133,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         }
         else
         {
-            is_wlan_added = false;
+            /* In case network was added before, signal that it is added and that connection can start */
+            is_wlan_added = true;
         }
 
         /* At this point, the network details should be registered in the wlan driver */
