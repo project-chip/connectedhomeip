@@ -236,7 +236,8 @@ struct InterfaceKey
     {
         return (this->interfaceId < other.interfaceId) ||
             ((this->interfaceId == other.interfaceId) && (this->hostname < other.hostname)) ||
-            ((this->interfaceId == other.interfaceId) && (this->hostname == other.hostname) && (this->isSRPResult < other.isSRPResult));
+            ((this->interfaceId == other.interfaceId) && (this->hostname == other.hostname) &&
+             (this->isSRPResult < other.isSRPResult));
     }
 
     uint32_t interfaceId;
@@ -265,10 +266,10 @@ struct ResolveContext : public GenericContext
     // Indicates whether the timer for 250 msecs should be started
     // to give the resolve on SRP domain some extra time to complete.
     bool shouldStartSRPTimerForResolve = false;
-    bool isSRPTimerRunning            = false;
+    bool isSRPTimerRunning             = false;
 
-    ResolveContextWithType resolveContextWithSRPType = {this , true};
-    ResolveContextWithType resolveContextWithNonSRPType = {this, false};
+    ResolveContextWithType resolveContextWithSRPType    = { this, true };
+    ResolveContextWithType resolveContextWithNonSRPType = { this, false };
 
     // browseCausingResolve can be null.
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,

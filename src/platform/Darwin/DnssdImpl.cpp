@@ -286,7 +286,7 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     if (kDNSServiceErr_NoError == err)
     {
         InterfaceKey interfaceKey = { interfaceId, hostname, contextWithType->isSRPResolve };
-        CHIP_ERROR error = sdCtx->OnNewAddress(interfaceKey, address);
+        CHIP_ERROR error          = sdCtx->OnNewAddress(interfaceKey, address);
 
         // If we saw an address resolved on the SRP domain, set the shouldStartSRPTimerForResolve to false.
         if (error == CHIP_NO_ERROR && contextWithType->isSRPResolve)
@@ -341,8 +341,8 @@ static void GetAddrInfo(ResolveContext * sdCtx)
 
         ResolveContextWithType * contextWithType =
             (interface.first.isSRPResult) ? &sdCtx->resolveContextWithSRPType : &sdCtx->resolveContextWithNonSRPType;
-        auto err = DNSServiceGetAddrInfo(&sdRefCopy, kGetAddrInfoFlags, interfaceId, protocol, hostname, OnGetAddrInfo,
-                                         contextWithType);
+        auto err =
+            DNSServiceGetAddrInfo(&sdRefCopy, kGetAddrInfoFlags, interfaceId, protocol, hostname, OnGetAddrInfo, contextWithType);
         VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
         interface.second.isDNSLookUpRequested = true;
     }
