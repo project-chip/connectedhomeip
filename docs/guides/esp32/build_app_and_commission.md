@@ -31,8 +31,8 @@ and the ESP32S3.
 
 All the applications support variants of ESP32, ESP32C3, ESP32S3 chips.
 
-ESP32H2 and ESP32C6 are only supported and tested with lighting-app, lit-icd-app,
-and all-clusters-app.
+ESP32H2 and ESP32C6 are only supported and tested with lighting-app,
+lit-icd-app, and all-clusters-app.
 
 Note: M5Stack Core 2 display is not supported in the tft component, while other
 functionality can still work fine.
