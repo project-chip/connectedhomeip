@@ -28,7 +28,7 @@
 
 #include <lib/support/TypeTraits.h>
 
-#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917))
+#ifdef SL_CATALOG_SIMPLE_LED_LED1_PRESENT
 #define DW_STATE_LED 1
 #else
 #define DW_STATE_LED 0

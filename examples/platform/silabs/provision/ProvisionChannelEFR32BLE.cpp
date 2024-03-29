@@ -2,7 +2,7 @@
 #include "ProvisionEncoder.h"
 #include "ProvisionProtocol.h"
 #include <lib/support/CodeUtils.h>
-#ifndef SIWX_917
+#ifndef SLI_SI91X_MCU_INTERFACEX_MCU_INTERFACE
 #include <sl_bluetooth.h>
 #include <gatt_db.h>
 #endif

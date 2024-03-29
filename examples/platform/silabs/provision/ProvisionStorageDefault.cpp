@@ -12,7 +12,7 @@
 #include <nvm3_default.h>
 #include <nvm3_hal_flash.h>
 #include <silabs_creds.h>
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #include <sl_si91x_common_flash_intf.h>
 #endif
 
@@ -38,7 +38,7 @@ extern "C" __WEAK void setNvm3End(uint32_t addr) { (void)addr; }
 
 CHIP_ERROR ErasePage(uint32_t addr)
 {
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
     rsi_flash_erase_sector((uint32_t *)addr);
 #else
     MSC_ErasePage((uint32_t *)addr);
@@ -48,7 +48,7 @@ CHIP_ERROR ErasePage(uint32_t addr)
 
 CHIP_ERROR WritePage(uint32_t addr, const uint8_t *data, size_t size)
 {
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
     rsi_flash_write((uint32_t *)addr, (unsigned char *)data, size);
 #else
     MSC_WriteWord((uint32_t *)addr, data, size);
@@ -132,10 +132,10 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
     uint32_t base_addr = (uint32_t)linker_nvm_end;
     if(flash_size > 0)
     {
-#ifndef SIWX_917
+#ifndef SLI_SI91X_MCU_INTERFACE
         base_addr = (flash_addr + flash_size - FLASH_PAGE_SIZE);
         MSC_Init();
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
         setNvm3End(base_addr);
     }
     return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, base_addr);
@@ -509,7 +509,7 @@ CHIP_ERROR Storage::GetDeviceAttestationCert(MutableByteSpan & value)
     return err;
 }
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 CHIP_ERROR Storage::SetDeviceAttestationKey(const ByteSpan & value)
 {
     return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Creds_KeyId, value.data(), value.size());
@@ -547,7 +547,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     }
 }
 
-#else // SIWX_917
+#else // SLI_SI91X_MCU_INTERFACEX_MCU_INTERFACEX_MCU_INTERFACE
 
 CHIP_ERROR Storage::SetDeviceAttestationKey(const ByteSpan & value)
 {
@@ -585,7 +585,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     //ChipLogByteSpan(DeviceLayer, ByteSpan(signature.data(), signature.size() < kDebugLength ? signature.size() : kDebugLength));
     return err;
 }
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 
 //
 // Other

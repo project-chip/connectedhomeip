@@ -126,7 +126,7 @@ CHIP_ERROR AttestationKey::SignMessage(const ByteSpan & message, MutableByteSpan
     void *p_rng = nullptr;
     mbedtls_pk_context ctx;
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
     mbedtls_sha256(message.data(), message.size(), hash, 0);
     VerifyOrReturnError(0 == mbedtls_pk_parse_key(&ctx, sValue, sSize, nullptr, 0), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(0 == mbedtls_pk_sign(&ctx, MBEDTLS_MD_SHA256, hash, hash_size, signature, &signature_size, f_rng, p_rng ), CHIP_ERROR_INTERNAL);

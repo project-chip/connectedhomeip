@@ -93,7 +93,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::Credentials::Silabs;
+using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
 
 TaskHandle_t main_Task;
