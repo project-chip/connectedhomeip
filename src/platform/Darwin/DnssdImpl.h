@@ -196,6 +196,7 @@ struct BrowseContext : public BrowseHandler
     // TODO: Consider fixing the higher-level APIs to make it possible to pass
     // in multiple IPs for a successful browse result.
     static BrowseContext * sContextDispatchingSuccess;
+    static std::vector<DnssdService> * sDispatchedServices;
 };
 
 struct BrowseWithDelegateContext : public BrowseHandler
