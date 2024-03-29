@@ -203,11 +203,9 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P
 
     error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, ByteSpan{ signature_trustm, signature_trustm_len }, out_raw_sig_span);
 
-    // ChipLogError(NotSpecified, "EcdsaAsn1SignatureToRaw %" CHIP_ERROR_FORMAT, error.Format());
-
     SuccessOrExit(error);
 
-    SuccessOrExit(out_signature.SetLength(2 * kP256_FE_Length));
+    out_signature.SetLength(2 * kP256_FE_Length);
 
     error = CHIP_NO_ERROR;
 
@@ -286,8 +284,6 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, si
                                     out_der_sig_span);
     SuccessOrExit(error);
 
-    /* Set the public key */
-    // P256PublicKeyHSM & public_key = const_cast<P256PublicKeyHSM &>(Pubkey());
     signature_trustm_len = out_der_sig_span.size();
     // ECC verify
     return_status = trustm_ecdsa_verify((uint8_t *) hash, hash_length_u8, (uint8_t *) signature_trustm, signature_trustm_len_u16,
