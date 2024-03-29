@@ -154,22 +154,28 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_ConvertDacKey()
 
 CHIP_ERROR FactoryDataProviderImpl::SSS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset)
 {
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    auto res         = kStatus_SSS_Success;
+
     uint8_t keyBuf[Crypto::kP256_PrivateKey_Length];
     MutableByteSpan dacPrivateKeySpan(keyBuf);
     uint16_t keySize = 0;
 
-    ReturnErrorOnFailure(
-        SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize, &offset));
+    error = SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize, &offset);
+    SuccessOrExit(error);
     dacPrivateKeySpan.reduce_size(keySize);
 
-    auto res = SSS_KEY_STORE_SET_KEY(&mContext, dacPrivateKeySpan.data(), Crypto::kP256_PrivateKey_Length, keySize * 8,
-                                     kSSS_KeyPart_Private);
-    VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    res = SSS_KEY_STORE_SET_KEY(&mContext, dacPrivateKeySpan.data(), Crypto::kP256_PrivateKey_Length, keySize * 8,
+                                kSSS_KeyPart_Private);
+    VerifyOrExit(res == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     res = sss_sscp_key_store_export_key(&g_keyStore, &mContext, data, dataLen, kSSS_blobType_ELKE_blob);
-    VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(res == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    return CHIP_NO_ERROR;
+exit:
+    /* Sanitize temporary buffer */
+    memset(keyBuf, 0, Crypto::kP256_PrivateKey_Length);
+    return error;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset)

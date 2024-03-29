@@ -26,6 +26,8 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
+using namespace chip::app::Clusters::ElectricalPowerMeasurement::Attributes;
+using namespace chip::app::Clusters::ElectricalPowerMeasurement::Structs;
 
 CHIP_ERROR ElectricalPowerMeasurementInstance::Init()
 {

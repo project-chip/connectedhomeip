@@ -88,13 +88,10 @@ static NSString * const kErrorOperationalKeypairInit = @"Init failure while crea
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
-static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
 static NSString * const kErrorPreWarmCommissioning = @"Failure while trying to pre-warm the commissioning process";
 static NSString * const kErrorOpenPairingWindow = @"Open Pairing Window failed";
-static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
-static NSString * const kInfoStackShutdown = @"Shutting down the Matter Stack";
 static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
 static NSString * const kErrorGenerateNOC = @"Generating operational certificate failed";
 static NSString * const kErrorKeyAllocation = @"Generating new operational key failed";
@@ -929,12 +926,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             _nodeIDToDeviceMap[nodeID] = deviceToReturn;
         }
 
+#if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
         // Load persisted attributes if they exist.
         NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
         MTR_LOG_INFO("Loaded %lu attributes from storage for %@", static_cast<unsigned long>(attributesFromCache.count), deviceToReturn);
         if (attributesFromCache.count) {
             [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
         }
+#endif
+        // Load persisted cluster data if they exist.
         NSDictionary * clusterData = [_controllerDataStore getStoredClusterDataForNodeID:nodeID];
         MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), deviceToReturn);
         if (clusterData.count) {
@@ -998,7 +998,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                                     salt:(NSData *)salt
                                                    error:(NSError * __autoreleasing *)error
 {
-    chip::Spake2pVerifier verifier;
+    chip::Crypto::Spake2pVerifier verifier;
     CHIP_ERROR err = verifier.Generate(iterations.unsignedIntValue, AsByteSpan(salt), setupPasscode.unsignedIntValue);
 
     MATTER_LOG_METRIC_SCOPE(kMetricPASEVerifierForSetupCode, err);
