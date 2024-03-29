@@ -38,7 +38,7 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917))
+#ifdef SL_CATALOG_SIMPLE_LED_LED1_PRESENT
 #define ONOFF_LED 1
 #else
 #define ONOFF_LED 0
