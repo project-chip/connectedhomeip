@@ -73,10 +73,13 @@ public:
     ///
     /// This method must be called while in the Matter context (from the Matter event
     /// loop, or while holding the Matter stack lock).
-    CHIP_ERROR StartScan(System::Clock::Timeout timeout);
+    CHIP_ERROR StartScan();
 
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
+
+    /// Check if the scanner is active
+    bool IsScanning() const { return mScannerState == ChipDeviceScannerState::SCANNER_SCANNING; }
 
     /// Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
     void OnDeviceAdded(BluezDevice1 & device) override;
@@ -91,16 +94,8 @@ private:
         SCANNER_SCANNING
     };
 
-    enum ScannerTimerState
-    {
-        TIMER_CANCELED,
-        TIMER_STARTED,
-        TIMER_EXPIRED
-    };
-
     CHIP_ERROR StartScanImpl();
     CHIP_ERROR StopScanImpl();
-    static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
 
     /// Check if a given device is a CHIP device and if yes, report it as discovered
     void ReportDevice(BluezDevice1 & device);
@@ -114,8 +109,6 @@ private:
 
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
-    /// Used to track if timer has already expired and doesn't need to be canceled.
-    ScannerTimerState mTimerState = ScannerTimerState::TIMER_CANCELED;
     GAutoPtr<GCancellable> mCancellable;
 };
 

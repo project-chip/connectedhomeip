@@ -368,6 +368,7 @@ void BrowseContext::DispatchPartialSuccess()
     {
         dnsServices.push_back(std::move(iter.first));
     }
+
     sDispatchedServices = &dnsServices;
     callback(context, dnsServices.data(), dnsServices.size(), false, CHIP_NO_ERROR);
     sDispatchedServices        = nullptr;

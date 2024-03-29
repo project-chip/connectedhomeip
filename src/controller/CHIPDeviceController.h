@@ -135,6 +135,13 @@ struct ControllerInitParams
      */
     bool removeFromFabricTableOnShutdown = true;
 
+    /**
+     * Specifies whether to utilize the fabric table entry for the given FabricIndex
+     * for initialization. If provided and neither the operational key pair nor the NOC
+     * chain are provided, then attempt to locate a fabric corresponding to the given FabricIndex.
+     */
+    chip::Optional<FabricIndex> fabricIndex;
+
     chip::VendorId controllerVendorId;
 };
 
@@ -350,6 +357,21 @@ public:
      */
     CHIP_ERROR InitControllerNOCChain(const ControllerInitParams & params);
 
+    /**
+     * @brief Update the NOC chain of controller.
+     *
+     * @param[in] noc                                NOC in CHIP certificate format.
+     * @param[in] icac                               ICAC in CHIP certificate format. If no icac is present, an empty
+     *                                               ByteSpan should be passed.
+     * @param[in] externalOperationalKeypair         External operational keypair. If null, use keypair in OperationalKeystore.
+     * @param[in] operationalKeypairExternalOwned    If true, external operational keypair must outlive the fabric.
+     *                                               If false, the keypair is copied and owned in heap of a FabricInfo.
+     *
+     * @return CHIP_ERROR                            CHIP_NO_ERROR on success.
+     */
+    CHIP_ERROR UpdateControllerNOCChain(const ByteSpan & noc, const ByteSpan & icac, Crypto::P256Keypair * operationalKeypair,
+                                        bool operationalKeypairExternalOwned);
+
 protected:
     enum class State
     {
@@ -372,6 +394,8 @@ protected:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     bool mRemoveFromFabricTableOnShutdown = true;
+
+    FabricTable::AdvertiseIdentity mAdvertiseIdentity = FabricTable::AdvertiseIdentity::Yes;
 
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
