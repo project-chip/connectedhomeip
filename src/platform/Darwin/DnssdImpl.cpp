@@ -288,7 +288,8 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
         InterfaceKey interfaceKey = { interfaceId, hostname, contextWithType->isSRPResolve };
         CHIP_ERROR error          = sdCtx->OnNewAddress(interfaceKey, address);
 
-        // If we saw an address resolved on the SRP domain, set the shouldStartSRPTimerForResolve to false.
+        // If we saw an address resolved on the SRP domain, we don't need to wait
+        // for SRP results, so don't bother with starting a timer to wait for those.
         if (error == CHIP_NO_ERROR && contextWithType->isSRPResolve)
         {
             sdCtx->shouldStartSRPTimerForResolve = false;
@@ -316,6 +317,8 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
             if (error != CHIP_NO_ERROR)
             {
+                // If we failed to start the timer, just go ahead and report whatever information
+                // we have gotten so far.
                 sdCtx->Finalize();
                 return;
             }
