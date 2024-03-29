@@ -374,7 +374,8 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
     }
 }
 
-static CHIP_ERROR ResolveWithContext(ResolveContext * sdCtx, uint32_t interfaceId, const char * type, const char * name, const char * domain, ResolveContextWithType * contextWithType)
+static CHIP_ERROR ResolveWithContext(ResolveContext * sdCtx, uint32_t interfaceId, const char * type, const char * name,
+                                     const char * domain, ResolveContextWithType * contextWithType)
 {
     auto sdRef = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
 
@@ -396,7 +397,9 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
     // Otherwise we will try to resolve using both the local domain and the SRP domain.
     if (domain != nullptr)
     {
-        ReturnErrorOnFailure(ResolveWithContext(sdCtx, interfaceId, type, name, domain, IsSRPType(domain) ? &sdCtx->resolveContextWithSRPType : &sdCtx->resolveContextWithNonSRPType));
+        ReturnErrorOnFailure(
+            ResolveWithContext(sdCtx, interfaceId, type, name, domain,
+                               IsSRPType(domain) ? &sdCtx->resolveContextWithSRPType : &sdCtx->resolveContextWithNonSRPType));
         sdCtx->shoulStartSRPTimerForResolve = false;
     }
     else
@@ -574,8 +577,10 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
 
     if (BrowseContext::sContextDispatchingSuccess != nullptr)
     {
-        for (size_t i = 0; i < BrowseContext::sDispatchedServices->size(); ++i) {
-            if (service == &BrowseContext::sDispatchedServices->at(i)) {
+        for (size_t i = 0; i < BrowseContext::sDispatchedServices->size(); ++i)
+        {
+            if (service == &BrowseContext::sDispatchedServices->at(i))
+            {
                 domain = BrowseContext::sContextDispatchingSuccess->services[i].second.c_str();
                 break;
             }

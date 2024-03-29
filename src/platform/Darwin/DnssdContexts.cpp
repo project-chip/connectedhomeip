@@ -335,7 +335,7 @@ void RegisterContext::DispatchSuccess()
     mHostNameRegistrar.Register();
 }
 
-BrowseContext * BrowseContext::sContextDispatchingSuccess = nullptr;
+BrowseContext * BrowseContext::sContextDispatchingSuccess      = nullptr;
 std::vector<DnssdService> * BrowseContext::sDispatchedServices = nullptr;
 
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
@@ -370,7 +370,7 @@ void BrowseContext::DispatchPartialSuccess()
     }
     sDispatchedServices = &dnsServices;
     callback(context, dnsServices.data(), dnsServices.size(), false, CHIP_NO_ERROR);
-    sDispatchedServices = nullptr;
+    sDispatchedServices        = nullptr;
     sContextDispatchingSuccess = nullptr;
     services.clear();
 }
