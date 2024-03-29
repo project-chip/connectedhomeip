@@ -60,6 +60,8 @@ struct BrowseWithDelegateContext;
 struct RegisterContext;
 struct ResolveContext;
 
+void CancelSRPTimer(ResolveContext * ctx);
+
 class MdnsContexts
 {
 public:
@@ -222,16 +224,48 @@ struct InterfaceInfo
     DnssdService service;
     std::vector<Inet::IPAddress> addresses;
     std::string fullyQualifiedDomainName;
+    bool isDNSLookUpRequested = false;
+};
+
+struct InterfaceKey
+{
+    InterfaceKey() = default;
+    ~InterfaceKey() = default;
+    inline bool operator<(const InterfaceKey & other) const
+    {
+        return (this->interfaceId < other.interfaceId) || ((this->interfaceId == other.interfaceId) && (this->hostname < other.hostname));
+    }
+
+    uint32_t interfaceId;
+    std::string hostname;
+    bool isSRPTypeRequested = false;
+};
+
+struct ResolveContextWithType
+{
+    ResolveContextWithType() = default;
+    ~ResolveContextWithType() = default;
+
+    ResolveContext * context;
+    bool isSRPType = false;
 };
 
 struct ResolveContext : public GenericContext
 {
     DnssdResolveCallback callback;
-    std::map<uint32_t, InterfaceInfo> interfaces;
+    std::map<InterfaceKey, InterfaceInfo> interfaces;
     DNSServiceProtocol protocol;
     std::string instanceName;
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
+
+    // Indicates whether the timer for 250 msecs should be started
+    // to give the resolve on SRP domain some extra time to complete.
+    bool shoulStartSRPTimerForResolve = false;
+    bool isSRPTimerRunning = false;
+
+    ResolveContextWithType resolveContextWithSRPType;
+    ResolveContextWithType resolveContextWithNonSRPType;
 
     // browseCausingResolve can be null.
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
@@ -244,11 +278,11 @@ struct ResolveContext : public GenericContext
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
-    CHIP_ERROR OnNewAddress(uint32_t interfaceId, const struct sockaddr * address);
+    CHIP_ERROR OnNewAddress(const InterfaceKey & interfaceKey, const struct sockaddr * address);
     bool HasAddress();
 
     void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,
-                        const unsigned char * txtRecord);
+                        const unsigned char * txtRecord, bool isSRPType);
     bool HasInterface();
     bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
 
@@ -258,6 +292,8 @@ private:
      * Returns true if information was reported, false if not (e.g. if there
      * were no IP addresses, etc).
      */
+    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, std::string hostname, bool isSRPType);
+
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
 };
 

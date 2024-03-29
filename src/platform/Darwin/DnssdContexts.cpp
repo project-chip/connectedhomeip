@@ -30,12 +30,6 @@ namespace {
 
 constexpr uint8_t kDnssdKeyMaxSize          = 32;
 constexpr uint8_t kDnssdTxtRecordMaxEntries = 20;
-constexpr char kLocalDot[]                  = "local.";
-
-bool IsLocalDomain(const char * domain)
-{
-    return strcmp(kLocalDot, domain) == 0;
-}
 
 std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
 {
@@ -393,7 +387,6 @@ void BrowseContext::OnBrowseAdd(const char * name, const char * type, const char
     ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
-    VerifyOrReturn(IsLocalDomain(domain));
     auto service = GetService(name, type, protocol, interfaceId);
     services.push_back(std::make_pair(std::move(service), std::string(domain)));
 }
@@ -404,7 +397,6 @@ void BrowseContext::OnBrowseRemove(const char * name, const char * type, const c
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
     VerifyOrReturn(name != nullptr);
-    VerifyOrReturn(IsLocalDomain(domain));
 
     services.erase(std::remove_if(services.begin(), services.end(),
                                   [name, type, interfaceId, domain](const auto & service) {
@@ -449,8 +441,6 @@ void BrowseWithDelegateContext::OnBrowseAdd(const char * name, const char * type
     ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
-    VerifyOrReturn(IsLocalDomain(domain));
-
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     auto service  = GetService(name, type, protocol, interfaceId);
     delegate->OnBrowseAdd(service);
@@ -462,7 +452,6 @@ void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * t
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
     VerifyOrReturn(name != nullptr);
-    VerifyOrReturn(IsLocalDomain(domain));
 
     auto delegate = static_cast<DnssdBrowseDelegate *>(context);
     auto service  = GetService(name, type, protocol, interfaceId);
@@ -472,7 +461,9 @@ void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * t
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
                                const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
                                std::shared_ptr<uint32_t> && consumerCounterToUse) :
-    browseThatCausedResolve(browseCausingResolve)
+    browseThatCausedResolve(browseCausingResolve),
+    resolveContextWithSRPType({this, true}),
+    resolveContextWithNonSRPType({this, false})
 {
     type            = ContextType::Resolve;
     context         = cbContext;
@@ -484,7 +475,9 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
 
 ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
                                const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
-    browseThatCausedResolve(nullptr)
+    browseThatCausedResolve(nullptr),
+    resolveContextWithSRPType({this, true}),
+    resolveContextWithNonSRPType({this, false})
 {
     type            = ContextType::Resolve;
     context         = delegate;
@@ -494,7 +487,12 @@ ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::In
     consumerCounter = std::move(consumerCounterToUse);
 }
 
-ResolveContext::~ResolveContext() {}
+ResolveContext::~ResolveContext() {
+    if (this->isSRPTimerRunning)
+    {
+        CancelSRPTimer(this);
+    }
+}
 
 void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
@@ -554,7 +552,7 @@ void ResolveContext::DispatchSuccess()
 
     for (auto & interface : interfaces)
     {
-        if (TryReportingResultsForInterfaceIndex(interface.first))
+        if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname, interface.first.isSRPTypeRequested))
         {
             break;
         }
@@ -566,7 +564,7 @@ void ResolveContext::DispatchSuccess()
     }
 }
 
-bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex)
+bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, std::string hostname, bool isSRPType)
 {
     if (interfaceIndex == 0)
     {
@@ -574,8 +572,9 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
         return false;
     }
 
-    auto & interface = interfaces[interfaceIndex];
-    auto & ips       = interface.addresses;
+    InterfaceKey interfaceKey = {interfaceIndex, hostname, isSRPType};
+    auto & interface          = interfaces[interfaceKey];
+    auto & ips                = interface.addresses;
 
     // Some interface may not have any ips, just ignore them.
     if (ips.size() == 0)
@@ -602,7 +601,36 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     return true;
 }
 
-CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)
+bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex)
+{
+    if (interfaceIndex == 0)
+    {
+        // Not actually an interface we have.
+        return false;
+    }
+
+    for (auto & interface : interfaces)
+    {
+        if (interface.first.interfaceId == interfaceIndex)
+        {
+            auto & ips = interface.second.addresses;
+
+            // Some interface may not have any ips, just ignore them.
+            if (ips.size() == 0)
+            {
+                continue;
+            }
+
+            if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname, interface.first.isSRPTypeRequested))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey,  const struct sockaddr * address)
 {
     // If we don't have any information about this interfaceId, just ignore the
     // address, since it won't be usable anyway without things like the port.
@@ -610,7 +638,9 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
     // on the system, because the hostnames we are looking up all end in
     // ".local".  In other words, we can get regular DNS results in here, not
     // just DNS-SD ones.
-    if (interfaces.find(interfaceId) == interfaces.end())
+    auto interfaceId = interfaceKey.interfaceId;
+
+    if (interfaces.find(interfaceKey) == interfaces.end())
     {
         return CHIP_NO_ERROR;
     }
@@ -633,7 +663,7 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
         return CHIP_NO_ERROR;
     }
 
-    interfaces[interfaceId].addresses.push_back(ip);
+    interfaces[interfaceKey].addresses.push_back(ip);
 
     return CHIP_NO_ERROR;
 }
@@ -652,7 +682,7 @@ bool ResolveContext::HasAddress()
 }
 
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
-                                    uint16_t txtLen, const unsigned char * txtRecord)
+                                    uint16_t txtLen, const unsigned char * txtRecord, bool isSRPType)
 {
 #if CHIP_PROGRESS_LOGGING
     std::string txtString;
@@ -715,7 +745,8 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
-    interfaces.insert(std::make_pair(interfaceId, std::move(interface)));
+    InterfaceKey interfaceKey = {interfaceId, hostnameWithDomain, isSRPType};
+    interfaces.insert(std::make_pair(std::move(interfaceKey), std::move(interface)));
 }
 
 bool ResolveContext::HasInterface()
@@ -731,7 +762,8 @@ InterfaceInfo::InterfaceInfo()
 
 InterfaceInfo::InterfaceInfo(InterfaceInfo && other) :
     service(std::move(other.service)), addresses(std::move(other.addresses)),
-    fullyQualifiedDomainName(std::move(other.fullyQualifiedDomainName))
+    fullyQualifiedDomainName(std::move(other.fullyQualifiedDomainName)),
+    isDNSLookUpRequested(other.isDNSLookUpRequested)
 {
     // Make sure we're not trying to free any state from the other DnssdService,
     // since we took over ownership of its allocated bits.
