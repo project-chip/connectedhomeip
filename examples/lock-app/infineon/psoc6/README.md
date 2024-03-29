@@ -154,12 +154,14 @@ cloud, giving every IoT device its own unique identity.
 
 -   Building
 
-    Follow the steps to build with OPTIGA™ Trust M for device attestation use case:
+    Follow the steps to build with OPTIGA™ Trust M for device attestation use
+    case:
 
     ```
       $ source scripts/activate.sh
       $ scripts/build/build_examples.py --no-log-timestamps --target 'infineon-psoc6-lock-trustm' build
     ```
+
 -   To delete generated executable, libraries and object files use:
 
         $ cd ~/connectedhomeip

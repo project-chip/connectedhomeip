@@ -398,7 +398,7 @@ optiga_lib_status_t deriveKey_HKDF(const uint8_t * salt, uint16_t salt_length, c
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
         return_status     = optiga_crypt_hkdf(p_local_crypt, OPTIGA_HKDF_SHA_256, TRUSTM_HKDF_OID_KEY, /* Input secret OID */
-                                          salt, salt_length, info, info_length, derived_key_length, TRUE, derived_key);
+                                              salt, salt_length, info, info_length, derived_key_length, TRUE, derived_key);
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
             // optiga_crypt_hkdf api returns error !!!
@@ -550,11 +550,8 @@ optiga_lib_status_t optiga_crypt_rng(uint8_t * random_data, uint16_t random_data
         }
 
         return_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_crypt_random(p_local_crypt,
-                                            OPTIGA_RNG_TYPE_DRNG,
-                                            random_data,
-                                            random_data_length);
-if (OPTIGA_LIB_SUCCESS != return_status)
+        return_status = optiga_crypt_random(p_local_crypt, OPTIGA_RNG_TYPE_DRNG, random_data, random_data_length);
+        if (OPTIGA_LIB_SUCCESS != return_status)
         {
             // optiga_crypt_random api returns error !!!
             optiga_lib_print_message("optiga_crypt_random api returns error !!!", OPTIGA_UTIL_SERVICE, OPTIGA_UTIL_SERVICE_COLOR);
@@ -578,7 +575,7 @@ if (OPTIGA_LIB_SUCCESS != return_status)
     return return_status;
 }
 optiga_lib_status_t trustm_ecc_keygen(uint16_t optiga_key_id, uint8_t key_type, optiga_ecc_curve_t curve_id, uint8_t * pubkey,
-                                      uint16_t *pubkey_length)
+                                      uint16_t * pubkey_length)
 {
     optiga_lib_status_t return_status;
     uint8_t header256[] = { 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02,
@@ -720,8 +717,8 @@ optiga_lib_status_t trustm_ecdsa_sign(optiga_key_id_t optiga_key_id, uint8_t * d
             signature[i + 2] = signature[i];
         }
 
-        signature[0]      = 0x30;                         // Insert SEQUENCE
-        signature[1]      = (uint8_t)(*signature_length); // insert length
+        signature[0]      = 0x30;                          // Insert SEQUENCE
+        signature[1]      = (uint8_t) (*signature_length); // insert length
         *signature_length = *signature_length + 2;
 
     } while (0);
@@ -872,12 +869,11 @@ optiga_lib_status_t trustm_ecdh_derive_secret(optiga_key_id_t optiga_key_id, uin
         }
 
         optiga_lib_status = OPTIGA_LIB_BUSY;
-        return_status = optiga_crypt_ecdh(p_local_crypt, optiga_key_id, &public_key_details, TRUE, shared_secret);
+        return_status     = optiga_crypt_ecdh(p_local_crypt, optiga_key_id, &public_key_details, TRUE, shared_secret);
         if (OPTIGA_LIB_SUCCESS != return_status)
         {
             // optiga_crypt_ecdh api returns error !!!
-            optiga_lib_print_message("optiga_crypt_ecdh api returns error !!!", OPTIGA_UTIL_SERVICE,
-                                     OPTIGA_UTIL_SERVICE_COLOR);
+            optiga_lib_print_message("optiga_crypt_ecdh api returns error !!!", OPTIGA_UTIL_SERVICE, OPTIGA_UTIL_SERVICE_COLOR);
             break;
         }
         while (optiga_lib_status == OPTIGA_LIB_BUSY)

@@ -47,11 +47,11 @@ extern optiga_util_t * p_local_util;
 
 #define IFX_CRYPTO_KEY_MAGIC                                                                                                       \
     {                                                                                                                              \
-        0xA0, 0x10, 0xA0, 0x10                                                                             \
+        0xA0, 0x10, 0xA0, 0x10                                                                                                     \
     }
 
 static const uint8_t trustm_magic_no[] = IFX_CRYPTO_KEY_MAGIC;
-static const uint8_t DA_KEY_ID[] = {0xE0, 0xF0};
+static const uint8_t DA_KEY_ID[]       = { 0xE0, 0xF0 };
 /* Open session to trustm */
 void trustm_Open(void);
 void read_certificate_from_optiga(uint16_t optiga_oid, char * cert_pem, uint16_t * cert_pem_length);
@@ -63,7 +63,7 @@ optiga_lib_status_t deriveKey_HKDF(const uint8_t * salt, uint16_t salt_length, c
 optiga_lib_status_t hmac_sha256(optiga_hmac_type_t type, const uint8_t * input_data, uint32_t input_data_length, uint8_t * mac,
                                 uint32_t * mac_length);
 optiga_lib_status_t trustm_ecc_keygen(uint16_t optiga_key_id, uint8_t key_type, optiga_ecc_curve_t curve_id, uint8_t * pubkey,
-                                      uint16_t *pubkey_length);
+                                      uint16_t * pubkey_length);
 optiga_lib_status_t trustm_hash(uint8_t * msg, uint16_t msg_length, uint8_t * digest, uint8_t digest_length);
 optiga_lib_status_t trustm_ecdsa_sign(optiga_key_id_t optiga_key_id, uint8_t * digest, uint8_t digest_length, uint8_t * signature,
                                       uint16_t * signature_length);
@@ -75,7 +75,7 @@ void trustm_close(void);
 CHIP_ERROR trustmGetCertificate(uint16_t optiga_oid, uint8_t * buf, uint16_t * buflen);
 optiga_lib_status_t trustm_ecdh_derive_secret(optiga_key_id_t optiga_key_id, uint8_t * public_key, uint16_t public_key_length,
                                               uint8_t * shared_secret, uint8_t shared_secret_length);
-optiga_lib_status_t optiga_crypt_rng(uint8_t * random_data, uint16_t random_data_length);                                              
+optiga_lib_status_t optiga_crypt_rng(uint8_t * random_data, uint16_t random_data_length);
 optiga_lib_status_t trustm_PBKDF2_HMAC(const unsigned char * salt, size_t slen, unsigned int iteration_count, uint32_t key_length,
                                        unsigned char * output);
 #ifdef __cplusplus

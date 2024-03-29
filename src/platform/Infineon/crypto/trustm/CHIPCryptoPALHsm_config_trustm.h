@@ -25,29 +25,29 @@
 /*
  * Enable trustm for Generate EC Key
  */
-#define ENABLE_TRUSTM_GENERATE_EC_KEY       1
+#define ENABLE_TRUSTM_GENERATE_EC_KEY 1
 
 /*
  * Enable ECDSA Verify using trustm
  */
-#define ENABLE_TRUSTM_ECDSA_VERIFY          1
+#define ENABLE_TRUSTM_ECDSA_VERIFY 1
 
 /*
  * Enable Key Import for trustm
  */
-#define ENABLE_TRUSTM_KEY_IMPORT     0
+#define ENABLE_TRUSTM_KEY_IMPORT 0
 
 /*
  * Enable trustm for HKDF SHA256
  */
-#define ENABLE_TRUSTM_HKDF_SHA256           0
+#define ENABLE_TRUSTM_HKDF_SHA256 0
 
 /*
  * Enable trustm for HMAC SHA256
  */
-#define ENABLE_TRUSTM_HMAC_SHA256           0
+#define ENABLE_TRUSTM_HMAC_SHA256 0
 
 /*
  * Enable trustm for DA
  */
-#define ENABLE_TRUSTM_DEVICE_ATTESTATION    1
+#define ENABLE_TRUSTM_DEVICE_ATTESTATION 1

@@ -23,36 +23,33 @@ if (chip_crypto == "platform") {
 }
 
 source_set("public_headers") {
-  sources = [
-  ]
+  sources = []
 
   public_deps = [
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${nlassert_root}:nlassert",
-    "${chip_root}/src/crypto",
-
   ]
 }
 
 static_library("infineon_crypto_lib") {
   sources = [
-    "CHIPCryptoPAL_HostFallBack.cpp",
     "CHIPCryptoPALHost.cpp",
     "CHIPCryptoPALHsm_HKDF_trustm.cpp",
     "CHIPCryptoPALHsm_HMAC_trustm.cpp",
     "CHIPCryptoPALHsm_P256_trustm.cpp",
     "CHIPCryptoPALHsm_rng_trustm.cpp",
     "CHIPCryptoPALHsm_utils_trustm.cpp",
+    "CHIPCryptoPAL_HostFallBack.cpp",
     "DeviceAttestationCredsExampleTrustM.cpp",
   ]
 
   public_deps = [ ":public_headers" ]
   public_configs = []
   public_deps += [ "${chip_root}/third_party/infineon/trustm:optiga-trust-m" ]
-  public_configs +=
-    [ "${chip_root}/third_party/infineon/trustm:trustm_config" ]
+  public_configs += [ "${chip_root}/third_party/infineon/trustm:trustm_config" ]
   deps = [ "${chip_root}/${infineon_crypto_root}:optiga-trust-m" ]
   external_mbedtls = current_os == "zephyr"
 
@@ -64,5 +61,4 @@ static_library("infineon_crypto_lib") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform/Infineon/crypto/trustm",
   ]
-  
 }

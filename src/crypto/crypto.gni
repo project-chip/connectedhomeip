@@ -16,7 +16,7 @@ declare_args() {
   # Crypto implementation: mbedtls, openssl, boringssl, platform.
   chip_crypto = ""
   chip_with_se05x = 0
-  
+
   # Compile mbedtls externally. Only used if chip_crypto == "mbedtls"
   chip_external_mbedtls = false
 }

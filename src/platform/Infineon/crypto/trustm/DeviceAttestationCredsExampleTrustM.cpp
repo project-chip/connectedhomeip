@@ -16,10 +16,10 @@
  */
 
 #include "DeviceAttestationCredsExampleTrustM.h"
+#include <CHIPCryptoPALHsm_config_trustm.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
-#include <CHIPCryptoPALHsm_config_trustm.h>
 
 #ifdef ENABLE_TRUSTM_DEVICE_ATTESTATION
 #include <CHIPCryptoPALHsm_utils_trustm.h>
@@ -115,7 +115,7 @@ CHIP_ERROR ExampleTrustMDACProvider::SignWithDeviceAttestationKey(const ByteSpan
 
     memset(serialized_keypair.Bytes(), 0, Crypto::kP256_PublicKey_Length);
     memcpy(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length, trustm_magic_no, sizeof(trustm_magic_no));
-    memcpy(serialized_keypair.Bytes() + (Crypto::kP256_PublicKey_Length + sizeof (trustm_magic_no)), DA_KEY_ID, 2);
+    memcpy(serialized_keypair.Bytes() + (Crypto::kP256_PublicKey_Length + sizeof(trustm_magic_no)), DA_KEY_ID, 2);
 
     ReturnErrorOnFailure(keypair.Deserialize(serialized_keypair));
 
@@ -137,4 +137,4 @@ DeviceAttestationCredentialsProvider * GetExampleTrustMDACProvider()
 } // namespace Credentials
 } // namespace chip
 
-#endif //#ifdef ENABLE_TRUSTM_DEVICE_ATTESTATION
+#endif // #ifdef ENABLE_TRUSTM_DEVICE_ATTESTATION

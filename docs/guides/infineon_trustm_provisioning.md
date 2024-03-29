@@ -57,5 +57,5 @@ Please note that production devices cannot re-use these test keys/certificates.
 _Step3: Write DAC test certificate into OPTIGA&trade; Trust M certificate slot
 0xE0E0_
 
-_Step4: Write Matter test PAI into OPTIGA&trade; Trust M certificate slot 0xE0E8
-and test CD into OPTIGA&trade; Trust M Arbitrary OID 0xF1E0.
+\_Step4: Write Matter test PAI into OPTIGA&trade; Trust M certificate slot
+0xE0E8 and test CD into OPTIGA&trade; Trust M Arbitrary OID 0xF1E0.

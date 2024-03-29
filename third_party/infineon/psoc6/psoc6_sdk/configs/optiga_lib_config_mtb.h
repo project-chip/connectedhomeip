@@ -121,19 +121,19 @@ extern "C" {
  * Enable macro OPTIGA_LIB_ENABLE_CRYPT_LOGGING for Crypt Service layer logging     \n
  * Enable macro OPTIGA_LIB_ENABLE_CMD_LOGGING for Command layer logging     \n
  * Enable macro OPTIGA_LIB_ENABLE_COMMS_LOGGING for Communication layer logging     */
-//#define OPTIGA_LIB_ENABLE_LOGGING
+// #define OPTIGA_LIB_ENABLE_LOGGING
 /** @brief Enable macro OPTIGA_PAL_INIT_ENABLED for calling pal_init functionality */
 #define OPTIGA_PAL_INIT_ENABLED
 /// @cond
 #ifdef OPTIGA_LIB_ENABLE_LOGGING
 /** @brief Macro to enable logger for Util service */
-//#define OPTIGA_LIB_ENABLE_UTIL_LOGGING
+// #define OPTIGA_LIB_ENABLE_UTIL_LOGGING
 /** @brief Macro to enable logger for Crypt service */
-//#define OPTIGA_LIB_ENABLE_CRYPT_LOGGING
+// #define OPTIGA_LIB_ENABLE_CRYPT_LOGGING
 /** @brief Macro to enable logger for Command layer */
 // #define OPTIGA_LIB_ENABLE_CMD_LOGGING
 /** @brief Macro to enable logger for Communication layer */
-//#define OPTIGA_LIB_ENABLE_COMMS_LOGGING
+// #define OPTIGA_LIB_ENABLE_COMMS_LOGGING
 #endif
 /// @endcond
 
@@ -148,21 +148,21 @@ extern "C" {
 /*
  * The following GPIO settings are only ModusToolbox and specific PSoC6 family board relevant
  */
-//#if defined(CYBSP_TRUSTM_I2C_SCL)
-//    #define OPTIGA_TRUSTM_SCL        CYBSP_TRUSTM_I2C_SCL
-//#elif defined(CYBSP_I2C_SCL)
+// #if defined(CYBSP_TRUSTM_I2C_SCL)
+//     #define OPTIGA_TRUSTM_SCL        CYBSP_TRUSTM_I2C_SCL
+// #elif defined(CYBSP_I2C_SCL)
 #define OPTIGA_TRUSTM_SCL CYBSP_I2C_SCL
-//#else
-//    #error "You need to define the OPTIGA_TRUSTM_SCL macro for OPTIGA to know what to use for the communication"
-//#endif
+// #else
+//     #error "You need to define the OPTIGA_TRUSTM_SCL macro for OPTIGA to know what to use for the communication"
+// #endif
 
-//#if defined(CYBSP_TRUSTM_I2C_SDA)
-//   #define OPTIGA_TRUSTM_SDA        CYBSP_TRUSTM_I2C_SDA
-//#elif defined(CYBSP_I2C_SDA)
+// #if defined(CYBSP_TRUSTM_I2C_SDA)
+//    #define OPTIGA_TRUSTM_SDA        CYBSP_TRUSTM_I2C_SDA
+// #elif defined(CYBSP_I2C_SDA)
 #define OPTIGA_TRUSTM_SDA CYBSP_I2C_SDA
-//#else
-//   #error "You need to define the OPTIGA_TRUSTM_SDA macro for OPTIGA to know what to use for the communication"
-//#endif
+// #else
+//    #error "You need to define the OPTIGA_TRUSTM_SDA macro for OPTIGA to know what to use for the communication"
+// #endif
 
 #if defined(CYBSP_TRUSTM_RST)
 #define OPTIGA_TRUSTM_RST CYBSP_TRUSTM_RST

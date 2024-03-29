@@ -28,7 +28,6 @@
 #include "optiga_lib_types.h"
 #include <lib/core/CHIPEncoding.h>
 
-
 namespace chip {
 namespace Crypto {
 
