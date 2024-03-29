@@ -270,7 +270,7 @@ LinuxCommissionableDataProvider gCommissionableDataProvider;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 
-void ConnectivityChnagedtimerCallback(System::Layer *, void * callbackContext)
+void UpdateDnssdServiceCallback(System::Layer *, void * callbackContext)
 {
     app::DnssdServer::Instance().StartServer();
 }
@@ -284,8 +284,10 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
     else if ((event->Type == chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange))
     {
-        // Restart the server on connectivity change,because recieving a netlink router event doesn't guarantee immediate network reachablility,specially ethernet,so we daly 1200 millis to start dnssd server
-         DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1200),ConnectivityChnagedtimerCallback , nullptr);
+          //Restart the server with a timer delay on connectivity change.
+        // When kInternetConnectivityChange happens,it doesn't guarantee immediate network reachablility,
+        //which restart dnssd server will fail with some low layer fail,so a delay timer  will be needed.
+         DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(UPDATE_DNS_SD_SERVICE_DELAY_VALUE),UpdateDnssdServiceCallback , nullptr);
        
     }
 }

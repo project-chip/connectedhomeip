@@ -108,14 +108,10 @@ gboolean IPChangeListener(GIOChannel * ch, GIOCondition /* condition */, void * 
                             continue;
                         }
 
-                        if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr && ConnectivityMgrImpl().GetEthernetIfName() == nullptr)
-                        {
-                            ChipLogDetail(DeviceLayer, "No wifi interface name or etherInterface name. Ignoring IP update event.");
-                            continue;
-                        }
-
-                        if (strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) != 0 && strcmp(name, ConnectivityMgrImpl().GetEthernetIfName()) != 0)
-                        {
+                        bool wifi_matched = ConnectivityMgrImpl().GetWiFiIfName()!= nullptr && strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) == 0;
+                        bool ethernet_matched = ConnectivityMgrImpl().GetEthernetIfName() != nullptr && strcmp(name, ConnectivityMgrImpl().GetEthernetIfName()) == 0;
+                        if(!wifi_matched && !ethernet_matched){
+                             ChipLogDetail(DeviceLayer, "No wifi interface name or ethernet interface name match the router info interface name . Ignoring IP update event.");
                             continue;
                         }
 
