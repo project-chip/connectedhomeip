@@ -250,8 +250,12 @@ DataVersion gComposedTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters
 
 // ---------------------------------------------------------------------------
 
+//If you add single endpoint in device after start up, it is excepted to lock all the actions of adding.
+//But when adding many devices in start up , we hope a lock must be applied to more wide range of operations,so that all the adding of all endpoints can be done in one lock,
+// in case of the lock was applied by a read request thread, so the controller may read only a part of endpoint list of the node in some times.
+
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
+                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId,bool lockInternal = false)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -263,7 +267,10 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
             while (true)
             {
                 // Todo: Update this to schedule the work rather than use this lock
-                DeviceLayer::StackLock lock;
+                if(lockInternal){
+                    DeviceLayer::StackLock lock;
+                }
+                
                 dev->SetEndpointId(gCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
                 err =
@@ -779,7 +786,7 @@ void * bridge_polling_thread(void * context)
             {
                 // TC-BR-2 step 2, Add Light2
                 AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight2DataVersions), 1);
+                                  Span<DataVersion>(gLight2DataVersions), 1,true);
                 light2_added = true;
             }
             else if (ch == '4' && light1_added == true)
@@ -792,7 +799,7 @@ void * bridge_polling_thread(void * context)
             {
                 // TC-BR-2 step 5, Add Light 1 back
                 AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight1DataVersions), 1);
+                                  Span<DataVersion>(gLight1DataVersions), 1,true);
                 light1_added = true;
             }
             if (ch == 'b')
@@ -941,7 +948,8 @@ void ApplicationInit()
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
-
+    // lock all the start up operations
+    DeviceLayer::StackLock lock;
     // Add light 1 -> will be mapped to ZCL endpoints 3
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight1DataVersions), 1);
