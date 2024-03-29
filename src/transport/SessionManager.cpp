@@ -450,8 +450,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 #if CHIP_ERROR_LOGGING
         char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
         destination->ToString(addressStr);
-
-        ChipLogError(Inet, "SendMessage() to %s failed: %" CHIP_ERROR_FORMAT, addressStr, err.Format());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Inet, "SendMessage() to %s failed: %" CHIP_ERROR_FORMAT, addressStr, err.Format());
+        }
 #endif // CHIP_ERROR_LOGGING
         return err;
     }
