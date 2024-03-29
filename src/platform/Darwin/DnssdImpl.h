@@ -229,11 +229,12 @@ struct InterfaceInfo
 
 struct InterfaceKey
 {
-    InterfaceKey() = default;
+    InterfaceKey()  = default;
     ~InterfaceKey() = default;
     inline bool operator<(const InterfaceKey & other) const
     {
-        return (this->interfaceId < other.interfaceId) || ((this->interfaceId == other.interfaceId) && (this->hostname < other.hostname));
+        return (this->interfaceId < other.interfaceId) ||
+            ((this->interfaceId == other.interfaceId) && (this->hostname < other.hostname));
     }
 
     uint32_t interfaceId;
@@ -243,7 +244,7 @@ struct InterfaceKey
 
 struct ResolveContextWithType
 {
-    ResolveContextWithType() = default;
+    ResolveContextWithType()  = default;
     ~ResolveContextWithType() = default;
 
     ResolveContext * context;
@@ -262,7 +263,7 @@ struct ResolveContext : public GenericContext
     // Indicates whether the timer for 250 msecs should be started
     // to give the resolve on SRP domain some extra time to complete.
     bool shoulStartSRPTimerForResolve = false;
-    bool isSRPTimerRunning = false;
+    bool isSRPTimerRunning            = false;
 
     ResolveContextWithType resolveContextWithSRPType;
     ResolveContextWithType resolveContextWithNonSRPType;

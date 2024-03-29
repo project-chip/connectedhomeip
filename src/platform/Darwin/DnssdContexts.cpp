@@ -462,8 +462,7 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
                                const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
                                std::shared_ptr<uint32_t> && consumerCounterToUse) :
     browseThatCausedResolve(browseCausingResolve),
-    resolveContextWithSRPType({this, true}),
-    resolveContextWithNonSRPType({this, false})
+    resolveContextWithSRPType({ this, true }), resolveContextWithNonSRPType({ this, false })
 {
     type            = ContextType::Resolve;
     context         = cbContext;
@@ -476,8 +475,7 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
 ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
                                const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
     browseThatCausedResolve(nullptr),
-    resolveContextWithSRPType({this, true}),
-    resolveContextWithNonSRPType({this, false})
+    resolveContextWithSRPType({ this, true }), resolveContextWithNonSRPType({ this, false })
 {
     type            = ContextType::Resolve;
     context         = delegate;
@@ -487,7 +485,8 @@ ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::In
     consumerCounter = std::move(consumerCounterToUse);
 }
 
-ResolveContext::~ResolveContext() {
+ResolveContext::~ResolveContext()
+{
     if (this->isSRPTimerRunning)
     {
         CancelSRPTimer(this);
@@ -552,7 +551,8 @@ void ResolveContext::DispatchSuccess()
 
     for (auto & interface : interfaces)
     {
-        if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname, interface.first.isSRPTypeRequested))
+        if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname,
+                                                 interface.first.isSRPTypeRequested))
         {
             break;
         }
@@ -572,7 +572,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
         return false;
     }
 
-    InterfaceKey interfaceKey = {interfaceIndex, hostname, isSRPType};
+    InterfaceKey interfaceKey = { interfaceIndex, hostname, isSRPType };
     auto & interface          = interfaces[interfaceKey];
     auto & ips                = interface.addresses;
 
@@ -621,7 +621,8 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
                 continue;
             }
 
-            if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname, interface.first.isSRPTypeRequested))
+            if (TryReportingResultsForInterfaceIndex(interface.first.interfaceId, interface.first.hostname,
+                                                     interface.first.isSRPTypeRequested))
             {
                 return true;
             }
@@ -630,7 +631,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     return false;
 }
 
-CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey,  const struct sockaddr * address)
+CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const struct sockaddr * address)
 {
     // If we don't have any information about this interfaceId, just ignore the
     // address, since it won't be usable anyway without things like the port.
@@ -745,7 +746,7 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
-    InterfaceKey interfaceKey = {interfaceId, hostnameWithDomain, isSRPType};
+    InterfaceKey interfaceKey = { interfaceId, hostnameWithDomain, isSRPType };
     interfaces.insert(std::make_pair(std::move(interfaceKey), std::move(interface)));
 }
 
@@ -762,8 +763,7 @@ InterfaceInfo::InterfaceInfo()
 
 InterfaceInfo::InterfaceInfo(InterfaceInfo && other) :
     service(std::move(other.service)), addresses(std::move(other.addresses)),
-    fullyQualifiedDomainName(std::move(other.fullyQualifiedDomainName)),
-    isDNSLookUpRequested(other.isDNSLookUpRequested)
+    fullyQualifiedDomainName(std::move(other.fullyQualifiedDomainName)), isDNSLookUpRequested(other.isDNSLookUpRequested)
 {
     // Make sure we're not trying to free any state from the other DnssdService,
     // since we took over ownership of its allocated bits.
