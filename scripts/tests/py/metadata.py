@@ -52,6 +52,7 @@ class Metadata_Reader:
     """
     
     def __init__(self, env_file_name: str):
+        print(env_file_name)
         """
         Constructs the environment object
 
