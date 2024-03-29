@@ -131,7 +131,7 @@ std::shared_ptr<uint32_t> GetCounterHolder(const char * name)
     return std::make_shared<uint32_t>(0);
 }
 
-bool IsSRPType(const char * domain)
+bool IsSRPDomain(const char * domain)
 {
     return strcmp(kSRPDot, domain) == 0;
 }
@@ -164,7 +164,7 @@ CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
 {
     VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeoutInMSecs), SRPTimerExpiredCallback,
-                                                 reinterpret_cast<void *>(ctx));
+                                                 static_cast<void *>(ctx));
 }
 
 /**
@@ -174,7 +174,7 @@ CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
  */
 void CancelSRPTimer(ResolveContext * ctx)
 {
-    DeviceLayer::SystemLayer().CancelTimer(SRPTimerExpiredCallback, reinterpret_cast<void *>(ctx));
+    DeviceLayer::SystemLayer().CancelTimer(SRPTimerExpiredCallback, static_cast<void *>(ctx));
 }
 
 Global<MdnsContexts> MdnsContexts::sInstance;
@@ -285,7 +285,7 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
     if (kDNSServiceErr_NoError == err)
     {
-        InterfaceKey interfaceKey = { interfaceId, hostname, contextWithType->isSRPType };
+        InterfaceKey interfaceKey = { interfaceId, hostname, contextWithType->isSRP };
         sdCtx->OnNewAddress(interfaceKey, address);
 
         // Set the flag to start the timer for resolve on SRP domain to complete if the key has the SRP type requested flag set to
@@ -339,7 +339,7 @@ static void GetAddrInfo(ResolveContext * sdCtx)
         if (!interface.second.isDNSLookUpRequested)
         {
             ResolveContextWithType * contextWithType =
-                (interface.first.isSRPTypeRequested) ? &sdCtx->resolveContextWithSRPType : &sdCtx->resolveContextWithNonSRPType;
+                (interface.first.isSRPResult) ? &sdCtx->resolveContextWithSRPType : &sdCtx->resolveContextWithNonSRPType;
             auto err = DNSServiceGetAddrInfo(&sdRefCopy, kGetAddrInfoFlags, interfaceId, protocol, hostname, OnGetAddrInfo,
                                              contextWithType);
             VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));

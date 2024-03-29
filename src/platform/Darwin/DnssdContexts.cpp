@@ -491,7 +491,7 @@ ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::In
 
 ResolveContext::~ResolveContext()
 {
-    if (this->isSRPTimerRunning)
+    if (isSRPTimerRunning)
     {
         CancelSRPTimer(this);
     }
@@ -568,7 +568,7 @@ void ResolveContext::DispatchSuccess()
     }
 }
 
-bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, std::string hostname, bool isSRPType)
+bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPType)
 {
     if (interfaceIndex == 0)
     {
@@ -687,7 +687,7 @@ bool ResolveContext::HasAddress()
 }
 
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
-                                    uint16_t txtLen, const unsigned char * txtRecord, bool isSRPType)
+                                    uint16_t txtLen, const unsigned char * txtRecord, bool isFromSRPResolve)
 {
 #if CHIP_PROGRESS_LOGGING
     std::string txtString;

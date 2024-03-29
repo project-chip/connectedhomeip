@@ -240,7 +240,7 @@ struct InterfaceKey
 
     uint32_t interfaceId;
     std::string hostname;
-    bool isSRPTypeRequested = false;
+    bool isSRPResult = false;
 };
 
 struct ResolveContextWithType
@@ -248,8 +248,8 @@ struct ResolveContextWithType
     ResolveContextWithType()  = default;
     ~ResolveContextWithType() = default;
 
-    ResolveContext * context;
-    bool isSRPType = false;
+    ResolveContext * const context;
+    const bool isSRPResolve;
 };
 
 struct ResolveContext : public GenericContext
@@ -263,7 +263,7 @@ struct ResolveContext : public GenericContext
 
     // Indicates whether the timer for 250 msecs should be started
     // to give the resolve on SRP domain some extra time to complete.
-    bool shoulStartSRPTimerForResolve = false;
+    bool shouldStartSRPTimerForResolve = false;
     bool isSRPTimerRunning            = false;
 
     ResolveContextWithType resolveContextWithSRPType;
@@ -284,7 +284,7 @@ struct ResolveContext : public GenericContext
     bool HasAddress();
 
     void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,
-                        const unsigned char * txtRecord, bool isSRPType);
+                        const unsigned char * txtRecord, bool isSRPResult);
     bool HasInterface();
     bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
 
@@ -294,7 +294,7 @@ private:
      * Returns true if information was reported, false if not (e.g. if there
      * were no IP addresses, etc).
      */
-    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, std::string hostname, bool isSRPType);
+    bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult);
 
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
 };
