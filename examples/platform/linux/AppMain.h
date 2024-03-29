@@ -30,7 +30,7 @@
 
 #include "Options.h"
 
-static constexpr uint16_t UPDATE_DNS_SD_SERVICE_DELAY_VALUE = 1;
+static constexpr uint16_t UPDATE_DNS_SD_SERVICE_DELAY_VALUE = 1200;
 
 // Applications can optionally provide the endpoint id of a secondary network
 // commissioning endpoint, if one is supported.
