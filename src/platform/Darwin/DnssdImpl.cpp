@@ -302,15 +302,14 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
     VerifyOrReturn(sdCtx->HasAddress(), sdCtx->Finalize(kDNSServiceErr_BadState));
 
-    // We should complete the resolve if we got a resolution on non SRP domain and no resolution on SRP domain was requested.
+    // If either we didn't start a resolve on the SRP domain or we started a resolve on the SRP domain and got an address,
+    // we are done. Otherwise start the timer to give the resolve on SRP domain some extra time to complete.
     if (!sdCtx->shouldStartSRPTimerForResolve)
     {
         sdCtx->Finalize();
     }
     else
     {
-        // Since we started a resolve on the SRP domain we are going to start a timer to give the resolve some extra time to
-        // complete.
         if (!sdCtx->isSRPTimerRunning)
         {
             CHIP_ERROR error = StartSRPTimer(kSRPTimeoutInMsec, sdCtx);
