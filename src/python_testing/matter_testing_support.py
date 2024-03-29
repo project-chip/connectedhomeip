@@ -648,6 +648,7 @@ def hex_from_bytes(b: bytes) -> str:
 class TestStep:
     test_plan_number: typing.Union[int, str]
     description: str
+    expectation: str = ""
     is_commissioning: bool = False
 
 

@@ -46,6 +46,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -78,8 +79,6 @@
 namespace chip {
 
 namespace Controller {
-
-using namespace chip::Protocols::UserDirectedCommissioning;
 
 inline constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
 
@@ -272,7 +271,7 @@ public:
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR ComputePASEVerifier(uint32_t iterations, uint32_t setupPincode, const ByteSpan & salt,
-                                   Spake2pVerifier & outVerifier);
+                                   Crypto::Spake2pVerifier & outVerifier);
 
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
 
@@ -720,7 +719,10 @@ public:
      *   Return the UDC Server instance
      *
      */
-    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer * GetUserDirectedCommissioningServer()
+    {
+        return mUdcServer;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     /**
@@ -785,7 +787,7 @@ private:
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
-    UserDirectedCommissioningServer * mUdcServer = nullptr;
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     UdcTransportMgr * mUdcTransportMgr = nullptr;
     uint16_t mUdcListenPort            = CHIP_UDC_PORT;
@@ -821,7 +823,7 @@ private:
        The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const Optional<ByteSpan> & icaCertBuf,
-                                          IdentityProtectionKeySpan ipk, NodeId adminSubject,
+                                          Crypto::IdentityProtectionKeySpan ipk, NodeId adminSubject,
                                           Optional<System::Clock::Timeout> timeout);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a reference to the device object.
@@ -886,7 +888,7 @@ private:
                                                            Credentials::AttestationVerificationResult result);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                           const ByteSpan & rcac, Optional<IdentityProtectionKeySpan> ipk,
+                                           const ByteSpan & rcac, Optional<Crypto::IdentityProtectionKeySpan> ipk,
                                            Optional<NodeId> adminSubject);
     static void OnArmFailSafe(void * context,
                               const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);

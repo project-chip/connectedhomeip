@@ -926,12 +926,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             _nodeIDToDeviceMap[nodeID] = deviceToReturn;
         }
 
+#if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
         // Load persisted attributes if they exist.
         NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
         MTR_LOG_INFO("Loaded %lu attributes from storage for %@", static_cast<unsigned long>(attributesFromCache.count), deviceToReturn);
         if (attributesFromCache.count) {
             [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
         }
+#endif
+        // Load persisted cluster data if they exist.
         NSDictionary * clusterData = [_controllerDataStore getStoredClusterDataForNodeID:nodeID];
         MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), deviceToReturn);
         if (clusterData.count) {
@@ -995,7 +998,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                                     salt:(NSData *)salt
                                                    error:(NSError * __autoreleasing *)error
 {
-    chip::Spake2pVerifier verifier;
+    chip::Crypto::Spake2pVerifier verifier;
     CHIP_ERROR err = verifier.Generate(iterations.unsignedIntValue, AsByteSpan(salt), setupPasscode.unsignedIntValue);
 
     MATTER_LOG_METRIC_SCOPE(kMetricPASEVerifierForSetupCode, err);

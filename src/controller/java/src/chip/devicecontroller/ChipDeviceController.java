@@ -419,7 +419,7 @@ public class ChipDeviceController {
    * @param params
    * @return CHIP_ERROR error code (0 is no error)
    */
-  public int onNOCChainGeneration(ControllerParams params) {
+  public long onNOCChainGeneration(ControllerParams params) {
     return onNOCChainGeneration(deviceControllerPtr, params);
   }
 
@@ -555,19 +555,19 @@ public class ChipDeviceController {
     }
   }
 
-  public void onPairingComplete(int errorCode) {
+  public void onPairingComplete(long errorCode) {
     if (completionListener != null) {
       completionListener.onPairingComplete(errorCode);
     }
   }
 
-  public void onCommissioningComplete(long nodeId, int errorCode) {
+  public void onCommissioningComplete(long nodeId, long errorCode) {
     if (completionListener != null) {
       completionListener.onCommissioningComplete(nodeId, errorCode);
     }
   }
 
-  public void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode) {
+  public void onCommissioningStatusUpdate(long nodeId, String stage, long errorCode) {
     if (completionListener != null) {
       completionListener.onCommissioningStatusUpdate(nodeId, stage, errorCode);
     }
@@ -581,7 +581,7 @@ public class ChipDeviceController {
     }
   }
 
-  public void onScanNetworksFailure(int errorCode) {
+  public void onScanNetworksFailure(long errorCode) {
     if (scanNetworksListener != null) {
       scanNetworksListener.onScanNetworksFailure(errorCode);
     }
@@ -604,7 +604,7 @@ public class ChipDeviceController {
     }
   }
 
-  public void onPairingDeleted(int errorCode) {
+  public void onPairingDeleted(long errorCode) {
     if (completionListener != null) {
       completionListener.onPairingDeleted(errorCode);
     }
@@ -636,7 +636,7 @@ public class ChipDeviceController {
     }
   }
 
-  public void onICDRegistrationComplete(int errorCode, ICDDeviceInfo icdDeviceInfo) {
+  public void onICDRegistrationComplete(long errorCode, ICDDeviceInfo icdDeviceInfo) {
     if (completionListener != null) {
       completionListener.onICDRegistrationComplete(errorCode, icdDeviceInfo);
     }
@@ -1576,7 +1576,7 @@ public class ChipDeviceController {
 
   private native List<ICDClientInfo> getICDClientInfo(long deviceControllerPtr, long fabricIndex);
 
-  private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
+  private native long onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
   private native int getFabricIndex(long deviceControllerPtr);
 
@@ -1642,7 +1642,7 @@ public class ChipDeviceController {
    */
   public interface ScanNetworksListener {
     /** Notifies when scan networks call fails. */
-    void onScanNetworksFailure(int errorCode);
+    void onScanNetworksFailure(long errorCode);
 
     void onScanNetworksSuccess(
         Integer networkingStatus,
@@ -1661,20 +1661,20 @@ public class ChipDeviceController {
     void onStatusUpdate(int status);
 
     /** Notifies the completion of pairing. */
-    void onPairingComplete(int errorCode);
+    void onPairingComplete(long errorCode);
 
     /** Notifies the deletion of pairing session. */
-    void onPairingDeleted(int errorCode);
+    void onPairingDeleted(long errorCode);
 
     /** Notifies the completion of commissioning. */
-    void onCommissioningComplete(long nodeId, int errorCode);
+    void onCommissioningComplete(long nodeId, long errorCode);
 
     /** Notifies the completion of each stage of commissioning. */
     void onReadCommissioningInfo(
         int vendorId, int productId, int wifiEndpointId, int threadEndpointId);
 
     /** Notifies the completion of each stage of commissioning. */
-    void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode);
+    void onCommissioningStatusUpdate(long nodeId, String stage, long errorCode);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();
@@ -1695,6 +1695,6 @@ public class ChipDeviceController {
     void onICDRegistrationInfoRequired();
 
     /** Notifies when the registration flow for the ICD completes. */
-    void onICDRegistrationComplete(int errorCode, ICDDeviceInfo icdDeviceInfo);
+    void onICDRegistrationComplete(long errorCode, ICDDeviceInfo icdDeviceInfo);
   }
 }
