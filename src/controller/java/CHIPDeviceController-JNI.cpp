@@ -26,6 +26,7 @@
 #include "AndroidCurrentFabricRemover.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include "AndroidInteractionClient.h"
+#include <controller/java/ControllerConfig.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>

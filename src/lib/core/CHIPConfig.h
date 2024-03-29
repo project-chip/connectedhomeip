@@ -1599,15 +1599,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
- *
- * @brief Disable Dynamic Server by default
- */
-#ifndef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
-#define CHIP_DEVICE_CONFIG_DYNAMIC_SERVER 0
-#endif
-
-/**
  * @def CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
  *
  * @brief Default value for the ICD Management cluster IdleModeDuration attribute, in seconds
