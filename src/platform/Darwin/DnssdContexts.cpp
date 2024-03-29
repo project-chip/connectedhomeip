@@ -368,7 +368,12 @@ void BrowseContext::DispatchSuccess()
 void BrowseContext::DispatchPartialSuccess()
 {
     sContextDispatchingSuccess = this;
-    callback(context, services.data(), services.size(), false, CHIP_NO_ERROR);
+    std::vector<DnssdService> dnsServices;
+    for (auto iter : services)
+    {
+        dnsServices.push_back(std::move(iter.first));
+    }
+    callback(context, dnsServices.data(), dnsServices.size(), false, CHIP_NO_ERROR);
     sContextDispatchingSuccess = nullptr;
     services.clear();
 }
@@ -390,7 +395,7 @@ void BrowseContext::OnBrowseAdd(const char * name, const char * type, const char
 
     VerifyOrReturn(IsLocalDomain(domain));
     auto service = GetService(name, type, protocol, interfaceId);
-    services.push_back(service);
+    services.push_back(std::make_pair(std::move(service), std::string(domain)));
 }
 
 void BrowseContext::OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId)
@@ -402,9 +407,10 @@ void BrowseContext::OnBrowseRemove(const char * name, const char * type, const c
     VerifyOrReturn(IsLocalDomain(domain));
 
     services.erase(std::remove_if(services.begin(), services.end(),
-                                  [name, type, interfaceId](const DnssdService & service) {
-                                      return strcmp(name, service.mName) == 0 && type == GetFullType(&service) &&
-                                          service.mInterface == chip::Inet::InterfaceId(interfaceId);
+                                  [name, type, interfaceId, domain](const auto & service) {
+                                      return strcmp(name, service.first.mName) == 0 && type == GetFullType(&service.first) &&
+                                          service.first.mInterface == chip::Inet::InterfaceId(interfaceId) &&
+                                          strcmp(domain, service.second.c_str()) == 0;
                                   }),
                    services.end());
 }
