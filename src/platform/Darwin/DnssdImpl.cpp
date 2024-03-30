@@ -143,11 +143,6 @@ std::shared_ptr<uint32_t> GetCounterHolder(const char * name)
     return std::make_shared<uint32_t>(0);
 }
 
-bool IsSRPDomain(const char * domain)
-{
-    return strcmp(kSRPDot, domain) == 0;
-}
-
 } // namespace
 
 namespace chip {
@@ -377,8 +372,7 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
     if (domain != nullptr)
     {
         ReturnErrorOnFailure(
-            ResolveWithContext(sdCtx, interfaceId, type, name, domain,
-                               IsSRPDomain(domain) ? &sdCtx->resolveContextWithSRPType : &sdCtx->resolveContextWithNonSRPType));
+            ResolveWithContext(sdCtx, interfaceId, type, name, domain, &sdCtx->resolveContextWithNonSRPType));
         sdCtx->shouldStartSRPTimerForResolve = false;
     }
     else

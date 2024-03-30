@@ -401,12 +401,13 @@ void BrowseContext::OnBrowseRemove(const char * name, const char * type, const c
                     StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
 
     VerifyOrReturn(name != nullptr);
+    std::string domain_str(domain);
 
     services.erase(std::remove_if(services.begin(), services.end(),
-                                  [name, type, interfaceId, domain](const auto & service) {
+                                  [name, type, interfaceId, &domain_str](const auto & service) {
                                       return strcmp(name, service.first.mName) == 0 && type == GetFullType(&service.first) &&
                                           service.first.mInterface == chip::Inet::InterfaceId(interfaceId) &&
-                                          domain != nullptr && strcmp(domain, service.second.c_str()) == 0;
+                                          service.second == domain_str;
                                   }),
                    services.end());
 }
