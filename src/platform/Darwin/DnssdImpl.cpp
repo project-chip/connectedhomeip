@@ -371,8 +371,7 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
     // Otherwise we will try to resolve using both the local domain and the SRP domain.
     if (domain != nullptr)
     {
-        ReturnErrorOnFailure(
-            ResolveWithContext(sdCtx, interfaceId, type, name, domain, &sdCtx->resolveContextWithNonSRPType));
+        ReturnErrorOnFailure(ResolveWithContext(sdCtx, interfaceId, type, name, domain, &sdCtx->resolveContextWithNonSRPType));
         sdCtx->shouldStartSRPTimerForResolve = false;
     }
     else
