@@ -406,7 +406,7 @@ void BrowseContext::OnBrowseRemove(const char * name, const char * type, const c
                                   [name, type, interfaceId, domain](const auto & service) {
                                       return strcmp(name, service.first.mName) == 0 && type == GetFullType(&service.first) &&
                                           service.first.mInterface == chip::Inet::InterfaceId(interfaceId) &&
-                                          strcmp(domain, service.second.c_str()) == 0;
+                                          domain != nullptr && strcmp(domain, service.second.c_str()) == 0;
                                   }),
                    services.end());
 }
