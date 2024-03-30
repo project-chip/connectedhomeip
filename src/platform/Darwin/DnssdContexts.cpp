@@ -619,7 +619,6 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     return false;
 }
 
-
 void ResolveContext::SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext)
 {
     auto sdCtx = static_cast<ResolveContext *>(callbackContext);

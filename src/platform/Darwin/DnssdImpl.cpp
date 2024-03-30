@@ -75,8 +75,8 @@ void LogOnFailure(const char * name, DNSServiceErrorType err)
 CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
 {
     VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs), ResolveContext::SRPTimerExpiredCallback,
-                                                 static_cast<void *>(ctx));
+    return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs),
+                                                       ResolveContext::SRPTimerExpiredCallback, static_cast<void *>(ctx));
 }
 
 class ScopedTXTRecord
@@ -387,7 +387,8 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
 
         ReturnErrorOnFailure(ResolveWithContext(sdCtx, interfaceId, type, name, kSRPDot, &sdCtx->resolveContextWithNonSRPType));
 
-        // Set the flag to start the timer for resolve on SRP domain to complete since a resolve has been requested on the SRP domain.
+        // Set the flag to start the timer for resolve on SRP domain to complete since a resolve has been requested on the SRP
+        // domain.
         sdCtx->shouldStartSRPTimerForResolve = true;
     }
 
