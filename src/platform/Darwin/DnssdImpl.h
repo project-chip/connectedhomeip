@@ -20,6 +20,7 @@
 #include <dns_sd.h>
 #include <lib/core/Global.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "DnssdHostNameRegistrar.h"
 
@@ -59,8 +60,6 @@ private:
 struct BrowseWithDelegateContext;
 struct RegisterContext;
 struct ResolveContext;
-
-void CancelSRPTimer(ResolveContext * ctx);
 
 class MdnsContexts
 {
@@ -290,6 +289,14 @@ struct ResolveContext : public GenericContext
     bool HasInterface();
     bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
 
+    /**
+     * @brief Callback that is called when the timeout for resolving on the kSRPDot domain has expired.
+     *
+     * @param[in] systemLayer The system layer.
+     * @param[in] callbackContext The context passed to the timer callback.
+     */
+    static void SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext);
+
 private:
     /**
      * Try reporting the results we got on the provided interface index.
@@ -299,6 +306,12 @@ private:
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult);
 
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
+
+    /**
+     * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
+     *
+     */
+    void CancelSRPTimer();
 };
 
 } // namespace Dnssd

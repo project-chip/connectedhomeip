@@ -491,7 +491,7 @@ ResolveContext::~ResolveContext()
 {
     if (isSRPTimerRunning)
     {
-        CancelSRPTimer(this);
+        CancelSRPTimer();
     }
 }
 
@@ -566,7 +566,7 @@ void ResolveContext::DispatchSuccess()
     }
 }
 
-bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResolve)
+bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult)
 {
     if (interfaceIndex == 0)
     {
@@ -574,7 +574,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
         return false;
     }
 
-    InterfaceKey interfaceKey = { interfaceIndex, hostname, isSRPResolve };
+    InterfaceKey interfaceKey = { interfaceIndex, hostname, isSRPResult };
     auto & interface          = interfaces[interfaceKey];
     auto & ips                = interface.addresses;
 
@@ -617,6 +617,19 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
         }
     }
     return false;
+}
+
+
+void ResolveContext::SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext)
+{
+    auto sdCtx = static_cast<ResolveContext *>(callbackContext);
+    VerifyOrDie(sdCtx != nullptr);
+    sdCtx->Finalize();
+}
+
+void ResolveContext::CancelSRPTimer()
+{
+    DeviceLayer::SystemLayer().CancelTimer(SRPTimerExpiredCallback, static_cast<void *>(this));
 }
 
 CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const struct sockaddr * address)

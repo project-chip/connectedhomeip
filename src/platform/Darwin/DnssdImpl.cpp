@@ -24,7 +24,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
@@ -65,6 +64,19 @@ void LogOnFailure(const char * name, DNSServiceErrorType err)
     {
         ChipLogError(Discovery, "%s (%s)", StringOrNullMarker(name), Error::ToString(err));
     }
+}
+
+/**
+ * @brief Starts a timer to wait for the resolution on the kSRPDot domain to happen.
+ *
+ * @param[in] timeoutSeconds The timeout in seconds.
+ * @param[in] ResolveContext The resolve context.
+ */
+CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
+{
+    VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs), ResolveContext::SRPTimerExpiredCallback,
+                                                 static_cast<void *>(ctx));
 }
 
 class ScopedTXTRecord
@@ -140,42 +152,6 @@ bool IsSRPDomain(const char * domain)
 
 namespace chip {
 namespace Dnssd {
-
-/**
- * @brief Callback that is called when the timeout for resolving on the kSRPDot domain has expired.
- *
- * @param[in] systemLayer The system layer.
- * @param[in] callbackContext The context passed to the timer callback.
- */
-void SRPTimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
-{
-    auto sdCtx = static_cast<ResolveContext *>(callbackContext);
-    VerifyOrDie(sdCtx != nullptr);
-    sdCtx->Finalize();
-}
-
-/**
- * @brief Starts a timer to wait for the resolution on the kSRPDot domain to happen.
- *
- * @param[in] timeoutSeconds The timeout in seconds.
- * @param[in] ResolveContext The resolve context.
- */
-CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
-{
-    VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeoutInMSecs), SRPTimerExpiredCallback,
-                                                 static_cast<void *>(ctx));
-}
-
-/**
- * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
- *
- * @param[in] ResolveContext The resolve context.
- */
-void CancelSRPTimer(ResolveContext * ctx)
-{
-    DeviceLayer::SystemLayer().CancelTimer(SRPTimerExpiredCallback, static_cast<void *>(ctx));
-}
 
 Global<MdnsContexts> MdnsContexts::sInstance;
 
@@ -384,12 +360,6 @@ static CHIP_ERROR ResolveWithContext(ResolveContext * sdCtx, uint32_t interfaceI
 
     auto err = DNSServiceResolve(&sdRef, kResolveFlags, interfaceId, name, type, domain, OnResolve, contextWithType);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
-
-    // Set the flag to start the timer for resolve on SRP domain to complete if a resolve has been requested on the SRP domain.
-    if (contextWithType->isSRPResolve)
-    {
-        sdCtx->shouldStartSRPTimerForResolve = true;
-    }
     return CHIP_NO_ERROR;
 }
 
@@ -416,6 +386,9 @@ static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::In
         ReturnErrorOnFailure(ResolveWithContext(sdCtx, interfaceId, type, name, kLocalDot, &sdCtx->resolveContextWithNonSRPType));
 
         ReturnErrorOnFailure(ResolveWithContext(sdCtx, interfaceId, type, name, kSRPDot, &sdCtx->resolveContextWithNonSRPType));
+
+        // Set the flag to start the timer for resolve on SRP domain to complete since a resolve has been requested on the SRP domain.
+        sdCtx->shouldStartSRPTimerForResolve = true;
     }
 
     auto retval = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
