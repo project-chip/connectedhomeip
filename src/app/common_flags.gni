@@ -17,4 +17,8 @@ declare_args() {
   chip_app_use_echo = false
   chip_enable_read_client = true
   chip_build_controller_dynamic_server = false
+
+  # Flag that controls whether the time-to-wait from BUSY responses is
+  # communicated to OperationalSessionSetup API consumers.
+  chip_enable_busy_handling_for_operational_session_setup = true
 }
