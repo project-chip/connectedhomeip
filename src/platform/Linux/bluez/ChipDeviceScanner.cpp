@@ -89,11 +89,10 @@ void ChipDeviceScanner::Shutdown()
     mScannerState = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
 }
 
-CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
+CHIP_ERROR ChipDeviceScanner::StartScan()
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mScannerState != ChipDeviceScannerState::SCANNER_SCANNING, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mTimerState == ScannerTimerState::TIMER_CANCELED, CHIP_ERROR_INCORRECT_STATE);
 
     mCancellable.reset(g_cancellable_new());
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
@@ -105,32 +104,10 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         return err;
     }
 
-    // Here need to set the Bluetooth scanning status immediately.
-    // So that if the timer fails to start in the next step,
-    // calling StopScan will be effective.
     mScannerState = ChipDeviceScannerState::SCANNER_SCANNING;
-
-    err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "Failed to schedule scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
-        StopScan();
-        return err;
-    }
-
-    mTimerState = ScannerTimerState::TIMER_STARTED;
-
     ChipLogDetail(Ble, "ChipDeviceScanner has started scanning!");
 
     return CHIP_NO_ERROR;
-}
-
-void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState)
-{
-    ChipDeviceScanner * chipDeviceScanner = static_cast<ChipDeviceScanner *>(appState);
-    chipDeviceScanner->mTimerState        = ScannerTimerState::TIMER_EXPIRED;
-    chipDeviceScanner->mDelegate->OnScanError(CHIP_ERROR_TIMEOUT);
-    chipDeviceScanner->StopScan();
 }
 
 CHIP_ERROR ChipDeviceScanner::StopScan()
@@ -151,14 +128,6 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
 
     ChipLogDetail(Ble, "ChipDeviceScanner has stopped scanning!");
 
-    if (mTimerState == ScannerTimerState::TIMER_STARTED)
-    {
-        chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
-    }
-
-    // Reset timer status
-    mTimerState = ScannerTimerState::TIMER_CANCELED;
-
     mDelegate->OnScanComplete();
 
     return CHIP_NO_ERROR;
@@ -171,17 +140,7 @@ CHIP_ERROR ChipDeviceScanner::StopScanImpl()
     g_cancellable_cancel(mCancellable.get());
     mCancellable.reset();
 
-    if (mObjectAddedSignal)
-    {
-        g_signal_handler_disconnect(mObjectManager.GetObjectManager(), mObjectAddedSignal);
-        mObjectAddedSignal = 0;
-    }
-
-    if (mPropertiesChangedSignal)
-    {
-        g_signal_handler_disconnect(mObjectManager.GetObjectManager(), mPropertiesChangedSignal);
-        mPropertiesChangedSignal = 0;
-    }
+    mObjectManager.UnsubscribeDeviceNotifications(mAdapter.get(), this);
 
     GAutoPtr<GError> error;
     if (!bluez_adapter1_call_stop_discovery_sync(mAdapter.get(), nullptr /* not cancellable */, &error.GetReceiver()))
@@ -198,22 +157,15 @@ CHIP_ERROR ChipDeviceScanner::StopScanImpl()
     return CHIP_NO_ERROR;
 }
 
-void ChipDeviceScanner::SignalObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject)
+void ChipDeviceScanner::OnDeviceAdded(BluezDevice1 & device)
 {
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObject)));
-    VerifyOrReturn(device);
-
-    ReportDevice(*device.get());
+    ReportDevice(device);
 }
 
-void ChipDeviceScanner::SignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
-                                                         GDBusProxy * aInterface, GVariant * aChangedProperties,
-                                                         const char * const * aInvalidatedProps)
+void ChipDeviceScanner::OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps,
+                                                const char * const * invalidatedProps)
 {
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObject)));
-    VerifyOrReturn(device);
-
-    ReportDevice(*device.get());
+    ReportDevice(device);
 }
 
 void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
@@ -254,20 +206,8 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 & device)
 
 CHIP_ERROR ChipDeviceScanner::StartScanImpl()
 {
-
-    mObjectAddedSignal = g_signal_connect(mObjectManager.GetObjectManager(), "object-added",
-                                          G_CALLBACK(+[](GDBusObjectManager * aMgr, GDBusObject * aObj, ChipDeviceScanner * self) {
-                                              return self->SignalObjectAdded(aMgr, aObj);
-                                          }),
-                                          this);
-
-    mPropertiesChangedSignal = g_signal_connect(
-        mObjectManager.GetObjectManager(), "interface-proxy-properties-changed",
-        G_CALLBACK(+[](GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface, GVariant * aChangedProps,
-                       const char * const * aInvalidatedProps, ChipDeviceScanner * self) {
-            return self->SignalInterfacePropertiesChanged(aMgr, aObj, aIface, aChangedProps, aInvalidatedProps);
-        }),
-        this);
+    CHIP_ERROR err = mObjectManager.SubscribeDeviceNotifications(mAdapter.get(), this);
+    ReturnErrorOnFailure(err);
 
     ChipLogProgress(Ble, "BLE removing known devices");
     for (BluezObject & object : mObjectManager.GetObjects())

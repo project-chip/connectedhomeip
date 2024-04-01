@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "WiFiDnssdImpl.h"
+#include "ESP32DnssdImpl.h"
 #include "lib/dnssd/platform/Dnssd.h"
 
 #include <esp_err.h>
@@ -130,7 +130,7 @@ static CHIP_ERROR RemoveMdnsQuery(GenericContext * ctx)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
+CHIP_ERROR EspDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     esp_err_t espError;
@@ -153,7 +153,7 @@ static const char * GetProtocolString(DnssdServiceProtocol protocol)
     return protocol == DnssdServiceProtocol::kDnssdProtocolTcp ? "_tcp" : "_udp";
 }
 
-CHIP_ERROR WiFiDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
+CHIP_ERROR EspDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
     CHIP_ERROR error        = CHIP_NO_ERROR;
     mdns_txt_item_t * items = nullptr;
@@ -165,7 +165,7 @@ CHIP_ERROR WiFiDnssdPublishService(const DnssdService * service, DnssdPublishCal
     }
 
     VerifyOrExit(service->mTextEntrySize <= UINT8_MAX, error = CHIP_ERROR_INVALID_ARGUMENT);
-    if (service->mTextEntries)
+    if (service->mTextEntries && service->mTextEntrySize > 0)
     {
         items = static_cast<mdns_txt_item_t *>(chip::Platform::MemoryCalloc(service->mTextEntrySize, sizeof(mdns_txt_item_t)));
         VerifyOrExit(items != nullptr, error = CHIP_ERROR_NO_MEMORY);
@@ -203,11 +203,28 @@ exit:
     return error;
 }
 
-CHIP_ERROR WiFiDnssdRemoveServices()
+CHIP_ERROR EspDnssdRemoveServices()
 {
     mdns_service_remove("_matter", "_tcp");
     mdns_service_remove("_matterc", "_udp");
+    mdns_service_remove("_matterd", "_udp");
     return CHIP_NO_ERROR;
+}
+
+static Inet::InterfaceId GetServiceInterfaceId(esp_netif_t * esp_netif)
+{
+    if (!esp_netif)
+    {
+        // If the InterfaceId in the context and esp_netif in current result is Null,
+        // we will use the Station or Ethernet netif by default.
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        return Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
+#elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+        return Inet::InterfaceId(
+            DeviceLayer::Internal::ESP32Utils::GetNetif(DeviceLayer::Internal::ESP32Utils::kDefaultEthernetNetifKey));
+#endif
+    }
+    return Inet::InterfaceId(static_cast<struct netif *>(esp_netif_get_netif_impl(esp_netif)));
 }
 
 static Inet::IPAddressType MapAddressType(mdns_ip_protocol_t ip_protocol)
@@ -330,16 +347,9 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
                 ctx->mService[servicesIndex].mTextEntrySize = currentResult->txt_count;
                 ctx->mService[servicesIndex].mSubTypes      = NULL;
                 ctx->mService[servicesIndex].mSubTypeSize   = 0;
-                if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
-                {
-                    // If the InterfaceId in the context is Null, we will use the Station netif by default.
-                    ctx->mService[servicesIndex].mInterface =
-                        Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
-                }
-                else
-                {
-                    ctx->mService[servicesIndex].mInterface = ctx->mInterfaceId;
-                }
+                ctx->mService[servicesIndex].mInterface     = ctx->mInterfaceId != chip::Inet::InterfaceId::Null()
+                        ? ctx->mInterfaceId
+                        : GetServiceInterfaceId(currentResult->esp_netif);
                 if (currentResult->addr)
                 {
                     Inet::IPAddress IPAddr;
@@ -416,16 +426,9 @@ static CHIP_ERROR ParseSrvResult(ResolveContext * ctx)
         ctx->mService->mPort          = ctx->mSrvQueryResult->port;
         ctx->mService->mSubTypes      = nullptr;
         ctx->mService->mSubTypeSize   = 0;
-        if (ctx->mInterfaceId == chip::Inet::InterfaceId::Null())
-        {
-            // If the InterfaceId in the context is Null, we will use the Station netif by default.
-            ctx->mService->mInterface = Inet::InterfaceId(DeviceLayer::Internal::ESP32Utils::GetStationNetif());
-        }
-        else
-        {
-            ctx->mService->mInterface = ctx->mInterfaceId;
-        }
-
+        ctx->mService->mInterface     = ctx->mInterfaceId != chip::Inet::InterfaceId::Null()
+                ? ctx->mInterfaceId
+                : GetServiceInterfaceId(ctx->mSrvQueryResult->esp_netif);
         return CHIP_NO_ERROR;
     }
     else
@@ -595,9 +598,9 @@ static void MdnsQueryNotifier(mdns_search_once_t * searchHandle)
     chip::DeviceLayer::PlatformMgr().ScheduleWork(MdnsQueryDone, reinterpret_cast<intptr_t>(searchHandle));
 }
 
-CHIP_ERROR WiFiDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
-                           intptr_t * browseIdentifier)
+CHIP_ERROR EspDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                          chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                          intptr_t * browseIdentifier)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     mdns_search_once_t * queryHandle =
@@ -623,8 +626,7 @@ CHIP_ERROR WiFiDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     return error;
 }
 
-CHIP_ERROR WiFiDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
-                            void * context)
+CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
 {
     CHIP_ERROR error              = CHIP_NO_ERROR;
     mdns_search_once_t * querySrv = mdns_query_async_new(service->mName, service->mType, GetProtocolString(service->mProtocol),

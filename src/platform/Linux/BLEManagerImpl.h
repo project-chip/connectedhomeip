@@ -93,6 +93,8 @@ public:
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
 
+    static void NotifyBLEAdapterAdded(unsigned int aAdapterId, const char * aAdapterAddress);
+    static void NotifyBLEAdapterRemoved(unsigned int aAdapterId, const char * aAdapterAddress);
     static void NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error);
     static void NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error);
     static void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
@@ -185,6 +187,7 @@ private:
     BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
     void InitiateScan(BleScanState scanType);
+    static void HandleScannerTimer(chip::System::Layer *, void * appState);
     void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
