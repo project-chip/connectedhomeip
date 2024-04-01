@@ -38,7 +38,6 @@
 #include <app/EventPathParams.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
-#include <app/ObjectList.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
@@ -54,6 +53,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/LinkedList.h>
 #include <lib/support/Pool.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
@@ -187,22 +187,22 @@ public:
 
     reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
-    void ReleaseAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList);
+    void ReleaseAttributePathList(SingleLinkedListNode<AttributePathParams> *& aAttributePathList);
 
-    CHIP_ERROR PushFrontAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList,
+    CHIP_ERROR PushFrontAttributePathList(SingleLinkedListNode<AttributePathParams> *& aAttributePathList,
                                           AttributePathParams & aAttributePath);
 
     // If a concrete path indicates an attribute that is also referenced by a wildcard path in the request,
     // the path SHALL be removed from the list.
-    void RemoveDuplicateConcreteAttributePath(ObjectList<AttributePathParams> *& aAttributePaths);
+    void RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths);
 
-    void ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList);
+    void ReleaseEventPathList(SingleLinkedListNode<EventPathParams> *& aEventPathList);
 
-    CHIP_ERROR PushFrontEventPathParamsList(ObjectList<EventPathParams> *& aEventPathList, EventPathParams & aEventPath);
+    CHIP_ERROR PushFrontEventPathParamsList(SingleLinkedListNode<EventPathParams> *& aEventPathList, EventPathParams & aEventPath);
 
-    void ReleaseDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList);
+    void ReleaseDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList);
 
-    CHIP_ERROR PushFrontDataVersionFilterList(ObjectList<DataVersionFilter> *& aDataVersionFilterList,
+    CHIP_ERROR PushFrontDataVersionFilterList(SingleLinkedListNode<DataVersionFilter> *& aDataVersionFilterList,
                                               DataVersionFilter & aDataVersionFilter);
 
     CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
@@ -354,6 +354,19 @@ public:
     //
     void SetForceHandlerQuota(bool forceHandlerQuota) { mForceHandlerQuota = forceHandlerQuota; }
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    //
+    // Override the subscription timeout resumption retry interval seconds. The default retry interval will be
+    // 300s + GetFibonacciForIndex(retry_times) * 300s, which is too long for unit-tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetSubscriptionTimeoutResumptionRetryIntervalSeconds(int32_t seconds)
+    {
+        mSubscriptionResumptionRetrySecondsOverride = seconds;
+    }
+#endif
+
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
     // they don't provide for the ability to shut down those subscriptions after they've been established.
@@ -391,6 +404,8 @@ private:
 
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
+
+    void TryToResumeSubscriptions();
 
     ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
 
@@ -576,9 +591,9 @@ private:
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 
     template <typename T, size_t N>
-    void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);
+    void ReleasePool(SingleLinkedListNode<T> *& aObjectList, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool);
     template <typename T, size_t N>
-    CHIP_ERROR PushFront(ObjectList<T> *& aObjectList, T & aData, ObjectPool<ObjectList<T>, N> & aObjectPool);
+    CHIP_ERROR PushFront(SingleLinkedListNode<T> *& aObjectList, T & aData, ObjectPool<SingleLinkedListNode<T>, N> & aObjectPool);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
 
@@ -606,13 +621,13 @@ private:
                   "CHIP_IM_MAX_NUM_READS is too small to match the requirements of spec 8.5.1");
 #endif
 
-    ObjectPool<ObjectList<AttributePathParams>,
+    ObjectPool<SingleLinkedListNode<AttributePathParams>,
                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS>
         mAttributePathPool;
-    ObjectPool<ObjectList<EventPathParams>,
+    ObjectPool<SingleLinkedListNode<EventPathParams>,
                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS>
         mEventPathPool;
-    ObjectPool<ObjectList<DataVersionFilter>,
+    ObjectPool<SingleLinkedListNode<DataVersionFilter>,
                CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_READS + CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS>
         mDataVersionFilterPool;
 
@@ -637,7 +652,10 @@ private:
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
     bool mForceHandlerQuota = false;
-#endif
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    int mSubscriptionResumptionRetrySecondsOverride = -1;
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool HasSubscriptionsToResume();
@@ -661,75 +679,11 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
                                   CommandHandler * apCommandObj);
 
 /**
- *  Check whether the given cluster exists on the given endpoint and supports
- *  the given command.  If it does, Success will be returned.  If it does not,
- *  one of UnsupportedEndpoint, UnsupportedCluster, or UnsupportedCommand
- *  will be returned, depending on how the command fails to exist.
- */
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
-
-/**
- *  Fetch attribute value and version info and write to the AttributeReport provided.
- *  The ReadSingleClusterData will do everything required for encoding an attribute, i.e. it will try to put one or more
- * AttributeReportIB to the AttributeReportIBs::Builder.
- *  When the endpoint / cluster / attribute data specified by aPath does not exist, corresponding interaction
- * model error code will be put into aAttributeReports, and CHIP_NO_ERROR will be returned. If the data exists on the server, the
- * data (with tag kData) and the data version (with tag kDataVersion) will be put into aAttributeReports. TLVWriter error will be
- * returned if any error occurred while encoding these values. This function is implemented by CHIP as a part of cluster data
- * storage & management.
- *
- *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
- *  @param[in]    aPath                 The concrete path of the data being read.
- *  @param[in]    aAttributeReports      The TLV Builder for Cluter attribute builder.
- *
- *  @retval  CHIP_NO_ERROR on success
- */
-CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState);
-
-/**
- *  Check whether concrete attribute path is an "existent attribute path" in spec terms.
- *  @param[in]    aPath                 The concrete path of the data being read.
- *  @retval  boolean   true if the concrete attribute path indicates an attribute that exists on the node.
- */
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath);
-
-/**
  *  Get the registered attribute access override. nullptr when attribute access override is not found.
  *
  * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
  */
 AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
-
-/**
- * TODO: Document.
- */
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
-                                  const ConcreteDataAttributePath & aAttributePath, TLV::TLVReader & aReader,
-                                  WriteHandler * apWriteHandler);
-
-/**
- * Check if the given cluster has the given DataVersion.
- */
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
-
-/**
- * Returns true if device type is on endpoint, false otherwise.
- */
-bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
-
-/**
- * Returns the metadata of the attribute for the given path.
- *
- * @retval The metadata of the attribute, will return null if the given attribute does not exists.
- */
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath);
-
-/**
- * Returns the event support status for the given event, as an interaction model status.
- */
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath);
 
 } // namespace app
 } // namespace chip

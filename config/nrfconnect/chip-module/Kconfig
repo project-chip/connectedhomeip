@@ -206,6 +206,11 @@ choice CHIP_FACTORY_DATA_CERT_SOURCE
 
 endchoice
 
+config CHIP_FACTORY_DATA_GENERATE_CD
+	bool "Generates Certification Declaration to the output build directory"
+	help
+	  Generates the new Certification Declaration and stores it to the output build directory.
+
 if CHIP_FACTORY_DATA_CERT_SOURCE_USER
 
 config CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT
@@ -230,6 +235,7 @@ endif # CHIP_FACTORY_DATA_CERT_SOURCE_USER
 # Configs for SPAKE2+ generation
 config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
 	bool "Generate SPAKE2+ verifier"
+	default y
 	help
 	  Enables the generation of the SPAKE2+ verifier for the configured SPAKE2+
 	  passcode, iteration count and salt.
@@ -279,5 +285,21 @@ config CHIP_ENABLE_READ_CLIENT
 	  Enable support for Read Client in the Interaction Model.
 	  This config can be disabled for device types that do not require Read Client functionality.
 	  Disabling this config can save flash and RAM space.
+
+config CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+	bool "Operational keys migration feature"
+	depends on CHIP_CRYPTO_PSA
+	help
+	  Enables migration of the operational keys stored in the persistent storage to the PSA ITS secure storage.
+	  Enable this feature while updating the firmware of in-field devices that run Mbed TLS cryptography backend
+	  to the firmware based on PSA Crypto API.
+
+config CHIP_FACTORY_RESET_ON_KEY_MIGRATION_FAILURE
+	bool "Perform factory reset if the operational key migration failed"
+	default y
+	depends on CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+	help
+	  Perform factory reset of the device if the operational key for Fabric has not been migrated
+	  properly to PSA ITS storage.
 
 endif # CHIP

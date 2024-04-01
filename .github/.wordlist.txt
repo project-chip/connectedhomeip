@@ -14,29 +14,19 @@ abfb
 ABI
 ABIs
 ables
-AccessControl
-AccessControlEntry
+accesscontrol
 accessor
 Accessors
-AccountLogin
 acdbc
 ack
 ACKed
 ACL
 ACLs
 actdiag
-AdapterAddress
-AdapterName
 adb
 AddNOC
-AddOrUpdateThreadNetwork
-AddOrUpdateWiFiNetwork
 addr
-AddResponse
-AddThreadNetwork
-AddStatus
 adk
-AdministratorCommissioning
 adoc
 adr
 AdvAutonomous
@@ -48,7 +38,6 @@ AE
 aef
 AES
 AIDL
-AlarmCode
 algs
 alloc
 Ameba
@@ -61,15 +50,12 @@ AnnounceOTAProvider
 AnnounceOTAProviderRequest
 APIs
 apk
-AppConfig
 AppImpl
 AppleTV
 appliable
-ApplianceControl
 applianceeventsandalert
 ApplianceIdentification
 appliancestatistics
-ApplicationBasic
 ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
@@ -171,7 +157,6 @@ BRD
 breakpoint
 bredr
 BridgedDeviceBasicInformation
-bridgedLightEndpoint
 bringup
 BroadcastReceiver
 BromateConcentrationMeasurement
@@ -259,9 +244,6 @@ CLIs
 cloudbuild
 CLRF
 clusterAttrs
-clusterId
-clusterList
-clusterListName
 ClusterName
 ClusterObjectTests
 ClusterRevision
@@ -315,7 +297,6 @@ ContentApp's
 ContentAppPlatform
 ContentLaunch
 ContentLauncher
-continuousHinting
 contrib
 controllee
 conv
@@ -382,7 +363,6 @@ DefaultOTARequestor
 DefaultOTARequestorDriver
 DefaultOTARequestorStorage
 DefaultSuccess
-defaultValue
 definedValue
 DehumidificationControl
 DelayedActionTime
@@ -415,9 +395,7 @@ DeviceLayer
 DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
-deviceSoftwareVersionModel
 DeviceTemperatureConfiguration
-deviceType
 DevKitC
 DevKitM
 devtype
@@ -487,6 +465,7 @@ EchoMessage
 EchoRequests
 EchoResponse
 EchoService
+ECW
 edaf
 edc
 EDR
@@ -511,8 +490,6 @@ EnableNetwork
 EnableWiFiNetwork
 endian
 EndpointId
-endpointName
-endsWith
 eno
 entrypoint
 enum
@@ -523,6 +500,7 @@ epochStartTime
 eq
 errorValue
 esd
+espcoredump
 ESPPORT
 Espressif
 esptool
@@ -579,7 +557,6 @@ FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
-formatOnSave
 FOTA
 FreeRTOS
 FreeRTOSConfig
@@ -613,7 +590,6 @@ GetIP
 getManualTests
 GetSafeAttributePersistenceProvider
 getstarted
-getTests
 GH
 ghcr
 ghp
@@ -638,8 +614,6 @@ graphviz
 Groupcast
 GroupId
 GroupKeyManagement
-groupKeySecurityPolicy
-groupKeySetID
 groupsettings
 gsdk
 gtk
@@ -693,8 +667,6 @@ ifconfig
 ifdef
 ifdefs
 IGMP
-ignoreApplyUpdate
-ignoreQueryImage
 ihex
 IlluminanceMeasurement
 IM
@@ -767,6 +739,7 @@ kCase
 Kconfig
 kDacPublicKey
 KeypadInput
+keypair
 keyset
 kGroup
 kInvalidCommandId
@@ -913,6 +886,7 @@ mlan
 MLD
 mmevk
 moal
+Mobly
 ModeSelect
 modprobe
 Modustoolbox
@@ -977,6 +951,7 @@ nrfdks
 nrfutil
 nrfxlib
 NTAG
+NTP
 nullable
 nullptr
 NUM
@@ -1042,6 +1017,7 @@ OTBR
 otcli
 outform
 outgoingCommands
+overridable
 OxygenConcentrationMeasurement
 OzoneConcentrationMeasurement
 PAA
@@ -1080,6 +1056,7 @@ perfetto
 periodicQueryTimeout
 pexpect
 pickString
+PICSCODE
 PID
 Pigweed
 PinCode
@@ -1395,6 +1372,7 @@ TestGenExample
 TestGroupDemoConfig
 TestMultiRead
 TestName
+TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke
 TESTPASSWD
 TestPICS
 TESTSSID
@@ -1462,6 +1440,7 @@ ttymxc
 ttyUSB
 TurbidityConcentrationMeasurement
 TvCasting
+TVOC
 tvOS
 TXD
 txt

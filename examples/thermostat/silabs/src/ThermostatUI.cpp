@@ -25,7 +25,7 @@
 #include "glib.h"
 #include "lcd.h"
 
-#if SL_WIFI && !defined(SIWX_917)
+#if SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 // Only needed for wifi NCP devices
 #include "spi_multiplex.h"
 #endif // SL_WIFI

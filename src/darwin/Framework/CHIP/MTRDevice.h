@@ -18,7 +18,6 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
-#import <Matter/MTRDiagnosticLogsType.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -63,6 +62,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *      The device is currently unreachable.
  */
 @property (nonatomic, readonly) MTRDeviceState state;
+
+/**
+ * Is the device cache primed for this device?
+ *
+ * This will be true after the deviceCachePrimed: delegate callback has been called, false if not.
+ *
+ * Please note if you have a storage delegate implemented, the cache is then stored persistently, so
+ * the delegate would then only be called once, ever - and this property would basically always be true
+ * if a subscription has ever been established at any point in the past.
+ *
+ */
+@property (readonly) BOOL deviceCachePrimed MTR_NEWLY_AVAILABLE;
 
 /**
  * The estimated device system start time.
@@ -402,6 +413,15 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
  * device, especially if the device is sleepy and might not be active very often.
  */
 - (void)deviceBecameActive:(MTRDevice *)device MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Notifies delegate when the device attribute cache has been primed with initial configuration data of the device
+ *
+ * This is called when the MTRDevice object goes from not knowing the device to having cached the first attribute reports that include basic mandatory information, e.g. Descriptor clusters.
+ *
+ * The intention is that after this is called, the client should be able to call read for mandatory attributes and likely expect non-nil values.
+ */
+- (void)deviceCachePrimed:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
 @end
 

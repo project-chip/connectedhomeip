@@ -273,5 +273,3 @@ data class EventState(
     return null
   }
 }
-
-data class Status(val status: Int, val clusterStatus: Int?)

@@ -30,6 +30,9 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#if CONFIG_DIAG_LOGS_DEMO
+#include "DiagnosticLogsProviderDelegateImpl.h"
+#endif
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -78,6 +81,9 @@ static LEDWidget sContactSensorLED;
 
 static bool sIsThreadProvisioned = false;
 static bool sHaveBLEConnections  = false;
+#if CHIP_ENABLE_LIT
+static bool sIsDeviceCommissioned = false;
+#endif
 
 static uint32_t eventMask = 0;
 
@@ -92,6 +98,9 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip;
 using namespace chip::app;
+#if CONFIG_DIAG_LOGS_DEMO
+using namespace chip::app::Clusters::DiagnosticLogs;
+#endif
 
 AppTask AppTask::sAppTask;
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
@@ -110,6 +119,11 @@ static BDXDownloader gDownloader __attribute__((section(".data")));
 
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
+
+static pm_notify_element_t appNotifyElement = {
+    .notifyCallback = AppTask::LowPowerCallback,
+    .data           = NULL,
+};
 
 static void app_gap_callback(gapGenericEvent_t * event)
 {
@@ -145,7 +159,15 @@ CHIP_ERROR AppTask::Init()
     if (ContactSensorMgr().Init() != 0)
     {
         K32W_LOG("ContactSensorMgr().Init() failed");
-        assert(status == 0);
+        assert(0);
+    }
+
+    // Register enter/exit low power application callback.
+    status_t status = PM_RegisterNotify(kPM_NotifyGroup2, &appNotifyElement);
+    if (status != kStatus_Success)
+    {
+        K32W_LOG("Failed to register low power app callback.")
+        return APP_ERROR_PM_REGISTER_LP_CALLBACK_FAILED;
     }
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
@@ -247,6 +269,24 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     VerifyOrDie((chip::Server::GetInstance().Init(initParams)) == CHIP_NO_ERROR);
+
+#if CONFIG_DIAG_LOGS_DEMO
+    char diagLog[CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE];
+    uint16_t diagLogSize = CHIP_DEVICE_CONFIG_MAX_DIAG_LOG_SIZE;
+
+    StorageKeyName keyUser  = LogProvider::GetKeyDiagUserSupport();
+    StorageKeyName keyNwk   = LogProvider::GetKeyDiagNetwork();
+    StorageKeyName keyCrash = LogProvider::GetKeyDiagCrashLog();
+
+    memset(diagLog, 0, diagLogSize);
+    Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(keyUser.KeyName(), diagLog, diagLogSize);
+
+    memset(diagLog, 1, diagLogSize);
+    Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(keyNwk.KeyName(), diagLog, diagLogSize);
+
+    memset(diagLog, 2, diagLogSize);
+    Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(keyCrash.KeyName(), diagLog, diagLogSize);
+#endif
 }
 
 void AppTask::PrintOnboardingInfo()
@@ -398,6 +438,12 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
         {
             button_event.Handler = ResetActionEventHandler;
         }
+#if CHIP_ENABLE_LIT
+        else if (button_action == USER_ACTIVE_MODE_TRIGGER_PUSH)
+        {
+            button_event.Handler = UserActiveModeHandler;
+        }
+#endif
     }
 
     sAppTask.PostEvent(&button_event);
@@ -418,6 +464,12 @@ button_status_t AppTask::KBD_Callback(void * buttonHandle, button_callback_messa
             {
                 ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
             }
+#if CHIP_ENABLE_LIT
+            else if (sIsDeviceCommissioned)
+            {
+                ButtonEventHandler(BLE_BUTTON, USER_ACTIVE_MODE_TRIGGER_PUSH);
+            }
+#endif
             else
             {
                 ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
@@ -616,6 +668,28 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     }
 }
 
+#if CHIP_ENABLE_LIT
+void AppTask::UserActiveModeHandler(void * aGenericEvent)
+{
+    AppEvent * aEvent = (AppEvent *) aGenericEvent;
+
+    if (aEvent->ButtonEvent.PinNo != BLE_BUTTON)
+        return;
+
+    if (sAppTask.mFunction != Function::kNoneSelected)
+    {
+        K32W_LOG("Another function is scheduled. Could not request ICD Active Mode!");
+        return;
+    }
+    PlatformMgr().ScheduleWork(AppTask::UserActiveModeTrigger, 0);
+}
+
+void AppTask::UserActiveModeTrigger(intptr_t arg)
+{
+    ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+}
+#endif
+
 void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange && event->ServiceProvisioningChange.IsServiceProvisioned)
@@ -629,6 +703,12 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
             sIsThreadProvisioned = FALSE;
         }
     }
+#if CHIP_ENABLE_LIT
+    else if (event->Type == DeviceEventType::kCommissioningComplete)
+    {
+        sIsDeviceCommissioned = TRUE;
+    }
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     if (event->Type == DeviceEventType::kDnssdInitialized)
@@ -723,6 +803,11 @@ void AppTask::OnIdentifyStop(Identify * identify)
         K32W_LOG("Identify process has stopped.");
         sAppTask.mFunction = Function::kNoneSelected;
     }
+}
+
+status_t AppTask::LowPowerCallback(pm_event_type_t eventType, uint8_t powerState, void * data)
+{
+    return kStatus_Success;
 }
 
 void AppTask::PostContactActionRequest(ContactSensorManager::Action aAction)

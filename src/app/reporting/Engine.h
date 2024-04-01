@@ -179,7 +179,7 @@ private:
     // of those will fail to match.  This function should return false if either nothing in the list matches the given
     // endpoint+cluster in the path or there is an entry in the list that matches the endpoint+cluster in the path but does not
     // match the current data version of that cluster.
-    bool IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
+    bool IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
                                    const ConcreteReadAttributePath & aPath);
 
     /**

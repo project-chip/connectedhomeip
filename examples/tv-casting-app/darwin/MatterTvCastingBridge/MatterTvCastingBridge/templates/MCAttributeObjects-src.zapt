@@ -1,0 +1,70 @@
+{{> header excludeZapComment=false}}
+
+#import "MCAttributeObjects.h"
+
+#import "../MCAttribute_Internal.h"
+#import "../MCCastingApp.h"
+#import "../MCErrorUtils.h"
+#import "../NSDataSpanConversion.h"
+#import "../NSStringSpanConversion.h"
+
+#include "core/Attribute.h"
+#include <app-common/zap-generated/cluster-objects.h>
+
+#import <Foundation/Foundation.h>
+
+{{#zcl_clusters}}
+{{#if (isInConfigList name "MatterCastingClusters")}}
+
+// {{asUpperCamelCase name}} cluster attributes:
+
+{{#zcl_attributes_server removeKeys='isOptional'}}
+@implementation MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Attribute
+- (void)read:(void * _Nullable)context
+    completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+{
+    MCAttributeTemplate<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->read(context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+        completion(context, before, after, err);
+        delete mcAttribute;
+    });
+}
+
+- (void)subscribe:(void * _Nullable)context
+       completion:(void (^_Nonnull __strong)(void * _Nullable, id _Nullable __strong before, id _Nullable __strong after, NSError * _Nullable __strong error))completion
+      minInterval:(NSNumber * _Nonnull)minInterval
+      maxInterval:(NSNumber * _Nonnull)maxInterval
+{
+    MCAttributeTemplate<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo> * mcAttribute = new MCAttributeTemplate<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(self.cppAttribute,
+        [self](std::any cppValue, CHIP_ERROR * errPtr) {
+            return [self getObjCTypeFromCpp:cppValue errorCode:errPtr];
+        });
+    mcAttribute->subscribe(
+        context, [mcAttribute, completion](void * context, id before, id after, NSError * err) {
+            completion(context, before, after, err);
+            delete mcAttribute;
+        }, minInterval, maxInterval);
+}
+
+- (id _Nullable)getObjCTypeFromCpp:(std::any)cppValue errorCode:(CHIP_ERROR *)aError
+{
+    {{asObjectiveCClass type ../name structTypePrefix="MC"}} * value = nil;
+    if (cppValue.type() == typeid(std::shared_ptr<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType>)) {
+        std::shared_ptr<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType> sharedPtr = std::any_cast<std::shared_ptr<chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType>>(cppValue);
+        chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType _cppValue = *sharedPtr;
+        *aError = CHIP_NO_ERROR;
+        {{asObjectiveCType type parent.name structTypePrefix="MC"}} value;
+        {{>decode_value target="value" source="_cppValue" cluster=parent.name errorCode="*aError = err; return nil;" depth=0}}
+        return value;
+    }
+    *aError = CHIP_ERROR_INTERNAL;
+    return value;
+}
+@end
+
+{{/zcl_attributes_server}}
+{{/if}}
+{{/zcl_clusters}}

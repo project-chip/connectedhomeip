@@ -268,16 +268,24 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 #define ChipLogValueMEI(aValue) static_cast<uint16_t>(aValue >> 16), static_cast<uint16_t>(aValue)
 
 /**
- * Logging helpers for exchanges.  For now just log the exchange id and whether
- * it's an initiator or responder, but eventually we may want to log the peer
- * node id as well (especially for the responder case).  Some callsites only
+ * Logging helpers for exchanges.  Log the exchange id, whether
+ * it's an initiator or responder and the scoped node.  Some callsites only
  * have the exchange id and initiator/responder boolean, not an actual exchange,
  * so we want to have a helper for that case too.
  */
 #define ChipLogFormatExchangeId "%u%c"
 #define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
+
+#if CHIP_EXCHANGE_NODE_ID_LOGGING
+#define ChipLogFormatExchange ChipLogFormatExchangeId " with Node: " ChipLogFormatScopedNodeId
+#define ChipLogValueExchange(ec)                                                                                                   \
+    ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator()),                                                            \
+        ChipLogValueScopedNodeId((ec)->HasSessionHandle() ? (ec)->GetSessionHandle()->GetPeer() : ScopedNodeId())
+#else // CHIP_EXCHANGE_NODE_ID_LOGGING
 #define ChipLogFormatExchange ChipLogFormatExchangeId
 #define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
+#endif // CHIP_EXCHANGE_NODE_ID_LOGGING
+
 #define ChipLogValueExchangeIdFromSentHeader(payloadHeader)                                                                        \
     ChipLogValueExchangeId((payloadHeader).GetExchangeID(), (payloadHeader).IsInitiator())
 // A received header's initiator boolean is the inverse of the exchange's.

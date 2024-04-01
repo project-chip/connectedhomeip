@@ -39,6 +39,32 @@ public interface UserPrompter {
    */
   void promptForCommissionPinCode(int vendorId, int productId, String commissioneeName);
 
+  /**
+   * Called to when CancelCommissioning is received via UDC. Indicates that commissioner can stop
+   * showing the passcode entry or display dialog. For example, can show text such as "Commissioning
+   * cancelled by client" before hiding dialog.
+   */
+  void hidePromptsOnCancel(int vendorId, int productId, String commissioneeName);
+
+  /**
+   * Called to display the given setup passcode to the user, for commissioning the given
+   * commissioneeName with the given vendorId and productId, and provide instructions for where to
+   * enter it in the commissionee (when pairingHint and pairingInstruction are provided). For
+   * example "Casting Passcode: [passcode]. For more instructions, click here."
+   */
+  void promptWithCommissionerPasscode(
+      int vendorId,
+      int productId,
+      String commissioneeName,
+      long passcode,
+      int pairingHint,
+      String pairingInstruction);
+
+  /*
+   *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
+   */
+  void promptCommissioningStarted(int vendorId, int productId, String commissioneeName);
+
   /*
    *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
    */
@@ -48,4 +74,9 @@ public interface UserPrompter {
    *   Called to notify the user that commissioning succeeded. It can be in form of UI Notification.
    */
   void promptCommissioningFailed(String commissioneeName, String error);
+
+  /*
+   * Called to display a message on the screen
+   */
+  void promptWithMessage(Message message);
 }

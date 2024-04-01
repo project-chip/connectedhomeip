@@ -36,8 +36,8 @@ style:
             - "**/src/controller/java/src/matter/tlv/types.kt"
             - "**/src/controller/java/src/matter/tlv/utils.kt"
             - "**/src/controller/java/src/matter/tlv/values.kt"
-            - "**/src/controller/java/src/chip/WildcardImport
-              examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"
+            - "**/src/controller/java/src/matter/tlv/values.kt"
+            - "**/src/controller/java/src/matter/controller/model/Status.kt"
             - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterEventStructTest.kt"
             - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterStructTest.kt"
             - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
@@ -104,6 +104,7 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkInstanceNameCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImInvokeCommand.kt"
+            - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImExtendableInvokeCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImWriteCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt"

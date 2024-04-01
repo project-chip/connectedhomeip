@@ -109,6 +109,14 @@ public:
     void postObserverEvent(ObserverEventType event);
     OperationalState GetOperationalState() { return mOperationalState; }
 
+    /**
+     * @brief Ensures that the remaining Active Mode duration is at least the smaller of 30000 milliseconds and stayActiveDuration.
+     *
+     * @param stayActiveDuration The duration (in milliseconds) requested by the client to stay in Active Mode
+     * @return The duration (in milliseconds) the device will stay in Active Mode
+     */
+    uint32_t StayActiveRequest(uint32_t stayActiveDuration);
+
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     void SendCheckInMsgs();
 
@@ -131,6 +139,12 @@ public:
     void OnSubscriptionReport() override;
 
 protected:
+    /**
+     * @brief Hepler function that extends the Active Mode duration as well as the Active Mode Jitter timer for the transition to
+     * iddle mode.
+     */
+    void ExtendActiveMode(System::Clock::Milliseconds16 extendDuration);
+
     friend class TestICDManager;
 
     static void OnIdleModeDone(System::Layer * aLayer, void * appState);

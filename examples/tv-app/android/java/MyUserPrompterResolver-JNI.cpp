@@ -30,10 +30,10 @@ using namespace chip;
 
 JNI_METHOD(void, OnPinCodeEntered)(JNIEnv *, jobject, jint jPinCode)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     chip::DeviceLayer::StackLock lock;
-    uint32_t pinCode = (uint32_t) jPinCode;
+    uint32_t pinCode = static_cast<uint32_t>(jPinCode);
     ChipLogProgress(Zcl, "OnPinCodeEntered %d", pinCode);
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     GetCommissionerDiscoveryController()->CommissionWithPasscode(pinCode);
 #endif
 }
@@ -63,4 +63,35 @@ JNI_METHOD(void, OnPromptDeclined)(JNIEnv *, jobject)
     ChipLogProgress(Zcl, "OnPromptDeclined");
     GetCommissionerDiscoveryController()->Cancel();
 #endif
+}
+
+JNI_METHOD(void, OnCommissionerPasscodeOK)(JNIEnv *, jobject)
+{
+    ChipLogProgress(Zcl, "OnCommissionerPasscodeOK");
+}
+
+JNI_METHOD(void, OnCommissionerPasscodeCancel)(JNIEnv *, jobject)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(Zcl, "OnCommissionerPasscodeCancel");
+    GetCommissionerDiscoveryController()->Cancel();
+#endif
+}
+
+JNI_METHOD(void, OnMessageResponse)(JNIEnv * env, jobject, jstring jMessageId, jlong jOptionId)
+{
+    chip::DeviceLayer::StackLock lock;
+    uint32_t optionid = static_cast<uint32_t>(jOptionId);
+    ChipLogProgress(Zcl, "OnMessageResponse option id: %u", optionid);
+
+    JniUtfString messageId(env, jMessageId);
+    if (jMessageId != nullptr)
+    {
+        ChipLogProgress(Zcl, "OnMessageResponse message id: %s", messageId.c_str());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "OnMessageResponse message id null");
+    }
 }

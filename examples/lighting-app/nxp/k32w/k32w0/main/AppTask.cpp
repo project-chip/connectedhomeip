@@ -52,6 +52,9 @@
 #include "LEDWidget.h"
 #include "app_config.h"
 
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
@@ -643,7 +646,6 @@ void AppTask::BleStartAdvertising(intptr_t arg)
     else
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-
         if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");
@@ -984,4 +986,9 @@ extern "C" void OTAIdleActivities(void)
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     OTA_TransactionResume();
 #endif
+}
+
+extern "C" bool AppHaveBLEConnections(void)
+{
+    return sHaveBLEConnections;
 }

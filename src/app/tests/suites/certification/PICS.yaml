@@ -5294,6 +5294,9 @@ PICS:
     - label: "Device has Deadfront behaviour"
       id: OO.S.F01
 
+    - label: "Device has OffOnly feature"
+      id: OO.S.F02
+
     #
     # server / manually
     #
@@ -10160,3 +10163,36 @@ PICS:
 
     - label: "Can the mode change be manually controlled?"
       id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+
+    #
+    # Power Topology Cluster
+    #
+    - label: "Does the device implement the Power Topology Cluster as a server?"
+      id: PWRTL.S
+
+    #  Features
+
+    - label:
+          "Does the associated endpoint provide or consume power for the entire
+          node?"
+      id: PWRTL.S.F00
+
+    - label:
+          "Does the associated endpoint provide or consume power for itself and
+          its child endpoints?"
+      id: PWRTL.S.F01
+
+    - label:
+          "Does the associated endpoint provide or consume power for a provided
+          set of endpoints?"
+      id: PWRTL.S.F02
+
+    - label: "Can the provided set of endpoints change?"
+      id: PWRTL.S.F03
+
+    #Server attributes
+    - label: "Does the device implement the AvailableEndpoints attribute?"
+      id: PWRTL.S.A0000
+
+    - label: "Does the device implement the ActiveEndpoints attribute?"
+      id: PWRTL.S.A0001

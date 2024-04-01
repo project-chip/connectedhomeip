@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
@@ -50,6 +51,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
+using namespace chip::Crypto;
 
 namespace {
 

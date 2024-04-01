@@ -30,6 +30,7 @@ from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.rw61x import RW61XApp, RW61XBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
@@ -237,7 +238,7 @@ def BuildEfr32Target():
         TargetPart('brd4186a', board=Efr32Board.BRD4186A),
         TargetPart('brd4187a', board=Efr32Board.BRD4187A),
         TargetPart('brd4304a', board=Efr32Board.BRD4304A),
-        TargetPart('brd4338a', board=Efr32Board.BRD4338A),
+        TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
     ])
 
     # apps
@@ -256,26 +257,26 @@ def BuildEfr32Target():
     target.AppendModifier('icd', enable_icd=True)
     target.AppendModifier('low-power', enable_low_power=True).OnlyIfRe('-icd')
     target.AppendModifier('shell', chip_build_libshell=True)
-    target.AppendModifier('no_logging', chip_logging=False)
-    target.AppendModifier('openthread_mtd', chip_openthread_ftd=False)
-    target.AppendModifier('enable_heap_monitoring',
+    target.AppendModifier('no-logging', chip_logging=False)
+    target.AppendModifier('openthread-mtd', chip_openthread_ftd=False)
+    target.AppendModifier('heap-monitoring',
                           enable_heap_monitoring=True)
-    target.AppendModifier('no_openthread_cli', enable_openthread_cli=False)
+    target.AppendModifier('no-openthread-cli', enable_openthread_cli=False)
     target.AppendModifier(
-        'show_qr_code', show_qr_code=True).ExceptIfRe('-low-power')
+        'show-qr-code', show_qr_code=True).ExceptIfRe('-low-power')
     target.AppendModifier('wifi', enable_wifi=True)
-    target.AppendModifier('rs911x', enable_rs911x=True).OnlyIfRe('-wifi')
+    target.AppendModifier('rs9116', enable_rs9116=True).OnlyIfRe('-wifi')
     target.AppendModifier('wf200', enable_wf200=True).OnlyIfRe('-wifi')
-    target.AppendModifier('wifi_ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
-    target.AppendModifier('917_soc', enable_917_soc=True).OnlyIfRe('-wifi')
-    target.AppendModifier('additional_data_advertising',
+    target.AppendModifier('siwx917', enable_917_ncp=True).OnlyIfRe('-wifi')
+    target.AppendModifier('ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
+    target.AppendModifier('additional-data-advertising',
                           enable_additional_data_advertising=True)
-    target.AppendModifier('use_ot_lib', enable_ot_lib=True).ExceptIfRe(
-        '-(wifi|use_ot_coap_lib)')
-    target.AppendModifier('use_ot_coap_lib', enable_ot_coap_lib=True).ExceptIfRe(
-        '-(wifi|use_ot_lib)')
+    target.AppendModifier('use-ot-lib', enable_ot_lib=True).ExceptIfRe(
+        '-(wifi|use-ot-coap-lib)')
+    target.AppendModifier('use-ot-coap-lib', enable_ot_coap_lib=True).ExceptIfRe(
+        '-(wifi|use-ot-lib)')
     target.AppendModifier('no-version', no_version=True)
-    target.AppendModifier('skip_rps_generation', use_rps_extension=False).OnlyIfRe('-wifi')
+    target.AppendModifier('skip-rps-generation', use_rps_extension=False)
 
     return target
 
@@ -703,6 +704,25 @@ def BuildMW320Target():
     return target
 
 
+def BuildRW61XTarget():
+    target = BuildTarget('rw61x', RW61XBuilder)
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('all-clusters-app', app=RW61XApp.ALL_CLUSTERS, release=True),
+        TargetPart('thermostat', app=RW61XApp.THERMOSTAT, release=True),
+        TargetPart('laundry-washer', app=RW61XApp.LAUNDRY_WASHER, release=True),
+    ])
+
+    target.AppendModifier(name="ota", enable_ota=True)
+    target.AppendModifier(name="wifi", enable_wifi=True)
+    target.AppendModifier(name="thread", enable_thread=True)
+    target.AppendModifier(name="factory-data", enable_factory_data=True)
+    target.AppendModifier(name="matter-shell", enable_shell=True)
+
+    return target
+
+
 def BuildGenioTarget():
     target = BuildTarget('genio', GenioBuilder)
     target.AppendFixedTargets([TargetPart('lighting-app', app=GenioApp.LIGHT)])
@@ -783,6 +803,7 @@ BUILD_TARGETS = [
     BuildHostTestRunnerTarget(),
     BuildIMXTarget(),
     BuildInfineonTarget(),
+    BuildRW61XTarget(),
     BuildK32WTarget(),
     BuildMbedTarget(),
     BuildMW320Target(),

@@ -1,0 +1,24 @@
+{{> header excludeZapComment=false}}
+
+#import "MCInteractionModelStructs.h"
+
+#import "../MCAttribute.h"
+#import <Foundation/Foundation.h>
+
+#ifndef MCAttributeObjects_h
+#define MCAttributeObjects_h
+
+{{#zcl_clusters}}
+{{#if (isInConfigList name "MatterCastingClusters")}}
+
+// {{asUpperCamelCase name}} cluster attributes:
+
+{{#zcl_attributes_server}}
+@interface MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Attribute : MCAttribute <{{asObjectiveCClass type ../name structTypePrefix="MC"}} *>
+@end
+
+{{/zcl_attributes_server}}
+{{/if}}
+{{/zcl_clusters}}
+
+#endif /* MCAttributeObjects_h */

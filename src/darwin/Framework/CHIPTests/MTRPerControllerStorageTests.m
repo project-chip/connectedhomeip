@@ -20,8 +20,10 @@
 #import <XCTest/XCTest.h>
 
 #import "MTRDeviceTestDelegate.h"
+#import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
+#import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
@@ -32,28 +34,6 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kTestVendorId = 0xFFF1u;
-
-#ifdef DEBUG
-// MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
-@protocol MTRDeviceControllerDataStoreAttributeStoreMethods
-- (nullable NSArray<NSDictionary *> *)getStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
-- (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)clearAllStoredAttributes;
-@end
-
-// Declare internal methods for testing
-@interface MTRDeviceController (Test)
-+ (void)forceLocalhostAdvertisingOnly;
-- (void)removeDevice:(MTRDevice *)device;
-@property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
-@end
-
-@interface MTRDevice (Test)
-- (BOOL)_attributeDataValue:(NSDictionary *)one isEqualToDataValue:(NSDictionary *)theOther;
-- (NSUInteger)unitTestAttributesReportedSinceLastCheck;
-@end
-#endif // DEBUG
 
 @interface MTRPerControllerStorageTestsControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -1103,6 +1083,19 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [controller.controllerDataStore storeAttributeValues:testAttributes forNodeID:@(1002)];
     [controller.controllerDataStore storeAttributeValues:testAttributes forNodeID:@(1003)];
 
+    MTRDeviceClusterData * testClusterData1 = [[MTRDeviceClusterData alloc] init];
+    testClusterData1.dataVersion = @(1);
+    MTRDeviceClusterData * testClusterData2 = [[MTRDeviceClusterData alloc] init];
+    testClusterData2.dataVersion = @(2);
+    MTRDeviceClusterData * testClusterData3 = [[MTRDeviceClusterData alloc] init];
+    testClusterData3.dataVersion = @(3);
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * testClusterData = @{
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(1)] : testClusterData1,
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)] : testClusterData2,
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(3)] : testClusterData3,
+    };
+    [controller.controllerDataStore storeClusterData:testClusterData forNodeID:@(1001)];
+
     // Check values are written and can be fetched
     NSArray * dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1001)];
     XCTAssertEqual(dataStoreValues.count, 9);
@@ -1144,6 +1137,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         }
     }
 
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(1001)];
+    for (MTRClusterPath * path in testClusterData) {
+        XCTAssertEqualObjects(testClusterData[path].dataVersion, dataStoreClusterData[path].dataVersion);
+    }
+
     [controller.controllerDataStore clearStoredAttributesForNodeID:@(1001)];
     dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1001)];
     XCTAssertEqual(dataStoreValues.count, 0);
@@ -1159,6 +1157,38 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertEqual(dataStoreValues.count, 0);
     dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1003)];
     XCTAssertEqual(dataStoreValues.count, 0);
+
+    // Test MTRDeviceControllerDataStore _pruneEmptyStoredAttributesBranches
+    //  - Clear cache
+    //  - Store an attribute
+    //  - Manually delete it from the test storage delegate
+    //  - Call _pruneEmptyStoredAttributesBranches
+    [controller.controllerDataStore clearAllStoredAttributes];
+
+    NSArray * testAttribute = @[
+        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(1)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(111) } },
+    ];
+    [controller.controllerDataStore storeAttributeValues:testAttribute forNodeID:@(2001)];
+
+    // store is async, so remove on the same queue to ensure order
+    dispatch_sync(_storageQueue, ^{
+        NSString * testAttributeValueKey = [controller.controllerDataStore _attributeValueKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1) attributeID:@(1)];
+        [storageDelegate controller:controller removeValueForKey:testAttributeValueKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
+    [controller.controllerDataStore unitTestPruneEmptyStoredAttributesBranches];
+
+    // Now check the indexes are pruned
+    NSString * testAttributeIndexKey = [controller.controllerDataStore _attributeIndexKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1)];
+    id testAttributeIndex = [storageDelegate controller:controller valueForKey:testAttributeIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testAttributeIndex);
+    NSString * testClusterIndexKey = [controller.controllerDataStore _clusterIndexKeyForNodeID:@(2001) endpointID:@(1)];
+    id testClusterIndex = [storageDelegate controller:controller valueForKey:testClusterIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testClusterIndex);
+    NSString * testEndpointIndexKey = [controller.controllerDataStore _endpointIndexKeyForNodeID:@(2001)];
+    id testEndpointIndex = [storageDelegate controller:controller valueForKey:testEndpointIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testEndpointIndex);
+    id testNodeIndex = [storageDelegate controller:controller valueForKey:@"attrCacheNodeIndex" securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testNodeIndex);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -1219,7 +1249,21 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
+    NSUInteger dataStoreValuesCount = 0;
+#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    for (MTRClusterPath * path in dataStoreClusterData) {
+        MTRDeviceClusterData * data = dataStoreClusterData[path];
+        for (NSNumber * attributeID in data.attributes) {
+            dataStoreValuesCount++;
+            NSDictionary * dataValue = data.attributes[attributeID];
+            NSDictionary * dataValueFromMTRDevice = [device readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:attributeID params:nil];
+            XCTAssertTrue([device _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
+        }
+    }
+#else
     NSArray * dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:deviceID];
+    dataStoreValuesCount = dataStoreValues.count;
 
     // Verify all values are stored into storage
     for (NSDictionary * responseValue in dataStoreValues) {
@@ -1231,6 +1275,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         NSDictionary * dataValueFromMTRDevice = [device readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute params:nil];
         XCTAssertTrue([device _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
     }
+#endif
 
     // Now force the removal of the object from controller to test reloading read cache from storage
     [controller removeDevice:device];
@@ -1238,6 +1283,18 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // Verify the new device is initialized with the same values
     __auto_type * newDevice = [MTRDevice deviceWithNodeID:deviceID controller:controller];
     NSUInteger storedAttributeDifferFromMTRDeviceCount = 0;
+#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
+    for (MTRClusterPath * path in dataStoreClusterData) {
+        MTRDeviceClusterData * data = dataStoreClusterData[path];
+        for (NSNumber * attributeID in data.attributes) {
+            NSDictionary * dataValue = data.attributes[attributeID];
+            NSDictionary * dataValueFromMTRDevice = [newDevice readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:attributeID params:nil];
+            if (![newDevice _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]) {
+                storedAttributeDifferFromMTRDeviceCount++;
+            }
+        }
+    }
+#else
     for (NSDictionary * responseValue in dataStoreValues) {
         MTRAttributePath * path = responseValue[MTRAttributePathKey];
         XCTAssertNotNil(path);
@@ -1249,10 +1306,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
             storedAttributeDifferFromMTRDeviceCount++;
         }
     }
+#endif
 
     // Only test that 90% of attributes are the same because there are some changing attributes each time (UTC time, for example)
     //   * With all-clusters-app as of 2024-02-10, about 1.476% of attributes change.
-    double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValues.count;
+    double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValuesCount;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
 
     // Now
@@ -1273,7 +1331,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // 2) Some attributes do change on resubscribe
     //   * With all-clusts-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
     // And so conservatively, assert that data version filters save at least 300 entries.
-    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValues.count - [device unitTestAttributesReportedSinceLastCheck];
+    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesCount - [device unitTestAttributesReportedSinceLastCheck];
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 
     // Reset our commissionee.

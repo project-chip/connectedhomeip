@@ -130,6 +130,9 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
     def write_to_app_pipe(self, command):
         with open(self.app_pipe, "w") as app_pipe:
             app_pipe.write(command + "\n")
+        # Delay for pipe command to be processed (otherwise tests are flaky)
+        # TODO(#31239): centralize pipe write logic and remove the need of sleep
+        sleep(0.001)
 
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):
@@ -231,7 +234,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
         await self.send_resume_cmd_with_check(13, op_errors.kNoError)
 
-        if self.check_pics("OPSTATE.S.M.RESUME_AFTER_ERR"):
+        if self.check_pics("RVCOPSTATE.S.M.RESUME_AFTER_ERR"):
             self.print_instruction(16, "Manually put the device in the Running state")
 
             await self.read_operational_state_with_check(17, op_states.kRunning)

@@ -1,0 +1,32 @@
+DarwinForceWritable:
+    # Work-around for not allowing changes from writable to read-only
+    # happened in https://github.com/project-chip/connectedhomeip/pull/30134
+    - ApplicationLauncher::CurrentApp
+    - ContentLauncher::SupportedStreamingProtocols
+    - FanControl::FanModeSequence
+
+# A list of commands that used to have only optional arguments before we started
+# generating the no-params-needed variants of methods for that case.  These
+# declarations need to have availability based on when we started generating
+# those variants, not the command's own availability.
+LegacyCommandsWithOnlyOptionalArguments:
+    - NetworkCommissioning::ScanNetworks
+    - DoorLock::LockDoor
+    - DoorLock::UnlockDoor
+    - ApplicationLauncher::LaunchApp
+    - ApplicationLauncher::StopApp
+    - ApplicationLauncher::HideApp
+    - UnitTesting::TestNullableOptionalRequest
+    - UnitTesting::TestSimpleOptionalArgumentRequest
+
+# The media clusters relevant to Matter Casting
+MatterCastingClusters:
+    - Application Basic
+    - Application Launcher
+    - Content Launcher
+    - Keypad Input
+    - Level Control
+    - Media Playback
+    - On/Off
+    - Target Navigator
+    - Wake on LAN

@@ -52,6 +52,7 @@ extern CommissionerDiscoveryController * GetCommissionerDiscoveryController();
 using namespace chip;
 using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 class MyUserPrompter : public UserPrompter
@@ -102,10 +103,28 @@ MyUserPrompter gMyUserPrompter;
 
 class MyPasscodeService : public PasscodeService
 {
-    bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
-                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode) override
+    void LookupTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                                chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info) override
     {
-        return ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
+        uint32_t passcode = 0;
+        bool foundApp     = ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
+        if (!foundApp)
+        {
+            info.checkState = TargetAppCheckState::kAppNotFound;
+        }
+        else if (passcode != 0)
+        {
+            info.checkState = TargetAppCheckState::kAppFoundPasscodeReturned;
+        }
+        else
+        {
+            info.checkState = TargetAppCheckState::kAppFoundNoPasscode;
+        }
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->HandleTargetContentAppCheck(info, passcode);
+        }
     }
 
     uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
@@ -114,9 +133,14 @@ class MyPasscodeService : public PasscodeService
         return 12345678;
     }
 
-    uint32_t FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
     {
-        return ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
+        uint32_t passcode = ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
+        CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
+        if (cdc != nullptr)
+        {
+            cdc->HandleContentAppPasscodeResponse(passcode);
+        }
     }
 };
 MyPasscodeService gMyPasscodeService;
@@ -549,11 +573,16 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
             ChipLogProgress(DeviceLayer,
                             "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint priviledged vendor accessible clusters "
                             "being returned.");
-            return { chip::app::Clusters::Descriptor::Id,         chip::app::Clusters::OnOff::Id,
-                     chip::app::Clusters::WakeOnLan::Id,          chip::app::Clusters::MediaPlayback::Id,
-                     chip::app::Clusters::LowPower::Id,           chip::app::Clusters::KeypadInput::Id,
-                     chip::app::Clusters::ContentLauncher::Id,    chip::app::Clusters::AudioOutput::Id,
-                     chip::app::Clusters::ApplicationLauncher::Id };
+            return { chip::app::Clusters::Descriptor::Id,
+                     chip::app::Clusters::OnOff::Id,
+                     chip::app::Clusters::WakeOnLan::Id,
+                     chip::app::Clusters::MediaPlayback::Id,
+                     chip::app::Clusters::LowPower::Id,
+                     chip::app::Clusters::KeypadInput::Id,
+                     chip::app::Clusters::ContentLauncher::Id,
+                     chip::app::Clusters::AudioOutput::Id,
+                     chip::app::Clusters::ApplicationLauncher::Id,
+                     chip::app::Clusters::Messages::Id }; // TODO: messages?
         }
         ChipLogProgress(
             DeviceLayer,
@@ -561,7 +590,8 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
         return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
                  chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
                  chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
-                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id };
+                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id,
+                 chip::app::Clusters::Messages::Id };
     }
     return {};
 }

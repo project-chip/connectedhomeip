@@ -97,6 +97,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetActiveAudioTrack(AttributeValueEncoder
 
 CHIP_ERROR MediaPlaybackManager::HandleGetActiveTrack(bool audio, AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     Structs::TrackStruct::Type response;
     Structs::TrackAttributesStruct::Type trackAttributes;
     response.trackAttributes = Nullable<Structs::TrackAttributesStruct::Type>(trackAttributes);
@@ -151,7 +152,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetActiveTrack(bool audio, AttributeValue
     }
     else
     {
-        err = aEncoder.EncodeNull();
+        return aEncoder.EncodeNull();
     }
 
 exit:
@@ -170,6 +171,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableAudioTracks(AttributeValueEnc
 
 CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTracks(bool audio, AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -178,6 +180,8 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTracks(bool audio, AttributeV
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleGetAvailableAudioTracks");
     VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAvailableTracksMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     return aEncoder.EncodeList([this, env, audio](const auto & encoder) -> CHIP_ERROR {
         jobjectArray trackList = (jobjectArray) env->CallObjectMethod(mMediaPlaybackManagerObject.ObjectRef(),
@@ -317,6 +321,7 @@ bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & track
 
 bool MediaPlaybackManager::HandleActivateTrack(bool audio, const chip::CharSpan & trackId)
 {
+    DeviceLayer::StackUnlock unlock;
     std::string id(trackId.data(), trackId.size());
 
     jint ret       = -1;
@@ -328,9 +333,11 @@ bool MediaPlaybackManager::HandleActivateTrack(bool audio, const chip::CharSpan 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleActivateAudioTrack");
     VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mActivateTrackMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
+
     {
         UtfString jniid(env, id.c_str());
-        env->ExceptionClear();
         ret = env->CallIntMethod(mMediaPlaybackManagerObject.ObjectRef(), mActivateTrackMethod, static_cast<jboolean>(audio),
                                  jniid.jniValue());
         if (env->ExceptionCheck())
@@ -351,6 +358,7 @@ bool MediaPlaybackManager::HandleActivateTextTrack(const chip::CharSpan & trackI
 
 bool MediaPlaybackManager::HandleDeactivateTextTrack()
 {
+    DeviceLayer::StackUnlock unlock;
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -439,6 +447,7 @@ void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
 
 uint64_t MediaPlaybackManager::HandleMediaRequestGetAttribute(MediaPlaybackRequestAttribute attribute)
 {
+    DeviceLayer::StackUnlock unlock;
     uint64_t ret          = std::numeric_limits<uint64_t>::max();
     jlong jAttributeValue = -1;
     CHIP_ERROR err        = CHIP_NO_ERROR;
@@ -449,6 +458,8 @@ uint64_t MediaPlaybackManager::HandleMediaRequestGetAttribute(MediaPlaybackReque
     ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetAttribute:%d", attribute);
     VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     jAttributeValue =
         env->CallLongMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetAttributeMethod, static_cast<jint>(attribute));
@@ -480,6 +491,7 @@ exit:
 
 long MediaPlaybackManager::HandleMediaRequestGetLongAttribute(MediaPlaybackRequestAttribute attribute)
 {
+    DeviceLayer::StackUnlock unlock;
     long ret              = 0;
     jlong jAttributeValue = -1;
     CHIP_ERROR err        = CHIP_NO_ERROR;
@@ -490,6 +502,8 @@ long MediaPlaybackManager::HandleMediaRequestGetLongAttribute(MediaPlaybackReque
     ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetLongAttribute:%d", attribute);
     VerifyOrExit(mMediaPlaybackManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     jAttributeValue =
         env->CallLongMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetAttributeMethod, static_cast<jint>(attribute));
@@ -516,6 +530,7 @@ Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaP
                                                                           uint64_t deltaPositionMilliseconds)
 
 {
+    DeviceLayer::StackUnlock unlock;
     Commands::PlaybackResponse::Type response;
 
     jint ret       = -1;
@@ -553,6 +568,7 @@ exit:
 
 CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     Structs::PlaybackPositionStruct::Type response;
     response.updatedAt = 0;
     response.position  = Nullable<uint64_t>(0);

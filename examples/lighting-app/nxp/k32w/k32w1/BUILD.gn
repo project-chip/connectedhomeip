@@ -36,6 +36,9 @@ if (chip_enable_pw_rpc) {
 
 declare_args() {
   chip_software_version = 0
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
 }
 
 assert(current_os == "freertos")
@@ -85,6 +88,10 @@ k32w1_sdk("sdk") {
       "BOARD_APP_UART_CLK_FREQ=96000000",
     ]
   }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
 }
 
 k32w1_executable("light_app") {
@@ -92,6 +99,13 @@ k32w1_executable("light_app") {
 
   sources = []
   deps = []
+  defines = []
+
+  if (chip_config_dimmable_led) {
+    defines += [ "CHIP_CONFIG_ENABLE_DIMMABLE_LED = 1" ]
+  } else {
+    defines += [ "CHIP_CONFIG_ENABLE_DIMMABLE_LED = 0" ]
+  }
 
   if (chip_enable_pw_rpc) {
     forward_variables_from(pw_rpc_server, "*")
@@ -111,12 +125,19 @@ k32w1_executable("light_app") {
     "main/main.cpp",
   ]
 
-  public = [ "${chip_root}/src/platform/nxp/k32w/k32w1/DefaultTestEventTriggerDelegate.h" ]
+  if (chip_config_dimmable_led) {
+    sources += [
+      "${k32w1_platform_dir}/util/LED_Dimmer.cpp",
+      "${k32w1_platform_dir}/util/include/LED_Dimmer.h",
+    ]
+    deps += [ "${chip_root}/examples/lighting-app/lighting-common/" ]
+  } else {
+    deps += [ "${chip_root}/examples/lighting-app/nxp/zap/" ]
+  }
 
   deps += [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lighting-app/nxp/zap/",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform:syscalls_stub",
@@ -126,13 +147,13 @@ k32w1_executable("light_app") {
 
   if (chip_openthread_ftd) {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+      "${openthread_root}:libopenthread-cli-ftd",
+      "${openthread_root}:libopenthread-ftd",
     ]
   } else {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+      "${openthread_root}:libopenthread-cli-mtd",
+      "${openthread_root}:libopenthread-mtd",
     ]
   }
 

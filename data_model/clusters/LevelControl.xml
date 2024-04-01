@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control" revision="5">
   <revisionHistory>
@@ -65,6 +67,7 @@ Davis, CA 95616, USA
     <revision revision="5" summary="New data model format and notation"/>
   </revisionHistory>
   <clusterIds>
+    <clusterId id="0x0008" name="Level Control"/>
     <clusterId id="0x001C" name="Pulse Width Modulation"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="LVL" scope="Endpoint"/>
@@ -123,6 +126,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
@@ -210,7 +214,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="MoveToLevel" response="Y">
+    <command id="0x00" name="MoveToLevel" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Level" type="uint8">
@@ -230,7 +234,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x01" name="Move" response="Y">
+    <command id="0x01" name="Move" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="MoveMode" type="MoveModeEnum">
@@ -250,7 +254,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x02" name="Step" response="Y">
+    <command id="0x02" name="Step" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="StepMode" type="StepModeEnum">
@@ -273,7 +277,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x03" name="Stop" response="Y">
+    <command id="0x03" name="Stop" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="OptionsMask" type="OptionsBitmap" default="0">
@@ -285,23 +289,23 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x04" name="MoveToLevelWithOnOff" response="Y">
+    <command id="0x04" name="MoveToLevelWithOnOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x05" name="MoveWithOnOff" response="Y">
+    <command id="0x05" name="MoveWithOnOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x06" name="StepWithOnOff" response="Y">
+    <command id="0x06" name="StepWithOnOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x07" name="StopWithOnOff" response="Y">
+    <command id="0x07" name="StopWithOnOff" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x08" name="MoveToClosestFrequency" response="Y">
+    <command id="0x08" name="MoveToClosestFrequency" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="FQ"/>

@@ -20,7 +20,7 @@
 
 #include "StructParser.h"
 #include <app/AppConfig.h>
-#include <app/InteractionModelRevision.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/util/basic-types.h>
 
 namespace chip {

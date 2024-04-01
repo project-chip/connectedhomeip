@@ -352,7 +352,7 @@ tests:
       command: "writeAttribute"
       attribute: "ActiveCalendarType"
       arguments:
-          value: 50
+          value: CalendarTypeEnum.UnknownEnumValue(50)
       response:
           error: CONSTRAINT_ERROR
 
@@ -361,6 +361,6 @@ tests:
       command: "writeAttribute"
       attribute: "HourFormat"
       arguments:
-          value: 5
+          value: HourFormatEnum.UnknownEnumValue(5)
       response:
           error: CONSTRAINT_ERROR

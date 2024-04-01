@@ -301,6 +301,7 @@
     "AccessControlEnforcement": [],
     "OvenMode": ["Test_TC_OTCCM_1_1", "Test_TC_OTCCM_1_2"],
     "EnergyEVSE": ["Test_TC_EEVSE_1_1", "Test_TC_EEVSE_2_1"],
+    "PowerTopology": ["Test_TC_PWRTL_1_1"],
     "collection": [
         "DeviceDiscovery",
         "Groups",
@@ -327,6 +328,7 @@
         "ModeSelect",
         "OTASoftwareUpdate",
         "PowerSourceConfiguration",
+        "PowerTopology",
         "PressureMeasurement",
         "SecureChannel",
         "SoftwareDiagnostics",

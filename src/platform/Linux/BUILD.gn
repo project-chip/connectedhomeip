@@ -74,6 +74,7 @@ static_library("Linux") {
   ]
 
   deps = [
+    "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
   ]
@@ -102,6 +103,8 @@ static_library("Linux") {
       "bluez/BluezEndpoint.h",
       "bluez/BluezObjectIterator.h",
       "bluez/BluezObjectList.h",
+      "bluez/BluezObjectManager.cpp",
+      "bluez/BluezObjectManager.h",
       "bluez/ChipDeviceScanner.cpp",
       "bluez/ChipDeviceScanner.h",
       "bluez/Types.h",

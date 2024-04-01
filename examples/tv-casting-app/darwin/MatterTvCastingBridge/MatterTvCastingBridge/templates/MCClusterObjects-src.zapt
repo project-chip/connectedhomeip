@@ -1,0 +1,47 @@
+{{> header excludeZapComment=false}}
+
+#import "MCClusterObjects.h"
+
+#import "../MCAttribute_Internal.h"
+#import "../MCCluster_Internal.h"
+#import "../MCCommand_Internal.h"
+
+#include "core/Attribute.h"
+#include "core/Command.h"
+#include <app-common/zap-generated/cluster-objects.h>
+
+#import <Foundation/Foundation.h>
+
+{{#zcl_clusters}}
+{{#if (isInConfigList name "MatterCastingClusters")}}
+
+// {{asUpperCamelCase name}} cluster:
+
+@implementation MC{{asUpperCamelCase name}}Cluster
+
+// {{asUpperCamelCase name}} cluster commands:
+
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+
+- (id){{asMethodName name}}Command
+{
+    void * cppCommand = self.cppCluster->GetCommand(chip::app::Clusters::{{asUpperCamelCase ../name}}::Commands::{{asUpperCamelCase name}}::Id);
+    return cppCommand != nil ? [[MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command alloc] initWithCppCommand:cppCommand] : nil;
+}
+
+{{/if}}
+{{/zcl_commands}}
+
+// {{asUpperCamelCase name}} cluster attributes:
+{{#zcl_attributes_server}}
+
+- (id){{asMethodName name}}Attribute
+{
+    void * cppAttribute = self.cppCluster->GetAttribute(chip::app::Clusters::{{asUpperCamelCase ../name}}::Attributes::{{asUpperCamelCase name}}::Id);
+    return cppAttribute != nil ? [[MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Attribute alloc] initWithCppAttribute:cppAttribute] : nil;
+}
+{{/zcl_attributes_server}}
+@end
+{{/if}}
+{{/zcl_clusters}}

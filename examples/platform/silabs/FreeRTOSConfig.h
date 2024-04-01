@@ -107,7 +107,7 @@ extern "C" {
 
 #include <stdint.h>
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #include "si91x_device.h"
 extern uint32_t SystemCoreClock;
 #else // For EFR32
@@ -122,7 +122,7 @@ extern uint32_t SystemCoreClock;
 #include "sl_component_catalog.h"
 #endif
 
-#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
+#ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
 #include "SEGGER_SYSVIEW_FreeRTOS.h"
 #endif
 
@@ -169,23 +169,23 @@ extern uint32_t SystemCoreClock;
 #define configTIMER_QUEUE_LENGTH (10)
 #define configTIMER_TASK_STACK_DEPTH (1024)
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #ifdef __NVIC_PRIO_BITS
 #undef __NVIC_PRIO_BITS
 #endif
 #define configPRIO_BITS 6 /* 6 priority levels. */
-#endif                    // SIWX_917
+#endif                    // SLI_SI91X_MCU_INTERFACE
 
 /* Interrupt priorities used by the kernel port layer itself.  These are generic
 to all Cortex-M ports, and do not rely on any particular library functions. */
 #define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 20
 #else
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 48
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 
 #define configENABLE_FPU 0
 #define configENABLE_MPU 0
@@ -232,11 +232,11 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
 #ifdef DIC_ENABLE
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 #define configTOTAL_HEAP_SIZE ((size_t) ((75 + EXTRA_HEAP_k) * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t) ((68 + EXTRA_HEAP_k) * 1024))
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 #else
 #define configTOTAL_HEAP_SIZE ((size_t) ((42 + EXTRA_HEAP_k) * 1024))
 #endif // DIC

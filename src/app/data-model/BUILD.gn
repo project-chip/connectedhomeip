@@ -37,11 +37,20 @@ source_set("data-model") {
     #       of this, in part due to zap-generated code dependency.
     #
     #  - app/util/attribute-storage-null-handling.h
-    #  - app/ConcreteAttributePath.h
     #
+    "${chip_root}/src/app:paths",
     "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",
   ]
+}
+
+# Provides extensions that use heap and should be
+# used for systems that are not as constrained as
+# embedded systems typically are
+source_set("heap") {
+  sources = [ "ListLargeSystemExtensions.h" ]
+
+  deps = [ ":data-model" ]
 }

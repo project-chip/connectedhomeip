@@ -137,12 +137,6 @@ chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
 uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
 
 /**
- * Returns the index of a given endpoint; Does not ignore disabled endpoints.
- * Will return 0xFFFF if this is not a valid endpoint id.
- */
-uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
-
-/**
  *  @brief Returns the index of the given endpoint in the list of all endpoints that might support the given cluster server.
  *
  * Returns kEmberInvalidEndpointIndex if the given endpoint does not support the
@@ -189,62 +183,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::C
  */
 uint16_t emberAfFixedEndpointCount(void);
 
-/**
- *@brief Returns true if type is signed, false otherwise.
- */
-bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
-
-/*
- * @brief Function that copies a ZCL string type into a buffer.  The size
- * parameter should indicate the maximum number of characters to copy to the
- * destination buffer not including the length byte.
- */
-void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size);
-/*
- * @brief Function that copies a ZCL long string into a buffer.  The size
- * parameter should indicate the maximum number of characters to copy to the
- * destination buffer not including the length bytes.
- */
-void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
-
 /** @} END Attribute Storage */
-
-/** @name Device Control */
-// @{
-
-/**
- * @brief Function that checks if endpoint is identifying
- *
- * This function returns true if device at a given endpoint is
- * identifying.
- *
- * @param endpoint Zigbee endpoint number
- */
-bool emberAfIsDeviceIdentifying(chip::EndpointId endpoint);
-
-/** @} END Device Control */
-
-/** @name Miscellaneous */
-// @{
-
-/** @brief Returns true if a given ZCL data type is a list type. */
-bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
-
-/**
- * @brief Simple integer comparison function.
- * Compares two values of a known length as integers.
- * Signed integer comparison are supported for numbers with length of
- * 4 (bytes) or less.
- * The integers are in native endianness.
- *
- * @return -1, if val1 is smaller
- *          0, if they are the same or if two negative numbers with length
- *          greater than 4 is being compared
- *          1, if val2 is smaller.
- */
-int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber);
-
-/** @} END Miscellaneous */
 
 /** @} END addtogroup */
 

@@ -182,7 +182,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps += [
         "${chip_root}/src/app/server/java",
         "${chip_root}/src/controller/java",
+        "${chip_root}/src/controller/java:jsontlv",
         "${chip_root}/src/controller/java:onboarding_payload",
+        "${chip_root}/src/controller/java:tlv",
         "${chip_root}/src/platform/android:java",
       ]
     }
@@ -361,6 +363,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the Linux LIT ICD example.
     enable_linux_lit_icd_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux RVC app example.
+    enable_linux_rvc_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the cc13x2x7_26x2x7 lock app example.
@@ -742,6 +748,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":genio_shell_app" ]
+  }
+
+  if (enable_linux_rvc_app_build) {
+    group("linux_rvc_app") {
+      deps = [ "${chip_root}/examples/rvc-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_rvc_app" ]
   }
 
   group("default") {

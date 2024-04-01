@@ -36,12 +36,14 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, const chip::Credentials::DeviceAtte
     const ByteSpan DAC                                    = info.dacDerBuffer();
     const ByteSpan PAI                                    = info.paiDerBuffer();
     const Optional<ByteSpan> certificationDeclarationSpan = info.cdBuffer();
+    uint16_t vendorId                                     = info.BasicInformationVendorId();
+    uint16_t productId                                    = info.BasicInformationProductId();
 
     err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/AttestationInfo", infoClass);
     SuccessOrExit(err);
 
     env->ExceptionClear();
-    constructor = env->GetMethodID(infoClass, "<init>", "([B[B[B)V");
+    constructor = env->GetMethodID(infoClass, "<init>", "([B[B[BII)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     err = JniReferences::GetInstance().N2J_ByteArray(env, DAC.data(), static_cast<jsize>(DAC.size()), javaDAC);
@@ -54,7 +56,8 @@ CHIP_ERROR N2J_AttestationInfo(JNIEnv * env, const chip::Credentials::DeviceAtte
                                                          static_cast<jsize>(certificationDeclarationSpan.Value().size()), javaCD);
         SuccessOrExit(err);
     }
-    outAttestationInfo = (jobject) env->NewObject(infoClass, constructor, javaDAC, javaPAI, javaCD);
+    outAttestationInfo = (jobject) env->NewObject(infoClass, constructor, javaDAC, javaPAI, javaCD, static_cast<jint>(vendorId),
+                                                  static_cast<jint>(productId));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 exit:
     return err;
@@ -83,7 +86,7 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
         {
             jmethodID onDeviceAttestationCompletedMethod;
             JniReferences::GetInstance().FindMethod(env, mDeviceAttestationDelegate.ObjectRef(), "onDeviceAttestationCompleted",
-                                                    "(JLchip/devicecontroller/AttestationInfo;I)V",
+                                                    "(JLchip/devicecontroller/AttestationInfo;J)V",
                                                     &onDeviceAttestationCompletedMethod);
             VerifyOrReturn(onDeviceAttestationCompletedMethod != nullptr,
                            ChipLogError(Controller, "Could not find deviceAttestation completed method"));

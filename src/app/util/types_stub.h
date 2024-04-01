@@ -20,9 +20,9 @@
 #include <string.h> // For mem* functions.
 
 #include <app/util/basic-types.h>
+#include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
 
-#include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 
 /**
@@ -165,12 +165,6 @@ typedef struct
     chip::EndpointId endpoint;
 
 } EmberEventControl;
-
-/**
- * @description Useful macro for avoiding compiler warnings related to unused
- * function arguments or unused variables.
- */
-#define UNUSED_VAR(x) (void) (x)
 
 /**
  * @brief Returns the value of the bitmask \c bits within

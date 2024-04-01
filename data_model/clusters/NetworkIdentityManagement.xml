@@ -54,12 +54,17 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Network Identity Management" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0450" name="Network Identity Management" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="TODO" scope="Endpoint"/>
+  <clusterIds>
+    <clusterId id="0x0450" name="Network Identity Management"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="NETIM" scope="Endpoint"/>
   <dataTypes>
     <number name="Client Table" type=""/>
     <enum name="NetworkIdentityStatus">
@@ -119,7 +124,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="AddOrUpdateClient" response="Y">
+    <command id="0x00" name="AddOrUpdateClient" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="ClientIdentity" type="octstr">
@@ -130,7 +135,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x01" name="RemoveClient" response="Y">
+    <command id="0x01" name="RemoveClient" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="ClientNumber" type="uint16">
@@ -141,7 +146,7 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="20"/>
       </field>
     </command>
-    <command id="0x40" name="EndorseNetworkIdentityUpdate" response="Y">
+    <command id="0x40" name="EndorseNetworkIdentityUpdate" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="NetworkIdentifier" type="octstr">

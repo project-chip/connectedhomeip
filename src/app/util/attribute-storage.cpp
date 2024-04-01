@@ -15,13 +15,15 @@
  *    limitations under the License.
  */
 
-#include "app/util/common.h"
+#include <app/util/attribute-storage.h>
+
+#include <app/AttributeAccessInterfaceCache.h>
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
-#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
@@ -36,10 +38,7 @@ using chip::Protocols::InteractionModel::Status;
 //   - zap-generated/callback.h is needed because endpoint_config will call the
 //     corresponding callbacks (via GENERATED_FUNCTION_ARRAYS) and the include
 //     for it is:
-//       util/common.h
-//           -> util/af.h
-//           -> util/config.h
-//           -> zap-generated/endpoint_config.h
+//     util/config.h -> zap-generated/endpoint_config.h
 #include <app-common/zap-generated/callback.h>
 
 using namespace chip;
@@ -131,13 +130,16 @@ constexpr const EmberAfCluster generatedClusters[] = GENERATED_CLUSTERS;
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 #endif
 
+#if FIXED_ENDPOINT_COUNT > 0
 constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
 constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVICE_TYPES;
 
 // Not const, because these need to mutate.
 DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
+#endif // FIXED_ENDPOINT_COUNT > 0
 
 AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
+AttributeAccessInterfaceCache gAttributeAccessInterfaceCache;
 
 // shouldUnregister returns true if the given AttributeAccessInterface should be
 // unregistered.
@@ -173,6 +175,36 @@ void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
     }
 }
 
+bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
+{
+    return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
+}
+
+uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints)
+{
+    if (endpoint == kInvalidEndpointId)
+    {
+        return kEmberInvalidEndpointIndex;
+    }
+
+    uint16_t epi;
+    for (epi = 0; epi < emberAfEndpointCount(); epi++)
+    {
+        if (emAfEndpoints[epi].endpoint == endpoint &&
+            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask.Has(EmberAfEndpointOptions::isEnabled)))
+        {
+            return epi;
+        }
+    }
+    return kEmberInvalidEndpointIndex;
+}
+
+// Returns the index of a given endpoint.  Considers disabled endpoints.
+uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
+{
+    return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
+}
+
 } // anonymous namespace
 
 // Initial configuration
@@ -183,10 +215,15 @@ void emberAfEndpointConfigure()
     static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
                   "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
 
-    uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
-    uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
-    uint16_t fixedDeviceTypeListOffsets[] = FIXED_DEVICE_TYPE_OFFSETS;
-    uint8_t fixedEmberAfEndpointTypes[]   = FIXED_ENDPOINT_TYPES;
+    emberEndpointCount = FIXED_ENDPOINT_COUNT;
+
+#if FIXED_ENDPOINT_COUNT > 0
+
+    constexpr uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
+    constexpr uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
+    constexpr uint16_t fixedDeviceTypeListOffsets[] = FIXED_DEVICE_TYPE_OFFSETS;
+    constexpr uint8_t fixedEmberAfEndpointTypes[]   = FIXED_ENDPOINT_TYPES;
+    constexpr EndpointId fixedParentEndpoints[]     = FIXED_PARENT_ENDPOINTS;
 
 #if ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
     // Initialize our data version storage.  If
@@ -201,15 +238,15 @@ void emberAfEndpointConfigure()
     }
 #endif // ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
 
-    emberEndpointCount                = FIXED_ENDPOINT_COUNT;
     DataVersion * currentDataVersions = fixedEndpointDataVersions;
     for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)
     {
         emAfEndpoints[ep].endpoint = fixedEndpoints[ep];
         emAfEndpoints[ep].deviceTypeList =
             Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[ep]], fixedDeviceTypeListLengths[ep]);
-        emAfEndpoints[ep].endpointType = &generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[ep]];
-        emAfEndpoints[ep].dataVersions = currentDataVersions;
+        emAfEndpoints[ep].endpointType     = &generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[ep]];
+        emAfEndpoints[ep].dataVersions     = currentDataVersions;
+        emAfEndpoints[ep].parentEndpointId = fixedParentEndpoints[ep];
 
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
@@ -218,6 +255,8 @@ void emberAfEndpointConfigure()
         // this endpoint has.
         currentDataVersions += emberAfClusterCountByIndex(ep, /* server = */ true);
     }
+
+#endif // FIXED_ENDPOINT_COUNT > 0
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
@@ -343,21 +382,6 @@ uint16_t emberAfEndpointCount()
 bool emberAfEndpointIndexIsEnabled(uint16_t index)
 {
     return (emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isEnabled));
-}
-
-bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
-{
-    return (attributeType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-}
-
-bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType)
-{
-    return (attributeType == ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
-}
-
-bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
-{
-    return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
 }
 
 // This function is used to call the per-cluster attribute changed callback
@@ -846,25 +870,6 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(EndpointId e
     return nullptr;
 }
 
-static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints)
-{
-    if (endpoint == kInvalidEndpointId)
-    {
-        return kEmberInvalidEndpointIndex;
-    }
-
-    uint16_t epi;
-    for (epi = 0; epi < emberAfEndpointCount(); epi++)
-    {
-        if (emAfEndpoints[epi].endpoint == endpoint &&
-            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask.Has(EmberAfEndpointOptions::isEnabled)))
-        {
-            return epi;
-        }
-    }
-    return kEmberInvalidEndpointIndex;
-}
-
 uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
 {
     VerifyOrDie(fixedClusterServerEndpointCount <= FIXED_ENDPOINT_COUNT);
@@ -979,12 +984,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
 {
     return findIndexFromEndpoint(endpoint, true /* ignoreDisabledEndpoints */);
-}
-
-// Returns the index of a given endpoint.  Considers disabled endpoints.
-uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
-{
-    return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 }
 
 EndpointId emberAfEndpointFromIndex(uint16_t index)
@@ -1376,6 +1375,7 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * 
 
 bool registerAttributeAccessOverride(AttributeAccessInterface * attrOverride)
 {
+    gAttributeAccessInterfaceCache.Invalidate();
     for (auto * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
     {
         if (cur->Matches(*attrOverride))
@@ -1391,19 +1391,39 @@ bool registerAttributeAccessOverride(AttributeAccessInterface * attrOverride)
 
 void unregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
 {
+    gAttributeAccessInterfaceCache.Invalidate();
     UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; });
 }
 
 namespace chip {
 namespace app {
+
 app::AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
 {
-    for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
+    using CacheResult = AttributeAccessInterfaceCache::CacheResult;
+
+    AttributeAccessInterface * cached = nullptr;
+    CacheResult result                = gAttributeAccessInterfaceCache.Get(endpointId, clusterId, &cached);
+    switch (result)
     {
-        if (cur->Matches(endpointId, clusterId))
+    case CacheResult::kDefinitelyUnused:
+        return nullptr;
+    case CacheResult::kDefinitelyUsed:
+        return cached;
+    case CacheResult::kCacheMiss:
+    default:
+        // Did not cache yet, search set of AAI registered, and cache if found.
+        for (app::AttributeAccessInterface * cur = gAttributeAccessOverrides; cur; cur = cur->GetNext())
         {
-            return cur;
+            if (cur->Matches(endpointId, clusterId))
+            {
+                gAttributeAccessInterfaceCache.MarkUsed(endpointId, clusterId, cur);
+                return cur;
+            }
         }
+
+        // Did not find AAI registered: mark as definitely not using.
+        gAttributeAccessInterfaceCache.MarkUnused(endpointId, clusterId);
     }
 
     return nullptr;

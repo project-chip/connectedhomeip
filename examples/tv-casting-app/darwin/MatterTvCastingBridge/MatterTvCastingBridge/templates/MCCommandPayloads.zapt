@@ -1,0 +1,34 @@
+{{> header excludeZapComment=false}}
+
+#import "MCInteractionModelStructs.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface MCAbstractPayload : NSObject <NSCopying>
+@end
+
+{{#zcl_clusters}}
+{{#if (isInConfigList name "MatterCastingClusters")}}
+
+// {{asUpperCamelCase name}} cluster:
+{{#zcl_commands}}
+{{#*inline "completeDecl"}}
+
+@interface MC{{cluster}}Cluster{{command}}Params : {{base}}
+{{#zcl_command_arguments}}
+{{> struct_field_decl cluster=parent.parent.name type=type label=label}};
+{{#*inline "oldNameFieldDecl"}}
+{{> struct_field_decl cluster=parent.parent.name type=type label=commandField}};
+{{/inline}}
+{{/zcl_command_arguments}}
+@end
+{{/inline}}
+{{> completeDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                 command=(asUpperCamelCase name preserveAcronyms=true)
+                 deprecationMessage="This command has been removed"
+                 base="MCAbstractPayload"}}
+{{/zcl_commands}}
+{{/if}}
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

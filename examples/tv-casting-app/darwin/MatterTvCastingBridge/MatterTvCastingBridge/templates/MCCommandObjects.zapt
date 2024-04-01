@@ -1,0 +1,27 @@
+{{> header excludeZapComment=false}}
+
+#import "../MCCommand.h"
+#import "MCCommandPayloads.h"
+#import <Foundation/Foundation.h>
+
+#ifndef MCCommandObjects_h
+#define MCCommandObjects_h
+
+@interface MCNullObjectType : NSObject
+@end
+
+{{#zcl_clusters}}
+{{#if (isInConfigList name "MatterCastingClusters")}}
+
+// {{asUpperCamelCase name}} cluster:
+
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+@interface MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Command : MCCommand <MC{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Params *, {{>command_response_type command=.}} *>
+@end
+
+{{/if}}
+{{/zcl_commands}}
+{{/if}}
+{{/zcl_clusters}}
+#endif /* MCCommandObjects_h */
