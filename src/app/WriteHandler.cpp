@@ -328,7 +328,9 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         mProcessingAttributeIsList = dataAttributePath.IsListOperation();
         mProcessingAttributePath.SetValue(dataAttributePath);
 
-        MatterPreAttributeWriteCallback(dataAttributePath);
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                              DataModelCallbacks::OperationOrder::Pre, dataAttributePath);
+
         TLV::TLVWriter backup;
         DataVersion version = 0;
         mWriteResponseBuilder.GetWriteResponses().Checkpoint(backup);
@@ -348,7 +350,9 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             mWriteResponseBuilder.GetWriteResponses().Rollback(backup);
             err = AddStatus(dataAttributePath, StatusIB(err));
         }
-        MatterPostAttributeWriteCallback(dataAttributePath);
+
+        DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                              DataModelCallbacks::OperationOrder::Post, dataAttributePath);
         SuccessOrExit(err);
     }
 
@@ -482,7 +486,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
             chip::TLV::TLVReader tmpDataReader(dataReader);
 
-            MatterPreAttributeWriteCallback(dataAttributePath);
+            DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                                  DataModelCallbacks::OperationOrder::Pre, dataAttributePath);
             err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, tmpDataReader, this);
 
             if (err != CHIP_NO_ERROR)
@@ -493,7 +498,8 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
                              mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                              ChipLogValueMEI(dataAttributePath.mAttributeId), err.Format());
             }
-            MatterPostAttributeWriteCallback(dataAttributePath);
+            DataModelCallbacks::GetInstance()->AttributeOperation(DataModelCallbacks::OperationType::Write,
+                                                                  DataModelCallbacks::OperationOrder::Post, dataAttributePath);
         }
 
         dataAttributePath.mEndpointId = kInvalidEndpointId;
@@ -677,6 +683,3 @@ void WriteHandler::MoveToState(const State aTargetState)
 
 } // namespace app
 } // namespace chip
-
-void __attribute__((weak)) MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-void __attribute__((weak)) MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}

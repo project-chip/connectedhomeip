@@ -14,11 +14,29 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/device.gni")
+
+buildconfig_header("controller_buildconfig") {
+  header = "ControllerBuildConfig.h"
+  header_dir = "java"
+
+  defines = [
+    "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER=${chip_build_controller_dynamic_server}",
+  ]
+
+  visibility = [ ":controller_config" ]
+}
+
+source_set("controller_config") {
+  sources = [ "ControllerConfig.h" ]
+
+  deps = [ ":controller_buildconfig" ]
+}
 
 if (!matter_enable_java_compilation) {
   import("${build_root}/config/android_abi.gni")
@@ -74,6 +92,7 @@ shared_library("jni") {
   ]
 
   deps = [
+    ":controller_config",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/credentials:default_attestation_verifier",
@@ -101,12 +120,11 @@ shared_library("jni") {
       "OTAProviderDelegateBridge.h",
     ]
 
-    defines += [
-      "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-      "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER",
-    ]
+    defines += [ "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1" ]
 
     deps += [ "${chip_root}/src/controller:nodatamodel" ]
+  } else {
+    deps += [ "${chip_root}/src/controller/data_model" ]
   }
 
   if (matter_enable_java_compilation) {

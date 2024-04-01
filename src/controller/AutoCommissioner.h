@@ -19,6 +19,7 @@
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <credentials/DeviceAttestationConstructor.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
@@ -70,7 +71,8 @@ private:
     ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
     ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
 
-    CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, IdentityProtectionKeySpan ipk, NodeId adminSubject);
+    CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Crypto::IdentityProtectionKeySpan ipk,
+                                 NodeId adminSubject);
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
 
@@ -123,7 +125,6 @@ private:
     bool mNeedsDST = false;
 
     bool mNeedIcdRegistration = false;
-
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;
     uint16_t mDACLen = 0;

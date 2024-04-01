@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDevice_Internal.h>
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #else
@@ -68,6 +69,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable NSArray<NSDictionary *> *)getStoredAttributesForNodeID:(NSNumber *)nodeID;
 - (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
+- (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
 - (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
 - (void)clearAllStoredAttributes;
 
