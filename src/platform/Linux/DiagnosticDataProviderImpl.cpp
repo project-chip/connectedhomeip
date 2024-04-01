@@ -759,6 +759,22 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+    uint32_t count;
+
+    if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    ReturnErrorOnFailure(ConnectivityUtils::GetWiFiBeaconRxCount(ConnectivityMgrImpl().GetWiFiIfName(), count));
+    VerifyOrReturnError(count >= mBeaconRxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
+    beaconRxCount = count - mBeaconRxCount;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
