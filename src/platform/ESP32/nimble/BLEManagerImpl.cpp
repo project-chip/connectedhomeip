@@ -1673,7 +1673,7 @@ void BLEManagerImpl::OnDeviceScanned(const struct ble_hs_adv_fields & fields, co
     {
         if (!mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator()))
         {
-            printf("Discriminator didi not match \n");
+            ChipLogProgress(Ble, "Discriminator did not match");
             return;
         }
         ChipLogProgress(Ble, "Device Discriminator match. Attempting to connect");
