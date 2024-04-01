@@ -754,7 +754,7 @@ CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryContext & context)
     const auto browseIdentifier = context.GetBrowseIdentifier().Value();
     context.ClearBrowseIdentifier();
 
-    return ChipDnssdStopBrowse(browseIdentifier, HandleNodeBrowse);
+    return ChipDnssdStopBrowse(browseIdentifier);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)

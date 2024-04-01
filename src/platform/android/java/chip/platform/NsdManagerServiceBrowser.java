@@ -69,7 +69,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
         new Runnable() {
           @Override
           public void run() {
-            stopDiscover(callbackHandle, chipMdnsCallback);
+            stopDiscover(callbackHandle);
           }
         };
     startDiscover(serviceType, callbackHandle, contextHandle, chipMdnsCallback);
@@ -89,6 +89,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
     NsdManagerDiscovery discovery =
         new NsdManagerDiscovery(serviceType, callbackHandle, contextHandle);
     multicastLock.acquire();
+    discovery.setChipMdnsCallback(chipMdnsCallback);
 
     Log.d(TAG, "Starting service discovering for '" + serviceType + "'");
 
@@ -96,7 +97,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
     callbackMap.put(callbackHandle, discovery);
   }
 
-  public void stopDiscover(final long callbackHandle, final ChipMdnsCallback chipMdnsCallback) {
+  public void stopDiscover(final long callbackHandle) {
     if (!callbackMap.containsKey(callbackHandle)) {
       return;
     }
@@ -112,7 +113,6 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
       multicastLock.release();
     }
 
-    discovery.setChipMdnsCallback(chipMdnsCallback);
     this.nsdManager.stopServiceDiscovery(discovery);
   }
 
@@ -157,7 +157,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
 
     @Override
     public void onDiscoveryStopped(String serviceType) {
-      Log.w(TAG, "Succeed to stop discovery service '" + serviceType);
+      Log.w(TAG, "Successfully stopped discovery service '" + serviceType);
       this.handleServiceBrowse(chipMdnsCallback);
     }
 

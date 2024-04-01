@@ -208,15 +208,13 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier, DnssdBrowseCallback callback)
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
-    VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sMdnsCallbackObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    env->CallVoidMethod(sBrowserObject.ObjectRef(), sStopBrowseMethod, reinterpret_cast<jlong>(callback),
-                        sMdnsCallbackObject.ObjectRef());
+    env->CallVoidMethod(sBrowserObject.ObjectRef(), sStopBrowseMethod, sMdnsCallbackObject.ObjectRef());
 
     if (env->ExceptionCheck())
     {
@@ -322,7 +320,7 @@ void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobjec
 
     sBrowseMethod = env->GetMethodID(browserClass, "browse", "(Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
 
-    sStopBrowseMethod = env->GetMethodID(browserClass, "stopDiscover", "(JLchip/platform/ChipMdnsCallback;)V");
+    sStopBrowseMethod = env->GetMethodID(browserClass, "stopDiscover", "(J)V");
 
     if (sResolveMethod == nullptr)
     {

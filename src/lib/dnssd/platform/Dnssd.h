@@ -230,10 +230,9 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
  *
  * @param browseIdentifier an identifier for a browse operation that came from
  *                         ChipDnssdBrowse.
- * @param callback         The callback to call when the browse is stopped.
  *
  */
-CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier, DnssdBrowseCallback callback = {});
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 /**

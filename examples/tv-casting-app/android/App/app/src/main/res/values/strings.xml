@@ -34,9 +34,9 @@
     <string name="matter_discovery_message_discovering_text">Discovering Casting Players on-network:</string>
     <string name="matter_discovery_message_stopped_text">Discovery Stopped</string>
     <string name="matter_discovery_error_message_initial">No errors to report</string>
-    <string name="matter_discovery_error_message_start_error">START DISCOVERY error. -</string>
-    <string name="matter_discovery_error_message_stop_before_starting">START DISCOVERY error. Discovery ongoing, STOP before STARTING. -</string>
-    <string name="matter_discovery_error_message_stop_error">STOP DISCOVERY error. -</string>
+    <string name="matter_discovery_error_message_start_error">Start discovery error. -</string>
+    <string name="matter_discovery_error_message_stop_before_starting">Start discovery error. Discovery ongoing, stop before starting. -</string>
+    <string name="matter_discovery_error_message_stop_error">Stop discovery error. -</string>
     <string name="matter_connection_next_button_text">Next</string>
     <string name="matter_action_selector_text">Select an action</string>
     <string name="matter_select_content_launcher_launch_url_button_text">Content Launcher Launch URL</string>
