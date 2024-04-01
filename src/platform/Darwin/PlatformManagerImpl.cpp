@@ -23,6 +23,7 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <tracing/metric_macros.h>
 
 #if !CHIP_DISABLE_PLATFORM_KVS
 #include <platform/Darwin/DeviceInstanceInfoProviderImpl.h>
@@ -36,6 +37,10 @@
 #include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <tracing/metric_event.h>
+
+#import "PlatformMetricKeys.h"
+using namespace chip::Tracing::DarwinPlatform;
 
 namespace chip {
 namespace DeviceLayer {
@@ -169,7 +174,10 @@ dispatch_queue_t PlatformManagerImpl::GetWorkQueue()
 {
     if (mWorkQueue == nullptr)
     {
-        mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        mWorkQueue =
+            dispatch_queue_create(CHIP_CONTROLLER_QUEUE,
+                                  dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL,
+                                                                          QOS_CLASS_USER_INITIATED, QOS_MIN_RELATIVE_PRIORITY));
         dispatch_suspend(mWorkQueue);
         dispatch_queue_set_specific(mWorkQueue, &sPlatformManagerKey, this, nullptr);
         mIsWorkQueueSuspended = true;
@@ -185,7 +193,7 @@ bool PlatformManagerImpl::IsWorkQueueCurrentQueue() const
 CHIP_ERROR PlatformManagerImpl::StartBleScan(BleScannerDelegate * delegate)
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    ReturnErrorOnFailure(Internal::BLEMgrImpl().StartScan(delegate));
+    ReturnErrorOnFailureWithMetric(kMetricBLEScan, Internal::BLEMgrImpl().StartScan(delegate));
 #endif // CONFIG_NETWORK_LAYER_BLE
     return CHIP_NO_ERROR;
 }
@@ -193,7 +201,7 @@ CHIP_ERROR PlatformManagerImpl::StartBleScan(BleScannerDelegate * delegate)
 CHIP_ERROR PlatformManagerImpl::StopBleScan()
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    ReturnErrorOnFailure(Internal::BLEMgrImpl().StopScan());
+    ReturnErrorOnFailureWithMetric(kMetricBLEScan, Internal::BLEMgrImpl().StopScan());
 #endif // CONFIG_NETWORK_LAYER_BLE
     return CHIP_NO_ERROR;
 }
@@ -201,7 +209,7 @@ CHIP_ERROR PlatformManagerImpl::StopBleScan()
 CHIP_ERROR PlatformManagerImpl::PrepareCommissioning()
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    ReturnErrorOnFailure(Internal::BLEMgrImpl().StartScan());
+    ReturnErrorOnFailureWithMetric(kMetricBLEStartPreWarmScan, Internal::BLEMgrImpl().StartScan());
 #endif // CONFIG_NETWORK_LAYER_BLE
     return CHIP_NO_ERROR;
 }

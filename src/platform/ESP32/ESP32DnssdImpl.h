@@ -139,18 +139,18 @@ struct ResolveContext : public GenericContext
     }
 };
 
-CHIP_ERROR WiFiDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
+CHIP_ERROR EspDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
 
-CHIP_ERROR WiFiDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context);
+CHIP_ERROR EspDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context);
 
-CHIP_ERROR WiFiDnssdRemoveServices();
+CHIP_ERROR EspDnssdRemoveServices();
 
-CHIP_ERROR WiFiDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
-                           intptr_t * browseIdentifier);
+CHIP_ERROR EspDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                          chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                          intptr_t * browseIdentifier);
 
-CHIP_ERROR WiFiDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
-                            void * context);
+CHIP_ERROR EspDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
+                           void * context);
 
 } // namespace Dnssd
 } // namespace chip

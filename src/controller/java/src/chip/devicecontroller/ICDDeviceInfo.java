@@ -56,6 +56,9 @@ public class ICDDeviceInfo {
   private final byte[] symmetricKey;
   private final Set<UserActiveModeTriggerBitmap> userActiveModeTriggerHint;
   private final String userActiveModeTriggerInstruction;
+  private final long idleModeDuration;
+  private final long activeModeDuration;
+  private final int activeModeThreshold;
   private final long icdNodeId;
   private final long icdCounter;
   private final long monitoredSubject;
@@ -66,6 +69,9 @@ public class ICDDeviceInfo {
       byte[] symmetricKey,
       Set<UserActiveModeTriggerBitmap> userActiveModeTriggerHint,
       String userActiveModeTriggerInstruction,
+      long idleModeDuration,
+      long activeModeDuration,
+      int activeModeThreshold,
       long icdNodeId,
       long icdCounter,
       long monitoredSubject,
@@ -74,6 +80,9 @@ public class ICDDeviceInfo {
     this.symmetricKey = symmetricKey;
     this.userActiveModeTriggerHint = userActiveModeTriggerHint;
     this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
+    this.idleModeDuration = idleModeDuration;
+    this.activeModeDuration = activeModeDuration;
+    this.activeModeThreshold = activeModeThreshold;
     this.icdNodeId = icdNodeId;
     this.icdCounter = icdCounter;
     this.monitoredSubject = monitoredSubject;
@@ -85,6 +94,9 @@ public class ICDDeviceInfo {
       byte[] symmetricKey,
       int userActiveModeTriggerHintRaw,
       String userActiveModeTriggerInstruction,
+      long idleModeDuration,
+      long activeModeDuration,
+      int activeModeThreshold,
       long icdNodeId,
       long icdCounter,
       long monitoredSubject,
@@ -92,6 +104,9 @@ public class ICDDeviceInfo {
       int fabricIndex) {
     this.symmetricKey = symmetricKey;
     this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
+    this.idleModeDuration = idleModeDuration;
+    this.activeModeDuration = activeModeDuration;
+    this.activeModeThreshold = activeModeThreshold;
     this.icdNodeId = icdNodeId;
     this.icdCounter = icdCounter;
     this.monitoredSubject = monitoredSubject;
@@ -120,6 +135,21 @@ public class ICDDeviceInfo {
   /** Returns the UserActiveModeTriggerInstruction. */
   public String getUserActiveModeTriggerInstruction() {
     return userActiveModeTriggerInstruction;
+  }
+
+  /** Returns the GetIdleModeDuration. */
+  public long getIdleModeDuration() {
+    return idleModeDuration;
+  }
+
+  /** Returns the GetActiveModeDuration. */
+  public long getActiveModeDuration() {
+    return activeModeDuration;
+  }
+
+  /** Returns the GetActiveModeThreshold. */
+  public int getActiveModeThreshold() {
+    return activeModeThreshold;
   }
 
   /** Returns the ICD Node Id. */

@@ -43,10 +43,6 @@ constexpr uint16_t kMinTemperatureDelta  = 50;    // 0.5 degree Celcius
 /**********************************************************
  * Variable declarations
  *********************************************************/
-
-TimerHandle_t sSensorTimer;
-StaticTimer_t sStaticSensorTimerStruct;
-
 SensorManager SensorManager::sSensorManager;
 
 #ifndef USE_TEMP_SENSOR
@@ -56,13 +52,12 @@ static int16_t mSimulatedTemp[]               = { 2300, 2400, 2800, 2550, 2200, 
 
 CHIP_ERROR SensorManager::Init()
 {
-    // Create FreeRTOS sw timer for temp sensor timer.
-    sSensorTimer = xTimerCreateStatic("sensorTmr", pdMS_TO_TICKS(kSensorTImerPeriodMs), true, nullptr, SensorTimerEventHandler,
-                                      &sStaticSensorTimerStruct);
+    // Create cmsisos sw timer for temp sensor timer.
+    mSensorTimer = osTimerNew(SensorTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
 
-    if (sSensorTimer == NULL)
+    if (mSensorTimer == NULL)
     {
-        SILABS_LOG("sSensorTimer timer create failed");
+        SILABS_LOG("mSensorTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
@@ -75,15 +70,13 @@ CHIP_ERROR SensorManager::Init()
 #endif
 
     // Update Temp immediatly at bootup
-    SensorTimerEventHandler(sSensorTimer);
-
+    SensorTimerEventHandler(nullptr);
     // Trigger periodic update
-    xTimerStart(sSensorTimer, portMAX_DELAY);
-
+    osTimerStart(mSensorTimer, pdMS_TO_TICKS(kSensorTImerPeriodMs));
     return CHIP_NO_ERROR;
 }
 
-void SensorManager::SensorTimerEventHandler(TimerHandle_t xTimer)
+void SensorManager::SensorTimerEventHandler(void * arg)
 {
     int16_t temperature            = 0;
     static int16_t lastTemperature = 0;

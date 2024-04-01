@@ -276,8 +276,6 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    CHIP_ERROR err;
-
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
     K32WConfig::FactoryResetConfig();

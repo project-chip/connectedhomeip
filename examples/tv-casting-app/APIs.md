@@ -905,17 +905,26 @@ Once the Casting Client has selected an `Endpoint`, it is ready to
 [issue commands](#issuing-commands) to it, [read](#read-operations) current
 playback state, and [subscribe](#subscriptions) to playback events.
 
-Refer to the following platform specific files for a list of clusters, command
-and attributes supported by the Matter TV Casting library:
+On Linux refer to the following platform specific files:
 
-1. Linux:
+1. For a list of clusters, commands and attributes supported by the Matter TV
+   Casting library:
    [tv-casting-common/clusters/Clusters.h](tv-casting-common/clusters/Clusters.h)
-
-Refer to the following platform specific files for the IDs and request /
-response types to use with these APIs:
-
-1. Linux:
+2. For the IDs and request / response types to use with these APIs:
    [/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h](/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h)
+
+On iOS refer to the following platform specific files:
+
+1. For a list of clusters, commands and attributes supported by the Matter TV
+   Casting library:
+   [/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.h](/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.h)
+2. For the IDs and request / response types to use with the commands:
+   [/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandObjects.h](/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandObjects.h)
+   and
+   [/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandPayloads.h](/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandPayloads.h)
+3. For attribute [read operations](#read-operations) and
+   [subscriptions](#subscriptions):
+   [/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCAttributeObjects.h](/darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCAttributeObjects.h)
 
 ### Issuing Commands
 
@@ -998,7 +1007,7 @@ if(launchURLCommand == nil)
 }
 
 // create the LaunchURL request
-let request: MCContentLauncherClusterLaunchURLRequest = MCContentLauncherClusterLaunchURLRequest()
+let request: MCContentLauncherClusterLaunchURLParams = MCContentLauncherClusterLaunchURLParams()
 request.contentURL = contentUrl
 request.displayString = displayString
 

@@ -23,9 +23,8 @@
 
 #include "AppEvent.h"
 
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
 class SensorManager
@@ -36,8 +35,10 @@ public:
 private:
     friend SensorManager & SensorMgr();
 
+    osTimerId_t mSensorTimer;
+
     // Reads new generated sensor value, stores it, and updates local temperature attribute
-    static void SensorTimerEventHandler(TimerHandle_t xTimer);
+    static void SensorTimerEventHandler(void * arg);
 
     static SensorManager sSensorManager;
 };

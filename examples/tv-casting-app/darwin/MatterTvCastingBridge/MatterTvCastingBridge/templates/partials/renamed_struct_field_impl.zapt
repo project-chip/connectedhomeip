@@ -1,0 +1,9 @@
+- (void)set{{asUpperCamelCase oldName}}:({{asObjectiveCType type cluster structTypePrefix="MC"}}){{asStructPropertyName oldName}}
+{
+  self.{{asStructPropertyName newName}} = {{asStructPropertyName oldName}};
+}
+
+- ({{asObjectiveCType type cluster structTypePrefix="MC"}}){{asGetterName oldName}}
+{
+  return self.{{asStructPropertyName newName}};
+}
