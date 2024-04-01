@@ -131,7 +131,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
         keyid = TRUSTM_ECDH_OID_KEY;
 
         // Trust M ECC 256 Key Gen
-        ChipLogDetail(Crypto, "Generating NIST256 key in TrustM for ECDH!");
+        ChipLogDetail(Crypto, "Generating NIST256 key for ECDH!");
         key_usage = OPTIGA_KEY_USAGE_KEY_AGREEMENT;
     }
     else
@@ -188,7 +188,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P
 
     VerifyOrReturnError(msg != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(msg_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogDetail(Crypto, "ECDSA_sign_msg: Using TrustM for ecdsa sign!");
+    ChipLogDetail(Crypto, "TrustM: ECDSA_sign_msg");
     // Trust M Init
     trustm_Open();
     // Hash to get the digest
@@ -234,11 +234,11 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     uint32_t keyid                    = 0;
     if (CHIP_NO_ERROR != get_trustm_keyid_from_keypair(mKeypair, &keyid))
     {
-        ChipLogDetail(Crypto, "ECDH_derive_secret : Using Host for ECDH");
+        ChipLogDetail(Crypto, "ECDH_derive_secret : Host");
         return ECDH_derive_secret_H(&mKeypair, remote_public_key, out_secret);
     }
 
-    ChipLogDetail(Crypto, "ECDH_derive_secret: Using TrustM for ECDH !");
+    ChipLogDetail(Crypto, "ECDH_derive_secret: TrustM");
     trustm_Open();
 
     const uint8_t * const rem_pubKey = Uint8::to_const_uchar(remote_public_key);
@@ -281,7 +281,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, si
 
     VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(hash_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogDetail(Crypto, "ECDSA_validate_hash_signature: Using TrustM for TrustM verify (hash) !");
+    ChipLogDetail(Crypto, "ECDSA_validate_hash_signature");
 
     // Trust M init
     trustm_Open();
@@ -390,7 +390,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, size
     VerifyOrReturnError(msg != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(msg_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogDetail(Crypto, "ECDSA_validate_msg_signature: Using TrustM for TrustM verify (msg) !");
+    ChipLogDetail(Crypto, "ECDSA_validate_msg_signature");
 
     // Trust M init
     trustm_Open();
@@ -464,10 +464,10 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
 
     if (CHIP_NO_ERROR != get_trustm_keyid_from_keypair(mKeypair, &keyid))
     {
-        ChipLogDetail(Crypto, "NewCertificateSigningRequest : Not hsm key. Using host for CSR");
+        ChipLogDetail(Crypto, "NewCertificateSigningRequest : Host");
         return NewCertificateSigningRequest_H(&mKeypair, csr, csr_length);
     }
-    ChipLogDetail(Crypto, "NewCertificateSigningRequest: Using TrustM for CSR Creating!");
+    ChipLogDetail(Crypto, "NewCertificateSigningRequest: TrustM");
 
     // No extensions are copied
     buffer_index -= kTlvHeader;
@@ -590,10 +590,7 @@ exit:
         trustm_close();
     }
     return error;
-// MutableByteSpan out_csr(csr, csr_length);
-// CHIP_ERROR err = GenerateCertificateSigningRequest(this, out_csr);
-// csr_length     = (CHIP_NO_ERROR == err) ? out_csr.size() : 0;
-// return err;
+    
 #endif
 }
 

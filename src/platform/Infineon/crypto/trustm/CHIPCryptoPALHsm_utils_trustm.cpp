@@ -110,8 +110,14 @@ static void optiga_crypt_callback(void * context, optiga_lib_status_t return_sta
 /**********************************************************************
  * trustm_Open()
  **********************************************************************/
+static bool init = false;
 void trustm_Open(void)
 {
+    optiga_lib_status_t xResult;
+    uint16_t dOptigaOID = 0xE0C4;
+    // Maximum Power, Minimum Current limitation
+    uint8_t cCurrentLimit = 15;
+
     if (!trustm_isOpen)
     {
         optiga_lib_status_t return_status;
@@ -142,7 +148,21 @@ void trustm_Open(void)
             optiga_lib_status = OPTIGA_LIB_BUSY;
             return_status     = optiga_util_open_application(p_local_util, 0); // skip restore
             while (optiga_lib_status == OPTIGA_LIB_BUSY)
+
+            // Only run once for initialisation
+            if (init)
+            {
+                xResult = optiga_util_write_data(p_local_util, dOptigaOID, OPTIGA_UTIL_WRITE_ONLY, 0, &cCurrentLimit,1);
+
+                if (OPTIGA_LIB_SUCCESS != xResult)
+                {
+                    break;
+                }
+                while (optiga_lib_status == OPTIGA_LIB_BUSY)
                 ;
+                // Set init to true
+                init = true;
+            }
 
             if (OPTIGA_LIB_SUCCESS != return_status)
             {

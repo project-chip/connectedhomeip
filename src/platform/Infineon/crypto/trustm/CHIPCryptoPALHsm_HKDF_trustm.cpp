@@ -28,19 +28,6 @@
 #include "optiga_lib_types.h"
 #include <lib/core/CHIPEncoding.h>
 
-static const uint8_t metadata[] = {
-    // Metadata tag in the data object
-    0x20,
-    0x06,
-    // Data object type set to PRESSEC
-    0xE8,
-    0x01,
-    0x21,
-    0xD3,
-    0x01,
-    0x00,
-};
-
 namespace chip {
 namespace Crypto {
 
@@ -80,8 +67,7 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
 
     // Trust M init
     trustm_Open();
-    // Write metada(Done during provisioning)
-    // write_metadata(TRUSTM_HKDF_OID_KEY, metadata, sizeof(metadata));
+    
     // Write the secret key
     write_data(TRUSTM_HKDF_OID_KEY, secret, secret_length_u16);
 
