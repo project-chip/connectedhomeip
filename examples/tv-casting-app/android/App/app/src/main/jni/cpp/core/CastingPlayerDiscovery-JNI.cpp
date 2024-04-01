@@ -246,6 +246,13 @@ JNI_METHOD(jobject, removeCastingPlayerChangeListener)(JNIEnv * env, jobject, jo
 
         return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
     }
+    else if (DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject.ObjectRef() == nullptr)
+    {
+        ChipLogError(AppServer,
+                     "CastingPlayerDiscovery-JNI::removeCastingPlayerChangeListener() Warning: Cannot remove listener. No "
+                     "listener was added");
+        return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
+    }
     else
     {
         ChipLogError(AppServer,

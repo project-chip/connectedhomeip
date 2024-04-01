@@ -24,6 +24,7 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.MulticastLock;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.MessageQueue;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,8 +98,13 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
 
   public void stopDiscover(final long callbackHandle, final ChipMdnsCallback chipMdnsCallback) {
     if (!callbackMap.containsKey(callbackHandle)) {
-      Log.d(TAG, "Invalid callbackHandle");
       return;
+    }
+
+    MessageQueue queue = mainThreadHandler.getLooper().getQueue();
+    if (!queue.isIdle()) {
+      Log.i(TAG, "canceling scheduled browse timeout runnable");
+      mainThreadHandler.removeCallbacksAndMessages(null);
     }
 
     NsdManagerDiscovery discovery = callbackMap.remove(callbackHandle);
@@ -106,8 +112,8 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
       multicastLock.release();
     }
 
+    discovery.setChipMdnsCallback(chipMdnsCallback);
     this.nsdManager.stopServiceDiscovery(discovery);
-    discovery.handleServiceBrowse(chipMdnsCallback);
   }
 
   public class NsdManagerDiscovery implements NsdManager.DiscoveryListener {
@@ -115,6 +121,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
     private long callbackHandle;
     private long contextHandle;
     private ArrayList<String> serviceNameList = new ArrayList<>();
+    private ChipMdnsCallback chipMdnsCallback;
 
     public NsdManagerDiscovery(String serviceType, long callbackHandle, long contextHandle) {
       this.serviceType = serviceType;
@@ -151,6 +158,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
     @Override
     public void onDiscoveryStopped(String serviceType) {
       Log.w(TAG, "Succeed to stop discovery service '" + serviceType);
+      this.handleServiceBrowse(chipMdnsCallback);
     }
 
     public void handleServiceBrowse(ChipMdnsCallback chipMdnsCallback) {
@@ -159,6 +167,10 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
           serviceType,
           callbackHandle,
           contextHandle);
+    }
+
+    public void setChipMdnsCallback(final ChipMdnsCallback chipMdnsCallback) {
+      this.chipMdnsCallback = chipMdnsCallback;
     }
   }
 }
