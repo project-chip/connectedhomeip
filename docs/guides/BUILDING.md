@@ -393,10 +393,6 @@ gn gen out/custom
 gn args --list out/custom
 ```
 
-
-
-
-
 ## Build examples
 
 You can build examples in two ways.
