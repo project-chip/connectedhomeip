@@ -759,6 +759,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+    beaconRxCount = mBeaconRxCount;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;

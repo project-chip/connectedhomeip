@@ -89,11 +89,10 @@ void ChipDeviceScanner::Shutdown()
     mScannerState = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
 }
 
-CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
+CHIP_ERROR ChipDeviceScanner::StartScan()
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mScannerState != ChipDeviceScannerState::SCANNER_SCANNING, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mTimerState == ScannerTimerState::TIMER_CANCELED, CHIP_ERROR_INCORRECT_STATE);
 
     mCancellable.reset(g_cancellable_new());
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
@@ -105,32 +104,10 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         return err;
     }
 
-    // Here need to set the Bluetooth scanning status immediately.
-    // So that if the timer fails to start in the next step,
-    // calling StopScan will be effective.
     mScannerState = ChipDeviceScannerState::SCANNER_SCANNING;
-
-    err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "Failed to schedule scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
-        StopScan();
-        return err;
-    }
-
-    mTimerState = ScannerTimerState::TIMER_STARTED;
-
     ChipLogDetail(Ble, "ChipDeviceScanner has started scanning!");
 
     return CHIP_NO_ERROR;
-}
-
-void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState)
-{
-    ChipDeviceScanner * chipDeviceScanner = static_cast<ChipDeviceScanner *>(appState);
-    chipDeviceScanner->mTimerState        = ScannerTimerState::TIMER_EXPIRED;
-    chipDeviceScanner->mDelegate->OnScanError(CHIP_ERROR_TIMEOUT);
-    chipDeviceScanner->StopScan();
 }
 
 CHIP_ERROR ChipDeviceScanner::StopScan()
@@ -150,14 +127,6 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     mScannerState = ChipDeviceScannerState::SCANNER_INITIALIZED;
 
     ChipLogDetail(Ble, "ChipDeviceScanner has stopped scanning!");
-
-    if (mTimerState == ScannerTimerState::TIMER_STARTED)
-    {
-        chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
-    }
-
-    // Reset timer status
-    mTimerState = ScannerTimerState::TIMER_CANCELED;
 
     mDelegate->OnScanComplete();
 

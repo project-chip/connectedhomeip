@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <controller/java/ControllerConfig.h>
 #include <lib/support/JniReferences.h>
 
 #include <memory>

@@ -24,8 +24,6 @@
 namespace chip {
 namespace app {
 
-using namespace std;
-
 class InteractionModelEngine;
 
 /// Callbacks for check in protocol

@@ -1249,7 +1249,21 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
+    NSUInteger dataStoreValuesCount = 0;
+#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
+    for (MTRClusterPath * path in dataStoreClusterData) {
+        MTRDeviceClusterData * data = dataStoreClusterData[path];
+        for (NSNumber * attributeID in data.attributes) {
+            dataStoreValuesCount++;
+            NSDictionary * dataValue = data.attributes[attributeID];
+            NSDictionary * dataValueFromMTRDevice = [device readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:attributeID params:nil];
+            XCTAssertTrue([device _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
+        }
+    }
+#else
     NSArray * dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:deviceID];
+    dataStoreValuesCount = dataStoreValues.count;
 
     // Verify all values are stored into storage
     for (NSDictionary * responseValue in dataStoreValues) {
@@ -1261,6 +1275,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         NSDictionary * dataValueFromMTRDevice = [device readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute params:nil];
         XCTAssertTrue([device _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
     }
+#endif
 
     // Now force the removal of the object from controller to test reloading read cache from storage
     [controller removeDevice:device];
@@ -1268,6 +1283,18 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // Verify the new device is initialized with the same values
     __auto_type * newDevice = [MTRDevice deviceWithNodeID:deviceID controller:controller];
     NSUInteger storedAttributeDifferFromMTRDeviceCount = 0;
+#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
+    for (MTRClusterPath * path in dataStoreClusterData) {
+        MTRDeviceClusterData * data = dataStoreClusterData[path];
+        for (NSNumber * attributeID in data.attributes) {
+            NSDictionary * dataValue = data.attributes[attributeID];
+            NSDictionary * dataValueFromMTRDevice = [newDevice readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:attributeID params:nil];
+            if (![newDevice _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]) {
+                storedAttributeDifferFromMTRDeviceCount++;
+            }
+        }
+    }
+#else
     for (NSDictionary * responseValue in dataStoreValues) {
         MTRAttributePath * path = responseValue[MTRAttributePathKey];
         XCTAssertNotNil(path);
@@ -1279,10 +1306,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
             storedAttributeDifferFromMTRDeviceCount++;
         }
     }
+#endif
 
     // Only test that 90% of attributes are the same because there are some changing attributes each time (UTC time, for example)
     //   * With all-clusters-app as of 2024-02-10, about 1.476% of attributes change.
-    double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValues.count;
+    double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValuesCount;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
 
     // Now
@@ -1303,7 +1331,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // 2) Some attributes do change on resubscribe
     //   * With all-clusts-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
     // And so conservatively, assert that data version filters save at least 300 entries.
-    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValues.count - [device unitTestAttributesReportedSinceLastCheck];
+    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesCount - [device unitTestAttributesReportedSinceLastCheck];
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 
     // Reset our commissionee.
