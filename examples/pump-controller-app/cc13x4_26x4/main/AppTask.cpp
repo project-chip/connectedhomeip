@@ -132,7 +132,7 @@ void identify_TakeAction(void)
 #ifdef LED_ENABLE
     LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
     LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
-#endif //LED_ENABLE
+#endif // LED_ENABLE
 }
 
 // Identify stop action
@@ -141,7 +141,7 @@ void identify_StopAction(void)
 #ifdef LED_ENABLE
     LED_stopBlinking(sAppGreenHandle);
     LED_setOff(sAppGreenHandle);
-#endif //LED_ENABLE
+#endif // LED_ENABLE
 }
 
 int AppTask::Init()
@@ -174,8 +174,8 @@ int AppTask::Init()
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#endif //CHIP_DEVICE_CONFIG_ENABLE_SED
-#endif //CHIP_DEVICE_CONFIG_THREAD_FTD
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif // CHIP_DEVICE_CONFIG_THREAD_FTD
 
     if (ret != CHIP_NO_ERROR)
     {
@@ -442,7 +442,6 @@ void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
     }
 }
 
-
 #ifdef BUTTON_ENABLE
 void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
 {
@@ -483,44 +482,44 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
         /* Failed to post the message */
     }
 }
-#endif //BUTTON_ENABLE
+#endif // BUTTON_ENABLE
 
 void AppTask::uiInit(void)
 {
-    #ifdef LED_ENABLE
+#ifdef LED_ENABLE
 
-        LED_Params ledParams;
+    LED_Params ledParams;
 
-        // Initialize LEDs
-        PLAT_LOG("Initialize LEDs");
-        LED_init();
+    // Initialize LEDs
+    PLAT_LOG("Initialize LEDs");
+    LED_init();
 
-        LED_Params_init(&ledParams); // default PWM LED
-        sAppRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
-        LED_setOff(sAppRedHandle);
+    LED_Params_init(&ledParams); // default PWM LED
+    sAppRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
+    LED_setOff(sAppRedHandle);
 
-        LED_Params_init(&ledParams); // default PWM LED
-        sAppGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
-        LED_setOff(sAppGreenHandle);
-#endif //LED ENABLE
+    LED_Params_init(&ledParams); // default PWM LED
+    sAppGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
+    LED_setOff(sAppGreenHandle);
+#endif // LED ENABLE
 
 #ifdef BUTTON_ENABLE
-        Button_Params buttonParams;
+    Button_Params buttonParams;
 
-        // Initialize buttons
-        PLAT_LOG("Initialize buttons");
-        Button_init();
+    // Initialize buttons
+    PLAT_LOG("Initialize buttons");
+    Button_init();
 
-        Button_Params_init(&buttonParams);
-        buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-        buttonParams.longPressDuration = 1000U; // ms
-        sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
-        Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
+    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
+    Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
 
-        Button_Params_init(&buttonParams);
-        buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-        buttonParams.longPressDuration = 1000U; // ms
-        sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
-        Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
-#endif //BUTTON ENABLE
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
+    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
+    Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
+#endif // BUTTON ENABLE
 }
