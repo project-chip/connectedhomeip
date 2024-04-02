@@ -39,7 +39,7 @@ class Metadata:
     tests: Optional[str] = None
 
 
-class Metadata_Reader:
+class MetadataReader:
     """
     A class to parse run arguments from the test scripts and 
     resolve them to environment specific values.
