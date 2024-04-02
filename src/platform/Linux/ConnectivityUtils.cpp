@@ -573,29 +573,6 @@ CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32
     return err;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiBeaconRxCount(const char * ifname, uint32_t & beaconRxCount)
-{
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    struct iw_statistics stats;
-    int skfd;
-
-    if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
-        return CHIP_ERROR_OPEN_FAILED;
-    }
-
-    if (GetWiFiStats(skfd, ifname, &stats) == CHIP_NO_ERROR)
-    {
-        beaconRxCount = stats.miss.beacon;
-        err           = CHIP_NO_ERROR;
-    }
-
-    close(skfd);
-
-    return err;
-}
-
 CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
 {
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
