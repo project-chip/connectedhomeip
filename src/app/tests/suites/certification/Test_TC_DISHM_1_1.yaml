@@ -121,7 +121,6 @@ tests:
               type: list
               excludes: [3]
 
-    # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
     - label: "5. TH reads from the DUT the EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
@@ -131,7 +130,6 @@ tests:
           constraints:
               type: list
 
-    # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
     - label: "6. TH reads AcceptedCommandList from DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -140,7 +138,6 @@ tests:
               type: list
               contains: [0]
 
-    # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
     - label: "7. TH reads from the DUT the GeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
