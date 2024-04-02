@@ -138,7 +138,7 @@ class Metadata_Reader:
             
     def __read_args__(self,run_args_lines: List[str],metadata_dict: Dict[str, str]) -> None:
         """
-        Goes these each raw line in argument header of a test script and extracts argument
+        Parses a list of lines and extracts argument
         values from it.
 
         Parameters:
