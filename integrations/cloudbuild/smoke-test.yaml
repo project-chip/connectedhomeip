@@ -75,8 +75,8 @@ steps:
               ./scripts/build/build_examples.py --enable-flashbundle
               --target efr32-brd4161a-light
               --target efr32-brd4161a-light-rpc
-              --target efr32-brd4161a-lock-openthread_mtd
-              --target efr32-brd4161a-lock-rpc-openthread_mtd
+              --target efr32-brd4161a-lock-openthread-mtd
+              --target efr32-brd4161a-lock-rpc-openthread-mtd
               --target efr32-brd4161a-unit-test
               build
               --create-archives /workspace/artifacts/
