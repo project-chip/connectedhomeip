@@ -294,10 +294,11 @@ bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabric
 bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID)
 {
     bool mightHaveSubscription = mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID);
-    if (!mightHaveSubscription && !mIsBootUpResumeSubscriptionExecuted) {
+    if (!mightHaveSubscription && !mIsBootUpResumeSubscriptionExecuted)
+    {
         mightHaveSubscription = mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID);
     }
-    
+
     return !mightHaveSubscription;
 }
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
@@ -397,7 +398,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         // unless the device would need to send Check-In messages
         if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-            || CheckInMessagesWouldBeSent(function)
+            || CheckInMessagesWouldBeSent(sendCheckInMessagesOnActiveMode)
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
         )
         {

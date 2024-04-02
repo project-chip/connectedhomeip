@@ -1926,22 +1926,22 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     // future improvements: https://github.com/project-chip/connectedhomeip/issues/25439
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator            = mpSubscriptionResumptionStorage->IterateSubscriptions();
-    mNumOfSubscriptionToResume = 0;
-    uint16_t minInterval       = 0;
+    auto * iterator             = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    mNumOfSubscriptionsToResume = 0;
+    uint16_t minInterval        = 0;
     while (iterator->Next(subscriptionInfo))
     {
-        mNumOfSubscriptionToResume++;
+        mNumOfSubscriptionsToResume++;
         minInterval = std::max(minInterval, subscriptionInfo.mMinInterval);
     }
     iterator->Release();
 
-    if (mNumOfSubscriptionToResume)
+    if (mNumOfSubscriptionsToResume)
     {
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         mSubscriptionResumptionScheduled = true;
 #endif
-        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", mNumOfSubscriptionToResume, minInterval);
+        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", mNumOfSubscriptionsToResume, minInterval);
         ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds16(minInterval),
                                                                                            ResumeSubscriptionsTimerCallback, this));
     }
@@ -2066,15 +2066,15 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 void InteractionModelEngine::DecrementNumSubscriptionsToResume()
 {
-    VerifyOrReturn(mNumOfSubscriptionToResume > 0);
+    VerifyOrReturn(mNumOfSubscriptionsToResume > 0);
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     VerifyOrDie(mICDManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
-    mNumOfSubscriptionToResume--;
+    mNumOfSubscriptionsToResume--;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-    if (!mNumOfSubscriptionToResume)
+    if (!mNumOfSubscriptionsToResume)
     {
         mICDManager->SetBootUpResumeSubscriptionExecuted();
     }

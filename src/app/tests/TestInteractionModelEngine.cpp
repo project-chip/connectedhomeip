@@ -701,7 +701,7 @@ void TestInteractionModelEngine::TestDecrementNumSubscriptionsToResume(nlTestSui
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
     // Set number of subs
-    engine->mNumOfSubscriptionToResume = kNumberOfSubsToResume;
+    engine->mNumOfSubscriptionsToResume = kNumberOfSubsToResume;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     // Verify mIsBootUpResumeSubscriptionExecuted has not been set
@@ -711,7 +711,7 @@ void TestInteractionModelEngine::TestDecrementNumSubscriptionsToResume(nlTestSui
     // Decrease number of subs by 1
     numberOfSubsRemaining--;
     engine->DecrementNumSubscriptionsToResume();
-    NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionToResume);
+    NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionsToResume);
 
     // Decrease to 0 subs remaining
     while (numberOfSubsRemaining > 0)
@@ -723,7 +723,7 @@ void TestInteractionModelEngine::TestDecrementNumSubscriptionsToResume(nlTestSui
 
         numberOfSubsRemaining--;
         engine->DecrementNumSubscriptionsToResume();
-        NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionToResume);
+        NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionsToResume);
     }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
@@ -733,7 +733,7 @@ void TestInteractionModelEngine::TestDecrementNumSubscriptionsToResume(nlTestSui
 
     // Make sure we don't rollover / go negative
     engine->DecrementNumSubscriptionsToResume();
-    NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionToResume);
+    NL_TEST_ASSERT_EQUALS(apSuite, numberOfSubsRemaining, engine->mNumOfSubscriptionsToResume);
 
     // Clean up
 #if CHIP_CONFIG_ENABLE_ICD_CIP && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
