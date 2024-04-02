@@ -81,7 +81,7 @@ TimeFormatLocalizationAttrAccess gAttrAccess;
 bool HasFeature(EndpointId endpoint, Feature feature)
 {
     uint32_t featureMap;
-    return FeatureMap::Get(endpoint, &featureMap) == Status::Success ? featureMap & to_underlying(feature) : false;
+    return FeatureMap::Get(endpoint, &featureMap) == Status::Success ? (featureMap & to_underlying(feature)) : false;
 }
 
 CHIP_ERROR TimeFormatLocalizationAttrAccess::ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder)
