@@ -448,10 +448,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     {
         CHIP_ERROR err = mTransportMgr->SendMessage(*destination, std::move(msgBuf));
 #if CHIP_ERROR_LOGGING
-        char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
-        destination->ToString(addressStr);
         if (err != CHIP_NO_ERROR)
         {
+            char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
+            destination->ToString(addressStr);
             ChipLogError(Inet, "SendMessage() to %s failed: %" CHIP_ERROR_FORMAT, addressStr, err.Format());
         }
 #endif // CHIP_ERROR_LOGGING
