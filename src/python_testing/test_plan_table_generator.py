@@ -15,12 +15,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import click
 import importlib
 import os
-
 from pathlib import Path
-from matter_testing_support import generate_mobly_test_config, MatterTestConfig
+
+import click
+from matter_testing_support import MatterTestConfig, generate_mobly_test_config
 
 
 def indent_multiline(multiline: str, num_spaces: int) -> str:
