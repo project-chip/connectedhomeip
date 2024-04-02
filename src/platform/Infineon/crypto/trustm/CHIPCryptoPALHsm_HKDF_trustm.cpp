@@ -67,7 +67,7 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
 
     // Trust M init
     trustm_Open();
-    
+
     // Write the secret key
     write_data(TRUSTM_HKDF_OID_KEY, secret, secret_length_u16);
 

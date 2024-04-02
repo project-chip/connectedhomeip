@@ -590,7 +590,7 @@ exit:
         trustm_close();
     }
     return error;
-    
+
 #endif
 }
 

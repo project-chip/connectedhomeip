@@ -149,20 +149,20 @@ void trustm_Open(void)
             return_status     = optiga_util_open_application(p_local_util, 0); // skip restore
             while (optiga_lib_status == OPTIGA_LIB_BUSY)
 
-            // Only run once for initialisation
-            if (init)
-            {
-                xResult = optiga_util_write_data(p_local_util, dOptigaOID, OPTIGA_UTIL_WRITE_ONLY, 0, &cCurrentLimit,1);
-
-                if (OPTIGA_LIB_SUCCESS != xResult)
+                // Only run once for initialisation
+                if (init)
                 {
-                    break;
+                    xResult = optiga_util_write_data(p_local_util, dOptigaOID, OPTIGA_UTIL_WRITE_ONLY, 0, &cCurrentLimit, 1);
+
+                    if (OPTIGA_LIB_SUCCESS != xResult)
+                    {
+                        break;
+                    }
+                    while (optiga_lib_status == OPTIGA_LIB_BUSY)
+                        ;
+                    // Set init to true
+                    init = true;
                 }
-                while (optiga_lib_status == OPTIGA_LIB_BUSY)
-                ;
-                // Set init to true
-                init = true;
-            }
 
             if (OPTIGA_LIB_SUCCESS != return_status)
             {
