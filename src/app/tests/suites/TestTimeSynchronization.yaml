@@ -196,10 +196,7 @@ tests:
       command: "readAttribute"
       attribute: "DSTOffset"
       response:
-          value:
-              [
-                  { Offset: 0, ValidStarting: 3, ValidUntil: null }
-              ]
+          value: [{ Offset: 0, ValidStarting: 3, ValidUntil: null }]
 
     - label: "Set DSTOffset with same validStarting and validUntil"
       command: "SetDSTOffset"
