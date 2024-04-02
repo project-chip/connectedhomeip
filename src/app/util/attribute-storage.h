@@ -21,11 +21,46 @@
 #include <app/util/af-types.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-metadata.h>
+#include <app/util/endpoint-config-defines.h>
 #include <lib/support/CodeUtils.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/attribute-type.h>
 
 static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
+
+// If we have fixed number of endpoints, then max is the same.
+#ifdef FIXED_ENDPOINT_COUNT
+#define MAX_ENDPOINT_COUNT (FIXED_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+#endif
+
+#define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
+    EmberAfEndpointType endpointName = { clusterList, ArraySize(clusterList), 0 }
+
+#define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
+
+// The role argument should be used to determine whether cluster works as a server or a client.
+// It can be assigned with the ZAP_CLUSTER_MASK(SERVER) or ZAP_CLUSTER_MASK(CLUSTER) values.
+#define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)                                 \
+    {                                                                                                                              \
+        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                        \
+    }
+
+#define DECLARE_DYNAMIC_CLUSTER_LIST_END }
+
+#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName) EmberAfAttributeMetadata attrListName[] = {
+
+#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
+    {                                                                                                                              \
+        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)                                     \
+    } /* cluster revision */                                                                                                       \
+    }
+
+#define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
+    {                                                                                                                              \
+        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
+    }
+
 
 /**
  * @brief locate attribute metadata
@@ -210,6 +245,34 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
 // Initial configuration
 void emberAfEndpointConfigure();
 
+
+// Register a dynamic endpoint. This involves registering descriptors that describe
+// the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
+// storage for data versions.
+//
+// dataVersionStorage.size() needs to be at least as large as the number of
+// server clusters on this endpoint.  If it's not, the endpoint will not be able
+// to store data versions, which may break consumers.
+//
+// The memory backing dataVersionStorage needs to remain allocated until this dynamic
+// endpoint is cleared.
+//
+// An optional device type list can be passed in as well. If provided, the memory
+// backing the list needs to remain allocated until this dynamic endpoint is cleared.
+//
+// An optional parent endpoint id should be passed for child endpoints of composed device.
+//
+// Returns  CHIP_NO_ERROR                   No error.
+//          CHIP_ERROR_NO_MEMORY            MAX_ENDPOINT_COUNT is reached or when no storage is left for clusters
+//          CHIP_ERROR_INVALID_ARGUMENT     The EndpointId value passed is kInvalidEndpointId
+//          CHIP_ERROR_ENDPOINT_EXISTS      If the EndpointId value passed already exists
+//
+CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
+                                     const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                     chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                     chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
+uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
  * @brief Loads attribute defaults and any non-volatile attributes stored
  *
