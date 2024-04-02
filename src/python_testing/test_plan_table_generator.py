@@ -18,7 +18,6 @@
 import click
 import importlib
 import os
-import string
 
 from pathlib import Path
 from matter_testing_support import generate_mobly_test_config, MatterTestConfig
