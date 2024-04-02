@@ -18,13 +18,12 @@
 #pragma once
 
 #include <app/AttributeAccessInterface.h>
+#include <app/util/af-types.h>
+#include <app/util/att-storage.h>
 #include <app/util/attribute-metadata.h>
 #include <lib/support/CodeUtils.h>
-#include <app/util/att-storage.h>
-#include <app/util/af-types.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-
 
 static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
@@ -238,7 +237,6 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
 // NOTE: It is the application's responsibility to free the existing list that is being replaced if needed.
 //
 CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const EmberAfDeviceType> deviceTypeList);
-
 
 namespace chip {
 namespace app {

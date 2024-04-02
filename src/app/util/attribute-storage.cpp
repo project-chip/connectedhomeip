@@ -824,8 +824,9 @@ EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId c
     EnsureMatchingEndpoint();
 }
 
-EndpointId EnabledEndpointsWithServerCluster::operator*() const {
-  return emberAfEndpointFromIndex(mEndpointIndex); 
+EndpointId EnabledEndpointsWithServerCluster::operator*() const
+{
+    return emberAfEndpointFromIndex(mEndpointIndex);
 }
 
 EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()

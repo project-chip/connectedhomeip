@@ -148,4 +148,3 @@ uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, 
 // Returns Optional<chip::AttributeId>::Missing() if the attribute does not exist.
 chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                                      uint16_t attributeIndex);
-

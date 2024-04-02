@@ -26,11 +26,11 @@
 #include <app/reporting/Engine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/attribute-storage-detail.h>
-#include <app/util/attribute-table.h>
 #include <app/util/attribute-table-detail.h>
+#include <app/util/attribute-table.h>
 #include <app/util/config.h>
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
