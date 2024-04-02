@@ -67,9 +67,7 @@ ti_sysconfig("sysconfig") {
 
   cflags = [
     "-Wno-comment",
-    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_ble_app_config.opt",
-                      root_build_dir),
-    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_build_config.opt",
+    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_compiler.opt",
                       root_build_dir),
   ]
 }
@@ -119,6 +117,10 @@ ti_simplelink_executable("all-clusters-app") {
 
   if (custom_factory_data) {
     defines = [ "CC13XX_26XX_FACTORY_DATA" ]
+  }
+
+ if(chip_enable_icd_server){
+    defines += ["CHIP_DEVICE_CONFIG_ENABLE_SED", "TI_ICD_ENABLE_SERVER"]
   }
 
   include_dirs = [

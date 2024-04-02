@@ -55,6 +55,13 @@
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
+#if (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
+#define LED_ENABLE 0
+#else
+#define LED_ENABLE 1
+#endif
+#define BUTTON_ENABLE 1
+
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
@@ -164,38 +171,9 @@ int AppTask::StartAppTask()
 
 int AppTask::Init()
 {
-    LED_Params ledParams;
-    Button_Params buttonParams;
-
     cc13xx_26xxLogInit();
 
-    // Initialize LEDs
-    PLAT_LOG("Initialize LEDs");
-    LED_init();
-
-    LED_Params_init(&ledParams); // default PWM LED
-    sAppRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
-    LED_setOff(sAppRedHandle);
-
-    LED_Params_init(&ledParams); // default PWM LED
-    sAppGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
-    LED_setOff(sAppGreenHandle);
-
-    // Initialize buttons
-    PLAT_LOG("Initialize buttons");
-    Button_init();
-
-    Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttonParams.longPressDuration = 1000U; // ms
-    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
-    Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
-
-    Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttonParams.longPressDuration = 1000U; // ms
-    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
-    Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
+    uiInit();
 
     // Init Chip memory management before the stack
     Platform::MemoryInit();
@@ -218,7 +196,7 @@ int AppTask::Init()
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-#elif CONFIG_OPENTHREAD_MTD_SED
+#elif CHIP_DEVICE_CONFIG_ENABLE_SED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
@@ -312,45 +290,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
-{
-    AppEvent event;
-    event.Type = AppEvent::kEventType_ButtonLeft;
 
-    if (events & Button_EV_CLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
-    }
-    else if (events & Button_EV_LONGCLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
-    }
-    // button callbacks are in ISR context
-    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
-    {
-        /* Failed to post the message */
-    }
-}
-
-void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)
-{
-    AppEvent event;
-    event.Type = AppEvent::kEventType_ButtonRight;
-
-    if (events & Button_EV_CLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
-    }
-    else if (events & Button_EV_LONGCLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
-    }
-    // button callbacks are in ISR context
-    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
-    {
-        /* Failed to post the message */
-    }
-}
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
@@ -404,4 +344,86 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     default:
         break;
     }
+}
+
+#ifdef BUTTON_ENABLE
+void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_ButtonLeft;
+
+    if (events & Button_EV_CLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
+    }
+    else if (events & Button_EV_LONGCLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
+    }
+    // button callbacks are in ISR context
+    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
+    {
+        /* Failed to post the message */
+    }
+}
+
+void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_ButtonRight;
+
+    if (events & Button_EV_CLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
+    }
+    else if (events & Button_EV_LONGCLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
+    }
+    // button callbacks are in ISR context
+    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
+    {
+        /* Failed to post the message */
+    }
+}
+#endif // BUTTON_ENABLE
+
+void AppTask::uiInit(void)
+{
+    #ifdef LED_ENABLE
+
+        LED_Params ledParams;
+
+        // Initialize LEDs
+        PLAT_LOG("Initialize LEDs");
+        LED_init();
+
+        LED_Params_init(&ledParams); // default PWM LED
+        sAppRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
+        LED_setOff(sAppRedHandle);
+
+        LED_Params_init(&ledParams); // default PWM LED
+        sAppGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
+        LED_setOff(sAppGreenHandle);
+#endif //LED ENABLE
+
+#ifdef BUTTON_ENABLE
+        Button_Params buttonParams;
+
+        // Initialize buttons
+        PLAT_LOG("Initialize buttons");
+        Button_init();
+
+        Button_Params_init(&buttonParams);
+        buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+        buttonParams.longPressDuration = 1000U; // ms
+        sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
+        Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
+
+        Button_Params_init(&buttonParams);
+        buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+        buttonParams.longPressDuration = 1000U; // ms
+        sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
+        Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
+#endif //BUTTON ENABLE
 }
