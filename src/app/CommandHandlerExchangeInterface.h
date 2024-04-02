@@ -35,7 +35,7 @@ namespace app {
  *
  * Design Rationale: This interface enhances unit testability and allows applications to
  * customize InvokeResponse behavior. For example, a bridge application might locally execute
- * a command using `emberAf...` methods without intending to sending a response on the exchange.
+ * a command using `emberAf...` methods without intending to sending a response on an exchange.
  * These ember methods require providing an instance of CommandHandler where a status response
  * is added (see github.com/project-chip/connectedhomeip/issues/32030).
  */
