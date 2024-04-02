@@ -119,8 +119,11 @@ ti_simplelink_executable("all-clusters-app") {
     defines = [ "CC13XX_26XX_FACTORY_DATA" ]
   }
 
- if(chip_enable_icd_server){
-    defines += ["CHIP_DEVICE_CONFIG_ENABLE_SED", "TI_ICD_ENABLE_SERVER"]
+  if (chip_enable_icd_server) {
+    defines += [
+      "CHIP_DEVICE_CONFIG_ENABLE_SED",
+      "TI_ICD_ENABLE_SERVER",
+    ]
   }
 
   include_dirs = [

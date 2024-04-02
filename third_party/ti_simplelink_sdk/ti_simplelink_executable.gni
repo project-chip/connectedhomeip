@@ -289,7 +289,6 @@ template("ti_simplelink_executable") {
         if (defined(invoker.ota_args)) {
           args += invoker.ota_args
         }
-        
       }
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
       if (custom_factory_data) {
@@ -419,13 +418,11 @@ template("ti_simplelink_executable") {
       flashable_executable("${simplelink_target_name}_mcubootloader") {
         output_name = "${output_base_name}.mcubootloader.out"
         output_dir = root_out_dir
-        deps = [ 
-          ":${simplelink_target_name}_mcuboot.syscfg", 
-          ":build_external_library", 
+        deps = [
+          ":${simplelink_target_name}_mcuboot.syscfg",
+          ":build_external_library",
         ]
-        public_configs = [ 
-          ":external_library_config", 
-        ]
+        public_configs = [ ":external_library_config" ]
         ldscript =
             "${ti_simplelink_sdk_build_root}/mcuboot/mcuboot_cc13x4_cc26x4.lds"
         objcopy_image_name = "${output_base_name}.mcubootloader.hex"
