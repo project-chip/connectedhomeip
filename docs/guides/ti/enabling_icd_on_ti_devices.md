@@ -21,7 +21,7 @@ chip_persist_subscriptions = true
 
 Subscription timeout resumption allows devices to attempt re-establishing subscriptions that may have expired. This feature is disabled out of box. 
 
-In addition, various ICD parameters such as idle/active mode durations, active mode threshold, and polling intervals can be configured in `src/platform/cc13xx_26xx/cc13x4_26x4/CHIPPlatformConfig.h`
+In addition, various ICD parameters such as idle/active mode duration, active mode threshold, and polling intervals can be configured in `src/platform/cc13xx_26xx/cc13x4_26x4/CHIPPlatformConfig.h`
 
 ```
 #define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 1000
