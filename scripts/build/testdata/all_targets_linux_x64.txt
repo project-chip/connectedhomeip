@@ -15,7 +15,7 @@ linux-x64-efr32-test-runner[-clang]
 imx-{chip-tool,lighting-app,thermostat,all-clusters-app,all-clusters-minimal-app,ota-provider-app}[-release]
 infineon-psoc6-{lock,light,all-clusters,all-clusters-minimal}[-ota][-updateimage]
 rw61x-{all-clusters-app,thermostat,laundry-washer}[-ota][-wifi][-thread][-factory-data][-matter-shell]
-k32w-{k32w0,k32w1}-{light,shell,lock,contact}[-se05x][-no-ble][-no-ota][-low-power][-nologs][-crypto-platform][-tokenizer][-openthread-ftd]
+nxp-{k32w0,k32w1}-{lighting,contact-sensor}[-factory][-low-power][-lit][-fro32k][-smu2][-dac-conversion][-rotating-id][-sw-v2]
 mbed-cy8cproto_062_4343w-{lock,light,all-clusters,all-clusters-minimal,pigweed,ota-requestor,shell}[-release][-develop][-debug]
 mw320-all-clusters-app
 nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,lock,light,light-switch,shell,pump,pump-controller,window-covering}[-rpc]
