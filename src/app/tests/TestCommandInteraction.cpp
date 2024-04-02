@@ -283,11 +283,11 @@ public:
     CHIP_ERROR mError           = CHIP_NO_ERROR;
 } mockCommandSenderExtendedDelegate;
 
-class MockCommandResponder : public CommandResponderInterface
+class MockCommandResponder : public CommandHandlerExchangeInterface
 {
 public:
     Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
-    void FlushAcksRightNow() override {}
+    void HandlingSlowCommand() override {}
     Access::SubjectDescriptor GetSubjectDescriptor() const override { return Access::SubjectDescriptor(); }
     FabricIndex GetAccessingFabricIndex() const override { return kUndefinedFabricIndex; }
 

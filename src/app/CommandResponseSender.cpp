@@ -39,9 +39,9 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::InvalidAction));
 
         err = SendCommandResponse();
-        // If SendCommandResponse() fails, we must still close the exchange. Since sending an
-        // InvokeResponseMessage seems problematic, we'll send a StatusResponse with 'Failure'
-        // instead.
+        // If SendCommandResponse() fails, we must close the exchange. We signal the failure to the
+        // requester with a StatusResponse ('Failure'). Since we're in the middle of processing an
+        // incoming message, we close the exchange by indicating that we don't expect a further response.
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::Failure));
 
         bool moreToSend = !mChunks.IsNull();
@@ -76,8 +76,6 @@ void CommandResponseSender::OnResponseTimeout(Messaging::ExchangeContext * apExc
 {
     ChipLogDetail(DataManagement, "CommandResponseSender: Timed out waiting for response from requester mState=[%10.10s]",
                   GetStateStr());
-    // We don't need to consider remaining async CommandHandlers here. We become the exchange
-    // delegate only after CommandHandler::OnDone is called.
     Close();
 }
 
@@ -99,9 +97,9 @@ void CommandResponseSender::StartSendingCommandResponses()
         //   {
         //       SendStatusResponse(Status::Failure);
         //   }
-        //   Close();
-        //   return;
         //   ```
+        Close();
+        return;
     }
 
     if (HasMoreToSend())
@@ -113,6 +111,31 @@ void CommandResponseSender::StartSendingCommandResponses()
     {
         Close();
     }
+}
+
+void CommandResponseSender::OnDone(CommandHandler & apCommandObj)
+{
+    if (mState == State::ErrorSentDelayCloseUntilOnDone)
+    {
+        // We have already sent a message to the client indicating that we are not expecting
+        // a response.
+        Close();
+        return;
+    }
+    StartSendingCommandResponses();
+}
+
+void CommandResponseSender::DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                     TLV::TLVReader & apPayload)
+{
+    VerifyOrReturn(mpCommandHandlerCallback);
+    mpCommandHandlerCallback->DispatchCommand(apCommandObj, aCommandPath, apPayload);
+}
+
+Status CommandResponseSender::CommandExists(const ConcreteCommandPath & aCommandPath)
+{
+    VerifyOrReturnValue(mpCommandHandlerCallback, Protocols::InteractionModel::Status::UnsupportedCommand);
+    return mpCommandHandlerCallback->CommandExists(aCommandPath);
 }
 
 CHIP_ERROR CommandResponseSender::SendCommandResponse()
@@ -153,6 +176,9 @@ const char * CommandResponseSender::GetStateStr() const
 
     case State::AllInvokeResponsesSent:
         return "AllInvokeResponsesSent";
+
+    case State::ErrorSentDelayCloseUntilOnDone:
+        return "ErrorSentDelayCloseUntilOnDone";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
@@ -185,8 +211,8 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
     mExchangeCtx.Grab(ec);
     mExchangeCtx->WillSendMessage();
 
-    // Grabbing Handle to prevent OnDone from being called before OnInvokeCommandRequest returns.
-    // This allows us to send a StatusResponse error instead of the queued up InvokeResponseMessages.
+    // Grabbing Handle to prevent mCommandHandler from calling OnDone before OnInvokeCommandRequest returns.
+    // This allows us to send a StatusResponse error instead of any potentially queued up InvokeResponseMessages.
     CommandHandler::Handle workHandle(&mCommandHandler);
     Status status = mCommandHandler.OnInvokeCommandRequest(*this, std::move(payload), isTimedInvoke);
     if (status != Status::Success)
@@ -196,7 +222,7 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
         // The API contract of OnInvokeCommandRequest requires the CommandResponder instance to outlive
         // the CommandHandler. Therefore, we cannot safely call Close() here, even though we have
         // finished sending data. Closing must be deferred until the CommandHandler::OnDone callback.
-        mDelayCallingCloseUntilOnDone = true;
+        MoveToState(State::ErrorSentDelayCloseUntilOnDone);
     }
 }
 

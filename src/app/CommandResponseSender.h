@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/CommandHandler.h>
-#include <app/CommandResponderInterface.h>
+#include <app/CommandHandlerExchangeInterface.h>
 #include <app/StatusResponse.h>
 #include <messaging/ExchangeHolder.h>
 #include <system/SystemPacketBuffer.h>
@@ -30,11 +30,11 @@ namespace app {
 /**
  * Manages the process of sending InvokeResponseMessage(s) to the requester.
  *
- * Implements the CommandResponderInterface. Uses a CommandHandler member to process
- * InvokeRequestCommand. The CommandHandler is provided a reference to this
- * CommandResponderInterface implementation to enable sending InvokeResponseMessage(s).
+ * Implements the CommandHandlerExchangeInterface. Uses a CommandHandler member to process
+ * InvokeCommandRequest. The CommandHandler is provided a reference to this
+ * CommandHandlerExchangeInterface implementation to enable sending InvokeResponseMessage(s).
  */
-class CommandResponseSender : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public CommandResponderInterface
+class CommandResponseSender : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public CommandHandlerExchangeInterface
 {
 public:
     class Callback
@@ -57,30 +57,12 @@ public:
 
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    void OnDone(CommandHandler & apCommandObj) override
-    {
-        if (mDelayCallingCloseUntilOnDone)
-        {
-            // We have already sent a message to the client indicating that we are not expecting
-            // a response.
-            Close();
-            return;
-        }
-        StartSendingCommandResponses();
-    }
+    void OnDone(CommandHandler & apCommandObj) override;
 
     void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
-                         TLV::TLVReader & apPayload) override
-    {
-        VerifyOrReturn(mpCommandHandlerCallback);
-        mpCommandHandlerCallback->DispatchCommand(apCommandObj, aCommandPath, apPayload);
-    }
+                         TLV::TLVReader & apPayload) override;
 
-    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override
-    {
-        VerifyOrReturnValue(mpCommandHandlerCallback, Protocols::InteractionModel::Status::UnsupportedCommand);
-        return mpCommandHandlerCallback->CommandExists(aCommandPath);
-    }
+    Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -116,14 +98,15 @@ public:
     Optional<GroupId> GetGroupId() const override
     {
         VerifyOrDie(mExchangeCtx);
-        if (!mExchangeCtx->IsGroupExchangeContext())
+        auto sessionHandle = mExchangeCtx->GetSessionHandle();
+        if (!sessionHandle->IsGroupSession())
         {
             return NullOptional;
         }
-        return MakeOptional(mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId());
+        return MakeOptional(sessionHandle->AsIncomingGroupSession()->GetGroupId());
     }
 
-    void FlushAcksRightNow() override
+    void HandlingSlowCommand() override
     {
         VerifyOrReturn(mExchangeCtx);
         auto * msgContext = mExchangeCtx->GetReliableMessageContext();
@@ -170,9 +153,10 @@ public:
 private:
     enum class State : uint8_t
     {
-        ReadyForInvokeResponses, ///< Accepting InvokeResponses to send back to requester.
-        AwaitingStatusResponse,  ///< Awaiting status response from requester, after sending InvokeResponse.
-        AllInvokeResponsesSent,  ///< All InvokeResponses have been sent out.
+        ReadyForInvokeResponses,       ///< Accepting InvokeResponses to send back to requester.
+        AwaitingStatusResponse,        ///< Awaiting status response from requester, after sending InvokeResponse.
+        AllInvokeResponsesSent,        ///< All InvokeResponses have been sent out.
+        ErrorSentDelayCloseUntilOnDone ///< We have sent an early error response, but still need to clean up.
     };
 
     void MoveToState(const State aTargetState);
@@ -201,7 +185,6 @@ private:
     Messaging::ExchangeHolder mExchangeCtx;
     State mState = State::ReadyForInvokeResponses;
 
-    bool mDelayCallingCloseUntilOnDone = false;
     bool mReportResponseDropped        = false;
 };
 

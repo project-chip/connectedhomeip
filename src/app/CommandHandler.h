@@ -32,7 +32,7 @@
 
 #include "CommandPathRegistry.h"
 
-#include <app/CommandResponderInterface.h>
+#include <app/CommandHandlerExchangeInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
@@ -181,7 +181,7 @@ public:
     {
     public:
         CommandPathRegistry * commandPathRegistry    = nullptr;
-        CommandResponderInterface * commandResponder = nullptr;
+        CommandHandlerExchangeInterface * commandResponder = nullptr;
     };
 
     /*
@@ -216,7 +216,7 @@ public:
      * command responder object must outlive this CommandHandler object. It is only safe to
      * release after client recieved OnDone callback.
      */
-    Protocols::InteractionModel::Status OnInvokeCommandRequest(CommandResponderInterface & commandResponder,
+    Protocols::InteractionModel::Status OnInvokeCommandRequest(CommandHandlerExchangeInterface & commandResponder,
                                                                System::PacketBufferHandle && payload, bool isTimedInvoke);
 
     /**
@@ -386,7 +386,7 @@ public:
     {
         if (mpResponder)
         {
-            mpResponder->FlushAcksRightNow();
+            mpResponder->HandlingSlowCommand();
         }
     }
 
@@ -428,7 +428,7 @@ public:
      */
     // TODO(#30453): After refactoring CommandHandler for better unit testability, create a
     // unit test specifically for the fault injection behavior.
-    void TestOnlyInvokeCommandRequestWithFaultsInjected(CommandResponderInterface & commandResponder,
+    void TestOnlyInvokeCommandRequestWithFaultsInjected(CommandHandlerExchangeInterface & commandResponder,
                                                         System::PacketBufferHandle && payload, bool isTimedInvoke,
                                                         NlFaultInjectionType faultType);
 #endif // CHIP_WITH_NLFAULTINJECTION
@@ -654,7 +654,7 @@ private:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
-    void SetCommandResponder(CommandResponderInterface * commandResponder);
+    void SetCommandResponder(CommandHandlerExchangeInterface * commandResponder);
 
     /**
      * Check whether the InvokeRequest we are handling is targeted to a group.
@@ -688,7 +688,7 @@ private:
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
-    CommandResponderInterface * mpResponder = nullptr;
+    CommandHandlerExchangeInterface * mpResponder = nullptr;
 
     State mState = State::Idle;
     State mBackupState;

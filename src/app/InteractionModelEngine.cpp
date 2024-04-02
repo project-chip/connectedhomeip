@@ -379,8 +379,11 @@ void InteractionModelEngine::OnDone(CommandResponseSender & apResponderObj)
     mCommandResponderObjs.ReleaseObject(&apResponderObj);
 }
 
+// TODO(#30453): Follow up refactor. Remove need for InteractionModelEngine::OnDone(CommandHandler).
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
+    // We are no longer expecting to receive this callback. With the introduction of CommandResponseSender, it is now
+    // responsible for receiving this callback.
     VerifyOrDie(false);
 }
 
