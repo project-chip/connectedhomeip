@@ -210,6 +210,7 @@ gboolean BluezEndpoint::BluezCharacteristicConfirm(BluezGattCharacteristic1 * aC
 {
     BluezConnection * conn = GetBluezConnectionViaDevice();
     ChipLogDetail(Ble, "Indication confirmation, %p", conn);
+    bluez_gatt_characteristic1_complete_confirm(aChar, aInvocation);
     BLEManagerImpl::HandleTXComplete(conn);
     return TRUE;
 }
