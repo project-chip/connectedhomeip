@@ -330,6 +330,11 @@ public:
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
+     *        This should be called after we have completed a re-subscribe attempt on a persisted subscription wether the attempt
+     *        was succesful or not.
+     */
     void DecrementNumSubscriptionsToResume();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
@@ -681,6 +686,12 @@ private:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     * mNumOfSubscriptionsToResume tracks the number of subscriptions that the device will try to resume at its next resumption
+     * attempt. At boot up, the attempt will be at the highest min interval of all the subscriptions to resume.
+     * When the subscription timeout resumption feature is present, after the boot up attempt, the next attempt will be determined
+     * by ComputeTimeSecondsTillNextSubscriptionResumption.
+     */
     int8_t mNumOfSubscriptionsToResume = 0;
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool HasSubscriptionsToResume();

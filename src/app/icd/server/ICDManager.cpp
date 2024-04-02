@@ -260,6 +260,12 @@ bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsg
  * @brief Implementation for when the persistent subscription and subscription timeout resumption feature are present.
  *        Function checks that there are no active or persisted subscriptions for a given fabricIndex or subjectID.
  *
+ * @note When the persistent subscription and subscription timeout resumption feature are present, we need to check for
+ *       persisted subscription at each transition to ActiveMode since there will be persisted subscriptions during normal
+ *       operation for the subscription timeout resumption feature. Once we have finished all our subscription resumption attempts
+ *       for a given subscription, the entry is deleted from persisted storage which will enable us to send Check-In messages for
+ *       the client registration. This logic avoids the device sending a Check-In message while trying to resume subscriptions.
+ *
  * @param aFabricIndex
  * @param subjectID subjectID to check. Can be an operational node id or a CAT
  *
@@ -306,6 +312,9 @@ bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabric
 /**
  * @brief Implementation for when neither the persistent subscription nor the subscription timeout resumption features are present.
  *        Function checks that there no active sbuscriptions for a given fabricIndex and subjectId combination.
+ *
+ * @note When neither the persistent subscription nor the subscription timeout resumption features are present, we only need to
+ *       check for active subscription since we will never have any persisted subscription.
  *
  * @param aFabricIndex
  * @param subjectID subjectID to check. Can be an opperationnal node id or a CAT

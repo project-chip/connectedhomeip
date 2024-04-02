@@ -91,7 +91,9 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
     InteractionModelEngine * imEngine                                  = InteractionModelEngine::GetInstance();
 
-    // Decrement the number of subscriptions to resume
+    // Decrement the number of subscriptions to resume since we have completed our retry attempt for a given subscription.
+    // We do this before the readHandler creation since we do not care if the subscription has successfully been resumed or
+    // not. Counter only tracks the number of individual subscriptions we will try to resume.
     imEngine->DecrementNumSubscriptionsToResume();
 
     if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, subscriptionInfo.mAttributePaths.AllocatedSize(),
@@ -129,7 +131,9 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
     ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
                  error.Format());
 
-    // Decrement the number of subscriptions to resume
+    // Decrement the number of subscriptions to resume since we have completed our retry attempt for a given subscription.
+    // We do this here since we were not able to connect to the subscriber thus we have completed our resumption attempt.
+    // Counter only tracks the number of individual subscriptions we will try to resume.
     imEngine->DecrementNumSubscriptionsToResume();
 
     auto * subscriptionResumptionStorage = imEngine->GetSubscriptionResumptionStorage();
