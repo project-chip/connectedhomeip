@@ -365,7 +365,10 @@ bool InteractionModelEngine::SubjectHasPersistedSubscription(FabricIndex aFabric
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
-    // Verify that we were able to allocate an iterator. If not, assume we have a persisted subscription.
+    // Verify that we were able to allocate an iterator. If not, we are probably currently trying to resubscribe to our persisted
+    // subscriptions. As such, we assume we have a persisted subscription and return true.
+    // If we don't have a persisted subscription for the given fabric index and subjectID, we will send a Check-In message next time
+    // we transition to ActiveMode.
     VerifyOrReturnValue(iterator, true);
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
