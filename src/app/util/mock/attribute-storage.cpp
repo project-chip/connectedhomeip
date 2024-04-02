@@ -35,6 +35,7 @@
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
 

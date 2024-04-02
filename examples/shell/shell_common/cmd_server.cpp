@@ -26,6 +26,7 @@
 
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <transport/Session.h>
