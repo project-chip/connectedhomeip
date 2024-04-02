@@ -1831,12 +1831,12 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
     if (completionStatus.err == CHIP_NO_ERROR)
     {
         CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(nodeId);
+        CommissioningStageComplete(CHIP_NO_ERROR);
         if (commissionee != nullptr)
         {
             ReleaseCommissioneeDevice(commissionee);
         }
         // Send the callbacks, we're done.
-        CommissioningStageComplete(CHIP_NO_ERROR);
         SendCommissioningCompleteCallbacks(nodeId, mCommissioningCompletionStatus);
     }
     else if (completionStatus.err == CHIP_ERROR_CANCELLED)
