@@ -298,7 +298,7 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
         LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
         LED_stopBlinking(sAppRedHandle);
         LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
-#endif 
+#endif
     }
     else if (aAction == PumpManager::STOP_ACTION)
     {
@@ -308,7 +308,7 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
         LED_setOff(sAppRedHandle);
-#endif 
+#endif
     }
     if (aActor == AppEvent::kEventType_ButtonLeft)
     {
