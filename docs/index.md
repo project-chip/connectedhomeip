@@ -20,8 +20,10 @@ testing/index
 tools/index
 BUG_REPORT
 code_generation
-clusters
+zap_clusters
+spec_clusters
 ERROR_CODES
+
 ```
 
 ```{include} README.md
