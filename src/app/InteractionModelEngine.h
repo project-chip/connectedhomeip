@@ -681,7 +681,7 @@ private:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    int8_t mNumOfSubscriptionToResume = 0;
+    int8_t mNumOfSubscriptionsToResume = 0;
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool HasSubscriptionsToResume();
     uint32_t ComputeTimeSecondsTillNextSubscriptionResumption();

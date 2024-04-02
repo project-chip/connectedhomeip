@@ -257,8 +257,8 @@ bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsg
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 /**
- * @brief Implementation for when the persistant subscription and subscription timeout resumption feature are present.
- *        Function checks that there no active or persisted subscriptions for a given fabricIndex or subjectID.
+ * @brief Implementation for when the persistent subscription and subscription timeout resumption feature are present.
+ *        Function checks that there are no active or persisted subscriptions for a given fabricIndex or subjectID.
  *
  * @param aFabricIndex
  * @param subjectID subjectID to check. Can be an operational node id or a CAT
@@ -273,8 +273,8 @@ bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabric
 }
 #else
 /**
- * @brief Implementation for when the persistant subscription feature is present without the subscription timeout resumption
- * feature. Function checks that there no active subscriptions. If the boot up subscription resumption has not been completed,
+ * @brief Implementation for when the persistent subscription feature is present without the subscription timeout resumption
+ * feature. Function checks that there are no active subscriptions. If the boot up subscription resumption has not been completed,
  *        function also checks if there are persisted subscriptions.
  *
  * @note The persistent subscriptions feature tries to resume subscriptions at the highest min interval
@@ -286,26 +286,24 @@ bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabric
  * @param subjectID subjectID to check. Can be an opperationnal node id or a CAT
  *
  * @return true Returns true if the fabricIndex and subjectId combination does not have an active subscription.
- *              If the boot up susbscription has not been completed, there must not be a persisted subscription either.
+ *              If the boot up subscription resumption has not been completed, there must not be a persisted subscription either.
  * @return false Returns false if the fabricIndex and subjectId combination has an active subscription.
- *               If the boot up susbscription has not been completed,
+ *               If the boot up subscription resumption has not been completed,
  *               returns false if the fabricIndex and subjectId combination has a persisted subscription.
  */
 bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID)
 {
-    bool wouldSendCheckIn = !(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID));
-
-    if (!mIsBootUpResumeSubscriptionExecuted)
-    {
-        wouldSendCheckIn = wouldSendCheckIn && !mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID);
+    bool mightHaveSubscription = mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID);
+    if (!mightHaveSubscription && !mIsBootUpResumeSubscriptionExecuted) {
+        mightHaveSubscription = mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID);
     }
-
-    return wouldSendCheckIn;
+    
+    return !mightHaveSubscription;
 }
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #else
 /**
- * @brief Implementation for when neither the persistant subscription and subscription timeout resumption features are present.
+ * @brief Implementation for when neither the persistent subscription nor the subscription timeout resumption features are present.
  *        Function checks that there no active sbuscriptions for a given fabricIndex and subjectId combination.
  *
  * @param aFabricIndex
@@ -391,7 +389,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         mOperationalState = OperationalState::IdleMode;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-        std::function<ShouldCheckInMsgsBeSentFunction> function =
+        std::function<ShouldCheckInMsgsBeSentFunction> sendCheckInMessagesOnActiveMode =
             std::bind(&ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction, this, std::placeholders::_1, std::placeholders::_2);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
