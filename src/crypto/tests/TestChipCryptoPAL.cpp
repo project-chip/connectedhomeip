@@ -77,6 +77,7 @@
 
 using namespace chip;
 using namespace chip::Crypto;
+using namespace chip::Credentials;
 using namespace chip::TLV;
 
 namespace {

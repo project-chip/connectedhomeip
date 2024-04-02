@@ -41,6 +41,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
 using namespace chip::Protocols;
+using namespace chip::Crypto;
 using chip::Protocols::InteractionModel::Status;
 
 class AdministratorCommissioningAttrAccess : public AttributeAccessInterface

@@ -25,11 +25,52 @@ The Matter build system has the following features:
 
 ## Checking out the Matter code
 
-To check out the Matter repository, run the following command:
+To check out the Matter code, there are two options: one is to check out all
+platforms together, which is recommended; the other is to check out with support
+for specific platforms, which can obviously reduce the project size.
+
+### Checking out All Platforms
+
+To check out the Matter repository with all platforms, run the following
+command:
 
 ```
 git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
+
 ```
+
+### Specific platforms Checking out
+
+-   first step, checking out matter top level repo with command below:
+
+```
+  git clone --depth=1 git@github.com:project-chip/connectedhomeip.git
+
+```
+
+-   Second step, check out third-party platform support repos as follows:
+
+```
+  python3 scripts/checkout_submodules.py --shallow --platform platform1,platform2...
+
+```
+
+For Linux host example:
+
+```
+ ./scripts/checkout_submodules.py --shallow --platform  linux
+
+```
+
+For Darwin host example:
+
+```
+ ./scripts/checkout_submodules.py --shallow --platform  darwin
+
+```
+
+Please note that in the above commands, you should replace platform1,platform2
+with the specific platform names you wish to check out.
 
 ## Updating Matter code
 

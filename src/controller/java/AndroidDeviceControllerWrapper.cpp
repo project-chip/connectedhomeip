@@ -792,6 +792,9 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
     memset(mUserActiveModeTriggerInstructionBuffer, 0x00, kUserActiveModeTriggerInstructionBufferLen);
     CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction, mUserActiveModeTriggerInstruction);
 
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
+                    info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
+
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),
                         static_cast<jint>(info.basic.productId), static_cast<jint>(info.network.wifi.endpoint),
                         static_cast<jint>(info.network.thread.endpoint));
@@ -1036,7 +1039,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     methodErr = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
 
-    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJJJI)V");
+    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJIJJJJI)V");
     VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
 
     methodErr =
@@ -1048,7 +1051,8 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     icdDeviceInfoObj = env->NewObject(
         icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()),
-        jUserActiveModeTriggerInstruction, static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
+        jUserActiveModeTriggerInstruction, static_cast<jlong>(mIdleModeDuration), static_cast<jlong>(mActiveModeDuration),
+        static_cast<jint>(mActiveModeThreshold), static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
         static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()),
         static_cast<jlong>(Controller()->GetFabricId()), static_cast<jint>(Controller()->GetFabricIndex()));
 

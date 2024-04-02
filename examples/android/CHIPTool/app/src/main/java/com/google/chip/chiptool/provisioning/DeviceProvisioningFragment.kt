@@ -303,7 +303,11 @@ class DeviceProvisioningFragment : Fragment() {
             requireActivity(),
             getString(
               R.string.icd_registration_completed,
-              icdDeviceInfo.userActiveModeTriggerHint.toString()
+              icdDeviceInfo.userActiveModeTriggerHint.toString(),
+              icdDeviceInfo.userActiveModeTriggerInstruction,
+              icdDeviceInfo.idleModeDuration.toString(),
+              icdDeviceInfo.activeModeDuration.toString(),
+              icdDeviceInfo.activeModeThreshold.toString()
             ),
             Toast.LENGTH_LONG
           )

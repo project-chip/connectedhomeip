@@ -26,15 +26,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MTRAsyncWorkQueue;
 
+typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
+
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
+
+// Whether to store attributes by cluster instead of as individual entries for each attribute
+#define MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER 1
 
 /**
  * Information about a cluster, currently is just data version
  */
 MTR_TESTABLE
-@interface MTRDeviceClusterData : NSObject <NSSecureCoding>
+@interface MTRDeviceClusterData : NSObject <NSSecureCoding, NSCopying>
 @property (nonatomic) NSNumber * dataVersion;
-// TODO: add cluster attributes in this object, and remove direct attribute storage
+@property (nonatomic) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
 @end
 
 @interface MTRDevice ()

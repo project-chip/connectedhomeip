@@ -284,3 +284,18 @@ jobs:
               if: always()
               run: |
                   git grep -I -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.
+            - name: Check for use of "using namespace" outside of a class/function in headers.
+              if: always()
+              run: |
+                  # Various platforms have `using namespace chip::Ble` in their BLEManager* headers; just exclude those for now.
+                  #
+                  # Exclude platform openiotsdk bits that do this in their persistent storage header.
+                  #
+                  # Also exclude examples (for now) and third_party, which have various instances of this.
+                  #
+                  # Ignore uses of `System::Clock::Literals`, because that's the only way to have things using _ms32 or whatnot
+                  # in a header file.
+                  git grep -I -n -e '^using namespace' --and --not -e 'System::Clock::Literals' -- './**/*.h' ':(exclude)src/platform/*/BLEManager*.h' ':(exclude)src/platform/openiotsdk/KVPsaPsStore.h' ':(exclude)./examples' ':(exclude)./third_party' && exit 1 || exit 0
