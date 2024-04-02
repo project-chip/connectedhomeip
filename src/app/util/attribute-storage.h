@@ -24,8 +24,8 @@
 #include <app/util/endpoint-config-defines.h>
 #include <lib/support/CodeUtils.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
@@ -60,7 +60,6 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
     {                                                                                                                              \
         ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
     }
-
 
 /**
  * @brief locate attribute metadata
@@ -244,7 +243,6 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
 
 // Initial configuration
 void emberAfEndpointConfigure();
-
 
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
