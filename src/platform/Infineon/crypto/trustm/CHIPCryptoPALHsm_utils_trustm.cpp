@@ -219,7 +219,7 @@ void trustm_close(void)
         optiga_util_destroy(p_local_util);
         optiga_crypt_destroy(p_local_crypt);
         pal_os_event_destroy(NULL);
-
+        trustm_isOpen = false;
         return_status = OPTIGA_LIB_SUCCESS;
     } while (0);
 }
