@@ -63,13 +63,18 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 public:
-    using MulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &);
-    static void SetJoinMulticastGroupHandler(MulticastGroupHandler handler) { sJoinMulticastGroupHandler = handler; }
-    static void SetLeaveMulticastGroupHandler(MulticastGroupHandler handler) { sLeaveMulticastGroupHandler = handler; }
+    enum class MulticastOperation
+    {
+        kJoin,
+        kLeave
+    };
+
+    using MulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &, MulticastOperation operation);
+
+    static void SetMulticastGroupHandler(MulticastGroupHandler handler) { sMulticastGroupHandler = handler; }
 
 private:
-    static MulticastGroupHandler sJoinMulticastGroupHandler;
-    static MulticastGroupHandler sLeaveMulticastGroupHandler;
+    static MulticastGroupHandler sMulticastGroupHandler;
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 };
 
