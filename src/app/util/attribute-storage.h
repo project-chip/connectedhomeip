@@ -21,6 +21,7 @@
 #include <app/util/af-types.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-metadata.h>
+#include <app/util/config.h>
 #include <app/util/endpoint-config-defines.h>
 #include <lib/support/CodeUtils.h>
 
