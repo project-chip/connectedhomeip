@@ -254,8 +254,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
-    SetDeviceInstanceInfoProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
-    SetCommissionableDataProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+    SetDeviceInstanceInfoProvider(&DeviceLayer::Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+    SetCommissionableDataProvider(&DeviceLayer::Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 

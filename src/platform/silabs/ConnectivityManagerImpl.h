@@ -37,6 +37,7 @@
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
+#include "EndpointQueueFilter.h"
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
@@ -131,6 +132,9 @@ private:
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
 
     void UpdateInternetConnectivityState(void);
+#endif
+#ifdef SL_WIFI
+    Inet::Silabs::EndpointQueueFilter mEndpointQueueFilter;
 #endif
 };
 
