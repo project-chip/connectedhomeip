@@ -14,7 +14,7 @@
 
 import unittest
 from metadata import Metadata
-from metadata import Metadata_Reader
+from metadata import MetadataReader
 from os import path
 
 
@@ -23,7 +23,7 @@ class TestMetadataReader(unittest.TestCase):
     def setUp(self):
 
         # build the reader object
-        self.reader=Metadata_Reader(path.join(path.dirname(__file__),"env_test.yaml"))
+        self.reader=MetadataReader(path.join(path.dirname(__file__),"env_test.yaml"))
             
 
     def test_parse_single_run(self):
