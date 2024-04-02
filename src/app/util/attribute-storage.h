@@ -28,6 +28,10 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
+// NOTE: direct include here even though app/util/config.h is the public header,
+//       because MAX_ENDPOINT_COUNT needs FIXED_ENDPOINT_COUNT definitions.
+#include <zap-generated/endpoint_config.h>
+
 static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
 // If we have fixed number of endpoints, then max is the same.
