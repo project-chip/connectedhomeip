@@ -59,7 +59,6 @@ tests:
           constraints:
               type: bitmap32
 
-    # Reference for "SHALL NOT contain" issue: https://github.com/project-chip/connectedhomeip/issues/28287
     - label: "4. TH reads AttributeList from DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
