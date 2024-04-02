@@ -194,7 +194,7 @@ static bool emitTimeZoneStatusEvent(EndpointId ep)
         return false;
     }
 
-    ChipLogProgress(Zcl, "TimeZoneStatusEvent offset: %ld", tz.offset);
+    ChipLogProgress(Zcl, "TimeZoneStatusEvent offset: %d", static_cast<int>(tz.offset));
     return true;
 }
 
