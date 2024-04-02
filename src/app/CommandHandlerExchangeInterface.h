@@ -64,7 +64,7 @@ public:
      * WARNING: This method should only be called when the caller is certain the
      * session has not been evicted.
      */
-    virtual Access::SubjectDescriptor GetSubjectDescriptor() const  = 0;
+    virtual Access::SubjectDescriptor GetSubjectDescriptor() const = 0;
 
     /**
      * Gets accessing fabic index of the exchange.
@@ -72,12 +72,12 @@ public:
      * WARNING: This method should only be called when the caller is certain the
      * session has not been evicted.
      */
-    virtual FabricIndex GetAccessingFabricIndex() const             = 0;
+    virtual FabricIndex GetAccessingFabricIndex() const = 0;
     /**
      * If the incoming session is a group session, returns its group ID. Otherwise,
      * returns a null optional.
      */
-    virtual Optional<GroupId> GetGroupId() const                    = 0;
+    virtual Optional<GroupId> GetGroupId() const = 0;
 
     /**
      * @brief Called to indicates slow command is being processed.

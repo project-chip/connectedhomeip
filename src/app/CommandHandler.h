@@ -180,7 +180,7 @@ public:
     struct TestOnlyOverrides
     {
     public:
-        CommandPathRegistry * commandPathRegistry    = nullptr;
+        CommandPathRegistry * commandPathRegistry          = nullptr;
         CommandHandlerExchangeInterface * commandResponder = nullptr;
     };
 

@@ -126,7 +126,7 @@ void CommandResponseSender::OnDone(CommandHandler & apCommandObj)
 }
 
 void CommandResponseSender::DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
-                     TLV::TLVReader & apPayload)
+                                            TLV::TLVReader & apPayload)
 {
     VerifyOrReturn(mpCommandHandlerCallback);
     mpCommandHandlerCallback->DispatchCommand(apCommandObj, aCommandPath, apPayload);

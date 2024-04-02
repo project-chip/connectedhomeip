@@ -99,8 +99,8 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-Status CommandHandler::OnInvokeCommandRequest(CommandHandlerExchangeInterface & commandResponder, System::PacketBufferHandle && payload,
-                                              bool isTimedInvoke)
+Status CommandHandler::OnInvokeCommandRequest(CommandHandlerExchangeInterface & commandResponder,
+                                              System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "state should be Idle");
 

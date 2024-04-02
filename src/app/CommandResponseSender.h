@@ -34,7 +34,9 @@ namespace app {
  * InvokeCommandRequest. The CommandHandler is provided a reference to this
  * CommandHandlerExchangeInterface implementation to enable sending InvokeResponseMessage(s).
  */
-class CommandResponseSender : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public CommandHandlerExchangeInterface
+class CommandResponseSender : public Messaging::ExchangeDelegate,
+                              public CommandHandler::Callback,
+                              public CommandHandlerExchangeInterface
 {
 public:
     class Callback
@@ -185,7 +187,7 @@ private:
     Messaging::ExchangeHolder mExchangeCtx;
     State mState = State::ReadyForInvokeResponses;
 
-    bool mReportResponseDropped        = false;
+    bool mReportResponseDropped = false;
 };
 
 } // namespace app
