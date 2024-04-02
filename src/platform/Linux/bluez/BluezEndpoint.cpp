@@ -621,7 +621,7 @@ CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
     auto params = std::make_pair(this, &aDevice);
     mConnectCancellable.reset(g_cancellable_new());
     return PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](typeof(params) * aParams) { return aParams->first->ConnectDeviceImpl(*aParams->second); }, &params);
+        +[](decltype(params) * aParams) { return aParams->first->ConnectDeviceImpl(*aParams->second); }, &params);
 }
 
 void BluezEndpoint::CancelConnect()
