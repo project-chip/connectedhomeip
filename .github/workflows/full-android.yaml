@@ -73,6 +73,30 @@ jobs:
                     "./scripts/build/build_examples.py --target android-arm-chip-tool build"
             - name: Clean out build output
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
+            - name: Build Android arm-tv-casting-app
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm-tv-casting-app build"
+            - name: Clean out build output
+              run: rm -rf ./out examples/tv-casting-app/android/App/app/libs/jniLibs/* examples/tv-casting-app/android/App/app/libs/*.jar
+            - name: Build Android arm-tv-server
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm-tv-server build"
+            - name: Clean out build output
+              run: rm -rf ./out examples/tv-app/android/App/app/libs/jniLibs/* examples/tv-app/android/App/app/libs/*.jar
+            - name: Build Android arm64-tv-casting-app
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
+            - name: Clean out build output
+              run: rm -rf ./out examples/tv-casting-app/android/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
+            - name: Build Android arm64-tv-server
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm64-tv-server build"
+            - name: Clean out build output
+              run: rm -rf ./out examples/tv-app/android/App/app/libs/jniLibs/* examples/tv-app/android/App/app/libs/*.jar
             - name: Build Android arm64-chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
