@@ -91,7 +91,7 @@ gboolean BluezEndpoint::BluezCharacteristicReadValue(BluezGattCharacteristic1 * 
 }
 
 gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                        GVariant * aOptions)
+                                                        GUnixFDList * aFDList, GVariant * aOptions)
 {
     int fds[2] = { -1, -1 };
 #if CHIP_ERROR_LOGGING
@@ -126,15 +126,15 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1
     conn->SetupWriteHandler(fds[0]);
     bluez_gatt_characteristic1_set_write_acquired(aChar, TRUE);
 
-    GUnixFDList * fd_list = g_unix_fd_list_new_from_array(&fds[1], 1);
-    bluez_gatt_characteristic1_complete_acquire_write(aChar, aInvocation, fd_list, g_variant_new_handle(0), conn->GetMTU());
-    g_object_unref(fd_list);
+    GUnixFDList * fdList = g_unix_fd_list_new_from_array(&fds[1], 1);
+    bluez_gatt_characteristic1_complete_acquire_write(aChar, aInvocation, fdList, g_variant_new_handle(0), conn->GetMTU());
+    g_object_unref(fdList);
 
     return TRUE;
 }
 
 static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                     GVariant * aOptions)
+                                                     GUnixFDList * aFDList, GVariant * aOptions)
 {
     ChipLogDetail(DeviceLayer, "Received %s", __func__);
     g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotSupported",
@@ -143,7 +143,7 @@ static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * 
 }
 
 gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                         GVariant * aOptions)
+                                                         GUnixFDList * aFDList, GVariant * aOptions)
 {
     int fds[2] = { -1, -1 };
 #if CHIP_ERROR_LOGGING
@@ -188,9 +188,9 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic
     bluez_gatt_characteristic1_set_notify_acquired(aChar, TRUE);
     conn->SetNotifyAcquired(true);
 
-    GUnixFDList * fd_list = g_unix_fd_list_new_from_array(&fds[1], 1);
-    bluez_gatt_characteristic1_complete_acquire_notify(aChar, aInvocation, fd_list, g_variant_new_handle(0), conn->GetMTU());
-    g_object_unref(fd_list);
+    GUnixFDList * fdList = g_unix_fd_list_new_from_array(&fds[1], 1);
+    bluez_gatt_characteristic1_complete_acquire_notify(aChar, aInvocation, fdList, g_variant_new_handle(0), conn->GetMTU());
+    g_object_unref(fdList);
 
     BLEManagerImpl::HandleTXCharCCCDWrite(conn);
 
@@ -446,10 +446,11 @@ void BluezEndpoint::SetupGattService()
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
                      this);
-    g_signal_connect(mC1.get(), "handle-acquire-write",
-                     G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
-                                    BluezEndpoint * self) { return self->BluezCharacteristicAcquireWrite(aChar, aInv, aOpt); }),
-                     this);
+    g_signal_connect(
+        mC1.get(), "handle-acquire-write",
+        G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList, GVariant * aOpt,
+                       BluezEndpoint * self) { return self->BluezCharacteristicAcquireWrite(aChar, aInv, aFDList, aOpt); }),
+        this);
     g_signal_connect(mC1.get(), "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotifyError), nullptr);
     g_signal_connect(mC1.get(), "handle-confirm", G_CALLBACK(BluezCharacteristicConfirmError), nullptr);
 
@@ -460,10 +461,11 @@ void BluezEndpoint::SetupGattService()
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
                      this);
     g_signal_connect(mC2.get(), "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), nullptr);
-    g_signal_connect(mC2.get(), "handle-acquire-notify",
-                     G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
-                                    BluezEndpoint * self) { return self->BluezCharacteristicAcquireNotify(aChar, aInv, aOpt); }),
-                     this);
+    g_signal_connect(
+        mC2.get(), "handle-acquire-notify",
+        G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList, GVariant * aOpt,
+                       BluezEndpoint * self) { return self->BluezCharacteristicAcquireNotify(aChar, aInv, aFDList, aOpt); }),
+        this);
     g_signal_connect(mC2.get(), "handle-confirm",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, BluezEndpoint * self) {
                          return self->BluezCharacteristicConfirm(aChar, aInv);
@@ -482,10 +484,11 @@ void BluezEndpoint::SetupGattService()
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
                      this);
     g_signal_connect(mC3.get(), "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), nullptr);
-    g_signal_connect(mC3.get(), "handle-acquire-notify",
-                     G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
-                                    BluezEndpoint * self) { return self->BluezCharacteristicAcquireNotify(aChar, aInv, aOpt); }),
-                     this);
+    g_signal_connect(
+        mC3.get(), "handle-acquire-notify",
+        G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList, GVariant * aOpt,
+                       BluezEndpoint * self) { return self->BluezCharacteristicAcquireNotify(aChar, aInv, aFDList, aOpt); }),
+        this);
     g_signal_connect(mC3.get(), "handle-confirm",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, BluezEndpoint * self) {
                          return self->BluezCharacteristicConfirm(aChar, aInv);
