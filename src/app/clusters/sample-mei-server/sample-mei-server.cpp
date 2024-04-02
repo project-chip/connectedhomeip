@@ -10,6 +10,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>

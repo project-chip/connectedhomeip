@@ -29,6 +29,7 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>

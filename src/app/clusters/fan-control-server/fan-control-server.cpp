@@ -32,6 +32,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>

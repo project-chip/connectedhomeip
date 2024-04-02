@@ -16,7 +16,10 @@
  */
 #include <app/util/attribute-table.h>
 
+#include <app/util/attribute-table-detail.h>
+
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
 #include <app/util/odd-sized-integers.h>

@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/config.h>
 #include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>

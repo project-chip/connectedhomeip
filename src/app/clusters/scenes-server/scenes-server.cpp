@@ -25,6 +25,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/Span.h>

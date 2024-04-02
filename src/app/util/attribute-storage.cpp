@@ -17,6 +17,8 @@
 
 #include <app/util/attribute-storage.h>
 
+#include <app/util/attribute-storage-detail.h>
+
 #include <app/AttributeAccessInterfaceCache.h>
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
@@ -818,8 +820,14 @@ namespace app {
 
 EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
 {
+    mEndpointCount = emberAfEndpointCount();
     EnsureMatchingEndpoint();
 }
+
+EndpointId EnabledEndpointsWithServerCluster::operator*() const {
+  return emberAfEndpointFromIndex(mEndpointIndex); 
+}
+
 EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
 {
     ++mEndpointIndex;

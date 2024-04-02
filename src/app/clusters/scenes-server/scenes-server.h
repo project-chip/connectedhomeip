@@ -25,6 +25,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 
 namespace chip {
