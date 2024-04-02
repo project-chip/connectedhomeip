@@ -266,10 +266,17 @@ AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, Cl
     return nullptr;
 }
 
+EndpointId EnabledEndpointsWithServerCluster::operator*() const
+{
+    return emberAfEndpointFromIndex(mEndpointIndex);
+}
+
 EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
 {
+    mEndpointCount = emberAfEndpointCount();
     EnsureMatchingEndpoint();
 }
+
 EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
 {
     ++mEndpointIndex;
