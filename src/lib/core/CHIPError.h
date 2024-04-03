@@ -1135,7 +1135,15 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_TRANSACTION_CANCELED                        CHIP_CORE_ERROR(0x68)
 
 // AVAILABLE: 0x69
-// AVAILABLE: 0x6a
+
+/**
+ *  @def CHIP_ERROR_UNSUPPORTED_ATTRIBUTE
+ *
+ *  @brief
+ *    The requested CHIP attribute is not supported.
+ *
+ */
+#define CHIP_ERROR_UNSUPPORTED_ATTRIBUTE                    CHIP_CORE_ERROR(0x6a)
 
 /**
  *  @def CHIP_ERROR_INVALID_SUBSCRIPTION

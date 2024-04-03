@@ -435,7 +435,6 @@ tests:
           "Step 4e: TH sends a RecallScene command to DUT with the GroupID field
           set to GI (Where GI is a group currently absent from the group table)
           and the SceneID field set to 0x01."
-      PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
           values:

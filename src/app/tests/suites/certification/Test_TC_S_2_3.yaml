@@ -721,7 +721,7 @@ tests:
     - label:
           "Step 6g: TH sends a ViewScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x03."
-      PICS: S.S.C01.Rsp && PICS_SDK_CI_ONLY
+      PICS: S.S.C01.Rsp
       command: "ViewScene"
       arguments:
           values:
