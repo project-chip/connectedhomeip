@@ -169,7 +169,6 @@ LED1.$hardware                  = system.deviceData.board.components.LED_RED;
 LED1.gpioPin.$name              = "CONFIG_GPIO_RLED";
 LED1.gpioPin.mode               = "Output";
 
-
 /* Green LED */
 LED2.$name                      = "CONFIG_LED_GREEN";
 LED2.$hardware                  = system.deviceData.board.components.LED_GREEN;
