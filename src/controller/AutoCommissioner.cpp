@@ -24,12 +24,14 @@
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
+#include <tracing/metric_event.h>
 
 namespace chip {
 namespace Controller {
 
 using namespace chip::app::Clusters;
 using namespace chip::Crypto;
+using namespace chip::Tracing;
 using chip::app::DataModel::MakeNullable;
 using chip::app::DataModel::NullNullable;
 

@@ -38,11 +38,13 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
+#include <tracing/metric_event.h>
 
 using namespace chip::Callback;
 using chip::AddressResolve::NodeLookupRequest;
 using chip::AddressResolve::Resolver;
 using chip::AddressResolve::ResolveResult;
+using namespace chip::Tracing;
 
 namespace chip {
 
@@ -246,6 +248,8 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
         return;
     }
 
+    MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, CHIP_NO_ERROR);
+
     CHIP_ERROR err = EstablishConnection(config);
     LogErrorOnFailure(err);
     if (err == CHIP_NO_ERROR)
@@ -305,9 +309,11 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ReliableMessagePro
     mCASEClient = mClientPool->Allocate();
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESession);
     CHIP_ERROR err = mCASEClient->EstablishSession(mInitParams, mPeerId, mDeviceAddress, config, this);
     if (err != CHIP_NO_ERROR)
     {
+        MATTER_LOG_METRIC_END(kMetricDeviceCASESession, err);
         CleanupCASEClient();
         return err;
     }
@@ -503,6 +509,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     }
 
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESession, error);
     DequeueConnectionCallbacks(error, stage);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
@@ -520,6 +527,8 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
 {
     VerifyOrReturn(mState == State::Connecting,
                    ChipLogError(Discovery, "OnSessionEstablished was called while we were not connecting"));
+
+    MATTER_LOG_METRIC_END(kMetricDeviceCASESession, CHIP_NO_ERROR);
 
     if (!mSecureSession.Grab(session))
     {
@@ -591,6 +600,7 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
     {
         --mResolveAttemptsAllowed;
     }
+    MATTER_LOG_METRIC(kMetricDeviceOperationalDiscoveryAttemptCount, mAttemptsDone);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     // NOTE: This is public API that can be used to update our stored peer
@@ -604,6 +614,8 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
                         mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()));
         return CHIP_NO_ERROR;
     }
+
+    MATTER_LOG_METRIC_BEGIN(kMetricDeviceOperationalDiscovery);
 
     auto const * fabricInfo = mInitParams.fabricTable->FindFabricWithIndex(mPeerId.GetFabricIndex());
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -676,6 +688,8 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
             --mAttemptsDone;
         }
 
+        MATTER_LOG_METRIC(kMetricDeviceOperationalDiscoveryAttemptCount, mAttemptsDone);
+
         CHIP_ERROR err = LookupPeerAddress();
         if (err == CHIP_NO_ERROR)
         {
@@ -689,6 +703,8 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
         }
     }
 #endif
+
+    MATTER_LOG_METRIC_END(kMetricDeviceOperationalDiscovery, reason);
 
     // No need to modify any variables in `this` since call below releases `this`.
     DequeueConnectionCallbacks(reason);

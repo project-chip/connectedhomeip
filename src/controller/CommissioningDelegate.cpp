@@ -141,5 +141,124 @@ const char * StageToString(CommissioningStage stage)
     }
 }
 
+#if MATTER_TRACING_ENABLED
+const char * MetricKeyForCommissioningStage(CommissioningStage stage)
+{
+    switch (stage)
+    {
+    case kError:
+        return "core_cm_stg_error";
+
+    case kSecurePairing:
+        return "core_cm_stg_secure_pairing";
+
+    case kReadCommissioningInfo:
+        return "core_cm_stg_rd_comm_info";
+
+    case kReadCommissioningInfo2:
+        return "core_cm_stg_rd_comm_info2";
+
+    case kArmFailsafe:
+        return "core_cm_stg_afs";
+
+    case kScanNetworks:
+        return "core_cm_stg_scn_nws";
+
+    case kConfigRegulatory:
+        return "core_cm_stg_cfg_reg";
+
+    case kConfigureUTCTime:
+        return "core_cm_stg_cfg_utc";
+
+    case kConfigureTimeZone:
+        return "core_cm_stg_cfg_tmz";
+
+    case kConfigureDSTOffset:
+        return "core_cm_stg_cfg_dst_off";
+
+    case kConfigureDefaultNTP:
+        return "core_cm_stg_cfg_ntp";
+
+    case kSendPAICertificateRequest:
+        return "core_cm_stg_csr_req";
+
+    case kSendDACCertificateRequest:
+        return "core_cm_stg_dac_req";
+
+    case kSendAttestationRequest:
+        return "core_cm_stg_att_req";
+
+    case kAttestationVerification:
+        return "core_cm_stg_att_ver";
+
+    case kSendOpCertSigningRequest:
+        return "core_cm_stg_opcrt_csr";
+
+    case kValidateCSR:
+        return "core_cm_stg_val_csr";
+
+    case kGenerateNOCChain:
+        return "core_cm_stg_gen_noc";
+
+    case kSendTrustedRootCert:
+        return "core_cm_stg_trust_rca";
+
+    case kSendNOC:
+        return "core_cm_stg_snd_noc";
+
+    case kConfigureTrustedTimeSource:
+        return "core_cm_stg_cfg_tms";
+
+    case kICDGetRegistrationInfo:
+        return "core_cm_stg_icd_reg_info";
+
+    case kICDRegistration:
+        return "core_cm_stg_icd_reg";
+
+    case kWiFiNetworkSetup:
+        return "core_cm_stg_wifi_nw_cred";
+
+    case kThreadNetworkSetup:
+        return "core_cm_stg_thrd_nw_cred";
+
+    case kFailsafeBeforeWiFiEnable:
+        return "core_cm_stg_afs_bf_wifi";
+
+    case kFailsafeBeforeThreadEnable:
+        return "core_cm_stg_afs_bf_thrd";
+
+    case kWiFiNetworkEnable:
+        return "core_cm_stg_wifi_enbl";
+
+    case kThreadNetworkEnable:
+        return "core_cm_stg_thrd_enbl";
+
+    case kEvictPreviousCaseSessions:
+        return "core_cm_stg_evict_case";
+
+    case kFindOperationalForStayActive:
+        return "core_cm_stg_op_stay_active";
+
+    case kFindOperationalForCommissioningComplete:
+        return "core_cm_stg_op_cm_comp";
+
+    case kICDSendStayActive:
+        return "core_cm_stg_icd_stay_act";
+
+    case kSendComplete:
+        return "core_cm_stg_snd_comp";
+
+    case kCleanup:
+        return "core_cm_stg_cleanup";
+
+    case kNeedsNetworkCreds:
+        return "core_cm_stg_need_nw_creds";
+
+    default:
+        return "core_cm_stg_unknown";
+    }
+}
+#endif
+
 } // namespace Controller
 } // namespace chip
