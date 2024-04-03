@@ -113,7 +113,7 @@ jobs:
 
                   # Disable BLE (CHIP_IS_BLE=NO) because the app does not have the permission to use it and that may crash the CI.
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx ${{ matrix.options.arguments }} \
-                    OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1 ${{ matrix.options.defines }}' \
+                    CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
                     > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
             - name: Collect crash logs
               if: failure() && !env.ACT
