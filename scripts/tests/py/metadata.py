@@ -1,4 +1,3 @@
-#!/usr/local/bin/python3
 # Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +25,7 @@ class Metadata:
     py_script_path: Optional[str] = None
     run: Optional[str] = None
     app: Optional[str] = None
-    factoryreset: Optional[bool] = False
+    factoryreset: bool = False
     comissioning_method: Optional[str] = None
     discriminator: Optional[int] = None
     kvs: Optional[str] = None
