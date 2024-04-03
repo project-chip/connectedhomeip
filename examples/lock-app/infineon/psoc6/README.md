@@ -59,7 +59,8 @@ will then join the network.
 
 _To build with Infineon Hardware Security Module-OPTIGA™ Trust M for Device
 attestation and other security use cases, please refer to the
-[Building with OPTIGA™ Trust M as HSM](#building-with-optiga-trust-m-as-hsm) for more instructions_
+[Building with OPTIGA™ Trust M as HSM](#building-with-optiga-trust-m-as-hsm) for
+more instructions_
 
 ## Flashing the Application
 
@@ -96,7 +97,7 @@ Run the built executable and pass it the discriminator and pairing code of the
 remote device, as well as the network credentials to use.
 
          $ ./out/debug/chip-tool pairing ble-wifi 1234 ${SSID} ${PASSWORD} 20202021 3840
-    
+
          Parameters:
          1. Discriminator: 3840
          2. Setup-pin-code: 20202021
