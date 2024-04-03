@@ -41,6 +41,7 @@ template("chip_test_group") {
                              "deps",
                              "tests",
                            ])
+
     deps = []
     if (defined(invoker.deps)) {
       deps = invoker.deps

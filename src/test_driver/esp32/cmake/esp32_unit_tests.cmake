@@ -45,7 +45,6 @@ macro(esp32_unit_test)
 
     add_dependencies(${UNIT_TEST_NAME} idf::main)
     add_dependencies(${UNIT_TEST_NAME} idf::chip)
-
     # TODO:
     #   - this does NOT properly handle dependencies  on UNIT_TEST_LIBRARY and such,
     #     so changes in the tests themselves will not re-gen
@@ -97,6 +96,8 @@ macro(esp32_unit_test)
     add_custom_target(gen_image_${UNIT_TEST_NAME} ALL DEPENDS "${build_dir}/${UNIT_TEST_NAME}.img_timestamp")
 
     LIST(APPEND ESP32_TEST_IMAGES ${UNIT_TEST_NAME}.img)
-# IMAGE CAN BE RUN AS
-# $QEMU_ESP32 -nographic -no-reboot -machine esp32 -drive file=out/esp32-qemu-tests/testASN1.img,if=mtd,format=raw
+
+
+    # IMAGE CAN BE RUN AS
+    # $QEMU_ESP32 -nographic -no-reboot -machine esp32 -drive file=out/esp32-qemu-tests/testASN1.img,if=mtd,format=raw
 endmacro()
