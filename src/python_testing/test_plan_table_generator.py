@@ -43,7 +43,7 @@ def main(filename, classname, test):
     indent = 6
     s = ('[cols="5%,45%,45%"]\n'
          '|===\n'
-         '|**#**   |*Test Step*|*Expected Outcome*\n')
+         '|**#**  |*Test Step*|*Expected Outcome*\n')
     for step in steps:
         # add 2 to indent for a| and | at start
         s += f'|{step.test_plan_number:<{indent}}a|{indent_multiline(step.description, indent+3)}\n'
