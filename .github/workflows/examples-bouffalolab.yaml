@@ -16,6 +16,8 @@ name: Build example - BouffaloLab
 
 on:
   push:
+    branches:
+      - 'master'
   pull_request:
   merge_group:
   workflow_dispatch:
