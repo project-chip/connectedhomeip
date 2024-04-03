@@ -500,6 +500,10 @@ void ConnectivityManagerImpl::DriveStationState()
             mLastStationConnectFailTime = System::Clock::kZero;
             OnStationConnected();
         }
+        else
+        {
+            ChangeWiFiStationState(kWiFiStationState_Connecting);
+        }
     }
 
     // Otherwise the station interface is NOT connected to an AP, so...
