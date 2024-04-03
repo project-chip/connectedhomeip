@@ -36,15 +36,15 @@ jobs:
             matrix:
                 options: # We don't need a full matrix
                     - flavor: macos-release-availability
-                      arguments: -sdk macosx -configuration Release   WARNING_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new'
+                      arguments: -sdk macosx -configuration Release   WARNING_CFLAGS='${inherited} -Wno-unguarded-availability-new' OTHER_CFLAGS='${inherited} -UMTR_NO_AVAILABILITY'
                     - flavor: ios-release
-                      arguments: -sdk iphoneos -configuration Release WARNING_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk iphoneos -configuration Release
                     - flavor: ios-debug
-                      arguments: -sdk iphoneos -configuration Debug   WARNING_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk iphoneos -configuration Debug
                     - flavor: tvos-debug
-                      arguments: -sdk appletvos -configuration Debug  WARNING_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk appletvos -configuration Debug
                     - flavor: watchos-debug
-                      arguments: -sdk watchos -configuration Debug    WARNING_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk watchos -configuration Debug
         steps:
             - name: Checkout
               uses: actions/checkout@v4
