@@ -16,6 +16,8 @@ name: Build example - ESP32
 
 on:
     push:
+        branches:
+            - master
     pull_request:
     merge_group:
 
