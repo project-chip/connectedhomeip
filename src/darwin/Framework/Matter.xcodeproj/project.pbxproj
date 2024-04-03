@@ -51,8 +51,6 @@
 		0382FA2A2992F05E00247BBB /* Command.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382FA292992F05E00247BBB /* Command.cpp */; };
 		0382FA2C2992F06C00247BBB /* Commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382FA2B2992F06C00247BBB /* Commands.cpp */; };
 		0382FA302992F40C00247BBB /* ComplexArgumentParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382FA2F2992F40C00247BBB /* ComplexArgumentParser.cpp */; };
-		0382FA312992FD6E00247BBB /* MTRLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3DECCB712934AFE200585AEC /* MTRLogging.mm */; };
-		0382FA322992FDCE00247BBB /* MTRFramework.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */; };
 		039145E12993102B00257B3E /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 039145E02993102B00257B3E /* main.mm */; };
 		039145E3299311FF00257B3E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 039145E2299311FF00257B3E /* IOKit.framework */; platformFilters = (macos, ); };
 		039145E52993124800257B3E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 039145E42993124800257B3E /* SystemConfiguration.framework */; platformFilters = (macos, ); };
@@ -278,7 +276,6 @@
 		88EBF8D027FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 88EBF8CD27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.h */; };
 		88FA798D2B7B257100CD4B6F /* MTRMetricsCollector.h in Headers */ = {isa = PBXBuildFile; fileRef = 88FA798B2B7B257100CD4B6F /* MTRMetricsCollector.h */; };
 		88FA798E2B7B257100CD4B6F /* MTRMetricsCollector.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88FA798C2B7B257100CD4B6F /* MTRMetricsCollector.mm */; };
-		88FA79902B7BE42500CD4B6F /* MTRMetricsCollector.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88FA798C2B7B257100CD4B6F /* MTRMetricsCollector.mm */; };
 		93B2CF9A2B56E45C00E4D187 /* MTRClusterNames.mm in Sources */ = {isa = PBXBuildFile; fileRef = 93B2CF992B56E45C00E4D187 /* MTRClusterNames.mm */; };
 		93E610AA2B626E290077F02A /* MTRClusterNames.h in Headers */ = {isa = PBXBuildFile; fileRef = 93E610A92B626E290077F02A /* MTRClusterNames.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0842475F45400C13860 /* MTRDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* MTRDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1834,7 +1831,6 @@
 				B45373C32A9FEA9100807602 /* wsi.c in Sources */,
 				039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */,
 				B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */,
-				88FA79902B7BE42500CD4B6F /* MTRMetricsCollector.mm in Sources */,
 				75A202E62BA8DBAC00A771DD /* reporting.cpp in Sources */,
 				514C79EE2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp in Sources */,
 				039145E82993179300257B3E /* GetCommissionerNodeIdCommand.mm in Sources */,
@@ -1858,7 +1854,6 @@
 				037C3DBC2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.mm in Sources */,
 				0382FA2A2992F05E00247BBB /* Command.cpp in Sources */,
 				039546A12991DFC5006D42A8 /* json_value.cpp in Sources */,
-				0382FA322992FDCE00247BBB /* MTRFramework.mm in Sources */,
 				0382FA302992F40C00247BBB /* ComplexArgumentParser.cpp in Sources */,
 				039145E12993102B00257B3E /* main.mm in Sources */,
 				037C3DD42991BD5200B7EEE2 /* logging.mm in Sources */,
@@ -1876,7 +1871,6 @@
 				037C3DB42991BD5000B7EEE2 /* DeviceControllerDelegateBridge.mm in Sources */,
 				039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */,
 				514C79F12B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
-				0382FA312992FD6E00247BBB /* MTRLogging.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
