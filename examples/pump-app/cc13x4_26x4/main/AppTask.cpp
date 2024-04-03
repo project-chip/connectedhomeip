@@ -163,13 +163,12 @@ int AppTask::Init()
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-#else
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#elif CHIP_CONFIG_ENABLE_ICD_SERVER
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
-#endif // CHIP_DEVICE_CONFIG_THREAD_FTD
+#endif 
+
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
@@ -274,7 +273,7 @@ void AppTask::ActionInitiated(PumpManager::Action_t aAction, int32_t aActor)
         PLAT_LOG("Stop initiated");
         ; // TODO
     }
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
     LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
     LED_startBlinking(sAppGreenHandle, 50 /* ms */, LED_BLINK_FOREVER);
     LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
@@ -290,7 +289,7 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
     if (aAction == PumpManager::START_ACTION)
     {
         PLAT_LOG("Pump start completed");
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
         LED_stopBlinking(sAppGreenHandle);
         LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
         LED_stopBlinking(sAppRedHandle);
@@ -302,7 +301,7 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
     else if (aAction == PumpManager::STOP_ACTION)
     {
         PLAT_LOG("Pump stop completed");
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
         LED_stopBlinking(sAppGreenHandle);
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
@@ -370,7 +369,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         break;
 
     case AppEvent::kEventType_IdentifyStart:
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
         LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
         LED_startBlinking(sAppGreenHandle, sIdentifyBlinkRateMs, LED_BLINK_FOREVER);
 #endif
@@ -378,7 +377,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         break;
 
     case AppEvent::kEventType_IdentifyStop:
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
         LED_stopBlinking(sAppGreenHandle);
         if (!PumpMgr().IsStopped())
         {
@@ -633,7 +632,7 @@ void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
     }
 }
 
-#ifdef BUTTON_ENABLE
+#if(BUTTON_ENABLE == 1)
 void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
 {
     AppEvent event;
@@ -677,7 +676,7 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
 
 void AppTask::uiInit(void)
 {
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
 
     LED_Params ledParams;
 
@@ -694,7 +693,7 @@ void AppTask::uiInit(void)
     LED_setOff(sAppGreenHandle);
 #endif // LED ENABLE
 
-#ifdef BUTTON_ENABLE
+#if(BUTTON_ENABLE == 1)
     Button_Params buttonParams;
 
     // Initialize buttons

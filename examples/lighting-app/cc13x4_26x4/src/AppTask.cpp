@@ -144,7 +144,7 @@ int AppTask::StartAppTask()
 // Identify take action
 void identify_TakeAction(void)
 {
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
     LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
     LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
 #endif // LED_ENABLE
@@ -153,7 +153,7 @@ void identify_TakeAction(void)
 // Identify stop action
 void identify_StopAction(void)
 {
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
     LED_stopBlinking(sAppGreenHandle);
     LED_setOff(sAppGreenHandle);
 #endif // LED_ENABLE
@@ -183,13 +183,12 @@ int AppTask::Init()
     }
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-#else
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#elif CHIP_CONFIG_ENABLE_ICD_SERVER
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
-#endif // CHIP_DEVICE_CONFIG_THREAD_FTD
+#endif 
+
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
@@ -479,7 +478,7 @@ void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
 void uiTurnOn(void)
 {
     PLAT_LOG("Light On initiated");
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
     LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
     LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
 #endif // LED_ENABLE
@@ -489,7 +488,7 @@ void uiTurnOn(void)
 void uiTurnedOn(void)
 {
     PLAT_LOG("Light On completed");
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
     LED_stopBlinking(sAppRedHandle);
     LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
 #endif // LED_ENABLE
@@ -499,7 +498,7 @@ void uiTurnedOn(void)
 void uiTurnOff(void)
 {
     PLAT_LOG("Light Off initiated");
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
     LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
     LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
 #endif // LED_ENABLE
@@ -509,13 +508,13 @@ void uiTurnOff(void)
 void uiTurnedOff(void)
 {
     PLAT_LOG("Light Off completed");
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
     LED_stopBlinking(sAppRedHandle);
     LED_setOff(sAppRedHandle);
 #endif // LED_ENABLE
 }
 
-#ifdef BUTTON_ENABLE
+#if(BUTTON_ENABLE == 1)
 void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
 {
     AppEvent event;
@@ -559,7 +558,7 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
 
 void AppTask::uiInit(void)
 {
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
 
     LED_Params ledParams;
 
@@ -576,7 +575,7 @@ void AppTask::uiInit(void)
     LED_setOff(sAppGreenHandle);
 #endif // LED ENABLE
 
-#ifdef BUTTON_ENABLE
+#if(BUTTON_ENABLE == 1)
     Button_Params buttonParams;
 
     // Initialize buttons

@@ -96,15 +96,14 @@ ti_simplelink_executable("shell_app") {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
   }
 
+  defines = []
+
   if (custom_factory_data) {
-    defines = [ "CC13XX_26XX_FACTORY_DATA" ]
+    defines += [ "CC13XX_26XX_FACTORY_DATA" ]
   }
 
   if (chip_enable_icd_server) {
-    defines += [
-      "CHIP_DEVICE_CONFIG_ENABLE_SED",
-      "TI_ICD_ENABLE_SERVER",
-    ]
+    defines += [ "TI_ICD_ENABLE_SERVER" ]
   }
 
   include_dirs = [

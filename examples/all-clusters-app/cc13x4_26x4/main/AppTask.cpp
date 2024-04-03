@@ -196,11 +196,12 @@ int AppTask::Init()
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-#elif CHIP_DEVICE_CONFIG_ENABLE_SED
+#elif CHIP_CONFIG_ENABLE_ICD_SERVER
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
+
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
@@ -344,7 +345,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-#ifdef BUTTON_ENABLE
+#if(BUTTON_ENABLE == 1)
 void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
 {
     AppEvent event;
@@ -388,7 +389,7 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
 
 void AppTask::uiInit(void)
 {
-#ifdef LED_ENABLE
+#if(LED_ENABLE == 1)
 
     LED_Params ledParams;
 
@@ -405,7 +406,7 @@ void AppTask::uiInit(void)
     LED_setOff(sAppGreenHandle);
 #endif // LED ENABLE
 
-#ifdef BUTTON_ENABLE
+#if(BUTTON_ENABLE == 1)
     Button_Params buttonParams;
 
     // Initialize buttons
