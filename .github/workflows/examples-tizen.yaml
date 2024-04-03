@@ -16,6 +16,8 @@ name: Build example - Tizen
 
 on:
     push:
+        branches:
+            - master
     pull_request:
     merge_group:
 
