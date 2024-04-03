@@ -230,7 +230,6 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
  *
  * @param browseIdentifier an identifier for a browse operation that came from
  *                         ChipDnssdBrowse.
- *
  */
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier);
 

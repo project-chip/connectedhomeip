@@ -69,6 +69,13 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
         new Runnable() {
           @Override
           public void run() {
+            Log.i(
+                TAG,
+                "Browse for service '"
+                    + serviceType
+                    + "' expired after timeout: "
+                    + timeout
+                    + " ms");
             stopDiscover(callbackHandle);
           }
         };
@@ -82,7 +89,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
       final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback) {
     if (callbackMap.containsKey(callbackHandle)) {
-      Log.d(TAG, "Invalid callbackHandle");
+      Log.w(TAG, "Starting service discovering failed. Invalid callback ID: " + callbackHandle);
       return;
     }
 
@@ -91,26 +98,33 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
     multicastLock.acquire();
     discovery.setChipMdnsCallback(chipMdnsCallback);
 
-    Log.d(TAG, "Starting service discovering for '" + serviceType + "'");
+    Log.d(
+        TAG,
+        "Starting service discovering for '"
+            + serviceType
+            + "' with callback ID: "
+            + callbackHandle);
 
     this.nsdManager.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, discovery);
     callbackMap.put(callbackHandle, discovery);
   }
 
   public void stopDiscover(final long callbackHandle) {
+    Log.d(TAG, "Stopping service discovering with callback ID: " + callbackHandle);
     if (!callbackMap.containsKey(callbackHandle)) {
+      Log.w(TAG, "Stopping service discovering failed. Callback handle not found.");
       return;
-    }
-
-    MessageQueue queue = mainThreadHandler.getLooper().getQueue();
-    if (!queue.isIdle()) {
-      Log.i(TAG, "canceling scheduled browse timeout runnable");
-      mainThreadHandler.removeCallbacksAndMessages(null);
     }
 
     NsdManagerDiscovery discovery = callbackMap.remove(callbackHandle);
     if (multicastLock.isHeld()) {
       multicastLock.release();
+    }
+
+    MessageQueue queue = mainThreadHandler.getLooper().getQueue();
+    if (!queue.isIdle()) {
+      Log.d(TAG, "Canceling scheduled browse timeout runnable for '" + discovery.serviceType + "'");
+      mainThreadHandler.removeCallbacksAndMessages(null);
     }
 
     this.nsdManager.stopServiceDiscovery(discovery);

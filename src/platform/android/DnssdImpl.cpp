@@ -204,17 +204,20 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
-    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+    auto sdCtx        = chip::Platform::New<BrowseContext>(callback);
+    *browseIdentifier = reinterpret_cast<intptr_t>(sdCtx);
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
-    VerifyOrReturnError(sMdnsCallbackObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(sBrowserObject.HasValidObjectRef() && sStopBrowseMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    auto ctx     = reinterpret_cast<BrowseContext *>(browseIdentifier);
 
-    env->CallVoidMethod(sBrowserObject.ObjectRef(), sStopBrowseMethod, sMdnsCallbackObject.ObjectRef());
+    env->CallVoidMethod(sBrowserObject.ObjectRef(), sStopBrowseMethod, reinterpret_cast<jlong>(ctx->callback));
 
     if (env->ExceptionCheck())
     {
@@ -223,6 +226,8 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
         env->ExceptionClear();
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
+    chip::Platform::Delete(ctx);
+
     return CHIP_NO_ERROR;
 }
 
