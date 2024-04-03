@@ -19,7 +19,7 @@
 // The purpose of this test is to ensure that our availablity annotations are
 // at least syntactically valid, because within the project we generally
 // compile everything with MTR_NO_AVAILABILITY=1 (so that we can internally use
-// and test features of Matter.framework  independently of when they will ship.)
+// and test features of Matter.framework independently of when they will ship.)
 #if MTR_NO_AVAILABILITY
 #error This test must be compiled with MTR_NO_AVAILABILITY=0
 #endif
