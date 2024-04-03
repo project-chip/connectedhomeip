@@ -50,18 +50,18 @@ class MetadataReader:
        YAML format. 
     """
     
-    def __init__(self, env_file_name: str):
+    def __init__(self, env_yaml_file_path: str):
         """
-        Constructs the environment object
+        Reads the YAML file and Constructs the environment object
 
         Parameters:
         
-        env_file_name: str
+        env_yaml_file_path: str
           Path to the environment file that contains the YAML configuration.
         """
-        self.env = self.__build_env_object__(env_file_name)
-        
-
+        with open(env_yaml_file_path) as stream:
+            self.env=yaml.safe_load(stream)
+            
 
     def __build_env_object__(self, env_yaml_file_path: str) -> Dict[str, Union[str, int, Dict]]:
         """
