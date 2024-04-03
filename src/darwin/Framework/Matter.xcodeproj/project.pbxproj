@@ -109,7 +109,7 @@
 		3CF134AD289D8E570017A19E /* MTRDeviceAttestationInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CF134AC289D8E570017A19E /* MTRDeviceAttestationInfo.mm */; };
 		3CF134AF289D90FF0017A19E /* MTROperationalCertificateIssuer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF134AE289D90FF0017A19E /* MTROperationalCertificateIssuer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */; };
-		3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTest.m */; settings = {COMPILER_FLAGS = "-UMTR_NO_AVAILABILITY -Wno-unguarded-availability-new"; }; };
+		3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */; settings = {COMPILER_FLAGS = "-UMTR_NO_AVAILABILITY -Wno-unguarded-availability-new"; }; };
 		3D69868529383096007314E7 /* com.csa.matter.plist in Copy Logging Preferences */ = {isa = PBXBuildFile; fileRef = 3D69868029382EF4007314E7 /* com.csa.matter.plist */; };
 		3D843711294977000070D20A /* NSStringSpanConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370E294977000070D20A /* NSStringSpanConversion.h */; };
 		3D843712294977000070D20A /* MTRCallbackBridgeBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */; };
@@ -497,7 +497,7 @@
 		3CF134AC289D8E570017A19E /* MTRDeviceAttestationInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceAttestationInfo.mm; sourceTree = "<group>"; };
 		3CF134AE289D90FF0017A19E /* MTROperationalCertificateIssuer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTROperationalCertificateIssuer.h; sourceTree = "<group>"; };
 		3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRErrorTests.m; sourceTree = "<group>"; };
-		3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRAvailabilityTest.m; sourceTree = "<group>"; };
+		3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRAvailabilityTests.m; sourceTree = "<group>"; };
 		3D69868029382EF4007314E7 /* com.csa.matter.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = com.csa.matter.plist; sourceTree = "<group>"; };
 		3D84370E294977000070D20A /* NSStringSpanConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringSpanConversion.h; sourceTree = "<group>"; };
 		3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCallbackBridgeBase.h; sourceTree = "<group>"; };
@@ -1365,7 +1365,7 @@
 				5143851C2A65885400EDC8E6 /* MatterTests-Bridging-Header.h */,
 				7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */,
 				3DA1A3572ABABF69004F0BB9 /* MTRAsyncWorkQueueTests.m */,
-				3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTest.m */,
+				3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */,
 				51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */,
 				3DFCB3282966684500332B35 /* MTRCertificateInfoTests.m */,
 				517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */,
@@ -1974,7 +1974,7 @@
 				51D0B12A2B61766F006E3511 /* MTRServerEndpointTests.m in Sources */,
 				7596A8512878709F004DAE0E /* MTRAsyncCallbackQueueTests.m in Sources */,
 				997DED1A26955D0200975E97 /* MTRThreadOperationalDatasetTests.mm in Sources */,
-				3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTest.m in Sources */,
+				3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m in Sources */,
 				518D3F852AA14006008E0007 /* MTRControllerAdvertisingTests.m in Sources */,
 				51C8E3F82825CDB600D47D00 /* MTRTestKeys.m in Sources */,
 				51C984622A61CE2A00B0AD9A /* MTRFabricInfoChecker.m in Sources */,

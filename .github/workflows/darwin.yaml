@@ -35,8 +35,8 @@ jobs:
         strategy:
             matrix:
                 options: # We don't need a full matrix
-                    - flavor: macos-release-availability
-                      arguments: -sdk macosx -configuration Release   WARNING_CFLAGS='${inherited} -Wno-unguarded-availability-new' OTHER_CFLAGS='${inherited} -UMTR_NO_AVAILABILITY'
+                    - flavor: macos-release
+                      arguments: -sdk macosx -configuration Release
                     - flavor: ios-release
                       arguments: -sdk iphoneos -configuration Release
                     - flavor: ios-debug
