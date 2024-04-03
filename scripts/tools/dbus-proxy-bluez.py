@@ -19,6 +19,7 @@ import logging
 import os.path
 from argparse import ArgumentParser
 from collections import namedtuple
+import typing
 
 from gi.repository import Gio, GLib
 
@@ -60,8 +61,8 @@ class DBusServiceProxy:
 
     MappingKey = namedtuple("MappingKey", ["path", "iface"])
 
-    objects: dict[MappingKey, int] = {}
-    subscriptions: set[str] = set()
+    objects: typing.Dict[MappingKey, int] = {}
+    subscriptions: typing.Set[str] = set()
     clients = {}
 
     def __init__(self, source: str, proxy: str, service: str):
