@@ -89,7 +89,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
       final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback) {
     if (callbackMap.containsKey(callbackHandle)) {
-      Log.w(TAG, "Starting service discovering failed. Invalid callback ID: " + callbackHandle);
+      Log.w(TAG, "Starting service discovery failed. Invalid callbackHandle: " + callbackHandle);
       return;
     }
 
@@ -100,9 +100,9 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
 
     Log.d(
         TAG,
-        "Starting service discovering for '"
+        "Starting service discovery for '"
             + serviceType
-            + "' with callback ID: "
+            + "' with callbackHandle: "
             + callbackHandle);
 
     this.nsdManager.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, discovery);
@@ -110,9 +110,9 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
   }
 
   public void stopDiscover(final long callbackHandle) {
-    Log.d(TAG, "Stopping service discovering with callback ID: " + callbackHandle);
+    Log.d(TAG, "Stopping service discovery with callbackHandle: " + callbackHandle);
     if (!callbackMap.containsKey(callbackHandle)) {
-      Log.w(TAG, "Stopping service discovering failed. Callback handle not found.");
+      Log.w(TAG, "Stopping service discovery failed. Callback handle not found.");
       return;
     }
 
