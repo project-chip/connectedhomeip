@@ -16,6 +16,8 @@ name: Unit / Integration Tests
 
 on:
     push:
+        branches:
+            - 'master'
     pull_request:
     merge_group:
 
