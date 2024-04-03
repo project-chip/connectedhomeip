@@ -16,6 +16,8 @@ name: Build example - nRF Connect SDK
 
 on:
     push:
+        branches:
+            - master
     pull_request:
     merge_group:
 
