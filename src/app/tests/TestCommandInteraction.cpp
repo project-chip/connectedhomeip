@@ -393,7 +393,7 @@ private:
             CommandHandler(apCallback)
         {
             GetCommandPathRegistry().Add(aRequestCommandPath, aRef);
-            SetCommandResponder(&mMockCommandResponder);
+            SetExchangeInterface(&mMockCommandResponder);
         }
         MockCommandResponder mMockCommandResponder;
     };

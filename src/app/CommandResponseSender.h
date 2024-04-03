@@ -101,7 +101,7 @@ public:
     {
         VerifyOrDie(mExchangeCtx);
         auto sessionHandle = mExchangeCtx->GetSessionHandle();
-        if (!sessionHandle->IsGroupSession())
+        if (sessionHandle->GetSessionType() != Transport::Session::SessionType::kGroupIncoming)
         {
             return NullOptional;
         }

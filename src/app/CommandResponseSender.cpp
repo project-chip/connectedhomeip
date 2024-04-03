@@ -206,8 +206,8 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
     VerifyOrDieWithMsg(ec != nullptr, DataManagement, "Incoming exchange context should not be null");
     VerifyOrDieWithMsg(mState == State::ReadyForInvokeResponses, DataManagement, "state should be ReadyForInvokeResponses");
 
-    // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
-    // Exchange Manager for unsolicited InvokeCommand Requests.
+    // NOTE: we already know this is an InvokeRequestMessage because we explicitly registered with the
+    // Exchange Manager for unsolicited InvokeRequestMessages.
     mExchangeCtx.Grab(ec);
     mExchangeCtx->WillSendMessage();
 

@@ -214,7 +214,7 @@ public:
      *
      * commandResponder handles sending InvokeResponses, added by clusters, to the client. The
      * command responder object must outlive this CommandHandler object. It is only safe to
-     * release after client recieved OnDone callback.
+     * release after the caller of OnInvokeCommandRequest receives the OnDone callback.
      */
     Protocols::InteractionModel::Status OnInvokeCommandRequest(CommandHandlerExchangeInterface & commandResponder,
                                                                System::PacketBufferHandle && payload, bool isTimedInvoke);
@@ -654,7 +654,7 @@ private:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
-    void SetCommandResponder(CommandHandlerExchangeInterface * commandResponder);
+    void SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder);
 
     /**
      * Check whether the InvokeRequest we are handling is targeted to a group.

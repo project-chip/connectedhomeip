@@ -420,6 +420,7 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
                                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                                       bool aIsTimedInvoke)
 {
+    // TODO(#30453): Refactor CommandResponseSender's constructor to accept an exchange context parameter.
     CommandResponseSender * commandResponder = mCommandResponderObjs.CreateObject(this, this);
     if (commandResponder == nullptr)
     {

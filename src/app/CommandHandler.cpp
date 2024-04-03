@@ -54,7 +54,7 @@ CommandHandler::CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apC
     }
     if (aTestOverride.commandResponder)
     {
-        SetCommandResponder(aTestOverride.commandResponder);
+        SetExchangeInterface(aTestOverride.commandResponder);
     }
 }
 
@@ -104,7 +104,7 @@ Status CommandHandler::OnInvokeCommandRequest(CommandHandlerExchangeInterface & 
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "state should be Idle");
 
-    SetCommandResponder(&commandResponder);
+    SetExchangeInterface(&commandResponder);
 
     // Using RAII here: if this is the only handle remaining, DecrementHoldOff will
     // call the CommandHandler::OnDone callback when this function returns.
@@ -430,9 +430,8 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     VerifyOrDie(mpResponder);
-    auto optionalGroupId = mpResponder->GetGroupId();
-    VerifyOrDie(optionalGroupId.HasValue());
-    groupId = optionalGroupId.Value();
+    // The optionalGroupId must have a value, otherwise we wouldn't have reached this code path.
+    groupId = mpResponder->GetGroupId().Value();
     fabric  = GetAccessingFabricIndex();
 
     ChipLogDetail(DataManagement, "Received group command for Group=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
@@ -845,7 +844,7 @@ CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessage(bool aHasMoreChunks)
     return CHIP_NO_ERROR;
 }
 
-void CommandHandler::SetCommandResponder(CommandHandlerExchangeInterface * commandResponder)
+void CommandHandler::SetExchangeInterface(CommandHandlerExchangeInterface * commandResponder)
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "CommandResponseSender can only be set in idle state");
     mpResponder = commandResponder;
@@ -928,7 +927,7 @@ void CommandHandler::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandHandl
                                                                     NlFaultInjectionType faultType)
 {
     VerifyOrDieWithMsg(mState == State::Idle, DataManagement, "TH Failure: state should be Idle, issue with TH");
-    SetCommandResponder(&commandResponder);
+    SetExchangeInterface(&commandResponder);
 
     ChipLogProgress(DataManagement, "Response to InvokeRequestMessage overridden by fault injection");
     ChipLogProgress(DataManagement, "   Injecting the following response:%s", GetFaultInjectionTypeStr(faultType));

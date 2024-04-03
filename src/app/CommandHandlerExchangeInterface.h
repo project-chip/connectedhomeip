@@ -35,9 +35,9 @@ namespace app {
  *
  * Design Rationale: This interface enhances unit testability and allows applications to
  * customize InvokeResponse behavior. For example, a bridge application might locally execute
- * a command using `emberAf...` methods without intending to sending a response on an exchange.
- * These ember methods require providing an instance of CommandHandler where a status response
- * is added (see github.com/project-chip/connectedhomeip/issues/32030).
+ * a command using cluster APIs without intending to sending a response on an exchange.
+ * These cluster APIs require providing an instance of CommandHandler where a status response
+ * is added (see https://github.com/project-chip/connectedhomeip/issues/32030).
  */
 class CommandHandlerExchangeInterface
 {
@@ -45,12 +45,14 @@ public:
     virtual ~CommandHandlerExchangeInterface() = default;
 
     /**
-     * Gets the inner exchange context object associated with incoming
-     * InvokeRequestMessage, without ownership.
+     * Get a non-owning pointer to the exchange context the InvokeRequestMessage was
+     * delivered on.
      *
-     * @return The inner exchange context, might be nullptr if no
-     *         exchange context has been assigned or the context
-     *         has been released.
+     * @return The exchange context. Might be nullptr if no exchange context has been
+     *         assigned or the context has been released. For example, the exchange
+     *         context might not be assigned in unit tests, or if an application wishes
+     *         to locally execute cluster APIs and still receive response data without
+     *         sending it on an exchange.
      */
     virtual Messaging::ExchangeContext * GetExchangeContext() const = 0;
 
@@ -74,16 +76,16 @@ public:
      */
     virtual FabricIndex GetAccessingFabricIndex() const = 0;
     /**
-     * If the incoming session is a group session, returns its group ID. Otherwise,
+     * If session for the exchange is a group session, returns its group ID. Otherwise,
      * returns a null optional.
      */
     virtual Optional<GroupId> GetGroupId() const = 0;
 
     /**
-     * @brief Called to indicates slow command is being processed.
+     * @brief Called to indicate a slow command is being processed.
      *
-     * Facilitates communication on the exchange (if needed) that slow command is being
-     * processed. For example, sending a standalone ack when using MRP.
+     * Enables the exchange to send whatever transport-level acks might be needed without waiting
+     * for command processing to complete.
      */
     virtual void HandlingSlowCommand() = 0;
 
@@ -93,6 +95,7 @@ public:
      * Called by CommandHandler.
      */
     virtual void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket) = 0;
+
     /**
      * @brief Called to indicate that an InvokeResponse was dropped.
      *
