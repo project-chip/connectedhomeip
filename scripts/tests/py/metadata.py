@@ -93,10 +93,6 @@ class MetadataReader:
         metadata_dict: Dict[str, str]
           Dictionary where each key represent a particular argument and its value represent
           the value for that argument defined in the test script.
-
-        Return:
-
-        None
         """
 
         for run_arg,run_arg_val in metadata_dict.items():
