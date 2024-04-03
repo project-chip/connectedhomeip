@@ -16,6 +16,8 @@ name: Full builds - Android
 
 on:
     push:
+        branches:
+            - 'master'
     workflow_dispatch:
 
 concurrency:
