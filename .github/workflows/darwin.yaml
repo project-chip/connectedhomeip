@@ -16,6 +16,8 @@ name: Darwin
 
 on:
     push:
+        branches:
+            - master
     pull_request:
     merge_group:
     workflow_dispatch:
