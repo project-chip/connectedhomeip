@@ -112,13 +112,23 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     mDNSResolver.SetCommissioningDelegate(this);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
 
-    VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
-
     mVendorId = params.controllerVendorId;
     if (params.operationalKeypair != nullptr || !params.controllerNOC.empty() || !params.controllerRCAC.empty())
     {
         ReturnErrorOnFailure(InitControllerNOCChain(params));
+    }
+    else if (params.fabricIndex.HasValue())
+    {
+        VerifyOrReturnError(params.systemState->Fabrics()->FabricCount() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+        if (params.systemState->Fabrics()->FindFabricWithIndex(params.fabricIndex.Value()) != nullptr)
+        {
+            mFabricIndex = params.fabricIndex.Value();
+        }
+        else
+        {
+            ChipLogError(Controller, "There is no fabric corresponding to the given fabricIndex");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
     }
 
     mSystemState = params.systemState->Retain();
@@ -306,8 +316,62 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     ReturnErrorOnFailure(err);
     VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
 
-    mFabricIndex = fabricIndex;
+    mFabricIndex       = fabricIndex;
+    mAdvertiseIdentity = advertiseOperational;
+    return CHIP_NO_ERROR;
+}
 
+CHIP_ERROR DeviceController::UpdateControllerNOCChain(const ByteSpan & noc, const ByteSpan & icac,
+                                                      Crypto::P256Keypair * operationalKeypair,
+                                                      bool operationalKeypairExternalOwned)
+{
+    VerifyOrReturnError(mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INTERNAL);
+    FabricTable * fabricTable = mSystemState->Fabrics();
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    FabricId fabricId;
+    NodeId nodeId;
+    CATValues oldCats;
+    CATValues newCats;
+    ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(noc, &nodeId, &fabricId));
+    ReturnErrorOnFailure(fabricTable->FetchCATs(mFabricIndex, oldCats));
+    ReturnErrorOnFailure(ExtractCATsFromOpCert(noc, newCats));
+
+    bool needCloseSession = true;
+    if (GetFabricInfo()->GetNodeId() == nodeId && oldCats == newCats)
+    {
+        needCloseSession = false;
+    }
+
+    if (operationalKeypair != nullptr)
+    {
+        err = fabricTable->UpdatePendingFabricWithProvidedOpKey(mFabricIndex, noc, icac, operationalKeypair,
+                                                                operationalKeypairExternalOwned, mAdvertiseIdentity);
+    }
+    else
+    {
+        VerifyOrReturnError(fabricTable->HasOperationalKeyForFabric(mFabricIndex), CHIP_ERROR_KEY_NOT_FOUND);
+        err = fabricTable->UpdatePendingFabricWithOperationalKeystore(mFabricIndex, noc, icac, mAdvertiseIdentity);
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        err = fabricTable->CommitPendingFabricData();
+    }
+    else
+    {
+        fabricTable->RevertPendingFabricData();
+    }
+
+    ReturnErrorOnFailure(err);
+    if (needCloseSession)
+    {
+        // If the node id or CATs have changed, our existing CASE sessions are no longer valid,
+        // because the other side will think anything coming over those sessions comes from our
+        // old node ID, and the new CATs might not satisfy the ACL requirements of the other side.
+        mSystemState->SessionMgr()->ExpireAllSessionsForFabric(mFabricIndex);
+    }
+    ChipLogProgress(Controller, "Controller NOC chain has updated");
     return CHIP_NO_ERROR;
 }
 
@@ -398,6 +462,8 @@ DeviceCommissioner::DeviceCommissioner() :
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
+    VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
     ReturnErrorOnFailure(DeviceController::Init(params));
 
     mPairingDelegate = params.pairingDelegate;

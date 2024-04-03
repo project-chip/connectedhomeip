@@ -351,6 +351,12 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
     auto * exchangeMgr                            = mInitParams.exchangeMgr;
     Optional<SessionHandle> optionalSessionHandle = mSecureSession.Get();
     ScopedNodeId peerId                           = mPeerId;
+    System::Clock::Milliseconds16 requestedBusyDelay =
+#if CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+        mRequestedBusyDelay;
+#else
+        System::Clock::kZero;
+#endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
 
     if (releaseBehavior == ReleaseBehavior::Release)
     {
@@ -361,14 +367,15 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Sessi
     // DO NOT touch any members of this object after this point.  It's dead.
 
     NotifyConnectionCallbacks(failureReady, setupFailureReady, successReady, error, stage, peerId, performingAddressUpdate,
-                              exchangeMgr, optionalSessionHandle);
+                              exchangeMgr, optionalSessionHandle, requestedBusyDelay);
 }
 
 void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureReady, Cancelable & setupFailureReady,
                                                         Cancelable & successReady, CHIP_ERROR error,
                                                         SessionEstablishmentStage stage, const ScopedNodeId & peerId,
                                                         bool performingAddressUpdate, Messaging::ExchangeManager * exchangeMgr,
-                                                        const Optional<SessionHandle> & optionalSessionHandle)
+                                                        const Optional<SessionHandle> & optionalSessionHandle,
+                                                        System::Clock::Milliseconds16 requestedBusyDelay)
 {
     //
     // If we encountered no error, go ahead and call all success callbacks. Otherwise,
@@ -401,6 +408,12 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureRead
         {
             // Initialize the ConnnectionFailureInfo object
             ConnnectionFailureInfo failureInfo(peerId, error, stage);
+#if CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+            if (error == CHIP_ERROR_BUSY)
+            {
+                failureInfo.requestedBusyDelay.Emplace(requestedBusyDelay);
+            }
+#endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
             cb->mCall(cb->mContext, failureInfo);
         }
     }
@@ -482,9 +495,9 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, Sess
 
 void OperationalSessionSetup::OnResponderBusy(System::Clock::Milliseconds16 requestedDelay)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES || CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
     // Store the requested delay, so that we can use it for scheduling our
-    // retry.
+    // retry or communicate it to our API consumer.
     mRequestedBusyDelay = requestedDelay;
 #endif
 }

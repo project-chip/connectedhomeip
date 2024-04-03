@@ -668,6 +668,7 @@ ifdef
 ifdefs
 IGMP
 ihex
+Illuminance
 IlluminanceMeasurement
 IM
 imager
