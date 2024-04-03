@@ -14,8 +14,8 @@ An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
             -   [Notes](#notes)
         -   [Cluster control](#cluster-control)
         -   [Factory Reset](#factory-reset)
-    -   [Building with OPTIGA™ Trust M as HSM](#build-trustm-hsm)
-        -   [OPTIGA™ Trust M Provisioning](#provisioning-trustm)
+    -   [Building with Optiga Trust M as HSM](#building-with-optiga-trust-m-as-hsm)
+        -   [Optiga Trust M Provisioning](#optiga-trust-m-provisioning)
     -   [OTA Software Update](#ota-software-update)
 
 <hr>
@@ -59,7 +59,7 @@ will then join the network.
 
 _To build with Infineon Hardware Security Module-OPTIGA™ Trust M for Device
 attestation and other security use cases, please refer to the
-[Building with OPTIGA™ Trust M as HSM](#build-trustm-hsm) for more instructions_
+[Building with OPTIGA™ Trust M as HSM](#building-with-optiga-trust-m-as-hsm) for more instructions_
 
 ## Flashing the Application
 
@@ -96,7 +96,7 @@ Run the built executable and pass it the discriminator and pairing code of the
 remote device, as well as the network credentials to use.
 
          $ ./out/debug/chip-tool pairing ble-wifi 1234 ${SSID} ${PASSWORD} 20202021 3840
-
+    
          Parameters:
          1. Discriminator: 3840
          2. Setup-pin-code: 20202021
@@ -137,9 +137,7 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
 -   Pressing the button again within 5 seconds will cancel the factory reset of
     the board.
 
-## <a name="build-trustm-hsm"></a>
-
-## Building with OPTIGA™ Trust M as HSM
+## Building with Optiga Trust M as HSM
 
 Infineon Hardware Security Module-OPTIGA™ Trust M is a high-end security
 solution that provides an anchor of trust for connecting IoT devices to the
@@ -152,7 +150,7 @@ cloud, giving every IoT device its own unique identity.
 
     [OPTIGA™ Trust Adapter](https://www.infineon.com/cms/en/product/evaluation-boards/optiga-trust-adapter/)
 
--   Building
+-   Building:
 
     Follow the steps to build with OPTIGA™ Trust M for device attestation use
     case:
@@ -170,9 +168,7 @@ cloud, giving every IoT device its own unique identity.
 -   Proceed to OPTIGA™ Trust M Provisioning section to complete the credential
     storage into HSM.
 
-### <a name="provisioning-trustm"></a>
-
-### OPTIGA™ Trust M Provisioning
+### Optiga Trust M Provisioning
 
 For the description of OPTIGA™ Trust M Provisioning with test DAC generation and
 PAI and CD storage, please refer to
