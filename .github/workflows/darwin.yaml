@@ -39,8 +39,6 @@ jobs:
                       arguments: -sdk macosx -configuration Release
                     - flavor: ios-release
                       arguments: -sdk iphoneos -configuration Release
-                    - flavor: ios-debug
-                      arguments: -sdk iphoneos -configuration Debug
                     - flavor: tvos-debug
                       arguments: -sdk appletvos -configuration Debug
                     - flavor: watchos-debug
