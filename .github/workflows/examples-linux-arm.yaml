@@ -16,6 +16,8 @@ name: Build example - Linux ARM
 
 on:
     push:
+        branches:
+            - 'master'
     pull_request:
     merge_group:
 
