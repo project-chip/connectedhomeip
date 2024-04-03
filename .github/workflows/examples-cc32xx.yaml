@@ -16,6 +16,8 @@ name: Build example - TI CC32XX
 
 on:
     push:
+        branches:
+            - 'master'
     pull_request:
     merge_group:
 
