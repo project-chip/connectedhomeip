@@ -281,9 +281,9 @@ static_library("app") {
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandHandler.cpp",
+    "CommandHandlerExchangeInterface.h",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
-    "CommandResponseSender.h",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",
@@ -304,6 +304,7 @@ static_library("app") {
     # TODO: the following items cannot be included due to interaction-model circularity
     #       (app depending on im and im including these headers):
     #       Name with _ so that linter does not recognize it
+    # "CommandResponseSender._h"
     # "CommandHandler._h"
     # "ReadHandler._h",
     # "WriteHandler._h"
