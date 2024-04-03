@@ -179,7 +179,7 @@ int AppTask::Init()
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#endif 
+#endif
 
     if (ret != CHIP_NO_ERROR)
     {
