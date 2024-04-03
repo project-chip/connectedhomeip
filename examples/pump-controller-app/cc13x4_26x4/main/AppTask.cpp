@@ -129,7 +129,7 @@ int AppTask::StartAppTask()
 // Identify take action
 void identify_TakeAction(void)
 {
-#if(LED_ENABLE == 1)
+#if (LED_ENABLE == 1)
     LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
     LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
 #endif // LED_ENABLE
@@ -138,7 +138,7 @@ void identify_TakeAction(void)
 // Identify stop action
 void identify_StopAction(void)
 {
-#if(LED_ENABLE == 1)
+#if (LED_ENABLE == 1)
     LED_stopBlinking(sAppGreenHandle);
     LED_setOff(sAppGreenHandle);
 #endif // LED_ENABLE
@@ -275,7 +275,7 @@ void AppTask::ActionInitiated(PumpManager::Action_t aAction, int32_t aActor)
         PLAT_LOG("Stop initiated");
         ; // TODO
     }
-#if(LED_ENABLE == 1)
+#if (LED_ENABLE == 1)
     LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
     LED_startBlinking(sAppGreenHandle, 50 /* ms */, LED_BLINK_FOREVER);
     LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
@@ -291,7 +291,7 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
     if (aAction == PumpManager::START_ACTION)
     {
         PLAT_LOG("Pump start completed");
-#if(LED_ENABLE == 1)
+#if (LED_ENABLE == 1)
         LED_stopBlinking(sAppGreenHandle);
         LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
         LED_stopBlinking(sAppRedHandle);
@@ -301,7 +301,7 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
     else if (aAction == PumpManager::STOP_ACTION)
     {
         PLAT_LOG("Pump stop completed");
-#if(LED_ENABLE == 1)
+#if (LED_ENABLE == 1)
         LED_stopBlinking(sAppGreenHandle);
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
@@ -367,7 +367,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         break;
 
     case AppEvent::kEventType_IdentifyStop:
-#if(LED_ENABLE == 1)
+#if (LED_ENABLE == 1)
         LED_stopBlinking(sAppGreenHandle);
 
         if (!PumpMgr().IsStopped())
@@ -440,7 +440,7 @@ void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
     }
 }
 
-#if(BUTTON_ENABLE == 1)
+#if (BUTTON_ENABLE == 1)
 void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
 {
     AppEvent event;
@@ -484,7 +484,7 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
 
 void AppTask::uiInit(void)
 {
-#if(LED_ENABLE == 1)
+#if (LED_ENABLE == 1)
 
     LED_Params ledParams;
 
@@ -501,7 +501,7 @@ void AppTask::uiInit(void)
     LED_setOff(sAppGreenHandle);
 #endif // LED ENABLE
 
-#if(BUTTON_ENABLE == 1)
+#if (BUTTON_ENABLE == 1)
     Button_Params buttonParams;
 
     // Initialize buttons

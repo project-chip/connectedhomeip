@@ -345,7 +345,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-#if(BUTTON_ENABLE == 1)
+#if (BUTTON_ENABLE == 1)
 void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
 {
     AppEvent event;
@@ -389,7 +389,7 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
 
 void AppTask::uiInit(void)
 {
-#if(LED_ENABLE == 1)
+#if (LED_ENABLE == 1)
 
     LED_Params ledParams;
 
@@ -406,7 +406,7 @@ void AppTask::uiInit(void)
     LED_setOff(sAppGreenHandle);
 #endif // LED ENABLE
 
-#if(BUTTON_ENABLE == 1)
+#if (BUTTON_ENABLE == 1)
     Button_Params buttonParams;
 
     // Initialize buttons
