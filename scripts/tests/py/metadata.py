@@ -61,23 +61,6 @@ class MetadataReader:
         """
         with open(env_yaml_file_path) as stream:
             self.env=yaml.safe_load(stream)
-            
-
-    def __build_env_object__(self, env_yaml_file_path: str) -> Dict[str, Union[str, int, Dict]]:
-        """
-        Reads a YAML file and converts it into a dictionary
-
-        Parameters:
-
-        env_yaml_file_path: str
-          path to the YAML file that contains environment configuration
-
-        Returns:
-         Dict - a Python Dictionary representation of the environment YAML file
-        
-        """
-        with open(env_yaml_file_path) as stream:
-            return yaml.safe_load(stream)
 
     
     def __resolve_env_vals__(self, metadata_dict: Dict[str, str]) -> None:
