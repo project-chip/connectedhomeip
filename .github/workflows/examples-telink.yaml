@@ -16,6 +16,8 @@ name: Build example - Telink
 
 on:
     push:
+        branches:
+            - 'master'
     pull_request:
     merge_group:
 
