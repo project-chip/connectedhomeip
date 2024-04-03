@@ -14,11 +14,13 @@
 
 import("//build_overrides/chip.gni")
 
-# This config is to allow ota-provider or similar to include `_attribute-storage.h` (underscore
-# no make linter not recognize this as a reference) for overriden function access that are
-# overriden by DynamicDispatcher
+# This config is to allow ota-provider or similar to include
+# `_attribute-storage.h` (underscore to make linter not recognize this as a
+# reference) for overriden function access that are overriden by
+# DynamicDispatcher
 #
-# This feels awkward and should be cleaned up once we manage to isolate generated code more.
+# This feels awkward and should be cleaned up once we manage to isolate
+# generated code more.
 config("mock-codegen-config") {
   include_dirs = [ "mock_includes" ]
 }
