@@ -49,4 +49,7 @@ rm -f "$root"/sdkconfig
     echo "build $sdkconfig_name failed"
     exit 1
 }
-cp "$root"/build/chip-"$app".elf "$root"/build/"${sdkconfig_name%".defaults"}"-chip-"$app".elf
+
+project_name=$(grep -o 'project([^)]*)' "$root"/CMakeLists.txt | sed 's/project(\(.*\))/\1/')
+
+cp "$root"/build/"$project_name".elf "$root"/build/"${sdkconfig_name%".defaults"}"-"$project_name".elf
