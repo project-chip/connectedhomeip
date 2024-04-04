@@ -20,31 +20,29 @@ from os import path
 
 
 class TestMetadataReader(unittest.TestCase):
-    test_file = "simple_run_args.txt"
+    path_under_test = path_under_test=path.join(path.dirname(__file__),"simple_run_args.txt")
 
     def setUp(self):
 
         # build the reader object
         self.reader=MetadataReader(path.join(path.dirname(__file__),"env_test.yaml"))
-        with open(self.test_file, 'w', encoding='utf8') as test_file:
+        with open(self.path_under_test, 'w', encoding='utf8') as test_file:
             test_file.writelines(["# test-runner-runs: run1","\n# test-runner-run/run1: app/all-clusters discriminator KVS storage-path commissioning-method discriminator passcode"])
-                   
-
+        
+            
     def test_parse_single_run(self):
         
         expected_runs_metadata = []
-        path_under_test=path.join(path.dirname(__file__),self.test_file)
         
         expected_runs_metadata.append(Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-                   discriminator=1234, py_script_path=path_under_test, run="run1", passcode=20202021))
+                   discriminator=1234, py_script_path=self.path_under_test, run="run1", passcode=20202021))
 
-        self.assertEqual(self.reader.parse_script(path_under_test), expected_runs_metadata)
+        self.assertEqual(self.reader.parse_script(self.path_under_test), expected_runs_metadata)
 
     def tearDown(self):
-        if os.path.exists(self.test_file):
-            os.remove(self.test_file)
+        if os.path.exists(self.path_under_test):
+            os.remove(self.path_under_test)
             
     
 if __name__=="__main__":
     unittest.main()
-    
