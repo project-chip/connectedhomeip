@@ -126,6 +126,12 @@ if (chip_device_platform == "nxp" && chip_enable_openthread) {
   chip_mdns = "minimal"
 }
 
+declare_args() {
+  # Select DNS-SD components to build
+  chip_mdns_minimal = chip_mdns == "minimal"
+  chip_mdns_platform = chip_mdns == "platform"
+}
+
 _chip_device_layer = "none"
 if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "cc13xx_26xx/cc13x2_26x2"
