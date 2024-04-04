@@ -25,8 +25,20 @@
 #include <crypto/CHIPCryptoPALPSA.h>
 #endif
 
+#ifdef CONFIG_FPROTECT
 #include <fprotect.h>
+#endif // if CONFIG_FPROTECT
+
+#if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
 #include <pm_config.h>
+#define FACTORY_DATA_ADDRESS PM_FACTORY_DATA_ADDRESS
+#define FACTORY_DATA_SIZE PM_FACTORY_DATA_SIZE
+#else
+#include <zephyr/storage/flash_map.h>
+#define FACTORY_DATA_SIZE DT_REG_SIZE(DT_ALIAS(factory_data))
+#define FACTORY_DATA_ADDRESS DT_REG_ADDR(DT_ALIAS(factory_data))
+#endif // if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
+
 #include <system/SystemError.h>
 #include <zephyr/drivers/flash.h>
 
@@ -39,8 +51,8 @@ struct InternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
     {
-        data     = reinterpret_cast<uint8_t *>(PM_FACTORY_DATA_ADDRESS);
-        dataSize = PM_FACTORY_DATA_SIZE;
+        data     = reinterpret_cast<uint8_t *>(FACTORY_DATA_ADDRESS);
+        dataSize = FACTORY_DATA_SIZE;
         return CHIP_NO_ERROR;
     }
 
@@ -75,19 +87,24 @@ struct InternalFlashFactoryData
 #undef TO_STR_IMPL
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite()
     {
-        int ret = fprotect_area(FactoryDataBlockBegin(), FactoryDataBlockSize());
+#ifdef CONFIG_FPROTECT
+        int ret = fprotect_area(FACTORY_DATA_ADDRESS, FACTORY_DATA_SIZE);
         return System::MapErrorZephyr(ret);
+#else
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // if CONFIG_FPROTECT
     }
 #else
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
 };
 
+#if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
 struct ExternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
     {
-        int ret = flash_read(mFlashDevice, PM_FACTORY_DATA_ADDRESS, mFactoryDataBuffer, PM_FACTORY_DATA_SIZE);
+        int ret = flash_read(mFlashDevice, FACTORY_DATA_ADDRESS, mFactoryDataBuffer, FACTORY_DATA_SIZE);
 
         if (ret != 0)
         {
@@ -95,16 +112,17 @@ struct ExternalFlashFactoryData
         }
 
         data     = mFactoryDataBuffer;
-        dataSize = PM_FACTORY_DATA_SIZE;
+        dataSize = FACTORY_DATA_SIZE;
 
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
-    uint8_t mFactoryDataBuffer[PM_FACTORY_DATA_SIZE];
+    const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(nordic_pm_ext_flash));
+    uint8_t mFactoryDataBuffer[FACTORY_DATA_SIZE];
 };
+#endif // if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
 
 class FactoryDataProviderBase : public chip::Credentials::DeviceAttestationCredentialsProvider,
                                 public CommissionableDataProvider,
@@ -195,8 +213,8 @@ public:
     CHIP_ERROR GetUserKey(const char * userKey, void * buf, size_t & len) override;
 
 private:
-    static constexpr uint16_t kFactoryDataPartitionSize    = PM_FACTORY_DATA_SIZE;
-    static constexpr uint32_t kFactoryDataPartitionAddress = PM_FACTORY_DATA_ADDRESS;
+    static constexpr uint16_t kFactoryDataPartitionSize    = FACTORY_DATA_SIZE;
+    static constexpr uint32_t kFactoryDataPartitionAddress = FACTORY_DATA_ADDRESS;
     static constexpr uint8_t kDACPrivateKeyLength          = 32;
     static constexpr uint8_t kDACPublicKeyLength           = 65;
 

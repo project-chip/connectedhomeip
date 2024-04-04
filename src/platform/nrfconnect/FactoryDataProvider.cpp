@@ -432,7 +432,9 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetUserKey(const char * userKe
 
 // Fully instantiate the template class in whatever compilation unit includes this file.
 template class FactoryDataProvider<InternalFlashFactoryData>;
+#if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
 template class FactoryDataProvider<ExternalFlashFactoryData>;
+#endif // if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
 
 } // namespace DeviceLayer
 } // namespace chip
