@@ -238,7 +238,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
         return ECDH_derive_secret_H(&mKeypair, remote_public_key, out_secret);
     }
 
-    ChipLogDetail(Crypto, "ECDH_derive_secret: TrustM");
+    ChipLogDetail(Crypto, "TrustM: ECDH_derive_secret");
     trustm_Open();
 
     const uint8_t * const rem_pubKey = Uint8::to_const_uchar(remote_public_key);
@@ -281,7 +281,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, si
 
     VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(hash_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogDetail(Crypto, "ECDSA_validate_hash_signature");
+    ChipLogDetail(Crypto, "TrustM: ECDSA_validate_hash_signature");
 
     // Trust M init
     trustm_Open();
@@ -338,12 +338,12 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 
     VerifyOrReturnError(input.Length() == public_key.Length() + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
-    privkey = input.ConstBytes() /*Uint8::to_const_uchar(input) */ + public_key.Length();
+    privkey = input.ConstBytes() + public_key.Length();
 
     if (0 == memcmp(privkey, trustm_magic_no, sizeof(trustm_magic_no)))
     {
         /* trustm_magic_no + KeyID is passed */
-        ChipLogDetail(Crypto, "Deserialize: ref key found");
+        ChipLogDetail(Crypto, "Deserialize: key found");
         bbuf.Put(input.Bytes(), public_key.Length());
         VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
@@ -351,7 +351,6 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 
         mKeypair.mBytes[4] = *(privkey + 4);
         mKeypair.mBytes[5] = *(privkey + 5);
-        // ChipLogDetail(Crypto, "Parsed keyId = 0x%02X%02X", mKeypair.mBytes[4], mKeypair.mBytes[5]);
 
         mInitialized = true;
 
@@ -390,7 +389,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, size
     VerifyOrReturnError(msg != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(msg_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogDetail(Crypto, "ECDSA_validate_msg_signature");
+    ChipLogDetail(Crypto, "TrustM: ECDSA_validate_msg_signature");
 
     // Trust M init
     trustm_Open();
@@ -399,8 +398,6 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, size
                                     out_der_sig_span);
     SuccessOrExit(error);
 
-    /* Set the public key */
-    // P256PublicKeyHSM & public_key = const_cast<P256PublicKeyHSM &>(Pubkey());
     signature_trustm_len = out_der_sig_span.size();
     // Hash to get the digest
     memset(&digest[0], 0, sizeof(digest));
@@ -422,7 +419,7 @@ exit:
 
 static void add_tlv(uint8_t * buf, size_t buf_index, uint8_t tag, size_t len, uint8_t * val)
 {
-    buf[buf_index++] = (uint8_t) tag;
+    buf[buf_index++] = tag;
     buf[buf_index++] = (uint8_t) len;
     if (len > 0 && val != NULL)
     {
@@ -501,8 +498,6 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
 
     // Add length
     buffer_index -= kTlvHeader;
-    // Subject TLV ==> 1 + 1 + len(subject)
-    // Org OID TLV ==> 1 + 1 + len(organisation_oid)
     VerifyOrExit(buffer_index > 0, error = CHIP_ERROR_INTERNAL);
     add_tlv(data_to_hash, buffer_index, (ASN1_CONSTRUCTED | ASN1_SEQUENCE),
             ((2 * kTlvHeader) + (sizeof(SUBJECT_STR) - 1) + sizeof(organisation_oid)), NULL);
