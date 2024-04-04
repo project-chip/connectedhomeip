@@ -130,7 +130,7 @@ public:
 
 int main(int argc, char * argv[])
 {
-    ChipLogProgress(AppServer, "chip_casting_simplified = 1");
+    ChipLogProgress(AppServer, "chip_casting_simplified = 1"); // this file is built/run only if chip_casting_simplified = 1
     // Create AppParameters that need to be passed to CastingApp.Initialize()
     AppParameters appParameters;
     RotatingDeviceIdUniqueIdProvider rotatingDeviceIdUniqueIdProvider;
