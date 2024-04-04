@@ -19,7 +19,7 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from chip.interaction_model import Status
+from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -42,6 +42,9 @@ class TC_FAN_3_3(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.RockSetting(rock_setting))])
         asserts.assert_equal(result[0].Status, Status.Success, "RockSetting write failed")
 
+    async def write_rock_setting_expect_failure(self, endpoint, rock_setting):
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.RockSetting(rock_setting))])
+        asserts.assert_equal(result[0].Status, Status.ConstraintError, "Expected ConstraintError but received a different error.")
 
     def desc_TC_FAN_3_3(self) -> str:
         return "[TC-FAN-3.3] Optional rock functionality with DUT as Server"
@@ -50,16 +53,16 @@ class TC_FAN_3_3(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read from the DUT the RockSupport attribute and store"),
-            TestStep(3, "RockLeftRight is supported, so write 0x01 to RockSetting")
+            TestStep(3, "RockLeftRight is supported, so write 0x01 to RockSetting"),
             TestStep(4, "Read from the DUT the RockSetting attribute"),
-            TestStep(5, "RockLeftRight is not supported, so write 0x01 to RockSetting to check for constraint error")
-            TestStep(6, "RockUpDown is supported, so write 0x02 to RockSetting")
+            TestStep(5, "RockLeftRight is not supported, so write 0x01 to RockSetting to check for constraint error"),
+            TestStep(6, "RockUpDown is supported, so write 0x02 to RockSetting"),
             TestStep(7, "Read from the DUT the RockSetting attribute"),
-            TestStep(8, "RockUpDown is not supported, so write 0x02 to RockSetting to check for constraint error")
-            TestStep(9, "RockRound is supported, so write 0x04 to RockSetting")
+            TestStep(8, "RockUpDown is not supported, so write 0x02 to RockSetting to check for constraint error"),
+            TestStep(9, "RockRound is supported, so write 0x04 to RockSetting"),
             TestStep(10, "Read from the DUT the RockSetting attribute"),
-            TestStep(11, "RockRound is not supported, so write 0x04 to RockSetting to check for constraint error")
-            TestStep(12, "Write RockSetting to 0x00")
+            TestStep(11, "RockRound is not supported, so write 0x04 to RockSetting to check for constraint error"),
+            TestStep(12, "Write RockSetting to 0x00"),
         ]
         return steps
 
@@ -94,11 +97,7 @@ class TC_FAN_3_3(MatterBaseTest):
             self.skip_step(4)
 
             self.step(5)
-            try:
-                await self.write_rock_setting(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockLeftRight)
-                asserts.assert_fail("Expected an exception but received none.")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different error.")
+            self.write_rock_setting_expect_failure(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockLeftRight)
 
         if rock_support & Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown:
             self.step(6)
@@ -115,11 +114,7 @@ class TC_FAN_3_3(MatterBaseTest):
             self.skip_step(7)
             
             self.step(8)
-            try:
-                await self.write_rock_setting(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown)
-                asserts.assert_fail("Expected an exception but received none.")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different error.")
+            await self.write_rock_setting_expect_failure(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown)
 
         if rock_support & Clusters.FanControl.Bitmaps.RockBitmap.kRockRound:
             self.step(9)
@@ -135,11 +130,7 @@ class TC_FAN_3_3(MatterBaseTest):
             self.skip_step(10)
             
             self.step(11)
-            try:
-                await self.write_rock_setting(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockRound)
-                asserts.assert_fail("Expected an exception but received none.")
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different error.")
+            await self.write_rock_setting_expect_failure(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockRound)
 
         self.step(12)
         await self.write_rock_setting(endpoint=endpoint, rock_setting=0x00)
