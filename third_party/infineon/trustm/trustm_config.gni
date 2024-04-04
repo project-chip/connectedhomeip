@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,13 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
-import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/src/crypto/crypto.gni")
-import("${chip_root}/src/platform/Infineon/PSOC6/args.gni")
+# Configuration file
 
-psoc6_target_project =
-    get_label_info(":lock_app_sdk_sources", "label_no_toolchain")
-
-import("${chip_root}/src/platform/Infineon/crypto/trustm/args.gni")
+declare_args() {
+  chip_trustm_da = 0
+}
