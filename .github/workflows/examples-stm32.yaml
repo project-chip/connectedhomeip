@@ -16,8 +16,8 @@ name: Build example - stm32
 
 on:
     push:
-        branches:
-            - master
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
