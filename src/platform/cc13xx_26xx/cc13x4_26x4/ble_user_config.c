@@ -372,7 +372,7 @@ const boardConfig_t boardConfig = {
 #if defined(CC13X2P_2_LAUNCHXL)
     .txPwrBackoffTbl = &appTxPwrBackoffTbl,
 #else
-    .txPwrBackoffTbl = NULL,
+    .txPwrBackoffTbl          = NULL,
 #endif // defined(CC13X2P_2_LAUNCHXL)
 #if defined(EM_CC1354P10_1_LP)
     .rfRegOverrideTxStdTblptr = NULL,
@@ -386,8 +386,8 @@ const boardConfig_t boardConfig = {
     .rfRegOverrideCtePtr = (regOverride_t *) (pOverrides_bleCommon + BLE_STACK_OVERRIDES_OFFSET + CTE_OVERRIDES_OFFSET),
     .cteAntennaPropPtr   = &appCTEAntProp,
 #else
-    .rfRegOverrideCtePtr = NULL,
-    .cteAntennaPropPtr   = NULL,
+    .rfRegOverrideCtePtr  = NULL,
+    .cteAntennaPropPtr    = NULL,
 #endif
     .privOverrideOffset = BLE_STACK_OVERRIDES_OFFSET + PRIVACY_OVERRIDE_OFFSET,
 #if defined(USE_COEX)

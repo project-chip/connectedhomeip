@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 /**
  *    @file
  *      Overrides to default OpenThread configuration.
@@ -23,7 +22,6 @@
  */
 
 #pragma once
-
 
 #define OPENTHREAD_CONFIG_DHCP6_SERVER_ENABLE 0
 #define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE 0
