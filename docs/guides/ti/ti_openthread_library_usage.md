@@ -64,7 +64,7 @@ chip_openthread_ftd = true
 -   **Custom Openthread Library**:
 
     1.  `ot_ti_lib_dir` Points to a library directory containing a custom
-        libopenthread-ftd/mtd variant
+        `libopenthread-ftd/mtd` variant
 
         ```
         ot_ti_lib_dir="${chip_root}/CUSTOM_LIB_DIR_PATH/"

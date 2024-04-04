@@ -86,8 +86,6 @@ static_library("cc13x2_26x2") {
   if (chip_enable_openthread) {
     public_deps += [
       "${chip_root}/third_party/openthread:openthread",
-
-      #"${chip_root}/third_party/openthread/platforms/cc13x2_26x2:libopenthread-cc13x2_cc26x2",
       "${chip_root}/third_party/openthread/platforms/ti:libopenthread-ti",
       "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
