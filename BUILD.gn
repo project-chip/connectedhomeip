@@ -232,8 +232,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
         "//scripts/py_matter_idl:matter_idl.tests",
-        "//scripts/tests/py:metadata_parser.tests",
         "//scripts/py_matter_yamltests:matter_yamltests.tests",
+        "//scripts/tests/py:metadata_parser.tests",
         "//src:tests_run",
       ]
 
