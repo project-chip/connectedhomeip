@@ -145,7 +145,7 @@ static bool emitDSTTableEmptyEvent(EndpointId ep)
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "DSTTableEmptyEvent failed");
+        ChipLogError(Zcl, "DSTTableEmptyEvent failed: %" CHIP_ERROR_FORMAT, error.Format());
         return false;
     }
     ChipLogProgress(Zcl, "DSTTableEmptyEvent");
@@ -165,7 +165,7 @@ static bool emitDSTStatusEvent(EndpointId ep, bool dstOffsetActive)
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "DSTStatusEvent failed");
+        ChipLogError(Zcl, "DSTStatusEvent failed: %" CHIP_ERROR_FORMAT, error.Format());
         return false;
     }
 
@@ -191,7 +191,7 @@ static bool emitTimeZoneStatusEvent(EndpointId ep)
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "TimeZoneStatusEvent failed");
+        ChipLogError(Zcl, "TimeZoneStatusEvent failed: %" CHIP_ERROR_FORMAT, error.Format());
         return false;
     }
 
@@ -208,7 +208,7 @@ static bool emitTimeFailureEvent(EndpointId ep)
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "TimeFailureEvent failed");
+        ChipLogError(Zcl, "TimeFailureEvent failed: %" CHIP_ERROR_FORMAT, error.Format());
         return false;
     }
 
