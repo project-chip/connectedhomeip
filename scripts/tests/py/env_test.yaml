@@ -16,7 +16,7 @@
 discriminator: 1234
 KVS: kvs1
 trace-to-appjson: json:out/trace_data/app-{SCRIPT_BASE_NAME}.json
-enable-key: 000102030405060708090a0b0c0d0e0f 
+enable-key: 000102030405060708090a0b0c0d0e0f
 
 storage-path: admin_storage.json
 commissioning-method: on-network
