@@ -54,7 +54,6 @@
 #import <os/lock.h>
 
 #include <app/server/Dnssd.h>
-#include <app/util/af.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>

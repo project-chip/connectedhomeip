@@ -30,6 +30,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #endif // SIWX917_USE_COMISSIONABLE_DATA
 
+#include <string>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {

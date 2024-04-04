@@ -20,7 +20,6 @@
 #include "PWMDevice.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/af.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>

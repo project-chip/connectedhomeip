@@ -25,6 +25,8 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <string>
+
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
 
