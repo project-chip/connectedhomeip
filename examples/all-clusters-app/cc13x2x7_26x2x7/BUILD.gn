@@ -47,10 +47,6 @@ ti_sysconfig("sysconfig") {
     "ti_dmm_application_policy.c",
     "ti_dmm_application_policy.h",
 
-    # disabled until upstream generation is aligned
-    #"tiop_config.h",
-    #"tiop_config.c",
-
     # not traditional source files
     #"ti_utils_build_linker.cmd.genlibs",
     #"syscfg_c.rov.xs",
@@ -105,13 +101,8 @@ ti_simplelink_executable("all-clusters-app") {
     ":sysconfig",
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/openthread:openthread",
   ]
-
-  if (chip_openthread_ftd) {
-    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-  } else {
-    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
-  }
 
   if (custom_factory_data) {
     defines = [ "CC13XX_26XX_FACTORY_DATA" ]

@@ -29,6 +29,9 @@ lwip_debug = false
 
 chip_enable_ota_requestor = false
 
+openthread_external_platform =
+    "${chip_root}/third_party/openthread/platforms/ti:libopenthread-ti"
+
 # Disable FTD Build for all-clusters app to save Flash
 chip_openthread_ftd = false
 

@@ -48,8 +48,8 @@ In the TI example applications the Bluetooth Low Energy protocol is used to
 provision the Thread protocol to enable Matter communication. Then Thread is
 used for IP communication with other Matter devices.
 
-The TI applications leverage the Bluetooth Low Energy stack on the CC13X2 and
-CC26X2 families. This BLE software is distributed in binary form within the TI
+The TI applications leverage the Bluetooth Low Energy stack on the CC13XX and
+CC26XX families. This BLE software is distributed in binary form within the TI
 SimpleLink SDK. The BLE stack leverages code that is present in the device ROM
 for certain common BLE operations.
 
@@ -123,6 +123,33 @@ For instructions on how to migrate the CC1354P10-6 examples to either the
 CC2674P10 or the CC2674R10, please refer to the guide linked below.
 
 -   [TI CC2674 Migration Guide](./matter_cc2674_migration.md)
+
+<hr>
+
+## Factory Data Programming Tool
+
+For instructions on how to program custom factory data on TI devices, please
+refer to the guide linked below.
+
+-   [TI Factory Data User Guide](./ti_factory_data_user_guide.md)
+
+<hr>
+
+## Intermittently Connected Devices
+
+For instructions on how to use Matters' ICD feature on TI devices, please refer
+to the guide linked below.
+
+-   [Enabling ICD On TI Devices](./enabling_icd_on_ti_devices.md)
+
+<hr>
+
+## Matter Openthread Library Configuration
+
+For instructions on how to configure the Openthread build configuration for a
+Matter application, please refer to the guide linked below.
+
+-   [Openthread Library Configuration](./ti_openthread_library_usage.md)
 
 <hr>
 

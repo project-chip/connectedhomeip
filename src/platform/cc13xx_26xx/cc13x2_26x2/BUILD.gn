@@ -84,23 +84,15 @@ static_library("cc13x2_26x2") {
   }
 
   if (chip_enable_openthread) {
-    # needed for MTD/FTD
-    import("//build_overrides/ti_simplelink_sdk.gni")
-    import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
     public_deps += [
-      "${chip_root}/third_party/openthread/platforms/cc13x2_26x2:libopenthread-cc13x2_cc26x2",
+      "${chip_root}/third_party/openthread:openthread",
+
+      #"${chip_root}/third_party/openthread/platforms/cc13x2_26x2:libopenthread-cc13x2_cc26x2",
+      "${chip_root}/third_party/openthread/platforms/ti:libopenthread-ti",
       "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
     ]
-
-    if (chip_openthread_ftd) {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-    } else {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
-    }
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",

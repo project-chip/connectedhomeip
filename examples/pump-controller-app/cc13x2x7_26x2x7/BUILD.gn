@@ -82,13 +82,8 @@ ti_simplelink_executable("pump_controller_app") {
     "${chip_root}/examples/platform/cc13x2_26x2:cc13x2_26x2-attestation-credentials",
     "${chip_root}/examples/pump-controller-app/pump-controller-common",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/openthread:openthread",
   ]
-
-  if (chip_openthread_ftd) {
-    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
-  } else {
-    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
-  }
 
   if (custom_factory_data) {
     defines = [ "CC13XX_26XX_FACTORY_DATA" ]
