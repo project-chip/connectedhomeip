@@ -44,6 +44,7 @@ JniGlobalReference sBrowserObject;
 JniGlobalReference sMdnsCallbackObject;
 jmethodID sResolveMethod          = nullptr;
 jmethodID sBrowseMethod           = nullptr;
+jmethodID sStopBrowseMethod       = nullptr;
 jmethodID sGetTextEntryKeysMethod = nullptr;
 jmethodID sGetTextEntryDataMethod = nullptr;
 jclass sMdnsCallbackClass         = nullptr;
@@ -203,13 +204,31 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
 
-    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+    auto sdCtx        = chip::Platform::New<BrowseContext>(callback);
+    *browseIdentifier = reinterpret_cast<intptr_t>(sdCtx);
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(sBrowserObject.HasValidObjectRef() && sStopBrowseMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    auto ctx     = reinterpret_cast<BrowseContext *>(browseIdentifier);
+
+    env->CallVoidMethod(sBrowserObject.ObjectRef(), sStopBrowseMethod, reinterpret_cast<jlong>(ctx->callback));
+
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Discovery, "Java exception in ChipDnssdStopBrowse");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_JNI_ERROR_EXCEPTION_THROWN;
+    }
+    chip::Platform::Delete(ctx);
+
+    return CHIP_NO_ERROR;
 }
 
 template <size_t N>
@@ -305,6 +324,8 @@ void InitializeWithObjects(jobject resolverObject, jobject browserObject, jobjec
         env->GetMethodID(resolverClass, "resolve", "(Ljava/lang/String;Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
 
     sBrowseMethod = env->GetMethodID(browserClass, "browse", "(Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
+
+    sStopBrowseMethod = env->GetMethodID(browserClass, "stopDiscover", "(J)V");
 
     if (sResolveMethod == nullptr)
     {
