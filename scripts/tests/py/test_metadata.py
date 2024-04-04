@@ -13,31 +13,37 @@
 # limitations under the License.
 
 import unittest
+import os
 from metadata import Metadata
 from metadata import MetadataReader
 from os import path
 
 
 class TestMetadataReader(unittest.TestCase):
+    test_file = "simple_run_args.txt"
 
     def setUp(self):
 
         # build the reader object
         self.reader=MetadataReader(path.join(path.dirname(__file__),"env_test.yaml"))
-            
+        with open(self.test_file, 'w', encoding='utf8') as test_file:
+            test_file.writelines(["# test-runner-runs: run1","\n# test-runner-run/run1: app/all-clusters discriminator KVS storage-path commissioning-method discriminator passcode"])
+                   
 
     def test_parse_single_run(self):
+        
+        expected_runs_metadata = []
+        path_under_test=path.join(path.dirname(__file__),self.test_file)
+        
+        expected_runs_metadata.append(Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
+                   discriminator=1234, py_script_path=path_under_test, run="run1", passcode=20202021))
 
-        expected_runs_metadata = {}
-        path_under_test=path.join(path.dirname(__file__),"simple_run_args.txt")
-        
-        expected_runs_metadata[path_under_test] = Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-                   discriminator=1234, py_script_path=path_under_test, run="run1", passcode=20202021)
-        
-                
-        for run in expected_runs_metadata:
-            self.assertEqual(self.reader.parse_script(run)[0], expected_runs_metadata[run])
-    
+        self.assertEqual(self.reader.parse_script(path_under_test), expected_runs_metadata)
+
+    def tearDown(self):
+        if os.path.exists(self.test_file):
+            os.remove(self.test_file)
+            
     
 if __name__=="__main__":
     unittest.main()
