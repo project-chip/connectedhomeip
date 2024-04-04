@@ -357,6 +357,7 @@ void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
             SetUTCTime(kRootEndpointId, mTimeReadInfo->utcTime.Value(), ourGranularity, TimeSourceEnum::kNodeTimeCluster);
         if (err == CHIP_NO_ERROR)
         {
+            mTimeReadInfo = nullptr;
             return;
         }
     }
