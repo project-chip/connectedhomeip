@@ -330,3 +330,6 @@
 	branch = matter_support
 	platforms = infineon
 
+[submodule "ot-stm32"]
+	path = third_party/openthread/ot-stm32
+	url = https://github.com/openthread/openthread
