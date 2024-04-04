@@ -382,8 +382,9 @@ void DeviceController::Shutdown()
 
     VerifyOrReturn(mState != State::NotInitialized);
 
+    // If our state is initialialized it means mSystemState is valid,
+    // and we can use it below before we release our reference to it.
     ChipLogDetail(Controller, "Shutting down the controller");
-
     mState = State::NotInitialized;
 
     if (mFabricIndex != kUndefinedFabricIndex)

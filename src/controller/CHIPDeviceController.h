@@ -405,8 +405,8 @@ protected:
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
-    bool mRemoveFromFabricTableOnShutdown;
-    bool mDeleteFromFabricTableOnShutdown;
+    bool mRemoveFromFabricTableOnShutdown = true;
+    bool mDeleteFromFabricTableOnShutdown = false;
 
     FabricTable::AdvertiseIdentity mAdvertiseIdentity = FabricTable::AdvertiseIdentity::Yes;
 
