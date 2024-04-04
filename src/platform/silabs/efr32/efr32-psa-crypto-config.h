@@ -30,5 +30,10 @@
 #define PSA_WANT_ALG_CBC_NO_PADDING
 #endif // SL_USE_COAP_CONFIG
 
+// Multi-chip OTA encryption processing
+#if OTA_ENCRYPTION_ENABLE
+#define PSA_WANT_ALG_CTR
+#endif // OTA_ENCRYPTION_ENABLE
+
 // Include Generated fies
 #include "psa_crypto_config.h"

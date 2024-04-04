@@ -79,14 +79,27 @@ static_library("efr32") {
   }
 
   if (chip_enable_multi_ota_requestor) {
+    if(chip_enable_multi_ota_encryption) {
+      sources += [
+        "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.cpp",
+        "${silabs_platform_dir}/multi-ota/OtaTlvEncryptionKey.h",
+      ]
+    }
+
+  if (chip_enable_ota_custom_tlv_testing) {
+      sources += [
+        "${silabs_platform_dir}/multi-ota/OTACustomProcessor.cpp",
+        "${silabs_platform_dir}/multi-ota/OTACustomProcessor.h",
+      ]
+    }
     sources += [
       "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.cpp",
       "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.h",
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.cpp",
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
-      "${silabs_platform_dir}/multi-ota/efr32/OTAFirmwareProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/efr32/OTAFirmwareProcessor.h",
-      "${silabs_platform_dir}/multi-ota/efr32/OTAHooks.cpp",
+      "${silabs_platform_dir}/multi-ota/OTAFirmwareProcessor.cpp",
+      "${silabs_platform_dir}/multi-ota/OTAFirmwareProcessor.h",
+      "${silabs_platform_dir}/multi-ota/OTAHooks.cpp",
     ]
   } else if (chip_enable_ota_requestor) {
     sources += [

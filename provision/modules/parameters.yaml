@@ -384,3 +384,10 @@ attestation_credentials:
     name: 'common_name'
     short: 'dn'
     type: 'string'
+
+  - id: 0x01a2
+    desc: 'Ota Key'
+    name: "ota_key"
+    short: 'ok'
+    type: 'binary'
+    max: 128

@@ -223,7 +223,7 @@
                     <name>CCDefines</name>
                     <state>CHIP_CONFIG_SHA256_CONTEXT_SIZE=256</state>
                     <state>CHIP_SYSTEM_CONFIG_USE_SOCKETS=1</state>
-                    <state>SILABS_PROVISION_PROTOCOL_V1=1</state>
+                    <state>SILABS_PROVISION_PROTOCOL_V1=0</state>
                     <state>SL_PROVISION_CHANNEL_ENABLED=1</state>
                     <state>EFR32MG24A010F1024IM48=1</state>
                     <state>SL_APP_PROPERTIES=1</state>
@@ -570,7 +570,7 @@
                     <name>ADefines</name>
                     <state>CHIP_CONFIG_SHA256_CONTEXT_SIZE=256</state>
                     <state>CHIP_SYSTEM_CONFIG_USE_SOCKETS=1</state>
-                    <state>SILABS_PROVISION_PROTOCOL_V1=1</state>
+                    <state>SILABS_PROVISION_PROTOCOL_V1=0</state>
                     <state>SL_PROVISION_CHANNEL_ENABLED=1</state>
                     <state>EFR32MG24A010F1024IM48=1</state>
                     <state>SL_APP_PROPERTIES=1</state>

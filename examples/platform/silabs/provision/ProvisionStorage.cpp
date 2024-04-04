@@ -364,10 +364,14 @@ CHIP_ERROR Storage::Set(uint16_t id, const uint8_t *value, size_t size)
             mCommonName[size] = 0;
         }
         return CHIP_NO_ERROR;
+
+    case Parameters::ID::kOtaTlvEncryptionKey:
+        
+        if(value != nullptr)
+            return SetOtaTlvEncryptionKey(ByteSpan(value, size));
     }
     return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
 }
-
 
 CHIP_ERROR Storage::Set(uint16_t id, const uint64_t *value)
 {
@@ -378,7 +382,6 @@ CHIP_ERROR Storage::Get(uint16_t id, uint64_t &value)
 {
     return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
 }
-
 
 CHIP_ERROR Storage::Get(uint16_t id, uint8_t *value, size_t max_size, size_t &size)
 {

@@ -80,6 +80,8 @@ declare_args() {
 
   # Multi-chip OTA
   chip_enable_multi_ota_requestor = false
+  chip_enable_multi_ota_encryption = false
+  chip_enable_ota_custom_tlv_testing = false
 }
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 silabs_plat_efr32_wifi_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
@@ -328,6 +330,14 @@ template("efr32_sdk") {
         "SLI_SI91X_ENABLE_BLE=1",
         "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
       ]
+    }
+
+    if (chip_enable_multi_ota_encryption && chip_enable_multi_ota_requestor) {
+      defines += [ "OTA_ENCRYPTION_ENABLE=1" ]
+    }
+
+    if (chip_enable_ota_custom_tlv_testing && chip_enable_multi_ota_requestor) {
+      defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {

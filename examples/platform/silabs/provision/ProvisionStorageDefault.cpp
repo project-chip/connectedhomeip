@@ -1,5 +1,6 @@
 #include "ProvisionStorage.h"
 #include "AttestationKey.h"
+#include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <lib/support/CodeUtils.h>
@@ -619,6 +620,14 @@ CHIP_ERROR Storage::SetProvisionRequest(bool value)
 CHIP_ERROR Storage::GetProvisionRequest(bool &value)
 {
     return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Provision_Request, value);
+}
+
+CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
+{
+    chip::DeviceLayer::Silabs::OtaTlvEncryptionKey::OtaTlvEncryptionKey key;
+    ReturnErrorOnFailure(key.Import(value.data(), value.size()));
+    return SilabsConfig::WriteConfigValue(SilabsConfig::kOtaTlvEncryption_KeyId, key.GetId());
+    
 }
 
 } // namespace Provision

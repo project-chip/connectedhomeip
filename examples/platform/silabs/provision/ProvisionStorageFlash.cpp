@@ -538,6 +538,12 @@ CHIP_ERROR Storage::GetProvisionRequest(bool &value)
 
 }
 
+CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+
+}
+
 } // namespace Provision
 
 void MigrateDacProvider(void) {}

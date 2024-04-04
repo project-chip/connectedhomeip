@@ -18,7 +18,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
-#include <platform/silabs/multi-ota/efr32/OTAFirmwareProcessor.h>
+#include <platform/silabs/multi-ota/OTAFirmwareProcessor.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
@@ -72,7 +72,33 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
+#if OTA_ENCRYPTION_ENABLE
+        /* 16 bytes to used to store undecrypted data because of unalignment */
+        mAccumulator.Init(requestedOtaMaxBlockSize + 16);
+#endif
     }
+#if OTA_ENCRYPTION_ENABLE
+    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
+    memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
+
+    if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
+    {
+        uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
+        mAlignmentNum          = mAlignmentNum * 16;
+        mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
+        memcpy(&mBlock[requestedOtaMaxBlockSize], &mBlock[mAlignmentNum], mUnalignmentNum);
+        mBlock.reduce_size(mAlignmentNum);
+    }
+    else
+    {
+        mUnalignmentNum = mUnalignmentNum + block.size() - requestedOtaMaxBlockSize;
+        mBlock.reduce_size(requestedOtaMaxBlockSize);
+    }
+
+    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
+    block = mBlock;
+#endif
 
     uint32_t blockReadOffset = 0;
     while (blockReadOffset < block.size())

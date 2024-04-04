@@ -82,6 +82,7 @@ enum ID: uint16_t
     kKeyPass            = 0x0198,
     kPKCS12             = 0x0199,
     kCommonName         = 0x01a1,
+    kOtaTlvEncryptionKey = 0x01a2,
 };
 
 } // namespace Parameters
@@ -260,7 +261,8 @@ private:
     CHIP_ERROR GetProvisionVersion(char * value, size_t max, size_t &size);
     CHIP_ERROR SetSetupPayload(const uint8_t * value, size_t size);
     CHIP_ERROR GetSetupPayload(uint8_t * value, size_t max, size_t &size);
-
+    CHIP_ERROR SetOtaTlvEncryptionKey(const ByteSpan & value);
+    
     uint16_t mVendorId = 0;
     uint16_t mProductId = 0;
     uint16_t mHwVersion = 0;

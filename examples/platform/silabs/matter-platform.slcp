@@ -59,6 +59,8 @@ component:
 - {id: psa_crypto_ecdsa}
 - {id: psa_crypto_hash}
 - {id: psa_crypto_hkdf}
+# Only needed for multi-chip OTA
+- {id: psa_crypto_cipher_ctr}
 - {id: mbedtls_x509}
 - {id: mbedtls_cmac}
 - {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime }

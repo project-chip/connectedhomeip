@@ -55,6 +55,8 @@ include:
     - path: crypto/CHIPCryptoPALPSA.cpp
     - path: setup_payload/Base38Encode.h
     - path: setup_payload/Base38Encode.cpp
+    - path: platform/silabs/multi-ota/OtaTlvEncryptionKey.h
+    - path: platform/silabs/multi-ota/OtaTlvEncryptionKey.cpp
   - path: ../../src/include/
   - path: ../../zzz_generated/app-common/
   - path: ../../third_party/nlassert/repo/include/
@@ -75,6 +77,7 @@ component:
   - id: psa_crypto_ecc_secp256r1
   - id: psa_crypto_sha256
   - id: psa_crypto_ecdsa
+  - id: psa_crypto_cipher_ctr
   - id: mbedtls_pkcs5
   - id: mbedtls_ecc
   - id: mbedtls_x509
@@ -82,7 +85,7 @@ component:
 
 define:
 - { name: SL_PROVISION_CHANNEL_ENABLED, value: '1' }
-- { name: SILABS_PROVISION_PROTOCOL_V1, value: '1' }
+- { name: SILABS_PROVISION_PROTOCOL_V1, value: '0' }
 - { name: CHIP_SYSTEM_CONFIG_USE_SOCKETS, value: '1' }
 - { name: CHIP_CONFIG_SHA256_CONTEXT_SIZE, value: '256' }
 

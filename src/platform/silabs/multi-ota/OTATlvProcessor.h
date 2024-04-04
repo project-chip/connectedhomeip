@@ -43,6 +43,8 @@ namespace chip {
 #define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
 #define SL_GENERIC_OTA_ERROR CHIP_ERROR_TLV_PROCESSOR(0x0E)
 
+constexpr uint16_t requestedOtaMaxBlockSize = 1024;
+
 // Descriptor constants
 inline constexpr size_t kVersionStringSize = 64;
 inline constexpr size_t kBuildDateSize     = 64;
