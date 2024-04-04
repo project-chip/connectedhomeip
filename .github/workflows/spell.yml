@@ -16,8 +16,8 @@ name: Run misspell
 
 on:
     push:
-        branches:
-            - master
+        branches-ignore:
+            - 'dependabot/**'
         paths:
             - "**.md"
             - ".github/.wordlist.txt"
