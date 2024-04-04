@@ -16,8 +16,8 @@ name: Minimal Build (Linux / configure)
 
 on:
     push:
-        branches:
-            - 'master'
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
