@@ -333,6 +333,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                                  &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::InteractionModelEngine::GetInstance()->SetICDManager(&mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     // ICD Init needs to be after data model init and InteractionModel Init
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -446,12 +450,14 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         // We trigger Check-In messages before resuming subscriptions to avoid doing both.
         if (!mFailSafeContext.IsFailSafeArmed())
         {
-            mICDManager.TriggerCheckInMessages();
+            std::function<app::ICDManager::ShouldCheckInMsgsBeSentFunction> sendCheckInMessagesOnBootUp =
+                std::bind(&Server::ShouldCheckInMsgsBeSentAtBootFunction, this, std::placeholders::_1, std::placeholders::_2);
+            mICDManager.TriggerCheckInMessages(sendCheckInMessagesOnBootUp);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         ResumeSubscriptions();
-#endif
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         break;
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     case DeviceEventType::kThreadConnectivityChange:
@@ -519,6 +525,19 @@ void Server::RejoinExistingMulticastGroups()
     }
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+bool Server::ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, NodeId subjectID)
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    // If at least one registration has a persisted entry, do not send Check-In message.
+    // The resumption of the persisted subscription will serve the same function a check-in would have served.
+    return !app::InteractionModelEngine::GetInstance()->SubjectHasPersistedSubscription(aFabricIndex, subjectID);
+#else
+    return true;
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
 void Server::GenerateShutDownEvent()
 {
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
@@ -561,6 +580,9 @@ void Server::Shutdown()
 
     chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::InteractionModelEngine::GetInstance()->SetICDManager(nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mCommissioningWindowManager.Shutdown();
     mMessageCounterManager.Shutdown();
     mExchangeMgr.Shutdown();
@@ -645,13 +667,22 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     if (id.GetRotatingIdLength() == 0)
     {
-        char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
-        ReturnErrorOnFailure(
-            app::DnssdServer::Instance().GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
+        AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
+        uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+        MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
-        uint8_t * rotatingId = reinterpret_cast<uint8_t *>(rotatingDeviceIdHexBuffer);
-        size_t rotatingIdLen = strlen(rotatingDeviceIdHexBuffer);
-        id.SetRotatingId(rotatingId, rotatingIdLen);
+        ReturnErrorOnFailure(
+            chip::DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan));
+        ReturnErrorOnFailure(
+            chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter));
+        additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
+
+        uint8_t rotatingDeviceIdInternalBuffer[RotatingDeviceId::kMaxLength];
+        MutableByteSpan rotatingDeviceIdBufferTemp(rotatingDeviceIdInternalBuffer);
+        ReturnErrorOnFailure(AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsBinary(additionalDataPayloadParams,
+                                                                                               rotatingDeviceIdBufferTemp));
+
+        id.SetRotatingId(rotatingDeviceIdInternalBuffer, RotatingDeviceId::kMaxLength);
     }
 #endif
 

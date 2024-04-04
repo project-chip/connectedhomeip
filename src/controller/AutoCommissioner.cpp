@@ -29,6 +29,7 @@ namespace chip {
 namespace Controller {
 
 using namespace chip::app::Clusters;
+using namespace chip::Crypto;
 using chip::app::DataModel::MakeNullable;
 using chip::app::DataModel::NullNullable;
 
@@ -416,13 +417,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             }
             return CommissioningStage::kICDGetRegistrationInfo;
         }
-        return GetNextCommissioningStageInternal(CommissioningStage::kICDSendStayActive, lastErr);
+        return GetNextCommissioningStageInternal(CommissioningStage::kICDRegistration, lastErr);
     case CommissioningStage::kICDGetRegistrationInfo:
         return CommissioningStage::kICDRegistration;
     case CommissioningStage::kICDRegistration:
-        // TODO(#24259): StayActiveRequest is not supported by server. We may want to SendStayActive after OpDiscovery.
-        return CommissioningStage::kICDSendStayActive;
-    case CommissioningStage::kICDSendStayActive:
         // TODO(cecille): device attestation casues operational cert provisioning to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
@@ -446,7 +444,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             {
                 return CommissioningStage::kCleanup;
             }
-            return CommissioningStage::kFindOperational;
+            return CommissioningStage::kEvictPreviousCaseSessions;
         }
     case CommissioningStage::kScanNetworks:
         return CommissioningStage::kNeedsNetworkCreds;
@@ -489,7 +487,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         else
         {
             SetCASEFailsafeTimerIfNeeded();
-            return CommissioningStage::kFindOperational;
+            return CommissioningStage::kEvictPreviousCaseSessions;
         }
     case CommissioningStage::kThreadNetworkEnable:
         SetCASEFailsafeTimerIfNeeded();
@@ -497,8 +495,14 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kCleanup;
         }
-        return CommissioningStage::kFindOperational;
-    case CommissioningStage::kFindOperational:
+        return CommissioningStage::kEvictPreviousCaseSessions;
+    case CommissioningStage::kEvictPreviousCaseSessions:
+        return CommissioningStage::kFindOperationalForStayActive;
+    case CommissioningStage::kFindOperationalForStayActive:
+        return CommissioningStage::kICDSendStayActive;
+    case CommissioningStage::kICDSendStayActive:
+        return CommissioningStage::kFindOperationalForCommissioningComplete;
+    case CommissioningStage::kFindOperationalForCommissioningComplete:
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
@@ -539,7 +543,7 @@ void AutoCommissioner::SetCASEFailsafeTimerIfNeeded()
         //
         // A false return from ExtendArmFailSafe is fine; we don't want to make
         // the fail-safe shorter here.
-        mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, CommissioningStage::kFindOperational,
+        mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, mCommissioner->GetCommissioningStage(),
                                          mParams.GetCASEFailsafeTimerSeconds().Value(),
                                          GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe),
                                          OnExtendFailsafeSuccessForCASE, OnFailsafeFailureForCASE);
@@ -740,7 +744,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             if (mParams.GetCheckForMatchingFabric())
             {
-                chip::NodeId nodeId = mDeviceCommissioningInfo.remoteNodeId;
+                NodeId nodeId = mDeviceCommissioningInfo.remoteNodeId;
                 if (nodeId != kUndefinedNodeId)
                 {
                     mParams.SetRemoteNodeId(nodeId);
@@ -753,6 +757,11 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 {
                     mNeedIcdRegistration = true;
                     ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
+                }
+                else if (mParams.GetICDStayActiveDurationMsec().HasValue())
+                {
+                    ChipLogDetail(Controller, "AutoCommissioner: Clear ICD StayActiveDurationMsec");
+                    mParams.ClearICDStayActiveDurationMsec();
                 }
             }
             break;
@@ -822,10 +831,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kICDRegistration:
             // Noting to do. DevicePairingDelegate will handle this.
             break;
-        case CommissioningStage::kICDSendStayActive:
-            // Nothing to do.
-            break;
-        case CommissioningStage::kFindOperational:
+        case CommissioningStage::kFindOperationalForStayActive:
+        case CommissioningStage::kFindOperationalForCommissioningComplete:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
         case CommissioningStage::kCleanup:
@@ -861,7 +868,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
 DeviceProxy * AutoCommissioner::GetDeviceProxyForStep(CommissioningStage nextStage)
 {
-    if (nextStage == CommissioningStage::kSendComplete ||
+    if (nextStage == CommissioningStage::kSendComplete || nextStage == CommissioningStage::kICDSendStayActive ||
         (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy.GetDeviceId() != kUndefinedNodeId))
     {
         return &mOperationalDeviceProxy;

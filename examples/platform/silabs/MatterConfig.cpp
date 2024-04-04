@@ -46,10 +46,6 @@
 #include "wfx_rsi.h"
 #endif /* SLI_SI91X_MCU_INTERFACE */
 
-using namespace ::chip;
-using namespace ::chip::Inet;
-using namespace ::chip::DeviceLayer;
-
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
 // opaque keystore
@@ -74,6 +70,36 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #ifdef PERFORMANCE_TEST_ENABLED
 #include <performance_test_commands.h>
 #endif
+
+#include <AppTask.h>
+
+#include <DeviceInfoProviderImpl.h>
+#include <app/server/Server.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
+
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
+#include "FreeRTOSConfig.h"
+#include "event_groups.h"
+#include "task.h"
+
+/**********************************************************
+ * Defines
+ *********************************************************/
+
+#define MAIN_TASK_STACK_SIZE (1024 * 5)
+#define MAIN_TASK_PRIORITY (configMAX_PRIORITIES - 1)
+
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::Credentials::Silabs;
+using namespace chip::DeviceLayer::Silabs;
+
+TaskHandle_t main_Task;
+volatile int apperror_cnt;
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -128,6 +154,44 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
     return ThreadStackMgrImpl().StartThreadTask();
 }
 #endif // CHIP_ENABLE_OPENTHREAD
+
+namespace {
+void application_start(void * unused)
+{
+    CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
+    if (err != CHIP_NO_ERROR)
+        appError(err);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Credentials::Silabs::GetSilabsDacProvider());
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    SILABS_LOG("Starting App Task");
+    err = AppTask::GetAppTask().StartAppTask();
+    if (err != CHIP_NO_ERROR)
+        appError(err);
+
+    vTaskDelete(main_Task);
+}
+} // namespace
+
+void SilabsMatterConfig::AppInit()
+{
+    GetPlatform().Init();
+
+    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
+    SILABS_LOG("Starting scheduler");
+    GetPlatform().StartScheduler();
+
+    // Should never get here.
+    chip::Platform::MemoryShutdown();
+    SILABS_LOG("Start Scheduler Failed");
+    appError(CHIP_ERROR_INTERNAL);
+}
 
 #if SILABS_OTA_ENABLED
 void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)

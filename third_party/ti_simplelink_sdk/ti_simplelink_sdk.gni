@@ -14,18 +14,19 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+
 import("//build_overrides/freertos.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
 import("//build_overrides/pigweed.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 
 import("${chip_root}/src/platform/device.gni")
 import("${dir_pw_build}/python.gni")
-import("${freertos_root}/freertos.gni")
+
 import("${mbedtls_root}/mbedtls.gni")
 import("ti_simplelink_board.gni")
-
 declare_args() {
   # Location of the TI SimpleLink SDK.
 
@@ -73,6 +74,8 @@ template("ti_sysconfig") {
       "-fno-exceptions",
       "-fno-unwind-tables",
     ]
+
+    cflags = [ "-Wno-sign-compare" ]
     defines = [ "DeviceFamily_CC26X2X7" ]
   }
 
@@ -82,6 +85,7 @@ template("ti_sysconfig") {
       "-fno-exceptions",
       "-fno-unwind-tables",
     ]
+    cflags = [ "-Wno-sign-compare" ]
     if (ti_simplelink_device == "") {
       defines = [ "DeviceFamily_CC13X4" ]
     } else {
@@ -91,6 +95,7 @@ template("ti_sysconfig") {
 
   config("cc32xx_${target_name}_config") {
     ldflags = [ "-nostartfiles" ]
+    cflags = [ "-Wno-sign-compare" ]
     defines = [ "CC32XXWARE" ]
   }
 
@@ -176,21 +181,30 @@ template("ti_simplelink_sdk") {
   assert(ti_simplelink_sdk_root != "",
          "ti_simplelink_sdk_root must be specified")
 
-  action("build_external_library") {
-    script = "${ti_simplelink_sdk_build_root}/run_sdk_drivers_gen.py"
-    outputs = [ "${target_gen_dir}/drivers_${ti_simplelink_soc_family}.a" ]
-    args = [
-      "--sdk",
-      rebase_path(ti_simplelink_sdk_root),
-      "--chip-root",
-      rebase_path(chip_root),
-      "--src-path",
-      "/source/ti/drivers/lib/gcc/${ti_simplelink_isa}/drivers_${ti_simplelink_soc_family}.a",
-      "--dest-path",
-      rebase_path(target_gen_dir),
-    ]
-  }
+  if (ti_simplelink_device_family == "cc13x2_26x2" ||
+      ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
+      ti_simplelink_device_family == "cc13x4_26x4") {
+    action("build_external_library") {
+      script = "${ti_simplelink_sdk_build_root}/run_sdk_drivers_gen.py"
+      outputs = [
+        "${target_gen_dir}/drivers_${ti_simplelink_soc_family}.a",
+        "${target_gen_dir}/driverlib.lib",
+      ]
+      args = [
+        "--sdk",
+        rebase_path(ti_simplelink_sdk_root),
+        "--chip-root",
+        rebase_path(chip_root),
+        "--src-path-drivers",
+        "/source/ti/drivers/lib/gcc/${ti_simplelink_isa}/drivers_${ti_simplelink_soc_family}.a",
+        "--src-path-driverlib",
+        "/source/ti/devices/${ti_simplelink_device_family_driverlib}/driverlib/bin/gcc/driverlib.lib",
 
+        "--dest-path",
+        rebase_path(target_gen_dir),
+      ]
+    }
+  }
   if (defined(invoker.ti_simplelink_sdk_root)) {
     ti_simplelink_sdk_root = invoker.ti_simplelink_sdk_root
   }
@@ -198,26 +212,17 @@ template("ti_simplelink_sdk") {
   sdk_target_name = target_name
 
   config("cc13x2_26x2_sdk_config") {
-    libs = [
-      "${ti_simplelink_sdk_root}/source/ti/drivers/rf/lib/gcc/${ti_simplelink_isa}/rf_multiMode_${ti_simplelink_soc_family}.a",
-      "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2_cc26x2/driverlib/bin/gcc/driverlib.lib",
-    ]
+    libs = [ "${ti_simplelink_sdk_root}/source/ti/drivers/rf/lib/gcc/${ti_simplelink_isa}/rf_multiMode_${ti_simplelink_soc_family}.a" ]
     defines = [ "DeviceFamily_CC13X2_CC26X2" ]
   }
 
   config("cc13x2x7_26x2x7_sdk_config") {
-    libs = [
-      "${ti_simplelink_sdk_root}/source/ti/drivers/rf/lib/gcc/${ti_simplelink_isa}/rf_multiMode_${ti_simplelink_soc_family}.a",
-      "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2x7_cc26x2x7/driverlib/bin/gcc/driverlib.lib",
-    ]
+    libs = [ "${ti_simplelink_sdk_root}/source/ti/drivers/rf/lib/gcc/${ti_simplelink_isa}/rf_multiMode_cc26x2.a" ]
     defines = [ "DeviceFamily_CC13X2X7_CC26X2X7" ]
   }
 
   config("cc13x4_26x4_sdk_config") {
-    libs = [
-      "${ti_simplelink_sdk_root}/source/ti/drivers/rf/lib/gcc/${ti_simplelink_isa}/rf_multiMode_${ti_simplelink_soc_family}.a",
-      "${ti_simplelink_sdk_root}/source/ti/devices/cc13x4_cc26x4/driverlib/bin/gcc/driverlib.lib",
-    ]
+    libs = [ "${ti_simplelink_sdk_root}/source/ti/drivers/rf/lib/gcc/${ti_simplelink_isa}/rf_multiMode_${ti_simplelink_soc_family}.a" ]
     defines = [ "FLASH_ONLY_BUILD" ]
     if (ti_simplelink_device == "") {
       defines += [ "DeviceFamily_CC13X4" ]
@@ -248,13 +253,20 @@ template("ti_simplelink_sdk") {
     ]
   }
 
-  config("external_library_config") {
-    libs = [ "${target_gen_dir}/drivers_cc13x4.a" ]
-  }
+  if (ti_simplelink_device_family == "cc13x2_26x2" ||
+      ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
+      ti_simplelink_device_family == "cc13x4_26x4") {
+    config("external_library_config") {
+      libs = [
+        "${target_gen_dir}/drivers_${ti_simplelink_soc_family}.a",
+        "${target_gen_dir}/driverlib.lib",
+      ]
+    }
 
-  group("external_library") {
-    public_configs = [ ":external_library_config" ]
-    deps = [ ":build_external_library" ]
+    group("external_library") {
+      public_configs = [ ":external_library_config" ]
+      deps = [ ":build_external_library" ]
+    }
   }
 
   config("${sdk_target_name}_config") {
@@ -267,8 +279,6 @@ template("ti_simplelink_sdk") {
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
-
-    forward_variables_from(invoker, [ "defines" ])
 
     configs = [ ":${ti_simplelink_device_family}_sdk_config" ]
   }
@@ -358,7 +368,10 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/timer.c",
     ]
 
-    public_deps = [ ":${sdk_target_name}_dpl" ]
+    public_deps = [
+      ":${sdk_target_name}_dpl",
+      "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+    ]
 
     public_configs = [ ":${sdk_target_name}_config" ]
   }
@@ -766,7 +779,6 @@ template("ti_simplelink_sdk") {
     public_deps = [
       ":${sdk_target_name}_dpl",
       ":${sdk_target_name}_freertos",
-      ":build_external_library",
     ]
     if (ti_simplelink_device_family == "cc13x2_26x2" ||
         ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
@@ -774,11 +786,60 @@ template("ti_simplelink_sdk") {
       public_deps += [
         ":${sdk_target_name}_dmm",
         ":${sdk_target_name}_nvocmp",
+        ":build_external_library",
       ]
     }
     if (defined(invoker.public_configs)) {
       public_configs = invoker.public_configs
-      public_configs += [ ":external_library_config" ]
+      if (ti_simplelink_device_family == "cc13x2_26x2" ||
+          ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
+          ti_simplelink_device_family == "cc13x4_26x4") {
+        public_configs += [ ":external_library_config" ]
+      }
     }
+  }
+}
+
+template("freertos_target") {
+  freertos_target_name = target_name
+
+  if (ti_simplelink_device_family == "cc13x2_26x2" ||
+      ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
+      ti_simplelink_device_family == "cc13x4_26x4") {
+    _freertos_root = "${freertos_root}"
+  } else {
+    _freertos_root = "${freertos_root}/repo"
+  }
+
+  config("${freertos_target_name}_config") {
+    include_dirs = [ "${_freertos_root}/include" ]
+  }
+
+  source_set(freertos_target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(sources)) {
+      sources = []
+    }
+
+    sources += [
+      "${_freertos_root}/croutine.c",
+      "${_freertos_root}/event_groups.c",
+      "${_freertos_root}/list.c",
+      "${_freertos_root}/queue.c",
+      "${_freertos_root}/stream_buffer.c",
+      "${_freertos_root}/tasks.c",
+      "${_freertos_root}/timers.c",
+    ]
+
+    if (!defined(configs)) {
+      configs = []
+    }
+
+    if (!defined(public_configs)) {
+      public_configs = []
+    }
+
+    public_configs += [ ":${freertos_target_name}_config" ]
   }
 }

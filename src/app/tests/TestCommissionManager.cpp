@@ -32,6 +32,8 @@
 
 #include <nlunit-test.h>
 
+using namespace chip::Crypto;
+
 using chip::CommissioningWindowAdvertisement;
 using chip::CommissioningWindowManager;
 using chip::Server;
@@ -328,9 +330,9 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     CHIP_ERROR err = chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
-    chip::Spake2pVerifier verifier;
-    constexpr uint32_t kIterations = chip::kSpake2p_Min_PBKDF_Iterations;
-    uint8_t salt[chip::kSpake2p_Min_PBKDF_Salt_Length];
+    Spake2pVerifier verifier;
+    constexpr uint32_t kIterations = kSpake2p_Min_PBKDF_Iterations;
+    uint8_t salt[kSpake2p_Min_PBKDF_Salt_Length];
     chip::ByteSpan saltData(salt);
 
     NL_TEST_ASSERT(suite, !sWindowStatusDirty);

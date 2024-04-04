@@ -1003,17 +1003,10 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         return;
     }
 
-    // appclusters, 5.2.4.14 - spec does not allow setting the schedule for multiple days in the bitmask
-    int setBitsInDaysMask = 0;
-    uint8_t rawDaysMask   = daysMask.Raw();
-    for (size_t i = 0; i < sizeof(rawDaysMask) * 8; ++i)
-    {
-        setBitsInDaysMask += rawDaysMask & 0x1;
-        rawDaysMask = static_cast<uint8_t>(rawDaysMask >> 1);
-    }
+    uint8_t rawDaysMask = daysMask.Raw();
 
-    // TODO: Check that bits are within range
-    if (setBitsInDaysMask == 0 || setBitsInDaysMask > 1)
+    // Check that bits are within range
+    if ((0 == rawDaysMask) || (rawDaysMask & 0x80))
     {
         ChipLogProgress(Zcl,
                         "[SetWeekDaySchedule] Unable to add schedule - daysMask is out of range "

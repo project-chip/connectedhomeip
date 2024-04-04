@@ -28,14 +28,16 @@ RUN set -x \
 # Download NuttX SDK
 RUN set -x \
     && cd /opt/nuttx \
-    && wget -q -O nuttx.zip https://codeload.github.com/apache/nuttx/zip/b8e0423 \
+    && rm -rf nuttx \
+    && wget -q -O nuttx.zip https://codeload.github.com/apache/nuttx/zip/ce61e866 \
     && unzip -q nuttx.zip \
-    && mv nuttx-b8e0423 nuttx \
+    && mv nuttx-ce61e866 nuttx \
     && rm nuttx.zip
 
 RUN set -x \
     && cd /opt/nuttx \
-    && wget -q -O nuttx_app.zip https://codeload.github.com/apache/nuttx-apps/zip/9c48a8d \
+    && rm -rf apps \
+    && wget -q -O nuttx_app.zip https://codeload.github.com/apache/nuttx-apps/zip/e2805fc9 \
     && unzip -q nuttx_app.zip \
-    && mv nuttx-apps-9c48a8d apps \
+    && mv nuttx-apps-e2805fc9 apps \
     && rm nuttx_app.zip

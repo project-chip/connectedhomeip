@@ -82,7 +82,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
                      }),
                      this);
 
-    g_dbus_object_manager_server_export(mRoot.get(), G_DBUS_OBJECT_SKELETON(object));
+    g_dbus_object_manager_server_export(mEndpoint.GetGattApplicationObjectManager(), G_DBUS_OBJECT_SKELETON(object));
     g_object_unref(object);
 
     return adv;
@@ -94,6 +94,7 @@ gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 
     // We can use it to update the state of the advertisement in the CHIP layer.
     ChipLogDetail(DeviceLayer, "BLE advertisement stopped by BlueZ");
     mIsAdvertising = false;
+    bluez_leadvertisement1_complete_release(aAdv, aInvocation);
     BLEManagerImpl::NotifyBLEPeripheralAdvReleased();
     return TRUE;
 }
@@ -108,16 +109,15 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, const char * aAdvName)
+CHIP_ERROR BluezAdvertisement::Init(BluezAdapter1 * apAdapter, const char * aAdvUUID, const char * aAdvName)
 {
     VerifyOrReturnError(!mAdv, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "FAIL: BLE advertisement already initialized in %s", __func__));
 
-    mRoot.reset(reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(aEndpoint.GetGattApplicationObjectManager())));
-    mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(aEndpoint.GetAdapter())));
+    mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(apAdapter)));
 
     GAutoPtr<char> rootPath;
-    g_object_get(G_OBJECT(mRoot.get()), "object-path", &rootPath.GetReceiver(), nullptr);
+    g_object_get(G_OBJECT(mEndpoint.GetGattApplicationObjectManager()), "object-path", &rootPath.GetReceiver(), nullptr);
     g_snprintf(mAdvPath, sizeof(mAdvPath), "%s/advertising", rootPath.get());
     g_strlcpy(mAdvUUID, aAdvUUID, sizeof(mAdvUUID));
 
@@ -205,11 +205,10 @@ void BluezAdvertisement::Shutdown()
     // attached to the advertising object that may run on the glib thread.
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezAdvertisement * self) {
-            // The object manager server (mRoot) might not be released right away (it may be held
+            // The application object manager might not be released right away (it may be held
             // by other BLE layer objects). We need to unexport the advertisement object in the
             // explicit way to make sure that we can export it again in the Init() method.
-            g_dbus_object_manager_server_unexport(self->mRoot.get(), self->mAdvPath);
-            self->mRoot.reset();
+            g_dbus_object_manager_server_unexport(self->mEndpoint.GetGattApplicationObjectManager(), self->mAdvPath);
             self->mAdapter.reset();
             self->mAdv.reset();
             return CHIP_NO_ERROR;
@@ -226,16 +225,7 @@ void BluezAdvertisement::StartDone(GObject * aObject, GAsyncResult * aResult)
                                                                          aResult, &error.GetReceiver()))
     {
         ChipLogError(DeviceLayer, "FAIL: RegisterAdvertisement: %s", error->message);
-        switch (error->code)
-        {
-        case G_DBUS_ERROR_NO_REPLY:        // BlueZ crashed or the D-Bus connection is broken
-        case G_DBUS_ERROR_SERVICE_UNKNOWN: // BlueZ service is not available on the bus
-        case G_DBUS_ERROR_UNKNOWN_OBJECT:  // Requested BLE adapter is not available
-            BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(BLE_ERROR_ADAPTER_UNAVAILABLE);
-            break;
-        default:
-            BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR_INTERNAL);
-        }
+        BLEManagerImpl::NotifyBLEPeripheralAdvStartComplete(BluezCallToChipError(error.get()));
         return;
     }
 
@@ -290,16 +280,7 @@ void BluezAdvertisement::StopDone(GObject * aObject, GAsyncResult * aResult)
                                                                            aResult, &error.GetReceiver()))
     {
         ChipLogError(DeviceLayer, "FAIL: UnregisterAdvertisement: %s", error->message);
-        switch (error->code)
-        {
-        case G_DBUS_ERROR_NO_REPLY:        // BlueZ crashed or the D-Bus connection is broken
-        case G_DBUS_ERROR_SERVICE_UNKNOWN: // BlueZ service is not available on the bus
-        case G_DBUS_ERROR_UNKNOWN_OBJECT:  // Requested BLE adapter is not available
-            BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(BLE_ERROR_ADAPTER_UNAVAILABLE);
-            break;
-        default:
-            BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR_INTERNAL);
-        }
+        BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(BluezCallToChipError(error.get()));
         return;
     }
 

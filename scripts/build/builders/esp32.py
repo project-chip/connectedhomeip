@@ -139,7 +139,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         else:
             return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.C3DevKit:
-        return 'sdkconfig_c3devkit{}.defaults'.format(rpc)
+        return 'sdkconfig{}.defaults.esp32c3'.format(rpc)
     else:
         raise Exception('Unknown board type')
 

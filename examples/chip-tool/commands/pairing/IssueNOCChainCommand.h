@@ -46,7 +46,7 @@ public:
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const chip::ByteSpan & noc,
                                            const chip::ByteSpan & icac, const chip::ByteSpan & rcac,
-                                           chip::Optional<chip::IdentityProtectionKeySpan> ipk,
+                                           chip::Optional<chip::Crypto::IdentityProtectionKeySpan> ipk,
                                            chip::Optional<chip::NodeId> adminSubject)
     {
         auto command = static_cast<IssueNOCChainCommand *>(context);

@@ -15,74 +15,11 @@
  */
 #include "MatterCallbacks.h"
 
-// The defines below are using link-time callback and should be removed
-//
-// TODO: applications should be converted to use DataModelCallbacks instead
-//       of relying on weak linkage
-void __attribute__((weak)) MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-void __attribute__((weak)) MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-void __attribute__((weak)) MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-void __attribute__((weak)) MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
-CHIP_ERROR __attribute__((weak)) MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
-                                                                  const chip::Access::SubjectDescriptor & subjectDescriptor)
-{
-    return CHIP_NO_ERROR;
-}
-void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
-                                                             const chip::Access::SubjectDescriptor & subjectDescriptor)
-{}
-
 namespace chip {
 namespace {
 
-class WeakRedirectCallbacks : public DataModelCallbacks
-{
-public:
-    void AttributeOperation(OperationType operation, OperationOrder order, const chip::app::ConcreteAttributePath & path) override
-    {
-        switch (operation)
-        {
-        case OperationType::Read:
-            switch (order)
-            {
-            case OperationOrder::Pre:
-                MatterPreAttributeReadCallback(path);
-                break;
-            case OperationOrder::Post:
-                MatterPostAttributeReadCallback(path);
-                break;
-            }
-            break;
-        case OperationType::Write:
-            switch (order)
-            {
-            case OperationOrder::Pre:
-                MatterPreAttributeWriteCallback(path);
-                break;
-            case OperationOrder::Post:
-                MatterPostAttributeWriteCallback(path);
-                break;
-            }
-            break;
-        }
-    }
-
-    CHIP_ERROR PreCommandReceived(const chip::app::ConcreteCommandPath & commandPath,
-                                  const chip::Access::SubjectDescriptor & subjectDescriptor) override
-    {
-        return MatterPreCommandReceivedCallback(commandPath, subjectDescriptor);
-    }
-
-    void PostCommandReceived(const chip::app::ConcreteCommandPath & commandPath,
-                             const chip::Access::SubjectDescriptor & subjectDescriptor) override
-    {
-
-        MatterPostCommandReceivedCallback(commandPath, subjectDescriptor);
-    }
-};
-
-WeakRedirectCallbacks gWeakCallbacks;
-DataModelCallbacks * gInstance = &gWeakCallbacks;
+DataModelCallbacks gNoopCallbacks;
+DataModelCallbacks * gInstance = &gNoopCallbacks;
 
 } // namespace
 
@@ -97,3 +34,24 @@ DataModelCallbacks * DataModelCallbacks::SetInstance(DataModelCallbacks * newIns
 }
 
 } // namespace chip
+
+/// Strong-link callbacks for backwards compatibiltiy error reporting
+///
+/// We used to have these as __attribute__(weak) linkage in previous releases, so
+/// we define these as non-weak now so that we get compile errors in case anyone tries
+/// to link with them on the assumption they work (because they do not anymore)
+///
+/// TODO(future): we should be able to remove these once we assume everyone is updated
+///               to the latest code.
+void MatterPreAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void MatterPostAttributeReadCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void MatterPreAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+void MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & attributePath) {}
+CHIP_ERROR MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::Access::SubjectDescriptor & subjectDescriptor)
+{
+    return CHIP_NO_ERROR;
+}
+void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                       const chip::Access::SubjectDescriptor & subjectDescriptor)
+{}

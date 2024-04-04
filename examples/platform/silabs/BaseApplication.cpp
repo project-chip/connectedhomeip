@@ -79,7 +79,9 @@
 #define APP_TASK_STACK_SIZE (4096)
 #endif
 #define APP_TASK_PRIORITY 2
+#ifndef APP_EVENT_QUEUE_SIZE // Allow apps to define a different app queue size
 #define APP_EVENT_QUEUE_SIZE 10
+#endif
 #define EXAMPLE_VENDOR_ID 0xcafe
 
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
@@ -298,11 +300,11 @@ CHIP_ERROR BaseApplication::Init()
     return err;
 }
 
-void BaseApplication::FunctionTimerEventHandler(osTimerId_t xTimer)
+void BaseApplication::FunctionTimerEventHandler(void * timerCbArg)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = (void *) xTimer;
+    event.TimerEvent.Context = timerCbArg;
     event.Handler            = FunctionEventHandler;
     PostEvent(&event);
 }
@@ -677,7 +679,7 @@ void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
 }
 #endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
-void BaseApplication::LightTimerEventHandler(osTimerId_t xTimer)
+void BaseApplication::LightTimerEventHandler(void * timerCbArg)
 {
     LightEventHandler();
 }

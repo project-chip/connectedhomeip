@@ -60,8 +60,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    /// This callback is called once the message has been determined to be a command, but
-    /// after it being dispatched to the receiver.
+    /// This callback is called once for every command dispatch, after the dispatch is actually
+    /// done towards the receiver.
+    ///
+    /// This method is called once for every CommandDataIB (i.e. it may be called several times
+    /// in the case of batch invoke, where a single `InvokeRequestMessage` may contain several
+    /// CommandDataIB entries).
     virtual void PostCommandReceived(const chip::app::ConcreteCommandPath & commandPath,
                                      const chip::Access::SubjectDescriptor & subjectDescriptor)
     {}

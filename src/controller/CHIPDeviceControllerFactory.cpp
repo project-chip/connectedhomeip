@@ -310,6 +310,10 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerVendorId = params.controllerVendorId;
 
     controllerParams.enableServerInteractions = params.enableServerInteractions;
+    if (params.fabricIndex.HasValue())
+    {
+        controllerParams.fabricIndex.SetValue(params.fabricIndex.Value());
+    }
 }
 
 void DeviceControllerFactory::ControllerInitialized(const DeviceController & controller)

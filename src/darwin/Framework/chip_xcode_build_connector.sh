@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 
 #
 #    Copyright (c) 2020 Project CHIP Authors
@@ -27,37 +27,51 @@
 
 CHIP_ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
 
-# lotsa debug output :-)
-set -ex
+function format_gn_str() {
+    local val="$1"
+    val="${val//\\/\\\\}"         # escape '\'
+    val="${val//\$/\\\$}"         # escape '$'
+    echo -n "\"${val//\"/\\\"}\"" # escape '"'
+}
+
+function format_gn_list() {
+    local val sep=
+    echo -n "["
+    for val in "$@"; do
+        echo -n "$sep"
+        format_gn_str "$val"
+        sep=", "
+    done
+    echo "]"
+}
 
 # We only have work to do for the `installapi` and `build` phases
 [[ "$ACTION" == installhdrs ]] && exit 0
 
-# helpful debugging, save off environment that Xcode gives us, can source it to
-#  retry/repro failures from a bash terminal
 mkdir -p "$TEMP_DIR"
-export >"$TEMP_DIR/env.sh"
 
-declare -a defines=()
-# lots of environment variables passed by Xcode to this script
-read -r -a defines <<<"$GCC_PREPROCESSOR_DEFINITIONS"
+# For debugging, save off environment that Xcode gives us, can source it to
+# retry/repro failures from a bash terminal
+#export >"$TEMP_DIR/env.sh"
+#set -x
 
-declare target_defines=
-for define in "${defines[@]}"; do
-
+# Forward defines from Xcode (GCC_PREPROCESSOR_DEFINITIONS)
+declare -a target_defines=()
+read -r -a xcode_defines <<<"$GCC_PREPROCESSOR_DEFINITIONS"
+for define in "${xcode_defines[@]}"; do
     # skip over those that GN does for us
     case "$define" in
-        CHIP_HAVE_CONFIG_H)
-            continue
-            ;;
+        CHIP_HAVE_CONFIG_H) continue ;;
     esac
-    target_defines+=,\"${define//\"/\\\"}\"
+    target_defines+=("$define")
 done
-[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
-    target_defines+=,\"CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1\"
-}
-target_defines=[${target_defines:1}]
 
+# Forward C/C++ flags (OTHER_C*FLAGS)
+declare -a target_cflags=()
+read -r -a target_cflags_c <<<"$OTHER_CFLAGS"
+read -r -a target_cflags_cc <<<"$OTHER_CPLUSPLUSFLAGS"
+
+# Handle target OS and arch
 declare target_arch=
 declare target_cpu=
 declare target_cflags=
@@ -72,18 +86,12 @@ for arch in "${archs[@]}"; do
             *) target_cpu="$arch" ;;
         esac
     fi
-    if [ -n "$target_cflags" ]; then
-        target_cflags+=','
-    fi
-    target_cflags+='"-arch","'"$arch"'"'
+    target_cflags+=(-arch "$arch")
 done
 
-[[ $ENABLE_BITCODE == YES ]] && {
-    if [ -n "$target_cflags" ]; then
-        target_cflags+=','
-    fi
-    target_cflags+='"-flto"'
-}
+# Translate other options
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && target_defines+=("CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1")
+[[ $ENABLE_BITCODE == YES ]] && target_cflags+=("-flto")
 
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
@@ -98,10 +106,12 @@ declare -a args=(
     'chip_disable_platform_kvs=true'
     'enable_fuzz_test_targets=false'
     "target_cpu=\"$target_cpu\""
-    "target_defines=$target_defines"
-    "target_cflags=[$target_cflags]"
     "mac_target_arch=\"$target_arch\""
     "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
+    "target_defines=$(format_gn_list "${target_defines[@]}")"
+    "target_cflags=$(format_gn_list "${target_cflags[@]}")"
+    "target_cflags_c=$(format_gn_list "${target_cflags_c[@]}")"
+    "target_cflags_cc=$(format_gn_list "${target_cflags_cc[@]}")"
 )
 
 case "$CONFIGURATION" in
@@ -197,16 +207,18 @@ find_in_ancestors() {
     if [[ -z $CHIP_NO_ACTIVATE ]]; then
         # first run bootstrap/activate in an external env to build everything
         env -i PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 bash -c '. scripts/activate.sh'
-        set +ex
         # now source activate for env vars
+        opts="$(set +o)"
+        set +ex
         PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 . scripts/activate.sh
-        set -ex
+        eval "$opts"
     fi
 
     # put build intermediates in TEMP_DIR
     cd "$TEMP_DIR"
 
     # generate and build
+    set -x
     gn --root="$CHIP_ROOT" gen --check out --args="${args[*]}"
     exec ninja -v -C out
 }
