@@ -94,6 +94,7 @@ jobs:
                      --known-failure app/AttributeAccessToken.h \
                      --known-failure app/CommandHandler.h \
                      --known-failure app/CommandHandlerInterface.h \
+                     --known-failure app/CommandResponseSender.h \
                      --known-failure app/CommandSenderLegacyCallback.h \
                      --known-failure app/ReadHandler.h \
                      --known-failure app/reporting/reporting.cpp \

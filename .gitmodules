@@ -324,3 +324,9 @@
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip-network-interface-integration
 	url = https://github.com/Infineon/lwip-network-interface-integration.git
 	platforms = infineon
+[submodule "third_party/infineon/trustm/optiga-trust-m"]
+	path = third_party/infineon/trustm/optiga-trust-m
+	url = https://github.com/Infineon/optiga-trust-m.git
+	branch = matter_support
+	platforms = infineon
+

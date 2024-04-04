@@ -821,6 +821,7 @@ void ReadHandler::PersistSubscription()
     auto * subscriptionResumptionStorage = mManagementCallback.GetInteractionModelEngine()->GetSubscriptionResumptionStorage();
     VerifyOrReturn(subscriptionResumptionStorage != nullptr);
 
+    // TODO(#31873): We need to store the CAT information to enable better interactions with ICDs
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
                                                                          .mFabricIndex    = GetAccessingFabricIndex(),
                                                                          .mSubscriptionId = mSubscriptionId,

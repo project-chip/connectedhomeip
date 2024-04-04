@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/freertos.gni")
 import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/examples/platform/cc13x4_26x4/args.gni")
 
@@ -52,3 +53,10 @@ matter_software_ver = "0x0001"
 matter_software_ver_str = "1.0.1+1"
 
 custom_factory_data = true
+
+# ICD Default configurations
+chip_enable_icd_server = false
+chip_persist_subscriptions = false
+chip_subscription_timeout_resumption = false
+
+freertos_root = "//third_party/connectedhomeip/third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx/source/third_party/freertos"

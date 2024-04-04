@@ -122,7 +122,7 @@ source_set("global-attributes") {
   ]
 }
 
-source_set("subscription-manager") {
+source_set("subscription-info-provider") {
   sources = [ "SubscriptionsInfoProvider.h" ]
 
   public_deps = [ "${chip_root}/src/lib/core" ]
@@ -207,9 +207,10 @@ static_library("interaction-model") {
     ":app_config",
     ":constants",
     ":paths",
-    ":subscription-manager",
+    ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/app/util:callbacks",
@@ -281,9 +282,9 @@ static_library("app") {
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandHandler.cpp",
+    "CommandHandlerExchangeInterface.h",
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
-    "CommandResponseSender.h",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",
@@ -304,6 +305,7 @@ static_library("app") {
     # TODO: the following items cannot be included due to interaction-model circularity
     #       (app depending on im and im including these headers):
     #       Name with _ so that linter does not recognize it
+    # "CommandResponseSender._h"
     # "CommandHandler._h"
     # "ReadHandler._h",
     # "WriteHandler._h"
