@@ -284,7 +284,7 @@ class TestDefinition:
         return ", ".join([t.to_s() for t in self.tags])
 
     def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str,
-            timeout_seconds: typing.Optional[int], dry_run=False, test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON):
+            timeout_seconds: typing.Optional[int], dry_run=False, test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON, app_hci_number: typing.Optional[int] = None, tool_hci_number: typing.Optional[int] = None):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -331,8 +331,11 @@ class TestDefinition:
                         key = 'default'
                     else:
                         key = os.path.basename(path[-1])
-
-                    app = App(runner, path)
+                    ble_wifi_cmd = []
+                    if app_hci_number is not None:
+                        ble_wifi_cmd = ["--ble-device",
+                                        str(app_hci_number), "--wifi"]
+                    app = App(runner, path + ble_wifi_cmd)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
                     apps_register.add(key, app)
@@ -372,13 +375,21 @@ class TestDefinition:
                     runner.RunSubprocess(python_cmd, name='CHIP_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
-                pairing_cmd = paths.chip_tool_with_python_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]
-                if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                    pairing_cmd += ['--icd-registration', 'true']
+                pairing_server_args = []
+                if tool_hci_number is not None:
+                    pairing_cmd = paths.chip_tool_with_python_cmd + [
+                        "pairing", "ble-wifi",  TEST_NODE_ID, "Virtual_Wifi", "ExamplePassword", "20202021",  "3840", ]
+                    pairing_server_args = [
+                        "--ble-adapter", str(tool_hci_number)]
+                else:
+                    pairing_cmd = paths.chip_tool_with_python_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]
+                    if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                        pairing_cmd += ['--icd-registration', 'true']
                 test_cmd = paths.chip_tool_with_python_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
                 server_args = ['--server_path', paths.chip_tool[-1]] + \
                     ['--server_arguments', 'interactive server' +
-                        (' ' if len(tool_storage_args) else '') + ' '.join(tool_storage_args)]
+                        (' ' if len(tool_storage_args) else '') + ' '.join(tool_storage_args) +
+                        (' ' if len(pairing_server_args) else '') + ' '.join(pairing_server_args)]
                 pairing_cmd += server_args
                 test_cmd += server_args
 

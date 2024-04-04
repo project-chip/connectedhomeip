@@ -97,3 +97,66 @@ jobs:
                         --target tizen-arm-tests-no-ble-no-thread \
                         build
                     "
+
+    qemu-linux:
+        name: ubuntu
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/jlatusek/chip-build-linux-qemu:latest
+            volumes:
+                - "/tmp/log_output:/tmp/test_logs"
+            # Required for using KVM
+            options: --privileged
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+
+            - name: Build Apps
+              run: |
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-chip-tool \
+                        --target linux-x64-all-clusters \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+            # There is no enough space for running the test withouth cleaning the environment
+            - name: Clean up
+              run: |
+                rm -rf out/*/obj
+                rm -rf out/*/lib
+                rm -rf $PW_ENVIRONMENT_ROOT
+                git clean -fdx --exclude out
+            # Without all required apps paths provided as argument, script starts to search for them in the current directory and it takes a lot of time.
+            - name: Run ble commission test using the python parser sending commands to chip-tool
+              run: |
+                ./scripts/run_in_vm.sh \
+                "./scripts/run_in_build_env.sh \
+                \"./scripts/tests/run_test_suite.py \
+                  --runner chip_tool_python \
+                  --target TestCommissionerNodeId \
+                  --chip-tool ./out/linux-x64-chip-tool/chip-tool \
+                  run \
+                    --iterations 1 \
+                    --test-timeout-seconds 120 \
+                    --all-clusters-app ./out/linux-x64-all-clusters/chip-all-clusters-app \
+                    --lock-app ./out/linux-x64-lock/chip-lock-app \
+                    --ota-provider-app ./out/linux-x64-ota-provider/chip-ota-provider-app \
+                    --ota-requestor-app ./out/linux-x64-ota-requestor/chip-ota-requestor-app \
+                    --tv-app ./out/linux-x64-tv-app/chip-tv-app \
+                    --bridge-app ./out/linux-x64-bridge/chip-bridge-app \
+                    --lit-icd-app ./out/linux-x64-lit-icd/lit-icd-app \
+                    --microwave-oven-app .out/linux-x64-microwave-oven/chip-microwave-oven-app  \
+                    --rvc-app .out/linux-x64-rvc/chip-rvc-app  \
+                    --ble-wifi \
+                \" \
+                "
