@@ -169,10 +169,11 @@ class DBusServiceProxy:
                           invocation.get_interface_name(),
                           invocation.get_method_name())
             reply = conn.call_with_unix_fd_list_finish(result)
-            invocation.return_value_with_unix_fd_list(
-                reply[0], reply.out_fd_list)
+            invocation.return_value_with_unix_fd_list(reply[0],
+                                                      reply.out_fd_list)
         except GLib.Error as e:
-            invocation.return_gerror(e)
+            _, name, message = e.message.split(":", 2)
+            invocation.return_dbus_error(name, message.strip())
 
     def on_signal_from_source(self, sender, path, iface, signal, params):
         logging.debug("Signal from source: %s %s.%s", path, iface, signal)
