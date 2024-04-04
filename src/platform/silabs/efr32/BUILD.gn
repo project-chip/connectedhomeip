@@ -84,6 +84,8 @@ static_library("efr32") {
       "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.h",
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.cpp",
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
+      "${silabs_platform_dir}/multi-ota/OTAUtilityFirmwareProcessor.cpp",
+      "${silabs_platform_dir}/multi-ota/OTAUtilityFirmwareProcessor.h",
       "${silabs_platform_dir}/multi-ota/efr32/OTAFirmwareProcessor.cpp",
       "${silabs_platform_dir}/multi-ota/efr32/OTAFirmwareProcessor.h",
       "${silabs_platform_dir}/multi-ota/efr32/OTAHooks.cpp",

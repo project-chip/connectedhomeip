@@ -20,6 +20,7 @@
 
 #include <lib/support/Span.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
+#include <platform/silabs/multi-ota/OTAUtilityFirmwareProcessor.h>
 
 namespace chip {
 
@@ -41,19 +42,6 @@ public:
 private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
-
-    OTADataAccumulator mAccumulator;
-    bool mDescriptorProcessed = false;
-#if OTA_ENCRYPTION_ENABLE
-    uint32_t mUnalignmentNum;
-#endif
-    static constexpr size_t kAlignmentBytes = 64;
-    static uint32_t mWriteOffset; // End of last written block
-    static uint8_t mSlotId;       // Bootloader storage slot
-    // Bootloader storage API requires the buffer size to be a multiple of 4.
-    static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4)));
-    // Offset indicates how far the write buffer has been filled
-    static uint16_t writeBufOffset;
 };
 
 } // namespace chip

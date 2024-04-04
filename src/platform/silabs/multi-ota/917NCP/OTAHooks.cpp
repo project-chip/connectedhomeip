@@ -38,7 +38,7 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
     sApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
 
     auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(4, &sApplicationProcessor));
+    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(6, &sApplicationProcessor));
 
     return CHIP_NO_ERROR;
 }
