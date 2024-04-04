@@ -13,7 +13,7 @@ linux-fake-tests[-mbedtls][-boringssl][-asan][-tsan][-ubsan][-libfuzzer][-ossfuz
 linux-{x64,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,thermostat,java-matter-controller,kotlin-matter-controller,minmdns,light,lock,shell,ota-provider,ota-requestor,simulated-app1,simulated-app2,python-bindings,tv-app,tv-casting-app,bridge,tests,chip-cert,address-resolve-tool,contact-sensor,dishwasher,microwave-oven,refrigerator,rvc,air-purifier,lit-icd,air-quality-sensor,network-manager,energy-management}[-nodeps][-nlfaultinject][-platform-mdns][-minmdns-verbose][-libnl][-same-event-loop][-no-interactive][-ipv6only][-no-ble][-no-wifi][-no-thread][-mbedtls][-boringssl][-asan][-tsan][-ubsan][-libfuzzer][-ossfuzz][-coverage][-dmalloc][-clang][-test][-rpc][-with-ui][-evse-test-event]
 linux-x64-efr32-test-runner[-clang]
 imx-{chip-tool,lighting-app,thermostat,all-clusters-app,all-clusters-minimal-app,ota-provider-app}[-release]
-infineon-psoc6-{lock,light,all-clusters,all-clusters-minimal}[-ota][-updateimage]
+infineon-psoc6-{lock,light,all-clusters,all-clusters-minimal}[-ota][-updateimage][-trustm]
 rw61x-{all-clusters-app,thermostat,laundry-washer}[-ota][-wifi][-thread][-factory-data][-matter-shell]
 nxp-{k32w0,k32w1}-{lighting,contact-sensor}[-factory][-low-power][-lit][-fro32k][-smu2][-dac-conversion][-rotating-id][-sw-v2]
 mbed-cy8cproto_062_4343w-{lock,light,all-clusters,all-clusters-minimal,pigweed,ota-requestor,shell}[-release][-develop][-debug]
