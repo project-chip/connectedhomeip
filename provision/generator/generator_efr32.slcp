@@ -88,6 +88,7 @@ define:
 - { name: SILABS_PROVISION_PROTOCOL_V1, value: '0' }
 - { name: CHIP_SYSTEM_CONFIG_USE_SOCKETS, value: '1' }
 - { name: CHIP_CONFIG_SHA256_CONTEXT_SIZE, value: '256' }
+- { name: OTA_ENCRYPTION_ENABLE, value: '0'}
 
 toolchain_settings:
 - { option: optimize, value: debug }

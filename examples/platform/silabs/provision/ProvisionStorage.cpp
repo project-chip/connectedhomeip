@@ -364,11 +364,12 @@ CHIP_ERROR Storage::Set(uint16_t id, const uint8_t *value, size_t size)
             mCommonName[size] = 0;
         }
         return CHIP_NO_ERROR;
-
+#if OTA_ENCRYPTION_ENABLE
     case Parameters::ID::kOtaTlvEncryptionKey:
-        
-        if(value != nullptr)
+        if(value != nullptr) {
             return SetOtaTlvEncryptionKey(ByteSpan(value, size));
+        }
+#endif
     }
     return CHIP_ERROR_UNKNOWN_RESOURCE_ID;
 }

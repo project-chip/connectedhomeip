@@ -537,12 +537,13 @@ CHIP_ERROR Storage::GetProvisionRequest(bool &value)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 
 }
-
+#if OTA_ENCRYPTION_ENABLE
 CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 
 }
+#endif
 
 } // namespace Provision
 

@@ -261,7 +261,9 @@ private:
     CHIP_ERROR GetProvisionVersion(char * value, size_t max, size_t &size);
     CHIP_ERROR SetSetupPayload(const uint8_t * value, size_t size);
     CHIP_ERROR GetSetupPayload(uint8_t * value, size_t max, size_t &size);
+#if OTA_ENCRYPTION_ENABLE
     CHIP_ERROR SetOtaTlvEncryptionKey(const ByteSpan & value);
+#endif
     
     uint16_t mVendorId = 0;
     uint16_t mProductId = 0;
