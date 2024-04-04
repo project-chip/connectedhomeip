@@ -27,9 +27,9 @@ import zipfile
 import sys
 import os
 
-github_repo      = sys.argv[1]
-version          = sys.argv[2]
-root_out_dir     = sys.argv[3]
+github_repo = sys.argv[1]
+version = sys.argv[2]
+root_out_dir = sys.argv[3]
 expected_outputs = sys.argv[4]
 
 url = github_repo + '/releases/download/' + version + '/gitrelease-openthread-ti-' + version + '.zip'
@@ -40,7 +40,7 @@ if os.path.isdir(expected_outputs):
         fh, _ = urllib.request.urlretrieve(url)
         fo = zipfile.ZipFile(fh, 'r')
         fo.extractall(path=root_out_dir)
-    else:    
+    else:
         print("Thread libraries already present at: \n" + expected_outputs + "\nSkipping download..")
 else:
     print("Error: Download destination doesn't exist\n" + expected_outputs)
