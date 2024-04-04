@@ -145,10 +145,10 @@ static bool emitDSTTableEmptyEvent(EndpointId ep)
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "Unable to emit DSTTableEmpty event [ep=%d]", ep);
+        ChipLogError(Zcl, "DSTTableEmptyEvent failed");
         return false;
     }
-    ChipLogProgress(Zcl, "Emit DSTTableEmpty event [ep=%d]", ep);
+    ChipLogProgress(Zcl, "DSTTableEmptyEvent");
 
     // TODO: re-schedule event for after min 1hr https://github.com/project-chip/connectedhomeip/issues/27200
     // delegate->scheduleDSTTableEmptyEvent()
@@ -165,11 +165,11 @@ static bool emitDSTStatusEvent(EndpointId ep, bool dstOffsetActive)
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "Unable to emit DSTStatus event [ep=%d]", ep);
+        ChipLogError(Zcl, "DSTStatusEvent failed");
         return false;
     }
 
-    ChipLogProgress(Zcl, "Emit DSTStatus event [ep=%d]", ep);
+    ChipLogProgress(Zcl, "DSTStatusEvent active: %d", dstOffsetActive);
     return true;
 }
 
@@ -191,11 +191,11 @@ static bool emitTimeZoneStatusEvent(EndpointId ep)
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "Unable to emit TimeZoneStatus event [ep=%d]", ep);
+        ChipLogError(Zcl, "TimeZoneStatusEvent failed");
         return false;
     }
 
-    ChipLogProgress(Zcl, "Emit TimeZoneStatus event [ep=%d]", ep);
+    ChipLogProgress(Zcl, "TimeZoneStatusEvent offset: %d", static_cast<int>(tz.offset));
     return true;
 }
 
@@ -208,13 +208,13 @@ static bool emitTimeFailureEvent(EndpointId ep)
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "Unable to emit TimeFailure event [ep=%d]", ep);
+        ChipLogError(Zcl, "TimeFailureEvent failed");
         return false;
     }
 
     // TODO: re-schedule event for after min 1hr if no time is still available
     // https://github.com/project-chip/connectedhomeip/issues/27200
-    ChipLogProgress(Zcl, "Emit TimeFailure event [ep=%d]", ep);
+    ChipLogProgress(Zcl, "TimeFailureEvent");
     GetDelegate()->NotifyTimeFailure();
     return true;
 }
@@ -228,13 +228,13 @@ static bool emitMissingTrustedTimeSourceEvent(EndpointId ep)
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "Unable to emit MissingTrustedTimeSource event [ep=%d]", ep);
+        ChipLogError(Zcl, "Unable to emit MissingTrustedTimeSource event");
         return false;
     }
 
     // TODO: re-schedule event for after min 1hr if TTS is null or cannot be reached
     // https://github.com/project-chip/connectedhomeip/issues/27200
-    ChipLogProgress(Zcl, "Emit MissingTrustedTimeSource event [ep=%d]", ep);
+    ChipLogProgress(Zcl, "Emit MissingTrustedTimeSource event");
     return true;
 }
 
@@ -540,10 +540,6 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     size_t items;
     VerifyOrReturnError(CHIP_NO_ERROR == tzL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
-    if (items > CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE)
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
     if (items == 0)
     {
         return ClearTimeZone();
@@ -567,6 +563,12 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     auto newTzL = tzL.begin();
     uint8_t i   = 0;
     InitTimeZone();
+
+    if (items > mTimeZoneObj.timeZoneList.size())
+    {
+        LoadTimeZone();
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
     while (newTzL.Next())
     {
@@ -593,20 +595,14 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         tzStore.timeZone.validAt = newTz.validAt;
         if (newTz.name.HasValue() && newTz.name.Value().size() > 0)
         {
-            size_t len = newTz.name.Value().size();
-            if (len > sizeof(tzStore.name))
-            {
-                ReturnErrorOnFailure(LoadTimeZone());
-                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
-            }
             memset(tzStore.name, 0, sizeof(tzStore.name));
-            chip::MutableCharSpan tempSpan(tzStore.name, len);
+            chip::MutableCharSpan tempSpan(tzStore.name);
             if (CHIP_NO_ERROR != CopyCharSpanToMutableCharSpan(newTz.name.Value(), tempSpan))
             {
                 ReturnErrorOnFailure(LoadTimeZone());
                 return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
             }
-            tzStore.timeZone.name.SetValue(CharSpan(tzStore.name, len));
+            tzStore.timeZone.name.SetValue(tempSpan);
         }
         else
         {
@@ -665,11 +661,6 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
     size_t items;
     VerifyOrReturnError(CHIP_NO_ERROR == dstL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
-    if (items > CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE)
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
-
     if (items == 0)
     {
         return ClearDSTOffset();
@@ -678,6 +669,12 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
     auto newDstL = dstL.begin();
     size_t i     = 0;
     InitDSTOffset();
+
+    if (items > mDstOffsetObj.dstOffsetList.size())
+    {
+        LoadDSTOffset();
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
     while (newDstL.Next())
     {
@@ -979,7 +976,7 @@ CHIP_ERROR TimeSynchronizationAttrAccess::ReadDefaultNtp(EndpointId endpoint, At
     err = TimeSynchronizationServer::Instance().GetDefaultNtp(dntp);
     if (err == CHIP_NO_ERROR)
     {
-        err = aEncoder.Encode(CharSpan(buffer, dntp.size()));
+        err = aEncoder.Encode(dntp);
     }
     else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -1021,9 +1018,10 @@ CHIP_ERROR TimeSynchronizationAttrAccess::ReadDSTOffset(EndpointId endpoint, Att
 CHIP_ERROR TimeSynchronizationAttrAccess::ReadLocalTime(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     DataModel::Nullable<uint64_t> localTime;
-    CHIP_ERROR err = TimeSynchronizationServer::Instance().GetLocalTime(endpoint, localTime);
-    err            = aEncoder.Encode(localTime);
-    return err;
+    VerifyOrReturnError(CHIP_NO_ERROR == TimeSynchronizationServer::Instance().GetLocalTime(endpoint, localTime),
+                        aEncoder.EncodeNull());
+    ReturnErrorOnFailure(aEncoder.Encode(localTime));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -1094,19 +1092,18 @@ bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
     const auto & timeSource  = commandData.timeSource;
 
     auto currentGranularity = TimeSynchronizationServer::Instance().GetGranularity();
-    if (granularity < GranularityEnum::kNoTimeGranularity || granularity > GranularityEnum::kMicrosecondsGranularity)
+    if (granularity == GranularityEnum::kUnknownEnumValue)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
-    if (timeSource.HasValue() && (timeSource.Value() < TimeSourceEnum::kNone || timeSource.Value() > TimeSourceEnum::kGnss))
+    if (timeSource.HasValue() && timeSource.Value() == TimeSourceEnum::kUnknownEnumValue)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
-    if (granularity != GranularityEnum::kNoTimeGranularity &&
-        (currentGranularity == GranularityEnum::kNoTimeGranularity || granularity >= currentGranularity) &&
+    if (granularity > currentGranularity &&
         CHIP_NO_ERROR ==
             TimeSynchronizationServer::Instance().SetUTCTime(commandPath.mEndpointId, utcTime, granularity, TimeSourceEnum::kAdmin))
     {
