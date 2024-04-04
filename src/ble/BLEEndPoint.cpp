@@ -41,9 +41,6 @@
 #include <ble/BLEEndPoint.h>
 #include <ble/BleLayer.h>
 #include <ble/BtpEngine.h>
-#if CHIP_ENABLE_CHIPOBLE_TEST
-#include "BtpEngineTest.h"
-#endif
 
 // clang-format off
 
@@ -204,9 +201,6 @@ void BLEEndPoint::HandleSubscribeReceived()
     VerifyOrExit(!mSendQueue.IsNull(), err = CHIP_ERROR_INCORRECT_STATE);
 
     // Send BTP capabilities response to peripheral via GATT indication.
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    VerifyOrExit(mBtpEngine.PopPacketTag(mSendQueue) == kType_Data, err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
-#endif
     // Add reference to message fragment for duration of platform's GATT indication attempt. CHIP retains partial
     // ownership of message fragment's packet buffer, since this is the same buffer as that of the whole message, just
     // with a fragmenter-modified payload offset and data length.
@@ -289,9 +283,6 @@ void BLEEndPoint::Abort()
     OnConnectComplete  = nullptr;
     OnConnectionClosed = nullptr;
     OnMessageReceived  = nullptr;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    OnCommandReceived = NULL;
-#endif
 
     DoClose(kBleCloseFlag_SuppressCallback | kBleCloseFlag_AbortTransmission, CHIP_NO_ERROR);
 }
@@ -302,9 +293,6 @@ void BLEEndPoint::Close()
     OnConnectComplete  = nullptr;
     OnConnectionClosed = nullptr;
     OnMessageReceived  = nullptr;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    OnCommandReceived = NULL;
-#endif
 
     DoClose(kBleCloseFlag_SuppressCallback, CHIP_NO_ERROR);
 }
@@ -486,11 +474,6 @@ void BLEEndPoint::Free()
     StopAckReceivedTimer();
     StopSendAckTimer();
     StopUnsubscribeTimer();
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    mBtpEngineTest.StopTestTimer();
-    // Clear callback
-    OnCommandReceived = NULL;
-#endif
 
     // Clear callbacks.
     OnConnectComplete  = nullptr;
@@ -533,21 +516,6 @@ CHIP_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj,
         ChipLogError(Ble, "BtpEngine init failed");
         return err;
     }
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    err = static_cast<CHIP_ERROR>(mTxQueueMutex.Init(mTxQueueMutex));
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "%s: Mutex init failed", __FUNCTION__);
-        return err;
-    }
-    err = mBtpEngineTest.Init(this);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "BTP test init failed");
-        return err;
-    }
-#endif
 
     mBle      = bleLayer;
     mRefCount = 1;
@@ -630,10 +598,6 @@ CHIP_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle && buf)
  */
 void BLEEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
 {
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    ChipLogDebugBleEndPoint(Ble, "%s: data->%p, type %d, len %d", __FUNCTION__, data, type, data->DataLength());
-    mBtpEngine.PushPacketTag(data, type);
-#endif
 
     QueueTxLock();
 
@@ -715,25 +679,9 @@ CHIP_ERROR BLEEndPoint::SendNextMessage()
 {
     // Get the first queued packet to send
     QueueTxLock();
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    // Return if tx queue is empty
-    // Note: PopHead() does not check an empty queue
-    if (mSendQueue.IsNull())
-    {
-        QueueTxUnlock();
-        return CHIP_NO_ERROR;
-    }
-#endif
 
     PacketBufferHandle data = mSendQueue.PopHead();
     QueueTxUnlock();
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    // Get and consume the packet tag in message buffer
-    PacketType_t type = mBtpEngine.PopPacketTag(data);
-    mBtpEngine.SetTxPacketType(type);
-    mBtpEngineTest.DoTxTiming(data, BTP_TX_START);
-#endif
 
     // Hand whole message payload to the fragmenter.
     bool sentAck;
@@ -1020,9 +968,6 @@ CHIP_ERROR BLEEndPoint::DriveSending()
         // Clear fragmenter's pointer to sent message buffer and reset its Tx state.
         // Buffer will be freed at scope exit.
         PacketBufferHandle sentBuf = mBtpEngine.TakeTxPacket();
-#if CHIP_ENABLE_CHIPOBLE_TEST
-        mBtpEngineTest.DoTxTiming(sentBuf, BTP_TX_DONE);
-#endif // CHIP_ENABLE_CHIPOBLE_TEST
 
         if (!mSendQueue.IsNull())
         {
@@ -1201,13 +1146,6 @@ CHIP_ERROR BLEEndPoint::Receive(PacketBufferHandle && data)
     uint8_t closeFlags           = kBleCloseFlag_AbortTransmission;
     bool didReceiveAck           = false;
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    if (mBtpEngine.IsCommandPacket(data))
-    {
-        ChipLogDebugBleEndPoint(Ble, "%s: Received Control frame: Flags %x", __FUNCTION__, *(data->Start()));
-    }
-    else
-#endif
     { // This is a special handling on the first CHIPoBLE data packet, the CapabilitiesRequest.
         // Suppress error logging if peer's send overlaps with our unsubscribe on final close.
         if (IsUnsubscribePending())
@@ -1359,24 +1297,12 @@ CHIP_ERROR BLEEndPoint::Receive(PacketBufferHandle && data)
 
         ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
-        // If we have a control message received callback, and end point is not closing...
-        if (mBtpEngine.RxPacketType() == kType_Control && OnCommandReceived && mState != kState_Closing)
+        // If we have a message received callback, and end point is not closing...
+        if (mBleTransport != nullptr && mState != kState_Closing)
         {
-            ChipLogDebugBleEndPoint(Ble, "%s: calling OnCommandReceived, seq# %u, len = %u, type %u", __FUNCTION__, receivedAck,
-                                    full_packet->DataLength(), mBtpEngine.RxPacketType());
-            // Pass received control message up the stack.
-            mBtpEngine.SetRxPacketSeq(receivedAck);
-            OnCommandReceived(this, std::move(full_packet));
+            // Pass received message up the stack.
+            mBleTransport->OnEndPointMessageReceived(this, std::move(full_packet));
         }
-        else
-#endif
-            // If we have a message received callback, and end point is not closing...
-            if (mBleTransport != nullptr && mState != kState_Closing)
-            {
-                // Pass received message up the stack.
-                mBleTransport->OnEndPointMessageReceived(this, std::move(full_packet));
-            }
     }
 
 exit:

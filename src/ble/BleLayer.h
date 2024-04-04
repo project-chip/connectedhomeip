@@ -214,9 +214,6 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    friend class BtpEngineTest;
-#endif
 
 public:
     // Public data members:
@@ -318,10 +315,6 @@ public:
      *   the BLE connection close will not generate an upcall to CHIP, HandleConnectionError must be called with
      *   err = BLE_ERROR_APP_CLOSED_CONNECTION to prevent the leak of this chipConnection and its end point object. */
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, CHIP_ERROR err);
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    BLEEndPoint * mTestBleEndPoint;
-#endif
 
 private:
     // Private data members:
