@@ -219,15 +219,14 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 
     env->CallVoidMethod(sBrowserObject.ObjectRef(), sStopBrowseMethod, reinterpret_cast<jlong>(ctx->callback));
 
+    chip::Platform::Delete(ctx);
     if (env->ExceptionCheck())
     {
         ChipLogError(Discovery, "Java exception in ChipDnssdStopBrowse");
         env->ExceptionDescribe();
         env->ExceptionClear();
-        chip::Platform::Delete(ctx);
         return CHIP_JNI_ERROR_EXCEPTION_THROWN;
     }
-    chip::Platform::Delete(ctx);
 
     return CHIP_NO_ERROR;
 }
