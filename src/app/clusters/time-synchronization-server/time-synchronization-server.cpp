@@ -215,6 +215,7 @@ static bool emitTimeFailureEvent(EndpointId ep)
     // TODO: re-schedule event for after min 1hr if no time is still available
     // https://github.com/project-chip/connectedhomeip/issues/27200
     ChipLogProgress(Zcl, "Emit TimeFailure event [ep=%d]", ep);
+    GetDelegate()->NotifyTimeFailure();
     return true;
 }
 
@@ -504,6 +505,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(const DataModel::Null
     {
         AttemptToGetTime();
     }
+    GetDelegate()->TrustedTimeSourceAvailabilityChanged(!mTrustedTimeSource.IsNull(), mGranularity);
     return err;
 }
 
