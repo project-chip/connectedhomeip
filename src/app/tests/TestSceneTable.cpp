@@ -722,6 +722,44 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
     memset(failBuffer, 0, fail_list.size());
     memset(buffer, 0, buff_span.size());
+
+    // Test Serialize Add of an attribute value that is greater than the mock attribute size (size of uint32_t)
+    OOPairs[0].attributeValue = 0xFFFFFFFF'FFFFFFFF;
+
+    // EFS to test caping of value once a variable above the mock attribute size is serialize
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldValueCapOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldValueCapIn;
+
+    extensionFieldValueCapOut.clusterID          = kOnOffClusterId;
+    extensionFieldValueCapOut.attributeValueList = OOPairs;
+
+    /// Setup of input EFS (by temporary using the output one)
+    writer.Init(buff_span);
+    NL_TEST_ASSERT(
+        aSuite, CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldValueCapOut.attributeValueList));
+
+    reader.Init(buffer);
+    extensionFieldValueCapIn.clusterID = kOnOffClusterId;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldValueCapIn.attributeValueList.Decode(reader));
+
+    // Verify that the initial value is not capped
+    auto pair_iterator = extensionFieldValueCapIn.attributeValueList.begin();
+    pair_iterator.Next();
+    app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type pair = pair_iterator.GetValue();
+    NL_TEST_ASSERT(aSuite, pair.attributeValue == OOPairs[0].attributeValue);
+
+    // Verify that we cap the value to the mock attribute size when serializing
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));
+    NL_TEST_ASSERT(aSuite,
+                   CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint1, kOnOffClusterId, buff_span, extensionFieldValueCapOut));
+
+    // Verify that the output value is capped
+    NL_TEST_ASSERT(aSuite, extensionFieldValueCapOut.attributeValueList[0].attributeValue == 0x00000000'FFFFFFFF);
+
+    // Clear buffer
+    memset(failBuffer, 0, fail_list.size());
+    memset(buffer, 0, buff_span.size());
 };
 
 void TestHandlerHelpers(nlTestSuite * aSuite, void * aContext) {}

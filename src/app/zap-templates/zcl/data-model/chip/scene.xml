@@ -32,7 +32,7 @@ limitations under the License.
   <struct name="AttributeValuePair">
     <cluster code="0x0062"/>
     <item name="AttributeID" type="attrib_id" optional="false"/>
-    <item name="AttributeValue" type="int32u" optional="false"/>
+    <item name="AttributeValue" type="int64u" optional="false"/>
   </struct>
 
   <struct name="ExtensionFieldSet">

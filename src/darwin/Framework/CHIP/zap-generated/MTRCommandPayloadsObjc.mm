@@ -13068,7 +13068,7 @@ NS_ASSUME_NONNULL_BEGIN
                                 }
                                 auto element_2 = (MTRScenesManagementClusterAttributeValuePair *) element_0.attributeValueList[i_2];
                                 listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
-                                listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
+                                listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedLongLongValue;
                             }
                             listHolder_0->mList[i_0].attributeValueList = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
                         } else {
@@ -13428,7 +13428,7 @@ NS_ASSUME_NONNULL_BEGIN
                             MTRScenesManagementClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesManagementClusterAttributeValuePair new];
                             newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
-                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
+                            newElement_3.attributeValue = [NSNumber numberWithUnsignedLongLong:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
                         CHIP_ERROR err = iter_3.GetStatus();
