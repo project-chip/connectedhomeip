@@ -73,6 +73,11 @@
 	url = https://github.com/SiliconLabs/ot-efr32.git
 	branch  = matter_sve
 	platforms = silabs,silabs_docker
+[submodule "ot-stm32"]
+	path = third_party/openthread/ot-stm32
+	url = https://github.com/openthread/openthread
+        branch = eb6377f
+        platforms = stm32
 [submodule "third_party/openthread/ot-ifx"]
 	path = third_party/openthread/ot-ifx
 	url = https://github.com/Infineon/ot-ifx-release.git
@@ -329,8 +334,3 @@
 	url = https://github.com/Infineon/optiga-trust-m.git
 	branch = matter_support
 	platforms = infineon
-
-[submodule "ot-stm32"]
-	path = third_party/openthread/ot-stm32
-	url = https://github.com/openthread/openthread
-        branch = eb6377f1d
