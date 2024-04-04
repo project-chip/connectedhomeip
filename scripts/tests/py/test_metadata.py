@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
 import os
-from metadata import Metadata
-from metadata import MetadataReader
+import unittest
 from os import path
+
+from metadata import Metadata, MetadataReader
 
 
 class TestMetadataReader(unittest.TestCase):

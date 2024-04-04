@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Union
+
 import yaml
-from typing import Optional
-from typing import Dict
-from typing import List
-from typing import Union
 
 
 @dataclass
