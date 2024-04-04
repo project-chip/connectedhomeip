@@ -37,9 +37,7 @@ using namespace chip;
 
 // Test input data.
 
-// clang-format off
-static const CHIP_ERROR kTestElements[] =
-{
+static const CHIP_ERROR kTestElements[] = {
     BLE_ERROR_ADAPTER_UNAVAILABLE,
     BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK,
     BLE_ERROR_CENTRAL_UNSUBSCRIBED,
@@ -66,7 +64,6 @@ static const CHIP_ERROR kTestElements[] =
     BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER,
     BLE_ERROR_REASSEMBLER_INCORRECT_STATE,
 };
-// clang-format on
 
 TEST(TestBleErrorStr, CheckBleErrorStr)
 {

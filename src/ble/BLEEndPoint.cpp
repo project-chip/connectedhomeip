@@ -42,13 +42,11 @@
 #include <ble/BleLayer.h>
 #include <ble/BtpEngine.h>
 
-// clang-format off
-
 // Define below to enable extremely verbose, BLE end point-specific debug logging.
 #undef CHIP_BLE_END_POINT_DEBUG_LOGGING_ENABLED
 
 #ifdef CHIP_BLE_END_POINT_DEBUG_LOGGING_ENABLED
-#define ChipLogDebugBleEndPoint(MOD, MSG, ...) ChipLogDetail(MOD, MSG, ## __VA_ARGS__)
+#define ChipLogDebugBleEndPoint(MOD, MSG, ...) ChipLogDetail(MOD, MSG, ##__VA_ARGS__)
 #else
 #define ChipLogDebugBleEndPoint(MOD, MSG, ...)
 #endif
@@ -61,7 +59,7 @@
  *    packet to re-open its window instead of waiting for the send-ack timer to expire.
  *
  */
-#define BLE_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD                   1
+#define BLE_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD 1
 
 /**
  *  @def BLE_UNSUBSCRIBE_TIMEOUT_MS
@@ -71,14 +69,18 @@
  *    before it automatically releases its BLE connection and frees itself. The default value of 5 seconds is arbitrary.
  *
  */
-#define BLE_UNSUBSCRIBE_TIMEOUT_MS                            5000 // 5 seconds
+#define BLE_UNSUBSCRIBE_TIMEOUT_MS 5000
 
-#define BTP_ACK_SEND_TIMEOUT_MS                               2500 // 2.5 seconds
+#define BTP_ACK_SEND_TIMEOUT_MS 2500
 
-#define BTP_WINDOW_NO_ACK_SEND_THRESHOLD                         1 // Data fragments may only be sent without piggybacked
-                                                                   // acks if receiver's window size is above this threshold.
-
-// clang-format on
+/**
+ *  @def BTP_WINDOW_NO_ACK_SEND_THRESHOLD
+ *
+ *  @brief
+ *    Data fragments may only be sent without piggybacked acks if receiver's window size is above this threshold.
+ *
+ */
+#define BTP_WINDOW_NO_ACK_SEND_THRESHOLD 1
 
 namespace chip {
 namespace Ble {
