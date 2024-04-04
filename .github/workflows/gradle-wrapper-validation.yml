@@ -4,8 +4,6 @@ on:
         branches-ignore:
             - 'dependabot/**'
     pull_request:
-    merge_group:
-    workflow_dispatch:
 
 jobs:
   validation:
