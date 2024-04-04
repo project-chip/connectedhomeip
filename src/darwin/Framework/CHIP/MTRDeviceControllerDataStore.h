@@ -48,6 +48,13 @@ NS_ASSUME_NONNULL_BEGIN
                             storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                        storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue;
 
+// clusterDataByNode a dictionary: nodeID => cluster data dictionary
+typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNode);
+/**
+ * Asks the data store to load cluster data for nodes in bulk, if the storageDelegate supports it.
+ */
+- (void)startUpWithClusterDataHandler:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler;
+
 /**
  * Resumption info APIs.
  */
