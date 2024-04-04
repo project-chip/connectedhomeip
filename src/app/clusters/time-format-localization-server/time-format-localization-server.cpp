@@ -202,9 +202,18 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
 
 void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 {
+    uint32_t featureMap = 0;
+    Status status       = FeatureMap::Get(endpoint, &featureMap);
+
+    VerifyOrReturn(Status::Success == status,
+                   ChipLogError(Zcl, "Failed to read the time format lozalization feature map, err:0x%02x", to_underlying(status)));
+
+    // Check for calendar format feature, becuase we only read/write the calendar related attributes below
+    VerifyOrReturn(featureMap & to_underlying(Feature::kCalendarFormat));
+
     CalendarTypeEnum calendarType;
     CalendarTypeEnum validType;
-    Status status = ActiveCalendarType::Get(endpoint, &calendarType);
+    status = ActiveCalendarType::Get(endpoint, &calendarType);
 
     VerifyOrReturn(Status::Success == status,
                    ChipLogError(Zcl, "Failed to read calendar type with error: 0x%02x", to_underlying(status)));
