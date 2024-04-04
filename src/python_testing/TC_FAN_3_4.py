@@ -20,7 +20,7 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -42,6 +42,23 @@ class TC_FAN_3_4(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.WindSetting(wind_setting))])
         asserts.assert_equal(result[0].Status, Status.Success, "WindSetting write failed")
 
+    def desc_TC_FAN_3_4(self) -> str:
+        return "[TC-FAN-3.4] Optional wind functionality with DUT as Server"
+
+    def steps_TC_FAN_3_4(self) -> list[TestStep]:
+        steps = [
+            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(2, "Read from the DUT the WindSupport attribute and store"),
+            TestStep(3, "SleepWind is supported, so write 0x01 to WindSetting")
+            TestStep(4, "Read from the DUT the WindSetting attribute"),
+            TestStep(5, "SleepWind is not supported, so write 0x01 to WindSetting to check for constraint error")
+            TestStep(6, "NaturalWind is supported, so write 0x02 to WindSetting")
+            TestStep(7, "Read from the DUT the WindSetting attribute"),
+            TestStep(8, "NaturalWind is not supported, so write 0x02 to WindSetting to check for constraint error")
+            TestStep(9, "Write WindSetting to 0x00")
+        ]
+        return steps
+
     def pics_TC_FAN_3_4(self) -> list[str]:
         return ["FAN.S"]
 
@@ -53,28 +70,52 @@ class TC_FAN_3_4(MatterBaseTest):
 
         endpoint = self.user_params.get("endpoint", 1)
 
-        self.print_step(1, "Commissioning, already done")
+        self.step(1)
 
-        self.print_step(2, "Read from the DUT the WindSupport attribute and store")
+        self.step(2)
         wind_support = await self.read_wind_support(endpoint=endpoint)
 
         if wind_support & Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind:
-            self.print_step(3, "SleepWind is supported, so write 0x01 to WindSetting")
+            self.step(3)
             await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind)
             time.sleep(1)
 
-            self.print_step(4, "Read from the DUT the WindSetting attribute")
+            self.step(4)
             wind_setting = await self.read_wind_setting(endpoint=endpoint)
             asserts.assert_equal(wind_setting, Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind, "WindSetting is not 0x01")
 
+            self.skip_step(5)
+        else:
+            self.skip_step(3)
+            self.skip_step(4)
+
+            self.step(5)
+            try:
+                await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind)
+                asserts.assert_fail("Expected an exception but received none.")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different error.")
+
         if wind_support & Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind:
-            self.print_step(5, "NaturalWind is supported, so write 0x02 to WindSetting")
+            self.step(6)
             await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind)
             time.sleep(1)
 
-            self.print_step(6, "Read from the DUT the WindSetting attribute")
+            self.step(7)
             wind_setting = await self.read_wind_setting(endpoint=endpoint)
             asserts.assert_equal(wind_setting, Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind, "WindSetting is not 0x02")
+
+            self.skip_step(8)
+        else:
+            self.skip_step(6)
+            self.skip_step(7)
+
+            self.step(8)
+            try:
+                await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind)
+                asserts.assert_fail("Expected an exception but received none.")
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different error.")
 
         self.print_step(9, "Write WindSetting to 0x00")
         await self.write_wind_setting(endpoint=endpoint, wind_setting=0x00)
