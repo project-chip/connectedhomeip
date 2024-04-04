@@ -37,6 +37,33 @@ class Metadata:
     PICS: Optional[str] = None
     tests: Optional[str] = None
 
+    def copy_from_dict(self,attr_dict: Dict[str, str]) -> None:
+        """
+        Sets the value of the attributes from a dictionary.
+
+        Attributes:
+
+        attr_dict:
+          Dictionary that stores attributes value that should
+          be transferred to this class.
+        """
+        
+        if "app" in attr_dict:
+            self.app = attr_dict["app"]
+
+        if "run" in attr_dict:
+            self.run = attr_dict["run"]
+
+        if "discriminator" in attr_dict:
+            self.discriminator = attr_dict["discriminator"]
+
+        if "passcode" in attr_dict:
+            self.passcode = attr_dict["passcode"]
+
+        if "py_script_path" in attr_dict:
+            self.py_script_path=attr_dict["py_script_path"]
+
+        # TODO - set other attributes as well
 
 class MetadataReader:
     """
@@ -56,14 +83,13 @@ class MetadataReader:
 
         Parameters:
         
-        env_yaml_file_path: str
+        env_yaml_file_path:
           Path to the environment file that contains the YAML configuration.
         """
         with open(env_yaml_file_path) as stream:
             self.env=yaml.safe_load(stream)
 
-    
-    def __resolve_env_vals__(self, metadata_dict: Dict[str, str]) -> None:
+    def __resolve_env_vals__(self, metadata_dict: Dict[str, Union[str,bool]]) -> None:
         """
         Resolves the argument defined in the test script to environment values.
         For example, if a test script defines "all_clusters" as the value for app
@@ -73,7 +99,7 @@ class MetadataReader:
 
         Parameter:
         
-        metadata_dict: Dict[str, str]
+        metadata_dict:
           Dictionary where each key represent a particular argument and its value represent
           the value for that argument defined in the test script.
         """
@@ -111,8 +137,7 @@ class MetadataReader:
                 run_arg_val = True
 
             metadata_dict[run_arg] = run_arg_val
-
-                
+              
             
     def __read_args__(self,run_args_lines: List[str],metadata_dict: Dict[str, str]) -> None:
         """
@@ -121,22 +146,26 @@ class MetadataReader:
 
         Parameters:
         
-        run_args_lines: List[str]
-          Raw lines in argument header
+        run_args_lines:
+          Line in test script header that contains run argumment definition
 
-        metadata_dict: Dict[str, str]
+        metadata_dict:
           Dictionary where the extracted arguments will be stored.
           This represents the side effect of this function.
-
-        Return:
-        None
-
         """
         for run_line in run_args_lines:
             for run_arg_word in run_line.strip().split():
+                '''
+                We expect the run arg to be defined in one of the 
+                following two formats:
+                1. run_arg
+                2. run_arg/run_arg_val
+
+                Examples: "discriminator" and "app/all_clusters"
+                
+                '''
                 run_arg=run_arg_word.split('/',1)[0]
-                if run_arg in metadata_dict:
-                    metadata_dict[run_arg] = run_arg_word
+                metadata_dict[run_arg] = run_arg_word
 
 
     def parse_script(self, py_script_path: str) -> List[Metadata]:
@@ -147,7 +176,7 @@ class MetadataReader:
 
         Parameter:
         
-        py_script_path: str
+        py_script_path:
           path to the python test script
 
         Return:
@@ -179,8 +208,7 @@ class MetadataReader:
                     runs_arg_lines[args_match.group(1)].append(args_match.group(2))
 
         for run in runs_arg_lines:
-            metadata = Metadata()
-            metadata_dict = vars(metadata)
+            metadata_dict = {}
             self.__read_args__(runs_arg_lines[run], metadata_dict)
             self.__resolve_env_vals__(metadata_dict)
 
@@ -188,14 +216,10 @@ class MetadataReader:
             # metadata object
             metadata_dict['py_script_path'] = str(py_script_path)
             metadata_dict['run'] = str(run)
+
+            metadata = Metadata()
             
+            metadata.copy_from_dict(metadata_dict)
             runs_metadata.append(metadata)
 
         return runs_metadata
-
-
-
-
-
-
-    
