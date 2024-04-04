@@ -27,6 +27,7 @@ pw_python_package("metadata_parser") {
 
   inputs = [
     "env_test.yaml",
+    "simple_run_args.txt",
   ]
 
   sources = [
