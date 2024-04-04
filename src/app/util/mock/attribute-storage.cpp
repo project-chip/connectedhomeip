@@ -134,6 +134,12 @@ const uint8_t mockAttribute4[256]  = {
      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
 };
 
+EmberAfAttributeMetadata mockmetadata = { .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(static_cast<uint32_t>(0)),
+                                          .attributeId   = 0,
+                                          .size          = sizeof(uint32_t),
+                                          .attributeType = 0,
+                                          .mask          = 0 }; // namespace
+
 } // namespace Test
 } // namespace chip
 
@@ -310,6 +316,11 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
 {
     // shared data version storage
     return &dataVersion;
+}
+
+const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
+{
+    return &mockmetadata;
 }
 
 namespace chip {

@@ -16,29 +16,56 @@
  */
 
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
+#include <app/util/endpoint-config-api.h>
 
 namespace chip {
 namespace scenes {
 
 namespace {
 
-/// ValideAttribute
+using ConcreteAttributePath  = app::ConcreteAttributePath;
+using AttributeValuePairType = app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type;
+
+/// CapAttributeID
+/// Cap the attribute value based on the attribute type size
+/// @param[in] aVPair   AttributeValuePairType
+/// @param[in] metadata  EmberAfAttributeMetadata
+///
+void CapAttributeID(AttributeValuePairType & aVPair, const EmberAfAttributeMetadata * metadata)
+{
+    // Calculate the maximum value that can be represented with the given number of bytes
+    uint64_t maxValue = (1ULL << (metadata->size * 8)) - 1;
+
+    // If the attribute ID is greater than the maximum value, cap it
+    if (aVPair.attributeValue > maxValue)
+    {
+        aVPair.attributeValue = maxValue;
+    }
+}
+
 /// @brief  Validate the attribute exists for a given cluster
+/// @param[in] endpoint   Endpoint ID
 /// @param[in] clusterID  Cluster ID
-/// @param[in] attID      Attribute ID
+/// @param[in] aVPair     AttributeValuePairType, will be mutated to cap the value if it is out of range
 /// @return CHIP_ERROR_UNSUPPORTED_ATTRIBUTE if the attribute does not exist for a given cluster or is not scenable
 /// @note This will allways fail for global list attributes. If we do want to make them scenable someday, we will need to
 ///       use a different validation method.
-// TODO: Assess if we also want to throw an error if the attribute value is out of range
+// TODO: Assess if (and how) we also want to throw an error if the attribute value is out of range
 // TODO: Add check for "S" quality to determine if the attribute is scenable once suported :
 // https://github.com/project-chip/connectedhomeip/issues/24177
-CHIP_ERROR ValidateAttributePath(EndpointId endpoint, ClusterId cluster, AttributeId attributeId)
+CHIP_ERROR ValidateAttributePath(EndpointId endpoint, ClusterId cluster, AttributeValuePairType & aVPair)
 {
-    bool attIndex = emberAfContainsAttribute(endpoint, cluster, attributeId);
+    bool attIndex = emberAfContainsAttribute(endpoint, cluster, aVPair.attributeID);
     if (!attIndex)
     {
         return CHIP_ERROR_UNSUPPORTED_ATTRIBUTE;
     }
+
+    EmberAfAttributeMetadata metadata = *emberAfLocateAttributeMetadata(endpoint, cluster, aVPair.attributeID);
+
+    // Cap value based on the attribute type size
+    CapAttributeID(aVPair, &metadata);
+
     return CHIP_NO_ERROR;
 }
 } // namespace
@@ -81,8 +108,9 @@ DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint, const ExtensionFieldS
     auto pair_iterator = extensionFieldSet.attributeValueList.begin();
     while (pair_iterator.Next())
     {
-        ReturnErrorOnFailure(ValidateAttributePath(endpoint, extensionFieldSet.clusterID, pair_iterator.GetValue().attributeID));
-        aVPairs[pairCount] = pair_iterator.GetValue();
+        AttributeValuePairType currentPair = pair_iterator.GetValue();
+        ReturnErrorOnFailure(ValidateAttributePath(endpoint, extensionFieldSet.clusterID, currentPair));
+        aVPairs[pairCount] = currentPair;
         pairCount++;
     }
     ReturnErrorOnFailure(pair_iterator.GetStatus());

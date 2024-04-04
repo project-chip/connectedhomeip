@@ -2463,5 +2463,3 @@ endpoint 1 {
     handle command StepColorTemperature;
   }
 }
-
-
