@@ -202,10 +202,6 @@ private:
     void Free();
     void FreeBtpEngine();
 
-    // Mutex lock on Tx queue. Used only in BtpEngine test build for now.
-    // TODO: Remove these lock/unlock?
-    inline void QueueTxLock() {}
-    inline void QueueTxUnlock() {}
     void QueueTx(PacketBufferHandle && data, PacketType_t type);
 };
 

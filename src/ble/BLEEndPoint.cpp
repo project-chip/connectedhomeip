@@ -207,9 +207,7 @@ void BLEEndPoint::HandleSubscribeReceived()
     if (!SendIndication(mSendQueue.Retain()))
     {
         // Ensure transmit queue is empty and set to NULL.
-        QueueTxLock();
         mSendQueue = nullptr;
-        QueueTxUnlock();
 
         ChipLogError(Ble, "cap resp ind failed");
         err = BLE_ERROR_GATT_INDICATE_FAILED;
@@ -352,9 +350,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, CHIP_ERROR err)
     mState = kState_Closed;
 
     // Ensure transmit queue is empty and set to NULL.
-    QueueTxLock();
     mSendQueue = nullptr;
-    QueueTxUnlock();
 
     // Fire application's close callback if we haven't already, and it's not suppressed.
     if (oldState != kState_Closing && (flags & kBleCloseFlag_SuppressCallback) == 0)
@@ -598,9 +594,6 @@ CHIP_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle && buf)
  */
 void BLEEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
 {
-
-    QueueTxLock();
-
     if (mSendQueue.IsNull())
     {
         mSendQueue = std::move(data);
@@ -611,8 +604,6 @@ void BLEEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
         mSendQueue->AddToEnd(std::move(data));
         ChipLogDebugBleEndPoint(Ble, "%s: Append data to mSendQueue %p, type %d", __FUNCTION__, mSendQueue->Start(), type);
     }
-
-    QueueTxUnlock();
 }
 
 CHIP_ERROR BLEEndPoint::Send(PacketBufferHandle && data)
@@ -678,10 +669,7 @@ bool BLEEndPoint::PrepareNextFragment(PacketBufferHandle && data, bool & sentAck
 CHIP_ERROR BLEEndPoint::SendNextMessage()
 {
     // Get the first queued packet to send
-    QueueTxLock();
-
     PacketBufferHandle data = mSendQueue.PopHead();
-    QueueTxUnlock();
 
     // Hand whole message payload to the fragmenter.
     bool sentAck;
@@ -747,9 +735,7 @@ CHIP_ERROR BLEEndPoint::HandleHandshakeConfirmationReceived()
     uint8_t closeFlags = kBleCloseFlag_AbortTransmission;
 
     // Free capabilities request/response payload.
-    QueueTxLock();
     mSendQueue.FreeHead();
-    QueueTxUnlock();
 
     if (mRole == kBleRole_Central)
     {
