@@ -86,7 +86,6 @@ ti_simplelink_executable("lighting_app") {
     "${chip_root}/third_party/openthread:openthread",
   ]
 
-
   if (custom_factory_data) {
     defines = [ "CC13XX_26XX_FACTORY_DATA" ]
   }
