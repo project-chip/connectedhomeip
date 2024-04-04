@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,12 +25,14 @@
  *
  */
 
-#ifndef CHIP_PROJECT_CONFIG_H
-#define CHIP_PROJECT_CONFIG_H
+#pragma once
 
-// Enable support functions for parsing command-line arguments
-#define CHIP_CONFIG_ENABLE_ARG_PARSER 1
-
+/**
+ * @def CONFIG_BUILD_FOR_HOST_UNIT_TEST
+ *
+ * @brief Defines whether we're currently building for unit testing, which enables a set of features
+ *        that are only utilized in those tests. This flag should not be enabled on devices. If you have a test
+ *        that uses this flag, either appropriately conditionalize the entire test on this flag, or to exclude
+ *        the compliation of that test source file entirely.
+ */
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
-
-#endif // CHIP_PROJECT_CONFIG_H
