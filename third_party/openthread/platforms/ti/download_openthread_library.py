@@ -22,10 +22,10 @@ Run with:
     python download_openthread_library.py <ot-ti github repo> <version> <output directory> <Expected outputs>
 """
 
+import os
+import sys
 import urllib.request
 import zipfile
-import sys
-import os
 
 github_repo = sys.argv[1]
 version = sys.argv[2]
