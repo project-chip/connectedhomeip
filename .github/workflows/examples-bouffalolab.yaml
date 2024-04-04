@@ -16,8 +16,8 @@ name: Build example - BouffaloLab
 
 on:
   push:
-    branches:
-      - 'master'
+    branches-ignore:
+      - 'dependabot/**'
   pull_request:
   merge_group:
   workflow_dispatch:
