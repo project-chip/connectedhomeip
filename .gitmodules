@@ -333,3 +333,4 @@
 [submodule "ot-stm32"]
 	path = third_party/openthread/ot-stm32
 	url = https://github.com/openthread/openthread
+        branch = eb6377f1d
