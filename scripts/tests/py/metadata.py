@@ -20,6 +20,7 @@ from typing import Dict
 from typing import List
 from typing import Union
 
+
 @dataclass
 class Metadata:
     py_script_path: Optional[str] = None
@@ -37,7 +38,7 @@ class Metadata:
     PICS: Optional[str] = None
     tests: Optional[str] = None
 
-    def copy_from_dict(self,attr_dict: Dict[str, str]) -> None:
+    def copy_from_dict(self, attr_dict: Dict[str, str]) -> None:
         """
         Sets the value of the attributes from a dictionary.
 
@@ -47,7 +48,7 @@ class Metadata:
           Dictionary that stores attributes value that should
           be transferred to this class.
         """
-        
+
         if "app" in attr_dict:
             self.app = attr_dict["app"]
 
@@ -61,9 +62,10 @@ class Metadata:
             self.passcode = attr_dict["passcode"]
 
         if "py_script_path" in attr_dict:
-            self.py_script_path=attr_dict["py_script_path"]
+            self.py_script_path = attr_dict["py_script_path"]
 
         # TODO - set other attributes as well
+
 
 class MetadataReader:
     """
@@ -71,25 +73,25 @@ class MetadataReader:
     resolve them to environment specific values.
 
     Attributes:
-    
+
     env: str
        A dictionary that reprsents a environment configuration in
        YAML format. 
     """
-    
+
     def __init__(self, env_yaml_file_path: str):
         """
         Reads the YAML file and Constructs the environment object
 
         Parameters:
-        
+
         env_yaml_file_path:
           Path to the environment file that contains the YAML configuration.
         """
         with open(env_yaml_file_path) as stream:
-            self.env=yaml.safe_load(stream)
+            self.env = yaml.safe_load(stream)
 
-    def __resolve_env_vals__(self, metadata_dict: Dict[str, Union[str,bool]]) -> None:
+    def __resolve_env_vals__(self, metadata_dict: Dict[str, Union[str, bool]]) -> None:
         """
         Resolves the argument defined in the test script to environment values.
         For example, if a test script defines "all_clusters" as the value for app
@@ -98,24 +100,24 @@ class MetadataReader:
         to this raw value.
 
         Parameter:
-        
+
         metadata_dict:
           Dictionary where each key represent a particular argument and its value represent
           the value for that argument defined in the test script.
         """
 
-        for run_arg,run_arg_val in metadata_dict.items():
+        for run_arg, run_arg_val in metadata_dict.items():
 
-            if not type(run_arg_val)==str or run_arg=="run":
-                metadata_dict[run_arg]=run_arg_val
+            if not type(run_arg_val) == str or run_arg == "run":
+                metadata_dict[run_arg] = run_arg_val
                 continue
-            
+
             if run_arg_val is None:
                 continue
 
             sub_args = run_arg_val.split('/')
-            
-            if len(sub_args) not in [1,2]:
+
+            if len(sub_args) not in [1, 2]:
                 err = """The argument is not in the correct format. 
                 The argument must follow the format of arg1 or arg1/arg2. 
                 For example, arg1 represents the argument type and optionally arg2 
@@ -123,12 +125,12 @@ class MetadataReader:
                 value should be used as the argument value. If arg2 is not specified,
                 we will just use the first value associated with arg1 in the environment file."""
                 raise Exception(err)
-                        
-            if len(sub_args)==1:
-                run_arg_val=self.env.get(sub_args[0])
-                
-            elif len(sub_args)==2:
-                run_arg_val=self.env.get(sub_args[0]).get(sub_args[1])
+
+            if len(sub_args) == 1:
+                run_arg_val = self.env.get(sub_args[0])
+
+            elif len(sub_args) == 2:
+                run_arg_val = self.env.get(sub_args[0]).get(sub_args[1])
 
             # if a argument has been specified in the comment header
             # but can't be found in the env file, consider it to be
@@ -137,15 +139,14 @@ class MetadataReader:
                 run_arg_val = True
 
             metadata_dict[run_arg] = run_arg_val
-              
-            
-    def __read_args__(self,run_args_lines: List[str],metadata_dict: Dict[str, str]) -> None:
+
+    def __read_args__(self, run_args_lines: List[str], metadata_dict: Dict[str, str]) -> None:
         """
         Parses a list of lines and extracts argument
         values from it.
 
         Parameters:
-        
+
         run_args_lines:
           Line in test script header that contains run argumment definition
 
@@ -162,11 +163,10 @@ class MetadataReader:
                 2. run_arg/run_arg_val
 
                 Examples: "discriminator" and "app/all_clusters"
-                
-                '''
-                run_arg=run_arg_word.split('/',1)[0]
-                metadata_dict[run_arg] = run_arg_word
 
+                '''
+                run_arg = run_arg_word.split('/', 1)[0]
+                metadata_dict[run_arg] = run_arg_word
 
     def parse_script(self, py_script_path: str) -> List[Metadata]:
         """
@@ -175,34 +175,33 @@ class MetadataReader:
         with a particular run.
 
         Parameter:
-        
+
         py_script_path:
           path to the python test script
 
         Return:
-        
+
         List[Metadata]
           List of Metadata object where each Metadata element represents
           the run arguments associated with a particular run defined in
           the script file.
         """
-        
-        runs_def_ptrn=re.compile(r'^\s*#\s*test-runner-runs:\s*(.*)$')
-        args_def_ptrn=re.compile(r'^\s*#\s*test-runner-run/([a-zA-Z0-9_]+):\s*(.*)$')
+
+        runs_def_ptrn = re.compile(r'^\s*#\s*test-runner-runs:\s*(.*)$')
+        args_def_ptrn = re.compile(r'^\s*#\s*test-runner-run/([a-zA-Z0-9_]+):\s*(.*)$')
 
         runs_arg_lines = {}
         runs_metadata = []
-        
-    
+
         with open(py_script_path, 'r', encoding='utf8') as py_script:
             for line in py_script.readlines():
-            
+
                 runs_match = runs_def_ptrn.match(line.strip())
                 args_match = args_def_ptrn.match(line.strip())
-            
+
                 if runs_match:
                     for run in runs_match.group(1).strip().split():
-                        runs_arg_lines[run]=[]
+                        runs_arg_lines[run] = []
 
                 elif args_match:
                     runs_arg_lines[args_match.group(1)].append(args_match.group(2))
@@ -218,7 +217,7 @@ class MetadataReader:
             metadata_dict['run'] = str(run)
 
             metadata = Metadata()
-            
+
             metadata.copy_from_dict(metadata_dict)
             runs_metadata.append(metadata)
 
