@@ -39,7 +39,7 @@
 namespace chip {
 namespace Ble {
 
-inline constexpr size_t kTransferProtocolHeaderFlagsSize = 1; // Size in bytes of enocded BTP fragment header flag bits
+inline constexpr size_t kTransferProtocolHeaderFlagsSize = 1; // Size in bytes of encoded BTP fragment header flag bits
 inline constexpr size_t kTransferProtocolSequenceNumSize = 1; // Size in bytes of encoded BTP sequence number
 inline constexpr size_t kTransferProtocolAckSize         = 1; // Size in bytes of encoded BTP fragment acknowledgement number
 inline constexpr size_t kTransferProtocolMsgLenSize      = 2; // Size in byte of encoded BTP total fragmented message length

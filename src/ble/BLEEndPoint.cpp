@@ -505,7 +505,7 @@ CHIP_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj,
     VerifyOrReturnError((role == kBleRole_Central || role == kBleRole_Peripheral), CHIP_ERROR_INVALID_ARGUMENT);
 
     // If end point plays peripheral role, expect ack for indication sent as last step of BTP handshake.
-    // If central, periperal's handshake indication 'ack's write sent by central to kick off the BTP handshake.
+    // If central, peripheral's handshake indication 'ack's write sent by central to kick off the BTP handshake.
     bool expectInitialAck = (role == kBleRole_Peripheral);
 
     CHIP_ERROR err = mBtpEngine.Init(this, expectInitialAck);
@@ -767,7 +767,7 @@ CHIP_ERROR BLEEndPoint::HandleHandshakeConfirmationReceived()
             }
             else
             {
-                // Drive sending in case application callend Send() after we sent the handshake indication, but
+                // Drive sending in case application called Send() after we sent the handshake indication, but
                 // before the GATT confirmation for this indication was received.
                 err = DriveSending();
                 SuccessOrExit(err);
@@ -1209,7 +1209,7 @@ CHIP_ERROR BLEEndPoint::Receive(PacketBufferHandle && data)
     {
         ChipLogDebugBleEndPoint(Ble, "got btp ack = %u", receivedAck);
 
-        // If ack was rx'd for neweset unacked sent fragment, stop ack received timer.
+        // If ack was rx'd for newest unacked sent fragment, stop ack received timer.
         if (!mBtpEngine.ExpectingAck())
         {
             ChipLogDebugBleEndPoint(Ble, "got ack for last outstanding fragment");

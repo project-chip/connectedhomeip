@@ -275,7 +275,7 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
         }
 
         // Truncate the incoming fragment length by the mRxFragmentSize as the negotiated
-        // mRxFragnentSize may be smaller than the characteristic size.  Make sure
+        // mRxFragmentSize may be smaller than the characteristic size.  Make sure
         // we're not truncating to a data length smaller than what we have already consumed.
         VerifyOrExit(reader.OctetsRead() <= mRxFragmentSize, err = BLE_ERROR_REASSEMBLER_INCORRECT_STATE);
         data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
