@@ -135,6 +135,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     mState       = State::Initialized;
 
     mRemoveFromFabricTableOnShutdown = params.removeFromFabricTableOnShutdown;
+    mDeleteFromFabricTableOnShutdown = params.deleteFromFabricTableOnShutdown;
 
     if (GetFabricIndex() != kUndefinedFabricIndex)
     {
@@ -400,13 +401,13 @@ void DeviceController::Shutdown()
         // existing sessions too?
         mSystemState->SessionMgr()->ExpireAllSessionsForFabric(mFabricIndex);
 
-        if (mRemoveFromFabricTableOnShutdown)
+        if (mDeleteFromFabricTableOnShutdown)
         {
-            FabricTable * fabricTable = mSystemState->Fabrics();
-            if (fabricTable != nullptr)
-            {
-                fabricTable->Forget(mFabricIndex);
-            }
+            mSystemState->Fabrics()->Delete(mFabricIndex);
+        }
+        else if (mRemoveFromFabricTableOnShutdown)
+        {
+            mSystemState->Fabrics()->Forget(mFabricIndex);
         }
     }
 

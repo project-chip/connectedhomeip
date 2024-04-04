@@ -508,11 +508,15 @@ using namespace chip::Tracing::DarwinFramework;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
         commissionerParams.enableServerInteractions = startupParams.advertiseOperational;
-        // We don't want to remove things from the fabric table on controller
-        // shutdown, since our controller setup depends on being able to fetch
-        // fabric information for the relevant fabric indices on controller
-        // bring-up.
+
+        // We never want plain "removal" from the fabric table since this leaves
+        // the in-memory state out of sync with what's in storage. In per-controller
+        // storage mode, have the controller delete itself from the fabric table on shutdown.
+        // In factory storage mode we need to keep fabric information around so we can
+        // start another controller on that existing fabric at a later time.
         commissionerParams.removeFromFabricTableOnShutdown = false;
+        commissionerParams.deleteFromFabricTableOnShutdown = (startupParams.storageDelegate != nil);
+
         commissionerParams.permitMultiControllerFabrics = startupParams.allowMultipleControllersPerFabric;
 
         // Set up our attestation verifier.  Assume we want to use the default
