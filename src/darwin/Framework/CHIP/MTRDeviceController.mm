@@ -590,6 +590,22 @@ using namespace chip::Tracing::DarwinFramework;
         return NO;
     }
 
+    if (_controllerDataStore) {
+        // If the storage delegate supports the bulk read API, then a dictionary of nodeID => cluster data dictionary would be passed to the handler. Otherwise this would be a no-op, and stored attributes for MTRDevice objects will be loaded lazily in -deviceForNodeID:.
+        [_controllerDataStore startUpWithClusterDataHandler:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
+            MTR_LOG_INFO("Loaded %lu nodes from storage", static_cast<unsigned long>(clusterDataByNode.count));
+            for (NSNumber * nodeID in clusterDataByNode) {
+                MTRDevice * device = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
+                NSDictionary * clusterData = clusterDataByNode[nodeID];
+                MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), device);
+                if (clusterData.count) {
+                    [device setClusterData:clusterData];
+                }
+                self->_nodeIDToDeviceMap[nodeID] = device;
+            }
+        }];
+    }
+
     return YES;
 }
 
@@ -978,6 +994,18 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, nodeID.unsignedLongLongValue);
     }
 }
+
+#ifdef DEBUG
+- (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
+{
+    std::lock_guard lock(_deviceMapLock);
+    NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
+    for (NSNumber * nodeID in _nodeIDToDeviceMap) {
+        deviceAttributeCounts[nodeID] = @([_nodeIDToDeviceMap[nodeID] unitTestAttributeCount]);
+    }
+    return deviceAttributeCounts;
+}
+#endif
 
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {

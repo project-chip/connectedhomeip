@@ -111,6 +111,34 @@ MTR_NEWLY_AVAILABLE
     removeValueForKey:(NSString *)key
         securityLevel:(MTRStorageSecurityLevel)securityLevel
           sharingType:(MTRStorageSharingType)sharingType;
+
+@optional
+/**
+ * Return all keys and values stored, if any, for the provided controller in a
+ * dictionary. Returns nil if there is no stored value.
+ *
+ * securityLevel and dataType will always be the same for any given key value
+ * and are just present here to help locate the data if storage location is
+ * separated out by security level and data type.
+ *
+ * The set of classes that might be decoded by this function is available by
+ * calling MTRDeviceControllerStorageClasses().
+ */
+- (nullable NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller
+                                                                 securityLevel:(MTRStorageSecurityLevel)securityLevel
+                                                                   sharingType:(MTRStorageSharingType)sharingType;
+
+/**
+ * Store a list of keys and values in the form of a dictionary. Returns whether
+ * the store succeeded.
+ *
+ * securityLevel and dataType will always be the same for any given key value
+ * and are present here as a hint to how the value should be stored.
+ */
+- (BOOL)controller:(MTRDeviceController *)controller
+       storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values
+     securityLevel:(MTRStorageSecurityLevel)securityLevel
+       sharingType:(MTRStorageSharingType)sharingType;
 @end
 
 // TODO: FIXME: Is this a sane place to put this API?

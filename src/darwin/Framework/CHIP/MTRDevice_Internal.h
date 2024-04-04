@@ -90,6 +90,10 @@ MTR_TESTABLE
 //   Currently contains data version information
 - (void)setClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
 
+#ifdef DEBUG
+- (NSUInteger)unitTestAttributeCount;
+#endif
+
 @end
 
 #pragma mark - Utility for clamping numbers

@@ -86,4 +86,35 @@
 
 @end
 
+@implementation MTRTestPerControllerStorageWithBulkReadWrite
+
+- (NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
+{
+    XCTAssertEqualObjects(self.controllerID, controller.uniqueIdentifier);
+
+    if (!self.storage.count) {
+        return nil;
+    }
+
+    NSMutableDictionary * valuesToReturn = [NSMutableDictionary dictionary];
+    for (NSString * key in self.storage) {
+        valuesToReturn[key] = [self controller:controller valueForKey:key securityLevel:securityLevel sharingType:sharingType];
+    }
+
+    return valuesToReturn;
+}
+
+- (BOOL)controller:(MTRDeviceController *)controller storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
+{
+    XCTAssertEqualObjects(self.controllerID, controller.uniqueIdentifier);
+
+    for (NSString * key in values) {
+        [self controller:controller storeValue:values[key] forKey:key securityLevel:securityLevel sharingType:sharingType];
+    }
+
+    return YES;
+}
+
+@end
+
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
