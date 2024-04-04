@@ -97,7 +97,8 @@ class TC_FAN_3_3(MatterBaseTest):
             self.skip_step(4)
 
             self.step(5)
-            self.write_rock_setting_expect_failure(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockLeftRight)
+            self.write_rock_setting_expect_failure(
+                endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockLeftRight)
 
         if rock_support & Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown:
             self.step(6)
@@ -112,7 +113,7 @@ class TC_FAN_3_3(MatterBaseTest):
         else:
             self.skip_step(6)
             self.skip_step(7)
-            
+
             self.step(8)
             await self.write_rock_setting_expect_failure(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown)
 
@@ -128,7 +129,7 @@ class TC_FAN_3_3(MatterBaseTest):
         else:
             self.skip_step(9)
             self.skip_step(10)
-            
+
             self.step(11)
             await self.write_rock_setting_expect_failure(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockRound)
 
