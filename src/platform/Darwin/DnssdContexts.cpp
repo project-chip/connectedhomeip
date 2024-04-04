@@ -478,7 +478,7 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     consumerCounter = std::move(consumerCounterToUse);
 }
 
-ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
+ResolveContext::ResolveContext(DiscoverNodeDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
                                const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
     browseThatCausedResolve(nullptr)
 {
@@ -593,7 +593,7 @@ bool ResolveContext::TryReportingResultsForInterfaceIndex(uint32_t interfaceInde
     auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
     if (nullptr == callback)
     {
-        auto delegate = static_cast<CommissioningResolveDelegate *>(context);
+        auto delegate = static_cast<DiscoverNodeDelegate *>(context);
         DiscoveredNodeData nodeData;
         service.ToDiscoveredNodeData(addresses, nodeData);
         delegate->OnNodeDiscovered(nodeData);

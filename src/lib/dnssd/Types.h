@@ -205,7 +205,7 @@ inline constexpr size_t kMaxRotatingIdLen         = 50;
 inline constexpr size_t kMaxPairingInstructionLen = 128;
 
 /// Data that is specific to commisionable/commissioning node discovery
-struct CommissionNodeData
+struct DnssdNodeData
 {
     size_t rotatingIdLen                                      = 0;
     uint32_t deviceType                                       = 0;
@@ -220,13 +220,13 @@ struct CommissionNodeData
     char deviceName[kMaxDeviceNameLen + 1]                    = {};
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
 
-    CommissionNodeData() {}
+    DnssdNodeData() {}
 
     void Reset()
     {
         // Let constructor clear things as default
-        this->~CommissionNodeData();
-        new (this) CommissionNodeData();
+        this->~DnssdNodeData();
+        new (this) DnssdNodeData();
     }
 
     bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
@@ -300,12 +300,14 @@ struct ResolvedNodeData
 struct DiscoveredNodeData
 {
     CommonResolutionData resolutionData;
-    CommissionNodeData commissionData;
+    DnssdNodeData nodeData;
+    DiscoveryType nodeType;
 
     void Reset()
     {
         resolutionData.Reset();
-        commissionData.Reset();
+        nodeData.Reset();
+        nodeType = DiscoveryType::kUnknown;
     }
     DiscoveredNodeData() { Reset(); }
 
@@ -313,7 +315,7 @@ struct DiscoveredNodeData
     {
         ChipLogDetail(Discovery, "Discovered node:");
         resolutionData.LogDetail();
-        commissionData.LogDetail();
+        nodeData.LogDetail();
     }
 };
 
@@ -321,10 +323,10 @@ struct DiscoveredNodeData
 ///   - Commissioners
 ///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
 ///     connected to thread/wifi or devices with a commissioning window open)
-class CommissioningResolveDelegate
+class DiscoverNodeDelegate
 {
 public:
-    virtual ~CommissioningResolveDelegate() = default;
+    virtual ~DiscoverNodeDelegate() = default;
 
     /// Called within the CHIP event loop once a node is discovered.
     ///
