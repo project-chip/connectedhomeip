@@ -193,6 +193,12 @@ void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, BluezObject * 
     // Verify that the adapter is properly initialized - the class property must be set.
     // BlueZ can export adapter objects on the bus before it is fully initialized. Such
     // adapter objects are not usable and must be ignored.
+    //
+    // TODO: Find a better way to determine whether the adapter interface exposed by
+    //       BlueZ D-Bus service is fully functional. The current approach is based on
+    //       the assumption that the class property is non-zero, which is true only
+    //       for BR/EDR + LE adapters. LE-only adapters do not have HCI command to read
+    //       the class property and BlueZ sets it to 0 as a default value.
     if (adapter && bluez_adapter1_get_class(adapter.get()) != 0)
     {
         NotifyAdapterAdded(adapter.get());
