@@ -39,7 +39,6 @@ assert(chip_build_tests)
 #
 #   public_deps = [
 #     "${chip_root}/src/lib/foo",         # add dependencies here
-#     "${nlunit_test_root}:nlunit-test",
 #   ]
 # }
 #
@@ -57,7 +56,6 @@ assert(chip_build_tests)
 #
 #   public_deps = [
 #     "${chip_root}/src/lib/foo",         # add dependencies here
-#     "${nlunit_test_root}:nlunit-test",
 #   ]
 #
 #   tests = [
@@ -94,6 +92,8 @@ template("chip_test_suite") {
       public_deps = []
     }
 
+    deps = [ dir_pw_unit_test ]
+
     if (current_os != "zephyr" && current_os != "mbed") {
       # Depend on stdio logging, and have it take precedence over the default platform backend
       public_deps += [ "${chip_root}/src/platform/logging:force_stdio" ]
@@ -106,6 +106,11 @@ template("chip_test_suite") {
       foreach(_test, invoker.test_sources) {
         _test_name = string_replace(_test, ".cpp", "")
 
+        _test_output_dir = "${root_out_dir}/tests"
+        if (defined(invoker.output_dir)) {
+          _test_output_dir = invoker.output_dir
+        }
+
         pw_test(_test_name) {
           forward_variables_from(invoker,
                                  [
@@ -116,6 +121,7 @@ template("chip_test_suite") {
                                  ])
           public_deps += [ ":${_suite_name}.lib" ]
           sources = [ _test ]
+          output_dir = _test_output_dir
         }
         tests += [ _test_name ]
       }
@@ -123,6 +129,11 @@ template("chip_test_suite") {
 
     if (defined(invoker.tests)) {
       foreach(_test, invoker.tests) {
+        _test_output_dir = "${root_out_dir}/tests"
+        if (defined(invoker.output_dir)) {
+          _test_output_dir = invoker.output_dir
+        }
+
         pw_test(_test) {
           forward_variables_from(invoker,
                                  [
@@ -137,6 +148,7 @@ template("chip_test_suite") {
             "${_test}.cpp",
             "${_test}Driver.cpp",
           ]
+          output_dir = _test_output_dir
         }
         tests += [ _test ]
       }
@@ -164,7 +176,7 @@ template("chip_test_suite") {
   }
 }
 
-# TODO: remove this once transition away from nlunit-test is completed
+# TODO [PW_MIGRATION]: remove this once transition away from nlunit-test is completed
 template("chip_test_suite_using_nltest") {
   _suite_name = target_name
 
