@@ -1,326 +1,331 @@
 [submodule "nlassert"]
-	path = third_party/nlassert/repo
-	url = https://github.com/nestlabs/nlassert.git
-	branch  = master
+path = third_party/nlassert/repo
+url = https://github.com/nestlabs/nlassert.git
+branch = master
 [submodule "nlio"]
-	path = third_party/nlio/repo
-	url = https://github.com/nestlabs/nlio.git
-	branch  = master
+path = third_party/nlio/repo
+url = https://github.com/nestlabs/nlio.git
+branch = master
 [submodule "nlunit-test"]
-	path = third_party/nlunit-test/repo
-	url = https://github.com/nestlabs/nlunit-test.git
-	branch  = master
+path = third_party/nlunit-test/repo
+url = https://github.com/nestlabs/nlunit-test.git
+branch = master
 [submodule "mbedtls"]
-	path = third_party/mbedtls/repo
-	url = https://github.com/ARMmbed/mbedtls.git
-	branch = mbedtls-2.28
+path = third_party/mbedtls/repo
+url = https://github.com/ARMmbed/mbedtls.git
+branch = mbedtls-2.28
 [submodule "qrcode"]
-	path = examples/common/QRCode/repo
-	url = https://github.com/nayuki/QR-Code-generator.git
-	branch  = master
+path = examples/common/QRCode/repo
+url = https://github.com/nayuki/QR-Code-generator.git
+branch = master
 [submodule "m5stack-tft"]
-	path = examples/common/m5stack-tft/repo
-	url = https://github.com/jeremyjh/ESP32_TFT_library.git
-	branch  = master
-	platforms = esp32
+path = examples/common/m5stack-tft/repo
+url = https://github.com/jeremyjh/ESP32_TFT_library.git
+branch = master
+platforms = esp32
 [submodule "pigweed"]
-	path = third_party/pigweed/repo
-	url = https://github.com/google/pigweed.git
-	branch  = main
+path = third_party/pigweed/repo
+url = https://github.com/google/pigweed.git
+branch = main
 [submodule "openthread"]
-	path = third_party/openthread/repo
-	url = https://github.com/openthread/openthread.git
-	branch  = main
+path = third_party/openthread/repo
+url = https://github.com/openthread/openthread.git
+branch = main
 [submodule "ot-br-posix"]
-	path = third_party/ot-br-posix/repo
-	url = https://github.com/openthread/ot-br-posix.git
-	branch  = main
-	platforms = linux
+path = third_party/ot-br-posix/repo
+url = https://github.com/openthread/ot-br-posix.git
+branch = main
+platforms = linux
 [submodule "cirque"]
-	path = third_party/cirque/repo
-	url = https://github.com/openweave/cirque.git
-	branch  = master
-	platforms = linux
+path = third_party/cirque/repo
+url = https://github.com/openweave/cirque.git
+branch = master
+platforms = linux
 [submodule "nanopb"]
-	path = third_party/nanopb/repo
-	url = https://github.com/nanopb/nanopb.git
-	branch  = master
+path = third_party/nanopb/repo
+url = https://github.com/nanopb/nanopb.git
+branch = master
 [submodule "qpg_sdk"]
-	path = third_party/qpg_sdk/repo
-	url = https://github.com/Qorvo/QMatter
-	branch  = vlatest-libs
-	platforms = qpg
+path = third_party/qpg_sdk/repo
+url = https://github.com/Qorvo/QMatter
+branch = vlatest-libs
+platforms = qpg
 [submodule "freertos"]
-	path = third_party/freertos/repo
-	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
-	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13xx_26xx,bouffalolab,efr32,esp32,k32w,infineon,qpg,cc32xx,silabs_docker
+path = third_party/freertos/repo
+url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+branch = V10.3.1-kernel-only
+platforms = ameba,cc13xx_26xx,bouffalolab,efr32,esp32,k32w,infineon,qpg,cc32xx,silabs_docker
 [submodule "simw-top-mini"]
-	path = third_party/simw-top-mini/repo
-	url = https://github.com/NXP/plug-and-trust.git
-	branch  = int/CHIPSE_Release
-	platforms = k32w
+path = third_party/simw-top-mini/repo
+url = https://github.com/NXP/plug-and-trust.git
+branch = int/CHIPSE_Release
+platforms = k32w
 [submodule "third_party/openthread/ot-nxp"]
-	path = third_party/openthread/ot-nxp
-	url = https://github.com/NXP/ot-nxp.git
-	platforms = k32w
+path = third_party/openthread/ot-nxp
+url = https://github.com/NXP/ot-nxp.git
+platforms = k32w
 [submodule "third_party/openthread/ot-qorvo"]
-	path = third_party/openthread/ot-qorvo
-	url = https://github.com/openthread/ot-qorvo.git
-	platforms = qpg
+path = third_party/openthread/ot-qorvo
+url = https://github.com/openthread/ot-qorvo.git
+platforms = qpg
 [submodule "third_party/openthread/ot-efr32"]
-	path = third_party/openthread/ot-efr32
-	url = https://github.com/SiliconLabs/ot-efr32.git
-	branch  = matter_sve
-	platforms = efr32,silabs_docker
+path = third_party/openthread/ot-efr32
+url = https://github.com/SiliconLabs/ot-efr32.git
+branch = matter_sve
+platforms = efr32,silabs_docker
 [submodule "third_party/openthread/ot-ifx"]
-	path = third_party/openthread/ot-ifx
-	url = https://github.com/Infineon/ot-ifx-release.git
-	platforms = infineon
+path = third_party/openthread/ot-ifx
+url = https://github.com/Infineon/ot-ifx-release.git
+platforms = infineon
 [submodule "third_party/mbed-os/repo"]
-	path = third_party/mbed-os/repo
-	url = https://github.com/ARMmbed/mbed-os.git
-	branch = master
-	platforms = mbed
+path = third_party/mbed-os/repo
+url = https://github.com/ARMmbed/mbed-os.git
+branch = master
+platforms = mbed
 [submodule "third_party/mbed-os-posix-socket/repo"]
-	path = third_party/mbed-os-posix-socket/repo
-	url = https://github.com/ARMmbed/mbed-os-posix-socket.git
-	branch  = main
-	platforms = mbed
+path = third_party/mbed-os-posix-socket/repo
+url = https://github.com/ARMmbed/mbed-os-posix-socket.git
+branch = main
+platforms = mbed
 [submodule "mbed-os-cypress-capsense-button"]
-	path = third_party/mbed-os-cypress-capsense-button/repo
-	url = https://github.com/ARMmbed/mbed-os-cypress-capsense-button.git
-	branch = main
-	platforms = mbed
+path = third_party/mbed-os-cypress-capsense-button/repo
+url = https://github.com/ARMmbed/mbed-os-cypress-capsense-button.git
+branch = main
+platforms = mbed
 [submodule "p6/abstraction-rtos"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/abstraction-rtos
-	url = https://github.com/Infineon/abstraction-rtos
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/abstraction-rtos
+url = https://github.com/Infineon/abstraction-rtos
+platforms = infineon
 [submodule "p6/bluetooth-freertos"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/bluetooth-freertos
-	url = https://github.com/Infineon/bluetooth-freertos
-	branch  = v2.X
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/bluetooth-freertos
+url = https://github.com/Infineon/bluetooth-freertos
+branch = v2.X
+platforms = infineon
 [submodule "p6/btstack"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/btstack
-	url = https://github.com/Infineon/btstack
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/btstack
+url = https://github.com/Infineon/btstack
+platforms = infineon
 [submodule "p6/clib-support"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/clib-support
-	url = https://github.com/Infineon/clib-support
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/clib-support
+url = https://github.com/Infineon/clib-support
+platforms = infineon
 [submodule "p6/connectivity-utilities"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/connectivity-utilities
-	url = https://github.com/Infineon/connectivity-utilities
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/connectivity-utilities
+url = https://github.com/Infineon/connectivity-utilities
+platforms = infineon
 [submodule "p6/core-lib"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/core-lib
-	url = https://github.com/Infineon/core-lib
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/core-lib
+url = https://github.com/Infineon/core-lib
+platforms = infineon
 [submodule "p6/core-make"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/core-make
-	url = https://github.com/Infineon/core-make
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/core-make
+url = https://github.com/Infineon/core-make
+platforms = infineon
 [submodule "p6/kv-store"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/kv-store
-	url = https://github.com/Infineon/kv-store
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/kv-store
+url = https://github.com/Infineon/kv-store
+platforms = infineon
 [submodule "p6/mtb-hal-cat1"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/mtb-hal-cat1
-	url = https://github.com/Infineon/mtb-hal-cat1
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/mtb-hal-cat1
+url = https://github.com/Infineon/mtb-hal-cat1
+platforms = infineon
 [submodule "p6/mtb-pdl-cat1"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/mtb-pdl-cat1
-	url = https://github.com/Infineon/mtb-pdl-cat1
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/mtb-pdl-cat1
+url = https://github.com/Infineon/mtb-pdl-cat1
+platforms = infineon
 [submodule "p6/psoc6cm0p"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/psoc6cm0p
-	url = https://github.com/Infineon/psoc6cm0p
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/psoc6cm0p
+url = https://github.com/Infineon/psoc6cm0p
+platforms = infineon
 [submodule "p6/whd-bsp-integration"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/whd-bsp-integration
-	url = https://github.com/Infineon/whd-bsp-integration
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/whd-bsp-integration
+url = https://github.com/Infineon/whd-bsp-integration
+platforms = infineon
 [submodule "p6/wifi-connection-manager"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-connection-manager
-	url = https://github.com/Infineon/wifi-connection-manager
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-connection-manager
+url = https://github.com/Infineon/wifi-connection-manager
+platforms = infineon
 [submodule "p6/wifi-host-driver"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-host-driver
-	url = https://github.com/Infineon/wifi-host-driver
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-host-driver
+url = https://github.com/Infineon/wifi-host-driver
+platforms = infineon
 [submodule "p6/wifi-mw-core"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-mw-core
-	url = https://github.com/Infineon/wifi-mw-core
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-mw-core
+url = https://github.com/Infineon/wifi-mw-core
+platforms = infineon
 [submodule "p6/TARGET_CY8CKIT-062S2-43012"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/TARGET_CY8CKIT-062S2-43012
-	url = https://github.com/Infineon/TARGET_CY8CKIT-062S2-43012
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/TARGET_CY8CKIT-062S2-43012
+url = https://github.com/Infineon/TARGET_CY8CKIT-062S2-43012
+platforms = infineon
 [submodule "p6/freertos"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/freertos
-	url = https://github.com/Infineon/freertos
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/freertos
+url = https://github.com/Infineon/freertos
+platforms = infineon
 [submodule "p6/retarget-io"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/retarget-io
-	url = https://github.com/Infineon/retarget-io
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/retarget-io
+url = https://github.com/Infineon/retarget-io
+platforms = infineon
 [submodule "p6/mbedtls"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/mbedtls
-	url = https://github.com/ARMmbed/mbedtls
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/mbedtls
+url = https://github.com/ARMmbed/mbedtls
+platforms = infineon
 [submodule "p6/secure-sockets"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/secure-sockets
-	url = https://github.com/Infineon/secure-sockets
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/secure-sockets
+url = https://github.com/Infineon/secure-sockets
+platforms = infineon
 [submodule "p6/recipe-make-cat1a"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/recipe-make-cat1a
-	url = https://github.com/Infineon/recipe-make-cat1a
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/recipe-make-cat1a
+url = https://github.com/Infineon/recipe-make-cat1a
+platforms = infineon
 [submodule "third_party/pybind11/repo"]
-	path = third_party/pybind11/repo
-	url = https://github.com/pybind/pybind11
-	branch  = stable
+path = third_party/pybind11/repo
+url = https://github.com/pybind/pybind11
+branch = stable
 [submodule "p6/lwip"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip
-	url = https://github.com/lwip-tcpip/lwip.git
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip
+url = https://github.com/lwip-tcpip/lwip.git
+platforms = infineon
 [submodule "third_party/jsoncpp/repo"]
-	path = third_party/jsoncpp/repo
-	url = https://github.com/open-source-parsers/jsoncpp.git
+path = third_party/jsoncpp/repo
+url = https://github.com/open-source-parsers/jsoncpp.git
 [submodule "cyw30739_sdk/30739A0"]
-	path = third_party/infineon/cyw30739_sdk/repos/30739A0
-	url = https://github.com/Infineon/OT-Matter-30739A0.git
-	platforms = infineon
+path = third_party/infineon/cyw30739_sdk/repos/30739A0
+url = https://github.com/Infineon/OT-Matter-30739A0.git
+platforms = infineon
 [submodule "cyw30739_sdk/include"]
-	path = third_party/infineon/cyw30739_sdk/repos/btsdk-include
-	url = https://github.com/Infineon/btsdk-include.git
-	platforms = infineon
+path = third_party/infineon/cyw30739_sdk/repos/btsdk-include
+url = https://github.com/Infineon/btsdk-include.git
+platforms = infineon
 [submodule "cyw30739_sdk/target"]
-	path = third_party/infineon/cyw30739_sdk/repos/CYW930739M2EVB-01
-	url = https://github.com/Infineon/OT-Matter-TARGET_CYW930739M2EVB-01.git
-	platforms = infineon
+path = third_party/infineon/cyw30739_sdk/repos/CYW930739M2EVB-01
+url = https://github.com/Infineon/OT-Matter-TARGET_CYW930739M2EVB-01.git
+platforms = infineon
 [submodule "cyw30739_sdk/tools"]
-	path = third_party/infineon/cyw30739_sdk/repos/btsdk-tools
-	url = https://github.com/Infineon/btsdk-tools.git
-	platforms = infineon
+path = third_party/infineon/cyw30739_sdk/repos/btsdk-tools
+url = https://github.com/Infineon/btsdk-tools.git
+platforms = infineon
 [submodule "third_party/p6/p6_sdk/libs/anycloud-ota"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/anycloud-ota
-	url = https://github.com/Infineon/anycloud-ota
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/anycloud-ota
+url = https://github.com/Infineon/anycloud-ota
+platforms = infineon
 [submodule "third_party/mbed-mcu-boot/repo"]
-	path = third_party/mbed-mcu-boot/repo
-	url = https://github.com/ATmobica/mcuboot.git
-	platforms = mbed
+path = third_party/mbed-mcu-boot/repo
+url = https://github.com/ATmobica/mcuboot.git
+platforms = mbed
 [submodule "p6/serial-flash"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/serial-flash
-	url = https://github.com/Infineon/serial-flash
-	platforms = infineon
+path = third_party/infineon/psoc6/psoc6_sdk/libs/serial-flash
+url = https://github.com/Infineon/serial-flash
+platforms = infineon
 [submodule "ti_simplelink_sdk"]
-	path = third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx
-	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
-	branch = main
-	platforms = cc13xx_26xx
+path = third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx
+url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
+branch = main
+platforms = cc13xx_26xx
 [submodule "third_party/ti_simplelink_sdk/repo_cc32xx"]
-	path = third_party/ti_simplelink_sdk/repo_cc32xx
-	url = https://github.com/TexasInstruments/cc32xx_open_sdk.git
-	branch = main
-	platforms = cc32xx
+path = third_party/ti_simplelink_sdk/repo_cc32xx
+url = https://github.com/TexasInstruments/cc32xx_open_sdk.git
+branch = main
+platforms = cc32xx
 [submodule "third_party/openthread/ot-ti"]
-	path = third_party/openthread/ot-ti
-	url = https://github.com/TexasInstruments/ot-ti.git
-	branch = main
-	platforms = cc13xx_26xx
+path = third_party/openthread/ot-ti
+url = https://github.com/TexasInstruments/ot-ti.git
+branch = main
+platforms = cc13xx_26xx
 [submodule "third_party/nxp/mw320_sdk/repo"]
-	path = third_party/nxp/mw320_sdk/repo
-	url = https://github.com/nxptest/mw320_sdk
-	platforms = mw320
+path = third_party/nxp/mw320_sdk/repo
+url = https://github.com/nxptest/mw320_sdk
+platforms = mw320
 [submodule "third_party/silabs/matter_support"]
-	path = third_party/silabs/matter_support
-	url = https://github.com/SiliconLabs/sdk_support.git
-	branch = main
-	platforms = efr32,silabs_docker
+path = third_party/silabs/matter_support
+url = https://github.com/SiliconLabs/sdk_support.git
+branch = main
+platforms = efr32,silabs_docker
 [submodule "third_party/silabs/gecko_sdk"]
-	path = third_party/silabs/gecko_sdk
-	url = https://github.com/SiliconLabs/gecko_sdk.git
-	branch = v4.3.2
-	platforms = efr32
+path = third_party/silabs/gecko_sdk
+url = https://github.com/SiliconLabs/gecko_sdk.git
+branch = v4.3.2
+platforms = efr32
 [submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
-	path = third_party/silabs/wiseconnect-wifi-bt-sdk
-	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
-	branch = 2.8.2
-	platforms = efr32,silabs_docker
+path = third_party/silabs/wiseconnect-wifi-bt-sdk
+url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
+branch = 2.8.2
+platforms = efr32,silabs_docker
 [submodule "third_party/silabs/wifi_sdk"]
-	path = third_party/silabs/wifi_sdk
-	url = https://github.com/SiliconLabs/wiseconnect.git
-	branch = v3.1.0
-	platforms = efr32
+path = third_party/silabs/wifi_sdk
+url = https://github.com/SiliconLabs/wiseconnect.git
+branch = v3.1.0
+platforms = efr32
 [submodule "editline"]
-	path = third_party/editline/repo
-	url = https://github.com/troglobit/editline.git
+path = third_party/editline/repo
+url = https://github.com/troglobit/editline.git
 [submodule "third_party/boringssl/repo/src"]
-	path = third_party/boringssl/repo/src
-	url = https://github.com/google/boringssl.git
+path = third_party/boringssl/repo/src
+url = https://github.com/google/boringssl.git
 [submodule "third_party/mt793x_sdk/filogic"]
-	path = third_party/mt793x_sdk/filogic
-	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
-	branch = main
-	platforms = genio
+path = third_party/mt793x_sdk/filogic
+url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
+branch = main
+platforms = genio
 [submodule "third_party/mt793x_sdk/mDNSResponder"]
-	path = third_party/mt793x_sdk/mDNSResponder
-	url = https://github.com/matter-mtk/genio-matter-mdnsresponder.git
-	branch = main
-	platforms = genio
+path = third_party/mt793x_sdk/mDNSResponder
+url = https://github.com/matter-mtk/genio-matter-mdnsresponder.git
+branch = main
+platforms = genio
 [submodule "third_party/mt793x_sdk/lwip"]
-	path = third_party/mt793x_sdk/lwip
-	url = https://github.com/matter-mtk/genio-matter-lwip.git
-	branch = main
-	platforms = genio
+path = third_party/mt793x_sdk/lwip
+url = https://github.com/matter-mtk/genio-matter-lwip.git
+branch = main
+platforms = genio
 [submodule "open-iot-sdk"]
-	path = third_party/open-iot-sdk/sdk
-	url = https://git.gitlab.arm.com/iot/open-iot-sdk/sdk.git
-	branch = main
-	platforms = openiotsdk
+path = third_party/open-iot-sdk/sdk
+url = https://git.gitlab.arm.com/iot/open-iot-sdk/sdk.git
+branch = main
+platforms = openiotsdk
 [submodule "bouffalolab_sdk"]
-	path = third_party/bouffalolab/repo
-	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
-	branch = main
-	platforms = bouffalolab
+path = third_party/bouffalolab/repo
+url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
+branch = main
+platforms = bouffalolab
 [submodule "third_party/libwebsockets/repo"]
-	path = third_party/libwebsockets/repo
-	url = https://github.com/warmcat/libwebsockets
-	platforms = linux,darwin,tizen
+path = third_party/libwebsockets/repo
+url = https://github.com/warmcat/libwebsockets
+platforms = linux,darwin,tizen
 [submodule "third_party/imgui/repo"]
-	path = third_party/imgui/repo
-	url = https://github.com/ocornut/imgui
-	platforms = linux
+path = third_party/imgui/repo
+url = https://github.com/ocornut/imgui
+platforms = linux
 [submodule "third_party/asr/asr582x/asr_sdk"]
-	path = third_party/asr/asr582x/asr_sdk
-	url = https://github.com/asriot/ASR582X_Freertos.git
-	branch = matter
-	platforms = asr
+path = third_party/asr/asr582x/asr_sdk
+url = https://github.com/asriot/ASR582X_Freertos.git
+branch = matter
+platforms = asr
 [submodule "third_party/asr/asr595x/asr_sdk"]
-	path = third_party/asr/asr595x/asr_sdk
-	url = https://github.com/asriot/ASR595X_Freertos.git
-	branch = matter
-	platforms = asr
+path = third_party/asr/asr595x/asr_sdk
+url = https://github.com/asriot/ASR595X_Freertos.git
+branch = matter
+platforms = asr
 [submodule "perfetto"]
-	path = third_party/perfetto/repo
-	url = https://github.com/google/perfetto.git
-	branch = master
-	platforms = linux,android,darwin
+path = third_party/perfetto/repo
+url = https://github.com/google/perfetto.git
+branch = master
+platforms = linux,android,darwin
 [submodule "third_party/asr/components"]
-	path = third_party/asr/components
-	url = https://github.com/asriot/asriot_components.git
-	branch = matter
-	platforms = asr
+path = third_party/asr/components
+url = https://github.com/asriot/asriot_components.git
+branch = matter
+platforms = asr
 [submodule "third_party/asr/asr550x/asr_sdk"]
-	path = third_party/asr/asr550x/asr_sdk
-	url = https://github.com/asriot/ASR550X_Freertos.git
-	branch = matter
-	platforms = asr
+path = third_party/asr/asr550x/asr_sdk
+url = https://github.com/asriot/ASR550X_Freertos.git
+branch = matter
+platforms = asr
 [submodule "third_party/st/STM32CubeWB"]
-	path = third_party/st/STM32CubeWB
-	url = https://github.com/STMicroelectronics/STM32CubeWB.git
-	branch = v1.17.0
-	platforms = stm32
+path = third_party/st/STM32CubeWB
+url = https://github.com/STMicroelectronics/STM32CubeWB.git
+branch = v1.17.0
+platforms = stm32
+[submodule "third_party/infineon/trustm/optiga-trust-m"]
+path = third_party/infineon/trustm/optiga-trust-m
+url = https://github.com/Infineon/optiga-trust-m.git
+branch = matter_support
+platforms = infineon

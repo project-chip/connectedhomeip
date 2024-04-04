@@ -1,0 +1,73 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/infineon/trustm/trustm_config.gni")
+
+config("trustm_config") {
+  if (chip_trustm_da == 1) {
+    defines += [ "CHIP_TRUSTM_DA" ]
+  }
+
+  include_dirs = [
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/include",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/include/optiga",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/include/optiga/ifx_i2c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/include/optiga/comms",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/include/optiga/common",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/include/optiga/cmd",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/include/optiga/pal",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/externals/mbedtls/include",
+    "${chip_root}/third_party/infineon/trustm",
+  ]
+  if (chip_device_platform == "psoc6") {
+    include_dirs += [ "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4" ]
+  }
+}
+
+source_set("optiga-trust-m") {
+  sources = [
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/cmd/optiga_cmd.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/common/optiga_lib_common.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/common/optiga_lib_logger.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/comms/ifx_i2c/ifx_i2c.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/comms/ifx_i2c/ifx_i2c_config.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/comms/ifx_i2c/ifx_i2c_data_link_layer.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/comms/ifx_i2c/ifx_i2c_physical_layer.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/comms/ifx_i2c/ifx_i2c_presentation_layer.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/comms/ifx_i2c/ifx_i2c_transport_layer.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/comms/optiga_comms_ifx_i2c.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/crypt/optiga_crypt.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/optiga/util/optiga_util.c",
+    "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/pal_crypt_mbedtls.c",
+  ]
+
+  if (chip_device_platform == "psoc6") {
+    sources += [
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal.c",
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal_gpio.c",
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal_i2c.c",
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal_ifx_i2c_config.c",
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal_logger.c",
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal_os_datastore.c",
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal_os_event.c",
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal_os_lock.c",
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal_os_memory.c",
+      "${chip_root}/third_party/infineon/trustm/optiga-trust-m/pal/COMPONENT_PSOC6_FREERTOS/COMPONENT_CM4/pal_os_timer.c",
+    ]
+  }
+  public_deps = [ "${chip_root}/third_party/mbedtls:mbedtls" ]
+  configs += [ ":trustm_config" ]
+}
