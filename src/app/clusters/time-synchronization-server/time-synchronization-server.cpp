@@ -600,7 +600,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
             if (CHIP_NO_ERROR != CopyCharSpanToMutableCharSpan(newTz.name.Value(), tempSpan))
             {
                 ReturnErrorOnFailure(LoadTimeZone());
-                return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
             tzStore.timeZone.name.SetValue(tempSpan);
         }
