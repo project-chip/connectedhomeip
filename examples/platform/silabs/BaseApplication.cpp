@@ -78,7 +78,6 @@
 #ifndef APP_TASK_STACK_SIZE
 #define APP_TASK_STACK_SIZE (4096)
 #endif
-#define APP_TASK_PRIORITY 2
 #ifndef APP_EVENT_QUEUE_SIZE // Allow apps to define a different app queue size
 #define APP_EVENT_QUEUE_SIZE 10
 #endif
