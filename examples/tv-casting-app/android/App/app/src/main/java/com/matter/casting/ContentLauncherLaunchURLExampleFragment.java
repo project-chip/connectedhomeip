@@ -17,18 +17,23 @@
 package com.matter.casting;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import chip.devicecontroller.ChipClusters;
 import com.R;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.core.Endpoint;
-import java.util.List;
+import java.util.Optional;
 
-/** A {@link Fragment} to send Content Launcher LaunchURL command from the TV Casting App. */
+/** A {@link Fragment} to send Content Launcher LaunchURL command using the TV Casting App. */
 public class ContentLauncherLaunchURLExampleFragment extends Fragment {
   private static final String TAG = ContentLauncherLaunchURLExampleFragment.class.getSimpleName();
   private static final Integer SAMPLE_ENDPOINT_VID = 65521;
@@ -63,19 +68,60 @@ public class ContentLauncherLaunchURLExampleFragment extends Fragment {
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     this.launchUrlButtonClickListener =
         v -> {
-          Endpoint endpoint = selectEndpoint();
+          Endpoint endpoint = EndpointSelectorExample.selectEndpointByVID(selectedCastingPlayer);
           if (endpoint == null) {
-            Log.e(
-                TAG,
-                "No Endpoint with chosen vendorID: "
-                    + SAMPLE_ENDPOINT_VID
-                    + " found on CastingPlayer");
+            Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
             return;
           }
 
-          // TODO: add command invocation API call
+          EditText contentUrlEditText = getView().findViewById(R.id.contentUrlEditText);
+          String contentUrl = contentUrlEditText.getText().toString();
+          EditText contentDisplayStringEditText =
+              getView().findViewById(R.id.contentDisplayStringEditText);
+          String contentDisplayString = contentDisplayStringEditText.getText().toString();
+
+          // get ChipClusters.ContentLauncherCluster from the endpoint
+          ChipClusters.ContentLauncherCluster cluster =
+              endpoint.getCluster(ChipClusters.ContentLauncherCluster.class);
+          if (cluster == null) {
+            Log.e(
+                TAG,
+                "Could not get ContentLauncherCluster for endpoint with ID: " + endpoint.getId());
+            return;
+          }
+
+          // call launchURL on the cluster object while passing in a
+          // ChipClusters.ContentLauncherCluster.LauncherResponseCallback and request parameters
+          cluster.launchURL(
+              new ChipClusters.ContentLauncherCluster.LauncherResponseCallback() {
+                @Override
+                public void onSuccess(Integer status, Optional<String> data) {
+                  Log.d(TAG, "LaunchURL success. Status: " + status + ", Data: " + data);
+                  new Handler(Looper.getMainLooper())
+                      .post(
+                          () -> {
+                            TextView launcherResult = getView().findViewById(R.id.launcherResult);
+                            launcherResult.setText(
+                                "LaunchURL result\nStatus: " + status + ", Data: " + data);
+                          });
+                }
+
+                @Override
+                public void onError(Exception error) {
+                  Log.e(TAG, "LaunchURL failure " + error);
+                  new Handler(Looper.getMainLooper())
+                      .post(
+                          () -> {
+                            TextView launcherResult = getView().findViewById(R.id.launcherResult);
+                            launcherResult.setText("LaunchURL result\nError: " + error);
+                          });
+                }
+              },
+              contentUrl,
+              Optional.of(contentDisplayString),
+              Optional.empty());
         };
-    return inflater.inflate(R.layout.fragment_content_launcher, container, false);
+    return inflater.inflate(R.layout.fragment_matter_content_launcher_launch_url, container, false);
   }
 
   @Override
@@ -83,23 +129,5 @@ public class ContentLauncherLaunchURLExampleFragment extends Fragment {
     super.onViewCreated(view, savedInstanceState);
     Log.d(TAG, "ContentLauncherLaunchURLExampleFragment.onViewCreated called");
     getView().findViewById(R.id.launchUrlButton).setOnClickListener(launchUrlButtonClickListener);
-  }
-
-  private Endpoint selectEndpoint() {
-    Endpoint endpoint = null;
-    if (selectedCastingPlayer != null) {
-      List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
-      if (endpoints == null) {
-        Log.e(TAG, "No Endpoints found on CastingPlayer");
-      } else {
-        endpoint =
-            endpoints
-                .stream()
-                .filter(e -> SAMPLE_ENDPOINT_VID.equals(e.getVendorId()))
-                .findFirst()
-                .get();
-      }
-    }
-    return endpoint;
   }
 }
