@@ -213,7 +213,7 @@ pigweed-app/**/README
 :maxdepth: 1
 
 pump-app/**/README
-pump-app/cc13x2x7_26x2x7/doc/programming*
+pump-app/cc13x4_26x4/doc/programming*
 ```
 
 ## Pump controller example
@@ -223,7 +223,7 @@ pump-app/cc13x2x7_26x2x7/doc/programming*
 :maxdepth: 1
 
 pump-controller-app/**/README
-pump-controller-app/cc13x2x7_26x2x7/doc/programming*
+pump-controller-app/cc13x4_26x4/doc/programming*
 ```
 
 ## Refrigerator example

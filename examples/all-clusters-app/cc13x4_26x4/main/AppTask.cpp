@@ -40,8 +40,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 
-#ifdef AUTO_PRINT_METRICS
-#include <platform/cc13x2_26x2/DiagnosticDataProviderImpl.h>
+#if AUTO_PRINT_METRICS
+//#include <platform/cc13xx_26xx/DiagnosticDataProviderImpl.h>
 #endif
 #include <app/server/OnboardingCodesUtil.h>
 
