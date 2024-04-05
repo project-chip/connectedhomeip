@@ -317,6 +317,66 @@ bool ConfigurationManagerImpl::CanFactoryReset()
     return true;
 }
 
+void ConfigurationManagerImpl::DoMatterDataReset(intptr_t arg)
+{
+    CHIP_ERROR err;
+
+    ChipLogProgress(DeviceLayer, "Performing matter data reset");
+
+    // Erase all values in the chip-config NVS namespace.
+    err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipConfig);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));
+    }
+
+    // Erase all values in the chip-counters NVS namespace.
+    err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipCounters);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ClearNamespace(ChipCounters) failed: %s", chip::ErrorStr(err));
+    }
+
+    // Erase all key-values including fabric info.
+    err = PersistedStorage::KeyValueStoreMgrImpl().EraseAll();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Clear Key-Value Storage failed");
+    }
+}
+
+void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
+{
+    CHIP_ERROR err;
+
+    ChipLogProgress(DeviceLayer, "Performing complete factory reset");
+
+    DoMatterDataReset(arg);
+
+    // Restore WiFi persistent settings to default values.
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    esp_err_t error = esp_wifi_restore();
+    if (error != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", esp_err_to_name(error));
+    }
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    ThreadStackMgr().ErasePersistentInfo();
+#endif
+
+    nvs_flash_deinit();
+    nvs_flash_erase();
+
+    // Restart the system.
+    esp_restart();
+}
+
+void ConfigurationManagerImpl::InitiateMatterDataReset()
+{
+    PlatformMgr().ScheduleWork(DoMatterDataReset);
+}
+
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
@@ -398,50 +458,6 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
     ESP32Config::RunConfigUnitTest();
-}
-
-void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
-{
-    CHIP_ERROR err;
-
-    ChipLogProgress(DeviceLayer, "Performing factory reset");
-
-    // Erase all values in the chip-config NVS namespace.
-    err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipConfig);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));
-    }
-
-    // Erase all values in the chip-counters NVS namespace.
-    err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipCounters);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "ClearNamespace(ChipCounters) failed: %s", chip::ErrorStr(err));
-    }
-
-    // Restore WiFi persistent settings to default values.
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    esp_err_t error = esp_wifi_restore();
-    if (error != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", esp_err_to_name(error));
-    }
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    ThreadStackMgr().ErasePersistentInfo();
-#endif
-
-    // Erase all key-values including fabric info.
-    err = PersistedStorage::KeyValueStoreMgrImpl().EraseAll();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Clear Key-Value Storage failed");
-    }
-
-    // Restart the system.
-    ChipLogProgress(DeviceLayer, "System restarting");
-    esp_restart();
 }
 
 ConfigurationManager & ConfigurationMgrImpl()
