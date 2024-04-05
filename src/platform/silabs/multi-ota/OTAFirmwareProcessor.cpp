@@ -114,7 +114,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
             if (err != SL_STATUS_OK)
             {
                 ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %ld", err);
-                return;
+                return CHIP_ERROR_CANCELLED;
             }
 #endif // SL_BTLCTRL_MUX
             CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
@@ -123,7 +123,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
             if (err != SL_STATUS_OK)
             {
                 ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
-                return;
+                return CHIP_ERROR_CANCELLED;
             }
 #endif // SL_BTLCTRL_MUX
             if (err)
