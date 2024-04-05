@@ -16,15 +16,12 @@ COPY files/bluetooth/main.conf /tmp/workdir/main.conf
 RUN set -x \
 	&& chmod +x /opt/ubuntu-qemu/run-img.sh \
 	&& apt-get update \
-	&& DEBIAN_FRONTEND=noninteractive apt-get install -fy apt-utils \
 	&& DEBIAN_FRONTEND=noninteractive apt-get install -fy \
 	bc \
-	build-essential \
 	cpio \
 	dwarves \
 	elfutils \
 	fakeroot \
-	flex \
 	libdw-dev \
 	libelf-dev \
 	libell-dev \
@@ -32,13 +29,12 @@ RUN set -x \
 	libguestfs-tools \
 	linux-image-generic \
 	ncurses-dev \
-	python3 \
-	python3-docutils \
 	qemu \
 	xz-utils \
 	zstd \
 	&& apt-get clean \
-	&& rm -rf /var/lib/apt/lists/ \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& rm -rf /var/cache/apt/* \
 	&& : # last line
 
 # Download Linux kernel source
@@ -52,67 +48,65 @@ RUN mkdir -p /tmp/workdir/linux \
 	&& cd /tmp/workdir/linux \
 	&& patch -p1 < /tmp/workdir/linux/0001-Bluetooth-MGMT-Synchronize-scan-start-and-LE-Meta-ev.patch \
 	&& make x86_64_defconfig \
-	&& ./scripts/config -e MAC80211 \
-	&& ./scripts/config -e MAC80211_HWSIM \
 	&& ./scripts/config -e BT \
 	&& ./scripts/config -e BT_BREDR \
 	&& ./scripts/config -e BT_HCIVHCI \
-	&& ./scripts/config -e CONFIG_CRYPTO_USER \
-	&& ./scripts/config -e CONFIG_CRYPTO_USER_API_SKCIPHER \
-	&& ./scripts/config -e CONFIG_CRYPTO_AES \
-	&& ./scripts/config -e CONFIG_CRYPTO_ECB \
-	&& ./scripts/config -e CONFIG_CRYPTO_CMAC \
-	&& ./scripts/config -e CONFIG_CRYPTO_USER_API_HASH \
-	&& ./scripts/config -e CONFIG_VETH \
 	&& ./scripts/config -e CONFIG_BRIDGE \
+	&& ./scripts/config -e CONFIG_CRYPTO_AES \
+	&& ./scripts/config -e CONFIG_CRYPTO_CMAC \
+	&& ./scripts/config -e CONFIG_CRYPTO_ECB \
+	&& ./scripts/config -e CONFIG_CRYPTO_USER \
+	&& ./scripts/config -e CONFIG_CRYPTO_USER_API_HASH \
+	&& ./scripts/config -e CONFIG_CRYPTO_USER_API_SKCIPHER \
+	&& ./scripts/config -e CONFIG_VETH \
+	&& ./scripts/config -e MAC80211 \
+	&& ./scripts/config -e MAC80211_HWSIM \
 	# Compile
 	&& make olddefconfig  \
 	&& make \
 	&& mkdir -p /opt/ubuntu-qemu/rootfs \
 	&& make modules_install INSTALL_MOD_PATH=/opt/ubuntu-qemu/rootfs \
 	&& cp /tmp/workdir/linux/arch/x86/boot/bzImage /opt/ubuntu-qemu/bzImage \
-	# Download Ubuntu image for QEMU
-	&& curl https://cloud-images.ubuntu.com/minimal/releases/focal/release/ubuntu-20.04-minimal-cloudimg-amd64.img \
-	-o /tmp/workdir/ubuntu-20.04-minimal-cloudimg-amd64.img \
 	# Build bluez
 	&& git clone git://git.kernel.org/pub/scm/libs/ell/ell.git /tmp/workdir/ell --depth 1 --branch ${ELL_VERSION} \
 	&& git clone https://github.com/bluez/bluez.git /tmp/workdir/bluez --depth 1 --branch ${BLUEZ_VERSION} \
 	&& cd /tmp/workdir/bluez \
 	&& ./bootstrap \
 	&& ./configure \
-	--disable-silent-rules \
-	--enable-pie \
-	--enable-tools \
-	--enable-test \
-	--enable-library \
-	--enable-testing \
-	--enable-udev \
-	--enable-experimental \
-	--enable-deprecated \
 	--enable-backtrace \
 	--enable-debug \
-	--enable-tools \
+	--enable-deprecated \
+	--enable-experimental \
+	--enable-library \
 	--enable-monitor \
-	--disable-cups \
-	--disable-sap \
-	--disable-hid2hci \
+	--enable-pie \
+	--enable-test \
+	--enable-testing \
+	--enable-tools \
+	--enable-tools \
+	--enable-udev \
 	--disable-a2dp \
 	--disable-avrcp \
-	--disable-network \
-	--disable-hid \
-	--disable-hog \
-	--disable-health \
 	--disable-bap \
 	--disable-bass \
-	--disable-mcp  \
-	--disable-vcp \
-	--disable-micp \
 	--disable-csip \
 	--disable-cups \
+	--disable-cups \
+	--disable-health \
+	--disable-hid \
+	--disable-hid2hci \
+	--disable-hog \
+	--disable-manpages \
+	--disable-mcp  \
 	--disable-mesh \
+	--disable-micp \
 	--disable-midi \
+	--disable-network \
 	--disable-obex \
 	--disable-optimization \
+	--disable-sap \
+	--disable-silent-rules \
+	--disable-vcp \
 	--prefix=/usr \
 	--mandir=/usr/share/man \
 	--sysconfdir=/etc \
@@ -121,6 +115,9 @@ RUN mkdir -p /tmp/workdir/linux \
 	--with-systemduserunitdir=/usr/lib/systemd \
 	&& make \
 	&& make install DESTDIR=/opt/ubuntu-qemu/rootfs && mkdir -p /opt/ubuntu-qemu/rootfs/usr/bin && cp /tmp/workdir/bluez/emulator/btvirt /opt/ubuntu-qemu/rootfs/usr/bin \
+	# Download Ubuntu image for QEMU
+	&& curl https://cloud-images.ubuntu.com/minimal/releases/focal/release/ubuntu-20.04-minimal-cloudimg-amd64.img \
+	-o /tmp/workdir/ubuntu-20.04-minimal-cloudimg-amd64.img \
 	# Prepare ubuntu image
 	&& qemu-img create -f qcow2 -o preallocation=off $UBUNTU_QEMU_IMG 10G \
 	&& virt-resize --expand /dev/sda1 /tmp/workdir/ubuntu-20.04-minimal-cloudimg-amd64.img $UBUNTU_QEMU_IMG \
@@ -133,22 +130,22 @@ RUN mkdir -p /tmp/workdir/linux \
 	sh 'apt-get update' : \
 	sh 'DEBIAN_FRONTEND=noninteractive apt-get install -y dnsmasq hostapd wpasupplicant iw libdw1 rfkill' : \
 	sh '/usr/bin/systemctl enable bluetooth.service' : \
-	sh '/usr/bin/systemctl disable systemd-networkd-wait-online.service' : \
 	sh '/usr/bin/systemctl disable cloud-init.service' : \
-	sh '/usr/bin/systemctl disable lxd-agent.service' : \
-	sh '/usr/bin/systemctl disable hostapd.service' : \
-	sh '/usr/bin/systemctl disable dnsmasq.service' : \
 	sh '/usr/bin/systemctl disable dbus-fi.w1.wpa_supplicant1.service' : \
-	sh '/usr/bin/systemctl disable wpa_supplicant.service' : \
+	sh '/usr/bin/systemctl disable dnsmasq.service' : \
+	sh '/usr/bin/systemctl disable hostapd.service' : \
+	sh '/usr/bin/systemctl disable lxd-agent.service' : \
+	sh '/usr/bin/systemctl disable systemd-networkd-wait-online.service' : \
 	sh '/usr/bin/systemctl disable systemd-timesyncd.service' : \
-	sh '/usr/bin/systemctl mask systemd-networkd-wait-online.service' : \
+	sh '/usr/bin/systemctl disable wpa_supplicant.service' : \
 	sh '/usr/bin/systemctl mask cloud-init.service' : \
-	sh '/usr/bin/systemctl mask lxd-agent.service' : \
-	sh '/usr/bin/systemctl mask hostapd.service' : \
-	sh '/usr/bin/systemctl mask dnsmasq.service' : \
 	sh '/usr/bin/systemctl mask dbus-fi.w1.wpa_supplicant1.service' : \
-	sh '/usr/bin/systemctl mask wpa_supplicant.service' : \
+	sh '/usr/bin/systemctl mask dnsmasq.service' : \
+	sh '/usr/bin/systemctl mask hostapd.service' : \
+	sh '/usr/bin/systemctl mask lxd-agent.service' : \
+	sh '/usr/bin/systemctl mask systemd-networkd-wait-online.service' : \
 	sh '/usr/bin/systemctl mask systemd-timesyncd.service' : \
+	sh '/usr/bin/systemctl mask wpa_supplicant.service' : \
 	sh 'passwd -d root' : \
 	sh 'ssh-keygen -A' : \
 	sh '/bin/echo -e "PermitRootLogin yes\nPasswordAuthentication yes\nPermitEmptyPasswords yes" > /etc/ssh/sshd_config' : \
@@ -165,7 +162,9 @@ RUN mkdir -p /tmp/workdir/linux \
 	sh 'DEBIAN_FRONTEND=noninteractive apt-get -y install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3 python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev' : \
 	sh 'git config --file /root/.gitconfig  --add safe.directory "*"' : \
 	sh 'apt-get clean' : \
-	sh 'rm -rf /var/lib/apt/lists' \
+	sh 'rm -rf /var/lib/apt/lists/*' : \
+	sh 'rm -rf /var/cache/apt/*' : \
+	sh 'echo Configuration completed.' \
 	&& mkdir -p /chip \
 	&& rm -rf /opt/ubuntu-qemu/rootfs \
 	&& echo -n \
@@ -184,7 +183,10 @@ RUN mkdir -p /tmp/workdir/linux \
 	"echo 'Shutting down emulated system...'\n" \
 	"echo o > /proc/sysrq-trigger\n" \
 	| guestfish --rw -a $UBUNTU_QEMU_IMG -m /dev/sda3:/ upload - /launcher.sh : chmod 0755 /launcher.sh \
-	&& rm -rf /var/tmp/.guestfs-0 \
-	&& rm -rf /tmp/workdir
+	&& virt-sparsify --compress ${UBUNTU_QEMU_IMG} ${UBUNTU_QEMU_IMG}.compressed \
+	&& mv ${UBUNTU_QEMU_IMG}.compressed ${UBUNTU_QEMU_IMG} \
+	&& rm -rf /var/tmp/.guestfs-0/* \
+	&& rm -rf /tmp/* \
+	&& : # last line
 
 WORKDIR /chip
