@@ -41,7 +41,7 @@
 #include <lib/support/CHIPPlatformMemory.h>
 
 #if AUTO_PRINT_METRICS
-//#include <platform/cc13xx_26xx/DiagnosticDataProviderImpl.h>
+// #include <platform/cc13xx_26xx/DiagnosticDataProviderImpl.h>
 #endif
 #include <app/server/OnboardingCodesUtil.h>
 
