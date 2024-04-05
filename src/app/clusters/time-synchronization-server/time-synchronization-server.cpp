@@ -689,8 +689,8 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     uint64_t lastValidUntil = 0;
-    auto newDstL = dstL.begin();
-    size_t i     = 0;
+    auto newDstL            = dstL.begin();
+    size_t i                = 0;
     InitDSTOffset();
 
     while (newDstL.Next())
