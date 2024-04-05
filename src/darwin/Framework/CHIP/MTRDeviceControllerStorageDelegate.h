@@ -114,8 +114,8 @@ MTR_NEWLY_AVAILABLE
 
 @optional
 /**
- * Return all keys and values stored, if any, for the provided controller in a
- * dictionary. Returns nil if there is no stored value.
+ * Return all keys and values stored, if any, for the provided controller, in a
+ * dictionary. Returns nil if there are no stored values.
  *
  * securityLevel and dataType will always be the same for any given key value
  * and are just present here to help locate the data if storage location is
