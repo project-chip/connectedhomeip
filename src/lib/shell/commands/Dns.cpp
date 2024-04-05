@@ -103,8 +103,7 @@ public:
         streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.nodeData.longDiscriminator);
         streamer_printf(streamer_get(), "   Device type: %u\r\n", nodeData.nodeData.deviceType);
         streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.nodeData.deviceName);
-        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n",
-                        static_cast<int>(nodeData.nodeData.commissioningMode));
+        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n", static_cast<int>(nodeData.nodeData.commissioningMode));
         streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.nodeData.pairingHint);
         streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.nodeData.pairingInstruction);
         streamer_printf(streamer_get(), "   Rotating ID %s\r\n", rotatingId);

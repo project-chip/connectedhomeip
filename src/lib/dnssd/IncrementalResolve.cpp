@@ -348,7 +348,7 @@ CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
     IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
     outputData.resolutionData = mCommonResolutionData;
-    outputData.nodeData = mSpecificResolutionData.Get<DnssdNodeData>();
+    outputData.nodeData       = mSpecificResolutionData.Get<DnssdNodeData>();
 
     ResetToInactive();
 
