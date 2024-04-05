@@ -791,7 +791,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
         return err;
     }
     GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
-    mGranularity  = granularity;
+    mGranularity  = static_cast<GranularityEnum>(to_underlying(granularity) - 1);
     Status status = TimeSource::Set(ep, source);
     if (!(status == Status::Success || status == Status::UnsupportedAttribute))
     {
