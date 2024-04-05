@@ -73,6 +73,7 @@ class TC_FAN_3_3(MatterBaseTest):
     async def test_TC_FAN_3_3(self):
         if not self.check_pics("FAN.S.F02"):
             logger.info("Test skipped because PICS FAN.S.F02 is not set")
+            self.skip_all_remaining_steps(1)
             return
 
         endpoint = self.user_params.get("endpoint", 1)
