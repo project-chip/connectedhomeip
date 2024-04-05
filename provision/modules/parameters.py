@@ -120,6 +120,7 @@ class ID:
     kKeyPass            = 0x0198
     kPKCS12             = 0x0199
     kCommonName         = 0x01a1
+    kOtaKey             = 0x01a2
 
 
 class Parameter:

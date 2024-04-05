@@ -69,3 +69,12 @@
       - SL_PSA_ITS_SUPPORT_V2_DRIVER 1
       - SL_PSA_ITS_SUPPORT_V3_DRIVER 1
       - kConfigKey_Creds_KeyId = 0x87320:
+
+- version: '2.1'
+  date: '2024-04-05'
+  supports:
+    - RC_2.3.0-1.3
+  module: 'v2_0'
+  summary: |-
+    - Setup parameter added:
+      - ota_key: Binary

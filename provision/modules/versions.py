@@ -33,7 +33,7 @@ class Version:
 
 class VersionManager:
 
-    DEFAULT = Version({ 'version': '2.0', 'module': 'v2_0', 'date': '2023-11-01', 'summary': 'Default'})
+    DEFAULT = Version({ 'version': '2.1', 'module': 'v2_0', 'date': '2023-11-01', 'summary': 'Default'})
 
     def __init__(self, paths) -> None:
         self.paths = paths
