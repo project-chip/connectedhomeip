@@ -565,6 +565,8 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         }
     }
 
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TimeState currentTzState;
     auto newTzL = tzL.begin();
     uint8_t i   = 0;
     InitTimeZone();
@@ -575,20 +577,17 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         const auto & newTz = newTzL.GetValue();
         if (newTz.offset < -43200 || newTz.offset > 50400)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            ExitNow(err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
         // first element shall have validAt entry of 0
         if (i == 0 && newTz.validAt != 0)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            ExitNow(err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
         // if second element, it shall have validAt entry of non-0
         if (i != 0 && newTz.validAt == 0)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            ExitNow(err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
         tzStore.timeZone.offset  = newTz.offset;
         tzStore.timeZone.validAt = newTz.validAt;
@@ -597,15 +596,13 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
             size_t len = newTz.name.Value().size();
             if (len > sizeof(tzStore.name))
             {
-                ReturnErrorOnFailure(LoadTimeZone());
-                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+                ExitNow(err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
             }
             memset(tzStore.name, 0, sizeof(tzStore.name));
             chip::MutableCharSpan tempSpan(tzStore.name, len);
             if (CHIP_NO_ERROR != CopyCharSpanToMutableCharSpan(newTz.name.Value(), tempSpan))
             {
-                ReturnErrorOnFailure(LoadTimeZone());
-                return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+                ExitNow(err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
             }
             tzStore.timeZone.name.SetValue(CharSpan(tzStore.name, len));
         }
@@ -617,8 +614,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     }
     if (CHIP_NO_ERROR != newTzL.GetStatus())
     {
-        ReturnErrorOnFailure(LoadTimeZone());
-        return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+        ExitNow(err = CHIP_IM_GLOBAL_STATUS(InvalidCommand));
     }
 
     mTimeZoneObj.validSize = i;
@@ -640,7 +636,18 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
             mEventFlag = TimeSyncEventFlag::kTimeZoneStatus;
         }
     }
-    return mTimeSyncDataProvider.StoreTimeZone(GetTimeZone());
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        // do not propagate if an error occurs here because it is not the user relevant error
+        LoadTimeZone();
+    }
+    else
+    {
+        err = mTimeSyncDataProvider.StoreTimeZone(GetTimeZone());
+    }
+    return err;
 }
 
 CHIP_ERROR TimeSynchronizationServer::LoadTimeZone()
@@ -676,6 +683,8 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
         return ClearDSTOffset();
     }
 
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    uint64_t lastValidUntil = 0;
     auto newDstL = dstL.begin();
     size_t i     = 0;
     InitDSTOffset();
@@ -687,16 +696,10 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
         i++;
     }
 
-    if (CHIP_NO_ERROR != newDstL.GetStatus())
-    {
-        ReturnErrorOnFailure(LoadDSTOffset());
-        return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
-    }
+    VerifyOrExit(CHIP_NO_ERROR == newDstL.GetStatus(), err = CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
     mDstOffsetObj.validSize = i;
 
-    // only 1 validuntil null value and shall be last in the list
-    uint64_t lastValidUntil = 0;
     for (i = 0; i < mDstOffsetObj.validSize; i++)
     {
         const auto & dstItem = GetDSTOffset()[i];
@@ -704,25 +707,33 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
         // validUntil shall be larger than validStarting
         if (!dstItem.validUntil.IsNull() && dstItem.validStarting >= dstItem.validUntil.Value())
         {
-            ReturnErrorOnFailure(LoadDSTOffset());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            ExitNow(err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
         // validStarting shall not be smaller than validUntil of previous entry
         if (dstItem.validStarting < lastValidUntil)
         {
-            ReturnErrorOnFailure(LoadDSTOffset());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            ExitNow(err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
         lastValidUntil = !dstItem.validUntil.IsNull() ? dstItem.validUntil.Value() : lastValidUntil;
         // only 1 validUntil null value and shall be last in the list
         if (dstItem.validUntil.IsNull() && (i != mDstOffsetObj.validSize - 1))
         {
-            ReturnErrorOnFailure(LoadDSTOffset());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            ExitNow(err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
         }
     }
 
-    return mTimeSyncDataProvider.StoreDSTOffset(GetDSTOffset());
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        // do not propagate if an error occurs here because it is not the user relevant error
+        LoadDSTOffset();
+    }
+    else
+    {
+        err = mTimeSyncDataProvider.StoreDSTOffset(GetDSTOffset());
+    }
+
+    return err;
 }
 
 CHIP_ERROR TimeSynchronizationServer::LoadDSTOffset()
@@ -785,7 +796,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
     if (!(status == Status::Success || status == Status::UnsupportedAttribute))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
-        return CHIP_IM_GLOBAL_STATUS(Failure);
+        return StatusIB(status).ToChipError();
     }
     return CHIP_NO_ERROR;
 }
@@ -1097,12 +1108,12 @@ bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
     auto currentGranularity = TimeSynchronizationServer::Instance().GetGranularity();
     if (granularity < GranularityEnum::kNoTimeGranularity || granularity > GranularityEnum::kMicrosecondsGranularity)
     {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
     }
     if (timeSource.HasValue() && (timeSource.Value() < TimeSourceEnum::kNone || timeSource.Value() > TimeSourceEnum::kGnss))
     {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
         return true;
     }
 
@@ -1179,7 +1190,11 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
     GetDelegate()->TimeZoneListChanged(TimeSynchronizationServer::Instance().GetTimeZone());
 
     TimeZoneDatabaseEnum tzDb;
-    TimeZoneDatabase::Get(commandPath.mEndpointId, &tzDb);
+    if (Status::Success != TimeZoneDatabase::Get(commandPath.mEndpointId, &tzDb))
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+        return true;
+    }
     Commands::SetTimeZoneResponse::Type response;
     TimeSynchronizationServer::Instance().UpdateTimeZoneState();
     const auto & tzList = TimeSynchronizationServer::Instance().GetTimeZone();
