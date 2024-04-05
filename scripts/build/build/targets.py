@@ -496,6 +496,7 @@ def BuildNxpTarget():
 
     return target
 
+
 def BuildCC13x4Target():
     target = BuildTarget('ti', TIBuilder)
 

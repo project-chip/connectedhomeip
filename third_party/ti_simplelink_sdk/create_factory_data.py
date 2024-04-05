@@ -135,7 +135,7 @@ def create_hex_file(args):
     # get hex file in a format that can be merged in a later step
     subprocess.call(['objcopy', args.factory_data_hex_file, '--input-target', 'ihex', '--output-target', 'binary', 'temp.bin'])
     subprocess.call(['objcopy', 'temp.bin', '--input-target', 'binary', '--output-target',
-                        'ihex', args.factory_data_hex_file, '--change-addresses=0xfe800'])
+                     'ihex', args.factory_data_hex_file, '--change-addresses=0xfe800'])
     subprocess.call(['rm', 'temp.bin'])
 
 

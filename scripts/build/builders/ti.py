@@ -120,7 +120,7 @@ class TIBuilder(GnBuilder):
             if (self.app == TIApp.LOCK
                 or self.app == TIApp.LIGHTING
                 or self.app == TIApp.PUMP
-                or self.app == TIApp.PUMP_CONTROLLER):
+                    or self.app == TIApp.PUMP_CONTROLLER):
                 extensions = [".out", ".out.map", "-mcuboot.hex"]
 
             else:
