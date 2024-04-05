@@ -35,7 +35,7 @@ assert(ti_simplelink_board != "", "ti_simplelink_board must be specified")
 # | CC3235SF_LAUNCHXL   | cc32xx          | cc3235SF      | Wi-Fi               |
 
 if (ti_simplelink_board == "LP_EM_CC1354P10_6" ||
-           ti_simplelink_board == "LP_EM_CC1354P10_1") {
+    ti_simplelink_board == "LP_EM_CC1354P10_1") {
   ti_simplelink_device_family = "cc13x4_26x4"
   ti_simplelink_device_family_driverlib = "cc13x4_cc26x4"
   ti_simplelink_soc_family = "cc13x4"

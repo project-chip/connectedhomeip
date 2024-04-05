@@ -514,7 +514,7 @@ template("ti_simplelink_sdk") {
   }
 
   source_set("${sdk_target_name}_dmm") {
-    if (ti_simplelink_device_family == "cc13x4_26x4" ) {
+    if (ti_simplelink_device_family == "cc13x4_26x4") {
       defines = []
       include_dirs = [
         "${chip_root}/third_party/openthread/repo/include/",

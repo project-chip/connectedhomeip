@@ -71,7 +71,7 @@ template("ti_simplelink_executable") {
 
     public_configs = [ ":${simplelink_target_name}_config" ]
 
-   if (ti_simplelink_device_family == "cc13x4_26x4") {
+    if (ti_simplelink_device_family == "cc13x4_26x4") {
       if (chip_enable_ota_requestor) {
         sources +=
             [ "${chip_root}/src/platform/cc13xx_26xx/oad_image_header.c" ]
@@ -103,7 +103,7 @@ template("ti_simplelink_executable") {
   }
 
   if (chip_enable_ota_requestor) {
-   if (ti_simplelink_device_family == "cc13x4_26x4") {
+    if (ti_simplelink_device_family == "cc13x4_26x4") {
       if (custom_factory_data) {
         pw_python_action("${simplelink_target_name}-without-factory-data.hex") {
           public_deps = [ ":${simplelink_target_name}.out.image" ]
