@@ -89,20 +89,6 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials::Silabs;
 using namespace chip::DeviceLayer::Silabs;
 
-constexpr uint32_t kMainTaskStackSize = (1024 * 5);
-// Task is dynamically allocated with max priority. This task gets deleted once the inits are completed.
-constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
-                                           .attr_bits  = osThreadDetached,
-                                           .cb_mem     = NULL,
-                                           .cb_size    = 0U,
-                                           .stack_mem  = NULL,
-                                           .stack_size = kMainTaskStackSize,
-                                           .priority   = osPriorityRealtime7 };
-osThreadId_t sMainTaskHandle;
-
-volatile int apperror_cnt;
-static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #include <openthread/cli.h>
@@ -158,6 +144,19 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
 namespace {
+
+constexpr uint32_t kMainTaskStackSize = (1024 * 5);
+// Task is dynamically allocated with max priority. This task gets deleted once the inits are completed.
+constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
+                                           .attr_bits  = osThreadDetached,
+                                           .cb_mem     = NULL,
+                                           .cb_size    = 0U,
+                                           .stack_mem  = NULL,
+                                           .stack_size = kMainTaskStackSize,
+                                           .priority   = osPriorityRealtime7 };
+osThreadId_t sMainTaskHandle;
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 void ApplicationStart(void * unused)
 {
     CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
