@@ -1664,7 +1664,7 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
     return info
 
 
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks) -> None:
+def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> bool:
 
     get_test_info(test_class, matter_test_config)
 
@@ -1676,7 +1676,10 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
 
-    stack = MatterStackState(matter_test_config)
+    if external_stack:
+        stack = external_stack
+    else:
+        stack = MatterStackState(matter_test_config)
 
     with TracingContext() as tracing_ctx:
         for destination in matter_test_config.trace_to:
@@ -1686,12 +1689,12 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
 
         # TODO: Steer to right FabricAdmin!
         # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
-
-        default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-            nodeId=matter_test_config.controller_node_id,
-            paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-            catTags=matter_test_config.controller_cat_tags
-        )
+        if not default_controller:
+            default_controller = stack.certificate_authorities[0].adminList[0].NewController(
+                nodeId=matter_test_config.controller_node_id,
+                paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+                catTags=matter_test_config.controller_cat_tags
+            )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 
         test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
@@ -1740,10 +1743,16 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
         hooks.stop(duration=duration)
 
     # Shutdown the stack when all done
-    stack.Shutdown()
+    if not external_stack:
+        stack.Shutdown()
 
     if ok:
         logging.info("Final result: PASS !")
     else:
         logging.error("Final result: FAIL !")
+    return ok
+
+
+def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
+    if not run_tests_internal(test_class, matter_test_config, hooks, default_controller, external_stack):
         sys.exit(1)
