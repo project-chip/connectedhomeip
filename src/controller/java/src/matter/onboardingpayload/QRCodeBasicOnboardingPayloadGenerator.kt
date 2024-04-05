@@ -68,9 +68,6 @@ fun payloadBase38RepresentationWithTLV(
 
     // Copy the subBuffer back to the outBuffer
     subBuffer.copyInto(outBuffer, prefixLen)
-
-    // Reduce output buffer size to be the size of written data
-    outBuffer.copyOf(prefixLen + subBuffer.size)
   }
 }
 

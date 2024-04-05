@@ -183,7 +183,5 @@ class ManualOnboardingPayloadGenerator(private val payloadContents: OnboardingPa
     if (offset + len > buffer.size) {
       throw OnboardingPayloadException("The outBuffer has insufficient size")
     }
-
-    String.format("%0${len}d", number).toCharArray(buffer, offset, 0, len)
   }
 }
