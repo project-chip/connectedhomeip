@@ -14,13 +14,10 @@ ARG UBUNTU_QEMU_IMG_DEFAULT
 ENV UBUNTU_QEMU_DIR=${UBUNTU_QEMU_DIR_DEFAULT}
 ENV UBUNTU_QEMU_IMG=${UBUNTU_QEMU_IMG_DEFAULT}
 
-
 RUN mkdir -p /tmp/workdir/linux
 COPY files/linux/0001-Bluetooth-MGMT-Synchronize-scan-start-and-LE-Meta-ev.patch /tmp/workdir/linux/0001-Bluetooth-MGMT-Synchronize-scan-start-and-LE-Meta-ev.patch
-COPY run-img.sh /opt/ubuntu-qemu/run-img.sh
 COPY files/bluetooth/main.conf /tmp/workdir/main.conf
 RUN set -x \
-	&& chmod +x /opt/ubuntu-qemu/run-img.sh \
 	&& apt-get update \
 	&& DEBIAN_FRONTEND=noninteractive apt-get install -fy \
 	bc \
@@ -207,7 +204,9 @@ ENV PW_ENVIRONMENT_ROOT="/root/pw_root"
 RUN set -x \
 	&& apt-get update \
 	&& DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+	cpu-checker \
 	qemu \
+	qemu-system-x86 \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /var/cache/apt/* \
