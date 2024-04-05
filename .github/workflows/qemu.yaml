@@ -134,6 +134,7 @@ jobs:
               run: |
                 rm -rf out/*/obj
                 rm -rf out/*/lib
+                rm -rf out/*/*.map
                 rm -rf $PW_ENVIRONMENT_ROOT
                 git clean -fdx --exclude out
             # Without all required apps paths provided as argument, script starts to search for them in the current directory and it takes a lot of time.
