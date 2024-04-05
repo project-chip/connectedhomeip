@@ -20,6 +20,8 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::IniEscaping;
 

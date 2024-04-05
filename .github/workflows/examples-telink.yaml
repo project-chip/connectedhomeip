@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:41
+            image: ghcr.io/project-chip/chip-build-telink:46
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -55,7 +55,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             # - name: Update Zephyr to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py b5c8028ec94f3efa69decff3a09f0d6f8a21fd6d"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 65dc1812431bf946dfc110682298acf83d63e27a"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               run: |

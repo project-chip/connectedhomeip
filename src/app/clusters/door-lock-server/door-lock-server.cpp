@@ -27,8 +27,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <cinttypes>
 
 #include <app/CommandHandler.h>

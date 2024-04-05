@@ -27,12 +27,11 @@
 #pragma once
 
 #include "fsl_component_mem_manager.h"
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip::SMU2 {
 
-CHIP_ERROR Init(PersistentStorageDelegate * storage);
+CHIP_ERROR Init();
 CHIP_ERROR Deactivate(void);
 void * Allocate(size_t size);
 

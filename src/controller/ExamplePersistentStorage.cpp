@@ -21,7 +21,9 @@
 #include <lib/support/IniEscaping.h>
 
 #include <fstream>
+#include <map>
 #include <memory>
+#include <string>
 
 using String   = std::basic_string<char>;
 using Section  = std::map<String, String>;

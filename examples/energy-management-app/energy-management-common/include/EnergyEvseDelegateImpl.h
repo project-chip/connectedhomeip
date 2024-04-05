@@ -21,7 +21,6 @@
 #include "app/clusters/energy-evse-server/energy-evse-server.h"
 #include <EVSECallbacks.h>
 
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 

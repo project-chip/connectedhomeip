@@ -250,6 +250,7 @@ static_library("interaction-model") {
     public_deps += [
       ":global-attributes",
       "${chip_root}/src/access",
+      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]

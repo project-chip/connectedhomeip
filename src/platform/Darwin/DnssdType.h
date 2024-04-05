@@ -19,6 +19,7 @@
 
 #include <lib/dnssd/platform/Dnssd.h>
 #include <string.h>
+#include <string>
 
 namespace chip {
 namespace Dnssd {
