@@ -1,13 +1,19 @@
 ARG VERSION=latest
-FROM ghcr.io/project-chip/chip-build:${VERSION}
+ARG UBUNTU_QEMU_DIR_DEFAULT="/opt/ubuntu-qemu"
+ARG UBUNTU_QEMU_IMG_DEFAULT="${UBUNTU_QEMU_DIR_DEFAULT}/ubuntu-20.04.img"
+
+FROM ghcr.io/project-chip/chip-build:${VERSION} as build-env
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
-ARG KERNEL_VERSION=6.7.3
 ARG BLUEZ_VERSION=5.72
 ARG ELL_VERSION=0.62
+ARG KERNEL_VERSION=6.7.3
+ARG UBUNTU_QEMU_DIR_DEFAULT
+ARG UBUNTU_QEMU_IMG_DEFAULT
 
-ENV UBUNTU_QEMU_IMG="/opt/ubuntu-qemu/ubuntu-20.04.img"
-ENV PW_ENVIRONMENT_ROOT="/root/pw_root"
+ENV UBUNTU_QEMU_DIR=${UBUNTU_QEMU_DIR_DEFAULT}
+ENV UBUNTU_QEMU_IMG=${UBUNTU_QEMU_IMG_DEFAULT}
+
 
 RUN mkdir -p /tmp/workdir/linux
 COPY files/linux/0001-Bluetooth-MGMT-Synchronize-scan-start-and-LE-Meta-ev.patch /tmp/workdir/linux/0001-Bluetooth-MGMT-Synchronize-scan-start-and-LE-Meta-ev.patch
@@ -188,5 +194,24 @@ RUN mkdir -p /tmp/workdir/linux \
 	&& rm -rf /var/tmp/.guestfs-0/* \
 	&& rm -rf /tmp/* \
 	&& : # last line
+
+FROM ghcr.io/project-chip/chip-build:${VERSION}
+
+ARG UBUNTU_QEMU_DIR_DEFAULT
+ARG UBUNTU_QEMU_IMG_DEFAULT
+
+ENV UBUNTU_QEMU_DIR=${UBUNTU_QEMU_DIR_DEFAULT}
+ENV UBUNTU_QEMU_IMG=${UBUNTU_QEMU_IMG_DEFAULT}
+ENV PW_ENVIRONMENT_ROOT="/root/pw_root"
+
+RUN set -x \
+	&& apt-get update \
+	&& DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+	qemu \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& rm -rf /var/cache/apt/* \
+	&& : # last line
+COPY --from=build-env ${UBUNTU_QEMU_DIR} ${UBUNTU_QEMU_DIR}
 
 WORKDIR /chip
