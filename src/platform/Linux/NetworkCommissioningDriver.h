@@ -150,10 +150,13 @@ private:
         Platform::SharedPtr<Crypto::P256Keypair> clientIdentityKeypair;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
-    uint8_t currentNetId          = 0;
-    uint8_t connectedNetworkIndex = 0;
-    WiFiNetwork mSavedNetwork[kMaxNetworks];
-    WiFiNetwork mStagingNetwork[kMaxNetworks];
+    // Stores the index location of the most recent WiFi Network added. The value is increments if a new
+    // WiFi network is added and decrements if a network is removed
+    uint8_t mCurrentNetworkIndex   = 0;
+    // The index of the WiFi network the device is connected to
+    uint8_t mConnectedNetworkIndex = 0;
+    WiFiNetwork mSavedNetworks[kMaxNetworks];
+    WiFiNetwork mStagingNetworks[kMaxNetworks];
     // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
     bool mIs5gSupported = false;
     bool StartReorderingEntries(uint8_t index, int8_t foundNetworkAtIndex);
