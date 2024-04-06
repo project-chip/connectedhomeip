@@ -58,6 +58,8 @@ static_library("chip-tool-utils") {
     "commands/common/BDXDiagnosticLogsServerDelegate.cpp",
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
+    "commands/common/ChipToolCheckInDelegate.cpp",
+    "commands/common/ChipToolCheckInDelegate.h",
     "commands/common/Command.cpp",
     "commands/common/Command.h",
     "commands/common/Commands.cpp",

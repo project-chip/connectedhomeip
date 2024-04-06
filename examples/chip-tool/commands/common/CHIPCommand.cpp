@@ -18,6 +18,7 @@
 
 #include "CHIPCommand.h"
 
+#include <commands/common/ChipToolCheckInDelegate.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <lib/core/CHIPConfig.h>
@@ -52,7 +53,7 @@ chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGr
 // All fabrics share the same ICD client storage.
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
-chip::app::DefaultCheckInDelegate CHIPCommand::sCheckInDelegate;
+ChipToolCheckInDelegate CHIPCommand::sCheckInDelegate;
 chip::app::CheckInHandler CHIPCommand::sCheckInHandler;
 
 namespace {
@@ -652,4 +653,14 @@ void CHIPCommand::ExecuteDeferredCleanups(intptr_t ignored)
         cmd->Cleanup();
     }
     sDeferredCleanups.clear();
+}
+
+void CHIPCommand::RegisterOnCheckInCompleteCallback(CheckInCompleteCallback * handler)
+{
+    sCheckInDelegate.RegisterOnCheckInCompleteCallback(handler);
+}
+
+void CHIPCommand::UnregisterOnCheckInCompleteCallback(CheckInCompleteCallback * handler)
+{
+    sCheckInDelegate.UnregisterOnCheckInCompleteCallback(handler);
 }
