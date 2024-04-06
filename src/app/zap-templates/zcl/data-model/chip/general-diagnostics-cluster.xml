@@ -16,6 +16,12 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0033"/>
+    <field name="DataModelTest" mask="0x1"/>
+  </bitmap>
+
   <enum name="HardwareFaultEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
@@ -120,6 +126,18 @@ limitations under the License.
       <description>Response for the TimeSnapshot command.</description>
       <arg name="SystemTimeMs" type="systime_ms" optional="false"/>
       <arg name="PosixTimeMs" type="posix_ms" isNullable="true" optional="false"/>
+    </command>
+
+    <command source="client" code="0x03" name="PayloadTestRequest" response="PayloadTestResponse" optional="true" apiMaturity="provisional">
+      <description>Request a variable length payload response.</description>
+      <arg name="EnableKey" type="octet_string" length="16"/>
+      <arg name="Value" type="int8u"/>
+      <arg name="Count" type="int16u" max="2048"/>
+    </command>
+
+    <command source="server" code="0x04" name="PayloadTestResponse" optional="true" apiMaturity="provisional">
+      <description>Response for the PayloadTestRequest command.</description>
+      <arg name="Payload" type="octet_string" max="2048" optional="false"/>
     </command>
 
     <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">

@@ -16,6 +16,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTest.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -35,6 +36,7 @@ extern "C" int main(void)
 
     LOG_INF("Starting CHIP tests!");
     int status = RunRegisteredUnitTests();
+    status += chip::test::RunAllTests();
     LOG_INF("CHIP test status: %d", status);
 
     _exit(status);

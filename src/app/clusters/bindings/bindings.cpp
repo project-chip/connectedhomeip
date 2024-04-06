@@ -26,7 +26,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/bindings/bindings.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -114,7 +113,7 @@ CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const Decodable
             oldListSize++;
         }
     }
-    ReturnErrorCodeIf(BindingTable::GetInstance().Size() - oldListSize + listSize > EMBER_BINDING_TABLE_SIZE,
+    ReturnErrorCodeIf(BindingTable::GetInstance().Size() - oldListSize + listSize > MATTER_BINDING_TABLE_SIZE,
                       CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
     return CHIP_NO_ERROR;
 }
@@ -153,7 +152,7 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
     return encoder.EncodeList([&](const auto & subEncoder) {
         for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
         {
-            if (entry.local == endpoint && entry.type == EMBER_UNICAST_BINDING)
+            if (entry.local == endpoint && entry.type == MATTER_UNICAST_BINDING)
             {
                 Binding::Structs::TargetStruct::Type value = {
                     .node        = MakeOptional(entry.nodeId),
@@ -164,7 +163,7 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
                 };
                 ReturnErrorOnFailure(subEncoder.Encode(value));
             }
-            else if (entry.local == endpoint && entry.type == EMBER_MULTICAST_BINDING)
+            else if (entry.local == endpoint && entry.type == MATTER_MULTICAST_BINDING)
             {
                 Binding::Structs::TargetStruct::Type value = {
                     .node        = NullOptional,
@@ -214,7 +213,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         {
             if (bindingTableIter->local == path.mEndpointId && bindingTableIter->fabricIndex == mAccessingFabricIndex)
             {
-                if (bindingTableIter->type == EMBER_UNICAST_BINDING)
+                if (bindingTableIter->type == MATTER_UNICAST_BINDING)
                 {
                     BindingManager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
                 }
@@ -284,7 +283,7 @@ CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)
         return err;
     }
 
-    if (entry.type == EMBER_UNICAST_BINDING)
+    if (entry.type == MATTER_UNICAST_BINDING)
     {
         err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
         if (err != CHIP_NO_ERROR)

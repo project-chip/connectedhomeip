@@ -13,7 +13,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="Energy Management"/>
-  <cluster>
+  <cluster apiMaturity="provisional">
     <name>Energy Preference</name>
     <domain>Energy Management</domain>
     <code>0x009B</code>
@@ -22,6 +22,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface to specify preferences for how devices should consume energy.</description>
     <!--Attributes-->
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
 
     <!--Conformance feature BALA - for now optional-->
     <attribute code="0x0000" side="server" type="array" entryType="BalanceStruct" define="ENERGY_PREFERENCE_ENERGY_BALANCES" isNullable="false" min="2" max="10" writable="false" optional="true">EnergyBalances</attribute>

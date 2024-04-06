@@ -101,7 +101,7 @@ public:
         if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_Creds_KeyId))
         {
             // Provisioned DAC key
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
             return CHIP_ERROR_NOT_IMPLEMENTED;
 #else
             uint32_t key_id       = SILABS_CREDENTIALS_DAC_KEY_ID;

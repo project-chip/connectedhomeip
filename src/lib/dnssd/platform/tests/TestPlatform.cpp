@@ -53,8 +53,7 @@ OperationalAdvertisingParameters operationalParams2 =
         .SetPort(CHIP_PORT)
         .EnableIpV4(true)
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32, 10_ms16)) // SII and SAI to match below
-        .SetTcpSupported(Optional<bool>(true))
-        .SetICDOperatingAsLIT(Optional<bool>(false));
+        .SetICDModeToAdvertise(ICDModeAdvertise::kSIT);
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
@@ -64,7 +63,6 @@ test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .AddTxt("SII", "32")
                                           .AddTxt("SAI", "30")
                                           .AddTxt("SAT", "10")
-                                          .AddTxt("T", "1")
                                           .AddTxt("ICD", "0");
 
 CommissionAdvertisingParameters commissionableNodeParamsSmall =
@@ -97,8 +95,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetPairingInstruction(Optional<const char *>("Pair me"))
         .SetProductId(Optional<uint16_t>(897))
         .SetRotatingDeviceId(Optional<const char *>("id_that_spins"))
-        .SetTcpSupported(Optional<bool>(true))
-        .SetICDOperatingAsLIT(Optional<bool>(false))
+        .SetICDModeToAdvertise(ICDModeAdvertise::kSIT)
         // 3600005 is over the max, so this should be adjusted by the platform
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
 
@@ -114,7 +111,6 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("RI", "id_that_spins")
                                                   .AddTxt("PI", "Pair me")
                                                   .AddTxt("PH", "3")
-                                                  .AddTxt("T", "1")
                                                   .AddTxt("ICD", "0")
                                                   .AddTxt("SII", "3600000")
                                                   .AddTxt("SAI", "3600000")

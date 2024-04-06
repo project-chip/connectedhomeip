@@ -158,7 +158,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * the startupParams.
  *
  * This method can only be used if the factory was initialized with storage.
- * When using per-controller storage, use createController.
+ * When using per-controller storage, use [MTRDeviceController initWithParameters:error:].
  */
 - (MTRDeviceController * _Nullable)createControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                               error:(NSError * __autoreleasing *)error;
@@ -172,12 +172,45 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * the startupParams.
  *
  * This method can only be used if the factory was initialized with storage.
- * When using per-controller storage, use createController.
+ * When using per-controller storage, use [MTRDeviceController initWithParameters:error:].
  */
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error;
 
 @end
+
+/**
+ * Set the Message Reliability Protocol parameters for all controllers.  This
+ * allows control over retransmit delays to account for high-latency networks.
+ *
+ * Setting all arguments to nil will reset to the MRP parameters to their
+ * default values.
+ *
+ * Setting some arguments to non-nil will change just those values, keeping
+ * current values for any arguments that are nil (not resetting them to
+ * defaults).
+ *
+ * Non-nil arguments are specified as an integer number of milliseconds.
+ *
+ * @param idleRetransmitMs the minimal interval between retransmits for someone
+ *                         sending messages to us, when they think we are
+ *                         "idle" and might have our radio only turned on
+ *                         intermittently.
+ * @param activeRetransmitMs the minimal interval between retransmits for
+ *                           someone sending messages to us, when they think we
+ *                           are "active" and have the radio turned on
+ *                           consistently.
+ * @param activeThresholdMs the amount of time we will stay in "active" mode after
+ *                          network activity.
+ * @param additionalRetransmitDelayMs additional delay between retransmits for
+ *                                    messages we send, on top of whatever delay
+ *                                    the other side requests via its MRP
+ *                                    parameters.
+ */
+MTR_EXTERN MTR_NEWLY_AVAILABLE void MTRSetMessageReliabilityParameters(NSNumber * _Nullable idleRetransmitMs,
+    NSNumber * _Nullable activeRetransmitMs,
+    NSNumber * _Nullable activeThresholdMs,
+    NSNumber * _Nullable additionalRetransmitDelayMs);
 
 MTR_DEPRECATED(
     "Please use MTRDeviceControllerFactoryParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))

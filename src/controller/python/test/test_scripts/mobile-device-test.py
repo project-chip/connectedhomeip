@@ -251,8 +251,12 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
               multiple=True,
               default=[],
               help="Trace location")
+@click.option('--app-pid',
+              type=int,
+              default=0,
+              help="The PID of the app against which the test is going to run")
 def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level,
-        log_format, print_test_list, paa_trust_store_path, trace_to):
+        log_format, print_test_list, paa_trust_store_path, trace_to, app_pid):
     coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
 
     if print_test_list:

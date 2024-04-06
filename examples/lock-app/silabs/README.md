@@ -54,8 +54,9 @@ Labs platform.
     (For Mac OS X, `commander` is located inside
     `Commander.app/Contents/MacOS/`.)
 
--   Download and install a suitable ARM gcc tool chain:
-    [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+-   Download and install a suitable ARM gcc tool chain (For most Host, the
+    bootstrap already installs the toolchain):
+    [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
 -   Install some additional tools(likely already present for CHIP developers):
 
@@ -261,22 +262,30 @@ combination with JLinkRTTClient as follows:
           <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
           <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
-    **LED 0** shows the overall state of the device and its connectivity. The
-    following states are possible:
+    **LED 0**
 
-        -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
+        -   ICD Configuration (Default) - LED is only active under two circumstances:
+
+            1. Factory reset sequence - LED will blink when initiated upon press and hold of
+            Button 0 after 3 seconds
+            2. An Identify command was received
+
+        -   Non-ICD Configuration - shows the overall state of the device and its connectivity. The
+            following states are possible:
+
+            Short Flash On (50 ms on/950 ms off): The device is in the
             unprovisioned (unpaired) state and is waiting for a commissioning
             application to connect.
 
-        -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
+            Rapid Even Flashing (100 ms on/100 ms off): The device is in the
             unprovisioned state and a commissioning application is connected through
             Bluetooth LE.
 
-        -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
+            Short Flash Off (950ms on/50ms off): The device is fully
             provisioned, but does not yet have full Thread network or service
             connectivity.
 
-        -   _Solid On_ ; The device is fully provisioned and has full Thread
+            Solid On: The device is fully provisioned and has full Thread
             network and service connectivity.
 
     **LED 1** Simulates the Lock The following states are possible:

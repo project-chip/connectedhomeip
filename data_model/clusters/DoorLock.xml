@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock" revision="7">
   <revisionHistory>
@@ -65,6 +67,9 @@ Davis, CA 95616, USA
     <revision revision="6" summary="New data model format and notation. Added User features. General cleanup of functionality"/>
     <revision revision="7" summary="Added support for European door locks (unbolt feature)"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0101" name="Door Lock"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DRLK" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PIN" name="PINCredential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
@@ -1055,7 +1060,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="LockDoor" response="Y">
+    <command id="0x00" name="LockDoor" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="PINCode" type="octstr">
@@ -1067,7 +1072,7 @@ Davis, CA 95616, USA
         </optionalConform>
       </field>
     </command>
-    <command id="0x01" name="UnlockDoor" response="Y">
+    <command id="0x01" name="UnlockDoor" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="PINCode" type="octstr">
@@ -1079,11 +1084,11 @@ Davis, CA 95616, USA
         </optionalConform>
       </field>
     </command>
-    <command id="0x02" name="Toggle" response="Y">
+    <command id="0x02" name="Toggle" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <disallowConform/>
     </command>
-    <command id="0x03" name="UnlockWithTimeout" response="Y">
+    <command id="0x03" name="UnlockWithTimeout" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <optionalConform/>
       <field id="0" name="Timeout" type="uint16">
@@ -1098,7 +1103,7 @@ Davis, CA 95616, USA
         </optionalConform>
       </field>
     </command>
-    <command id="0x04" name="GetLogRecord" response="GetLogRecordResponse">
+    <command id="0x04" name="GetLogRecord" direction="commandToServer" response="GetLogRecordResponse">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="LOG"/>
@@ -1109,7 +1114,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="GetLogRecordResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="LOG"/>
       </mandatoryConform>
@@ -1138,7 +1142,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x05" name="SetPINCode" response="Y">
+    <command id="0x05" name="SetPINCode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1165,7 +1169,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x06" name="GetPINCode" response="GetPINCodeResponse">
+    <command id="0x06" name="GetPINCode" direction="commandToServer" response="GetPINCodeResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1181,7 +1185,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x06" name="GetPINCodeResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <andTerm>
           <notTerm>
@@ -1209,7 +1212,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x07" name="ClearPINCode" response="Y">
+    <command id="0x07" name="ClearPINCode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1225,7 +1228,7 @@ Davis, CA 95616, USA
         <constraint type="allowed" value="0xFFFE"/>
       </field>
     </command>
-    <command id="0x08" name="ClearAllPINCodes" response="Y">
+    <command id="0x08" name="ClearAllPINCodes" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1236,7 +1239,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </command>
-    <command id="0x09" name="SetUserStatus" response="Y">
+    <command id="0x09" name="SetUserStatus" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1259,7 +1262,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x0A" name="GetUserStatus" response="GetUserStatusResponse">
+    <command id="0x0A" name="GetUserStatus" direction="commandToServer" response="GetUserStatusResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1279,7 +1282,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x0A" name="GetUserStatusResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <notTerm>
           <feature name="USR"/>
@@ -1293,7 +1295,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0B" name="SetWeekDaySchedule" response="Y">
+    <command id="0x0B" name="SetWeekDaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
@@ -1326,7 +1328,7 @@ Davis, CA 95616, USA
         <constraint type="between" from="0" to="59"/>
       </field>
     </command>
-    <command id="0x0C" name="GetWeekDaySchedule" response="GetWeekDayScheduleResponse">
+    <command id="0x0C" name="GetWeekDaySchedule" direction="commandToServer" response="GetWeekDayScheduleResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
@@ -1341,7 +1343,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x0C" name="GetWeekDayScheduleResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
       </mandatoryConform>
@@ -1377,7 +1378,7 @@ Davis, CA 95616, USA
         <constraint type="between" from="0" to="59"/>
       </field>
     </command>
-    <command id="0x0D" name="ClearWeekDaySchedule" response="Y">
+    <command id="0x0D" name="ClearWeekDaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="WDSCH"/>
@@ -1392,7 +1393,7 @@ Davis, CA 95616, USA
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x0E" name="SetYearDaySchedule" response="Y">
+    <command id="0x0E" name="SetYearDaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
@@ -1412,7 +1413,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0F" name="GetYearDaySchedule" response="GetYearDayScheduleResponse">
+    <command id="0x0F" name="GetYearDaySchedule" direction="commandToServer" response="GetYearDayScheduleResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
@@ -1427,7 +1428,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x0F" name="GetYearDayScheduleResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
       </mandatoryConform>
@@ -1450,7 +1450,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x10" name="ClearYearDaySchedule" response="Y">
+    <command id="0x10" name="ClearYearDaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="YDSCH"/>
@@ -1465,7 +1465,7 @@ Davis, CA 95616, USA
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x11" name="SetHolidaySchedule" response="Y">
+    <command id="0x11" name="SetHolidaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="HDSCH"/>
@@ -1484,7 +1484,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x12" name="GetHolidaySchedule" response="GetHolidayScheduleResponse">
+    <command id="0x12" name="GetHolidaySchedule" direction="commandToServer" response="GetHolidayScheduleResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="HDSCH"/>
@@ -1495,7 +1495,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x12" name="GetHolidayScheduleResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="HDSCH"/>
       </mandatoryConform>
@@ -1520,7 +1519,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x13" name="ClearHolidaySchedule" response="Y">
+    <command id="0x13" name="ClearHolidaySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="HDSCH"/>
@@ -1531,7 +1530,7 @@ Davis, CA 95616, USA
         <constraint type="allowed" value="0xFE"/>
       </field>
     </command>
-    <command id="0x14" name="SetUserType" response="Y">
+    <command id="0x14" name="SetUserType" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1553,7 +1552,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x15" name="GetUserType" response="GetUserTypeResponse">
+    <command id="0x15" name="GetUserType" direction="commandToServer" response="GetUserTypeResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1573,7 +1572,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x15" name="GetUserTypeResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <notTerm>
           <feature name="USR"/>
@@ -1587,7 +1585,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x16" name="SetRFIDCode" response="Y">
+    <command id="0x16" name="SetRFIDCode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1615,7 +1613,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x17" name="GetRFIDCode" response="GetRFIDCodeResponse">
+    <command id="0x17" name="GetRFIDCode" direction="commandToServer" response="GetRFIDCodeResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <andTerm>
@@ -1631,7 +1629,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x17" name="GetRFIDCodeResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <andTerm>
           <notTerm>
@@ -1659,7 +1656,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x18" name="ClearRFIDCode" response="Y">
+    <command id="0x18" name="ClearRFIDCode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1675,7 +1672,7 @@ Davis, CA 95616, USA
         <constraint type="allowed" value="0xFFFE"/>
       </field>
     </command>
-    <command id="0x19" name="ClearAllRFIDCodes" response="Y">
+    <command id="0x19" name="ClearAllRFIDCodes" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <andTerm>
@@ -1686,7 +1683,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </command>
-    <command id="0x1A" name="SetUser" response="Y">
+    <command id="0x1A" name="SetUser" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1731,7 +1728,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x1B" name="GetUser" response="GetUserResponse">
+    <command id="0x1B" name="GetUser" direction="commandToServer" response="GetUserResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1742,7 +1739,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x1C" name="GetUserResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
@@ -1792,7 +1788,7 @@ Davis, CA 95616, USA
         <constraint type="between" from="1" to="NumberOfTotalUsersSupported"/>
       </field>
     </command>
-    <command id="0x1D" name="ClearUser" response="Y">
+    <command id="0x1D" name="ClearUser" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1844,7 +1840,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x22" name="SetCredential" response="SetCredentialResponse">
+    <command id="0x22" name="SetCredential" direction="commandToServer" response="SetCredentialResponse">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1885,7 +1881,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x23" name="SetCredentialResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
@@ -1904,7 +1899,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x24" name="GetCredentialStatus" response="GetCredentialStatusResponse">
+    <command id="0x24" name="GetCredentialStatus" direction="commandToServer" response="GetCredentialStatusResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1914,7 +1909,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x25" name="GetCredentialStatusResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
@@ -1940,7 +1934,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x26" name="ClearCredential" response="Y">
+    <command id="0x26" name="ClearCredential" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
       <mandatoryConform>
         <feature name="USR"/>
@@ -1951,7 +1945,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x27" name="UnboltDoor" response="Y">
+    <command id="0x27" name="UnboltDoor" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="UBOLT"/>

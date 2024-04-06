@@ -18,6 +18,7 @@
 import argparse
 import asyncio
 import builtins
+import glob
 import inspect
 import json
 import logging
@@ -29,6 +30,7 @@ import re
 import sys
 import typing
 import uuid
+import xml.etree.ElementTree as ET
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -51,12 +53,14 @@ import chip.logging
 import chip.native
 from chip import discovery
 from chip.ChipStack import ChipStack
+from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.tracing import TracingContext
+from global_attribute_ids import GlobalAttributeIds
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
@@ -138,7 +142,7 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         return pathlib.Path.cwd()
 
 
-def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
+def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
     pics = {}
     for raw in lines:
         line, _, _ = raw.partition("#")
@@ -156,11 +160,30 @@ def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
     return pics
 
 
-def read_pics_from_file(filename: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file. """
-    with open(filename, 'r') as f:
-        lines = f.readlines()
-        return parse_pics(lines)
+def parse_pics_xml(contents: str) -> dict[str, bool]:
+    pics = {}
+    mytree = ET.fromstring(contents)
+    for pi in mytree.iter('picsItem'):
+        name = pi.find('itemNumber').text
+        support = pi.find('support').text
+        pics[name] = int(json.loads(support.lower())) == 1
+    return pics
+
+
+def read_pics_from_file(path: str) -> dict[str, bool]:
+    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
+    if os.path.isdir(os.path.abspath(path)):
+        pics_dict = {}
+        for filename in glob.glob(f'{path}/*.xml'):
+            with open(filename, 'r') as f:
+                contents = f.read()
+                pics_dict.update(parse_pics_xml(contents))
+        return pics_dict
+
+    else:
+        with open(path, 'r') as f:
+            lines = f.readlines()
+            return parse_pics(lines)
 
 
 def type_matches(received_value, desired_type):
@@ -252,6 +275,42 @@ class SimpleEventCallback:
         return self._name
 
 
+class EventChangeCallback:
+    def __init__(self, expected_cluster: ClusterObjects):
+        """This class creates a queue to store received event callbacks, that can be checked by the test script
+           expected_cluster: is the cluster from which the events are expected
+        """
+        self._q = queue.Queue()
+        self._expected_cluster = expected_cluster
+
+    async def start(self, dev_ctrl, node_id: int, endpoint: int):
+        """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        self._subscription = await dev_ctrl.ReadEvent(node_id,
+                                                      events=[(endpoint, self._expected_cluster, True)], reportInterval=(1, 5),
+                                                      fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
+        self._subscription.SetEventUpdateCallback(self.__call__)
+
+    def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
+        """This is the subscription callback when an event is received.
+           It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
+        if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
+            logging.info(
+                f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
+            self._q.put(res)
+
+    def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout: int = 10):
+        """This function allows a test script to block waiting for the specific event to arrive with a timeout.
+           It returns the event data so that the values can be checked."""
+        try:
+            res = self._q.get(block=True, timeout=timeout)
+        except queue.Empty:
+            asserts.fail("Failed to receive a report for the event {}".format(expected_event))
+
+        asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
+        asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
+        return res.Data
+
+
 class InternalTestRunnerHooks(TestRunnerHooks):
 
     def start(self, count: int):
@@ -287,6 +346,12 @@ class InternalTestRunnerHooks(TestRunnerHooks):
         """
         pass
 
+    def show_prompt(self,
+                    msg: str,
+                    placeholder: Optional[str] = None,
+                    default_value: Optional[str] = None) -> None:
+        pass
+
 
 @dataclass
 class MatterTestConfig:
@@ -303,6 +368,7 @@ class MatterTestConfig:
     tests: List[str] = field(default_factory=list)
     timeout: typing.Union[int, None] = None
     endpoint: int = 0
+    app_pid: int = 0
 
     commissioning_method: Optional[str] = None
     discriminators: Optional[List[int]] = None
@@ -353,6 +419,9 @@ class ClusterMapper:
             return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
 
     def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
+        global_attrs = [item.value for item in GlobalAttributeIds]
+        if attribute_id in global_attrs:
+            return f"Attribute {GlobalAttributeIds(attribute_id).to_name()} {attribute_id}, 0x{attribute_id:04X}"
         mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
         if not mapping:
             return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
@@ -579,6 +648,7 @@ def hex_from_bytes(b: bytes) -> str:
 class TestStep:
     test_plan_number: typing.Union[int, str]
     description: str
+    expectation: str = ""
     is_commissioning: bool = False
 
 
@@ -825,6 +895,43 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
 
+    async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
+        """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
+
+           The enableKey can be passed into the function, or omitted which will then
+           use the one provided to the script via --hex-arg enableKey:<HEX VALUE>
+           if not it defaults to 0x000102030405060708090a0b0c0d0e0f
+        """
+        # get the test event enable key or assume the default
+        # This can be passed in on command line using
+        #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+        if enableKey is None:
+            if 'enableKey' not in self.matter_test_config.global_test_params:
+                enableKey = bytes([b for b in range(16)])
+            else:
+                enableKey = self.matter_test_config.global_test_params['enableKey']
+
+        try:
+            # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
+            await self.send_single_cmd(endpoint=0,
+                                       cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                                           enableKey,
+                                           eventTrigger)
+                                       )
+
+        except InteractionModelError as e:
+            asserts.fail(
+                f"Sending TestEventTrigger resulted in Unexpected error. Are they enabled in DUT? Command returned - {e.status}")
+
+    async def check_test_event_triggers_enabled(self):
+        """This cluster checks that the General Diagnostics cluster TestEventTriggersEnabled attribute is True.
+           It will assert and fail the test if not True."""
+        full_attr = Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        cluster = Clusters.Objects.GeneralDiagnostics
+        # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
+        test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
+        asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
+
     def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
         logging.info(f'***** Test Step {stepnum} : {title}')
 
@@ -880,15 +987,27 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.runner_hook.test_stop(exception=None, duration=test_duration)
 
     def pics_guard(self, pics_condition: bool):
+        """Checks a condition and if False marks the test step as skipped and
+           returns False, otherwise returns True.
+           For example can be used to check if a test step should be run:
+
+              self.step("4")
+              if self.pics_guard(condition_needs_to_be_true_to_execute):
+                  # do the test for step 4
+
+              self.step("5")
+              if self.pics_guard(condition2_needs_to_be_true_to_execute):
+                  # do the test for step 5
+           """
         if not pics_condition:
             self.mark_current_step_skipped()
+        return pics_condition
 
     def mark_current_step_skipped(self):
         try:
             steps = self.get_test_steps(self.current_test_info.name)
             if self.current_step_index == 0:
                 asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
-            print(self.current_step_index-1)
             num = steps[self.current_step_index-1].test_plan_number
         except KeyError:
             num = self.current_step_index
@@ -905,6 +1024,25 @@ class MatterBaseTest(base_test.BaseTestClass):
     def skip_step(self, step):
         self.step(step)
         self.mark_current_step_skipped()
+
+    def skip_all_remaining_steps(self, starting_step_number):
+        ''' Skips all remaining test steps starting with provided starting step
+
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally. By providing argument
+                test is more deliberately identifying where test skips are starting from, making
+                it easier to validate against the test plan for correctness.
+        '''
+        steps = self.get_test_steps(self.current_test_info.name)
+        for idx, step in enumerate(steps):
+            if step.test_plan_number == starting_step_number:
+                starting_step_idx = idx
+                break
+        else:
+            asserts.fail("skip_all_remaining_steps was provided with invalid starting_step_num")
+        remaining = steps[starting_step_idx:]
+        for step in remaining:
+            self.skip_step(step.test_plan_number)
 
     def step(self, step: typing.Union[int, str]):
         test_name = self.current_test_info.name
@@ -959,6 +1097,28 @@ class MatterBaseTest(base_test.BaseTestClass):
             info.filter_value = setup_payload.long_discriminator
 
         return info
+
+    def wait_for_user_input(self,
+                            prompt_msg: str,
+                            input_msg: str = "Press Enter when done.\n",
+                            prompt_msg_placeholder: str = "Submit anything to continue",
+                            default_value: str = "y") -> str:
+        """Ask for user input and wait for it.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt. Indicates what is expected from the user.
+            input_msg (str, optional): Prompt for input function, used when running tests manually. Defaults to "Press Enter when done.\n".
+            prompt_msg_placeholder (str, optional): TH UI prompt input placeholder. Defaults to "Submit anything to continue".
+            default_value (str, optional): TH UI prompt default value. Defaults to "y".
+
+        Returns:
+            str: User input
+        """
+        if self.runner_hook:
+            self.runner_hook.show_prompt(msg=prompt_msg,
+                                         placeholder=prompt_msg_placeholder,
+                                         default_value=default_value)
+        return input(input_msg)
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
@@ -1234,6 +1394,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.tests = [] if args.tests is None else args.tests
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = 0 if args.endpoint is None else args.endpoint
+    config.app_pid = 0 if args.app_pid is None else args.app_pid
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -1286,6 +1447,7 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=0, help="Endpoint under test")
+    basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 

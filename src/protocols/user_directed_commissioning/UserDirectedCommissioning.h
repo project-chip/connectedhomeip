@@ -78,11 +78,7 @@ public:
     const char * GetInstanceName() const { return mInstanceName; }
     void SetInstanceName(const char * instanceName) { Platform::CopyString(mInstanceName, instanceName); }
 
-    bool HasDiscoveryInfo()
-    {
-        return mVendorId != 0 || mProductId != 0 || mCdPort != 0 || strlen(mDeviceName) > 0 || GetRotatingIdLength() > 0 ||
-            mNumTargetAppInfos > 0 || mNoPasscode || mCdUponPasscodeDialog || mCommissionerPasscode || mCommissionerPasscodeReady;
-    }
+    bool HasDiscoveryInfo() { return mVendorId != 0 && mProductId != 0 && mCdPort != 0 && strlen(mDeviceName) > 0; }
 
     const char * GetDeviceName() const { return mDeviceName; }
     void SetDeviceName(const char * deviceName) { Platform::CopyString(mDeviceName, deviceName); }

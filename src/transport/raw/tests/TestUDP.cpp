@@ -30,7 +30,6 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
-#include <nlbyteorder.h>
 #include <nlunit-test.h>
 
 #include <errno.h>
@@ -196,7 +195,7 @@ static nlTestSuite sSuite =
  */
 static int Initialize(void * aContext)
 {
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite);
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 

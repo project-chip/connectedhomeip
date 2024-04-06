@@ -25,7 +25,7 @@
 #include <memory>
 
 #include <app/AttributeAccessInterface.h>
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -100,14 +100,6 @@ public:
         kWiFiAPMode_Enabled                     = 3,
         kWiFiAPMode_OnDemand                    = 4,
         kWiFiAPMode_OnDemand_NoStationProvision = 5,
-    };
-
-    enum ThreadMode
-    {
-        kThreadMode_NotSupported          = 0,
-        kThreadMode_ApplicationControlled = 1,
-        kThreadMode_Disabled              = 2,
-        kThreadMode_Enabled               = 3,
     };
 
     enum WiFiStationState
@@ -192,17 +184,13 @@ public:
     void SetWiFiAPIdleTimeout(System::Clock::Timeout val);
 
     // Thread Methods
-    ThreadMode GetThreadMode();
-    CHIP_ERROR SetThreadMode(ThreadMode val);
     bool IsThreadEnabled();
-    bool IsThreadApplicationControlled();
     ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
     void ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
@@ -418,24 +406,9 @@ inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
     return static_cast<ImplClass *>(this)->_GetAndLogWiFiStatsCounters();
 }
 
-inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()
-{
-    return static_cast<ImplClass *>(this)->_GetThreadMode();
-}
-
-inline CHIP_ERROR ConnectivityManager::SetThreadMode(ThreadMode val)
-{
-    return static_cast<ImplClass *>(this)->_SetThreadMode(val);
-}
-
 inline bool ConnectivityManager::IsThreadEnabled()
 {
     return static_cast<ImplClass *>(this)->_IsThreadEnabled();
-}
-
-inline bool ConnectivityManager::IsThreadApplicationControlled()
-{
-    return static_cast<ImplClass *>(this)->_IsThreadApplicationControlled();
 }
 
 inline ConnectivityManager::ThreadDeviceType ConnectivityManager::GetThreadDeviceType()
@@ -475,25 +448,6 @@ inline void ConnectivityManager::ErasePersistentInfo()
 inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 {
     static_cast<ImplClass *>(this)->_ResetThreadNetworkDiagnosticsCounts();
-}
-
-/*
- * @brief Get runtime value from the thread network based on the given attribute ID.
- *        The info is encoded via the AttributeValueEncoder.
- *
- * @param attributeId Id of the attribute for the requested info.
- * @param aEncoder Encoder to encode the attribute value.
- *
- * @return CHIP_NO_ERROR = Succes.
- *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
- *                                      Use standard read.
- *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
- *         All other errors should be treated as a read error and reported as such.
- */
-inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                  app::AttributeValueEncoder & encoder)
-{
-    return static_cast<ImplClass *>(this)->_WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()

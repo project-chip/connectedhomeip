@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="Energy"/>
+  <domain name="Energy Management"/>
 
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0096"/>
@@ -177,7 +177,7 @@ limitations under the License.
 
   <cluster apiMaturity="provisional">
     <name>Demand Response Load Control</name>
-    <domain>Energy</domain>
+    <domain>Energy Management</domain>
     <description>This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control.</description>
     <code>0x0096</code>
     <define>DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER</define>

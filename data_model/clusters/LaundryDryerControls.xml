@@ -59,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x004A" name="Laundry Dryer Controls"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DRYERCTRL" scope="Endpoint"/>
   <dataTypes>
     <enum name="DrynessLevelEnum">

@@ -27,7 +27,6 @@
 #include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
-#include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
@@ -41,6 +40,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /**
  * @brief Type for the cluster mask
@@ -59,7 +59,7 @@ typedef void (*EmberAfGenericClusterFunction)(void);
  * @brief A distinguished manufacturer code that is used to indicate the
  * absence of a manufacturer-specific cluster, command, or attribute.
  */
-#define EMBER_AF_NULL_MANUFACTURER_CODE 0x0000
+#define MATTER_DM_NULL_MANUFACTURER_CODE 0x0000
 
 /**
  * @brief Struct describing cluster
@@ -234,12 +234,12 @@ struct EmberAfDefinedEndpoint
 /**
  * @brief Indicates the absence of a Scene table entry.
  */
-#define EMBER_AF_SCENE_TABLE_NULL_INDEX 0xFF
+#define MATTER_DM_SCENE_TABLE_NULL_INDEX 0xFF
 /**
  * @brief Value used when setting or getting the endpoint in a Scene table
  * entry.  It indicates that the entry is not in use.
  */
-#define EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID 0x00
+#define MATTER_DM_SCENE_TABLE_UNUSED_ENDPOINT_ID 0x00
 /**
  * @brief Maximum length of Scene names, not including the length byte.
  */
@@ -290,9 +290,8 @@ typedef void (*EmberAfClusterAttributeChangedCallback)(const chip::app::Concrete
  *
  * This function is called before an attribute changes.
  */
-typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(const chip::app::ConcreteAttributePath & attributePath,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
-                                                                   uint8_t * value);
+typedef chip::Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeChangedCallback)(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 #define MAX_INT32U_VALUE (0xFFFFFFFFUL)
 #define MAX_INT16U_VALUE (0xFFFF)

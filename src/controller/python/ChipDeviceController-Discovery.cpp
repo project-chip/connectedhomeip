@@ -89,6 +89,11 @@ PyChipError pychip_DeviceController_DiscoverCommissionableNodes(Controller::Devi
     return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
 }
 
+PyChipError pychip_DeviceController_StopCommissionableDiscovery(Controller::DeviceCommissioner * devCtrl)
+{
+    return ToPyChipError(devCtrl->StopCommissionableDiscovery());
+}
+
 void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::DeviceCommissioner * devCtrl,
                                                                   IterateDiscoveredCommissionableNodesFunct cb)
 {

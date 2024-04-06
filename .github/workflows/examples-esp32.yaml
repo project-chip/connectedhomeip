@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:32
+            image: ghcr.io/project-chip/chip-build-esp32:46
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -71,6 +71,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
                   mv scripts/codegen.py scripts/codegen.py.renamed
+                  mv scripts/tools/zap/generate.py scripts/tools/zap/generate.py.renamed
             - name: Clean output
               run: rm -rf ./out
             - name: Build some M5Stack variations with pregen
@@ -84,20 +85,13 @@ jobs:
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
-            - name: Check no code generation in output
-              run: |
-                  CNT=$(find out -name "CHIPClusters.h" | wc -l)
-                  if [ "${CNT}" != "0" ]; then
-                     echo "ERROR: found unexpected generated files:"
-                     find out -name "CHIPClusters.h"
-                     exit 1
-                  fi
             - name: Undo code pregeneration changes
               run: |
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
-            - name: Build example All Clusters App C3
-              run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
+                  mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py 
+            - name: Build example All Clusters App(Target:ESP32C3)
+              run: scripts/examples/esp_example.sh all-clusters-app sdkconfig.defaults.esp32c3 esp32c3
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/esp32-build
@@ -112,10 +106,10 @@ jobs:
               run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
 
             - name: Build example Lighting App (Target:ESP32H2)
-              run: scripts/examples/esp_example.sh lighting-app sdkconfig.defaults.esp32h2
+              run: scripts/examples/esp_example.sh lighting-app sdkconfig.defaults.esp32h2 esp32h2
 
             - name: Build example Lock App (Target:ESP32C6)
-              run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults.esp32c6
+              run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults.esp32c6 esp32c6
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
@@ -130,7 +124,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:32
+            image: ghcr.io/project-chip/chip-build-esp32:46
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -161,10 +155,13 @@ jobs:
               run: scripts/examples/esp_example.sh ota-provider-app sdkconfig.defaults
 
             - name: Build example Light Switch App (Target:ESP32C3)
-              run: scripts/examples/esp_example.sh light-switch-app sdkconfig.defaults.esp32c3
+              run: scripts/examples/esp_example.sh light-switch-app sdkconfig.defaults.esp32c3 esp32c3
 
             - name: Build example Lighting App (external platform)
               run: scripts/examples/esp_example.sh lighting-app sdkconfig.ext_plat.defaults
 
             - name: Build example Energy Management App
               run: scripts/examples/esp_example.sh energy-management-app sdkconfig.defaults
+
+            - name: Build example LIT ICD App (Target:ESP32H2)
+              run: scripts/examples/esp_example.sh lit-icd-app sdkconfig.defaults esp32h2

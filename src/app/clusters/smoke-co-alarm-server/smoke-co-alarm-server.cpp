@@ -467,11 +467,11 @@ void SmokeCoAlarmServer::SendEvent(EndpointId endpointId, T & event)
 
 template <typename T>
 bool SmokeCoAlarmServer::GetAttribute(EndpointId endpointId, AttributeId attributeId,
-                                      EmberAfStatus (*getFn)(EndpointId endpointId, T * value), T & value) const
+                                      Status (*getFn)(EndpointId endpointId, T * value), T & value) const
 {
-    EmberAfStatus status   = getFn(endpointId, &value);
-    bool success           = (EMBER_ZCL_STATUS_SUCCESS == status);
-    bool unsupportedStatus = (EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status);
+    Status status          = getFn(endpointId, &value);
+    bool success           = (Status::Success == status);
+    bool unsupportedStatus = (Status::UnsupportedAttribute == status);
 
     if (unsupportedStatus)
     {
@@ -487,10 +487,10 @@ bool SmokeCoAlarmServer::GetAttribute(EndpointId endpointId, AttributeId attribu
 
 template <typename T>
 bool SmokeCoAlarmServer::SetAttribute(EndpointId endpointId, AttributeId attributeId,
-                                      EmberAfStatus (*setFn)(EndpointId endpointId, T value), T value)
+                                      Status (*setFn)(EndpointId endpointId, T value), T value)
 {
-    EmberAfStatus status = setFn(endpointId, value);
-    bool success         = (EMBER_ZCL_STATUS_SUCCESS == status);
+    Status status = setFn(endpointId, value);
+    bool success  = (Status::Success == status);
 
     if (!success)
     {

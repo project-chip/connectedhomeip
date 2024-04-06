@@ -33,6 +33,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 
 #include "Keyboard.h"
@@ -41,6 +42,9 @@
 #include "PWR_Interface.h"
 #include "app_config.h"
 
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
@@ -777,11 +781,11 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     }
 
     // write the new door lock state
-    EmberAfStatus status = Attributes::LockState::Set(1, newValue);
+    chip::Protocols::InteractionModel::Status status = Attributes::LockState::Set(1, newValue);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != chip::Protocols::InteractionModel::Status::Success)
     {
-        ChipLogError(NotSpecified, "ERR: updating door lock state %x", status);
+        ChipLogError(NotSpecified, "ERR: updating door lock state %x", chip::to_underlying(status));
     }
 }
 

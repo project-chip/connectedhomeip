@@ -17,8 +17,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("zap") {
   zap_file = "thermostaticRadiatorValve.zap"
-
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/thermostat/qpg/zap-generated"
   is_server = true
 }

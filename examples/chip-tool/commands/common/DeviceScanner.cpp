@@ -218,7 +218,7 @@ void DeviceScanner::Log() const
     auto resultsCount = mDiscoveredResults.size();
     VerifyOrReturn(resultsCount > 0, ChipLogProgress(chipTool, "No device discovered."));
 
-    uint16_t index = 0;
+    [[maybe_unused]] uint16_t index = 0;
     for (auto & instance : mDiscoveredResults)
     {
         ChipLogProgress(chipTool, "Instance Name: %s ", instance.first.c_str());

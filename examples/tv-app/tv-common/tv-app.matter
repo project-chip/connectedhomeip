@@ -1206,6 +1206,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -1262,10 +1266,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1307,7 +1323,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -2007,6 +2023,99 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for passing messages to be presented by a device. */
+provisional cluster Messages = 151 {
+  revision 3;
+
+  enum FutureMessagePreferenceEnum : enum8 {
+    kAllowed = 0;
+    kIncreased = 1;
+    kReduced = 2;
+    kDisallowed = 3;
+    kBanned = 4;
+  }
+
+  enum MessagePriorityEnum : enum8 {
+    kLow = 0;
+    kMedium = 1;
+    kHigh = 2;
+    kCritical = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kReceivedConfirmation = 0x1;
+    kConfirmationResponse = 0x2;
+    kConfirmationReply = 0x4;
+    kProtectedMessages = 0x8;
+  }
+
+  bitmap MessageControlBitmap : bitmap8 {
+    kConfirmationRequired = 0x1;
+    kResponseRequired = 0x2;
+    kReplyMessage = 0x4;
+    kMessageConfirmed = 0x8;
+    kMessageProtected = 0x10;
+  }
+
+  struct MessageResponseOptionStruct {
+    optional int32u messageResponseID = 0;
+    optional char_string<32> label = 1;
+  }
+
+  struct MessageStruct {
+    octet_string<16> messageID = 0;
+    MessagePriorityEnum priority = 1;
+    MessageControlBitmap messageControl = 2;
+    nullable epoch_s startTime = 3;
+    nullable int64u duration = 4;
+    char_string<256> messageText = 5;
+    optional MessageResponseOptionStruct responses[] = 6;
+  }
+
+  info event MessageQueued = 0 {
+    octet_string messageID = 0;
+  }
+
+  info event MessagePresented = 1 {
+    octet_string messageID = 0;
+  }
+
+  info event MessageComplete = 2 {
+    octet_string messageID = 0;
+    optional nullable int32u responseID = 1;
+    optional nullable char_string reply = 2;
+    nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
+  }
+
+  readonly attribute MessageStruct messages[] = 0;
+  readonly attribute octet_string activeMessageIDs[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct PresentMessagesRequestRequest {
+    octet_string<16> messageID = 0;
+    MessagePriorityEnum priority = 1;
+    MessageControlBitmap messageControl = 2;
+    nullable epoch_s startTime = 3;
+    nullable int64u duration = 4;
+    char_string<256> messageText = 5;
+    optional MessageResponseOptionStruct responses[] = 6;
+  }
+
+  request struct CancelMessagesRequestRequest {
+    octet_string messageIDs[] = 0;
+  }
+
+  /** Command for requesting messages be presented */
+  fabric command PresentMessagesRequest(PresentMessagesRequestRequest): DefaultSuccess = 0;
+  /** Command for cancelling message present requests */
+  fabric command CancelMessagesRequest(CancelMessagesRequestRequest): DefaultSuccess = 1;
+}
+
 /** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
 cluster RelativeHumidityMeasurement = 1029 {
   revision 3;
@@ -2025,7 +2134,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute optional char_string<12> MACAddress = 0;
   readonly attribute optional octet_string<16> linkLocalAddress = 1;
@@ -2039,12 +2148,13 @@ cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
 cluster Channel = 1284 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ChannelTypeEnum : enum8 {
     kSatellite = 0;
     kCable = 1;
     kTerrestrial = 2;
+    kOTT = 3;
   }
 
   enum LineupInfoTypeEnum : enum8 {
@@ -2060,14 +2170,14 @@ cluster Channel = 1284 {
   bitmap Feature : bitmap32 {
     kChannelList = 0x1;
     kLineupInfo = 0x2;
-    kElectronicGuide = 0x3;
-    kRecordProgram = 0x4;
+    kElectronicGuide = 0x4;
+    kRecordProgram = 0x8;
   }
 
   bitmap RecordingFlagBitmap : bitmap32 {
     kScheduled = 0x1;
     kRecordSeries = 0x2;
-    kRecorded = 0x3;
+    kRecorded = 0x4;
   }
 
   struct ProgramCastStruct {
@@ -2213,7 +2323,7 @@ cluster Channel = 1284 {
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 cluster TargetNavigator = 1285 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -2257,7 +2367,7 @@ cluster TargetNavigator = 1285 {
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 cluster MediaPlayback = 1286 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -2299,9 +2409,9 @@ cluster MediaPlayback = 1286 {
   bitmap Feature : bitmap32 {
     kAdvancedSeek = 0x1;
     kVariableSpeed = 0x2;
-    kTextTracks = 0x3;
-    kAudioTracks = 0x4;
-    kAudioAdvance = 0x5;
+    kTextTracks = 0x4;
+    kAudioTracks = 0x8;
+    kAudioAdvance = 0x10;
   }
 
   struct TrackAttributesStruct {
@@ -2679,7 +2789,6 @@ cluster ContentLauncher = 1290 {
   bitmap SupportedProtocolsBitmap : bitmap32 {
     kDASH = 0x1;
     kHLS = 0x2;
-    kWebRTC = 0x2;
   }
 
   struct DimensionStruct {
@@ -2904,7 +3013,7 @@ cluster ApplicationBasic = 1293 {
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   critical event LoggedOut = 0 {
     optional node_id node = 0;
@@ -2944,15 +3053,15 @@ cluster AccountLogin = 1294 {
 }
 
 /** This cluster is used for managing the content control (including "parental control") settings on a media device such as a TV, or Set-top Box. */
-cluster ContentControl = 1295 {
+provisional cluster ContentControl = 1295 {
   revision 1; // NOTE: Default/not specifically set
 
   bitmap Feature : bitmap32 {
     kScreenTime = 0x1;
     kPINManagement = 0x2;
-    kBlockUnrated = 0x3;
-    kOnDemandContentRating = 0x4;
-    kScheduledContentRating = 0x5;
+    kBlockUnrated = 0x4;
+    kOnDemandContentRating = 0x8;
+    kScheduledContentRating = 0x10;
   }
 
   struct RatingNameStruct {
@@ -3027,7 +3136,7 @@ cluster ContentControl = 1295 {
 }
 
 /** This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse. */
-cluster ContentAppObserver = 1296 {
+provisional cluster ContentAppObserver = 1296 {
   revision 1; // NOTE: Default/not specifically set
 
   enum StatusEnum : enum8 {
@@ -3070,7 +3179,7 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -3212,8 +3321,8 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -3297,7 +3406,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster WiFiNetworkDiagnostics {
@@ -3428,8 +3537,25 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster Messages {
+    emits event MessageQueued;
+    emits event MessagePresented;
+    emits event MessageComplete;
+    callback attribute messages;
+    callback attribute activeMessageIDs;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 3;
+
+    handle command PresentMessagesRequest;
+    handle command CancelMessagesRequest;
   }
 
   server cluster WakeOnLan {
@@ -3443,7 +3569,7 @@ endpoint 1 {
     callback attribute lineup;
     callback attribute currentChannel;
     ram      attribute featureMap default = 0x0003;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeChannel;
     handle command ChangeChannelResponse;
@@ -3460,7 +3586,7 @@ endpoint 1 {
     callback attribute targetList;
     ram      attribute currentTarget default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command NavigateTarget;
     handle command NavigateTargetResponse;
@@ -3483,7 +3609,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x003;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command Play;
     handle command Pause;
@@ -3532,7 +3658,7 @@ endpoint 1 {
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
     ram      attribute featureMap default = 0x0003;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command LaunchContent;
     handle command LaunchURL;
@@ -3578,8 +3704,8 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute featureMap default = 28;
+    ram      attribute clusterRevision default = 2;
 
     handle command UpdatePIN;
     handle command ResetPIN;
@@ -3641,7 +3767,7 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 }
@@ -3655,7 +3781,7 @@ endpoint 3 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -3809,7 +3935,7 @@ endpoint 3 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 28;
     ram      attribute clusterRevision default = 1;
 
     handle command UpdatePIN;

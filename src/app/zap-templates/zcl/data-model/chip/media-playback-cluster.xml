@@ -23,6 +23,7 @@ limitations under the License.
     <define>MEDIA_PLAYBACK_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="2"/> <!-- Revision   -->
     <description>This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.</description>
 
     <globalAttribute side="server" code="0xFFFC" value="0" />
@@ -164,9 +165,9 @@ limitations under the License.
     <cluster code="0x0506"/>
     <field name="AdvancedSeek" mask="0x1"/>
     <field name="VariableSpeed" mask="0x2"/>
-    <field name="TextTracks" mask="0x3"/>
-    <field name="AudioTracks" mask="0x4"/>
-    <field name="AudioAdvance" mask="0x5"/>
+    <field name="TextTracks" mask="0x4"/>
+    <field name="AudioTracks" mask="0x8"/>
+    <field name="AudioAdvance" mask="0x10"/>
   </bitmap>
 
   <enum name="CharacteristicEnum" type="enum8">

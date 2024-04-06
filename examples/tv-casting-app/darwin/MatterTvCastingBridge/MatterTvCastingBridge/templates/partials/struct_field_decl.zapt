@@ -1,0 +1,3 @@
+{{! Override the getter name because some of our properties start with things
+    like "new" or "init" }}
+@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type cluster structTypePrefix="MC"}} {{asStructPropertyName label}} {{! Caller provides availability~}}

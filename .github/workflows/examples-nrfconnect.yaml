@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:32
+            image: ghcr.io/project-chip/chip-build-nrf-platform:46
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -49,7 +49,7 @@ jobs:
               with:
                 platform: nrfconnect
             - name: Detect changed paths
-              uses: dorny/paths-filter@v2
+              uses: dorny/paths-filter@v3
               id: changed_paths
               with:
                   filters: |

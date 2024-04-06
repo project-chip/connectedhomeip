@@ -67,6 +67,13 @@ static uint32_t identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_FINISH_STOP;
 
 #define LIGHTING_APPLICATION_IDENTIFY_ENDPOINT 1
 
+#if (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
+#define LED_ENABLE 0
+#else
+#define LED_ENABLE 1
+#endif
+#define BUTTON_ENABLE 1
+
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::Credentials;
@@ -82,6 +89,11 @@ static Button_Handle sAppRightHandle;
 static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 
 AppTask AppTask::sAppTask;
+
+void uiTurnOn(void);
+void uiTurnedOn(void);
+void uiTurnOff(void);
+void uiTurnedOff(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static DefaultOTARequestor sRequestorCore;
@@ -129,43 +141,26 @@ int AppTask::StartAppTask()
     return ret;
 }
 
-// Action initiated callback
-void uiTurnOn(void)
+// Identify take action
+void identify_TakeAction(void)
 {
-    PLAT_LOG("Light On initiated");
-    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
-    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+#if (LED_ENABLE == 1)
+    LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
+#endif // LED_ENABLE
 }
 
-// Action completed callback
-void uiTurnedOn(void)
+// Identify stop action
+void identify_StopAction(void)
 {
-    PLAT_LOG("Light On completed");
-    LED_stopBlinking(sAppRedHandle);
-    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
-}
-
-// Action initiated callback
-void uiTurnOff(void)
-{
-    PLAT_LOG("Light Off initiated");
-    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
-    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
-}
-
-// Action completed callback
-void uiTurnedOff(void)
-{
-    PLAT_LOG("Light Off completed");
-    LED_stopBlinking(sAppRedHandle);
-    LED_setOff(sAppRedHandle);
+#if (LED_ENABLE == 1)
+    LED_stopBlinking(sAppGreenHandle);
+    LED_setOff(sAppGreenHandle);
+#endif // LED_ENABLE
 }
 
 int AppTask::Init()
 {
-    LED_Params ledParams;
-    Button_Params buttonParams;
-
     cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
@@ -188,9 +183,12 @@ int AppTask::Init()
     }
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#elif CHIP_CONFIG_ENABLE_ICD_SERVER
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #endif
+
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
@@ -238,33 +236,7 @@ int AppTask::Init()
 
     Server::GetInstance().Init(initParams);
 
-    // Initialize LEDs
-    PLAT_LOG("Initialize LEDs");
-    LED_init();
-
-    LED_Params_init(&ledParams); // default PWM LED
-    sAppRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
-    LED_setOff(sAppRedHandle);
-
-    LED_Params_init(&ledParams); // default PWM LED
-    sAppGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
-    LED_setOff(sAppGreenHandle);
-
-    // Initialize buttons
-    PLAT_LOG("Initialize buttons");
-    Button_init();
-
-    Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttonParams.longPressDuration = 1000U; // ms
-    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
-    Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
-
-    Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
-    buttonParams.longPressDuration = 1000U; // ms
-    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
-    Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
+    uiInit();
 
     ret = LightMgr().Init();
 
@@ -282,6 +254,7 @@ int AppTask::Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
 #endif
+
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
@@ -301,46 +274,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sAppTask.DispatchEvent(&event);
         }
-    }
-}
-
-void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
-{
-    AppEvent event;
-    event.Type = AppEvent::kEventType_ButtonLeft;
-
-    if (events & Button_EV_CLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
-    }
-    else if (events & Button_EV_LONGCLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
-    }
-    // button callbacks are in ISR context
-    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
-    {
-        /* Failed to post the message */
-    }
-}
-
-void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)
-{
-    AppEvent event;
-    event.Type = AppEvent::kEventType_ButtonRight;
-
-    if (events & Button_EV_CLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
-    }
-    else if (events & Button_EV_LONGCLICKED)
-    {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
-    }
-    // button callbacks are in ISR context
-    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
-    {
-        /* Failed to post the message */
     }
 }
 
@@ -458,16 +391,13 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         switch (identify_trigger_effect)
         {
         case IDENTIFY_TRIGGER_EFFECT_BLINK:
-            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-            LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
+            identify_TakeAction();
             break;
         case IDENTIFY_TRIGGER_EFFECT_BREATHE:
-            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-            LED_startBlinking(sAppGreenHandle, 100, LED_BLINK_FOREVER);
+            identify_TakeAction();
             break;
         case IDENTIFY_TRIGGER_EFFECT_OKAY:
-            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-            LED_startBlinking(sAppGreenHandle, 500, LED_BLINK_FOREVER);
+            identify_TakeAction();
             break;
         default:
             break;
@@ -476,8 +406,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         break;
 
     case AppEvent::kEventType_IdentifyStop:
-        LED_stopBlinking(sAppGreenHandle);
-        LED_setOff(sAppGreenHandle);
+        identify_StopAction();
         PLAT_LOG("Identify stopped");
         break;
 
@@ -543,4 +472,126 @@ void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
     default:
         PLAT_LOG("No identifier effect");
     }
+}
+
+// Action initiated callback
+void uiTurnOn(void)
+{
+    PLAT_LOG("Light On initiated");
+#if (LED_ENABLE == 1)
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+#endif // LED_ENABLE
+}
+
+// Action completed callback
+void uiTurnedOn(void)
+{
+    PLAT_LOG("Light On completed");
+#if (LED_ENABLE == 1)
+    LED_stopBlinking(sAppRedHandle);
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+#endif // LED_ENABLE
+}
+
+// Action initiated callback
+void uiTurnOff(void)
+{
+    PLAT_LOG("Light Off initiated");
+#if (LED_ENABLE == 1)
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+#endif // LED_ENABLE
+}
+
+// Action completed callback
+void uiTurnedOff(void)
+{
+    PLAT_LOG("Light Off completed");
+#if (LED_ENABLE == 1)
+    LED_stopBlinking(sAppRedHandle);
+    LED_setOff(sAppRedHandle);
+#endif // LED_ENABLE
+}
+
+#if (BUTTON_ENABLE == 1)
+void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_ButtonLeft;
+
+    if (events & Button_EV_CLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
+    }
+    else if (events & Button_EV_LONGCLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
+    }
+    // button callbacks are in ISR context
+    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
+    {
+        /* Failed to post the message */
+    }
+}
+
+void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask events)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_ButtonRight;
+
+    if (events & Button_EV_CLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
+    }
+    else if (events & Button_EV_LONGCLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
+    }
+    // button callbacks are in ISR context
+    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
+    {
+        /* Failed to post the message */
+    }
+}
+#endif // BUTTON_ENABLE
+
+void AppTask::uiInit(void)
+{
+#if (LED_ENABLE == 1)
+
+    LED_Params ledParams;
+
+    // Initialize LEDs
+    PLAT_LOG("Initialize LEDs");
+    LED_init();
+
+    LED_Params_init(&ledParams); // default PWM LED
+    sAppRedHandle = LED_open(CONFIG_LED_RED, &ledParams);
+    LED_setOff(sAppRedHandle);
+
+    LED_Params_init(&ledParams); // default PWM LED
+    sAppGreenHandle = LED_open(CONFIG_LED_GREEN, &ledParams);
+    LED_setOff(sAppGreenHandle);
+#endif // LED ENABLE
+
+#if (BUTTON_ENABLE == 1)
+    Button_Params buttonParams;
+
+    // Initialize buttons
+    PLAT_LOG("Initialize buttons");
+    Button_init();
+
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
+    sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
+    Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
+
+    Button_Params_init(&buttonParams);
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
+    sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
+    Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
+#endif // BUTTON ENABLE
 }

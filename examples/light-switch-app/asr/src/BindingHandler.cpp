@@ -199,7 +199,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aB
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     BindingData * data = static_cast<BindingData *>(context);
 
-    if (aBinding.type == EMBER_MULTICAST_BINDING && data->IsGroup)
+    if (aBinding.type == MATTER_MULTICAST_BINDING && data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -214,7 +214,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aB
             break;
         }
     }
-    else if (aBinding.type == EMBER_UNICAST_BINDING && !data->IsGroup)
+    else if (aBinding.type == MATTER_UNICAST_BINDING && !data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -255,7 +255,7 @@ bool BindingHandler::IsGroupBound()
 
     for (auto & entry : bindingTable)
     {
-        if (EMBER_MULTICAST_BINDING == entry.type)
+        if (MATTER_MULTICAST_BINDING == entry.type)
         {
             return true;
         }
@@ -273,7 +273,7 @@ void BindingHandler::PrintBindingTable()
     {
         switch (entry.type)
         {
-        case EMBER_UNICAST_BINDING:
+        case MATTER_UNICAST_BINDING:
             ASR_LOG("[%d] UNICAST:", i++);
             ASR_LOG("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
@@ -283,7 +283,7 @@ void BindingHandler::PrintBindingTable()
                     (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.Value(), (int) entry.remote,
                     (int) entry.nodeId);
             break;
-        case EMBER_MULTICAST_BINDING:
+        case MATTER_MULTICAST_BINDING:
             ASR_LOG("[%d] GROUP:", i++);
             ASR_LOG("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
@@ -291,10 +291,10 @@ void BindingHandler::PrintBindingTable()
             \t+ GroupId %d",
                     (int) entry.fabricIndex, (int) entry.local, (int) entry.remote, (int) entry.groupId);
             break;
-        case EMBER_UNUSED_BINDING:
+        case MATTER_UNUSED_BINDING:
             ASR_LOG("[%d] UNUSED", i++);
             break;
-        // case EMBER_MANY_TO_ONE_BINDING:
+        // case MATTER_MANY_TO_ONE_BINDING:
         //     ASR_LOG("[%d] MANY TO ONE", i++);
         //     break;
         default:

@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 
+// TODO To prevent config with nl headers has to be included before  nl test headers
+#include <pw_unit_test/unit_test_service.h>
+
 #include <AppConfig.h>
 #include <FreeRTOS.h>
 #include <PigweedLogger.h>
@@ -166,10 +169,11 @@ StaticTask_t sTestTaskBuffer;
 StackType_t sTestTaskStack[TEST_TASK_STACK_SIZE];
 
 chip::rpc::NlTest nl_test_service;
+pw::unit_test::UnitTestService unit_test_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(nl_test_service);
+    server.RegisterService(nl_test_service, unit_test_service);
 }
 
 void RunRpcService(void *)

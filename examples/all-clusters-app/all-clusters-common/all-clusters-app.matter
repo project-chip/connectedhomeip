@@ -1697,6 +1697,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -1753,10 +1757,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1798,7 +1814,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -2716,7 +2732,7 @@ provisional cluster OvenMode = 73 {
 
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
-cluster LaundryDryerControls = 74 {
+provisional cluster LaundryDryerControls = 74 {
   revision 1;
 
   enum DrynessLevelEnum : enum8 {
@@ -2929,7 +2945,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
+    kNoFeatures = 0x0;
   }
 
   struct ModeTagStruct {
@@ -2945,7 +2961,6 @@ cluster RvcRunMode = 84 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2982,7 +2997,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
+    kNoFeatures = 0x0;
   }
 
   struct ModeTagStruct {
@@ -2998,7 +3013,6 @@ cluster RvcCleanMode = 85 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3480,10 +3494,6 @@ cluster RvcOperationalState = 97 {
 
   /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
   command Pause(): OperationalCommandResponse = 0;
-  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
-  command Stop(): OperationalCommandResponse = 1;
-  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
-  command Start(): OperationalCommandResponse = 2;
   /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
   command Resume(): OperationalCommandResponse = 3;
   /** On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device. */
@@ -3492,7 +3502,7 @@ cluster RvcOperationalState = 97 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional cluster ScenesManagement = 98 {
-  revision 5;
+  revision 1;
 
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;
@@ -3865,6 +3875,111 @@ provisional cluster ValveConfigurationAndControl = 129 {
   command Close(): DefaultSuccess = 1;
 }
 
+/** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
+provisional cluster ElectricalPowerMeasurement = 144 {
+  revision 1;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+  }
+
+  enum PowerModeEnum : enum8 {
+    kUnknown = 0;
+    kDC = 1;
+    kAC = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kDirectCurrent = 0x1;
+    kAlternatingCurrent = 0x2;
+    kPolyphasePower = 0x4;
+    kHarmonics = 0x8;
+    kPowerQuality = 0x10;
+  }
+
+  struct MeasurementAccuracyRangeStruct {
+    int64s rangeMin = 0;
+    int64s rangeMax = 1;
+    optional percent100ths percentMax = 2;
+    optional percent100ths percentMin = 3;
+    optional percent100ths percentTypical = 4;
+    optional int64u fixedMax = 5;
+    optional int64u fixedMin = 6;
+    optional int64u fixedTypical = 7;
+  }
+
+  struct MeasurementAccuracyStruct {
+    MeasurementTypeEnum measurementType = 0;
+    boolean measured = 1;
+    int64s minMeasuredValue = 2;
+    int64s maxMeasuredValue = 3;
+    MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
+  }
+
+  struct HarmonicMeasurementStruct {
+    int8u order = 0;
+    nullable int64s measurement = 1;
+  }
+
+  struct MeasurementRangeStruct {
+    MeasurementTypeEnum measurementType = 0;
+    int64s min = 1;
+    int64s max = 2;
+    optional epoch_s startTimestamp = 3;
+    optional epoch_s endTimestamp = 4;
+    optional epoch_s minTimestamp = 5;
+    optional epoch_s maxTimestamp = 6;
+    optional systime_ms startSystime = 7;
+    optional systime_ms endSystime = 8;
+    optional systime_ms minSystime = 9;
+    optional systime_ms maxSystime = 10;
+  }
+
+  info event MeasurementPeriodRanges = 0 {
+    MeasurementRangeStruct ranges[] = 0;
+  }
+
+  readonly attribute PowerModeEnum powerMode = 0;
+  readonly attribute int8u numberOfMeasurementTypes = 1;
+  readonly attribute MeasurementAccuracyStruct accuracy[] = 2;
+  readonly attribute optional MeasurementRangeStruct ranges[] = 3;
+  readonly attribute optional nullable voltage_mv voltage = 4;
+  readonly attribute optional nullable amperage_ma activeCurrent = 5;
+  readonly attribute optional nullable amperage_ma reactiveCurrent = 6;
+  readonly attribute optional nullable amperage_ma apparentCurrent = 7;
+  readonly attribute nullable power_mw activePower = 8;
+  readonly attribute optional nullable power_mw reactivePower = 9;
+  readonly attribute optional nullable power_mw apparentPower = 10;
+  readonly attribute optional nullable voltage_mv RMSVoltage = 11;
+  readonly attribute optional nullable amperage_ma RMSCurrent = 12;
+  readonly attribute optional nullable power_mw RMSPower = 13;
+  readonly attribute optional nullable int64s frequency = 14;
+  readonly attribute optional nullable HarmonicMeasurementStruct harmonicCurrents[] = 15;
+  readonly attribute optional nullable HarmonicMeasurementStruct harmonicPhases[] = 16;
+  readonly attribute optional nullable int64s powerFactor = 17;
+  readonly attribute optional nullable amperage_ma neutralCurrent = 18;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
 provisional cluster ElectricalEnergyMeasurement = 145 {
   revision 1;
@@ -3913,8 +4028,15 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
     MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
   }
 
+  struct CumulativeEnergyResetStruct {
+    optional nullable epoch_s importedResetTimestamp = 0;
+    optional nullable epoch_s exportedResetTimestamp = 1;
+    optional nullable systime_ms importedResetSystime = 2;
+    optional nullable systime_ms exportedResetSystime = 3;
+  }
+
   struct EnergyMeasurementStruct {
-    int64s energy = 0;
+    energy_mwh energy = 0;
     optional epoch_s startTimestamp = 1;
     optional epoch_s endTimestamp = 2;
     optional systime_ms startSystime = 3;
@@ -3936,6 +4058,7 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
   readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyExported = 2;
   readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyImported = 3;
   readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyExported = 4;
+  readonly attribute optional nullable CumulativeEnergyResetStruct cumulativeEnergyReset = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4330,6 +4453,61 @@ provisional cluster EnergyEvse = 153 {
   timed command GetTargets(): GetTargetsResponse = 6;
   /** Allows a client to clear all stored charging targets. */
   timed command ClearTargets(): DefaultSuccess = 7;
+}
+
+/** This cluster provides an interface to specify preferences for how devices should consume energy. */
+provisional cluster EnergyPreference = 155 {
+  revision 1;
+
+  enum EnergyPriorityEnum : enum8 {
+    kComfort = 0;
+    kSpeed = 1;
+    kEfficiency = 2;
+    kWaterConsumption = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kEnergyBalance = 0x1;
+    kLowPowerModeSensitivity = 0x2;
+  }
+
+  struct BalanceStruct {
+    percent step = 0;
+    optional char_string<64> label = 1;
+  }
+
+  readonly attribute optional BalanceStruct energyBalances[] = 0;
+  attribute optional int8u currentEnergyBalance = 1;
+  readonly attribute optional EnergyPriorityEnum energyPriorities[] = 2;
+  readonly attribute optional BalanceStruct lowPowerModeSensitivities[] = 3;
+  attribute optional int8u currentLowPowerModeSensitivity = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
+provisional cluster PowerTopology = 156 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kNodeTopology = 0x1;
+    kTreeTopology = 0x2;
+    kSetTopology = 0x4;
+    kDynamicPowerFlow = 0x8;
+  }
+
+  readonly attribute optional endpoint_no availableEndpoints[] = 0;
+  readonly attribute optional endpoint_no activeEndpoints[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -5124,7 +5302,7 @@ cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-provisional cluster FanControl = 514 {
+cluster FanControl = 514 {
   revision 4;
 
   enum AirflowDirectionEnum : enum8 {
@@ -5691,7 +5869,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 3;
+  revision 4;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
@@ -6302,7 +6480,7 @@ cluster RadonConcentrationMeasurement = 1071 {
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute optional char_string<12> MACAddress = 0;
   readonly attribute optional octet_string<16> linkLocalAddress = 1;
@@ -7063,7 +7241,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -7273,12 +7451,14 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
     handle command TimeSnapshotResponse;
+    handle command PayloadTestRequest;
+    handle command PayloadTestResponse;
   }
 
   server cluster SoftwareDiagnostics {
@@ -7358,7 +7538,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ResetCounts;
   }
@@ -7581,7 +7761,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Off;
     handle command On;
@@ -7644,7 +7824,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -7706,8 +7886,11 @@ endpoint 1 {
   }
 
   server cluster OvenCavityOperationalState {
+    emits event OperationalError;
+    emits event OperationCompletion;
     callback attribute phaseList;
     callback attribute currentPhase;
+    callback attribute countdownTime;
     callback attribute operationalStateList;
     callback attribute operationalState;
     callback attribute operationalError;
@@ -7717,6 +7900,12 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command Pause;
+    handle command Stop;
+    handle command Start;
+    handle command Resume;
+    handle command OperationalCommandResponse;
   }
 
   server cluster OvenMode {
@@ -7807,9 +7996,9 @@ endpoint 1 {
   server cluster RvcRunMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 2;
@@ -7821,9 +8010,9 @@ endpoint 1 {
   server cluster RvcCleanMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 2;
@@ -7951,7 +8140,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command Pause;
     handle command Stop;
@@ -7971,6 +8160,7 @@ endpoint 1 {
     callback attribute operationalError;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -7990,7 +8180,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
     handle command AddSceneResponse;
@@ -8088,6 +8278,35 @@ endpoint 1 {
     handle command Close;
   }
 
+  server cluster ElectricalPowerMeasurement {
+    emits event MeasurementPeriodRanges;
+    callback attribute powerMode;
+    callback attribute numberOfMeasurementTypes;
+    callback attribute accuracy;
+    callback attribute ranges;
+    callback attribute voltage;
+    callback attribute activeCurrent;
+    callback attribute reactiveCurrent;
+    callback attribute apparentCurrent;
+    callback attribute activePower;
+    callback attribute reactivePower;
+    callback attribute apparentPower;
+    callback attribute RMSVoltage;
+    callback attribute RMSCurrent;
+    callback attribute RMSPower;
+    callback attribute frequency;
+    callback attribute harmonicCurrents;
+    callback attribute harmonicPhases;
+    callback attribute powerFactor;
+    callback attribute neutralCurrent;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster ElectricalEnergyMeasurement {
     emits event CumulativeEnergyMeasured;
     emits event PeriodicEnergyMeasured;
@@ -8096,11 +8315,12 @@ endpoint 1 {
     callback attribute cumulativeEnergyExported;
     callback attribute periodicEnergyImported;
     callback attribute periodicEnergyExported;
+    callback attribute cumulativeEnergyReset;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x000F;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -8145,11 +8365,9 @@ endpoint 1 {
     callback attribute supplyState;
     callback attribute faultState;
     callback attribute chargingEnabledUntil;
-    callback attribute dischargingEnabledUntil;
     callback attribute circuitCapacity;
     callback attribute minimumChargeCurrent;
     callback attribute maximumChargeCurrent;
-    callback attribute maximumDischargeCurrent;
     callback attribute userMaximumChargeCurrent;
     callback attribute randomizationDelayWindow;
     callback attribute nextChargeStartTime;
@@ -8157,13 +8375,9 @@ endpoint 1 {
     callback attribute nextChargeRequiredEnergy;
     callback attribute nextChargeTargetSoC;
     callback attribute approximateEVEfficiency;
-    callback attribute stateOfCharge;
-    callback attribute batteryCapacity;
-    callback attribute vehicleID;
     callback attribute sessionID;
     callback attribute sessionDuration;
     callback attribute sessionEnergyCharged;
-    callback attribute sessionEnergyDischarged;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -8179,6 +8393,31 @@ endpoint 1 {
     handle command SetTargets;
     handle command GetTargets;
     handle command ClearTargets;
+  }
+
+  server cluster EnergyPreference {
+    callback attribute energyBalances;
+    ram      attribute currentEnergyBalance;
+    callback attribute energyPriorities;
+    callback attribute lowPowerModeSensitivities;
+    ram      attribute currentLowPowerModeSensitivity;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster PowerTopology {
+    callback attribute availableEndpoints;
+    callback attribute activeEndpoints;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster EnergyEvseMode {
@@ -8501,7 +8740,7 @@ endpoint 1 {
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {
@@ -8895,7 +9134,7 @@ endpoint 2 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command Off;
     handle command On;
@@ -8915,7 +9154,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -8944,7 +9183,7 @@ endpoint 2 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
     handle command AddSceneResponse;
@@ -8968,7 +9207,7 @@ endpoint 2 {
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 }
 endpoint 65534 {
@@ -8984,7 +9223,7 @@ endpoint 65534 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 

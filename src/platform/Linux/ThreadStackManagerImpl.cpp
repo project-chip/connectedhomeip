@@ -28,10 +28,6 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 
-#include <nlbyteorder.hpp>
-#include <nlio-byteorder.hpp>
-#include <nlio.hpp>
-
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
 using namespace chip::DeviceLayer::NetworkCommissioning;
@@ -89,7 +85,7 @@ CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackM
     GAutoPtr<GError> err;
     self->mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr,
-        &MakeUniquePointerReceiver(err).Get()));
+        &err.GetReceiver()));
     VerifyOrReturnError(
         self->mProxy != nullptr, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error"));
@@ -127,7 +123,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
         GVariant * value;
 
         GAutoPtr<GVariantIter> iter;
-        g_variant_get(changed_properties, "a{sv}", &MakeUniquePointerReceiver(iter).Get());
+        g_variant_get(changed_properties, "a{sv}", &iter.GetReceiver());
         if (!iter)
             return;
         while (g_variant_iter_loop(iter.get(), "{&sv}", &key, &value))
@@ -197,7 +193,7 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
     if (g_variant_n_children(routes.get()) > 0)
     {
         GAutoPtr<GVariantIter> iter;
-        g_variant_get(routes.get(), "av", &MakeUniquePointerReceiver(iter).Get());
+        g_variant_get(routes.get(), "av", &iter.GetReceiver());
         if (!iter)
             return false;
 
@@ -211,14 +207,13 @@ bool ThreadStackManagerImpl::_HaveRouteToAddress(const Inet::IPAddress & destAdd
             guchar preference;
             gboolean stable;
             gboolean nextHopIsThisDevice;
-            g_variant_get(route, "(&vqybb)", &MakeUniquePointerReceiver(prefix).Get(), &rloc16, &preference, &stable,
-                          &nextHopIsThisDevice);
+            g_variant_get(route, "(&vqybb)", &prefix.GetReceiver(), &rloc16, &preference, &stable, &nextHopIsThisDevice);
             if (!prefix)
                 continue;
 
             GAutoPtr<GVariant> address;
             guchar prefixLength;
-            g_variant_get(prefix.get(), "(&vy)", &MakeUniquePointerReceiver(address).Get(), &prefixLength);
+            g_variant_get(prefix.get(), "(&vy)", &address.GetReceiver(), &prefixLength);
             if (!address)
                 continue;
 
@@ -277,8 +272,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
         GAutoPtr<GError> err;
         GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                                            g_variant_new("(ss)", "io.openthread.BorderRouter", "ActiveDatasetTlvs"),
-                                                           G_DBUS_CALL_FLAGS_NONE, -1, nullptr,
-                                                           &MakeUniquePointerReceiver(err).Get()));
+                                                           G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
 
         if (err)
         {
@@ -334,7 +328,7 @@ bool ThreadStackManagerImpl::_IsThreadEnabled()
     GAutoPtr<GError> err;
     GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                                        g_variant_new("(ss)", "io.openthread.BorderRouter", "DeviceRole"),
-                                                       G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &MakeUniquePointerReceiver(err).Get()));
+                                                       G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
 
     if (err)
     {
@@ -394,8 +388,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     else
     {
         GAutoPtr<GError> err;
-        gboolean result =
-            openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
+        gboolean result = openthread_io_openthread_border_router_call_reset_sync(mProxy.get(), nullptr, &err.GetReceiver());
         if (err)
         {
             ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Reset", err->message);
@@ -417,8 +410,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
     GAutoPtr<GVariant> attachRes;
     GAutoPtr<GError> err;
     {
-        gboolean result = openthread_io_openthread_border_router_call_attach_finish(this_->mProxy.get(), res,
-                                                                                    &MakeUniquePointerReceiver(err).Get());
+        gboolean result = openthread_io_openthread_border_router_call_attach_finish(this_->mProxy.get(), res, &err.GetReceiver());
         if (!result)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
@@ -582,12 +574,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallScan(ThreadStackManagerImpl * self)
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
@@ -616,8 +602,8 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
     GAutoPtr<GVariant> scan_result;
     GAutoPtr<GError> err;
     {
-        gboolean result = openthread_io_openthread_border_router_call_scan_finish(
-            mProxy.get(), &MakeUniquePointerReceiver(scan_result).Get(), res, &MakeUniquePointerReceiver(err).Get());
+        gboolean result = openthread_io_openthread_border_router_call_scan_finish(mProxy.get(), &scan_result.GetReceiver(), res,
+                                                                                  &err.GetReceiver());
         if (!result)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
@@ -639,7 +625,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
     if (g_variant_n_children(scan_result.get()) > 0)
     {
         GAutoPtr<GVariantIter> iter;
-        g_variant_get(scan_result.get(), "a(tstayqqynyybb)", &MakeUniquePointerReceiver(iter).Get());
+        g_variant_get(scan_result.get(), "a(tstayqqynyybb)", &iter.GetReceiver());
         if (!iter)
         {
             delete scanResult;
@@ -714,174 +700,6 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
 }
 
 void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
-
-CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                               app::AttributeValueEncoder & encoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    switch (attributeId)
-    {
-    case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
-    case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
-    case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
-        err = encoder.EncodeEmptyList();
-        break;
-    case ThreadNetworkDiagnostics::Attributes::Channel::Id:
-    case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id:
-    case ThreadNetworkDiagnostics::Attributes::NetworkName::Id:
-    case ThreadNetworkDiagnostics::Attributes::PanId::Id:
-    case ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id:
-    case ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id:
-    case ThreadNetworkDiagnostics::Attributes::PartitionId::Id:
-    case ThreadNetworkDiagnostics::Attributes::Weighting::Id:
-    case ThreadNetworkDiagnostics::Attributes::DataVersion::Id:
-    case ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id:
-    case ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id:
-    case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id:
-    case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
-    case ThreadNetworkDiagnostics::Attributes::Delay::Id:
-    case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
-    case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
-    case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
-        err = encoder.EncodeNull();
-        break;
-    case ThreadNetworkDiagnostics::Attributes::OverrunCount::Id:
-        err = encoder.Encode(static_cast<uint64_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id:
-        err = encoder.Encode(static_cast<uint16_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxAckedCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxDataCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxDataCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    case ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id:
-        err = encoder.Encode(static_cast<uint32_t>(0));
-        break;
-    default:
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        break;
-    }
-
-    return err;
-}
 
 CHIP_ERROR
 ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset & dataset,

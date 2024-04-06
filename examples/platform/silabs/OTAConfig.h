@@ -22,7 +22,12 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR
+#include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
+#else
 #include <platform/silabs/OTAImageProcessorImpl.h>
+#endif
 
 class OTAConfig
 {

@@ -88,7 +88,7 @@ CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
         {
             for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
             {
-                if (entry.type == EMBER_UNICAST_BINDING)
+                if (entry.type == MATTER_UNICAST_BINDING)
                 {
                     // The CASE connection can also fail if the unicast peer is offline.
                     // There is recovery mechanism to retry connection on-demand so ignore error.
@@ -187,14 +187,14 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
     {
         if (iter->local == endpoint && (!iter->clusterId.HasValue() || iter->clusterId.Value() == cluster))
         {
-            if (iter->type == EMBER_UNICAST_BINDING)
+            if (iter->type == MATTER_UNICAST_BINDING)
             {
                 error = mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
                 SuccessOrExit(error);
                 error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
                 SuccessOrExit(error);
             }
-            else if (iter->type == EMBER_MULTICAST_BINDING)
+            else if (iter->type == MATTER_MULTICAST_BINDING)
             {
                 mBoundDeviceChangedHandler(*iter, nullptr, bindingContext->GetContext());
             }

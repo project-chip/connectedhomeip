@@ -390,6 +390,7 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
 
                         endpointAttributesList.push_back(endpointAttributes);
                         endpointServerListMap[endpointAttributes.mId] = serverList;
+                        serverList.clear();
                         continue;
                     }
                 }

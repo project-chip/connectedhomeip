@@ -51,3 +51,8 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(OperationalState::Ge
 {
     (mResumeRvcDeviceInstance->*mResumeCallback)(err);
 }
+
+void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
+{
+    (mGoHomeRvcDeviceInstance->*mGoHomeCallback)(err);
+}

@@ -475,7 +475,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     //
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
-    int testId = 0;
+    [[maybe_unused]] int testId = 0;
 
     // Read of E2C3A1(dedup), E*C3A1(E1C3A1 not exit, E2C3A1 exist), E2C3A* (5 supported attributes)
     // Expect no versions would be cached.

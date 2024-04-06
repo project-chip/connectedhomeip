@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h> // nogncheck
+#include <app/icd/server/ICDManager.h> // nogncheck
 #endif
-#include <app/icd/ICDStateObserver.h>
+#include <app/icd/server/ICDStateObserver.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
@@ -145,6 +145,11 @@ private:
 
     /// Set MDNS commissionable node advertisement
     CHIP_ERROR AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode mode);
+
+    // Our randomly-generated fallback "MAC address", in case we don't have a real one.
+    uint8_t mFallbackMAC[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength] = { 0 };
+
+    void GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac);
 
     //
     // Check if we have any valid operational credentials present in the fabric table and return true

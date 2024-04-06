@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 19.8.8. [TC-MEDIAPLAYBACK-6.9] Audio Track Verification
 
@@ -20,95 +19,58 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Media Playback"
+    endpoint: 3
+
+    AudioTrack_ID_Value:
+        type: CHAR_STRING
+        defaultValue: activeAudioTrackId_1
+    AudioOutputIndex_Value:
+        type: int16u
+        defaultValue: 1
 
 tests:
-    - label: "Preconditions"
-      verification: |
-          1.DUT is powered on and not in a low power state
-          2.DUT has media playing content with multiple audio tracks available
-      disabled: true
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Step 1: TH reads the ActiveAudioTrack attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0007
-      verification: |
-          ./chip-tool mediaplayback  read active-audio-track 1 3
-
-
-          [1705510425.048787][16407:16409] CHIP:DMG:         SuppressResponse = true,
-          [1705510425.048793][16407:16409] CHIP:DMG:         InteractionModelRevision = 11
-          [1705510425.048799][16407:16409] CHIP:DMG: }
-          [1705510425.048880][16407:16409] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0007 DataVersion: 900375739
-          [1705510425.048963][16407:16409] CHIP:TOO:   ActiveAudioTrack: {
-          [1705510425.048971][16407:16409] CHIP:TOO:     Id: activeAudioTrackId_0
-          [1705510425.048979][16407:16409] CHIP:TOO:     TrackAttributes: {
-          [1705510425.048985][16407:16409] CHIP:TOO:       LanguageCode: languageCode1
-          [1705510425.048999][16407:16409] CHIP:TOO:       DisplayName: displayName1
-          [1705510425.049006][16407:16409] CHIP:TOO:      }
-          [1705510425.049012][16407:16409] CHIP:TOO:    }
-          [1705510425.049085][16407:16409] CHIP:EM: <<< [E:36805i S:17177 M:13072081 (Ack:131987814)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "readAttribute"
+      attribute: "ActiveAudioTrack"
+      response:
+          saveAs: ActiveAudioTrackValue
 
     - label: "Step 2: TH reads the AvailableAudioTracks attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0008
-      verification: |
-          ./chip-tool mediaplayback read available-audio-tracks 1 3
-
-
-          [1705510455.278768][16412:16414] CHIP:DMG:
-          [1705510455.278774][16412:16414] CHIP:DMG:         SuppressResponse = true,
-          [1705510455.278781][16412:16414] CHIP:DMG:         InteractionModelRevision = 11
-          [1705510455.278786][16412:16414] CHIP:DMG: }
-          [1705510455.278928][16412:16414] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0008 DataVersion: 900375739
-          [1705510455.278981][16412:16414] CHIP:TOO:   AvailableAudioTracks: 2 entries
-          [1705510455.279038][16412:16414] CHIP:TOO:     [1]: {
-          [1705510455.279045][16412:16414] CHIP:TOO:       Id: activeAudioTrackId_0
-          [1705510455.279053][16412:16414] CHIP:TOO:       TrackAttributes: {
-          [1705510455.279059][16412:16414] CHIP:TOO:         LanguageCode: languageCode1
-          [1705510455.279074][16412:16414] CHIP:TOO:         DisplayName: displayName1
-          [1705510455.279081][16412:16414] CHIP:TOO:        }
-          [1705510455.279087][16412:16414] CHIP:TOO:      }
-          [1705510455.279101][16412:16414] CHIP:TOO:     [2]: {
-          [1705510455.279107][16412:16414] CHIP:TOO:       Id: activeAudioTrackId_1
-          [1705510455.279113][16412:16414] CHIP:TOO:       TrackAttributes: {
-          [1705510455.279119][16412:16414] CHIP:TOO:         LanguageCode: languageCode2
-          [1705510455.279125][16412:16414] CHIP:TOO:         DisplayName: displayName2
-          [1705510455.279131][16412:16414] CHIP:TOO:        }
-          [1705510455.279136][16412:16414] CHIP:TOO:      }
-          [1705510455.279220][16412:16414] CHIP:EM: <<< [E:35757i S:13973 M:92594399 (Ack:246741638)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1705510455.279240][16412:16414] CHIP:EM: Flushed pending ack for MessageC
-      disabled: true
+      command: "readAttribute"
+      attribute: "AvailableAudioTracks"
+      response:
+          saveAs: AvailableAudioTracksValue
+          constraints:
+              type: list
+              minLength: 2
 
     - label:
           "Step 3: TH sends a ActivateAudioTrack command to DUT specifying the
           ID value from step 2"
       PICS: MEDIAPLAYBACK.S.C09.Rsp
-      verification: |
-          ./chip-tool mediaplayback activate-text-track activeAudioTrackId_1 1 3
-
-          [1705510513.251669][16417:16419] CHIP:DMG:
-          [1705510513.251677][16417:16419] CHIP:DMG:         InteractionModelRevision = 11
-          [1705510513.251685][16417:16419] CHIP:DMG: },
-          [1705510513.251722][16417:16419] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000D Status=0x0
-          [1705510513.251744][16417:16419] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1705510513.251824][16417:16419] CHIP:EM: <<< [E:31201i S:10659 M:469610 (Ack:79656282)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "ActivateAudioTrack"
+      arguments:
+          values:
+              - name: "AudioOutputIndex"
+                value: AudioOutputIndex_Value
+              - name: "TrackID"
+                value: AudioTrack_ID_Value
 
     - label: "Step 4: TH reads the ActiveAudioTrack attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0007
-      verification: |
-          ./chip-tool mediaplayback  read active-audio-track 1 3
-
-          [1705510563.022455][16427:16429] CHIP:DMG: }
-          [1705510563.022535][16427:16429] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0007 DataVersion: 900375739
-          [1705510563.022607][16427:16429] CHIP:TOO:   ActiveAudioTrack: {
-          [1705510563.022614][16427:16429] CHIP:TOO:     Id: activeAudioTrackId_0
-          [1705510563.022622][16427:16429] CHIP:TOO:     TrackAttributes: {
-          [1705510563.022628][16427:16429] CHIP:TOO:       LanguageCode: languageCode1
-          [1705510563.022642][16427:16429] CHIP:TOO:       DisplayName: displayName1
-          [1705510563.022649][16427:16429] CHIP:TOO:      }
-          [1705510563.022655][16427:16429] CHIP:TOO:    }
-          [1705510563.022725][16427:16429] CHIP:EM: <<< [E:32787i S:18357 M:255165335 (Ack:47655138)] (S) Msg TX to 1:0000000000000001 [DC0D] [UDP:[fe80::a151:a1e6:e7:e224%wlp0s20f3]:5640] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1705510563.022757][16427:16429] CHIP:EM: Flushed pending ack for MessageCounter:47655138 on exchange 32787i
-      disabled: true
+      command: "readAttribute"
+      attribute: "ActiveAudioTrack"
+      response:
+          value: { ID: AudioTrack_ID_Value }

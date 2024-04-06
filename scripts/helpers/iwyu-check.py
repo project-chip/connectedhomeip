@@ -172,8 +172,8 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir,
         logging.info("============== IWYU output start  ================")
 
         logger = logging.info
-        while status.poll() is None:
-            line = status.stdout.readline().rstrip()
+        for line in status.stdout:
+            line = line.rstrip()
 
             if re.match(r"^warning:.*$", line):
                 logger = logging.warning

@@ -60,7 +60,7 @@ ti_sysconfig("sysconfig") {
     #"ti_build_config.opt",
   ]
 
-  public_configs = [ ":sdk_dmm_config" ]
+  public_configs = [ ":sdk_cc13x2x7_26x2x7_dmm_config" ]
 
   cflags = [
     "-Wno-comment",
@@ -89,6 +89,7 @@ ti_simplelink_executable("all-clusters-app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",

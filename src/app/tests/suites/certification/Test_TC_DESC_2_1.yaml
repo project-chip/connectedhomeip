@@ -79,7 +79,7 @@ tests:
           For all the Endpoint’s listed from the previous step run the following steps. The device type should correspond to the id value in the device_type.json
           Chip tool outputs all values in integer, convert to hex before comparing.
 
-          ./chip-tool descriptor read  parts-list 1 1
+          ./chip-tool descriptor read parts-list 1 1
 
           Verify  parts-list response contains 0 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -88,11 +88,10 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 1
 
-          On TH (Chip-tool) log, Verify that
-          - If PartsLists count is 0 then, DeviceTypeList count is at least one.
-          - DeviceTypeList should contains exactly one Application Device Type [In below log 256(In hex 0x100) is a   Application Device Type(On/OffLight)] or set of Application Device Types which are a subset of each other.
-          -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.[In below log DeviceType: 17(In hex 0x0011) is a Utility DeviceType ]
-          -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
+          On TH (Chip-tool) log, Verify that  the DeviceTypeList count is at least one.
+            - If the DeviceTypeList contains more than one Application Device Type, verify that all the Application Device Types are part of the same superset.
+            - Verify the DeviceTypeList does not contain the Root Node Device Type.
+            - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1674552599.264189][21135:21137] CHIP:DMG: }
           [1692617790.900384][31584:31586] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2832593371
@@ -106,7 +105,7 @@ tests:
           [1692617790.900428][31584:31586] CHIP:TOO:       Revision: 1
           [1692617790.900430][31584:31586] CHIP:TOO:      }
 
-          ./chip-tool descriptor read  parts-list 1 2
+          ./chip-tool descriptor read parts-list 1 2
 
           Verify parts-list response contains 0 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -115,11 +114,10 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 2
 
-          On TH (Chip-tool) log, Verify that
-          - If PartsLists count is 0 then, DeviceTypeList count is at least one.
-          - DeviceTypeList should contains exactly one Application Device Type [In below log 256(In hex 0x100) is a   Application Device Type(On/OffLight)] or set of Application Device Types which are a subset of each other.
-          -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.[In below log DeviceType: 17(In hex 0x0011) is a Utility DeviceType ]
-          -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
+          On TH (Chip-tool) log, Verify that  the DeviceTypeList count is at least one.
+            - If the DeviceTypeList contains more than one Application Device Type, verify that all the Application Device Types are part of the same superset.
+            - Verify the DeviceTypeList does not contain the Root Node Device Type.
+            - Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1692618454.794870][31669:31671] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1103199808
           [1692618454.794946][31669:31671] CHIP:TOO:   DeviceTypeList: 2 entries

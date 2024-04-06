@@ -64,6 +64,9 @@ Davis, CA 95616, USA
     <revision revision="5" summary="New data model format and notation, added FeatureMap, collapsed attribute sets, clarified edge cases around limits, default value of xxxSetpointLimit now respects AbsxxxSetpointLimit"/>
     <revision revision="6" summary="Introduced the LTNE feature and adapted text (spec issue #5778)"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0201" name="Thermostat"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="TSTAT" scope="Endpoint"/>
   <features>
     <feature bit="0" code="HEAT" name="Heating" summary="Thermostat is capable of managing a heating device">
@@ -297,7 +300,7 @@ Davis, CA 95616, USA
           <feature name="COOL"/>
         </optionalConform>
       </item>
-      <item value="7" name="Fan">
+      <item value="7" name="FanOnly">
         <optionalConform/>
       </item>
       <item value="8" name="Dry">
@@ -451,27 +454,16 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <bitmap name="TemperatureSetpointHoldPolicy">
-      <bitfield name="HoldDurationElapsed" bit="0" summary="Hold will be cleared when the hold duration has elapsed">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HoldDurationElapsedOrPresetChanged" bit="1" summary="Hold will be cleared when either the hold duration has elapsed or the preset changes">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
     <struct name="WeeklyScheduleTransitionStruct">
       <field id="0" name="TransitionTime" type="uint16">
-        <access read="true" write="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="0" to="1439"/>
+        <constraint type="max" value="1439"/>
       </field>
       <field id="1" name="HeatSetpoint" type="temperature">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="CoolSetpoint" type="temperature">
-        <access read="true" write="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -701,7 +693,7 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
       <optionalConform/>
-      <constraint type="between" from="0" to="1440"/>
+      <constraint type="max" value="1440"/>
     </attribute>
     <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="ProgrammingOperationModeBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -742,7 +734,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SB"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="OccupiedSetbackMax"/>
+      <constraint type="max" value="OccupiedSetbackMax"/>
     </attribute>
     <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
@@ -772,7 +764,7 @@ Davis, CA 95616, USA
           <feature name="OCC"/>
         </andTerm>
       </mandatoryConform>
-      <constraint type="between" from="0" to="UnoccupiedSetbackMax"/>
+      <constraint type="max" value="UnoccupiedSetbackMax"/>
     </attribute>
     <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperature" default="null">
       <access read="true" readPrivilege="view"/>
@@ -836,7 +828,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="SetpointRaiseLower" response="Y">
+    <command id="0x00" name="SetpointRaiseLower" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Mode" type="SetpointRaiseLowerModeEnum">
@@ -848,7 +840,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x00" name="GetWeeklyScheduleResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
@@ -869,7 +860,7 @@ Davis, CA 95616, USA
         <constraint type="maxCount" value="10"/>
       </field>
     </command>
-    <command id="0x01" name="SetWeeklySchedule" response="Y">
+    <command id="0x01" name="SetWeeklySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="SCH"/>
@@ -892,13 +883,12 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="GetRelayStatusLogResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
-        <attribute name="GetRelayStatusLog"/>
+        <command name="GetRelayStatusLog"/>
       </mandatoryConform>
       <field id="0" name="TimeOfDay" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="1439"/>
+        <constraint type="max" value="1439"/>
       </field>
       <field id="1" name="RelayStatus" type="RelayStateBitmap">
         <mandatoryConform/>
@@ -920,7 +910,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x02" name="GetWeeklySchedule" response="GetWeeklyScheduleResponse">
+    <command id="0x02" name="GetWeeklySchedule" direction="commandToServer" response="GetWeeklyScheduleResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="SCH"/>
@@ -934,13 +924,13 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x03" name="ClearWeeklySchedule" response="Y">
+    <command id="0x03" name="ClearWeeklySchedule" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
     </command>
-    <command id="0x04" name="GetRelayStatusLog" response="GetRelayStatusLogResponse">
+    <command id="0x04" name="GetRelayStatusLog" direction="commandToServer" response="GetRelayStatusLogResponse">
       <access invokePrivilege="operate"/>
       <optionalConform>
         <condition name="Zigbee"/>

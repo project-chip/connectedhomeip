@@ -91,15 +91,6 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
 
             id.UpdateClientState(client);
 
-            // TEST: send reply
-            if (id.GetCdPort() != 0)
-            {
-                CommissionerDeclaration cd;
-                cd.SetErrorCode(CommissionerDeclaration::CdError::kAppInstallConsentPending);
-                cd.SetNeedsPasscode(true);
-                SendCDCMessage(cd, chip::Transport::PeerAddress::UDP(source.GetIPAddress(), id.GetCdPort()));
-            }
-
             // Call the registered mUserConfirmationProvider, if any.
             if (mUserConfirmationProvider != nullptr)
             {

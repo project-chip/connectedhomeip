@@ -30,7 +30,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
+#include <app/util/endpoint-config-api.h>
 #include <cstdio>
 #include <inttypes.h>
 #include <jni.h>
@@ -44,6 +44,8 @@
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+
+#include <string>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -324,6 +326,7 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
         ChipLogProgress(DeviceLayer, " Looking next=%s ", app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->applicationId);
         if (app->GetApplicationBasicDelegate()->GetCatalogVendorApp()->Matches(vendorApp))
         {
+            // need to think about loading apk here?
             ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(gDataVersions[i]),
                                                             Span<const EmberAfDeviceType>(gContentAppDeviceType));
             return app;
@@ -422,11 +425,16 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
             ChipLogProgress(DeviceLayer,
                             "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint priviledged vendor accessible clusters "
                             "being returned.");
-            return { chip::app::Clusters::Descriptor::Id,         chip::app::Clusters::OnOff::Id,
-                     chip::app::Clusters::WakeOnLan::Id,          chip::app::Clusters::MediaPlayback::Id,
-                     chip::app::Clusters::LowPower::Id,           chip::app::Clusters::KeypadInput::Id,
-                     chip::app::Clusters::ContentLauncher::Id,    chip::app::Clusters::AudioOutput::Id,
-                     chip::app::Clusters::ApplicationLauncher::Id };
+            return { chip::app::Clusters::Descriptor::Id,
+                     chip::app::Clusters::OnOff::Id,
+                     chip::app::Clusters::WakeOnLan::Id,
+                     chip::app::Clusters::MediaPlayback::Id,
+                     chip::app::Clusters::LowPower::Id,
+                     chip::app::Clusters::KeypadInput::Id,
+                     chip::app::Clusters::ContentLauncher::Id,
+                     chip::app::Clusters::AudioOutput::Id,
+                     chip::app::Clusters::ApplicationLauncher::Id,
+                     chip::app::Clusters::Messages::Id };
         }
         ChipLogProgress(
             DeviceLayer,
@@ -434,7 +442,8 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
         return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
                  chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
                  chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
-                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id };
+                 chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id,
+                 chip::app::Clusters::Messages::Id };
     }
     return {};
 }

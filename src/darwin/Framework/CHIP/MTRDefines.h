@@ -51,9 +51,9 @@
 #define MTR_EXPORT __attribute__((visibility("default")))
 
 #ifdef __cplusplus
-#define MTR_EXTERN extern "C" MTR_EXPORT
+#define MTR_EXTERN extern "C"
 #else
-#define MTR_EXTERN extern MTR_EXPORT
+#define MTR_EXTERN extern
 #endif
 
 #if __has_attribute(__swift_attr__)

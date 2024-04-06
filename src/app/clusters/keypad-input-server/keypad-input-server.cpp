@@ -29,7 +29,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -47,7 +46,7 @@ using namespace chip::AppPlatform;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kKeypadInputDelegateTableSize =
-    EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kKeypadInputDelegateTableSize < kEmberInvalidEndpointIndex, "KeypadInput Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -72,7 +71,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogProgress(Zcl, "KeypadInput NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kKeypadInputDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -95,7 +94,7 @@ namespace KeypadInput {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kKeypadInputDelegateTableSize)
     {

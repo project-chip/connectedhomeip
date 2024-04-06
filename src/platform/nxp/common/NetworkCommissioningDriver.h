@@ -72,6 +72,10 @@ public:
     Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
+    /* Can be used to disconnect from WiFi network.
+     */
+    int DisconnectNetwork();
+
     /* Returns the network SSID. User needs to allocate a buffer of size >= DeviceLayer::Internal::kMaxWiFiSSIDLength.
      * ssid - pointer to the returned SSID
      */
@@ -81,6 +85,9 @@ public:
      * credentials - pointer to the returned password
      */
     Status GetNetworkPassword(char * credentials);
+
+    /* Returns all supported WiFi bands */
+    uint32_t GetSupportedWiFiBandsMask() const override;
 
     // WiFiDriver
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,

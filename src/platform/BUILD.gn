@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlio.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/linux/pkg_config.gni")
@@ -81,6 +80,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     # Define the default number of ip addresses to discover
     chip_max_discovered_ip_addresses = 5
+
+    # Allows enabling dynamic setting of the local MRP configuration, for
+    # devices with multiple radios that have different sleep behavior for
+    # different radios.
+    chip_device_config_enable_dynamic_mrp_config = false
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -111,11 +115,20 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         chip_enable_wifi && chip_device_platform != "darwin"
     chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
     chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
+
+    # This is used to identify which platforms implement their ThreadStackManager
+    # with the otbr posix dbus api.
+    chip_device_uses_otbr_posix_dbus =
+        chip_enable_openthread &&
+        (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
+         chip_device_platform == "webos")
+
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
       "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_device_config_thread_ftd}",
       "CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER=${chip_openthread_border_router}",
+      "CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK=${chip_device_uses_otbr_posix_dbus}",
       "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
@@ -123,13 +136,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DISABLE_PLATFORM_KVS=${chip_disable_platform_kvs}",
       "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=${chip_use_transitional_commissionable_data_provider}",
       "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=${chip_use_transitional_device_instance_info_provider}",
+      "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
     ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
-        chip_device_platform == "k32w0" || chip_device_platform == "webos" ||
-        chip_device_platform == "bl602" || chip_device_platform == "bl702" ||
-        chip_device_platform == "bl702l") {
+        chip_device_platform == "webos" || chip_device_platform == "bl602" ||
+        chip_device_platform == "bl702" || chip_device_platform == "bl702l") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
@@ -203,12 +216,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "qpg") {
       device_layer_target_define = "QPG"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=qpg" ]
-    } else if (chip_device_platform == "k32w0") {
-      device_layer_target_define = "K32W"
-      defines += [ "CHIP_DEVICE_LAYER_TARGET=nxp/k32w/k32w0" ]
-    } else if (chip_device_platform == "k32w1") {
-      device_layer_target_define = "K32W"
-      defines += [ "CHIP_DEVICE_LAYER_TARGET=nxp/k32w/k32w1" ]
     } else if (chip_device_platform == "nxp") {
       import("//build_overrides/nxp_sdk.gni")
       import("${nxp_sdk_build_root}/nxp_sdk.gni")
@@ -216,6 +223,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET=${nxp_device_layer}",
         "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}",
+      ]
+    } else if (chip_device_platform == "nxp_zephyr") {
+      device_layer_target_define = "NXP_ZEPHYR"
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_NXP_ZEPHYR=1",
+        "CHIP_DEVICE_LAYER_TARGET=nxp/zephyr",
       ]
     } else if (chip_device_platform == "telink") {
       device_layer_target_define = "TELINK"
@@ -318,8 +331,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "TIZEN",
       "NRFCONNECT",
       "QPG",
-      "K32W",
       "NXP",
+      "NXP_ZEPHYR",
       "TELINK",
       "MBED",
       "BL602",
@@ -500,7 +513,7 @@ if (chip_device_platform != "none") {
       ":platform_base",
       "${chip_root}/src/app:app_config",
       "${chip_root}/src/app/common:cluster-objects",
-      "${chip_root}/src/app/icd:icd_config",
+      "${chip_root}/src/app/icd/server:icd-server-config",
       "${chip_root}/src/credentials:build_time_header",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
@@ -520,10 +533,6 @@ if (chip_device_platform != "none") {
       _platform_target = "silabs/SiWx917"
     } else if (chip_device_platform == "esp32") {
       _platform_target = "ESP32"
-    } else if (chip_device_platform == "k32w0") {
-      _platform_target = "nxp/k32w/k32w0"
-    } else if (chip_device_platform == "k32w1") {
-      _platform_target = "nxp/k32w/k32w1"
     } else if (chip_device_platform == "linux") {
       _platform_target = "Linux"
     } else if (chip_device_platform == "nrfconnect") {
@@ -531,7 +540,9 @@ if (chip_device_platform != "none") {
     } else if (chip_device_platform == "qpg") {
       _platform_target = "qpg"
     } else if (chip_device_platform == "nxp") {
-      _platform_target = "nxp"
+      _platform_target = "nxp/${nxp_platform}:nxp_platform"
+    } else if (chip_device_platform == "nxp_zephyr") {
+      _platform_target = "nxp/zephyr:nxp_zephyr"
     } else if (chip_device_platform == "telink") {
       _platform_target = "telink"
     } else if (chip_device_platform == "mbed") {

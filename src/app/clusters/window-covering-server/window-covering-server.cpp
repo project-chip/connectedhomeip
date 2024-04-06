@@ -23,16 +23,14 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
 #include <lib/support/TypeTraits.h>
 #include <string.h>
 
-#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
-#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -47,7 +45,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 constexpr size_t kWindowCoveringDelegateTableSize =
-    EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "WindowCovering Delegate table size error");
 
 Delegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
@@ -55,7 +53,7 @@ Delegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kWindowCoveringDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -119,8 +117,8 @@ bool HasFeature(chip::EndpointId endpoint, Feature feature)
     bool hasFeature     = false;
     uint32_t featureMap = 0;
 
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    Status status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (Status::Success == status)
     {
         hasFeature = (featureMap & chip::to_underlying(feature));
     }
@@ -596,7 +594,7 @@ Status GetMotionLockStatus(chip::EndpointId endpoint)
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     // if endpoint is found
     if (ep < kWindowCoveringDelegateTableSize)

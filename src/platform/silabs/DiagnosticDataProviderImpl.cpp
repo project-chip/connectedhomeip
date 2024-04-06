@@ -31,6 +31,7 @@
 #include "AppConfig.h"
 #include "FreeRTOS.h"
 #include "heap_4_silabs.h"
+#include <inet/InetInterface.h>
 #include <lib/support/CHIPMemString.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
@@ -249,13 +250,32 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
     ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
-    ifp->isOperational             = true;
+    ifp->type                      = InterfaceTypeEnum::kThread;
+    ifp->isOperational             = ThreadStackMgrImpl().IsThreadAttached();
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = InterfaceTypeEnum::kThread;
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+
+    ThreadStackMgrImpl().GetPrimary802154MACAddress(ifp->MacAddress);
+    ifp->hardwareAddress = ByteSpan(ifp->MacAddress, kMaxHardwareAddrSize);
+
+    // The Thread implementation has only 1 interface and is IPv6-only
+    Inet::InterfaceAddressIterator interfaceAddressIterator;
+    uint8_t ipv6AddressesCount = 0;
+    while (interfaceAddressIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
+    {
+        Inet::IPAddress ipv6Address;
+        if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+        {
+            memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+            ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+            ipv6AddressesCount++;
+        }
+        interfaceAddressIterator.Next();
+    }
+
+    ifp->IPv6Addresses = app::DataModel::List<ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+
+    *netifpp = ifp;
 #else
     NetworkInterface * head = NULL;
     for (Inet::InterfaceIterator interfaceIterator; interfaceIterator.HasCurrent(); interfaceIterator.Next())
@@ -331,7 +351,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     *netifpp = head;
 #endif
 
-    *netifpp = ifp;
     return CHIP_NO_ERROR;
 }
 

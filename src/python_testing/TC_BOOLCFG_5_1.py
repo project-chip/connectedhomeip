@@ -64,10 +64,11 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
 
         asserts.assert_true('PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
                             "PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY must be included on the command line in "
-                            "the --int-arg flag as PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:<key>")
+                            "the --hex-arg flag as PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:<key>, "
+                            "e.g. --hex-arg PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
 
         endpoint = self.user_params.get("endpoint", 1)
-        enableKey = self.matter_test_config.global_test_params['PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY'].to_bytes(16, byteorder='big')
+        enableKey = self.matter_test_config.global_test_params['PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY']
 
         self.step(1)
         attributes = Clusters.BooleanStateConfiguration.Attributes
@@ -102,7 +103,7 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step("5b")
-        if is_vis_feature_supported:
+        if is_aud_feature_supported:
             enabledAlarms |= Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible
         else:
             logging.info("Test step skipped")
@@ -160,7 +161,7 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
         self.step("9b")
         if not is_aud_feature_supported:
             try:
-                await self.send_single_cmd(cmd=Clusters.Objects.BooleanStateConfiguration.Commands.SuppressAlarm(alarmsToSuppress=Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual), endpoint=endpoint)
+                await self.send_single_cmd(cmd=Clusters.Objects.BooleanStateConfiguration.Commands.SuppressAlarm(alarmsToSuppress=Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible), endpoint=endpoint)
                 asserts.fail("Received Success response when an CONSTRAINT_ERROR was expected")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned")

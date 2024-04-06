@@ -25,11 +25,52 @@ The Matter build system has the following features:
 
 ## Checking out the Matter code
 
-To check out the Matter repository, run the following command:
+To check out the Matter code, there are two options: one is to check out all
+platforms together, which is recommended; the other is to check out with support
+for specific platforms, which can obviously reduce the project size.
+
+### Checking out All Platforms
+
+To check out the Matter repository with all platforms, run the following
+command:
 
 ```
 git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
+
 ```
+
+### Specific platforms Checking out
+
+-   first step, checking out matter top level repo with command below:
+
+```
+  git clone --depth=1 git@github.com:project-chip/connectedhomeip.git
+
+```
+
+-   Second step, check out third-party platform support repos as follows:
+
+```
+  python3 scripts/checkout_submodules.py --shallow --platform platform1,platform2...
+
+```
+
+For Linux host example:
+
+```
+ ./scripts/checkout_submodules.py --shallow --platform  linux
+
+```
+
+For Darwin host example:
+
+```
+ ./scripts/checkout_submodules.py --shallow --platform  darwin
+
+```
+
+Please note that in the above commands, you should replace platform1,platform2
+with the specific platform names you wish to check out.
 
 ## Updating Matter code
 
@@ -93,6 +134,33 @@ Complete the following steps:
     ```
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
+
+#### Enable experimental Bluetooth support in BlueZ
+
+The Matter application on Linux uses BlueZ to communicate with the Bluetooth
+controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
+the features required by the Matter application by default. To enable these
+features, you need to enable experimental Bluetooth support in BlueZ.
+
+1. Edit the `bluetooth.service` unit by running the following command:
+
+    ```sh
+    sudo systemctl edit bluetooth.service
+    ```
+
+1. Add the following content to the override file:
+
+    ```ini
+    [Service]
+    ExecStart=
+    ExecStart=/usr/lib/bluetooth/bluetoothd -E
+    ```
+
+1. Restart the Bluetooth service by running the following command:
+
+    ```sh
+    sudo systemctl restart bluetooth.service
+    ```
 
 #### Configuring wpa_supplicant for storing permanent changes
 

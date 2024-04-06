@@ -22,6 +22,7 @@
 #import <Matter/MTROperationalCertificateIssuer.h>
 
 @class MTRBaseDevice;
+@class MTRServerEndpoint; // Defined in MTRServerEndpoint.h, which imports MTRAccessGrant.h, which imports MTRBaseClusters.h, which imports this file, so we can't import it.
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 @class MTRDeviceControllerAbstractParameters;
@@ -227,6 +228,29 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Add a server endpoint for this controller.  The endpoint starts off enabled.
+ *
+ * Will fail in the following cases:
+ *
+ * 1) There is already an endpoint defined with the given endpoint id.
+ * 2) There are too many endpoints defined already.
+ */
+- (BOOL)addServerEndpoint:(MTRServerEndpoint *)endpoint MTR_NEWLY_AVAILABLE;
+
+/**
+ * Remove the given server endpoint from this controller.  If the endpoint is
+ * not attached to this controller, will just call the completion and do nothing
+ * else.
+ */
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_NEWLY_AVAILABLE;
+
+/**
+ * Remove the given server endpoint without being notified when the removal
+ * completes.
+ */
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint MTR_NEWLY_AVAILABLE;
 
 /**
  * Compute a PASE verifier for the desired setup passcode.

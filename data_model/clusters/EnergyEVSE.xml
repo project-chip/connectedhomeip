@@ -54,12 +54,17 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0099" name="Energy EVSE" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0099" name="Energy EVSE"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="EEVSE" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PREF" name="ChargingPreferences" summary="EVSE supports storing user charging preferences">
@@ -227,12 +232,10 @@ Davis, CA 95616, USA
     </struct>
     <struct name="ChargingTargetStruct">
       <field id="0" name="TargetTimeMinutesPastMidnight" type="uint16" default="0">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="between" from="0" to="1439"/>
       </field>
       <field id="1" name="TargetSoC" type="percent" default="0">
-        <access read="true" write="true"/>
         <otherwiseConform>
           <mandatoryConform>
             <feature name="SOC"/>
@@ -241,7 +244,6 @@ Davis, CA 95616, USA
         </otherwiseConform>
       </field>
       <field id="2" name="AddedEnergy" type="energy-mWh" default="0">
-        <access read="true" write="true"/>
         <optionalConform choice="a" more="true"/>
         <constraint type="min" value="0"/>
       </field>
@@ -277,19 +279,19 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="80000"/>
+      <constraint type="min" value="0"/>
     </attribute>
     <attribute id="0x0006" name="MinimumChargeCurrent" type="amperage-mA" default="6000">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="80000"/>
+      <constraint type="min" value="0"/>
     </attribute>
     <attribute id="0x0007" name="MaximumChargeCurrent" type="amperage-mA" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="80000"/>
+      <constraint type="min" value="0"/>
     </attribute>
     <attribute id="0x0008" name="MaximumDischargeCurrent" type="amperage-mA" default="0">
       <access read="true" readPrivilege="view"/>
@@ -297,7 +299,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="V2X"/>
       </mandatoryConform>
-      <constraint type="between" from="0" to="80000"/>
+      <constraint type="min" value="0"/>
     </attribute>
     <attribute id="0x0009" name="UserMaximumChargeCurrent" type="amperage-mA" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -398,7 +400,6 @@ Davis, CA 95616, USA
   </attributes>
   <commands>
     <command id="0x00" name="GetTargetsResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
@@ -408,11 +409,11 @@ Davis, CA 95616, USA
         <constraint type="maxCount" value="7"/>
       </field>
     </command>
-    <command id="0x01" name="Disable" response="Y">
+    <command id="0x01" name="Disable" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
     </command>
-    <command id="0x02" name="EnableCharging" response="Y">
+    <command id="0x02" name="EnableCharging" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="ChargingEnabledUntil" type="epoch-s" default="null">
@@ -421,14 +422,14 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="MinimumChargeCurrent" type="amperage-mA">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="80000"/>
+        <constraint type="min" value="0"/>
       </field>
       <field id="2" name="MaximumChargeCurrent" type="amperage-mA">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="80000"/>
+        <constraint type="min" value="0"/>
       </field>
     </command>
-    <command id="0x03" name="EnableDischarging" response="Y">
+    <command id="0x03" name="EnableDischarging" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="V2X"/>
@@ -439,14 +440,14 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="MaximumDischargeCurrent" type="amperage-mA">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="80000"/>
+        <constraint type="min" value="0"/>
       </field>
     </command>
-    <command id="0x04" name="StartDiagnostics" response="Y">
+    <command id="0x04" name="StartDiagnostics" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <optionalConform/>
     </command>
-    <command id="0x05" name="SetTargets" response="Y">
+    <command id="0x05" name="SetTargets" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
@@ -457,13 +458,13 @@ Davis, CA 95616, USA
         <constraint type="maxCount" value="7"/>
       </field>
     </command>
-    <command id="0x06" name="GetTargets" response="GetTargetsResponse">
+    <command id="0x06" name="GetTargets" direction="commandToServer" response="GetTargetsResponse">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </command>
-    <command id="0x07" name="ClearTargets" response="Y">
+    <command id="0x07" name="ClearTargets" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" timed="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
@@ -512,7 +513,7 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="MaximumCurrent" type="amperage-mA">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="80000"/>
+        <constraint type="min" value="0"/>
       </field>
     </event>
     <event id="0x03" name="EnergyTransferStopped" priority="info">

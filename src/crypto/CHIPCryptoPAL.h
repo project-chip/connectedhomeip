@@ -266,7 +266,8 @@ public:
         // Sanitize after use
         ClearSecretData(mBytes);
     }
-
+    SensitiveDataBuffer() {}
+    SensitiveDataBuffer(const SensitiveDataBuffer & other) { *this = other; }
     SensitiveDataBuffer & operator=(const SensitiveDataBuffer & other)
     {
         // Guard self assignment
@@ -484,6 +485,9 @@ struct alignas(size_t) P256KeypairContext
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
 
+/**
+ * A serialized P256 key pair is the concatenation of the public and private keys, in that order.
+ */
 using P256SerializedKeypair = SensitiveDataBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length>;
 
 class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
@@ -590,27 +594,24 @@ protected:
     bool mInitialized = false;
 };
 
-using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-
 /**
- * @brief Platform-specific Symmetric key handle
+ * @brief Platform-specific symmetric key handle
  *
  * The class represents a key used by the Matter stack either in the form of raw key material or key
  * reference, depending on the platform. To achieve that, it contains an opaque context that can be
- * cast to a concrete representation used by the given platform. Note that currently Matter uses
- * 128-bit symmetric keys only.
+ * cast to a concrete representation used by the given platform.
  *
- * @note Symmetric128BitsKeyHandle is an abstract class to force child classes for each key handle type.
- *       Symmetric128BitsKeyHandle class implements all the necessary components for handles.
- *       Child classes only need to implement a constructor and delete all the copy operators.
+ * @note SymmetricKeyHandle is an abstract class to force child classes for each key handle type.
+ *       SymmetricKeyHandle class implements all the necessary components for handles.
  */
-class Symmetric128BitsKeyHandle
+template <size_t ContextSize>
+class SymmetricKeyHandle
 {
 public:
-    Symmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle &) = delete;
-    Symmetric128BitsKeyHandle(Symmetric128BitsKeyHandle &&)      = delete;
-    void operator=(const Symmetric128BitsKeyHandle &)            = delete;
-    void operator=(Symmetric128BitsKeyHandle &&)                 = delete;
+    SymmetricKeyHandle(const SymmetricKeyHandle &) = delete;
+    SymmetricKeyHandle(SymmetricKeyHandle &&)      = delete;
+    void operator=(const SymmetricKeyHandle &)     = delete;
+    void operator=(SymmetricKeyHandle &&)          = delete;
 
     /**
      * @brief Get internal context cast to the desired key representation
@@ -631,44 +632,44 @@ public:
     }
 
 protected:
-    Symmetric128BitsKeyHandle() = default;
-    ~Symmetric128BitsKeyHandle() { ClearSecretData(mContext.mOpaque); }
+    SymmetricKeyHandle() = default;
+    ~SymmetricKeyHandle() { ClearSecretData(mContext.mOpaque); }
 
 private:
-    static constexpr size_t kContextSize = CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
-
     struct alignas(uintptr_t) OpaqueContext
     {
-        uint8_t mOpaque[kContextSize] = {};
+        uint8_t mOpaque[ContextSize] = {};
     } mContext;
 };
 
-/**
- * @brief Platform-specific AES key handle
- */
-class Aes128KeyHandle final : public Symmetric128BitsKeyHandle
-{
-public:
-    Aes128KeyHandle() = default;
+using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
-    Aes128KeyHandle(const Aes128KeyHandle &) = delete;
-    Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
-    void operator=(const Aes128KeyHandle &)  = delete;
-    void operator=(Aes128KeyHandle &&)       = delete;
+/**
+ * @brief Platform-specific 128-bit symmetric key handle
+ */
+class Symmetric128BitsKeyHandle : public SymmetricKeyHandle<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>
+{
 };
 
 /**
- * @brief Platform-specific HMAC key handle
+ * @brief Platform-specific 128-bit AES key handle
+ */
+class Aes128KeyHandle final : public Symmetric128BitsKeyHandle
+{
+};
+
+/**
+ * @brief Platform-specific 128-bit HMAC key handle
  */
 class Hmac128KeyHandle final : public Symmetric128BitsKeyHandle
 {
-public:
-    Hmac128KeyHandle() = default;
+};
 
-    Hmac128KeyHandle(const Hmac128KeyHandle &) = delete;
-    Hmac128KeyHandle(Hmac128KeyHandle &&)      = delete;
-    void operator=(const Hmac128KeyHandle &)   = delete;
-    void operator=(Hmac128KeyHandle &&)        = delete;
+/**
+ * @brief Platform-specific HKDF key handle
+ */
+class HkdfKeyHandle final : public SymmetricKeyHandle<CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE>
+{
 };
 
 /**
@@ -1087,6 +1088,9 @@ public:
                                      unsigned int iteration_count, uint32_t key_length, uint8_t * output);
 };
 
+// TODO: Extract Spake2p to a separate header and replace the forward declaration with #include SessionKeystore.h
+class SessionKeystore;
+
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
  * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.
@@ -1202,14 +1206,17 @@ public:
     virtual CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len);
 
     /**
-     * @brief Return the shared secret.
+     * @brief Return the shared HKDF key.
      *
-     * @param out     The output secret.
-     * @param out_len The output secret length.
+     * Returns the shared key established during the Spake2+ process, which can be used
+     * to derive application-specific keys using HKDF.
+     *
+     * @param keystore The session keystore for managing the HKDF key lifetime.
+     * @param key The output HKDF key.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR GetKeys(uint8_t * out, size_t * out_len);
+    CHIP_ERROR GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key) const;
 
     CHIP_ERROR InternalHash(const uint8_t * in, size_t in_len);
     CHIP_ERROR WriteMN();

@@ -5428,6 +5428,520 @@ public static class ActivatedCarbonFilterMonitoringClusterReplacementProductStru
     return output.toString();
   }
 }
+public static class ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct {
+  public Long rangeMin;
+  public Long rangeMax;
+  public Optional<Integer> percentMax;
+  public Optional<Integer> percentMin;
+  public Optional<Integer> percentTypical;
+  public Optional<Long> fixedMax;
+  public Optional<Long> fixedMin;
+  public Optional<Long> fixedTypical;
+  private static final long RANGE_MIN_ID = 0L;
+  private static final long RANGE_MAX_ID = 1L;
+  private static final long PERCENT_MAX_ID = 2L;
+  private static final long PERCENT_MIN_ID = 3L;
+  private static final long PERCENT_TYPICAL_ID = 4L;
+  private static final long FIXED_MAX_ID = 5L;
+  private static final long FIXED_MIN_ID = 6L;
+  private static final long FIXED_TYPICAL_ID = 7L;
+
+  public ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct(
+    Long rangeMin,
+    Long rangeMax,
+    Optional<Integer> percentMax,
+    Optional<Integer> percentMin,
+    Optional<Integer> percentTypical,
+    Optional<Long> fixedMax,
+    Optional<Long> fixedMin,
+    Optional<Long> fixedTypical
+  ) {
+    this.rangeMin = rangeMin;
+    this.rangeMax = rangeMax;
+    this.percentMax = percentMax;
+    this.percentMin = percentMin;
+    this.percentTypical = percentTypical;
+    this.fixedMax = fixedMax;
+    this.fixedMin = fixedMin;
+    this.fixedTypical = fixedTypical;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(RANGE_MIN_ID, new IntType(rangeMin)));
+    values.add(new StructElement(RANGE_MAX_ID, new IntType(rangeMax)));
+    values.add(new StructElement(PERCENT_MAX_ID, percentMax.<BaseTLVType>map((nonOptionalpercentMax) -> new UIntType(nonOptionalpercentMax)).orElse(new EmptyType())));
+    values.add(new StructElement(PERCENT_MIN_ID, percentMin.<BaseTLVType>map((nonOptionalpercentMin) -> new UIntType(nonOptionalpercentMin)).orElse(new EmptyType())));
+    values.add(new StructElement(PERCENT_TYPICAL_ID, percentTypical.<BaseTLVType>map((nonOptionalpercentTypical) -> new UIntType(nonOptionalpercentTypical)).orElse(new EmptyType())));
+    values.add(new StructElement(FIXED_MAX_ID, fixedMax.<BaseTLVType>map((nonOptionalfixedMax) -> new UIntType(nonOptionalfixedMax)).orElse(new EmptyType())));
+    values.add(new StructElement(FIXED_MIN_ID, fixedMin.<BaseTLVType>map((nonOptionalfixedMin) -> new UIntType(nonOptionalfixedMin)).orElse(new EmptyType())));
+    values.add(new StructElement(FIXED_TYPICAL_ID, fixedTypical.<BaseTLVType>map((nonOptionalfixedTypical) -> new UIntType(nonOptionalfixedTypical)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long rangeMin = null;
+    Long rangeMax = null;
+    Optional<Integer> percentMax = Optional.empty();
+    Optional<Integer> percentMin = Optional.empty();
+    Optional<Integer> percentTypical = Optional.empty();
+    Optional<Long> fixedMax = Optional.empty();
+    Optional<Long> fixedMin = Optional.empty();
+    Optional<Long> fixedTypical = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == RANGE_MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          rangeMin = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == RANGE_MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          rangeMax = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == PERCENT_MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          percentMax = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == PERCENT_MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          percentMin = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == PERCENT_TYPICAL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          percentTypical = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == FIXED_MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fixedMax = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == FIXED_MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fixedMin = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == FIXED_TYPICAL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fixedTypical = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct(
+      rangeMin,
+      rangeMax,
+      percentMax,
+      percentMin,
+      percentTypical,
+      fixedMax,
+      fixedMin,
+      fixedTypical
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct {\n");
+    output.append("\trangeMin: ");
+    output.append(rangeMin);
+    output.append("\n");
+    output.append("\trangeMax: ");
+    output.append(rangeMax);
+    output.append("\n");
+    output.append("\tpercentMax: ");
+    output.append(percentMax);
+    output.append("\n");
+    output.append("\tpercentMin: ");
+    output.append(percentMin);
+    output.append("\n");
+    output.append("\tpercentTypical: ");
+    output.append(percentTypical);
+    output.append("\n");
+    output.append("\tfixedMax: ");
+    output.append(fixedMax);
+    output.append("\n");
+    output.append("\tfixedMin: ");
+    output.append(fixedMin);
+    output.append("\n");
+    output.append("\tfixedTypical: ");
+    output.append(fixedTypical);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalPowerMeasurementClusterMeasurementAccuracyStruct {
+  public Integer measurementType;
+  public Boolean measured;
+  public Long minMeasuredValue;
+  public Long maxMeasuredValue;
+  public ArrayList<ChipStructs.ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct> accuracyRanges;
+  private static final long MEASUREMENT_TYPE_ID = 0L;
+  private static final long MEASURED_ID = 1L;
+  private static final long MIN_MEASURED_VALUE_ID = 2L;
+  private static final long MAX_MEASURED_VALUE_ID = 3L;
+  private static final long ACCURACY_RANGES_ID = 4L;
+
+  public ElectricalPowerMeasurementClusterMeasurementAccuracyStruct(
+    Integer measurementType,
+    Boolean measured,
+    Long minMeasuredValue,
+    Long maxMeasuredValue,
+    ArrayList<ChipStructs.ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct> accuracyRanges
+  ) {
+    this.measurementType = measurementType;
+    this.measured = measured;
+    this.minMeasuredValue = minMeasuredValue;
+    this.maxMeasuredValue = maxMeasuredValue;
+    this.accuracyRanges = accuracyRanges;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MEASUREMENT_TYPE_ID, new UIntType(measurementType)));
+    values.add(new StructElement(MEASURED_ID, new BooleanType(measured)));
+    values.add(new StructElement(MIN_MEASURED_VALUE_ID, new IntType(minMeasuredValue)));
+    values.add(new StructElement(MAX_MEASURED_VALUE_ID, new IntType(maxMeasuredValue)));
+    values.add(new StructElement(ACCURACY_RANGES_ID, ArrayType.generateArrayType(accuracyRanges, (elementaccuracyRanges) -> elementaccuracyRanges.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalPowerMeasurementClusterMeasurementAccuracyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer measurementType = null;
+    Boolean measured = null;
+    Long minMeasuredValue = null;
+    Long maxMeasuredValue = null;
+    ArrayList<ChipStructs.ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct> accuracyRanges = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MEASUREMENT_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          measurementType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MEASURED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          measured = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == MIN_MEASURED_VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          minMeasuredValue = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_MEASURED_VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          maxMeasuredValue = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == ACCURACY_RANGES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          accuracyRanges = castingValue.map((elementcastingValue) -> ChipStructs.ElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new ElectricalPowerMeasurementClusterMeasurementAccuracyStruct(
+      measurementType,
+      measured,
+      minMeasuredValue,
+      maxMeasuredValue,
+      accuracyRanges
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalPowerMeasurementClusterMeasurementAccuracyStruct {\n");
+    output.append("\tmeasurementType: ");
+    output.append(measurementType);
+    output.append("\n");
+    output.append("\tmeasured: ");
+    output.append(measured);
+    output.append("\n");
+    output.append("\tminMeasuredValue: ");
+    output.append(minMeasuredValue);
+    output.append("\n");
+    output.append("\tmaxMeasuredValue: ");
+    output.append(maxMeasuredValue);
+    output.append("\n");
+    output.append("\taccuracyRanges: ");
+    output.append(accuracyRanges);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {
+  public Integer order;
+  public @Nullable Long measurement;
+  private static final long ORDER_ID = 0L;
+  private static final long MEASUREMENT_ID = 1L;
+
+  public ElectricalPowerMeasurementClusterHarmonicMeasurementStruct(
+    Integer order,
+    @Nullable Long measurement
+  ) {
+    this.order = order;
+    this.measurement = measurement;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ORDER_ID, new UIntType(order)));
+    values.add(new StructElement(MEASUREMENT_ID, measurement != null ? new IntType(measurement) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalPowerMeasurementClusterHarmonicMeasurementStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer order = null;
+    @Nullable Long measurement = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ORDER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          order = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MEASUREMENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          measurement = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new ElectricalPowerMeasurementClusterHarmonicMeasurementStruct(
+      order,
+      measurement
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalPowerMeasurementClusterHarmonicMeasurementStruct {\n");
+    output.append("\torder: ");
+    output.append(order);
+    output.append("\n");
+    output.append("\tmeasurement: ");
+    output.append(measurement);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalPowerMeasurementClusterMeasurementRangeStruct {
+  public Integer measurementType;
+  public Long min;
+  public Long max;
+  public Optional<Long> startTimestamp;
+  public Optional<Long> endTimestamp;
+  public Optional<Long> minTimestamp;
+  public Optional<Long> maxTimestamp;
+  public Optional<Long> startSystime;
+  public Optional<Long> endSystime;
+  public Optional<Long> minSystime;
+  public Optional<Long> maxSystime;
+  private static final long MEASUREMENT_TYPE_ID = 0L;
+  private static final long MIN_ID = 1L;
+  private static final long MAX_ID = 2L;
+  private static final long START_TIMESTAMP_ID = 3L;
+  private static final long END_TIMESTAMP_ID = 4L;
+  private static final long MIN_TIMESTAMP_ID = 5L;
+  private static final long MAX_TIMESTAMP_ID = 6L;
+  private static final long START_SYSTIME_ID = 7L;
+  private static final long END_SYSTIME_ID = 8L;
+  private static final long MIN_SYSTIME_ID = 9L;
+  private static final long MAX_SYSTIME_ID = 10L;
+
+  public ElectricalPowerMeasurementClusterMeasurementRangeStruct(
+    Integer measurementType,
+    Long min,
+    Long max,
+    Optional<Long> startTimestamp,
+    Optional<Long> endTimestamp,
+    Optional<Long> minTimestamp,
+    Optional<Long> maxTimestamp,
+    Optional<Long> startSystime,
+    Optional<Long> endSystime,
+    Optional<Long> minSystime,
+    Optional<Long> maxSystime
+  ) {
+    this.measurementType = measurementType;
+    this.min = min;
+    this.max = max;
+    this.startTimestamp = startTimestamp;
+    this.endTimestamp = endTimestamp;
+    this.minTimestamp = minTimestamp;
+    this.maxTimestamp = maxTimestamp;
+    this.startSystime = startSystime;
+    this.endSystime = endSystime;
+    this.minSystime = minSystime;
+    this.maxSystime = maxSystime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MEASUREMENT_TYPE_ID, new UIntType(measurementType)));
+    values.add(new StructElement(MIN_ID, new IntType(min)));
+    values.add(new StructElement(MAX_ID, new IntType(max)));
+    values.add(new StructElement(START_TIMESTAMP_ID, startTimestamp.<BaseTLVType>map((nonOptionalstartTimestamp) -> new UIntType(nonOptionalstartTimestamp)).orElse(new EmptyType())));
+    values.add(new StructElement(END_TIMESTAMP_ID, endTimestamp.<BaseTLVType>map((nonOptionalendTimestamp) -> new UIntType(nonOptionalendTimestamp)).orElse(new EmptyType())));
+    values.add(new StructElement(MIN_TIMESTAMP_ID, minTimestamp.<BaseTLVType>map((nonOptionalminTimestamp) -> new UIntType(nonOptionalminTimestamp)).orElse(new EmptyType())));
+    values.add(new StructElement(MAX_TIMESTAMP_ID, maxTimestamp.<BaseTLVType>map((nonOptionalmaxTimestamp) -> new UIntType(nonOptionalmaxTimestamp)).orElse(new EmptyType())));
+    values.add(new StructElement(START_SYSTIME_ID, startSystime.<BaseTLVType>map((nonOptionalstartSystime) -> new UIntType(nonOptionalstartSystime)).orElse(new EmptyType())));
+    values.add(new StructElement(END_SYSTIME_ID, endSystime.<BaseTLVType>map((nonOptionalendSystime) -> new UIntType(nonOptionalendSystime)).orElse(new EmptyType())));
+    values.add(new StructElement(MIN_SYSTIME_ID, minSystime.<BaseTLVType>map((nonOptionalminSystime) -> new UIntType(nonOptionalminSystime)).orElse(new EmptyType())));
+    values.add(new StructElement(MAX_SYSTIME_ID, maxSystime.<BaseTLVType>map((nonOptionalmaxSystime) -> new UIntType(nonOptionalmaxSystime)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalPowerMeasurementClusterMeasurementRangeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer measurementType = null;
+    Long min = null;
+    Long max = null;
+    Optional<Long> startTimestamp = Optional.empty();
+    Optional<Long> endTimestamp = Optional.empty();
+    Optional<Long> minTimestamp = Optional.empty();
+    Optional<Long> maxTimestamp = Optional.empty();
+    Optional<Long> startSystime = Optional.empty();
+    Optional<Long> endSystime = Optional.empty();
+    Optional<Long> minSystime = Optional.empty();
+    Optional<Long> maxSystime = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MEASUREMENT_TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          measurementType = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          min = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          max = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == START_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startTimestamp = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == END_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endTimestamp = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == MIN_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minTimestamp = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == MAX_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxTimestamp = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == START_SYSTIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startSystime = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == END_SYSTIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endSystime = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == MIN_SYSTIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          minSystime = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == MAX_SYSTIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          maxSystime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ElectricalPowerMeasurementClusterMeasurementRangeStruct(
+      measurementType,
+      min,
+      max,
+      startTimestamp,
+      endTimestamp,
+      minTimestamp,
+      maxTimestamp,
+      startSystime,
+      endSystime,
+      minSystime,
+      maxSystime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalPowerMeasurementClusterMeasurementRangeStruct {\n");
+    output.append("\tmeasurementType: ");
+    output.append(measurementType);
+    output.append("\n");
+    output.append("\tmin: ");
+    output.append(min);
+    output.append("\n");
+    output.append("\tmax: ");
+    output.append(max);
+    output.append("\n");
+    output.append("\tstartTimestamp: ");
+    output.append(startTimestamp);
+    output.append("\n");
+    output.append("\tendTimestamp: ");
+    output.append(endTimestamp);
+    output.append("\n");
+    output.append("\tminTimestamp: ");
+    output.append(minTimestamp);
+    output.append("\n");
+    output.append("\tmaxTimestamp: ");
+    output.append(maxTimestamp);
+    output.append("\n");
+    output.append("\tstartSystime: ");
+    output.append(startSystime);
+    output.append("\n");
+    output.append("\tendSystime: ");
+    output.append(endSystime);
+    output.append("\n");
+    output.append("\tminSystime: ");
+    output.append(minSystime);
+    output.append("\n");
+    output.append("\tmaxSystime: ");
+    output.append(maxSystime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct {
   public Long rangeMin;
   public Long rangeMax;
@@ -5680,6 +6194,97 @@ public static class ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct 
     output.append("\n");
     output.append("\taccuracyRanges: ");
     output.append(accuracyRanges);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct {
+  public @Nullable Optional<Long> importedResetTimestamp;
+  public @Nullable Optional<Long> exportedResetTimestamp;
+  public @Nullable Optional<Long> importedResetSystime;
+  public @Nullable Optional<Long> exportedResetSystime;
+  private static final long IMPORTED_RESET_TIMESTAMP_ID = 0L;
+  private static final long EXPORTED_RESET_TIMESTAMP_ID = 1L;
+  private static final long IMPORTED_RESET_SYSTIME_ID = 2L;
+  private static final long EXPORTED_RESET_SYSTIME_ID = 3L;
+
+  public ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct(
+    @Nullable Optional<Long> importedResetTimestamp,
+    @Nullable Optional<Long> exportedResetTimestamp,
+    @Nullable Optional<Long> importedResetSystime,
+    @Nullable Optional<Long> exportedResetSystime
+  ) {
+    this.importedResetTimestamp = importedResetTimestamp;
+    this.exportedResetTimestamp = exportedResetTimestamp;
+    this.importedResetSystime = importedResetSystime;
+    this.exportedResetSystime = exportedResetSystime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(IMPORTED_RESET_TIMESTAMP_ID, importedResetTimestamp != null ? importedResetTimestamp.<BaseTLVType>map((nonOptionalimportedResetTimestamp) -> new UIntType(nonOptionalimportedResetTimestamp)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(EXPORTED_RESET_TIMESTAMP_ID, exportedResetTimestamp != null ? exportedResetTimestamp.<BaseTLVType>map((nonOptionalexportedResetTimestamp) -> new UIntType(nonOptionalexportedResetTimestamp)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(IMPORTED_RESET_SYSTIME_ID, importedResetSystime != null ? importedResetSystime.<BaseTLVType>map((nonOptionalimportedResetSystime) -> new UIntType(nonOptionalimportedResetSystime)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(EXPORTED_RESET_SYSTIME_ID, exportedResetSystime != null ? exportedResetSystime.<BaseTLVType>map((nonOptionalexportedResetSystime) -> new UIntType(nonOptionalexportedResetSystime)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Optional<Long> importedResetTimestamp = null;
+    @Nullable Optional<Long> exportedResetTimestamp = null;
+    @Nullable Optional<Long> importedResetSystime = null;
+    @Nullable Optional<Long> exportedResetSystime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == IMPORTED_RESET_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          importedResetTimestamp = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == EXPORTED_RESET_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          exportedResetTimestamp = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == IMPORTED_RESET_SYSTIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          importedResetSystime = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == EXPORTED_RESET_SYSTIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          exportedResetSystime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct(
+      importedResetTimestamp,
+      exportedResetTimestamp,
+      importedResetSystime,
+      exportedResetSystime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct {\n");
+    output.append("\timportedResetTimestamp: ");
+    output.append(importedResetTimestamp);
+    output.append("\n");
+    output.append("\texportedResetTimestamp: ");
+    output.append(exportedResetTimestamp);
+    output.append("\n");
+    output.append("\timportedResetSystime: ");
+    output.append(importedResetSystime);
+    output.append("\n");
+    output.append("\texportedResetSystime: ");
+    output.append(exportedResetSystime);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -6454,6 +7059,203 @@ public static class DemandResponseLoadControlClusterLoadControlProgramStruct {
     output.append("\n");
     output.append("\trandomDurationMinutes: ");
     output.append(randomDurationMinutes);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MessagesClusterMessageResponseOptionStruct {
+  public Optional<Long> messageResponseID;
+  public Optional<String> label;
+  private static final long MESSAGE_RESPONSE_I_D_ID = 0L;
+  private static final long LABEL_ID = 1L;
+
+  public MessagesClusterMessageResponseOptionStruct(
+    Optional<Long> messageResponseID,
+    Optional<String> label
+  ) {
+    this.messageResponseID = messageResponseID;
+    this.label = label;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_RESPONSE_I_D_ID, messageResponseID.<BaseTLVType>map((nonOptionalmessageResponseID) -> new UIntType(nonOptionalmessageResponseID)).orElse(new EmptyType())));
+    values.add(new StructElement(LABEL_ID, label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageResponseOptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Long> messageResponseID = Optional.empty();
+    Optional<String> label = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_RESPONSE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          messageResponseID = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new MessagesClusterMessageResponseOptionStruct(
+      messageResponseID,
+      label
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageResponseOptionStruct {\n");
+    output.append("\tmessageResponseID: ");
+    output.append(messageResponseID);
+    output.append("\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MessagesClusterMessageStruct {
+  public byte[] messageID;
+  public Integer priority;
+  public Integer messageControl;
+  public @Nullable Long startTime;
+  public @Nullable Long duration;
+  public String messageText;
+  public Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses;
+  private static final long MESSAGE_I_D_ID = 0L;
+  private static final long PRIORITY_ID = 1L;
+  private static final long MESSAGE_CONTROL_ID = 2L;
+  private static final long START_TIME_ID = 3L;
+  private static final long DURATION_ID = 4L;
+  private static final long MESSAGE_TEXT_ID = 5L;
+  private static final long RESPONSES_ID = 6L;
+
+  public MessagesClusterMessageStruct(
+    byte[] messageID,
+    Integer priority,
+    Integer messageControl,
+    @Nullable Long startTime,
+    @Nullable Long duration,
+    String messageText,
+    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses
+  ) {
+    this.messageID = messageID;
+    this.priority = priority;
+    this.messageControl = messageControl;
+    this.startTime = startTime;
+    this.duration = duration;
+    this.messageText = messageText;
+    this.responses = responses;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
+    values.add(new StructElement(PRIORITY_ID, new UIntType(priority)));
+    values.add(new StructElement(MESSAGE_CONTROL_ID, new UIntType(messageControl)));
+    values.add(new StructElement(START_TIME_ID, startTime != null ? new UIntType(startTime) : new NullType()));
+    values.add(new StructElement(DURATION_ID, duration != null ? new UIntType(duration) : new NullType()));
+    values.add(new StructElement(MESSAGE_TEXT_ID, new StringType(messageText)));
+    values.add(new StructElement(RESPONSES_ID, responses.<BaseTLVType>map((nonOptionalresponses) -> ArrayType.generateArrayType(nonOptionalresponses, (elementnonOptionalresponses) -> elementnonOptionalresponses.encodeTlv())).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    Integer priority = null;
+    Integer messageControl = null;
+    @Nullable Long startTime = null;
+    @Nullable Long duration = null;
+    String messageText = null;
+    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == PRIORITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          priority = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MESSAGE_CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          messageControl = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == START_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startTime = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          duration = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == MESSAGE_TEXT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          messageText = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == RESPONSES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          responses = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.MessagesClusterMessageResponseOptionStruct.decodeTlv(elementcastingValue)));
+        }
+      }
+    }
+    return new MessagesClusterMessageStruct(
+      messageID,
+      priority,
+      messageControl,
+      startTime,
+      duration,
+      messageText,
+      responses
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageStruct {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("\tpriority: ");
+    output.append(priority);
+    output.append("\n");
+    output.append("\tmessageControl: ");
+    output.append(messageControl);
+    output.append("\n");
+    output.append("\tstartTime: ");
+    output.append(startTime);
+    output.append("\n");
+    output.append("\tduration: ");
+    output.append(duration);
+    output.append("\n");
+    output.append("\tmessageText: ");
+    output.append(messageText);
+    output.append("\n");
+    output.append("\tresponses: ");
+    output.append(responses);
     output.append("\n");
     output.append("}\n");
     return output.toString();

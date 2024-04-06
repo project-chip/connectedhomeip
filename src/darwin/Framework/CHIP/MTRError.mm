@@ -21,8 +21,6 @@
 #import "MTRError_Internal.h"
 
 #import <app/MessageDef/StatusIB.h>
-#import <app/util/af-enums.h>
-#import <app/util/error-mapping.h>
 #import <inet/InetError.h>
 #import <lib/support/TypeTraits.h>
 
@@ -47,63 +45,88 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 + (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode
 {
+    return [MTRError errorForCHIPErrorCode:errorCode logContext:nil];
+}
+
++ (NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode logContext:(id)contextToLog
+{
     if (errorCode == CHIP_NO_ERROR) {
         return nil;
     }
 
-    ChipLogError(Controller, "Creating NSError from %" CHIP_ERROR_FORMAT, errorCode.Format());
+    ChipLogError(Controller, "Creating NSError from %" CHIP_ERROR_FORMAT " (context: %@)", errorCode.Format(), contextToLog);
 
     if (errorCode.IsIMStatus()) {
         chip::app::StatusIB status(errorCode);
         return [MTRError errorForIMStatus:status];
     }
 
-    NSMutableDictionary * userInfo = [[NSMutableDictionary alloc] init];
-    MTRErrorCode code = MTRErrorCodeGeneralError;
-
-    if (errorCode == CHIP_ERROR_INVALID_STRING_LENGTH) {
+    MTRErrorCode code;
+    NSString * description;
+    NSDictionary * additionalUserInfo;
+    switch (errorCode.AsInteger()) {
+    case CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger():
         code = MTRErrorCodeInvalidStringLength;
-        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A list length is invalid.", nil) }];
-    } else if (errorCode == CHIP_ERROR_INVALID_INTEGER_VALUE) {
+        description = NSLocalizedString(@"A list length is invalid.", nil);
+        break;
+    case CHIP_ERROR_INVALID_INTEGER_VALUE.AsInteger():
         code = MTRErrorCodeInvalidIntegerValue;
-        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unexpected integer value.", nil) }];
-    } else if (errorCode == CHIP_ERROR_INVALID_ARGUMENT) {
+        description = NSLocalizedString(@"Unexpected integer value.", nil);
+        break;
+    case CHIP_ERROR_INVALID_ARGUMENT.AsInteger():
         code = MTRErrorCodeInvalidArgument;
-        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"An argument is invalid.", nil) }];
-    } else if (errorCode == CHIP_ERROR_INVALID_MESSAGE_LENGTH) {
+        description = NSLocalizedString(@"An argument is invalid.", nil);
+        break;
+    case CHIP_ERROR_INVALID_MESSAGE_LENGTH.AsInteger():
         code = MTRErrorCodeInvalidMessageLength;
-        [userInfo
-            addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A message length is invalid.", nil) }];
-    } else if (errorCode == CHIP_ERROR_INCORRECT_STATE) {
+        description = NSLocalizedString(@"A message length is invalid.", nil);
+        break;
+    case CHIP_ERROR_INCORRECT_STATE.AsInteger():
         code = MTRErrorCodeInvalidState;
-        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Invalid object state.", nil) }];
-    } else if (errorCode == CHIP_ERROR_INTEGRITY_CHECK_FAILED) {
+        description = NSLocalizedString(@"Invalid object state.", nil);
+        break;
+    case CHIP_ERROR_INTEGRITY_CHECK_FAILED.AsInteger():
         code = MTRErrorCodeIntegrityCheckFailed;
-        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
-    } else if (errorCode == CHIP_ERROR_TIMEOUT) {
+        description = NSLocalizedString(@"Integrity check failed.", nil);
+        break;
+    case CHIP_ERROR_TIMEOUT.AsInteger():
         code = MTRErrorCodeTimeout;
-        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Transaction timed out.", nil) }];
-    } else if (errorCode == CHIP_ERROR_BUFFER_TOO_SMALL) {
+        description = NSLocalizedString(@"Transaction timed out.", nil);
+        break;
+    case CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger():
         code = MTRErrorCodeBufferTooSmall;
-        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A buffer is too small.", nil) }];
-    } else if (errorCode == CHIP_ERROR_FABRIC_EXISTS) {
+        description = NSLocalizedString(@"A buffer is too small.", nil);
+        break;
+    case CHIP_ERROR_FABRIC_EXISTS.AsInteger():
         code = MTRErrorCodeFabricExists;
-        [userInfo addEntriesFromDictionary:@{
-            NSLocalizedDescriptionKey : NSLocalizedString(@"The device is already a member of this fabric.", nil)
-        }];
-    } else if (errorCode == CHIP_ERROR_DECODE_FAILED) {
+        description = NSLocalizedString(@"The device is already a member of this fabric.", nil);
+        break;
+    case CHIP_ERROR_DECODE_FAILED.AsInteger():
         code = MTRErrorCodeTLVDecodeFailed;
-        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"TLV decoding failed.", nil) }];
-    } else if (errorCode == CHIP_ERROR_DNS_SD_UNAUTHORIZED) {
+        description = NSLocalizedString(@"TLV decoding failed.", nil);
+        break;
+    case CHIP_ERROR_DNS_SD_UNAUTHORIZED.AsInteger():
         code = MTRErrorCodeDNSSDUnauthorized;
-        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Access denied to perform DNS-SD lookups.  Check that \"_matter._tcp\" and/or \"_matterc._udp\" are listed under the NSBonjourServices key in Info.plist", nil) }];
-    } else {
+        description = NSLocalizedString(@"Access denied to perform DNS-SD lookups. "
+                                         "Check that \"_matter._tcp\" and/or \"_matterc._udp\" "
+                                         "are listed under the NSBonjourServices key in Info.plist",
+            nil);
+        break;
+    case CHIP_ERROR_CANCELLED.AsInteger():
+        code = MTRErrorCodeCancelled;
+        description = NSLocalizedString(@"The operation was cancelled.", nil);
+        break;
+    default:
         code = MTRErrorCodeGeneralError;
-        [userInfo addEntriesFromDictionary:@{
-            NSLocalizedDescriptionKey :
-                [NSString stringWithFormat:NSLocalizedString(@"Undefined error:%u.", nil), errorCode.AsInteger()],
-            @"errorCode" : @(errorCode.AsInteger()),
-        }];
+        description = [NSString stringWithFormat:NSLocalizedString(@"General error: %u", nil), errorCode.AsInteger()];
+        additionalUserInfo = @{ @"errorCode" : @(errorCode.AsInteger()) };
+    }
+
+    NSDictionary * userInfo = @{ NSLocalizedDescriptionKey : description };
+    if (additionalUserInfo) {
+        NSMutableDictionary * combined = [userInfo mutableCopy];
+        [combined addEntriesFromDictionary:additionalUserInfo];
+        userInfo = combined;
     }
 
     auto * error = [NSError errorWithDomain:MTRErrorDomain code:code userInfo:userInfo];
@@ -122,104 +145,86 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     using chip::Protocols::InteractionModel::Status;
     switch (status.mStatus) {
     case Status::Failure:
-    default: {
+    default:
         description = NSLocalizedString(@"Operation was not successful.", nil);
         break;
-    }
-    case Status::InvalidSubscription: {
+    case Status::InvalidSubscription:
         description = NSLocalizedString(@"Subscription ID is not active.", nil);
         break;
-    }
-    case Status::UnsupportedAccess: {
+    case Status::UnsupportedAccess:
         description = NSLocalizedString(@"The sender of the action or command does not have authorization or access.", nil);
         break;
-    }
-    case Status::UnsupportedEndpoint: {
+    case Status::UnsupportedEndpoint:
         description = NSLocalizedString(@"The endpoint indicated is unsupported on the node.", nil);
         break;
-    }
-    case Status::InvalidAction: {
-        description = NSLocalizedString(
-            @"The action is malformed, has missing fields, or fields with invalid values. Action not carried out.", nil);
-        break;
-    }
-    case Status::UnsupportedCommand: {
-        description = NSLocalizedString(
-            @"The specified action or command indicated is not supported on the device. Command or action not carried out.", nil);
-        break;
-    }
-    case Status::InvalidCommand: {
-        description = NSLocalizedString(
-            @"The cluster command is malformed, has missing fields, or fields with invalid values. Command not carried out.", nil);
-        break;
-    }
-    case Status::UnsupportedAttribute: {
-        description
-            = NSLocalizedString(@"The specified attribute or attribute data field or entry does not exist on the device.", nil);
-        break;
-    }
-    case Status::ConstraintError: {
-        description = NSLocalizedString(@"Out of range error or set to a reserved value.", nil);
-        break;
-    }
-    case Status::UnsupportedWrite: {
-        description = NSLocalizedString(@"Attempt to write a read-only attribute.", nil);
-        break;
-    }
-    case Status::ResourceExhausted: {
-        description = NSLocalizedString(@"An action or operation failed due to insufficient available resources. ", nil);
-        break;
-    }
-    case Status::NotFound: {
-        description = NSLocalizedString(@"The indicated data field or entry could not be found.", nil);
-        break;
-    }
-    case Status::UnreportableAttribute: {
-        description = NSLocalizedString(@"Reports cannot be issued for this attribute.", nil);
-        break;
-    }
-    case Status::InvalidDataType: {
-        description = NSLocalizedString(
-            @"The data type indicated is undefined or invalid for the indicated data field. Command or action not carried out.",
+    case Status::InvalidAction:
+        description = NSLocalizedString(@"The action is malformed, has missing fields, or fields with invalid values. "
+                                         "Action not carried out.",
             nil);
         break;
-    }
-    case Status::UnsupportedRead: {
+    case Status::UnsupportedCommand:
+        description = NSLocalizedString(@"The specified action or command indicated is not supported on the device."
+                                         "Command or action not carried out.",
+            nil);
+        break;
+    case Status::InvalidCommand:
+        description = NSLocalizedString(@"The cluster command is malformed, has missing fields, or fields with invalid values."
+                                         "Command not carried out.",
+            nil);
+        break;
+    case Status::UnsupportedAttribute:
+        description = NSLocalizedString(@"The specified attribute or attribute data field or entry does not exist on the device.", nil);
+        break;
+    case Status::ConstraintError:
+        description = NSLocalizedString(@"Out of range error or set to a reserved value.", nil);
+        break;
+    case Status::UnsupportedWrite:
+        description = NSLocalizedString(@"Attempt to write a read-only attribute.", nil);
+        break;
+    case Status::ResourceExhausted:
+        description = NSLocalizedString(@"An action or operation failed due to insufficient available resources. ", nil);
+        break;
+    case Status::NotFound:
+        description = NSLocalizedString(@"The indicated data field or entry could not be found.", nil);
+        break;
+    case Status::UnreportableAttribute:
+        description = NSLocalizedString(@"Reports cannot be issued for this attribute.", nil);
+        break;
+    case Status::InvalidDataType:
+        description = NSLocalizedString(@"The data type indicated is undefined or invalid for the indicated data field. "
+                                         "Command or action not carried out.",
+            nil);
+        break;
+    case Status::UnsupportedRead:
         description = NSLocalizedString(@"Attempt to read a write-only attribute.", nil);
         break;
-    }
-    case Status::DataVersionMismatch: {
+    case Status::DataVersionMismatch:
         description = NSLocalizedString(@"Cluster instance data version did not match request path.", nil);
         break;
-    }
-    case Status::Timeout: {
+    case Status::Timeout:
         description = NSLocalizedString(@"The transaction was aborted due to time being exceeded.", nil);
         break;
-    }
     case Status::Busy: {
-        description = NSLocalizedString(
-            @"The receiver is busy processing another action that prevents the execution of the incoming action.", nil);
+        description = NSLocalizedString(@"The receiver is busy processing another action "
+                                         "that prevents the execution of the incoming action.",
+            nil);
         break;
-    }
-    case Status::UnsupportedCluster: {
+    case Status::UnsupportedCluster:
         description = NSLocalizedString(@"The cluster indicated is not supported", nil);
         break;
-    }
     // Gap in values is intentional.
-    case Status::NoUpstreamSubscription: {
+    case Status::NoUpstreamSubscription:
         description = NSLocalizedString(@"Proxy does not have a subscription to the source.", nil);
         break;
     }
-    case Status::NeedsTimedInteraction: {
-        description = NSLocalizedString(@"An Untimed Write or Untimed Invoke interaction was used for an attribute or command that "
-                                        @"requires a Timed Write or Timed Invoke.",
+    case Status::NeedsTimedInteraction:
+        description = NSLocalizedString(@"An Untimed Write or Untimed Invoke interaction was used "
+                                         "for an attribute or command that requires a Timed Write or Timed Invoke.",
             nil);
         break;
-    }
-    case Status::UnsupportedEvent: {
+    case Status::UnsupportedEvent:
         description = NSLocalizedString(@"The event indicated is unsupported on the cluster.", nil);
         break;
-    }
     }
 
     NSMutableDictionary * userInfo = [[NSMutableDictionary alloc] init];
@@ -298,16 +303,20 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     case MTRErrorCodeDNSSDUnauthorized:
         code = CHIP_ERROR_DNS_SD_UNAUTHORIZED.AsInteger();
         break;
+    case MTRErrorCodeCancelled:
+        code = CHIP_ERROR_CANCELLED.AsInteger();
+        break;
     case MTRErrorCodeGeneralError: {
-        if (error.userInfo != nil && error.userInfo[@"errorCode"] != nil) {
-            code = static_cast<decltype(code)>([error.userInfo[@"errorCode"] unsignedLongValue]);
+        id userInfoErrorCode = error.userInfo[@"errorCode"];
+        if ([userInfoErrorCode isKindOfClass:NSNumber.class]) {
+            code = static_cast<decltype(code)>([userInfoErrorCode unsignedLongValue]);
             break;
         }
         // Weird error we did not create.  Fall through.
+    }
     default:
         code = CHIP_ERROR_INTERNAL.AsInteger();
         break;
-    }
     }
 
     return chip::ChipError(code);

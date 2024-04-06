@@ -3833,6 +3833,27 @@ void TestTLVReader_SkipOverContainer(nlTestSuite * inSuite)
 }
 
 /**
+ * Tests using an uninitialized TLVReader.
+ */
+void TestTLVReaderUninitialized(nlTestSuite * inSuite)
+{
+    TLVReader reader;
+
+    NL_TEST_ASSERT(inSuite, reader.GetType() == kTLVType_NotSpecified);
+    NL_TEST_ASSERT(inSuite, reader.GetLength() == 0);
+    NL_TEST_ASSERT(inSuite, reader.GetControlByte() == kTLVControlByte_NotSpecified);
+    NL_TEST_ASSERT(inSuite, reader.GetContainerType() == kTLVType_NotSpecified);
+    NL_TEST_ASSERT(inSuite, reader.GetLengthRead() == 0);
+    NL_TEST_ASSERT(inSuite, reader.GetRemainingLength() == 0);
+    NL_TEST_ASSERT(inSuite, reader.GetTotalLength() == 0);
+    NL_TEST_ASSERT(inSuite, reader.GetBackingStore() == nullptr);
+    NL_TEST_ASSERT(inSuite, reader.IsElementDouble() == false);
+    NL_TEST_ASSERT(inSuite, reader.GetReadPoint() == nullptr);
+    NL_TEST_ASSERT(inSuite, reader.ImplicitProfileId == kProfileIdNotSpecified);
+    NL_TEST_ASSERT(inSuite, reader.AppData == nullptr);
+}
+
+/**
  *  Test CHIP TLV Reader
  */
 void CheckTLVReader(nlTestSuite * inSuite, void * inContext)
@@ -3852,6 +3873,8 @@ void CheckTLVReader(nlTestSuite * inSuite, void * inContext)
     TestTLVReader_NextOverContainer(inSuite);
 
     TestTLVReader_SkipOverContainer(inSuite);
+
+    TestTLVReaderUninitialized(inSuite);
 }
 
 /**

@@ -73,7 +73,7 @@ limitations under the License.
     <item name="Reverse" value="0x01"/>
   </enum>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Fan Control</name>
     <domain>HVAC</domain>
     <description>An interface for controlling a fan in a heating/cooling system.</description>

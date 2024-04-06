@@ -13,9 +13,12 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w1_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
-import("${chip_root}/third_party/nxp/k32w1_sdk/k32w1_sdk.gni")
+
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
@@ -27,8 +30,16 @@ config("openthread_k32w1_config") {
     "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
     "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
     "MBEDTLS_ENTROPY_HARDWARE_ALT=1",
-    "OPENTHREAD_PLATFORM_CORE_CONFIG_FILE=\"app/project_include/OpenThreadConfig.h\"",
+    "MBEDTLS_THREADING_C=1",
+    "MBEDTLS_THREADING_ALT=1",
   ]
+
+  if (use_smu2_dynamic) {
+    defines += [
+      "OPENTHREAD_CONFIG_MESSAGE_USE_HEAP_ENABLE=1",
+      "OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS_MANAGEMENT=0",
+    ]
+  }
 }
 
 source_set("openthread_core_config_k32w1") {
@@ -46,13 +57,13 @@ source_set("openthread_mbedtls_config_k32w1") {
 
 source_set("libopenthread-k32w1") {
   sources = [
+    "${openthread_nxp_root}/src/common/crypto.c",
     "${openthread_nxp_root}/src/common/flash_nvm.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/alarm.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/diag.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/entropy.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/logging.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/misc.c",
-    "${openthread_nxp_root}/src/k32w1/k32w1/power.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/radio.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/system.c",
     "${openthread_nxp_root}/src/k32w1/k32w1/uart.c",
@@ -60,6 +71,14 @@ source_set("libopenthread-k32w1") {
 
   if (chip_crypto == "platform") {
     sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/ecdsa_sss.cpp" ]
+
+    if (use_hw_sha256) {
+      sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/sha256_sss.cpp" ]
+    }
+
+    if (use_hw_aes) {
+      sources += [ "${openthread_nxp_root}/src/k32w1/k32w1/aes_sss.cpp" ]
+    }
   }
 
   if (chip_with_ot_cli == 1) {
@@ -68,7 +87,7 @@ source_set("libopenthread-k32w1") {
 
   public_deps = [
     ":openthread_core_config_k32w1",
-    "${k32w1_sdk_build_root}:k32w1_sdk",
+    "${nxp_sdk_build_root}:nxp_sdk",
     "${openthread_root}/src/core:libopenthread_core_headers",
     "../../..:libopenthread-platform",
     "../../..:libopenthread-platform-utils",

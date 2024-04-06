@@ -41,6 +41,7 @@ tests:
           constraints:
               type: int16u
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/31551
     - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -52,7 +53,7 @@ tests:
 
     - label:
           "Step 3: TH reads from the DUT the FeatureMap attribute, bit 0: SHALL
-          be 1 if and only if TCCM.S.F00(DEPONOFF)"
+          be 1 if and only if TCCM.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: TCCM.S.F00
@@ -90,9 +91,10 @@ tests:
               type: list
               contains: [2]
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/31551
     - label:
           "Step 4c: TH reads from the DUT the AttributeList attribute. 0x0003
-          SHALL be included if and only if TCCM.S.F00(DEPONOFF)"
+          SHALL be included if and only if TCCM.S.F00"
       PICS: TCCM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"

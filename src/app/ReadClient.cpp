@@ -135,6 +135,11 @@ uint32_t ReadClient::ComputeTimeTillNextSubscription()
         waitTimeInMsec    = minWaitTimeInMsec + (Crypto::GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
     }
 
+    if (mMinimalResubscribeDelay.count() > waitTimeInMsec)
+    {
+        waitTimeInMsec = mMinimalResubscribeDelay.count();
+    }
+
     return waitTimeInMsec;
 }
 
@@ -799,9 +804,8 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             }
 
-            if (attributePath ==
-                ConcreteDataAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                          Clusters::IcdManagement::Attributes::OperatingMode::Id))
+            if (attributePath.MatchesConcreteAttributePath(ConcreteAttributePath(
+                    kRootEndpointId, Clusters::IcdManagement::Id, Clusters::IcdManagement::Attributes::OperatingMode::Id)))
             {
                 PeerType peerType;
                 TLV::TLVReader operatingModeTlvReader;
@@ -945,7 +949,9 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
     // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
     //
-    const auto & ourMrpConfig = GetDefaultMRPConfig();
+    const auto & localMRPConfig   = GetLocalMRPConfig();
+    const auto & defaultMRPConfig = GetDefaultMRPConfig();
+    const auto & ourMrpConfig     = localMRPConfig.ValueOr(defaultMRPConfig);
     auto publisherTransmissionTimeout =
         GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
                                  System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
@@ -1057,6 +1063,10 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 
 CHIP_ERROR ReadClient::SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams)
 {
+    // Make sure we don't use minimal resubscribe delays from previous attempts
+    // for this one.
+    mMinimalResubscribeDelay = System::Clock::kZero;
+
     mReadPrepareParams = std::move(aReadPrepareParams);
     CHIP_ERROR err     = SendSubscribeRequest(mReadPrepareParams);
     if (err != CHIP_NO_ERROR)
@@ -1238,14 +1248,28 @@ void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManage
     }
 }
 
-void ReadClient::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
+void ReadClient::HandleDeviceConnectionFailure(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
 
-    ChipLogError(DataManagement, "Failed to establish CASE for re-subscription with error '%" CHIP_ERROR_FORMAT "'", err.Format());
+    ChipLogError(DataManagement, "Failed to establish CASE for re-subscription with error '%" CHIP_ERROR_FORMAT "'",
+                 failureInfo.error.Format());
 
-    _this->Close(err);
+#if CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+#if CHIP_DETAIL_LOGGING
+    if (failureInfo.requestedBusyDelay.HasValue())
+    {
+        ChipLogDetail(DataManagement, "Will delay resubscription by %u ms due to BUSY response",
+                      failureInfo.requestedBusyDelay.Value().count());
+    }
+#endif // CHIP_DETAIL_LOGGING
+    _this->mMinimalResubscribeDelay = failureInfo.requestedBusyDelay.ValueOr(System::Clock::kZero);
+#else
+    _this->mMinimalResubscribeDelay = System::Clock::kZero;
+#endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+
+    _this->Close(failureInfo.error);
 }
 
 void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts being used, fix callers that pass nullptr */,

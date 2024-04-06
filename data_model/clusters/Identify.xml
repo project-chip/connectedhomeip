@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0003" name="Identify" revision="4">
   <revisionHistory>
@@ -62,6 +64,9 @@ Davis, CA 95616, USA
     <revision revision="3" summary="All Hubs changes"/>
     <revision revision="4" summary="New data model format and notation; add IdentifyType"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0003" name="Identify"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="I" scope="Endpoint"/>
   <dataTypes>
     <enum name="EffectIdentifierEnum">
@@ -127,14 +132,14 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Identify" response="Y">
+    <command id="0x00" name="Identify" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
       <field id="0" name="IdentifyTime" type="uint16">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x40" name="TriggerEffect" response="Y">
+    <command id="0x40" name="TriggerEffect" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <optionalConform/>
       <field id="0" name="EffectIdentifier" type="EffectIdentifierEnum">

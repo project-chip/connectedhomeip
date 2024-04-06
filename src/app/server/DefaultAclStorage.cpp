@@ -138,7 +138,7 @@ CHIP_ERROR DefaultAclStorage::Init(PersistentStorageDelegate & persistentStorage
 
     CHIP_ERROR err;
 
-    size_t count = 0;
+    [[maybe_unused]] size_t count = 0;
 
     for (auto it = first; it != last; ++it)
     {

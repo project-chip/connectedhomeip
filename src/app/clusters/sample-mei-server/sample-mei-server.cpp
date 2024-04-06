@@ -9,8 +9,8 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -27,7 +27,7 @@ using namespace chip::app::Clusters::SampleMei::Attributes;
 
 void MatterSampleMeiPluginServerInitCallback()
 {
-    ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", EMBER_AF_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
+    ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(&SampleMeiServer::Instance()));
     VerifyOrReturn(registerAttributeAccessOverride(&SampleMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);

@@ -24,3 +24,18 @@ chip_enable_openthread = true
 
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
+
+# ICD Default configurations
+chip_enable_icd_server = true
+enable_synchronized_sed = true
+chip_subscription_timeout_resumption = false
+sl_use_subscription_synching = true
+
+# Openthread Configuration flags
+sl_ot_idle_interval_ms = 1000  # 1s Idle Intervals
+sl_ot_active_interval_ms = 500  # 500ms Active Intervals
+
+# ICD Matter Configuration flags
+sl_idle_mode_duration_s = 600  # 10min Idle Mode Duration
+sl_active_mode_duration_ms = 0  # 0s Active Mode Duration
+sl_active_mode_threshold_ms = 0  # 1s Active Mode Threshold

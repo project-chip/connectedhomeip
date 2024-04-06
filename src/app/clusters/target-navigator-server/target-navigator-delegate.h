@@ -22,7 +22,6 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandResponseHelper.h>
-#include <app/util/af.h>
 #include <list>
 
 namespace chip {
@@ -40,6 +39,7 @@ public:
     virtual uint8_t HandleGetCurrentTarget()                                          = 0;
     virtual void HandleNavigateTarget(CommandResponseHelper<Commands::NavigateTargetResponse::Type> & helper,
                                       const uint64_t & target, const CharSpan & data) = 0;
+    virtual uint16_t GetClusterRevision(chip::EndpointId endpoint)                    = 0;
 
     virtual ~Delegate() = default;
 };

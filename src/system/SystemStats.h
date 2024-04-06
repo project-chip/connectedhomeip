@@ -24,11 +24,6 @@
 
 #pragma once
 
-// Include standard C library limit macros
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 // Include configuration headers
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>

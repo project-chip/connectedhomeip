@@ -71,6 +71,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 using namespace ::chip::Messaging;
 using namespace ::chip::Controller;
@@ -367,6 +368,9 @@ void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioning
         ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
                         userActiveModeTriggerInstruction.c_str());
     }
+
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
+                    info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
 }
 
 void PairingCommand::OnFabricCheck(NodeId matchingNodeId)

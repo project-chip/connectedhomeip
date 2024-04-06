@@ -21,7 +21,6 @@
 
 #include "AppConfig.h"
 #include "AppTask.h"
-#include "FreeRTOS.h"
 
 #define ACTUATOR_MOVEMENT_PERIOS_MS 500
 
@@ -31,7 +30,7 @@ CHIP_ERROR PumpManager::Init()
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
-    mTimerHandle = xTimerCreate("PumpTmr", pdMS_TO_TICKS(ACTUATOR_MOVEMENT_PERIOS_MS), pdFALSE, this, TimerEventHandler);
+    mTimerHandle = osTimerNew(TimerEventHandler, osTimerOnce, this, NULL);
     if (NULL == mTimerHandle)
     {
         return CHIP_ERROR_INTERNAL;
@@ -95,18 +94,17 @@ bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
 
 void PumpManager::PumpTimer(uint32_t aTimeoutMs)
 {
-    xTimerChangePeriod(mTimerHandle, pdMS_TO_TICKS(aTimeoutMs), 100);
-    xTimerStart(mTimerHandle, 100);
+    osTimerStart(mTimerHandle, pdMS_TO_TICKS(aTimeoutMs));
 }
 
 void PumpManager::CancelTimer(void)
 {
-    xTimerStop(mTimerHandle, 100);
+    osTimerStop(mTimerHandle);
 }
 
-void PumpManager::TimerEventHandler(TimerHandle_t aTimer)
+void PumpManager::TimerEventHandler(void * timerCbArg)
 {
-    PumpManager * pump = static_cast<PumpManager *>(pvTimerGetTimerID(aTimer));
+    PumpManager * pump = static_cast<PumpManager *>(timerCbArg);
 
     // The timer event handler will be called in the context of the timer task
     // once sPumpTimer expires. Post an event to apptask queue with the actual handler

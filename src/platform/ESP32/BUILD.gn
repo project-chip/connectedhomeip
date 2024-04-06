@@ -122,20 +122,6 @@ static_library("ESP32") {
       "NetworkCommissioningDriver.cpp",
       "NetworkCommissioningDriver.h",
     ]
-    if (chip_mdns == "platform") {
-      sources += [
-        "WiFiDnssdImpl.cpp",
-        "WiFiDnssdImpl.h",
-      ]
-    }
-    if (chip_enable_route_hook) {
-      sources += [
-        "route_hook/ESP32RouteHook.c",
-        "route_hook/ESP32RouteHook.h",
-        "route_hook/ESP32RouteTable.c",
-        "route_hook/ESP32RouteTable.h",
-      ]
-    }
   }
 
   if (chip_mdns == "platform") {
@@ -147,6 +133,26 @@ static_library("ESP32") {
       "ConnectivityManagerImpl_Ethernet.cpp",
       "NetworkCommissioningDriver_Ethernet.cpp",
     ]
+  }
+
+  if (chip_enable_ethernet || chip_enable_wifi) {
+    if (chip_mdns == "platform") {
+      sources += [
+        "ESP32DnssdImpl.cpp",
+        "ESP32DnssdImpl.h",
+      ]
+    }
+    if (chip_mdns == "minimal") {
+      sources += [ "ESP32EndpointQueueFilter.h" ]
+    }
+    if (chip_enable_route_hook) {
+      sources += [
+        "route_hook/ESP32RouteHook.c",
+        "route_hook/ESP32RouteHook.h",
+        "route_hook/ESP32RouteTable.c",
+        "route_hook/ESP32RouteTable.h",
+      ]
+    }
   }
 
   if (chip_enable_openthread) {

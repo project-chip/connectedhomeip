@@ -110,6 +110,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
     }
     else
     {
+        matter_ble_stack_open();
+        matter_ble_add_service();
+        BLEMgrImpl().SetStackInit();
         mFlags.Set(Flags::kFlag_StackInitialized, true);
         log_i("ble is alread open!\n");
     }

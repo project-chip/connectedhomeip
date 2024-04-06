@@ -20,7 +20,7 @@
 #include "FreeRTOS.h"
 #include "silabs_utils.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -54,7 +54,7 @@ namespace Silabs {
 
 void OnSoftwareFaultEventHandler(const char * faultRecordString)
 {
-#ifdef EMBER_AF_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
+#ifdef MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
     EnabledEndpointsWithServerCluster enabledEndpoints(SoftwareDiagnostics::Id);
     VerifyOrReturn(enabledEndpoints.begin() != enabledEndpoints.end());
 
@@ -70,8 +70,12 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     softwareFault.id = taskDetails.xTaskNumber;
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
 
-    SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
-#endif // EMBER_AF_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
+    SystemLayer().ScheduleLambda([&softwareFault] { SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault); });
+    // Allow some time for the Fault event to be sent as the next action after exiting this function
+    // is typically an assert or reboot.
+    // Depending on the task at fault, it is possible the event can't be transmitted.
+    vTaskDelay(pdMS_TO_TICKS(1000));
+#endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 }
 
 } // namespace Silabs
@@ -82,7 +86,7 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 /**
  * Log register contents to UART when a hard fault occurs.
  */
-extern "C" void debugHardfault(uint32_t * sp)
+extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
 {
 #if SILABS_LOG_ENABLED
     uint32_t cfsr  = SCB->CFSR;
@@ -145,9 +149,6 @@ extern "C" void vApplicationMallocFailedHook(void)
 #endif
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
-    // Allow some time for the Fault event to be sent before the chipAbort action
-    // Depending of the task at fault, it is possible the event can't be transmitted.
-    vTaskDelay(pdMS_TO_TICKS(1000));
     /* Force an assert. */
     configASSERT((volatile void *) NULL);
 }
@@ -167,9 +168,6 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTask
 #endif
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
-    // Allow some time for the Fault event to be sent before the chipAbort action
-    // Depending of the task at fault, it is possible the event can't be transmitted.
-    vTaskDelay(pdMS_TO_TICKS(1000));
     /* Force an assert. */
     configASSERT((volatile void *) NULL);
 }
@@ -251,9 +249,6 @@ extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode
 #endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
-    // Allow some time for the Fault event to be sent before the chipAbort action
-    // Depending of the task at fault, it is possible the event can't be transmitted.
-    vTaskDelay(pdMS_TO_TICKS(1000));
     chipAbort();
 }
 #endif // BRD4325A

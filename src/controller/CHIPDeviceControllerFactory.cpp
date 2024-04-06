@@ -226,7 +226,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
     ReturnErrorOnFailure(stateParams.unsolicitedStatusHandler->Init(stateParams.exchangeMgr));
-    ReturnErrorOnFailure(stateParams.bdxTransferServer->ListenForSendInit(stateParams.systemLayer, stateParams.exchangeMgr));
+    ReturnErrorOnFailure(stateParams.bdxTransferServer->Init(stateParams.systemLayer, stateParams.exchangeMgr));
 
     InitDataModelHandler();
 
@@ -270,7 +270,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .exchangeMgr               = stateParams.exchangeMgr,
         .fabricTable               = stateParams.fabricTable,
         .groupDataProvider         = stateParams.groupDataProvider,
-        .mrpLocalConfig            = GetLocalMRPConfig(),
+        // Don't provide an MRP local config, so each CASE initiation will use
+        // the then-current value.
+        .mrpLocalConfig = NullOptional,
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
@@ -303,11 +305,16 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerRCAC                       = params.controllerRCAC;
     controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
     controllerParams.removeFromFabricTableOnShutdown      = params.removeFromFabricTableOnShutdown;
+    controllerParams.deleteFromFabricTableOnShutdown      = params.deleteFromFabricTableOnShutdown;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
 
     controllerParams.enableServerInteractions = params.enableServerInteractions;
+    if (params.fabricIndex.HasValue())
+    {
+        controllerParams.fabricIndex.SetValue(params.fabricIndex.Value());
+    }
 }
 
 void DeviceControllerFactory::ControllerInitialized(const DeviceController & controller)

@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0094" name="Water Heater Management" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release in Matter"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0094" name="Water Heater Management"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WHM" scope="Endpoint"/>
   <features>
     <feature bit="1" code="EM" name="EnergyManagement" summary="Allows energy management control of the tank">
@@ -129,7 +134,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x01" name="Boost" response="Y">
+    <command id="0x00" name="Boost" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
       <field id="0" name="Duration" type="elapsed-s">
@@ -151,7 +156,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x01" name="CancelBoost" response="Y">
+    <command id="0x01" name="CancelBoost" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
     </command>

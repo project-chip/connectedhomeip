@@ -63,13 +63,11 @@ ti_sysconfig("sysconfig") {
     #"ti_build_config.opt",
   ]
 
-  public_configs = [ ":sdk_dmm_config" ]
+  public_configs = [ ":sdk_cc13x4_26x4_dmm_config" ]
 
   cflags = [
     "-Wno-comment",
-    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_ble_app_config.opt",
-                      root_build_dir),
-    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_build_config.opt",
+    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_compiler.opt",
                       root_build_dir),
   ]
 }
@@ -92,6 +90,7 @@ ti_simplelink_executable("all-clusters-app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
@@ -116,8 +115,14 @@ ti_simplelink_executable("all-clusters-app") {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
   }
 
+  defines = []
+
   if (custom_factory_data) {
-    defines = [ "CC13XX_26XX_FACTORY_DATA" ]
+    defines += [ "CC13XX_26XX_FACTORY_DATA" ]
+  }
+
+  if (chip_enable_icd_server) {
+    defines += [ "TI_ICD_ENABLE_SERVER" ]
   }
 
   include_dirs = [

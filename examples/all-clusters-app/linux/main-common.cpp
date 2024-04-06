@@ -40,7 +40,6 @@
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
-#include <app/att-storage.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
@@ -49,7 +48,7 @@
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
+#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
@@ -60,6 +59,8 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
+
+#include <string>
 
 using namespace chip;
 using namespace chip::app;
@@ -104,7 +105,7 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
 };
 } // namespace
 
-#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+#ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
 extern void MatterDishwasherAlarmServerInit();
 #endif
 
@@ -225,7 +226,7 @@ void ApplicationInit()
         SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
 
-#ifdef EMBER_AF_PLUGIN_DISHWASHER_ALARM_SERVER
+#ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
     MatterDishwasherAlarmServerInit();
 #endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);

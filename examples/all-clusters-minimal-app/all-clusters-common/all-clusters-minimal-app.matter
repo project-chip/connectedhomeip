@@ -1577,6 +1577,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -1633,10 +1637,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1678,7 +1694,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -2398,7 +2414,7 @@ cluster TemperatureControl = 86 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional cluster ScenesManagement = 98 {
-  revision 5;
+  revision 1;
 
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;
@@ -3845,7 +3861,7 @@ cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-provisional cluster FanControl = 514 {
+cluster FanControl = 514 {
   revision 4;
 
   enum AirflowDirectionEnum : enum8 {
@@ -4412,7 +4428,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 3;
+  revision 4;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
@@ -4453,7 +4469,7 @@ cluster OccupancySensing = 1030 {
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute optional char_string<12> MACAddress = 0;
   readonly attribute optional octet_string<16> linkLocalAddress = 1;
@@ -4467,12 +4483,13 @@ cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
 cluster Channel = 1284 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ChannelTypeEnum : enum8 {
     kSatellite = 0;
     kCable = 1;
     kTerrestrial = 2;
+    kOTT = 3;
   }
 
   enum LineupInfoTypeEnum : enum8 {
@@ -4488,14 +4505,14 @@ cluster Channel = 1284 {
   bitmap Feature : bitmap32 {
     kChannelList = 0x1;
     kLineupInfo = 0x2;
-    kElectronicGuide = 0x3;
-    kRecordProgram = 0x4;
+    kElectronicGuide = 0x4;
+    kRecordProgram = 0x8;
   }
 
   bitmap RecordingFlagBitmap : bitmap32 {
     kScheduled = 0x1;
     kRecordSeries = 0x2;
-    kRecorded = 0x3;
+    kRecorded = 0x4;
   }
 
   struct ProgramCastStruct {
@@ -4641,7 +4658,7 @@ cluster Channel = 1284 {
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 cluster TargetNavigator = 1285 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -4685,7 +4702,7 @@ cluster TargetNavigator = 1285 {
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 cluster MediaPlayback = 1286 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -4727,9 +4744,9 @@ cluster MediaPlayback = 1286 {
   bitmap Feature : bitmap32 {
     kAdvancedSeek = 0x1;
     kVariableSpeed = 0x2;
-    kTextTracks = 0x3;
-    kAudioTracks = 0x4;
-    kAudioAdvance = 0x5;
+    kTextTracks = 0x4;
+    kAudioTracks = 0x8;
+    kAudioAdvance = 0x10;
   }
 
   struct TrackAttributesStruct {
@@ -5107,7 +5124,6 @@ cluster ContentLauncher = 1290 {
   bitmap SupportedProtocolsBitmap : bitmap32 {
     kDASH = 0x1;
     kHLS = 0x2;
-    kWebRTC = 0x2;
   }
 
   struct DimensionStruct {
@@ -5332,7 +5348,7 @@ cluster ApplicationBasic = 1293 {
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   critical event LoggedOut = 0 {
     optional node_id node = 0;
@@ -5897,7 +5913,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -6070,12 +6086,14 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
     handle command TimeSnapshotResponse;
+    handle command PayloadTestRequest;
+    handle command PayloadTestResponse;
   }
 
   server cluster SoftwareDiagnostics {
@@ -6102,7 +6120,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster WiFiNetworkDiagnostics {
@@ -6303,7 +6321,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -6393,7 +6411,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
     handle command AddSceneResponse;
@@ -6553,7 +6571,7 @@ endpoint 1 {
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster WakeOnLan {
@@ -6850,7 +6868,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -6876,7 +6894,7 @@ endpoint 2 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
     handle command AddSceneResponse;
@@ -6898,7 +6916,7 @@ endpoint 2 {
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 }
 endpoint 65534 {
@@ -6914,7 +6932,7 @@ endpoint 65534 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 

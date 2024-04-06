@@ -34,11 +34,15 @@
  *  mcuboot.syscfg
  */
 
-
-const Board = scripting.addModule("/ti/drivers/Board");
+const Button      = scripting.addModule("/ti/drivers/apps/Button");
+const Button1     = Button.addInstance();
+const Button2     = Button.addInstance();
+const LED         = scripting.addModule("/ti/drivers/apps/LED");
+const LED1        = LED.addInstance();
+const LED2        = LED.addInstance();
 
 /* ======== Board ======== */
-var boardName = system.deviceData.board.name;
+const deviceId = system.deviceData.deviceId;
 
 /**
  * Import the modules used in this configuration.
@@ -50,19 +54,19 @@ for(var setting in ccfgSettings)
     CCFG[setting] = ccfgSettings[setting];
 }
 
-if (boardName.match(/CC13.2.7|CC26.2.7/))
+if (deviceId.match(/CC13.2.7|CC26.2.7/))
 {
     // mcuboot stored at end of flash alongside CCFG
     CCFG.setFlashVectorTable = true;
     CCFG.addressFlashVectorTable = 0x000AC000;
 }
-else if (boardName.match(/CC13.4|CC26.[34]/))
+else if (deviceId.match(/CC13.4|CC26.[34]/))
 {
     // mcuboot stored at the beginning of flash
     CCFG.setFlashVectorTable = true;
     CCFG.addressFlashVectorTable = 0x00000000;
 }
-else if (boardName.match(/CC23.0/)) {
+else if (deviceId.match(/CC23.0/)) {
     // Nothing to do. Default pBldrVtor = 0x00000000
 }
 else
@@ -73,20 +77,30 @@ else
 CCFG.ccfgTemplate.$name      = "ti_devices_CCFG_CCFGCC26XXTemplate0";
 
 /* ======== GPIO ======== */
-var GPIO = scripting.addModule("/ti/drivers/GPIO");
 
-var gpio0 = GPIO.addInstance();
-gpio0.$hardware = system.deviceData.board.components.LED0;
-gpio0.$name = "CONFIG_GPIO_LED_0";
+Button1.$name                    = "CONFIG_BTN_LEFT";
+if (deviceId.match(/CC2674R/))
+{
+    Button1.button.$assign           = "DIO_13";
+}
+else
+{
+    Button1.button.$assign           = "DIO_15";
+}
+Button1.gpioPin.$name            = "CONFIG_GPIO_BTN1";
+Button1.gpioPin.pull             = "Pull Up";
+Button1.gpioPin.interruptTrigger = "Falling Edge";
 
-var gpio1 = GPIO.addInstance();
-gpio1.$hardware = system.deviceData.board.components.LED1;
-gpio1.$name = "CONFIG_GPIO_LED_1";
+Button2.$name                    = "CONFIG_BTN_RIGHT";
+Button2.button.$assign           = "DIO_14";
+Button2.gpioPin.$name            = "CONFIG_GPIO_BTN2";
+Button2.gpioPin.pull             = "Pull Up";
+Button2.gpioPin.interruptTrigger = "Falling Edge";
 
-var gpio2 = GPIO.addInstance();
-gpio2.$hardware = system.deviceData.board.components.BUTTON0;
-gpio2.$name = "CONFIG_GPIO_BUTTON_0";
+LED1.$name          = "CONFIG_LED_RED";
+LED1.ledPin.$assign = "DIO_6";
+LED1.gpioPin.$name  = "CONFIG_GPIO_RLED";
 
-var gpio3 = GPIO.addInstance();
-gpio3.$hardware = system.deviceData.board.components.BUTTON1;
-gpio3.$name = "CONFIG_GPIO_BUTTON_1";
+LED2.$name          = "CONFIG_LED_GREEN";
+LED2.ledPin.$assign = "DIO_7";
+LED2.gpioPin.$name  = "CONFIG_GPIO_GLED";

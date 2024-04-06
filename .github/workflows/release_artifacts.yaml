@@ -32,19 +32,15 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:32
+            image: ghcr.io/project-chip/chip-build-esp32:46
 
         steps:
             - name: Checkout
               uses: actions/checkout@v4
               with:
                 ref: "${{ github.event.inputs.releaseTag }}"
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               uses: ./.github/actions/bootstrap
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build
               run: scripts/examples/esp_example.sh all-clusters-app
@@ -68,18 +64,14 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-efr32:32
+            image: ghcr.io/project-chip/chip-build-efr32:46
         steps:
             - name: Checkout
               uses: actions/checkout@v4
               with:
                 ref: "${{ github.event.inputs.releaseTag }}"
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               uses: ./.github/actions/bootstrap
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build example EFR32 Lock App
               run: scripts/examples/gn_silabs_example.sh examples/lock-app/efr32/

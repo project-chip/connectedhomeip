@@ -26,6 +26,7 @@ extern "C" {
 #endif
 #include "assert.h"
 #include "rsi_board.h"
+#include "rsi_debug.h"
 #include "uart.h"
 #include <stddef.h>
 #include <string.h>
@@ -116,6 +117,30 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
         return status;
     }
     return BufLength;
+}
+
+/**
+ * @brief Write Logs to the Uart. Appends a return character
+ *
+ * @param log pointer to the logs
+ * @param length number of bytes to write
+ * @return int16_t Amount of bytes written or ERROR (-1)
+ */
+int16_t uartLogWrite(const char * log, uint16_t length)
+{
+    if (log == NULL || length == 0)
+    {
+        return UART_CONSOLE_ERR;
+    }
+    for (uint16_t i = 0; i < length; i++)
+    {
+        Board_UARTPutChar(log[i]);
+    }
+    // To print next log in new line with proper formatting
+    Board_UARTPutChar('\r');
+    Board_UARTPutChar('\n');
+
+    return length + 2;
 }
 
 /*

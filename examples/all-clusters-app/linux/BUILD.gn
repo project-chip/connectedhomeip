@@ -19,6 +19,14 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+  import("${chip_root}/examples/common/pigweed/rpc_config.gni")
+}
+
 source_set("chip-all-clusters-common") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
@@ -29,7 +37,10 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-alarm-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/electrical-energy-measurement-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/electrical-power-measurement-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
@@ -38,6 +49,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/power-topology-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp",
@@ -48,6 +60,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/linux/diagnostic-logs-provider-delegate-impl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
@@ -74,7 +87,19 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/energy-management-app/energy-management-common/include",
   ]
 
-  cflags = [ "-Wconversion" ]
+  if (chip_enable_pw_rpc) {
+    defines = rpc_defines
+    sources += rpc_sources
+    deps += rpc_deps
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [ "${chip_root}/examples/common" ]
+  } else {
+    # The system_rpc_server.cc file is in pigweed and doesn't compile with
+    # -Wconversion, remove check for RPC build only.
+    cflags = [ "-Wconversion" ]
+  }
 
   if (chip_build_libshell) {
     defines = [ "ENABLE_CHIP_SHELL" ]

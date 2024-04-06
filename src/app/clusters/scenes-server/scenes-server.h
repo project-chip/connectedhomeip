@@ -24,6 +24,8 @@
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 
 namespace chip {
@@ -35,7 +37,7 @@ class ScenesServer : public CommandHandlerInterface, public AttributeAccessInter
 {
 public:
     static constexpr size_t kScenesServerMaxEndpointCount =
-        EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+        MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
     static_assert(kScenesServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "Scenes endpoint count error");
     static constexpr uint8_t kScenesServerMaxFabricCount = CHIP_CONFIG_MAX_FABRICS;
 

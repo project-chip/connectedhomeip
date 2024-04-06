@@ -58,7 +58,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
     if (data->isReadAttribute)
     {
         // It should always enter here if isReadAttribute is true
-        if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+        if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
         {
             switch (data->clusterId)
             {
@@ -82,7 +82,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
     }
     else
     {
-        if (binding.type == EMBER_MULTICAST_BINDING && data->isGroup)
+        if (binding.type == MATTER_MULTICAST_BINDING && data->isGroup)
         {
             switch (data->clusterId)
             {
@@ -103,7 +103,7 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Operation
                 break;
             }
         }
-        else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+        else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
         {
             switch (data->clusterId)
             {
@@ -190,7 +190,7 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
 
     EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = EMBER_MULTICAST_BINDING;
+    entry->type                    = MATTER_MULTICAST_BINDING;
     entry->fabricIndex             = atoi(argv[0]);
     entry->groupId                 = atoi(argv[1]);
     entry->local                   = 1; // Hardcoded to endpoint 1 for now
@@ -205,7 +205,7 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
     VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
     EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = EMBER_UNICAST_BINDING;
+    entry->type                    = MATTER_UNICAST_BINDING;
     entry->fabricIndex             = atoi(argv[0]);
     entry->nodeId                  = atoi(argv[1]);
     entry->local                   = 1; // Hardcoded to endpoint 1 for now

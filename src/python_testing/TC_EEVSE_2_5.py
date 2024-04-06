@@ -20,8 +20,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from TC_EEVSE_Utils import EEVSEBaseTestHelper, EventChangeCallback
+from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +30,12 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
 
     def desc_TC_EEVSE_2_5(self) -> str:
         """Returns a description of this test"""
-        return "5.1.XXX. [TC-EEVSE-2.4] Fault test functionality with DUT as Server"
+        return "5.1.6. [TC-EEVSE-2.5] Optional diagnostics functionality with DUT as Server"
 
     def pics_TC_EEVSE_2_5(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        # In this case - there is no feature flags needed to run this test case
-        return ["EEVSE.S"]
+        # In this case - we need the EVSE to support the StartDiagnostics command
+        return ["EEVSE.S", "EEVSE.S.C04.Rsp"]
 
     def steps_TC_EEVSE_2_5(self) -> list[TestStep]:
         steps = [

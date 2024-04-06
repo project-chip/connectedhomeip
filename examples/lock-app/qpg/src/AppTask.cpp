@@ -26,7 +26,8 @@
 #include <app/server/OnboardingCodesUtil.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerDelegate.h>
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
@@ -189,10 +190,13 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 
-    // Use GenericFaultTestEventTriggerDelegate to inject faults
-    static GenericFaultTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    // Use GenericFaultTestEventTriggerHandler to inject faults
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    static GenericFaultTestEventTriggerHandler sFaultTestEventTriggerHandler{};
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFaultTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
 
@@ -618,10 +622,10 @@ void AppTask::UpdateClusterState(void)
 
         if (currentLockState.IsNull())
         {
-            EmberAfStatus status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
-            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            Protocols::InteractionModel::Status status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
+            if (status != Protocols::InteractionModel::Status::Success)
             {
-                ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
+                ChipLogError(NotSpecified, "ERR: updating DoorLock %x", to_underlying(status));
             }
         }
         else

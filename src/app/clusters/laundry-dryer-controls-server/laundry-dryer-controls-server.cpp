@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 
@@ -32,7 +31,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
-#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -43,7 +41,7 @@ using namespace chip::app::Clusters::LaundryDryerControls::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kLaundryDryerControlsDelegateTableSize =
-    EMBER_AF_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -56,7 +54,7 @@ namespace {
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryDryerControls::Id,
-                                                       EMBER_AF_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kLaundryDryerControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -70,7 +68,7 @@ LaundryDryerControlsServer LaundryDryerControlsServer::sInstance;
 void LaundryDryerControlsServer::SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryDryerControls::Id,
-                                                       EMBER_AF_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kLaundryDryerControlsDelegateTableSize)
     {
@@ -83,12 +81,12 @@ LaundryDryerControlsServer & LaundryDryerControlsServer::Instance()
     return sInstance;
 }
 
-EmberAfStatus LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel)
+Status LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId endpointId, DrynessLevelEnum newSelectedDrynessLevel)
 {
     DataModel::Nullable<DrynessLevelEnum> selectedDrynessLevel;
-    EmberAfStatus res = SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
+    Status res = SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
 
-    if ((res == EMBER_ZCL_STATUS_SUCCESS) && (selectedDrynessLevel != newSelectedDrynessLevel))
+    if ((res == Status::Success) && (selectedDrynessLevel != newSelectedDrynessLevel))
     {
         res = SelectedDrynessLevel::Set(endpointId, newSelectedDrynessLevel);
     }
@@ -96,8 +94,8 @@ EmberAfStatus LaundryDryerControlsServer::SetSelectedDrynessLevel(EndpointId end
     return res;
 }
 
-EmberAfStatus LaundryDryerControlsServer::GetSelectedDrynessLevel(EndpointId endpointId,
-                                                                  DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel)
+Status LaundryDryerControlsServer::GetSelectedDrynessLevel(EndpointId endpointId,
+                                                           DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel)
 {
     return SelectedDrynessLevel::Get(endpointId, selectedDrynessLevel);
 }

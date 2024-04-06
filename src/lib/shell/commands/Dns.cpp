@@ -131,7 +131,7 @@ public:
                             nodeData.resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
         }
         streamer_printf(streamer_get(), "   IP addresses:\r\n");
-        for (uint8_t i = 0; i < nodeData.resolutionData.numIPs; i++)
+        for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {
             streamer_printf(streamer_get(), "      %s\r\n", nodeData.resolutionData.ipAddress[i].ToString(ipAddressBuf));
         }

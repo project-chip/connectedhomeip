@@ -21,16 +21,7 @@
 namespace chip {
 namespace bdx {
 
-namespace {
-// Max block size for the BDX transfer.
-constexpr uint32_t kMaxBdxBlockSize = 1024;
-
-// Timeout for the BDX transfer session..
-constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
-constexpr TransferRole kBdxRole              = TransferRole::kReceiver;
-} // namespace
-
-CHIP_ERROR BDXTransferServer::ListenForSendInit(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr)
+CHIP_ERROR BDXTransferServer::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr)
 {
     VerifyOrReturnError(nullptr != systemLayer, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(nullptr != exchangeMgr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -38,6 +29,22 @@ CHIP_ERROR BDXTransferServer::ListenForSendInit(System::Layer * systemLayer, Mes
     mSystemLayer = systemLayer;
     mExchangeMgr = exchangeMgr;
     return mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(MessageType::SendInit, this);
+}
+
+CHIP_ERROR BDXTransferServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                                           Messaging::ExchangeDelegate *& newDelegate)
+{
+    auto * logTransfer = mPoolDelegate.Allocate(mDelegate, mSystemLayer);
+    VerifyOrReturnError(nullptr != logTransfer, CHIP_ERROR_NO_MEMORY);
+
+    newDelegate = logTransfer;
+    return CHIP_NO_ERROR;
+}
+
+void BDXTransferServer::OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate)
+{
+    auto * logTransfer = static_cast<BdxTransferDiagnosticLog *>(delegate);
+    mPoolDelegate.Release(logTransfer);
 }
 
 void BDXTransferServer::Shutdown()
@@ -49,161 +56,6 @@ void BDXTransferServer::Shutdown()
 
     mSystemLayer = nullptr;
     mExchangeMgr = nullptr;
-}
-
-void BDXTransferServer::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
-{
-    assertChipStackLockedByCurrentThread();
-
-    ChipLogDetail(BDX, "Got an event %s", event.ToString(event.EventType));
-
-    switch (event.EventType)
-    {
-    case TransferSession::OutputEventType::kInitReceived:
-        AbortTransferOnFailure(OnTransferSessionBegin(event));
-        break;
-    case TransferSession::OutputEventType::kStatusReceived:
-        ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
-        LogErrorOnFailure(OnTransferSessionEnd(CHIP_ERROR_INTERNAL));
-        break;
-    case TransferSession::OutputEventType::kInternalError:
-        LogErrorOnFailure(OnTransferSessionEnd(CHIP_ERROR_INTERNAL));
-        break;
-    case TransferSession::OutputEventType::kTransferTimeout:
-        LogErrorOnFailure(OnTransferSessionEnd(CHIP_ERROR_TIMEOUT));
-        break;
-    case TransferSession::OutputEventType::kBlockReceived:
-        AbortTransferOnFailure(OnBlockReceived(event));
-        break;
-    case TransferSession::OutputEventType::kMsgToSend:
-        LogErrorOnFailure(OnMessageToSend(event));
-
-        if (event.msgTypeData.HasMessageType(MessageType::BlockAckEOF))
-        {
-            LogErrorOnFailure(OnTransferSessionEnd(CHIP_NO_ERROR));
-        }
-        break;
-    case TransferSession::OutputEventType::kAckEOFReceived:
-    case TransferSession::OutputEventType::kNone:
-    case TransferSession::OutputEventType::kQueryWithSkipReceived:
-    case TransferSession::OutputEventType::kQueryReceived:
-    case TransferSession::OutputEventType::kAckReceived:
-    case TransferSession::OutputEventType::kAcceptReceived:
-        // Nothing to do.
-        break;
-    default:
-        // Should never happen.
-        chipDie();
-        break;
-    }
-}
-
-CHIP_ERROR BDXTransferServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                                System::PacketBufferHandle && payload)
-{
-    assertChipStackLockedByCurrentThread();
-
-    VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    // If we receive a SendInit message, then we prepare for transfer
-    if (payloadHeader.HasMessageType(MessageType::SendInit))
-    {
-        FabricIndex fabricIndex = ec->GetSessionHandle()->GetFabricIndex();
-        NodeId peerNodeId       = ec->GetSessionHandle()->GetPeer().GetNodeId();
-        VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(peerNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
-
-        mTransferProxy.SetFabricIndex(fabricIndex);
-        mTransferProxy.SetPeerNodeId(peerNodeId);
-        auto flags(TransferControlFlags::kSenderDrive);
-        ReturnLogErrorOnFailure(Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout));
-    }
-
-    return TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
-}
-
-CHIP_ERROR BDXTransferServer::OnMessageToSend(TransferSession::OutputEvent & event)
-{
-    assertChipStackLockedByCurrentThread();
-
-    VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    auto & msgTypeData  = event.msgTypeData;
-    bool isStatusReport = msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport);
-
-    // All messages sent from the Sender expect a response, except for a StatusReport which would indicate an error and
-    // the end of the transfer.
-    Messaging::SendFlags sendFlags;
-    VerifyOrDo(isStatusReport, sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse));
-
-    // If there's an error sending the message, close the exchange by calling Reset.
-    auto err = mExchangeCtx->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
-    VerifyOrDo(CHIP_NO_ERROR == err, Reset());
-
-    return err;
-}
-
-CHIP_ERROR BDXTransferServer::OnTransferSessionBegin(TransferSession::OutputEvent & event)
-{
-    assertChipStackLockedByCurrentThread();
-    VerifyOrReturnError(nullptr != mDelegate, CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorOnFailure(mTransferProxy.Init(&mTransfer));
-    return mDelegate->OnTransferBegin(&mTransferProxy);
-}
-
-CHIP_ERROR BDXTransferServer::OnTransferSessionEnd(CHIP_ERROR error)
-{
-    assertChipStackLockedByCurrentThread();
-    VerifyOrReturnError(nullptr != mDelegate, CHIP_ERROR_INCORRECT_STATE);
-
-    LogErrorOnFailure(mDelegate->OnTransferEnd(&mTransferProxy, error));
-    Reset();
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BDXTransferServer::OnBlockReceived(TransferSession::OutputEvent & event)
-{
-    assertChipStackLockedByCurrentThread();
-    VerifyOrReturnError(nullptr != mDelegate, CHIP_ERROR_INCORRECT_STATE);
-
-    ByteSpan blockData(event.blockdata.Data, event.blockdata.Length);
-    return mDelegate->OnTransferData(&mTransferProxy, blockData);
-}
-
-void BDXTransferServer::AbortTransferOnFailure(CHIP_ERROR error)
-{
-    VerifyOrReturn(CHIP_NO_ERROR != error);
-    LogErrorOnFailure(error);
-    LogErrorOnFailure(mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(error)));
-}
-
-void BDXTransferServer::Reset()
-{
-    assertChipStackLockedByCurrentThread();
-
-    Responder::ResetTransfer();
-
-    if (mExchangeCtx)
-    {
-        mIsExchangeClosing = true;
-        mExchangeCtx->Close();
-        mIsExchangeClosing = false;
-        mExchangeCtx       = nullptr;
-    }
-
-    mTransferProxy.Reset();
-}
-
-void BDXTransferServer::OnExchangeClosing(Messaging::ExchangeContext * ec)
-{
-    // This block checks and handles the scenario where the exchange is closed externally (e.g., receiving a StatusReport).
-    // Continuing to use it could lead to a use-after-free error and such an error might occur when the poll timer triggers and
-    // OnTransferSessionEnd is called.
-    // We know it's not just us normally closing the exchange if mIsExchangeClosing is false.
-    VerifyOrReturn(!mIsExchangeClosing);
-    mExchangeCtx = nullptr;
-    LogErrorOnFailure(OnTransferSessionEnd(CHIP_ERROR_INTERNAL));
 }
 
 } // namespace bdx

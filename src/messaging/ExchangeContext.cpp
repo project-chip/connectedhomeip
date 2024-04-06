@@ -20,21 +20,14 @@
  *      This file implements the ExchangeContext class.
  *
  */
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>

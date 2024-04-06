@@ -25,6 +25,7 @@
 #pragma once
 
 #include <app/AttributeAccessInterface.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/BitFlags.h>
 #include <platform/ThreadStackManager.h>
 
@@ -57,10 +58,7 @@ protected:
 
     void _Init();
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    ConnectivityManager::ThreadMode _GetThreadMode();
-    CHIP_ERROR _SetThreadMode(ConnectivityManager::ThreadMode val);
     bool _IsThreadEnabled();
-    bool _IsThreadApplicationControlled();
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -70,7 +68,6 @@ protected:
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
     void _ResetThreadNetworkDiagnosticsCounts();
-    CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
     // ===== Members for use by the implementation subclass.
 
@@ -82,7 +79,6 @@ private:
     enum class Flags : uint8_t
     {
         kHaveServiceConnectivity = 0x01,
-        kIsApplicationControlled = 0x02
     };
 
     BitFlags<Flags> mFlags;
@@ -100,12 +96,6 @@ template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_IsThreadEnabled()
 {
     return ThreadStackMgrImpl().IsThreadEnabled();
-}
-
-template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_Thread<ImplClass>::_IsThreadApplicationControlled()
-{
-    return mFlags.Has(Flags::kIsApplicationControlled);
 }
 
 template <class ImplClass>
@@ -152,14 +142,6 @@ template <class ImplClass>
 inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()
 {
     ThreadStackMgrImpl().ResetThreadNetworkDiagnosticsCounts();
-}
-
-template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_Thread<ImplClass>::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                                              app::AttributeValueEncoder & encoder)
-{
-    return ThreadStackMgrImpl().WriteThreadNetworkDiagnosticAttributeToTlv(attributeId, encoder);
 }
 
 } // namespace Internal

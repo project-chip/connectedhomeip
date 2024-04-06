@@ -1135,6 +1135,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -1191,10 +1195,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1236,7 +1252,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -1810,6 +1826,95 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Allows servers to ensure that listed clients are notified when a server is available for communication. */
+cluster IcdManagement = 70 {
+  revision 2;
+
+  enum OperatingModeEnum : enum8 {
+    kSIT = 0;
+    kLIT = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kCheckInProtocolSupport = 0x1;
+    kUserActiveModeTrigger = 0x2;
+    kLongIdleTimeSupport = 0x4;
+  }
+
+  bitmap UserActiveModeTriggerBitmap : bitmap32 {
+    kPowerCycle = 0x1;
+    kSettingsMenu = 0x2;
+    kCustomInstruction = 0x4;
+    kDeviceManual = 0x8;
+    kActuateSensor = 0x10;
+    kActuateSensorSeconds = 0x20;
+    kActuateSensorTimes = 0x40;
+    kActuateSensorLightsBlink = 0x80;
+    kResetButton = 0x100;
+    kResetButtonLightsBlink = 0x200;
+    kResetButtonSeconds = 0x400;
+    kResetButtonTimes = 0x800;
+    kSetupButton = 0x1000;
+    kSetupButtonSeconds = 0x2000;
+    kSetupButtonLightsBlink = 0x4000;
+    kSetupButtonTimes = 0x8000;
+    kAppDefinedButton = 0x10000;
+  }
+
+  fabric_scoped struct MonitoringRegistrationStruct {
+    fabric_sensitive node_id checkInNodeID = 1;
+    fabric_sensitive int64u monitoredSubject = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int32u idleModeDuration = 0;
+  readonly attribute int32u activeModeDuration = 1;
+  readonly attribute int16u activeModeThreshold = 2;
+  readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
+  readonly attribute access(read: administer) optional int32u ICDCounter = 4;
+  readonly attribute optional int16u clientsSupportedPerFabric = 5;
+  readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
+  readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RegisterClientRequest {
+    node_id checkInNodeID = 0;
+    int64u monitoredSubject = 1;
+    octet_string<16> key = 2;
+    optional octet_string<16> verificationKey = 3;
+  }
+
+  response struct RegisterClientResponse = 1 {
+    int32u ICDCounter = 0;
+  }
+
+  request struct UnregisterClientRequest {
+    node_id checkInNodeID = 0;
+    optional octet_string<16> verificationKey = 1;
+  }
+
+  request struct StayActiveRequestRequest {
+    int32u stayActiveDuration = 0;
+  }
+
+  response struct StayActiveResponse = 4 {
+    int32u promisedActiveDuration = 0;
+  }
+
+  /** Register a client to the end device */
+  fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
+  /** Unregister a client from an end device */
+  fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
+  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
+  command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
+}
+
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
   revision 5;
@@ -1978,7 +2083,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -2159,8 +2264,8 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -2243,7 +2348,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ResetCounts;
   }
@@ -2297,7 +2402,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
 
     handle command OpenCommissioningWindow;
-    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
@@ -2360,6 +2464,18 @@ endpoint 0 {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
+
+  server cluster IcdManagement {
+    callback attribute idleModeDuration;
+    callback attribute activeModeDuration;
+    callback attribute activeModeThreshold;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0000;
+    ram      attribute clusterRevision default = 2;
+  }
 }
 endpoint 1 {
   device type ma_windowcovering = 514, version 2;
@@ -2406,7 +2522,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -2492,7 +2608,7 @@ endpoint 2 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 

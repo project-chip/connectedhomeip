@@ -42,6 +42,10 @@ public:
     // The application can use this callback to e.g. close the underlying BLE connection if it is no longer needed,
     // decrement the connection's refcount if it has one, or perform any other sort of cleanup as desired.
     virtual void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) = 0;
+
+    // Called to determine whether the BLE connection should be closed when in Non-concurrent mode if sending
+    // ConnectNetworkResponse. The BTP will be in kState_Complete when all fragments have been sent.
+    virtual void CheckNonConcurrentBleClosing() {}
 };
 
 } /* namespace Ble */

@@ -50,7 +50,7 @@ limitations under the License.
     <define>SCENES_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
    
     <attribute side="server" code="0x0000" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
     <attribute side="server" code="0x0001" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16" writable="false" optional="false">SceneTableSize</attribute>

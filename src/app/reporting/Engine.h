@@ -40,6 +40,7 @@
 namespace chip {
 namespace app {
 
+class InteractionModelEngine;
 class TestReadInteraction;
 
 namespace reporting {
@@ -56,6 +57,11 @@ namespace reporting {
 class Engine
 {
 public:
+    /**
+     *  Constructor Engine with a valid InteractionModelEngine pointer.
+     */
+    Engine(InteractionModelEngine * apImEngine);
+
     /**
      * Initializes the reporting engine. Should only be called once.
      *
@@ -173,7 +179,7 @@ private:
     // of those will fail to match.  This function should return false if either nothing in the list matches the given
     // endpoint+cluster in the path or there is an entry in the list that matches the endpoint+cluster in the path but does not
     // match the current data version of that cluster.
-    bool IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
+    bool IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
                                    const ConcreteReadAttributePath & aPath);
 
     /**
@@ -279,6 +285,8 @@ private:
     uint32_t mReservedSize          = 0;
     uint32_t mMaxAttributesPerChunk = UINT32_MAX;
 #endif
+
+    InteractionModelEngine * mpImEngine = nullptr;
 };
 
 }; // namespace reporting

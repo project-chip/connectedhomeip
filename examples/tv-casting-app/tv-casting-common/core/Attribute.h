@@ -26,18 +26,18 @@ namespace matter {
 namespace casting {
 namespace core {
 
-template <typename TypeInfoDecodableType>
-using ReadResponseSuccessCallbackFn =
-    std::function<void(void * context, chip::Optional<TypeInfoDecodableType> before, TypeInfoDecodableType after)>;
+template <typename TypeInfo>
+using ReadResponseSuccessCallbackFn  = std::function<void(void * context, chip::Optional<typename TypeInfo::DecodableType> before,
+                                                         typename TypeInfo::DecodableArgType after)>;
 using ReadResponseFailureCallbackFn  = std::function<void(void * context, CHIP_ERROR err)>;
 using WriteResponseSuccessCallbackFn = std::function<void(void * context)>;
 using WriteResponseFailureCallbackFn = std::function<void(void * context, CHIP_ERROR err)>;
 
-template <typename TypeInfoDecodableType>
+template <typename TypeInfo>
 struct ReadAttributeContext;
-template <typename TypeInfoDecodableType>
+template <typename TypeInfo>
 struct WriteAttributeContext;
-template <typename TypeInfoDecodableType>
+template <typename TypeInfo>
 struct SubscribeAttributeContext;
 
 template <typename TypeInfo>
@@ -67,27 +67,24 @@ public:
 
     /**
      * @brief Reads the value of the Attribute that belongs to the associated Endpoint and corresponding Cluster
-     *
-     * @param context
+     * @param context current context passed back in successCb/FailureCb
      * @param successCb Called when the Attribute is read successfully, with the value of the attribute after reading, as well as
      * before (if the Attribute had been previously read)
      * @param failureCb Called when there is a failure in reading the Attribute
      */
-    void Read(void * context, ReadResponseSuccessCallbackFn<typename TypeInfo::DecodableType> successCb,
-              ReadResponseFailureCallbackFn failureCb)
+    void Read(void * context, ReadResponseSuccessCallbackFn<TypeInfo> successCb, ReadResponseFailureCallbackFn failureCb)
     {
         memory::Strong<core::Endpoint> endpoint = this->GetEndpoint().lock();
         if (endpoint)
         {
-            ReadAttributeContext<typename TypeInfo::DecodableType> * attributeContext =
-                new ReadAttributeContext<typename TypeInfo::DecodableType>(this, endpoint, context, successCb, failureCb);
+            ReadAttributeContext<TypeInfo> * attributeContext =
+                new ReadAttributeContext<TypeInfo>(this, endpoint, context, successCb, failureCb);
 
             endpoint->GetCastingPlayer()->FindOrEstablishSession(
                 attributeContext,
                 // FindOrEstablishSession success handler
                 [](void * _context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
-                    ReadAttributeContext<typename TypeInfo::DecodableType> * _attributeContext =
-                        static_cast<ReadAttributeContext<typename TypeInfo::DecodableType> *>(_context);
+                    ReadAttributeContext<TypeInfo> * _attributeContext = static_cast<ReadAttributeContext<TypeInfo> *>(_context);
                     ChipLogProgress(AppServer, "<Attribute>::Read() Found or established session");
 
                     // Read attribute
@@ -95,9 +92,9 @@ public:
                     CHIP_ERROR err = mediaClusterBase.template ReadAttribute<TypeInfo>(
                         _attributeContext,
                         // Read success handler
-                        [](void * __context, typename TypeInfo::DecodableType response) {
-                            ReadAttributeContext<typename TypeInfo::DecodableType> * __attributeContext =
-                                static_cast<ReadAttributeContext<typename TypeInfo::DecodableType> *>(__context);
+                        [](void * __context, typename TypeInfo::DecodableArgType response) {
+                            ReadAttributeContext<TypeInfo> * __attributeContext =
+                                static_cast<ReadAttributeContext<TypeInfo> *>(__context);
                             ChipLogProgress(AppServer, "<Attribute>::Read() success");
                             Attribute<TypeInfo> * __attr = static_cast<Attribute<TypeInfo> *>(__attributeContext->mAttribute);
                             __attr->value                = response;
@@ -115,8 +112,8 @@ public:
                         },
                         // Read failure handler
                         [](void * __context, CHIP_ERROR error) {
-                            ReadAttributeContext<typename TypeInfo::DecodableType> * __attributeContext =
-                                static_cast<ReadAttributeContext<typename TypeInfo::DecodableType> *>(__context);
+                            ReadAttributeContext<TypeInfo> * __attributeContext =
+                                static_cast<ReadAttributeContext<TypeInfo> *>(__context);
                             ChipLogError(AppServer,
                                          "<Attribute>::Read() failure response on EndpointId: %d with error: "
                                          "%" CHIP_ERROR_FORMAT,
@@ -138,8 +135,7 @@ public:
                 },
                 // FindOrEstablishSession failure handler
                 [](void * _context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
-                    ReadAttributeContext<typename TypeInfo::DecodableType> * _attributeContext =
-                        static_cast<ReadAttributeContext<typename TypeInfo::DecodableType> *>(_context);
+                    ReadAttributeContext<TypeInfo> * _attributeContext = static_cast<ReadAttributeContext<TypeInfo> *>(_context);
                     ChipLogError(AppServer,
                                  "<Attribute>::Read() failure in retrieving session info for peerId.nodeId: "
                                  "0x" ChipLogFormatX64 ", peer.fabricIndex: %d with error: %" CHIP_ERROR_FORMAT,
@@ -159,7 +155,7 @@ public:
      * @brief Writes the value of the Attribute to an associated Endpoint and corresponding Cluster
      *
      * @param requestData value of the Attribute to be written
-     * @param context
+     * @param context current context passed back in successCb/FailureCb
      * @param successCb Called when the Attribute is written successfully
      * @param failureCb Called when there is a failure in writing the Attribute
      * @param aTimedWriteTimeoutMs write timeout
@@ -239,29 +235,28 @@ public:
     /**
      * @brief Subscribes to the value of the Attribute that belongs to the associated Endpoint and corresponding Cluster
      *
-     * @param context
+     * @param context current context passed back in successCb/FailureCb
      * @param successCb Called when the Attribute is read successfully, with the value of the attribute after reading, as well as
      * before (if the Attribute had been previously read)
      * @param failureCb Called when there is a failure in reading the Attribute
-     * @param minIntervalFloorSeconds
-     * @param maxIntervalCeilingSeconds
+     * @param minIntervalFloorSeconds the requested minimum interval boundary floor in seconds for attribute udpates
+     * @param maxIntervalCeilingSeconds the requested maximum interval boundary ceiling in seconds for attribute udpates
      */
-    void Subscribe(void * context, ReadResponseSuccessCallbackFn<typename TypeInfo::DecodableType> successCb,
-                   ReadResponseFailureCallbackFn failureCb, uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds)
+    void Subscribe(void * context, ReadResponseSuccessCallbackFn<TypeInfo> successCb, ReadResponseFailureCallbackFn failureCb,
+                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds)
     {
         memory::Strong<core::Endpoint> endpoint = this->GetEndpoint().lock();
         if (endpoint)
         {
-            SubscribeAttributeContext<typename TypeInfo::DecodableType> * attributeContext =
-                new SubscribeAttributeContext<typename TypeInfo::DecodableType>(this, endpoint, context, successCb, failureCb,
-                                                                                minIntervalFloorSeconds, maxIntervalCeilingSeconds);
+            SubscribeAttributeContext<TypeInfo> * attributeContext = new SubscribeAttributeContext<TypeInfo>(
+                this, endpoint, context, successCb, failureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds);
 
             endpoint->GetCastingPlayer()->FindOrEstablishSession(
                 attributeContext,
                 // FindOrEstablishSession success handler
                 [](void * _context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
-                    SubscribeAttributeContext<typename TypeInfo::DecodableType> * _attributeContext =
-                        static_cast<SubscribeAttributeContext<typename TypeInfo::DecodableType> *>(_context);
+                    SubscribeAttributeContext<TypeInfo> * _attributeContext =
+                        static_cast<SubscribeAttributeContext<TypeInfo> *>(_context);
                     ChipLogProgress(AppServer, "<Attribute>::Subscribe() Found or established session");
 
                     // Subscribe to attribute
@@ -269,12 +264,13 @@ public:
                     CHIP_ERROR err = mediaClusterBase.template SubscribeAttribute<TypeInfo>(
                         _attributeContext,
                         // Subscription success handler
-                        [](void * __context, typename TypeInfo::DecodableType response) {
-                            SubscribeAttributeContext<typename TypeInfo::DecodableType> * __attributeContext =
-                                static_cast<SubscribeAttributeContext<typename TypeInfo::DecodableType> *>(__context);
+                        [](void * __context, typename TypeInfo::DecodableArgType response) {
+                            SubscribeAttributeContext<TypeInfo> * __attributeContext =
+                                static_cast<SubscribeAttributeContext<TypeInfo> *>(__context);
                             ChipLogProgress(AppServer, "<Attribute>::Subscribe() success");
                             Attribute<TypeInfo> * __attr = static_cast<Attribute<TypeInfo> *>(__attributeContext->mAttribute);
                             __attr->value                = response;
+                            // TODO: Save old value and then overwrite
                             if (__attr->hasValue)
                             {
                                 __attributeContext->mSuccessCb(__attributeContext->mClientContext,
@@ -289,8 +285,8 @@ public:
                         },
                         // Subscription failure handler
                         [](void * __context, CHIP_ERROR error) {
-                            SubscribeAttributeContext<typename TypeInfo::DecodableType> * __attributeContext =
-                                static_cast<SubscribeAttributeContext<typename TypeInfo::DecodableType> *>(__context);
+                            SubscribeAttributeContext<TypeInfo> * __attributeContext =
+                                static_cast<SubscribeAttributeContext<TypeInfo> *>(__context);
                             ChipLogError(AppServer,
                                          "<Attribute>::Subscribe() failure response on EndpointId: %d with error: "
                                          "%" CHIP_ERROR_FORMAT,
@@ -315,8 +311,8 @@ public:
                 },
                 // FindOrEstablishSession failure handler
                 [](void * _context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
-                    SubscribeAttributeContext<typename TypeInfo::DecodableType> * _attributeContext =
-                        static_cast<SubscribeAttributeContext<typename TypeInfo::DecodableType> *>(_context);
+                    SubscribeAttributeContext<TypeInfo> * _attributeContext =
+                        static_cast<SubscribeAttributeContext<TypeInfo> *>(_context);
                     ChipLogError(AppServer,
                                  "<Attribute>::Subscribe() failure in retrieving session info for peerId.nodeId: "
                                  "0x" ChipLogFormatX64 ", peer.fabricIndex: %d with error: %" CHIP_ERROR_FORMAT,
@@ -336,11 +332,11 @@ public:
 /**
  * @brief Context object used by the Attribute class during the Read API's execution
  */
-template <typename TypeInfoDecodableType>
+template <typename TypeInfo>
 struct ReadAttributeContext
 {
     ReadAttributeContext(void * attribute, memory::Strong<core::Endpoint> endpoint, void * clientContext,
-                         ReadResponseSuccessCallbackFn<TypeInfoDecodableType> successCb, ReadResponseFailureCallbackFn failureCb) :
+                         ReadResponseSuccessCallbackFn<TypeInfo> successCb, ReadResponseFailureCallbackFn failureCb) :
         mEndpoint(endpoint),
         mClientContext(clientContext), mSuccessCb(successCb), mFailureCb(failureCb)
     {
@@ -350,7 +346,7 @@ struct ReadAttributeContext
     void * mAttribute;
     memory::Strong<core::Endpoint> mEndpoint;
     void * mClientContext;
-    ReadResponseSuccessCallbackFn<TypeInfoDecodableType> mSuccessCb;
+    ReadResponseSuccessCallbackFn<TypeInfo> mSuccessCb;
     ReadResponseFailureCallbackFn mFailureCb;
 };
 
@@ -381,13 +377,12 @@ struct WriteAttributeContext
 /**
  * @brief Context object used by the Attribute class during the Subscribe API's execution
  */
-template <typename TypeInfoDecodableType>
+template <typename TypeInfo>
 struct SubscribeAttributeContext
 {
     SubscribeAttributeContext(void * attribute, memory::Strong<core::Endpoint> endpoint, void * clientContext,
-                              ReadResponseSuccessCallbackFn<TypeInfoDecodableType> successCb,
-                              ReadResponseFailureCallbackFn failureCb, uint16_t minIntervalFloorSeconds,
-                              uint16_t maxIntervalCeilingSeconds) :
+                              ReadResponseSuccessCallbackFn<TypeInfo> successCb, ReadResponseFailureCallbackFn failureCb,
+                              uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds) :
         mEndpoint(endpoint),
         mClientContext(clientContext), mSuccessCb(successCb), mFailureCb(failureCb)
     {
@@ -399,7 +394,7 @@ struct SubscribeAttributeContext
     void * mAttribute;
     memory::Strong<core::Endpoint> mEndpoint;
     void * mClientContext;
-    ReadResponseSuccessCallbackFn<TypeInfoDecodableType> mSuccessCb;
+    ReadResponseSuccessCallbackFn<TypeInfo> mSuccessCb;
     ReadResponseFailureCallbackFn mFailureCb;
     uint16_t mMinIntervalFloorSeconds;
     uint16_t mMaxIntervalCeilingSeconds;

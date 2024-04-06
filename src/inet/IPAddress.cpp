@@ -27,10 +27,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <inet/IPAddress.h>
 
 #include <inet/InetError.h>

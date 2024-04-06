@@ -23,10 +23,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include "spake2p.h"
 
 #include <errno.h>
@@ -39,6 +35,8 @@
 #include <lib/support/CHIPMem.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
+
+using namespace chip::Crypto;
 
 namespace {
 
@@ -155,7 +153,7 @@ OptionSet *gCmdOptionSets[] =
 uint32_t gCount          = 1;
 uint32_t gPinCode        = chip::kSetupPINCodeUndefinedValue;
 uint32_t gIterationCount = 0;
-uint8_t gSalt[BASE64_MAX_DECODED_LEN(BASE64_ENCODED_LEN(chip::kSpake2p_Max_PBKDF_Salt_Length))];
+uint8_t gSalt[BASE64_MAX_DECODED_LEN(BASE64_ENCODED_LEN(kSpake2p_Max_PBKDF_Salt_Length))];
 uint8_t gSaltDecodedLen   = 0;
 uint8_t gSaltLen          = 0;
 const char * gOutFileName = nullptr;
@@ -219,7 +217,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
     case 'i':
         if (!ParseInt(arg, gIterationCount) ||
-            !(gIterationCount >= chip::kSpake2p_Min_PBKDF_Iterations && gIterationCount <= chip::kSpake2p_Max_PBKDF_Iterations))
+            !(gIterationCount >= kSpake2p_Min_PBKDF_Iterations && gIterationCount <= kSpake2p_Max_PBKDF_Iterations))
         {
             PrintArgError("%s: Invalid value specified for the iteration-count parameter: %s\n", progName, arg);
             return false;
@@ -227,8 +225,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'l':
-        if (!ParseInt(arg, gSaltLen) ||
-            !(gSaltLen >= chip::kSpake2p_Min_PBKDF_Salt_Length && gSaltLen <= chip::kSpake2p_Max_PBKDF_Salt_Length))
+        if (!ParseInt(arg, gSaltLen) || !(gSaltLen >= kSpake2p_Min_PBKDF_Salt_Length && gSaltLen <= kSpake2p_Max_PBKDF_Salt_Length))
         {
             PrintArgError("%s: Invalid value specified for salt length parameter: %s\n", progName, arg);
             return false;
@@ -236,7 +233,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 's':
-        if (strlen(arg) > BASE64_ENCODED_LEN(chip::kSpake2p_Max_PBKDF_Salt_Length))
+        if (strlen(arg) > BASE64_ENCODED_LEN(kSpake2p_Max_PBKDF_Salt_Length))
         {
             fprintf(stderr, "%s: Salt parameter too long: %s\n", progName, arg);
             return false;
@@ -246,13 +243,13 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 
         // The first check was just to make sure Base64Decode32 would not write beyond the buffer.
         // Now double-check if the length is correct.
-        if (gSaltDecodedLen > chip::kSpake2p_Max_PBKDF_Salt_Length)
+        if (gSaltDecodedLen > kSpake2p_Max_PBKDF_Salt_Length)
         {
             fprintf(stderr, "%s: Salt parameter too long: %s\n", progName, arg);
             return false;
         }
 
-        if (gSaltDecodedLen < chip::kSpake2p_Min_PBKDF_Salt_Length)
+        if (gSaltDecodedLen < kSpake2p_Min_PBKDF_Salt_Length)
         {
             fprintf(stderr, "%s: Salt parameter too short: %s\n", progName, arg);
             return false;
@@ -336,7 +333,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
 
     for (uint32_t i = 0; i < gCount; i++)
     {
-        uint8_t salt[chip::kSpake2p_Max_PBKDF_Salt_Length];
+        uint8_t salt[kSpake2p_Max_PBKDF_Salt_Length];
         if (gSaltDecodedLen == 0)
         {
             CHIP_ERROR err = chip::Crypto::DRBG_get_bytes(salt, gSaltLen);
@@ -351,7 +348,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             memcpy(salt, gSalt, gSaltLen);
         }
 
-        chip::Spake2pVerifier verifier;
+        Spake2pVerifier verifier;
         CHIP_ERROR err = chip::PASESession::GeneratePASEVerifier(verifier, gIterationCount, chip::ByteSpan(salt, gSaltLen),
                                                                  (gPinCode == chip::kSetupPINCodeUndefinedValue), gPinCode);
         if (err != CHIP_NO_ERROR)
@@ -360,7 +357,7 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             return false;
         }
 
-        chip::Spake2pVerifierSerialized serializedVerifier;
+        Spake2pVerifierSerialized serializedVerifier;
         chip::MutableByteSpan serializedVerifierSpan(serializedVerifier);
         err = verifier.Serialize(serializedVerifierSpan);
         if (err != CHIP_NO_ERROR)
@@ -369,12 +366,12 @@ bool Cmd_GenVerifier(int argc, char * argv[])
             return false;
         }
 
-        char saltB64[BASE64_ENCODED_LEN(chip::kSpake2p_Max_PBKDF_Salt_Length) + 1];
+        char saltB64[BASE64_ENCODED_LEN(kSpake2p_Max_PBKDF_Salt_Length) + 1];
         uint32_t saltB64Len = chip::Base64Encode32(salt, gSaltLen, saltB64);
         saltB64[saltB64Len] = '\0';
 
-        char verifierB64[BASE64_ENCODED_LEN(chip::kSpake2p_VerifierSerialized_Length) + 1];
-        uint32_t verifierB64Len = chip::Base64Encode32(serializedVerifier, chip::kSpake2p_VerifierSerialized_Length, verifierB64);
+        char verifierB64[BASE64_ENCODED_LEN(kSpake2p_VerifierSerialized_Length) + 1];
+        uint32_t verifierB64Len     = chip::Base64Encode32(serializedVerifier, kSpake2p_VerifierSerialized_Length, verifierB64);
         verifierB64[verifierB64Len] = '\0';
 
         if (fprintf(outFile, "%d,%08d,%d,%s,%s\n", i, gPinCode, gIterationCount, saltB64, verifierB64) < 0 || ferror(outFile))

@@ -35,6 +35,7 @@ public:
     virtual CHIP_ERROR InitLCD() { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR SetGPIO(uint32_t port, uint32_t pin, bool state) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual bool GetGPIO(uint32_t port, uint32_t pin) { return false; }
+    virtual uint32_t GetRebootCause() = 0;
 
     // Scheduler
     virtual void StartScheduler(void) = 0;

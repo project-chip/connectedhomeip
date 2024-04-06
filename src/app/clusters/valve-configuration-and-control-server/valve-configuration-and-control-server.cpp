@@ -40,6 +40,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -49,7 +50,7 @@ using chip::app::Clusters::ValveConfigurationAndControl::Delegate;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kValveConfigurationAndControlDelegateTableSize =
-    EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static_assert(kValveConfigurationAndControlDelegateTableSize <= kEmberInvalidEndpointIndex,
               "ValveConfigurationAndControl Delegate table size error");
@@ -68,7 +69,7 @@ Delegate * gDelegateTable[kValveConfigurationAndControlDelegateTableSize] = { nu
 bool GetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> & duration)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturnValue(epIdx < kValveConfigurationAndControlDelegateTableSize, false);
     duration = gRemainingDuration[epIdx].remainingDuration;
     return true;
@@ -77,7 +78,7 @@ bool GetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> & d
 void SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> duration)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (epIdx < kValveConfigurationAndControlDelegateTableSize)
     {
         gRemainingDuration[epIdx].endpoint          = endpoint;
@@ -88,7 +89,7 @@ void SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> dur
 void SetRemainingDurationNull(EndpointId endpoint)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (epIdx < kValveConfigurationAndControlDelegateTableSize)
     {
         if (!gRemainingDuration[epIdx].remainingDuration.IsNull())
@@ -102,7 +103,7 @@ void SetRemainingDurationNull(EndpointId endpoint)
 RemainingDurationTable * GetRemainingDurationItem(EndpointId endpoint)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (epIdx < kValveConfigurationAndControlDelegateTableSize)
     {
         return &gRemainingDuration[epIdx];
@@ -113,7 +114,7 @@ RemainingDurationTable * GetRemainingDurationItem(EndpointId endpoint)
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                          MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (epIdx >= kValveConfigurationAndControlDelegateTableSize ? nullptr : gDelegateTable[epIdx]);
 }
 
@@ -260,7 +261,7 @@ namespace ValveConfigurationAndControl {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                       EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kValveConfigurationAndControlDelegateTableSize)
     {
@@ -279,19 +280,18 @@ CHIP_ERROR CloseValve(EndpointId ep)
     DataModel::Nullable<uint32_t> rDuration;
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
+    VerifyOrReturnError(Status::Success == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
                         attribute_error);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS ==
-                            CurrentState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning),
+    VerifyOrReturnError(Status::Success == CurrentState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning),
                         attribute_error);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::SetNull(ep), attribute_error);
+    VerifyOrReturnError(Status::Success == OpenDuration::SetNull(ep), attribute_error);
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
     {
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetLevel::Set(ep, 0), attribute_error);
+        VerifyOrReturnError(Status::Success == TargetLevel::Set(ep, 0), attribute_error);
     }
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))
     {
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::SetNull(ep), attribute_error);
+        VerifyOrReturnError(Status::Success == AutoCloseTime::SetNull(ep), attribute_error);
     }
     SetRemainingDurationNull(ep);
     RemainingDurationTable * item = GetRemainingDurationItem(ep);
@@ -328,33 +328,32 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
 
             uint64_t time = openDuration.Value() * chip::kMicrosecondsPerSecond;
             autoCloseTime.SetNonNull(chipEpochTime + time);
-            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::Set(ep, autoCloseTime), attribute_error);
+            VerifyOrReturnError(Status::Success == AutoCloseTime::Set(ep, autoCloseTime), attribute_error);
         }
         else
         {
-            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::SetNull(ep), attribute_error);
+            VerifyOrReturnError(Status::Success == AutoCloseTime::SetNull(ep), attribute_error);
         }
 #else
-        return CHIP_FAILURE;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
     }
 
     // level can only be null if LVL feature is not supported
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel) && !level.IsNull())
     {
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetLevel::Set(ep, level), attribute_error);
+        VerifyOrReturnError(Status::Success == TargetLevel::Set(ep, level), attribute_error);
     }
 
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::Set(ep, openDuration), attribute_error);
+    VerifyOrReturnError(Status::Success == OpenDuration::Set(ep, openDuration), attribute_error);
 
     SetRemainingDuration(ep, openDuration);
     // Trigger report for remainingduration
     MatterReportingAttributeChangeCallback(ep, ValveConfigurationAndControl::Id, RemainingDuration::Id);
     // set targetstate to open
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kOpen),
+    VerifyOrReturnError(Status::Success == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kOpen),
                         attribute_error);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS ==
-                            CurrentState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning),
+    VerifyOrReturnError(Status::Success == CurrentState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning),
                         attribute_error);
 
     // start movement towards target
@@ -364,7 +363,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
         DataModel::Nullable<Percent> cLevel = delegate->HandleOpenValve(level);
         if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
         {
-            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentLevel::Set(ep, cLevel), attribute_error);
+            VerifyOrReturnError(Status::Success == CurrentLevel::Set(ep, cLevel), attribute_error);
         }
     }
     // start countdown
@@ -377,8 +376,7 @@ CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
 {
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
     {
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentLevel::Set(ep, currentLevel),
-                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(Status::Success == CurrentLevel::Set(ep, currentLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         return CHIP_NO_ERROR;
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
@@ -386,7 +384,7 @@ CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
 
 CHIP_ERROR UpdateCurrentState(EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
 {
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentState::Set(ep, currentState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(Status::Success == CurrentState::Set(ep, currentState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
     emitValveStateChangedEvent(ep, currentState);
     return CHIP_NO_ERROR;
 }
@@ -405,7 +403,7 @@ void UpdateAutoCloseTime(uint64_t time)
         if (!d.IsNull() && d.Value() != 0)
         {
             uint64_t closingTime = d.Value() * chip::kMicrosecondsPerSecond + time;
-            if (EMBER_ZCL_STATUS_SUCCESS != AutoCloseTime::Set(t.endpoint, closingTime))
+            if (Status::Success != AutoCloseTime::Set(t.endpoint, closingTime))
             {
                 ChipLogError(Zcl, "Unable to update AutoCloseTime");
             }
@@ -430,7 +428,7 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
     Optional<Status> status = Optional<Status>::Missing();
 
     // if fault is registered return FailureDueToFault
-    if (EMBER_ZCL_STATUS_SUCCESS == ValveFault::Get(ep, &fault) && fault.HasAny())
+    if (Status::Success == ValveFault::Get(ep, &fault) && fault.HasAny())
     {
         commandObj->AddClusterSpecificFailure(commandPath,
                                               to_underlying(ValveConfigurationAndControl::StatusCodeEnum::kFailureDueToFault));
@@ -449,7 +447,7 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
     }
     else
     {
-        VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == DefaultOpenDuration::Get(ep, duration), status.Emplace(Status::Failure));
+        VerifyOrExit(Status::Success == DefaultOpenDuration::Get(ep, duration), status.Emplace(Status::Failure));
     }
 
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
@@ -459,7 +457,7 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
         {
             level.SetNonNull(targetLevel.Value());
         }
-        else if (EMBER_ZCL_STATUS_SUCCESS == DefaultOpenLevel::Get(ep, &defOpenLevel))
+        else if (Status::Success == DefaultOpenLevel::Get(ep, &defOpenLevel))
         {
             level.SetNonNull(defOpenLevel);
         }
@@ -496,7 +494,7 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault(0);
 
     // if fault is registered return FailureDueToFault
-    if (EMBER_ZCL_STATUS_SUCCESS == ValveFault::Get(ep, &fault) && fault.HasAny())
+    if (Status::Success == ValveFault::Get(ep, &fault) && fault.HasAny())
     {
         commandObj->AddClusterSpecificFailure(commandPath,
                                               to_underlying(ValveConfigurationAndControl::StatusCodeEnum::kFailureDueToFault));

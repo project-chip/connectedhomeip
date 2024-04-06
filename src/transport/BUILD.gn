@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlio.gni")
 import("//build_overrides/pigweed.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lib/core/core.gni")
@@ -45,6 +44,7 @@ static_library("transport") {
     "SessionManager.h",
     "SessionMessageCounter.h",
     "SessionMessageDelegate.h",
+    "SessionUpdateDelegate.h",
     "TracingStructs.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",
@@ -68,11 +68,13 @@ static_library("transport") {
     "${chip_root}/src/tracing",
     "${chip_root}/src/tracing:macros",
     "${chip_root}/src/transport/raw",
-    "${nlio_root}:nlio",
   ]
 
   if (chip_enable_transport_trace) {
-    sources += [ "TraceMessage.cpp" ]
+    sources += [
+      "TraceMessage.cpp",
+      "TraceMessage.h",
+    ]
   }
   if (chip_enable_transport_pw_trace) {
     public_deps += [ "$dir_pw_trace" ]

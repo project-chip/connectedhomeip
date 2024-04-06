@@ -14,7 +14,7 @@
 ** limitations under the License.
 */
 
-m_smu2_data_start                       = 0x489C0000;
+m_smu2_data_start                       = 0x489C0080;
 m_smu2_data_end                         = 0x489C537B;
 m_smu2_data_size                        = m_smu2_data_end - m_smu2_data_start + 1;
 

@@ -21,16 +21,15 @@
 class AttestationTrustStoreBridge : public chip::Credentials::AttestationTrustStore
 {
 public:
-    AttestationTrustStoreBridge(jobject attestationTrustStoreDelegate) :
-        mAttestationTrustStoreDelegate(attestationTrustStoreDelegate)
+    AttestationTrustStoreBridge(chip::JniGlobalReference && attestationTrustStoreDelegate) :
+        mAttestationTrustStoreDelegate(std::move(attestationTrustStoreDelegate))
     {}
-    ~AttestationTrustStoreBridge();
 
     CHIP_ERROR GetProductAttestationAuthorityCert(const chip::ByteSpan & skid,
                                                   chip::MutableByteSpan & outPaaDerBuffer) const override;
 
 protected:
-    jobject mAttestationTrustStoreDelegate = nullptr;
+    chip::JniGlobalReference mAttestationTrustStoreDelegate;
 
     CHIP_ERROR GetPaaCertFromJava(const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const;
 };

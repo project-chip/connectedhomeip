@@ -35,15 +35,18 @@ class MCConnectionExampleViewModel: ObservableObject {
         desiredEndpointFilter.vendorId = kDesiredEndpointVendorId
         selectedCastingPlayer?.verifyOrEstablishConnection(completionBlock: { err in
             self.Log.error("MCConnectionExampleViewModel connect() completed with \(err)")
-            if(err == nil)
+            DispatchQueue.main.async
             {
-                self.connectionSuccess = true
-                self.connectionStatus = "Connected!"
-            }
-            else
-            {
-                self.connectionSuccess = false
-                self.connectionStatus = "Connection failed with \(String(describing: err))"
+                if(err == nil)
+                {
+                    self.connectionSuccess = true
+                    self.connectionStatus = "Connected!"
+                }
+                else
+                {
+                    self.connectionSuccess = false
+                    self.connectionStatus = "Connection failed with \(String(describing: err))"
+                }
             }
         }, desiredEndpointFilter: desiredEndpointFilter)
     }

@@ -16,6 +16,9 @@
  */
 package com.matter.casting.core;
 
+import com.matter.casting.support.EndpointFilter;
+import com.matter.casting.support.MatterCallback;
+import com.matter.casting.support.MatterError;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -46,6 +49,8 @@ public interface CastingPlayer {
 
   long getDeviceType();
 
+  List<Endpoint> getEndpoints();
+
   @Override
   String toString();
 
@@ -55,24 +60,41 @@ public interface CastingPlayer {
   @Override
   int hashCode();
 
-  // TODO: Implement in following PRs. Related to player connection implementation.
-  //    List<Endpoint> getEndpoints();
-  //
-  //    ConnectionState getConnectionState();
-  //
-  //    CompletableFuture<Void> connect(long timeout);
-  //
-  //    static class ConnectionState extends Observable {
-  //        private boolean connected;
-  //
-  //        void setConnected(boolean connected) {
-  //            this.connected = connected;
-  //            setChanged();
-  //            notifyObservers(this.connected);
-  //        }
-  //
-  //        boolean isConnected() {
-  //            return connected;
-  //        }
-  //    }
+  /**
+   * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
+   * If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on
+   * disk, this will execute the user directed commissioning process.
+   *
+   * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window
+   *     open, if commissioning is required. Needs to be >= MIN_CONNECTION_TIMEOUT_SEC.
+   * @param desiredEndpointFilter (Optional) Attributes (such as VendorId) describing an Endpoint
+   *     that the client wants to interact with after commissioning. If this value is passed in, the
+   *     VerifyOrEstablishConnection will force User Directed Commissioning, in case the desired
+   *     Endpoint is not found in the on device CastingStore.
+   * @param successCallback called when the connection is established successfully
+   * @param failureCallback called with MatterError when the connection is fails to establish
+   * @return MatterError - Matter.NO_ERROR if request submitted successfully, otherwise a
+   *     MatterError object corresponding to the error
+   */
+  MatterError verifyOrEstablishConnection(
+      long commissioningWindowTimeoutSec,
+      EndpointFilter desiredEndpointFilter,
+      MatterCallback<Void> successCallback,
+      MatterCallback<MatterError> failureCallback);
+
+  /**
+   * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
+   * If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on
+   * disk, this will execute the user directed commissioning process.
+   *
+   * @param successCallback called when the connection is established successfully
+   * @param failureCallback called with MatterError when the connection is fails to establish
+   * @return MatterError - Matter.NO_ERROR if request submitted successfully, otherwise a
+   *     MatterError object corresponding to the error
+   */
+  MatterError verifyOrEstablishConnection(
+      MatterCallback<Void> successCallback, MatterCallback<MatterError> failureCallback);
+
+  /** @brief Sets the internal connection state of this CastingPlayer to "disconnected" */
+  void disconnect();
 }

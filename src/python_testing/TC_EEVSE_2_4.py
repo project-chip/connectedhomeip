@@ -20,8 +20,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from TC_EEVSE_Utils import EEVSEBaseTestHelper, EventChangeCallback
+from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
     def desc_TC_EEVSE_2_4(self) -> str:
         """Returns a description of this test"""
-        return "5.1.XXX. [TC-EEVSE-2.4] Fault test functionality with DUT as Server"
+        return "5.1.5. [TC-EEVSE-2.4] Fault test functionality with DUT as Server"
 
     def pics_TC_EEVSE_2_4(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
@@ -99,7 +99,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("4")
         await self.send_test_event_trigger_pluggedin()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EVConnected)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVConnected)
 
         self.step("4a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand)
@@ -117,7 +117,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("6")
         await self.send_test_event_trigger_charge_demand()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStarted)
 
         self.step("6a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging)
@@ -127,7 +127,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("7")
         await self.send_test_event_trigger_evse_ground_fault()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.Fault)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.Fault)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging
         previous_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kNoError
         current_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kGroundFault
@@ -141,7 +141,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("8")
         await self.send_test_event_trigger_evse_over_temperature_fault()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.Fault)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.Fault)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kFault
         previous_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kGroundFault
         current_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kOverTemperature
@@ -155,7 +155,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("9")
         await self.send_test_event_trigger_evse_fault_clear()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.Fault)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.Fault)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kFault
         previous_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kOverTemperature
         current_fault = Clusters.EnergyEvse.Enums.FaultStateEnum.kNoError
@@ -169,11 +169,11 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("10")
         await self.send_test_event_trigger_charge_demand_clear()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStopped)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStopped)
 
         self.step("11")
         await self.send_test_event_trigger_pluggedin_clear()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EVNotDetected)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVNotDetected)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand
         self.validate_ev_not_detected_event(event_data, session_id, expected_state, expected_duration=0, expected_charged=0)
 

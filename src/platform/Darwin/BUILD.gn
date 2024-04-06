@@ -71,6 +71,7 @@ static_library("Darwin") {
     "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "PlatformMetricKeys.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
@@ -97,9 +98,11 @@ static_library("Darwin") {
 
   deps = [
     ":logging",
+    ":tracing",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/tracing",
   ]
 
   public_deps = [
@@ -129,6 +132,18 @@ static_library("Darwin") {
       "UUIDHelperImpl.mm",
     ]
   }
+}
+
+source_set("tracing") {
+  sources = [
+    "Tracing.h",
+    "Tracing.mm",
+  ]
+
+  deps = [
+    ":logging",
+    "${chip_root}/src/tracing",
+  ]
 }
 
 static_library("logging") {

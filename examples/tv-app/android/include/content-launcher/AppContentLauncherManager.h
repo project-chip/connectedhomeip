@@ -22,6 +22,9 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 
+#include <list>
+#include <string>
+
 using chip::CharSpan;
 using chip::EndpointId;
 using chip::app::AttributeValueEncoder;
@@ -52,6 +55,7 @@ public:
     void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
     std::list<std::string> mAcceptHeaderList;
@@ -61,7 +65,7 @@ private:
     EndpointId mEndpointId;
 
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
-
+    static constexpr uint32_t kEndpointFeatureMap = 3;
+    static constexpr uint16_t kClusterRevision    = 2;
     ContentAppAttributeDelegate * mAttributeDelegate;
 };

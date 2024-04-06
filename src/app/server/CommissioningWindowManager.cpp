@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/server/CommissioningWindowManager.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
@@ -31,6 +31,7 @@
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
+using namespace chip::Crypto;
 
 using AdministratorCommissioning::CommissioningWindowStatusEnum;
 using chip::app::DataModel::MakeNullable;
@@ -89,8 +90,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 #if CONFIG_NETWORK_LAYER_BLE
     else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
     {
-        ChipLogProgress(AppServer, "Received kCloseAllBleConnections");
-        mServer->GetBleLayerObject()->CloseAllBleConnections();
+        ChipLogProgress(AppServer, "Received kCloseAllBleConnections:%d", static_cast<int>(event->Type));
+        mServer->GetBleLayerObject()->Shutdown();
     }
 #endif
 }

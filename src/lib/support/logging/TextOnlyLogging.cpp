@@ -209,21 +209,21 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
 }
 
 #if CHIP_LOG_FILTERING
-uint8_t gLogFilter = kLogCategory_Max;
+std::atomic<uint8_t> gLogFilter(kLogCategory_Max);
 
 uint8_t GetLogFilter()
 {
-    return gLogFilter;
+    return gLogFilter.load();
 }
 
 void SetLogFilter(uint8_t category)
 {
-    gLogFilter = category;
+    gLogFilter.store(category);
 }
 
 bool IsCategoryEnabled(uint8_t category)
 {
-    return (category <= gLogFilter);
+    return (category <= GetLogFilter());
 }
 #endif // CHIP_LOG_FILTERING
 

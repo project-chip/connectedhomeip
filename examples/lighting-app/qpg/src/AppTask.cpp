@@ -33,7 +33,8 @@
 #include <app/server/OnboardingCodesUtil.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerDelegate.h>
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -264,10 +265,13 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 
-    // Use GenericFaultTestEventTriggerDelegate to inject faults
-    static GenericFaultTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    // Use GenericFaultTestEventTriggerHandler to inject faults
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    static GenericFaultTestEventTriggerHandler sFaultTestEventTriggerHandler{};
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFaultTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
 
@@ -638,18 +642,19 @@ void AppTask::UpdateClusterState(void)
         ChipLogProgress(NotSpecified, "UpdateClusterState");
 
         // Write the new on/off value
-        EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
+        Protocols::InteractionModel::Status status =
+            Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+            ChipLogError(NotSpecified, "ERR: updating on/off %x", to_underlying(status));
         }
 
         // Write new level value
         status = Clusters::LevelControl::Attributes::CurrentLevel::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().GetLevel());
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(NotSpecified, "ERR: updating level %x", status);
+            ChipLogError(NotSpecified, "ERR: updating level %x", to_underlying(status));
         }
     });
 }

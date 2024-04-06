@@ -192,6 +192,13 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         {
             id.SetPairingInst(argv[5]);
         }
+        if (argc > 6)
+        {
+            uint16_t vid = (uint16_t) strtol(argv[6], &eptr, 10);
+            Protocols::UserDirectedCommissioning::TargetAppInfo info;
+            info.vendorId = vid;
+            id.AddTargetAppInfo(info);
+        }
         return Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(commissioner, port),
                                                                           id);
     }

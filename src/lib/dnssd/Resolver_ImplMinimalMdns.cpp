@@ -758,10 +758,14 @@ MinMdnsResolver gResolver;
 
 } // namespace
 
-Resolver & chip::Dnssd::Resolver::Instance()
+#if CHIP_DNSSD_DEFAULT_MINIMAL
+
+Resolver & GetDefaultResolver()
 {
     return gResolver;
 }
+
+#endif // CHIP_DNSSD_DEFAULT_MINIMAL
 
 } // namespace Dnssd
 } // namespace chip

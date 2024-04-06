@@ -39,7 +39,7 @@ using namespace chip::app::Clusters::AudioOutput;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kAudioOutputDelegateTableSize =
-    EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kAudioOutputDelegateTableSize <= kEmberInvalidEndpointIndex, "AudioOutput Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ Delegate * gDelegateTable[kAudioOutputDelegateTableSize] = { nullptr };
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::AudioOutput::Id,
-                                                       EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kAudioOutputDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -77,7 +77,7 @@ namespace AudioOutput {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::AudioOutput::Id,
-                                                       EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (ep < kAudioOutputDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
@@ -92,8 +92,8 @@ bool HasFeature(chip::EndpointId endpoint, Feature feature)
     bool hasFeature     = false;
     uint32_t featureMap = 0;
 
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    Status status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (Status::Success == status)
     {
         hasFeature = (featureMap & chip::to_underlying(feature));
     }

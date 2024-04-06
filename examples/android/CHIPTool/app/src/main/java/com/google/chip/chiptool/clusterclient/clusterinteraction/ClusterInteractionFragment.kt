@@ -1,6 +1,7 @@
 package com.google.chip.chiptool.clusterclient.clusterinteraction
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +46,13 @@ class ClusterInteractionFragment : Fragment() {
     binding.getEndpointListBtn.setOnClickListener {
       scope.launch {
         devicePtr =
-          ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+          try {
+            ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+          } catch (e: IllegalStateException) {
+            Log.d(TAG, "getConnectedDevicePointer exception", e)
+            showMessage("getConnectedDevicePointer fail!")
+            return@launch
+          }
         showMessage("Retrieving endpoints")
         binding.endpointList.visibility = View.VISIBLE
       }

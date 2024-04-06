@@ -32,7 +32,7 @@ CastingPlayer * CastingPlayer::mTargetCastingPlayer = nullptr;
 void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, unsigned long long int commissioningWindowTimeoutSec,
                                                 EndpointFilter desiredEndpointFilter)
 {
-    ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection called");
+    ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() called");
 
     std::vector<core::CastingPlayer>::iterator it;
     std::vector<core::CastingPlayer> cachedCastingPlayers = support::CastingStore::GetInstance()->ReadAll();
@@ -41,9 +41,11 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
 
     // ensure the app was not already in the process of connecting to this CastingPlayer
     err = (mConnectionState != CASTING_PLAYER_CONNECTING ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mConnectionState != CASTING_PLAYER_CONNECTING,
-                 ChipLogError(AppServer,
-                              "CastingPlayer::VerifyOrEstablishConnection called while already connecting to this CastingPlayer"));
+    VerifyOrExit(
+        mConnectionState != CASTING_PLAYER_CONNECTING,
+        ChipLogError(
+            AppServer,
+            "CastingPlayer::VerifyOrEstablishConnection() called while already connecting/connected to this CastingPlayer"));
     mConnectionState               = CASTING_PLAYER_CONNECTING;
     mOnCompleted                   = onCompleted;
     mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
@@ -64,14 +66,18 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
             if (ContainsDesiredEndpoint(&cachedCastingPlayers[index], desiredEndpointFilter))
             {
                 ChipLogProgress(
-                    AppServer, "CastingPlayer::VerifyOrEstablishConnection calling FindOrEstablishSession on cached CastingPlayer");
-                *this = cachedCastingPlayers[index];
+                    AppServer,
+                    "CastingPlayer::VerifyOrEstablishConnection() calling FindOrEstablishSession on cached CastingPlayer");
+                *this                          = cachedCastingPlayers[index];
+                mConnectionState               = CASTING_PLAYER_CONNECTING;
+                mOnCompleted                   = onCompleted;
+                mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
 
                 FindOrEstablishSession(
                     nullptr,
                     [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
                         ChipLogProgress(AppServer,
-                                        "CastingPlayer::VerifyOrEstablishConnection Connection to CastingPlayer successful");
+                                        "CastingPlayer::VerifyOrEstablishConnection() Connection to CastingPlayer successful");
                         CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
 
                         // this async call will Load all the endpoints with their respective attributes into the TargetCastingPlayer
@@ -80,7 +86,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
                         support::EndpointListLoader::GetInstance()->Load();
                     },
                     [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
-                        ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection Connection to CastingPlayer failed");
+                        ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection() Connection to CastingPlayer failed");
                         CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
                         CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
                         if (e != CHIP_NO_ERROR)
@@ -102,7 +108,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
     // will require User Directed Commissioning.
     if (chip::Server::GetInstance().GetFailSafeContext().IsFailSafeArmed())
     {
-        ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection Forcing expiry of armed FailSafe timer");
+        ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() Forcing expiry of armed FailSafe timer");
         // ChipDeviceEventHandler will handle the kFailSafeTimerExpired event by Opening the Basic Commissioning Window and Sending
         // the User Directed Commissioning Request
         chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
@@ -120,7 +126,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection failed with %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection() failed with %" CHIP_ERROR_FORMAT, err.Format());
         support::ChipDeviceEventHandler::SetUdcStatus(false);
         mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
         mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
@@ -255,7 +261,7 @@ void CastingPlayer::LogDetail() const
     {
         for (unsigned j = 0; j < mAttributes.numIPs; j++)
         {
-            char * ipAddressOut = mAttributes.ipAddresses[j].ToString(buf);
+            [[maybe_unused]] char * ipAddressOut = mAttributes.ipAddresses[j].ToString(buf);
             ChipLogDetail(AppServer, "\tIP Address #%d: %s", j + 1, ipAddressOut);
         }
     }

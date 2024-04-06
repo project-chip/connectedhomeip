@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,14 +17,42 @@
 
 #pragma once
 
-#include <app/util/af.h>
+#include <app/util/attribute-metadata.h>
+#include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
 
-// Remote devices writing attributes of local device
-EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                            uint8_t * dataPtr, EmberAfAttributeType dataType);
+/**
+ * @brief write an attribute, performing all the checks.
+ *
+ * This function will attempt to write the attribute value from
+ * the provided pointer. This function will only check that the
+ * attribute exists. If it does it will write the value into
+ * the attribute table for the given attribute.
+ *
+ * This function will not check to see if the attribute is
+ * writable since the read only / writable characteristic
+ * of an attribute only pertains to external devices writing
+ * over the air. Because this function is being called locally
+ * it assumes that the device knows what it is doing and has permission
+ * to perform the given operation.
+ *
+ * This function also does NOT check that the input dataType matches the expected
+ * data type (as Accessors.h/cpp have this correct by default).
+ * TODO: this not checking seems off - what if this is run without Accessors.h ?
+ */
+chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                                chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                                EmberAfAttributeType dataType);
 
-EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
-                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest);
-
-EmberAfStatus emAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
+/**
+ * @brief Read the attribute value, performing all the checks.
+ *
+ * This function will attempt to read the attribute and store it into the
+ * pointer.
+ *
+ * dataPtr may be NULL, signifying that we don't need the value, just the status
+ * (i.e. whether the attribute can be read).
+ */
+chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                               chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                               uint16_t readLength);

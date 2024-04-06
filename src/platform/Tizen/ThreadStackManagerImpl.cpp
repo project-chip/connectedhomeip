@@ -521,12 +521,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     ChipLogError(DeviceLayer, "Not implemented");
@@ -534,13 +528,6 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::Thread
 }
 
 void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
-
-CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
-                                                                               app::AttributeValueEncoder & encoder)
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
 
 CHIP_ERROR
 ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
@@ -650,6 +637,16 @@ CHIP_ERROR ThreadStackManagerImpl::_RemoveInvalidSrpServices()
         }
     }
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_ClearAllSrpHostAndServices()
+{
+    for (auto it = mSrpClientServices.begin(); it != mSrpClientServices.end();)
+    {
+        ReturnErrorOnFailure(_RemoveSrpService(it->mInstanceName, it->mName));
+        it = mSrpClientServices.erase(it);
+    }
     return CHIP_NO_ERROR;
 }
 

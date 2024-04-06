@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/util/ember-compatibility-functions.h>
 
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/callback.h>
@@ -30,8 +31,8 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
-#include <app/att-storage.h>
 #include <app/data-model/Decode.h>
+#include <app/util/att-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>

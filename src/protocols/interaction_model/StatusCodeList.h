@@ -22,7 +22,10 @@
  * include this file, then undefine the macro.
  */
 
-/// WARNING: If you touch this list, please also update src/controller/python/chip/interaction_model/__init__.py
+/// WARNING: If you touch this list,
+///          please update src/controller/python/chip/interaction_model/__init__.py
+///          please update src/controller/java/src/chip/devicecontroller/model/Status.java
+///          please update src/controller/java/src/matter/controller/model/Status.kt
 
 // clang-format off
 CHIP_IM_STATUS_CODE(Success               , SUCCESS                 , 0x0)

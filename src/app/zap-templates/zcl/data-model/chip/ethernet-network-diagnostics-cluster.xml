@@ -48,8 +48,8 @@ limitations under the License.
     <attribute side="server" code="0x05" define="COLLISION_COUNT" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CollisionCount</attribute>
     <attribute side="server" code="0x06" define="ETHERNET_OVERRUN_COUNT" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">OverrunCount</attribute>
     <attribute side="server" code="0x07" define="CARRIER_DETECT" type="boolean" min="0x00" max="0x01" writable="false" isNullable="true" optional="true">CarrierDetect</attribute>
-    <attribute side="server" code="0x08" define="TIME_SINCE_RESET" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">TimeSinceReset</attribute>            
-    <command source="client" code="0x00" name="ResetCounts" optional="false" cli="chip ethernet_network_diagnostics resetcounts">
+    <attribute side="server" code="0x08" define="TIME_SINCE_RESET" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">TimeSinceReset</attribute>
+    <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip ethernet_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0</description>
       <access op="invoke" role="manage"/>
     </command>

@@ -24,14 +24,6 @@
  *
  */
 
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
@@ -49,6 +41,7 @@ using namespace chip;
 // clang-format off
 static const CHIP_ERROR kTestElements[] =
 {
+    BLE_ERROR_ADAPTER_UNAVAILABLE,
     BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK,
     BLE_ERROR_CENTRAL_UNSUBSCRIBED,
     BLE_ERROR_GATT_SUBSCRIBE_FAILED,

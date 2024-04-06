@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="Measurement &amp; Sensing"/>
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x009C"/>
+    <field name="NodeTopology" mask="0x01"/>
+    <field name="TreeTopology" mask="0x02"/>
+    <field name="SetTopology" mask="0x04"/>
+    <field name="DynamicPowerFlow" mask="0x08"/>
+  </bitmap>
+  <cluster code="0x009C" apiMaturity="provisional">
+    <domain>Measurement &amp; Sensing</domain>
+    <name>Power Topology</name>
+    <code>0x009C</code>
+    <define>POWER_TOPOLOGY_CLUSTER</define>
+    <description>The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints.</description>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1"/>
+    <attribute code="0x0000" side="server" define="AVAILABLE_ENDPOINTS" type="array" entryType="endpoint_no" length="20" optional="true">AvailableEndpoints</attribute>
+    <attribute code="0x0001" side="server" define="ACTIVE_ENDPOINTS" type="array" entryType="endpoint_no" length="20" optional="true">ActiveEndpoints</attribute>
+  </cluster>
+</configurator>

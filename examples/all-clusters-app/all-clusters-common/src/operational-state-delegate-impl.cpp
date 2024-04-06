@@ -16,12 +16,23 @@
  *    limitations under the License.
  */
 #include <operational-state-delegate-impl.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
+
+static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data);
+
+DataModel::Nullable<uint32_t> GenericOperationalStateDelegateImpl::GetCountdownTime()
+{
+    if (mCountDownTime.IsNull())
+        return DataModel::NullNullable;
+
+    return DataModel::MakeNullable((uint32_t) (mCountDownTime.Value() - mRunningTime));
+}
 
 CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
@@ -72,10 +83,20 @@ void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOpera
 
 void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperationalError & err)
 {
+    OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    GetInstance()->GetCurrentOperationalError(current_err);
+
+    if (current_err.errorStateID != to_underlying(OperationalState::ErrorStateEnum::kNoError))
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
+        return;
+    }
+
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     else
@@ -90,11 +111,55 @@ void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperati
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
     {
+        (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, this);
+
+        OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+        GetInstance()->GetCurrentOperationalError(current_err);
+
+        Optional<DataModel::Nullable<uint32_t>> totalTime((DataModel::Nullable<uint32_t>(mRunningTime + mPausedTime)));
+        Optional<DataModel::Nullable<uint32_t>> pausedTime((DataModel::Nullable<uint32_t>(mPausedTime)));
+
+        GetInstance()->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime, pausedTime);
+
+        mRunningTime = 0;
+        mPausedTime  = 0;
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     else
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+    }
+}
+
+static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data)
+{
+    GenericOperationalStateDelegateImpl * delegate = reinterpret_cast<GenericOperationalStateDelegateImpl *>(data);
+
+    OperationalState::Instance * instance = OperationalState::GetOperationalStateInstance();
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
+
+    auto countdown_time = delegate->GetCountdownTime();
+
+    if (countdown_time.IsNull() || (!countdown_time.IsNull() && countdown_time.Value() > 0))
+    {
+        if (state == OperationalState::OperationalStateEnum::kRunning)
+        {
+            delegate->mRunningTime++;
+        }
+        else if (state == OperationalState::OperationalStateEnum::kPaused)
+        {
+            delegate->mPausedTime++;
+        }
+    }
+
+    if (state == OperationalState::OperationalStateEnum::kRunning || state == OperationalState::OperationalStateEnum::kPaused)
+    {
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, delegate);
+    }
+    else
+    {
+        (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
     }
 }
 

@@ -25,6 +25,7 @@ import chip.devicecontroller.model.ClusterState;
 import chip.devicecontroller.model.EndpointState;
 import chip.devicecontroller.model.InvokeElement;
 import chip.devicecontroller.model.NodeState;
+import chip.devicecontroller.model.Status;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -161,7 +162,6 @@ public class ChipClusters {
 
     @Deprecated
     public void deleteCluster(long chipClusterPtr) {}
-    
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
       super.finalize();
@@ -242,8 +242,15 @@ public class ChipClusters {
     }
 
     @Override
-    public void onResponse(ChipAttributePath attributePath) {
-      callback.onSuccess();
+    public void onResponse(ChipAttributePath attributePath, Status status) {
+      if (status.getStatus() == Status.Code.Success)
+      {
+        callback.onSuccess();
+      }
+      else
+      {
+        callback.onError(new StatusException(status.getStatus()));
+      }
     }
 
     @Override

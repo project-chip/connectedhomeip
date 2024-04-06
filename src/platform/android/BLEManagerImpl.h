@@ -23,9 +23,9 @@
 
 #pragma once
 
-#include <jni.h>
-
 #include <ble/BleLayer.h>
+#include <jni.h>
+#include <lib/support/JniReferences.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -124,7 +124,7 @@ private:
     CHIP_ERROR HasFlag(Flags flag, bool & has);
     CHIP_ERROR SetFlag(Flags flag, bool isSet);
 
-    jobject mBLEManagerObject = nullptr;
+    chip::JniGlobalReference mBLEManagerObject;
 
     jmethodID mInitMethod    = nullptr;
     jmethodID mSetFlagMethod = nullptr;

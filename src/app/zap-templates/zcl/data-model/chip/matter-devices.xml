@@ -74,10 +74,10 @@ limitations under the License.
                 <requireAttribute>ACTIVE_LOCALE</requireAttribute>
                 <requireAttribute>SUPPORTED_LOCALES</requireAttribute>
             </include>
-            <include cluster="Time Format Localization" client="false" server="true" clientLocked="true" serverLocked="false">
+            <include cluster="Time Format Localization" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>HOUR_FORMAT</requireAttribute>
             </include>
-            <include cluster="Unit Localization" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Unit Localization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>UP_TIME</requireAttribute>
             </include>
@@ -105,6 +105,21 @@ limitations under the License.
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-electricalsensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Electrical Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0510</deviceId>
+        <class>Utility</class>
+        <scope>Node</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Power Topology" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Electrical Energy Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Electrical Power Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1402,7 +1417,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
                 <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -1460,7 +1474,6 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
                 <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
@@ -2376,6 +2389,21 @@ limitations under the License.
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
             </include>
             <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+        <deviceType>
+        <name>Energy EVSE</name>
+        <domain>CHIP</domain>
+        <typeName>Matter EVSE</typeName>
+        <class>Simple</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x050C</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Energy EVSE" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Energy EVSE Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>

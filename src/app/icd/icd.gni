@@ -17,6 +17,8 @@ declare_args() {
   # TODO - Add Specifics when the design is refined
   chip_enable_icd_server = false
 
+  chip_enable_icd_lit = false
+
   # Matter SDK Configuration flag to enable ICD client functionality
   # TODO - Add Specifics when the design is refined
   chip_enable_icd_client = false
@@ -28,4 +30,10 @@ declare_args() {
 
   # Set to true to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
   icd_enforce_sit_slow_poll_limit = false
+}
+
+# Set the defaults for CIP and UAT features to be consistent with the LIT value.
+declare_args() {
+  chip_enable_icd_checkin = chip_enable_icd_lit
+  chip_enable_icd_user_active_mode_trigger = chip_enable_icd_lit
 }

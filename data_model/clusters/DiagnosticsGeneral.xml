@@ -58,9 +58,17 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="General Diagnostics" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="UpTime attribute now mandatory, and added TimeSnapshot command"/>
+    <revision revision="2" summary="UpTime attribute now mandatory, and added TimeSnapshot command, added DMTEST feature."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0033" name="General Diagnostics"/>
+  </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DGGEN" scope="Node"/>
+  <features>
+    <feature bit="0" code="DMTEST" name="DataModelTest" summary="Support specific testing needs for extended Data Model features">
+      <optionalConform/>
+    </feature>
+  </features>
   <dataTypes>
     <enum name="BootReasonEnum">
       <item value="0" name="Unspecified" summary="The Node is unable to identify the Power-On reason as one of the other provided enumeration values.">
@@ -175,50 +183,45 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="NetworkInterface">
-      <field id="0" name="Name" type="ref_DataTypeString">
-        <access read="true"/>
+      <field id="0" name="Name" type="string">
         <mandatoryConform/>
-        <constraint type="max" value="32"/>
+        <constraint type="maxLength" value="32"/>
       </field>
       <field id="1" name="IsOperational" type="bool">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="OffPremiseServicesReachableIPv4" type="bool" default="null">
-        <access read="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="OffPremiseServicesReachableIPv6" type="bool" default="null">
-        <access read="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="HardwareAddress" type="Hardware Address">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="5" name="IPv4Addresses" type="ref_DataTypeList[ref_Ipv4Adr]">
-        <access read="true"/>
+      <field id="5" name="IPv4Addresses" type="list">
+        <entry type="ref_Ipv4Adr"/>
         <mandatoryConform/>
-        <constraint type="max" value="4"/>
+        <constraint type="maxCount" value="4"/>
       </field>
-      <field id="6" name="IPv6Addresses" type="ref_DataTypeList[ref_Ipv6Adr]">
-        <access read="true"/>
+      <field id="6" name="IPv6Addresses" type="list">
+        <entry type="ref_Ipv6Adr"/>
         <mandatoryConform/>
-        <constraint type="max" value="8"/>
+        <constraint type="maxCount" value="8"/>
       </field>
       <field id="7" name="Type" type="InterfaceTypeEnum">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="NetworkInterfaces" type="ref_DataTypeList[NetworkInterface Type]">
+    <attribute id="0x0000" name="NetworkInterfaces" type="list">
+      <entry type="NetworkInterface"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="max" value="8"/>
+      <constraint type="maxCount" value="8"/>
     </attribute>
     <attribute id="0x0001" name="RebootCount" type="uint16">
       <access read="true" readPrivilege="view"/>
@@ -239,20 +242,23 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0005" name="ActiveHardwareFaults" type="ref_DataTypeList[HardwareFaultEnum Type]">
+    <attribute id="0x0005" name="ActiveHardwareFaults" type="list">
+      <entry type="HardwareFaultEnum"/>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="max" value="11"/>
+      <constraint type="maxCount" value="11"/>
     </attribute>
-    <attribute id="0x0006" name="ActiveRadioFaults" type="ref_DataTypeList[RadioFaultEnum Type]">
+    <attribute id="0x0006" name="ActiveRadioFaults" type="list">
+      <entry type="RadioFaultEnum"/>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="max" value="7"/>
+      <constraint type="maxCount" value="7"/>
     </attribute>
-    <attribute id="0x0007" name="ActiveNetworkFaults" type="ref_DataTypeList[NetworkFaultEnum Type]">
+    <attribute id="0x0007" name="ActiveNetworkFaults" type="list">
+      <entry type="NetworkFaultEnum"/>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="max" value="4"/>
+      <constraint type="maxCount" value="4"/>
     </attribute>
     <attribute id="0x0008" name="TestEventTriggersEnabled" type="bool">
       <access read="true" readPrivilege="view"/>
@@ -263,7 +269,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="TestEventTrigger" response="Y">
+    <command id="0x00" name="TestEventTrigger" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
       <field id="0" name="EnableKey" type="octstr">
@@ -274,12 +280,11 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="TimeSnapshot" response="TimeSnapshotResponse">
+    <command id="0x01" name="TimeSnapshot" direction="commandToServer" response="TimeSnapshotResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
     <command id="0x02" name="TimeSnapshotResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="SystemTimeMs" type="ref_DataTypeSystemTimeMs" default="MS">
         <mandatoryConform/>
@@ -289,42 +294,75 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
+    <command id="0x03" name="PayloadTestRequest" direction="commandToServer" response="PayloadTestResponse">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="DMTEST"/>
+      </mandatoryConform>
+      <field id="0" name="EnableKey" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="1" name="Value" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Count" type="uint16">
+        <mandatoryConform/>
+        <constraint type="max" value="2048"/>
+      </field>
+    </command>
+    <command id="0x04" name="PayloadTestResponse" direction="responseFromServer">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="DMTEST"/>
+      </mandatoryConform>
+      <field id="0" name="Payload" type="octstr">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="2048"/>
+      </field>
+    </command>
   </commands>
   <events>
     <event id="0x00" name="HardwareFaultChange" priority="critical">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="Current" type="ref_DataTypeList[HardwareFaultEnum Type]">
+      <field id="0" name="Current" type="list">
+        <entry type="HardwareFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="max" value="11"/>
+        <constraint type="maxCount" value="11"/>
       </field>
-      <field id="1" name="Previous" type="ref_DataTypeList[HardwareFaultEnum Type]">
+      <field id="1" name="Previous" type="list">
+        <entry type="HardwareFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="max" value="11"/>
+        <constraint type="maxCount" value="11"/>
       </field>
     </event>
     <event id="0x01" name="RadioFaultChange" priority="critical">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="Current" type="ref_DataTypeList[RadioFaultEnum Type]">
+      <field id="0" name="Current" type="list">
+        <entry type="RadioFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="max" value="7"/>
+        <constraint type="maxCount" value="7"/>
       </field>
-      <field id="1" name="Previous" type="ref_DataTypeList[RadioFaultEnum Type]">
+      <field id="1" name="Previous" type="list">
+        <entry type="RadioFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="max" value="7"/>
+        <constraint type="maxCount" value="7"/>
       </field>
     </event>
     <event id="0x02" name="NetworkFaultChange" priority="critical">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="Current" type="ref_DataTypeList[NetworkFaultEnum Type]">
+      <field id="0" name="Current" type="list">
+        <entry type="NetworkFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="max" value="4"/>
+        <constraint type="maxCount" value="4"/>
       </field>
-      <field id="1" name="Previous" type="ref_DataTypeList[NetworkFaultEnum Type]">
+      <field id="1" name="Previous" type="list">
+        <entry type="NetworkFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="max" value="4"/>
+        <constraint type="maxCount" value="4"/>
       </field>
     </event>
     <event id="0x03" name="BootReason" priority="critical">

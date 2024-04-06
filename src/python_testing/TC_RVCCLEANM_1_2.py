@@ -18,16 +18,26 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
-
 
 class TC_RVCCLEANM_1_2(MatterBaseTest):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.endpoint = 0
+        self.commonTags = {0x0: 'Auto',
+                           0x1: 'Quick',
+                           0x2: 'Quiet',
+                           0x3: 'LowNoise',
+                           0x4: 'LowEnergy',
+                           0x5: 'Vacation',
+                           0x6: 'Min',
+                           0x7: 'Max',
+                           0x8: 'Night',
+                           0x9: 'Day'}
+        self.cleanTags = [tag.value for tag in Clusters.RvcCleanMode.Enums.ModeTag]
+        self.supported_modes_dut = []
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcCleanMode
@@ -38,12 +48,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCCLEANM_1_2(self):
-
-        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT_ENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        self.endpoint = self.matter_test_config.endpoint
 
         attributes = Clusters.RvcCleanMode.Attributes
 
@@ -55,16 +60,18 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
 
             logging.info("SupportedModes: %s" % (supported_modes))
 
+            # Verify that the list has at least 2 and at most 255 entries
             asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
             asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
 
-            modes = []
+            # Verify that each ModeOptionsStruct entry has a unique Mode field value
             for m in supported_modes:
-                if m.mode in modes:
+                if m.mode in self.supported_modes_dut:
                     asserts.fail("SupportedModes must have unique mode values!")
                 else:
-                    modes.append(m.mode)
+                    self.supported_modes_dut.append(m.mode)
 
+            # Verify that each ModeOptionsStruct entry has a unique Label field value
             labels = []
             for m in supported_modes:
                 if m.label in labels:
@@ -72,47 +79,50 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
                 else:
                     labels.append(m.label)
 
-            # common mode tags
-            commonTags = {0x0: 'Auto',
-                          0x1: 'Quick',
-                          0x2: 'Quiet',
-                          0x3: 'LowNoise',
-                          0x4: 'LowEnergy',
-                          0x5: 'Vacation',
-                          0x6: 'Min',
-                          0x7: 'Max',
-                          0x8: 'Night',
-                          0x9: 'Day'}
-
-            cleanTags = [tag.value for tag in Clusters.RvcCleanMode.Enums.ModeTag
-                         if tag is not Clusters.RvcCleanMode.Enums.ModeTag.kUnknownEnumValue]
-
+            # Verify that each ModeOptionsStruct entry's ModeTags field has:
             for m in supported_modes:
+                # * at least one entry
+                if len(m.modeTags) == 0:
+                    asserts.fail("SupportedModes must have at least one mode tag!")
+
+                at_least_one_common_or_clean_tag = False
                 for t in m.modeTags:
-                    is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
-                    asserts.assert_true(t.value in commonTags.keys() or t.value in cleanTags or is_mfg,
-                                        "Found a SupportedModes entry with invalid mode tag value!")
+                    # * the values of the Value fields that are not larger than 16 bits
+                    if t.value > 0xFFFF or t.value < 0:
+                        asserts.fail("Mode tag values must not be larger than 16 bits!")
+
+                    # * for each Value field: {isCommonOrDerivedOrMfgTagsVal}
+                    is_mfg = (0x8000 <= t.value <= 0xBFFF)
+                    if (t.value not in self.commonTags and
+                            t.value not in self.cleanTags and
+                            not is_mfg):
+                        asserts.fail("Mode tag value is not a common tag, clean tag or vendor tag!")
+
+                    # * for at least one Value field: {isCommonOrDerivedTagsVal}
+                    if not is_mfg:
+                        at_least_one_common_or_clean_tag = True
+
+                if not at_least_one_common_or_clean_tag:
+                    asserts.fail("At least one mode tag must be a common tag or clean tag!")
+
+            # Verify that at least one ModeOptionsStruct entry includes either the
+            # Vacuum(0x4001) mode tag or the Mop(0x4002)mode tag in the ModeTags field
+            vacuum_mop_tags = [Clusters.RvcCleanMode.Enums.ModeTag.kVacuum, Clusters.RvcCleanMode.Enums.ModeTag.kMop]
+            has_vacuum_or_mop_mode_tag = False
+            for m in supported_modes:
+                has_vacuum_or_mop_mode_tag = any(t.value in vacuum_mop_tags for t in m.modeTags)
+                if has_vacuum_or_mop_mode_tag:
+                    break
+
+            asserts.assert_true(has_vacuum_or_mop_mode_tag,
+                                "At least one ModeOptionsStruct entry must include either the Vacuum or Mop mode tag")
 
         if self.check_pics("RVCCLEANM.S.A0001"):
             self.print_step(3, "Read CurrentMode attribute")
             current_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
             logging.info("CurrentMode: %s" % (current_mode))
-            asserts.assert_true(current_mode in modes, "CurrentMode is not a supported mode!")
-
-        if self.check_pics("RVCCLEANM.S.A0003"):
-            self.print_step(4, "Read OnMode attribute")
-            on_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.OnMode)
-
-            logging.info("OnMode: %s" % (on_mode))
-            asserts.assert_true(on_mode in modes or on_mode == NullValue, "OnMode is not a supported mode!")
-
-        if self.check_pics("RVCCLEANM.S.A0002"):
-            self.print_step(5, "Read StartUpMode attribute")
-            startup_mode = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.StartUpMode)
-
-            logging.info("StartUpMode: %s" % (startup_mode))
-            asserts.assert_true(startup_mode in modes or startup_mode == NullValue, "StartUpMode is not a supported mode!")
+            asserts.assert_true(current_mode in self.supported_modes_dut, "CurrentMode is not a supported mode!")
 
 
 if __name__ == "__main__":

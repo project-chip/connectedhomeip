@@ -37,7 +37,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 5
+          value: 1
           constraints:
               type: int16u
 
@@ -62,7 +62,7 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "Step 4: TH reads AttributeList mandatory attributes(global attribute
+          "Step 4a: TH reads AttributeList mandatory attributes(global attribute
           65531)"
       PICS: S.S
       command: "readAttribute"
@@ -70,7 +70,18 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+              contains: [1, 2, 65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: TH reads the LastConfiguredBy optional attribute from the
+          AttributeList (global attribute 65531)"
+      PICS: S.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
     - label: "Step 5: TH reads from the DUT the EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
@@ -110,7 +121,7 @@ tests:
               contains: [0, 1, 2, 3, 4, 6]
 
     - label:
-          "Step 7b: Read optional command(CopySceneResponse) in
+          "Step 7b: TH reads Read optional command(CopySceneResponse) in
           GeneratedCommandList (global attribute 65528)"
       PICS: S.S.C40.Rsp
       command: "readAttribute"

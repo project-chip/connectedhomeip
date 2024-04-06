@@ -215,6 +215,8 @@ private:
         }
 
         if (!callbackBridge->mQueue) {
+            ChipLogDetail(Controller, "%s %f seconds: can't dispatch response; no queue", callbackBridge->mCookie.UTF8String,
+                -[callbackBridge->mRequestTime timeIntervalSinceNow]);
             if (!callbackBridge->mKeepAlive) {
                 delete callbackBridge;
             }

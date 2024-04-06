@@ -32,7 +32,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
@@ -55,6 +54,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalCredentials;
 using namespace chip::Credentials;
+using namespace chip::Crypto;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
