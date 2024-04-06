@@ -492,11 +492,11 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     else if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
         // SSID present on Thread violates the `[WI]` conformance.
-        if (req.ssid.HasValue())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
+        // if (req.ssid.HasValue())
+        // {
+        //     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+        //     return;
+        // }
 
         mCurrentOperationBreadcrumb = req.breadcrumb;
         mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
