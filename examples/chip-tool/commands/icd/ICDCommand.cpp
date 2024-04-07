@@ -23,6 +23,7 @@
 #include <crypto/RawKeySessionKeystore.h>
 
 using namespace ::chip;
+using namespace ::chip::app;
 
 CHIP_ERROR ICDListCommand::RunCommand()
 {
@@ -64,12 +65,55 @@ CHIP_ERROR ICDListCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ICDWaitForDeviceCommand::RunCommand()
+{
+    if (!IsPeerLIT())
+    {
+        ChipLogError(chipTool, "The device is not a registered LIT-ICD device.");
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    mInterestedNode = ScopedNodeId(GetDestinationId(), CurrentCommissioner().GetFabricIndex());
+    RegisterOnCheckInCompleteCallback(this);
+    ChipLogError(chipTool, "Please trigger the device active mode.");
+    return CHIP_NO_ERROR;
+}
+
+void ICDWaitForDeviceCommand::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
+{
+    if (clientInfo.peer_node != mInterestedNode)
+    {
+        ChipLogDetail(chipTool, "The node " ChipLogFormatScopedNodeId " is not the one we are interested in.",
+                      ChipLogValueScopedNodeId(clientInfo.peer_node));
+        return;
+    }
+
+    ChipLogDetail(chipTool, "Received check-in message from the node, send stay active request to the device.");
+    UnregisterOnCheckInCompleteCallback(this);
+
+    CHIP_ERROR err = ClusterCommand::RunCommand();
+    if (err != CHIP_NO_ERROR)
+    {
+        SetCommandExitStatus(err);
+        return;
+    }
+}
+
+CHIP_ERROR ICDWaitForDeviceCommand::SendCommand(chip::DeviceProxy * device,
+                                                std::vector<chip::EndpointId> /* not used, always send to endpoint 0 */)
+{
+    chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::Type request;
+    request.stayActiveDuration = mStayActiveDurationSeconds;
+    return ClusterCommand::SendCommand(device, kRootEndpointId, Clusters::IcdManagement::Id,
+                                       Clusters::IcdManagement::Commands::StayActiveRequest::Id, request);
+}
+
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * name = "ICD";
 
     commands_list list = {
         make_unique<ICDListCommand>(credsIssuerConfig),
+        make_unique<ICDWaitForDeviceCommand>(credsIssuerConfig),
     };
 
     commands.RegisterCommandSet(name, list, "Commands for client-side ICD management.");
