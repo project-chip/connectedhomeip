@@ -31,6 +31,7 @@
 #include <app/util/attribute-table.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -4216,6 +4217,12 @@ namespace LastNetworkID {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
+    if (value.IsNull())
+    {
+        ChipLogError(Zcl, "Null Nullable<Span> passed to NetworkCommissioning::LastNetworkID::Get");
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
     uint8_t zclString[32 + 1];
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, zclString, sizeof(zclString));
@@ -4226,7 +4233,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
         value.SetNull();
         return Protocols::InteractionModel::Status::Success;
     }
-    auto & span = value.SetNonNull();
+    auto & span = value.Value();
 
     VerifyOrReturnError(span.size() == 32, Protocols::InteractionModel::Status::InvalidDataType);
     memcpy(span.data(), &zclString[1], 32);
@@ -12233,6 +12240,12 @@ namespace AliroReaderVerificationKey {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
+    if (value.IsNull())
+    {
+        ChipLogError(Zcl, "Null Nullable<Span> passed to DoorLock::AliroReaderVerificationKey::Get");
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
     uint8_t zclString[65 + 1];
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
@@ -12243,7 +12256,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
         value.SetNull();
         return Protocols::InteractionModel::Status::Success;
     }
-    auto & span = value.SetNonNull();
+    auto & span = value.Value();
 
     VerifyOrReturnError(span.size() == 65, Protocols::InteractionModel::Status::InvalidDataType);
     memcpy(span.data(), &zclString[1], 65);
@@ -12283,6 +12296,12 @@ namespace AliroReaderGroupIdentifier {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
+    if (value.IsNull())
+    {
+        ChipLogError(Zcl, "Null Nullable<Span> passed to DoorLock::AliroReaderGroupIdentifier::Get");
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
     uint8_t zclString[16 + 1];
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
@@ -12293,7 +12312,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
         value.SetNull();
         return Protocols::InteractionModel::Status::Success;
     }
-    auto & span = value.SetNonNull();
+    auto & span = value.Value();
 
     VerifyOrReturnError(span.size() == 16, Protocols::InteractionModel::Status::InvalidDataType);
     memcpy(span.data(), &zclString[1], 16);
@@ -12365,6 +12384,12 @@ namespace AliroGroupResolvingKey {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
+    if (value.IsNull())
+    {
+        ChipLogError(Zcl, "Null Nullable<Span> passed to DoorLock::AliroGroupResolvingKey::Get");
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
     uint8_t zclString[16 + 1];
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
@@ -12375,7 +12400,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
         value.SetNull();
         return Protocols::InteractionModel::Status::Success;
     }
-    auto & span = value.SetNonNull();
+    auto & span = value.Value();
 
     VerifyOrReturnError(span.size() == 16, Protocols::InteractionModel::Status::InvalidDataType);
     memcpy(span.data(), &zclString[1], 16);
@@ -17112,6 +17137,12 @@ namespace ActivePresetHandle {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
+    if (value.IsNull())
+    {
+        ChipLogError(Zcl, "Null Nullable<Span> passed to Thermostat::ActivePresetHandle::Get");
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
     uint8_t zclString[16 + 1];
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, sizeof(zclString));
@@ -17122,7 +17153,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
         value.SetNull();
         return Protocols::InteractionModel::Status::Success;
     }
-    auto & span = value.SetNonNull();
+    auto & span = value.Value();
 
     VerifyOrReturnError(span.size() == 16, Protocols::InteractionModel::Status::InvalidDataType);
     memcpy(span.data(), &zclString[1], 16);
@@ -17162,6 +17193,12 @@ namespace ActiveScheduleHandle {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
+    if (value.IsNull())
+    {
+        ChipLogError(Zcl, "Null Nullable<Span> passed to Thermostat::ActiveScheduleHandle::Get");
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
     uint8_t zclString[16 + 1];
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::Thermostat::Id, Id, zclString, sizeof(zclString));
@@ -17172,7 +17209,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
         value.SetNull();
         return Protocols::InteractionModel::Status::Success;
     }
-    auto & span = value.SetNonNull();
+    auto & span = value.Value();
 
     VerifyOrReturnError(span.size() == 16, Protocols::InteractionModel::Status::InvalidDataType);
     memcpy(span.data(), &zclString[1], 16);
@@ -31764,6 +31801,12 @@ namespace NullableOctetString {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
+    if (value.IsNull())
+    {
+        ChipLogError(Zcl, "Null Nullable<Span> passed to UnitTesting::NullableOctetString::Get");
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
     uint8_t zclString[10 + 1];
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
@@ -31774,7 +31817,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
         value.SetNull();
         return Protocols::InteractionModel::Status::Success;
     }
-    auto & span = value.SetNonNull();
+    auto & span = value.Value();
 
     VerifyOrReturnError(span.size() == 10, Protocols::InteractionModel::Status::InvalidDataType);
     memcpy(span.data(), &zclString[1], 10);
@@ -31814,6 +31857,12 @@ namespace NullableCharString {
 
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableCharSpan> & value)
 {
+    if (value.IsNull())
+    {
+        ChipLogError(Zcl, "Null Nullable<Span> passed to UnitTesting::NullableCharString::Get");
+        return Protocols::InteractionModel::Status::Failure;
+    }
+
     uint8_t zclString[10 + 1];
     Protocols::InteractionModel::Status status =
         emberAfReadAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
@@ -31824,7 +31873,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, DataModel::Nu
         value.SetNull();
         return Protocols::InteractionModel::Status::Success;
     }
-    auto & span = value.SetNonNull();
+    auto & span = value.Value();
 
     VerifyOrReturnError(span.size() == 10, Protocols::InteractionModel::Status::InvalidDataType);
     memcpy(span.data(), &zclString[1], 10);

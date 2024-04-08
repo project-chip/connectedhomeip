@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,8 +71,8 @@ k_timer sFactoryResetTimer;
 uint8_t sFactoryResetCntr = 0;
 
 bool sIsCommissioningFailed = false;
-bool sIsThreadProvisioned   = false;
-bool sIsThreadEnabled       = false;
+bool sIsNetworkProvisioned  = false;
+bool sIsNetworkEnabled      = false;
 bool sIsThreadAttached      = false;
 bool sHaveBLEConnections    = false;
 
@@ -165,6 +165,7 @@ class AppFabricTableDelegate : public FabricTable::Delegate
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
     // Disable openthread before reset to prevent writing to NVS
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     void OnShutDown() override
     {
         if (ThreadStackManagerImpl().IsThreadEnabled())
@@ -172,6 +173,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             ThreadStackManagerImpl().Finalize();
         }
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 };
 
 #if CONFIG_CHIP_LIB_SHELL
@@ -214,7 +216,7 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 
     AppEvent event = {};
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     StartThreadButtonEventHandler();
 #endif
 
@@ -401,14 +403,14 @@ void AppTaskCommon::LinkButtons(ButtonManager & buttonManager)
     buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
     buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
     buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
     buttonManager.addCallback(StartThreadButtonEventHandler, 3, true);
 #endif
 }
 
 void AppTaskCommon::UpdateStatusLED()
 {
-    if (sIsThreadProvisioned && sIsThreadEnabled)
+    if (sIsNetworkProvisioned && sIsNetworkEnabled)
     {
         if (sIsThreadAttached)
         {
@@ -546,7 +548,7 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CHIP_DEVICE_CONFIG_ENABLE_THREAD
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
     AppEvent event;
@@ -624,12 +626,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         }
 #endif
         break;
-    case DeviceEventType::kThreadStateChange:
-        sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-        sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-        sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
-        UpdateStatusLED();
-        break;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
         InitBasicOTARequestor();
@@ -641,6 +638,15 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #endif /* CONFIG_BOOTLOADER_MCUBOOT */
 #if CONFIG_CHIP_OTA_REQUESTOR
         }
+#endif
+        break;
+    case DeviceEventType::kThreadStateChange:
+        sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
+        sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
+        sIsThreadAttached     = ConnectivityMgr().IsThreadAttached();
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+        UpdateStatusLED();
 #endif
         break;
     default:
