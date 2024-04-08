@@ -44,13 +44,8 @@ Following data can be added to the manufacturing partition using
     -   Serial Number
     -   Unique identifier
 
--   Device information
-    -   Fixed Labels
-    -   Supported locales
-    -   Supported calendar types
-    -   Supported modes
-        -   Note: As per spec at max size of label should be 64 and `\0` will be
-            added at the end.
+-   Supported modes
+    -   Note: As per spec at max size of label should be 64 and `\0` will be added at the end.
 
 ### Configuration Options
 
@@ -75,12 +70,6 @@ ESP32 specific implementation of `DeviceInstanceInfoProvider`.
 
 [Component config → CHIP Device Layer → Commissioning options → Use ESP32 Device
 Instance Info Provider]
-
-Enable config option `CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER` to use ESP32
-specific implementation of `DeviceInfoProvider`.
-
-[Component config → CHIP Device Layer → Commissioning options → Use ESP32 Device
-Info Provider]
 
 ESP32 implementation reads factory data from nvs partition, chip-factory data
 must be flashed into the configured nvs partition. Factory partition can be
