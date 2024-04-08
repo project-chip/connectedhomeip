@@ -50,3 +50,15 @@ source_set("af-types") {
     "${chip_root}/src/protocols/interaction_model",
   ]
 }
+
+source_set("callbacks") {
+  sources = [
+    "MatterCallbacks.cpp",
+    "MatterCallbacks.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/access",
+    "${chip_root}/src/app:paths",
+  ]
+}

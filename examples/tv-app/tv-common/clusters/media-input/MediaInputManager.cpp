@@ -17,6 +17,8 @@
 
 #include "MediaInputManager.h"
 
+#include <string>
+
 using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;

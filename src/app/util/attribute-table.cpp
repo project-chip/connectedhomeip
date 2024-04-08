@@ -16,6 +16,9 @@
  */
 #include <app/util/attribute-table.h>
 
+#include <app/util/attribute-table-detail.h>
+
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
@@ -25,9 +28,113 @@
 #include <app/reporting/reporting.h>
 #include <protocols/interaction_model/Constants.h>
 
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
+#define EM_BIG_ENDIAN true
+#else
+#define EM_BIG_ENDIAN false
+#endif
+
 using chip::Protocols::InteractionModel::Status;
 
 using namespace chip;
+
+namespace {
+
+// Zigbee spec says types between signed 8 bit and signed 64 bit
+bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
+{
+    return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
+}
+
+/**
+ * @brief Simple integer comparison function.
+ * Compares two values of a known length as integers.
+ * Signed integer comparison are supported for numbers with length of
+ * 4 (bytes) or less.
+ * The integers are in native endianness.
+ *
+ * @return -1, if val1 is smaller
+ *          0, if they are the same or if two negative numbers with length
+ *          greater than 4 is being compared
+ *          1, if val2 is smaller.
+ *
+ * You can pass in val1 as NULL, which will assume that it is
+ * pointing to an array of all zeroes. This is used so that
+ * default value of NULL is treated as all zeroes.
+ */
+int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber)
+{
+    if (len == 0)
+    {
+        // no length means nothing to compare.  Shouldn't even happen, since len is sizeof(some-integer-type).
+        return 0;
+    }
+
+    if (signedNumber)
+    { // signed number comparison
+        if (len <= 4)
+        { // only number with 32-bits or less is supported
+            int32_t accum1 = 0x0;
+            int32_t accum2 = 0x0;
+            int32_t all1s  = -1;
+
+            for (uint16_t i = 0; i < len; i++)
+            {
+                uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+                accum1 |= j << (8 * (len - 1 - i));
+
+                uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+                accum2 |= k << (8 * (len - 1 - i));
+            }
+
+            // sign extending, no need for 32-bits numbers
+            if (len < 4)
+            {
+                if ((accum1 & (1 << (8 * len - 1))) != 0)
+                { // check sign
+                    accum1 |= all1s - ((1 << (len * 8)) - 1);
+                }
+                if ((accum2 & (1 << (8 * len - 1))) != 0)
+                { // check sign
+                    accum2 |= all1s - ((1 << (len * 8)) - 1);
+                }
+            }
+
+            if (accum1 > accum2)
+            {
+                return 1;
+            }
+            if (accum1 < accum2)
+            {
+                return -1;
+            }
+
+            return 0;
+        }
+
+        // not supported
+        return 0;
+    }
+
+    // regular unsigned number comparison
+    for (uint16_t i = 0; i < len; i++)
+    {
+        uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+        uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+
+        if (j > k)
+        {
+            return 1;
+        }
+        if (k > j)
+        {
+            return -1;
+        }
+    }
+    return 0;
+}
+
+} // namespace
 
 Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                   EmberAfAttributeType dataType)

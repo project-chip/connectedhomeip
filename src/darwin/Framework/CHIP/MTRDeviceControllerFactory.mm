@@ -54,7 +54,6 @@
 #import <os/lock.h>
 
 #include <app/server/Dnssd.h>
-#include <app/util/af.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
@@ -84,7 +83,11 @@ static NSString * const kErrorCertStoreInit = @"Init failure while initializing 
 static NSString * const kErrorSessionKeystoreInit = @"Init failure while initializing session keystore";
 
 static bool sExitHandlerRegistered = false;
-static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory]; }
+static void ShutdownOnExit()
+{
+    MTR_LOG_INFO("ShutdownOnExit invoked on exit");
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+}
 
 @interface MTRDeviceControllerFactory () {
     MTRServerEndpoint * _otaProviderEndpoint;
@@ -323,6 +326,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (void)cleanupStartupObjects
 {
+    MTR_LOG_INFO("Cleaning startup objects in controller factory");
+
     // Make sure the deinit order here is the reverse of the init order in
     // startControllerFactory:
     _certificationDeclarationCertificates = nil;
@@ -562,7 +567,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         [_controllers[0] shutdown];
     }
 
-    MTR_LOG_DEBUG("Shutting down the Matter controller factory");
+    MTR_LOG_INFO("Shutting down the Matter controller factory");
     _controllerFactory->Shutdown();
 
     [self cleanupStartupObjects];
@@ -1077,22 +1082,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         }
 
         sharedCleanupBlock();
-
-        // Now that our per-controller storage for the controller being shut
-        // down is guaranteed to be disconnected, go ahead and clean up the
-        // fabric table entry for the controller if we're in per-controller
-        // storage mode.
-        if (self->_usingPerControllerStorage) {
-            // We have to use a new fabric table to do this cleanup, because
-            // our system state is gone now.
-            FabricTable fabricTable;
-            CHIP_ERROR err = [self _initFabricTable:fabricTable];
-            if (err != CHIP_NO_ERROR) {
-                MTR_LOG_ERROR("Failed to clean up fabric entries.  Expect things to act oddly: %" CHIP_ERROR_FORMAT, err.Format());
-            } else {
-                fabricTable.Delete(controllerFabricIndex);
-            }
-        }
     } else {
         // Do the controller shutdown on the Matter work queue.
         dispatch_sync(_chipWorkQueue, ^{
@@ -1101,18 +1090,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             }
 
             sharedCleanupBlock();
-
-            // Now that our per-controller storage for the controller being shut
-            // down is guaranteed to be disconnected, go ahead and clean up the
-            // fabric table entry for the controller if we're in per-controller
-            // storage mode.
-            if (self->_usingPerControllerStorage) {
-                // Make sure to delete controllerFabricIndex from the system state's
-                // fabric table.  We know there's a system state here, because we
-                // still have a running controller.
-                auto * systemState = _controllerFactory->GetSystemState();
-                systemState->Fabrics()->Delete(controllerFabricIndex);
-            }
         });
     }
 

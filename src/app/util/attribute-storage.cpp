@@ -17,13 +17,15 @@
 
 #include <app/util/attribute-storage.h>
 
+#include <app/util/attribute-storage-detail.h>
+
 #include <app/AttributeAccessInterfaceCache.h>
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/ember-strings.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
@@ -173,6 +175,36 @@ void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
         }
         cur = next;
     }
+}
+
+bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
+{
+    return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
+}
+
+uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints)
+{
+    if (endpoint == kInvalidEndpointId)
+    {
+        return kEmberInvalidEndpointIndex;
+    }
+
+    uint16_t epi;
+    for (epi = 0; epi < emberAfEndpointCount(); epi++)
+    {
+        if (emAfEndpoints[epi].endpoint == endpoint &&
+            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask.Has(EmberAfEndpointOptions::isEnabled)))
+        {
+            return epi;
+        }
+    }
+    return kEmberInvalidEndpointIndex;
+}
+
+// Returns the index of a given endpoint.  Considers disabled endpoints.
+uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
+{
+    return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 }
 
 } // anonymous namespace
@@ -352,11 +384,6 @@ uint16_t emberAfEndpointCount()
 bool emberAfEndpointIndexIsEnabled(uint16_t index)
 {
     return (emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isEnabled));
-}
-
-bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
-{
-    return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
 }
 
 // This function is used to call the per-cluster attribute changed callback
@@ -791,10 +818,17 @@ bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
 namespace chip {
 namespace app {
 
-EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
+EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) :
+    mEndpointCount(emberAfEndpointCount()), mClusterId(clusterId)
 {
     EnsureMatchingEndpoint();
 }
+
+EndpointId EnabledEndpointsWithServerCluster::operator*() const
+{
+    return emberAfEndpointFromIndex(mEndpointIndex);
+}
+
 EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
 {
     ++mEndpointIndex;
@@ -843,25 +877,6 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(EndpointId e
         return emberAfFindClusterInType(emAfEndpoints[ep].endpointType, clusterId, mask);
     }
     return nullptr;
-}
-
-static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints)
-{
-    if (endpoint == kInvalidEndpointId)
-    {
-        return kEmberInvalidEndpointIndex;
-    }
-
-    uint16_t epi;
-    for (epi = 0; epi < emberAfEndpointCount(); epi++)
-    {
-        if (emAfEndpoints[epi].endpoint == endpoint &&
-            (!ignoreDisabledEndpoints || emAfEndpoints[epi].bitmask.Has(EmberAfEndpointOptions::isEnabled)))
-        {
-            return epi;
-        }
-    }
-    return kEmberInvalidEndpointIndex;
 }
 
 uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
@@ -978,12 +993,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
 {
     return findIndexFromEndpoint(endpoint, true /* ignoreDisabledEndpoints */);
-}
-
-// Returns the index of a given endpoint.  Considers disabled endpoints.
-uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
-{
-    return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 }
 
 EndpointId emberAfEndpointFromIndex(uint16_t index)

@@ -29,7 +29,7 @@
 using namespace chip;
 using namespace chip::app;
 
-namespace LightSwtichCommands {
+namespace LightSwitchCommands {
 
 using Shell::Engine;
 using Shell::shell_command_t;
@@ -286,6 +286,6 @@ void RegisterSwitchCommands()
     Engine::Root().RegisterCommands(&sSwitchCommand, 1);
 }
 
-} // namespace LightSwtichCommands
+} // namespace LightSwitchCommands
 
 #endif // ENABLE_CHIP_SHELL

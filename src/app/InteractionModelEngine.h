@@ -25,11 +25,15 @@
 
 #pragma once
 
+// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
+#include <lib/core/CHIPCore.h>
+
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/CommandHandler.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -46,6 +50,7 @@
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/ReportScheduler.h>
 #include <app/util/attribute-metadata.h>
@@ -65,6 +70,10 @@
 
 #include <app/CASESessionManager.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/server/ICDManager.h> // nogncheck
+#endif                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 namespace chip {
 namespace app {
 
@@ -77,6 +86,7 @@ namespace app {
  */
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
+                               public CommandResponseSender::Callback,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback,
                                public FabricTable::Delegate,
@@ -124,6 +134,10 @@ public:
                     SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
 
     void Shutdown();
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    void SetICDManager(ICDManager * manager) { mICDManager = manager; };
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; }
 
@@ -315,6 +329,15 @@ public:
 
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subjectID) override;
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     * @brief Function decrements the number of subscriptions to resume counter - mNumOfSubscriptionsToResume.
+     *        This should be called after we have completed a re-subscribe attempt on a persisted subscription wether the attempt
+     *        was succesful or not.
+     */
+    void DecrementNumSubscriptionsToResume();
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
@@ -402,6 +425,7 @@ private:
     friend class SubscriptionResumptionSessionEstablisher;
     using Status = Protocols::InteractionModel::Status;
 
+    void OnDone(CommandResponseSender & apResponderObj) override;
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
@@ -599,7 +623,11 @@ private:
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
 
-    ObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ICDManager * mICDManager = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    ObjectPool<CommandResponseSender, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandResponderObjs;
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
@@ -657,12 +685,21 @@ private:
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     * mNumOfSubscriptionsToResume tracks the number of subscriptions that the device will try to resume at its next resumption
+     * attempt. At boot up, the attempt will be at the highest min interval of all the subscriptions to resume.
+     * When the subscription timeout resumption feature is present, after the boot up attempt, the next attempt will be determined
+     * by ComputeTimeSecondsTillNextSubscriptionResumption.
+     */
+    int8_t mNumOfSubscriptionsToResume = 0;
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool HasSubscriptionsToResume();
     uint32_t ComputeTimeSecondsTillNextSubscriptionResumption();
     uint32_t mNumSubscriptionResumptionRetries = 0;
     bool mSubscriptionResumptionScheduled      = false;
-#endif
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
     FabricTable * mpFabricTable;
 

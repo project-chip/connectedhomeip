@@ -23,6 +23,7 @@
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -67,8 +68,8 @@ public:
     }
 
     bool HasPASEVerifier() const { return mHasPASEVerifier; }
-    const Spake2pVerifier & GetPASEVerifier() const { return mPASEVerifier; }
-    RendezvousParameters & SetPASEVerifier(Spake2pVerifier & verifier)
+    const Crypto::Spake2pVerifier & GetPASEVerifier() const { return mPASEVerifier; }
+    RendezvousParameters & SetPASEVerifier(Crypto::Spake2pVerifier & verifier)
     {
         memmove(&mPASEVerifier, &verifier, sizeof(verifier));
         mHasPASEVerifier = true;
@@ -131,7 +132,7 @@ private:
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
 
-    Spake2pVerifier mPASEVerifier;
+    Crypto::Spake2pVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
 
     Optional<ReliableMessageProtocolConfig> mMRPConfig;

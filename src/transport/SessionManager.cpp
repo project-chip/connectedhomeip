@@ -446,7 +446,16 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
     if (mTransportMgr != nullptr)
     {
-        return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
+        CHIP_ERROR err = mTransportMgr->SendMessage(*destination, std::move(msgBuf));
+#if CHIP_ERROR_LOGGING
+        if (err != CHIP_NO_ERROR)
+        {
+            char addressStr[Transport::PeerAddress::kMaxToStringSize] = { 0 };
+            destination->ToString(addressStr);
+            ChipLogError(Inet, "SendMessage() to %s failed: %" CHIP_ERROR_FORMAT, addressStr, err.Format());
+        }
+#endif // CHIP_ERROR_LOGGING
+        return err;
     }
 
     ChipLogError(Inet, "The transport manager is not initialized. Unable to send the message");

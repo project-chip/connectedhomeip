@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <string.h>
@@ -86,10 +87,16 @@ void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
     }
 }
 
-void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jint argument)
+void AndroidDeviceControllerWrapper::CallJavaIntMethod(const char * methodName, jint argument)
 {
     JniReferences::GetInstance().CallVoidInt(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef.ObjectRef(),
                                              methodName, argument);
+}
+
+void AndroidDeviceControllerWrapper::CallJavaLongMethod(const char * methodName, jlong argument)
+{
+    JniReferences::GetInstance().CallVoidLong(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef.ObjectRef(),
+                                              methodName, argument);
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
@@ -697,19 +704,19 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SetICDCheckInDelegate(jobject checkIn
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    CallJavaMethod("onStatusUpdate", static_cast<jint>(status));
+    CallJavaIntMethod("onStatusUpdate", static_cast<jint>(status));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    CallJavaMethod("onPairingComplete", static_cast<jint>(error.AsInteger()));
+    CallJavaLongMethod("onPairingComplete", static_cast<jlong>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    CallJavaMethod("onPairingDeleted", static_cast<jint>(error.AsInteger()));
+    CallJavaLongMethod("onPairingDeleted", static_cast<jlong>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
@@ -727,11 +734,11 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningCompleteMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningComplete", "(JI)V",
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningComplete", "(JJ)V",
                                                              &onCommissioningCompleteMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onCommissioningCompleteMethod, static_cast<jlong>(deviceId),
-                        static_cast<jint>(error.AsInteger()));
+                        static_cast<jlong>(error.AsInteger()));
 
     if (ssidStr != nullptr)
     {
@@ -762,12 +769,12 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
     JniLocalReferenceScope scope(env);
     jmethodID onCommissioningStatusUpdateMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningStatusUpdate",
-                                                             "(JLjava/lang/String;I)V", &onCommissioningStatusUpdateMethod);
+                                                             "(JLjava/lang/String;J)V", &onCommissioningStatusUpdateMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
     UtfString jStageCompleted(env, StageToString(stageCompleted));
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onCommissioningStatusUpdateMethod, static_cast<jlong>(peerId.GetNodeId()),
-                        jStageCompleted.jniValue(), static_cast<jint>(error.AsInteger()));
+                        jStageCompleted.jniValue(), static_cast<jlong>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
@@ -785,6 +792,9 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
     memset(mUserActiveModeTriggerInstructionBuffer, 0x00, kUserActiveModeTriggerInstructionBufferLen);
     CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction, mUserActiveModeTriggerInstruction);
 
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo ICD - IdleModeDuration=%u activeModeDuration=%u activeModeThreshold=%u",
+                    info.icd.idleModeDuration, info.icd.activeModeDuration, info.icd.activeModeThreshold);
+
     env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),
                         static_cast<jint>(info.basic.productId), static_cast<jint>(info.network.wifi.endpoint),
                         static_cast<jint>(info.network.thread.endpoint));
@@ -800,12 +810,12 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Error invoking Java callback: no JNIEnv"));
 
     err = JniReferences::GetInstance().FindMethod(
         env, mJavaObjectRef.ObjectRef(), "onScanNetworksSuccess",
         "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject NetworkingStatus;
     std::string NetworkingStatusClassName     = "java/lang/Integer";
@@ -937,7 +947,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
                                                                       threadInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ThreadScanResult");
+                ChipLogError(Controller, "Could not find class ThreadScanResult");
                 return;
             }
             jmethodID threadInterfaceScanResultStructCtor =
@@ -946,7 +956,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
                                  "Integer;[BLjava/lang/Integer;Ljava/lang/Integer;)V");
             if (threadInterfaceScanResultStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ThreadScanResult constructor");
+                ChipLogError(Controller, "Could not find ThreadScanResult constructor");
                 return;
             }
 
@@ -966,7 +976,7 @@ void AndroidDeviceControllerWrapper::OnScanNetworksFailure(CHIP_ERROR error)
 {
     chip::DeviceLayer::StackUnlock unlock;
 
-    CallJavaMethod("onScanNetworksFailure", static_cast<jint>(error.AsInteger()));
+    CallJavaLongMethod("onScanNetworksFailure", static_cast<jlong>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnICDRegistrationInfoRequired()
@@ -1022,14 +1032,14 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     jbyteArray jSymmetricKey          = nullptr;
     CHIP_ERROR methodErr =
         JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onICDRegistrationComplete",
-                                                "(ILchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
+                                                "(JLchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR,
                    ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, methodErr.Format()));
 
     methodErr = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
 
-    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJJJI)V");
+    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJIJJJJI)V");
     VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
 
     methodErr =
@@ -1041,11 +1051,12 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     icdDeviceInfoObj = env->NewObject(
         icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()),
-        jUserActiveModeTriggerInstruction, static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
+        jUserActiveModeTriggerInstruction, static_cast<jlong>(mIdleModeDuration), static_cast<jlong>(mActiveModeDuration),
+        static_cast<jint>(mActiveModeThreshold), static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
         static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()),
         static_cast<jlong>(Controller()->GetFabricId()), static_cast<jint>(Controller()->GetFabricIndex()));
 
-    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()),
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onICDRegistrationCompleteMethod, static_cast<jlong>(err.AsInteger()),
                         icdDeviceInfoObj);
 }
 

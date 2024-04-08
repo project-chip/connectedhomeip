@@ -31,34 +31,32 @@ jobs:
     framework:
         name: Build framework
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-latest
+        runs-on: macos-13
         strategy:
             matrix:
                 options: # We don't need a full matrix
-                    - flavor: macos-release-availability
-                      arguments: -sdk macosx -configuration Release   OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new'
+                    - flavor: macos-release
+                      arguments: -sdk macosx -configuration Release
                     - flavor: ios-release
-                      arguments: -sdk iphoneos -configuration Release OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
-                    - flavor: ios-debug
-                      arguments: -sdk iphoneos -configuration Debug   OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk iphoneos -configuration Release
                     - flavor: tvos-debug
-                      arguments: -sdk appletvos -configuration Debug  OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk appletvos -configuration Debug
                     - flavor: watchos-debug
-                      arguments: -sdk watchos -configuration Debug    OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+                      arguments: -sdk watchos -configuration Debug
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup Environment
-              run: brew install python@3.9
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: darwin
                 bootstrap-log-name: bootstrap-logs-framework-${{ matrix.options.flavor }}
             - name: Block zap-cli from being used
+              env:
+                PW_ENVSETUP_NO_BANNER: 1
               run: |
                 # Framework builds are NOT expected to require zap-cli
-                scripts/run_in_build_env.sh 'D=$(dirname $(which zap-cli)) && mv $D/zap-cli $D/zap-cli.moved'
+                scripts/run_in_build_env.sh 'rm -- "$(which zap-cli)"'
                 # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
                 scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
             - name: Build
@@ -68,7 +66,8 @@ jobs:
     tests:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-latest
+        needs: [ framework ] # serialize to avoid running to many parallel macos runners
+        runs-on: macos-13
         strategy:
             matrix:
                 options: # We don't need a full matrix
@@ -82,8 +81,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup Environment
-              run: brew install python@3.9
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -114,9 +111,10 @@ jobs:
 
                   # Disable BLE (CHIP_IS_BLE=NO) because the app does not have the permission to use it and that may crash the CI.
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx ${{ matrix.options.arguments }} \
-                    OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1 ${{ matrix.options.defines }}' \
+                    CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
                     > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
             - name: Collect crash logs
+              if: failure() && !env.ACT
               run: |
                   mkdir -p /tmp/darwin/framework-tests
                   find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
@@ -131,12 +129,11 @@ jobs:
     tv-casting-bridge:
         name: Build TV Casting Bridge example
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-latest
+        needs: [ framework ] # serialize to avoid running to many parallel macos runners
+        runs-on: macos-13
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Setup Environment
-              run: brew install python@3.9
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -144,11 +141,3 @@ jobs:
             - name: Build
               working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
               run: xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
-
-    darwin:
-        name: Build Darwin # Matches the previous monolithic build that's marked "required" for PRs
-        needs: [ framework, tests ]
-        runs-on: macos-latest
-        steps:
-            - name: Done
-              run: 'true' # nothing to do

@@ -34,7 +34,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:41
+            image: ghcr.io/project-chip/chip-build:46
 
         steps:
             - name: Checkout
@@ -50,4 +50,4 @@ jobs:
                     --github-limit-artifacts 500 \
                     --github-limit-comments 20 \
                     --github-repository project-chip/connectedhomeip \
-                    --github-api-token "${{ secrets.BLOAT_REPORT }}"
+                    --github-api-token "${{ secrets.GITHUB_TOKEN }}"

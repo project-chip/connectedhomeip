@@ -39,7 +39,7 @@ class BluezEndpoint;
 class BluezConnection
 {
 public:
-    BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice);
+    BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 & aDevice);
     ~BluezConnection() = default;
 
     const char * GetPeerAddress() const;

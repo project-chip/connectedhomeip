@@ -94,14 +94,6 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  */
 @protocol MTRDeviceControllerServerProtocol <NSObject>
 
-@optional
-/**
- * Gets device controller ID corresponding to a specific fabric ID
- */
-- (void)getDeviceControllerWithFabricId:(uint64_t)fabricId
-                             completion:(MTRDeviceControllerGetterHandler)completion
-    MTR_DEPRECATED("This never called.", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-
 @required
 /**
  * Gets any available device controller ID
@@ -183,6 +175,15 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
                                clusterId:(NSNumber * _Nullable)clusterId
                              attributeId:(NSNumber * _Nullable)attributeId
                               completion:(MTRValuesHandler)completion;
+
+@optional
+
+/**
+ * Gets device controller ID corresponding to a specific fabric ID
+ */
+- (void)getDeviceControllerWithFabricId:(uint64_t)fabricId
+                             completion:(MTRDeviceControllerGetterHandler)completion
+    MTR_DEPRECATED("This never called.", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 /**
  * Requests downloading some logs

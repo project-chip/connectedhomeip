@@ -17,21 +17,28 @@
 
 #include "matter_shell.h"
 #include <ChipShellCollection.h>
-#include <FreeRTOS.h>
+#include <cmsis_os2.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Engine.h>
-#include <task.h>
+#include <sl_cmsis_os2_common.h>
 
 using namespace ::chip;
 using chip::Shell::Engine;
 
 namespace {
 
-#define SHELL_TASK_STACK_SIZE 2048
-#define SHELL_TASK_PRIORITY 5
-TaskHandle_t shellTaskHandle;
-StackType_t shellStack[SHELL_TASK_STACK_SIZE / sizeof(StackType_t)];
-StaticTask_t shellTaskStruct;
+constexpr uint32_t kShellProcessFlag   = 1;
+constexpr uint32_t kShellTaskStackSize = 2048;
+uint8_t shellTaskStack[kShellTaskStackSize];
+osThread_t shellTaskControlBlock;
+constexpr osThreadAttr_t kShellTaskAttr = { .name       = "shell",
+                                            .attr_bits  = osThreadDetached,
+                                            .cb_mem     = &shellTaskControlBlock,
+                                            .cb_size    = osThreadCbSize,
+                                            .stack_mem  = shellTaskStack,
+                                            .stack_size = kShellTaskStackSize,
+                                            .priority   = osPriorityBelowNormal };
+osThreadId_t shellTaskHandle;
 
 void MatterShellTask(void * args)
 {
@@ -40,33 +47,17 @@ void MatterShellTask(void * args)
 
 } // namespace
 
-extern "C" unsigned int sleep(unsigned int seconds)
-{
-    const TickType_t xDelay = pdMS_TO_TICKS(1000 * seconds);
-    vTaskDelay(xDelay);
-    return 0;
-}
-
 namespace chip {
 
 void NotifyShellProcess()
 {
-    xTaskNotifyGive(shellTaskHandle);
-}
-
-void NotifyShellProcessFromISR()
-{
-    BaseType_t yieldRequired = pdFALSE;
-    if (shellTaskHandle != NULL)
-    {
-        vTaskNotifyGiveFromISR(shellTaskHandle, &yieldRequired);
-    }
-    portYIELD_FROM_ISR(yieldRequired);
+    // This function may be called from Interrupt Service Routines.
+    osThreadFlagsSet(shellTaskHandle, kShellProcessFlag);
 }
 
 void WaitForShellActivity()
 {
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    osThreadFlagsWait(kShellProcessFlag, osFlagsWaitAny, osWaitForever);
 }
 
 void startShellTask()
@@ -79,8 +70,8 @@ void startShellTask()
     cmd_misc_init();
     cmd_otcli_init();
 
-    shellTaskHandle = xTaskCreateStatic(MatterShellTask, "matter_cli", ArraySize(shellStack), NULL, SHELL_TASK_PRIORITY, shellStack,
-                                        &shellTaskStruct);
+    shellTaskHandle = osThreadNew(MatterShellTask, nullptr, &kShellTaskAttr);
+    VerifyOrDie(shellTaskHandle);
 }
 
 } // namespace chip

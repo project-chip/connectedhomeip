@@ -29,7 +29,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:41
+            image: ghcr.io/project-chip/chip-build:46
 
         steps:
             - name: Checkout
@@ -94,18 +94,19 @@ jobs:
                      --known-failure app/AttributeAccessToken.h \
                      --known-failure app/CommandHandler.h \
                      --known-failure app/CommandHandlerInterface.h \
+                     --known-failure app/CommandResponseSender.h \
                      --known-failure app/CommandSenderLegacyCallback.h \
-                     --known-failure app/data-model/ListLargeSystemExtensions.h \
                      --known-failure app/ReadHandler.h \
                      --known-failure app/reporting/reporting.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
                      --known-failure app/TestEventTriggerDelegate.h \
-                     --known-failure app/util/af.h \
                      --known-failure app/util/attribute-storage.cpp \
                      --known-failure app/util/attribute-storage.h \
+                     --known-failure app/util/attribute-storage-detail.h \
                      --known-failure app/util/attribute-table.cpp \
                      --known-failure app/util/attribute-table.h \
+                     --known-failure app/util/attribute-table-detail.h \
                      --known-failure app/util/binding-table.cpp \
                      --known-failure app/util/binding-table.h \
                      --known-failure app/util/config.h \
@@ -117,7 +118,6 @@ jobs:
                      --known-failure app/util/generic-callbacks.h \
                      --known-failure app/util/generic-callback-stubs.cpp \
                      --known-failure app/util/im-client-callbacks.h \
-                     --known-failure app/util/MatterCallbacks.h \
                      --known-failure app/util/util.cpp \
                      --known-failure app/util/util.h \
                      --known-failure app/WriteHandler.h \
@@ -254,7 +254,7 @@ jobs:
             - name: Check for use of 'emberAfReadAttribute' instead of the type-safe getters
               if: always()
               run: |
-                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/af.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
+                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
@@ -264,7 +264,7 @@ jobs:
             - name: Check for use of 'emberAfWriteAttribute' instead of the type-safe setters
               if: always()
               run: |
-                  git grep -I -n 'emberAfWriteAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/af.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)examples/common/pigweed/rpc_services/Attributes.h' ':(exclude)src/app/util/attribute-table.h' ':(exclude)src/app/util/ember-compatibility-functions.cpp' && exit 1 || exit 0
+                  git grep -I -n 'emberAfWriteAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)examples/common/pigweed/rpc_services/Attributes.h' ':(exclude)src/app/util/attribute-table.h' ':(exclude)src/app/util/ember-compatibility-functions.cpp' && exit 1 || exit 0
 
             # Run ruff python linter
             - name: Check for errors using ruff Python linter
@@ -287,3 +287,18 @@ jobs:
               if: always()
               run: |
                   git grep -I -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.
+            - name: Check for use of "using namespace" outside of a class/function in headers.
+              if: always()
+              run: |
+                  # Various platforms have `using namespace chip::Ble` in their BLEManager* headers; just exclude those for now.
+                  #
+                  # Exclude platform openiotsdk bits that do this in their persistent storage header.
+                  #
+                  # Also exclude examples (for now) and third_party, which have various instances of this.
+                  #
+                  # Ignore uses of `System::Clock::Literals`, because that's the only way to have things using _ms32 or whatnot
+                  # in a header file.
+                  git grep -I -n -e '^using namespace' --and --not -e 'System::Clock::Literals' -- './**/*.h' ':(exclude)src/platform/*/BLEManager*.h' ':(exclude)src/platform/openiotsdk/KVPsaPsStore.h' ':(exclude)./examples' ':(exclude)./third_party' && exit 1 || exit 0

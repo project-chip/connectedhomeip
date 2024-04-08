@@ -23,6 +23,7 @@
 #include <app/EventManagement.h>
 #include <app/GlobalAttributes.h>
 #include <app/util/att-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>

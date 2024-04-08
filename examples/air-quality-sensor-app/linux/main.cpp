@@ -20,8 +20,9 @@
 #include <AppMain.h>
 #include <air-quality-sensor-manager.h>
 
-#include <app/util/af.h>
 #include <platform/CHIPDeviceConfig.h>
+
+#include <string>
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>

@@ -25,16 +25,6 @@ on:
             - ".github/.wordlist.txt"
 
 jobs:
-#    Seems redundant; removed as pyspelling is customized while this is not
-#    check-reviewdog:
-#        name: Check Spelling - reviewdog
-#        runs-on: ubuntu-latest
-#        steps:
-#            - name: Checkout
-#              uses: actions/checkout@v4
-#            - uses: reviewdog/action-misspell@v1
-#              with:
-#                  github_token: ${{ secrets.GITHUB_TOKEN }}
     check-spellcheck:
         name: Check Spelling - pyspelling
         runs-on: ubuntu-latest

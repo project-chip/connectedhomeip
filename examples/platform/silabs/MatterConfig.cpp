@@ -21,8 +21,7 @@
 #include "BaseApplication.h"
 #include "OTAConfig.h"
 #include <MatterConfig.h>
-
-#include <FreeRTOS.h>
+#include <cmsis_os2.h>
 
 #include <mbedtls/platform.h>
 
@@ -45,10 +44,6 @@
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "wfx_rsi.h"
 #endif /* SLI_SI91X_MCU_INTERFACE */
-
-using namespace ::chip;
-using namespace ::chip::Inet;
-using namespace ::chip::DeviceLayer;
 
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
@@ -74,6 +69,25 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #ifdef PERFORMANCE_TEST_ENABLED
 #include <performance_test_commands.h>
 #endif
+
+#include <AppTask.h>
+
+#include <DeviceInfoProviderImpl.h>
+#include <app/server/Server.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
+
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
+/**********************************************************
+ * Defines
+ *********************************************************/
+
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::Credentials::Silabs;
+using namespace chip::DeviceLayer::Silabs;
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -128,6 +142,59 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
     return ThreadStackMgrImpl().StartThreadTask();
 }
 #endif // CHIP_ENABLE_OPENTHREAD
+
+namespace {
+
+constexpr uint32_t kMainTaskStackSize = (1024 * 5);
+// Task is dynamically allocated with max priority. This task gets deleted once the inits are completed.
+constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
+                                           .attr_bits  = osThreadDetached,
+                                           .cb_mem     = NULL,
+                                           .cb_size    = 0U,
+                                           .stack_mem  = NULL,
+                                           .stack_size = kMainTaskStackSize,
+                                           .priority   = osPriorityRealtime7 };
+osThreadId_t sMainTaskHandle;
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+void ApplicationStart(void * unused)
+{
+    CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
+    if (err != CHIP_NO_ERROR)
+        appError(err);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Credentials::Silabs::GetSilabsDacProvider());
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    SILABS_LOG("Starting App Task");
+    err = AppTask::GetAppTask().StartAppTask();
+    if (err != CHIP_NO_ERROR)
+        appError(err);
+
+    VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
+    sMainTaskHandle = nullptr;
+}
+} // namespace
+
+void SilabsMatterConfig::AppInit()
+{
+    GetPlatform().Init();
+
+    sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
+    SILABS_LOG("Starting scheduler");
+    VerifyOrDie(sMainTaskHandle); // We can't proceed if the Main Task creation failed.
+    GetPlatform().StartScheduler();
+
+    // Should never get here.
+    chip::Platform::MemoryShutdown();
+    SILABS_LOG("Start Scheduler Failed");
+    appError(CHIP_ERROR_INTERNAL);
+}
 
 #if SILABS_OTA_ENABLED
 void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
