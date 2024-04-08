@@ -289,9 +289,7 @@ struct ResolvedNodeData
 #if CHIP_PROGRESS_LOGGING
         // Would be nice to log the interface id, but sorting out how to do so
         // across our different InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
-                        ChipLogValueX64(operationalData.peerId.GetCompressedFabricId()),
-                        ChipLogValueX64(operationalData.peerId.GetNodeId()));
+        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatPeerId, ChipLogValuePeerId(operationalData.peerId));
         resolutionData.LogDetail();
 #endif // CHIP_PROGRESS_LOGGING
     }
