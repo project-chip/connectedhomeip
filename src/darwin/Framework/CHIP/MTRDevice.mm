@@ -2144,6 +2144,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // if expected values exists, purge and update read cache
             NSArray * expectedValue = _expectedValueCache[attributePath];
             if (expectedValue) {
+                previousValue = expectedValue[MTRDeviceExpectedValueFieldValueIndex];
                 _readCache[attributePath] = attributeDataValue;
                 shouldReportAttribute = NO;
             } else if (readCacheValueChanged) {
