@@ -96,24 +96,21 @@ DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
 using namespace app::Clusters::TimeFormatLocalization;
 using CalendarType = app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
 
-CalendarType supportedCalendarTyppes [] = {
-  CalendarTypeEnum::kGregorian,
-  CalendarTypeEnum::kCoptic,
-  CalendarTypeEnum::kBuddhist,
-  CalendarTypeEnum::kEthiopian,
-  CalendarTypeEnum::kChinese,
+CalendarType supportedCalendarTyppes[] = {
+    CalendarTypeEnum::kGregorian, CalendarTypeEnum::kCoptic,  CalendarTypeEnum::kBuddhist,
+    CalendarTypeEnum::kEthiopian, CalendarTypeEnum::kChinese,
 };
 
-CharSpan supportedLocales [] = {
+CharSpan supportedLocales[] = {
     CharSpan::fromCharString("en-US"),
     CharSpan::fromCharString("en-EU"),
     CharSpan::fromCharString("en-IN"),
 };
 
-struct ESP32DeviceInfoProvider::FixedLabelEntry fixedLabels [] = {
-    {0, CharSpan::fromCharString("Room"), CharSpan::fromCharString("Bedroom 2")},
-    {0, CharSpan::fromCharString("Orientation"), CharSpan::fromCharString("North")},
-    {0, CharSpan::fromCharString("Direction"), CharSpan::fromCharString("Up")},
+struct ESP32DeviceInfoProvider::FixedLabelEntry fixedLabels[] = {
+    { 0, CharSpan::fromCharString("Room"), CharSpan::fromCharString("Bedroom 2") },
+    { 0, CharSpan::fromCharString("Orientation"), CharSpan::fromCharString("North") },
+    { 0, CharSpan::fromCharString("Direction"), CharSpan::fromCharString("Up") },
 };
 
 Span<CalendarType> sSupportedCalendarTypes(supportedCalendarTyppes);
