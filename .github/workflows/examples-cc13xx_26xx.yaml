@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - TI CC26X2X7
+name: Build example - TI CC13XX_26XX
 
 on:
     push:
@@ -26,11 +26,11 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
     
 jobs:
-    cc26x2x7:
-        name: cc26x2x7
+    cc13xx_26xx:
+        name: cc13xx_26xx
 
         env:
-            BUILD_TYPE: gn_cc26x2x7
+            BUILD_TYPE: gn_cc13xx_26xx
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -97,11 +97,6 @@ jobs:
                     cc13x4_26x4 LP_EM_CC1354P10_6 lighting-app \
                     out/artifacts/ti-cc13x4_26x4-lighting-mtd/chip-LP_EM_CC1354P10_6-lighting-example.out \
                     /tmp/bloat_reports/
-            - name: Uploading Size Reports
-              uses: ./.github/actions/upload-size-reports
-              if: ${{ !env.ACT }}
-              with:
-                platform-name: cc13x2x7_26x2x7
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
