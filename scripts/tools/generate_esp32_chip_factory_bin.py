@@ -18,15 +18,12 @@
 
 import argparse
 import base64
-import enum
 import logging
 import os
 import sys
 from types import SimpleNamespace
 
 import cryptography.x509
-from bitarray import bitarray
-from bitarray.util import ba2int
 from esp_secure_cert.tlv_format import generate_partition_ds, generate_partition_no_ds, tlv_priv_key_t, tlv_priv_key_type_t
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
