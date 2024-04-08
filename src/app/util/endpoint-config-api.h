@@ -30,7 +30,7 @@
  *
  * Typically only used for endpoint index iteration.
  */
-uint16_t emberAfEndpointCount(void);
+uint16_t emberAfEndpointCount();
 
 /**
  * @brief Enable/disable endpoints

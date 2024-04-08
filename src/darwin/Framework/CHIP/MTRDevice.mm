@@ -2008,7 +2008,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return YES;
     }
     if (!one || !theOther) {
-        MTR_LOG_ERROR("%@ attribute data-value comparison does not expect a dictionary to be nil: %@ %@", self, one, theOther);
+        // Comparing against nil is expected, and should return NO quietly
         return NO;
     }
 

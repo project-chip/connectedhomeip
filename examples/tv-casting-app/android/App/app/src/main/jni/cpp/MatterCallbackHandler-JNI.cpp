@@ -18,6 +18,8 @@
 
 #include "MatterCallbackHandler-JNI.h"
 
+#include <string>
+
 using namespace chip;
 
 CHIP_ERROR CallbackBaseJNI::SetUp(JNIEnv * env, jobject inHandler)

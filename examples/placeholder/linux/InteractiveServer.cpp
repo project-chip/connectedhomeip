@@ -23,6 +23,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/logging/LogV.h>
 
+#include <string>
+
 using namespace chip::DeviceLayer;
 
 namespace {

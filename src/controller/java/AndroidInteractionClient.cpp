@@ -28,6 +28,8 @@
 
 #include <lib/support/jsontlv/JsonToTlv.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::Controller;
 
