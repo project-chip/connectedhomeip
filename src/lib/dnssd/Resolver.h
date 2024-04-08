@@ -206,10 +206,27 @@ public:
     virtual CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) = 0;
 
     /**
-     * Provides the system-wide implementation of the service resolver
+     * Returns the system-wide implementation of the service resolver.
+     *
+     * The method returns a reference to the resolver object configured by
+     * a user using the \c Resolver::SetInstance() method, or the default
+     * resolver returned by the \c GetDefaultResolver() function.
      */
     static Resolver & Instance();
+
+    /**
+     * Overrides the default implementation of the service resolver
+     */
+    static void SetInstance(Resolver & resolver);
+
+private:
+    static Resolver * sInstance;
 };
+
+/**
+ * Returns the default implementation of the service resolver.
+ */
+extern Resolver & GetDefaultResolver();
 
 } // namespace Dnssd
 } // namespace chip

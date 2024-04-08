@@ -37,9 +37,7 @@ CHIP_ERROR AppTask::Init(void)
 {
     CHIP_ERROR err;
 
-#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(AirQualitySensorUpdateTimerEventHandler);
-#endif
     InitCommonParts();
 
     err = SensorMgr().Init();

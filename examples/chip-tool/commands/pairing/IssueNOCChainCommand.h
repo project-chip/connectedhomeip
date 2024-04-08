@@ -22,6 +22,8 @@
 
 #include "ToTLVCert.h"
 
+#include <string>
+
 class IssueNOCChainCommand : public CHIPCommand
 {
 public:

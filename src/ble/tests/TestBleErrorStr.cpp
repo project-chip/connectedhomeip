@@ -30,9 +30,8 @@
 
 #include <ble/BleError.h>
 #include <lib/core/ErrorStr.h>
-#include <lib/support/UnitTestRegistration.h>
 
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
 using namespace chip;
 
@@ -69,7 +68,7 @@ static const CHIP_ERROR kTestElements[] =
 };
 // clang-format on
 
-static void CheckBleErrorStr(nlTestSuite * inSuite, void * inContext)
+TEST(TestBleErrorStr, CheckBleErrorStr)
 {
     // Register the layer error formatter
 
@@ -83,45 +82,12 @@ static void CheckBleErrorStr(nlTestSuite * inSuite, void * inContext)
 
         // Assert that the error string contains the error number in hex.
         snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err.AsInteger());
-        NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
+        EXPECT_NE(strstr(errStr, expectedText), nullptr);
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
         // Assert that the error string contains a description, which is signaled
         // by a presence of a colon proceeding the description.
-        NL_TEST_ASSERT(inSuite, (strchr(errStr, ':') != nullptr));
+        EXPECT_NE(strchr(errStr, ':'), nullptr);
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
     }
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("BleErrorStr", CheckBleErrorStr),
-
-    NL_TEST_SENTINEL()
-};
-// clang-format on
-
-int TestBleErrorStr()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "Test BLE range error strings conversions",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestBleErrorStr)

@@ -291,7 +291,7 @@ void uartConsoleInit(void)
 void USART_IRQHandler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
-    chip::NotifyShellProcessFromISR();
+    chip::NotifyShellProcess();
 #elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
@@ -333,7 +333,7 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
     UARTDRV_Receive(vcom_handle, data, transferCount, UART_rx_callback);
 
 #ifdef ENABLE_CHIP_SHELL
-    chip::NotifyShellProcessFromISR();
+    chip::NotifyShellProcess();
 #elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif

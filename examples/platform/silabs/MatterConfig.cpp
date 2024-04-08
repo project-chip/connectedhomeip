@@ -21,8 +21,7 @@
 #include "BaseApplication.h"
 #include "OTAConfig.h"
 #include <MatterConfig.h>
-
-#include <FreeRTOS.h>
+#include <cmsis_os2.h>
 
 #include <mbedtls/platform.h>
 
@@ -80,26 +79,15 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#include "FreeRTOSConfig.h"
-#include "event_groups.h"
-#include "task.h"
-
 /**********************************************************
  * Defines
  *********************************************************/
-
-#define MAIN_TASK_STACK_SIZE (1024 * 5)
-#define MAIN_TASK_PRIORITY (configMAX_PRIORITIES - 1)
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials::Silabs;
 using namespace chip::DeviceLayer::Silabs;
-
-TaskHandle_t main_Task;
-volatile int apperror_cnt;
-static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -156,7 +144,20 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
 namespace {
-void application_start(void * unused)
+
+constexpr uint32_t kMainTaskStackSize = (1024 * 5);
+// Task is dynamically allocated with max priority. This task gets deleted once the inits are completed.
+constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
+                                           .attr_bits  = osThreadDetached,
+                                           .cb_mem     = NULL,
+                                           .cb_size    = 0U,
+                                           .stack_mem  = NULL,
+                                           .stack_size = kMainTaskStackSize,
+                                           .priority   = osPriorityRealtime7 };
+osThreadId_t sMainTaskHandle;
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+void ApplicationStart(void * unused)
 {
     CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
     if (err != CHIP_NO_ERROR)
@@ -175,7 +176,8 @@ void application_start(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
-    vTaskDelete(main_Task);
+    VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
+    sMainTaskHandle = nullptr;
 }
 } // namespace
 
@@ -183,8 +185,9 @@ void SilabsMatterConfig::AppInit()
 {
     GetPlatform().Init();
 
-    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
+    sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
     SILABS_LOG("Starting scheduler");
+    VerifyOrDie(sMainTaskHandle); // We can't proceed if the Main Task creation failed.
     GetPlatform().StartScheduler();
 
     // Should never get here.

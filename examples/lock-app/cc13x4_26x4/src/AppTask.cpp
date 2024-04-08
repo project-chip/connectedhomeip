@@ -267,7 +267,7 @@ int AppTask::Init()
 
         Attributes::LockState::Get(endpointId, state);
         ret = LockMgr().Init(state,
-                             CC13X2_26X2DoorLock::LockInitParams::ParamBuilder()
+                             CC13X4_26X4DoorLock::LockInitParams::ParamBuilder()
                                  .SetNumberOfUsers(numberOfUsers)
                                  .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
                                  .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)

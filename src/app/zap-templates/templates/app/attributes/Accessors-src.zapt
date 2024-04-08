@@ -10,10 +10,11 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage-null-handling.h>
+#include <app/util/attribute-table.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -38,6 +39,13 @@ namespace {{asUpperCamelCase label}} {
 Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
 {
     {{~#if (isString type)}}
+    {{#if isNullable}}
+    if (value.IsNull()) {
+      ChipLogError(Zcl, "Null Nullable<Span> passed to {{asUpperCamelCase parent.label}}::{{asUpperCamelCase label}}::Get");
+      return Protocols::InteractionModel::Status::Failure;
+    }
+
+    {{/if}}
     {{~#*inline "lengthType"}}uint{{#if (isShortString type)}}8{{else}}16{{/if}}_t{{/inline}}
     uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
     Protocols::InteractionModel::Status status = emberAfReadAttribute(endpoint, {{>clusterId}}, Id, zclString, sizeof(zclString));
@@ -53,7 +61,7 @@ Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGet
       {{/if}}
     }
     {{#if isNullable}}
-    auto & span = value.SetNonNull();
+    auto & span = value.Value();
     {{/if}}
     {{~#*inline "value"}}{{#if isNullable}}span{{else}}value{{/if}}{{/inline}}
     VerifyOrReturnError({{>value}}.size() == {{maxLength}}, Protocols::InteractionModel::Status::InvalidDataType);

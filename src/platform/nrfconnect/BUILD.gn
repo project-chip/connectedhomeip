@@ -91,7 +91,7 @@ static_library("nrfconnect") {
       "ThreadStackManagerImpl.h",
     ]
 
-    if (chip_mdns == "platform") {
+    if (chip_mdns_platform) {
       sources += [
         "../OpenThread/DnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.cpp",

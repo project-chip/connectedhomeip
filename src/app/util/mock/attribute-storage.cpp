@@ -33,8 +33,9 @@
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/util/af.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
 
@@ -265,10 +266,17 @@ AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, Cl
     return nullptr;
 }
 
-EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
+EndpointId EnabledEndpointsWithServerCluster::operator*() const
+{
+    return emberAfEndpointFromIndex(mEndpointIndex);
+}
+
+EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) :
+    mEndpointCount(emberAfEndpointCount()), mClusterId(clusterId)
 {
     EnsureMatchingEndpoint();
 }
+
 EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
 {
     ++mEndpointIndex;

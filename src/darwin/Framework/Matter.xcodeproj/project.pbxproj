@@ -51,8 +51,6 @@
 		0382FA2A2992F05E00247BBB /* Command.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382FA292992F05E00247BBB /* Command.cpp */; };
 		0382FA2C2992F06C00247BBB /* Commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382FA2B2992F06C00247BBB /* Commands.cpp */; };
 		0382FA302992F40C00247BBB /* ComplexArgumentParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382FA2F2992F40C00247BBB /* ComplexArgumentParser.cpp */; };
-		0382FA312992FD6E00247BBB /* MTRLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3DECCB712934AFE200585AEC /* MTRLogging.mm */; };
-		0382FA322992FDCE00247BBB /* MTRFramework.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */; };
 		039145E12993102B00257B3E /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 039145E02993102B00257B3E /* main.mm */; };
 		039145E3299311FF00257B3E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 039145E2299311FF00257B3E /* IOKit.framework */; platformFilters = (macos, ); };
 		039145E52993124800257B3E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 039145E42993124800257B3E /* SystemConfiguration.framework */; platformFilters = (macos, ); };
@@ -68,10 +66,10 @@
 		039546A12991DFC5006D42A8 /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0395469C2991DFC4006D42A8 /* json_value.cpp */; };
 		039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546A52991E132006D42A8 /* InteractionModel.cpp */; };
 		039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */; };
-		0395470F2992DB37006D42A8 /* complete.c in Sources */ = {isa = PBXBuildFile; fileRef = 0395470C2992DB37006D42A8 /* complete.c */; };
+		0395470F2992DB37006D42A8 /* complete.c in Sources */ = {isa = PBXBuildFile; fileRef = 0395470C2992DB37006D42A8 /* complete.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-conversion -Wno-strict-prototypes"; }; };
 		03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */; };
-		03F430A82994112B00166449 /* editline.c in Sources */ = {isa = PBXBuildFile; fileRef = 0395470B2992DB37006D42A8 /* editline.c */; };
-		03F430AA2994113500166449 /* sysunix.c in Sources */ = {isa = PBXBuildFile; fileRef = 03F430A92994113500166449 /* sysunix.c */; };
+		03F430A82994112B00166449 /* editline.c in Sources */ = {isa = PBXBuildFile; fileRef = 0395470B2992DB37006D42A8 /* editline.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-conversion -Wno-strict-prototypes"; }; };
+		03F430AA2994113500166449 /* sysunix.c in Sources */ = {isa = PBXBuildFile; fileRef = 03F430A92994113500166449 /* sysunix.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-conversion -Wno-strict-prototypes"; }; };
 		03FB93DE2A46200A0048CB35 /* DiscoverCommissionablesCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 03FB93DB2A46200A0048CB35 /* DiscoverCommissionablesCommand.h */; };
 		03FB93DF2A46200A0048CB35 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 03FB93DC2A46200A0048CB35 /* Commands.h */; };
 		03FB93E02A46200A0048CB35 /* DiscoverCommissionablesCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 03FB93DD2A46200A0048CB35 /* DiscoverCommissionablesCommand.mm */; };
@@ -109,6 +107,7 @@
 		3CF134AD289D8E570017A19E /* MTRDeviceAttestationInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CF134AC289D8E570017A19E /* MTRDeviceAttestationInfo.mm */; };
 		3CF134AF289D90FF0017A19E /* MTROperationalCertificateIssuer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF134AE289D90FF0017A19E /* MTROperationalCertificateIssuer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */; };
+		3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */; settings = {COMPILER_FLAGS = "-UMTR_NO_AVAILABILITY -Wno-unguarded-availability-new"; }; };
 		3D69868529383096007314E7 /* com.csa.matter.plist in Copy Logging Preferences */ = {isa = PBXBuildFile; fileRef = 3D69868029382EF4007314E7 /* com.csa.matter.plist */; };
 		3D843711294977000070D20A /* NSStringSpanConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370E294977000070D20A /* NSStringSpanConversion.h */; };
 		3D843712294977000070D20A /* MTRCallbackBridgeBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */; };
@@ -277,7 +276,6 @@
 		88EBF8D027FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 88EBF8CD27FABDD500686BC1 /* MTRDeviceAttestationDelegateBridge.h */; };
 		88FA798D2B7B257100CD4B6F /* MTRMetricsCollector.h in Headers */ = {isa = PBXBuildFile; fileRef = 88FA798B2B7B257100CD4B6F /* MTRMetricsCollector.h */; };
 		88FA798E2B7B257100CD4B6F /* MTRMetricsCollector.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88FA798C2B7B257100CD4B6F /* MTRMetricsCollector.mm */; };
-		88FA79902B7BE42500CD4B6F /* MTRMetricsCollector.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88FA798C2B7B257100CD4B6F /* MTRMetricsCollector.mm */; };
 		93B2CF9A2B56E45C00E4D187 /* MTRClusterNames.mm in Sources */ = {isa = PBXBuildFile; fileRef = 93B2CF992B56E45C00E4D187 /* MTRClusterNames.mm */; };
 		93E610AA2B626E290077F02A /* MTRClusterNames.h in Headers */ = {isa = PBXBuildFile; fileRef = 93E610A92B626E290077F02A /* MTRClusterNames.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		991DC0842475F45400C13860 /* MTRDeviceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC0822475F45400C13860 /* MTRDeviceController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -310,44 +308,44 @@
 		B2E0D7B9245B0B5C003C5B48 /* MTRSetupPayload.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */; };
 		B2F53AF2245B0DCF0010745E /* MTRSetupPayloadParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B2F53AF1245B0DCF0010745E /* MTRSetupPayloadParserTests.m */; };
 		B45373AA2A9FE73400807602 /* WebSocketServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B45373A92A9FE73400807602 /* WebSocketServer.cpp */; };
-		B45373BD2A9FEA9100807602 /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B22A9FEA9000807602 /* service.c */; };
-		B45373BE2A9FEA9100807602 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B32A9FEA9000807602 /* network.c */; };
-		B45373BF2A9FEA9100807602 /* adopt.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B42A9FEA9000807602 /* adopt.c */; };
-		B45373C02A9FEA9100807602 /* output.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B52A9FEA9000807602 /* output.c */; };
-		B45373C12A9FEA9100807602 /* close.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B62A9FEA9000807602 /* close.c */; };
-		B45373C22A9FEA9100807602 /* vhost.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B72A9FEA9000807602 /* vhost.c */; };
-		B45373C32A9FEA9100807602 /* wsi.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B82A9FEA9000807602 /* wsi.c */; };
-		B45373C42A9FEA9100807602 /* dummy-callback.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B92A9FEA9000807602 /* dummy-callback.c */; };
-		B45373C52A9FEA9100807602 /* wsi-timeout.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373BA2A9FEA9000807602 /* wsi-timeout.c */; };
-		B45373C62A9FEA9100807602 /* sorted-usec-list.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373BB2A9FEA9100807602 /* sorted-usec-list.c */; };
-		B45373C72A9FEA9100807602 /* pollfd.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373BC2A9FEA9100807602 /* pollfd.c */; };
-		B45373D12A9FEB0C00807602 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CA2A9FEB0C00807602 /* alloc.c */; };
-		B45373D22A9FEB0C00807602 /* buflist.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CB2A9FEB0C00807602 /* buflist.c */; };
-		B45373D32A9FEB0C00807602 /* libwebsockets.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CC2A9FEB0C00807602 /* libwebsockets.c */; };
-		B45373D42A9FEB0C00807602 /* context.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CD2A9FEB0C00807602 /* context.c */; };
-		B45373D52A9FEB0C00807602 /* logs.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CE2A9FEB0C00807602 /* logs.c */; };
-		B45373D72A9FEB0C00807602 /* lws_dll2.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373D02A9FEB0C00807602 /* lws_dll2.c */; };
-		B45373D92A9FEB3800807602 /* poll.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373D82A9FEB3800807602 /* poll.c */; };
-		B45373DC2A9FEB5300807602 /* sha-1.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373DA2A9FEB5300807602 /* sha-1.c */; };
-		B45373DD2A9FEB5300807602 /* base64-decode.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373DB2A9FEB5300807602 /* base64-decode.c */; };
-		B45373DF2A9FEB6F00807602 /* system.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373DE2A9FEB6F00807602 /* system.c */; };
-		B45373E12A9FEB7F00807602 /* ops-h1.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E02A9FEB7F00807602 /* ops-h1.c */; };
-		B45373E52A9FEBA400807602 /* date.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E22A9FEBA400807602 /* date.c */; };
-		B45373E62A9FEBA400807602 /* header.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E32A9FEBA400807602 /* header.c */; };
-		B45373E72A9FEBA400807602 /* parsers.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E42A9FEBA400807602 /* parsers.c */; };
-		B45373E92A9FEBC100807602 /* server.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E82A9FEBC100807602 /* server.c */; };
-		B45373EB2A9FEBDB00807602 /* ops-listen.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373EA2A9FEBDB00807602 /* ops-listen.c */; };
-		B45373ED2A9FEBEC00807602 /* ops-pipe.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373EC2A9FEBEC00807602 /* ops-pipe.c */; };
-		B45373EF2A9FEBFE00807602 /* ops-raw-skt.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373EE2A9FEBFE00807602 /* ops-raw-skt.c */; };
-		B45373F22A9FEC1A00807602 /* ops-ws.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F02A9FEC1A00807602 /* ops-ws.c */; };
-		B45373F32A9FEC1A00807602 /* server-ws.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F12A9FEC1A00807602 /* server-ws.c */; };
-		B45373FB2A9FEC4F00807602 /* unix-service.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F42A9FEC4F00807602 /* unix-service.c */; };
-		B45373FC2A9FEC4F00807602 /* unix-caps.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F52A9FEC4F00807602 /* unix-caps.c */; };
-		B45373FD2A9FEC4F00807602 /* unix-pipe.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F62A9FEC4F00807602 /* unix-pipe.c */; };
-		B45373FE2A9FEC4F00807602 /* unix-fds.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F72A9FEC4F00807602 /* unix-fds.c */; };
-		B45373FF2A9FEC4F00807602 /* unix-misc.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F82A9FEC4F00807602 /* unix-misc.c */; };
-		B45374002A9FEC4F00807602 /* unix-init.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F92A9FEC4F00807602 /* unix-init.c */; };
-		B45374012A9FEC4F00807602 /* unix-sockets.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373FA2A9FEC4F00807602 /* unix-sockets.c */; };
+		B45373BD2A9FEA9100807602 /* service.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B22A9FEA9000807602 /* service.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373BE2A9FEA9100807602 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B32A9FEA9000807602 /* network.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373BF2A9FEA9100807602 /* adopt.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B42A9FEA9000807602 /* adopt.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373C02A9FEA9100807602 /* output.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B52A9FEA9000807602 /* output.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373C12A9FEA9100807602 /* close.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B62A9FEA9000807602 /* close.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373C22A9FEA9100807602 /* vhost.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B72A9FEA9000807602 /* vhost.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373C32A9FEA9100807602 /* wsi.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B82A9FEA9000807602 /* wsi.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373C42A9FEA9100807602 /* dummy-callback.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373B92A9FEA9000807602 /* dummy-callback.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373C52A9FEA9100807602 /* wsi-timeout.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373BA2A9FEA9000807602 /* wsi-timeout.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373C62A9FEA9100807602 /* sorted-usec-list.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373BB2A9FEA9100807602 /* sorted-usec-list.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373C72A9FEA9100807602 /* pollfd.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373BC2A9FEA9100807602 /* pollfd.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373D12A9FEB0C00807602 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CA2A9FEB0C00807602 /* alloc.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373D22A9FEB0C00807602 /* buflist.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CB2A9FEB0C00807602 /* buflist.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373D32A9FEB0C00807602 /* libwebsockets.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CC2A9FEB0C00807602 /* libwebsockets.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373D42A9FEB0C00807602 /* context.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CD2A9FEB0C00807602 /* context.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373D52A9FEB0C00807602 /* logs.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373CE2A9FEB0C00807602 /* logs.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373D72A9FEB0C00807602 /* lws_dll2.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373D02A9FEB0C00807602 /* lws_dll2.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373D92A9FEB3800807602 /* poll.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373D82A9FEB3800807602 /* poll.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373DC2A9FEB5300807602 /* sha-1.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373DA2A9FEB5300807602 /* sha-1.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373DD2A9FEB5300807602 /* base64-decode.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373DB2A9FEB5300807602 /* base64-decode.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373DF2A9FEB6F00807602 /* system.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373DE2A9FEB6F00807602 /* system.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373E12A9FEB7F00807602 /* ops-h1.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E02A9FEB7F00807602 /* ops-h1.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373E52A9FEBA400807602 /* date.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E22A9FEBA400807602 /* date.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373E62A9FEBA400807602 /* header.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E32A9FEBA400807602 /* header.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373E72A9FEBA400807602 /* parsers.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E42A9FEBA400807602 /* parsers.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373E92A9FEBC100807602 /* server.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373E82A9FEBC100807602 /* server.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373EB2A9FEBDB00807602 /* ops-listen.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373EA2A9FEBDB00807602 /* ops-listen.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373ED2A9FEBEC00807602 /* ops-pipe.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373EC2A9FEBEC00807602 /* ops-pipe.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373EF2A9FEBFE00807602 /* ops-raw-skt.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373EE2A9FEBFE00807602 /* ops-raw-skt.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373F22A9FEC1A00807602 /* ops-ws.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F02A9FEC1A00807602 /* ops-ws.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373F32A9FEC1A00807602 /* server-ws.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F12A9FEC1A00807602 /* server-ws.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373FB2A9FEC4F00807602 /* unix-service.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F42A9FEC4F00807602 /* unix-service.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373FC2A9FEC4F00807602 /* unix-caps.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F52A9FEC4F00807602 /* unix-caps.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373FD2A9FEC4F00807602 /* unix-pipe.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F62A9FEC4F00807602 /* unix-pipe.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373FE2A9FEC4F00807602 /* unix-fds.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F72A9FEC4F00807602 /* unix-fds.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45373FF2A9FEC4F00807602 /* unix-misc.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F82A9FEC4F00807602 /* unix-misc.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45374002A9FEC4F00807602 /* unix-init.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F92A9FEC4F00807602 /* unix-init.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
+		B45374012A9FEC4F00807602 /* unix-sockets.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373FA2A9FEC4F00807602 /* unix-sockets.c */; settings = {COMPILER_FLAGS = "-Wno-error -Wno-unreachable-code -Wno-conversion -Wno-format-nonliteral"; }; };
 		B4C8E6B72B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4C8E6B42B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm */; };
 		B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */; };
 		B4E262172AA0CF2000DBA5BC /* RemoteDataModelLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */; };
@@ -496,6 +494,7 @@
 		3CF134AC289D8E570017A19E /* MTRDeviceAttestationInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceAttestationInfo.mm; sourceTree = "<group>"; };
 		3CF134AE289D90FF0017A19E /* MTROperationalCertificateIssuer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTROperationalCertificateIssuer.h; sourceTree = "<group>"; };
 		3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRErrorTests.m; sourceTree = "<group>"; };
+		3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRAvailabilityTests.m; sourceTree = "<group>"; };
 		3D69868029382EF4007314E7 /* com.csa.matter.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = com.csa.matter.plist; sourceTree = "<group>"; };
 		3D84370E294977000070D20A /* NSStringSpanConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringSpanConversion.h; sourceTree = "<group>"; };
 		3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCallbackBridgeBase.h; sourceTree = "<group>"; };
@@ -987,8 +986,8 @@
 			isa = PBXGroup;
 			children = (
 				0395470C2992DB37006D42A8 /* complete.c */,
-				03F430A92994113500166449 /* sysunix.c */,
 				0395470B2992DB37006D42A8 /* editline.c */,
+				03F430A92994113500166449 /* sysunix.c */,
 			);
 			name = editline;
 			path = ../../third_party/editline;
@@ -1359,36 +1358,37 @@
 		B202529A2459E34F00F97062 /* CHIPTests */ = {
 			isa = PBXGroup;
 			children = (
-				8874C1312B69C7060084BEFD /* MTRMetricsTests.m */,
-				1EE0805C2A448756008A03C2 /* MTRCommissionableBrowserTests.m */,
-				51189FC72A33ACE900184508 /* TestHelpers */,
+				B202529D2459E34F00F97062 /* Info.plist */,
+				5143851C2A65885400EDC8E6 /* MatterTests-Bridging-Header.h */,
+				7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */,
+				3DA1A3572ABABF69004F0BB9 /* MTRAsyncWorkQueueTests.m */,
+				3D3928D62BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m */,
+				51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */,
 				3DFCB3282966684500332B35 /* MTRCertificateInfoTests.m */,
+				517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */,
+				51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */,
+				1EE0805C2A448756008A03C2 /* MTRCommissionableBrowserTests.m */,
+				518D3F842AA14006008E0007 /* MTRControllerAdvertisingTests.m */,
 				99C65E0F267282F1003402F6 /* MTRControllerTests.m */,
+				51A2F1312A00402A00F03298 /* MTRDataValueParserTests.m */,
 				5AE6D4E327A99041001F2493 /* MTRDeviceTests.m */,
 				51D9CB0A2BA37DCE0049D6DB /* MTRDSTOffsetTests.m */,
 				3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */,
-				5A6FEC9C27B5E48800F25F42 /* MTRXPCProtocolTests.m */,
-				5A7947DD27BEC3F500434CF2 /* MTRXPCListenerSampleTests.m */,
-				B2F53AF1245B0DCF0010745E /* MTRSetupPayloadParserTests.m */,
-				997DED1926955D0200975E97 /* MTRThreadOperationalDatasetTests.mm */,
-				517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */,
-				7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */,
-				3DA1A3572ABABF69004F0BB9 /* MTRAsyncWorkQueueTests.m */,
-				51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */,
-				510CECA6297F72470064E0B3 /* MTROperationalCertificateIssuerTests.m */,
 				5173A47829C0E82300F67F48 /* MTRFabricInfoTests.m */,
-				51742B4D29CB6B88009974FE /* MTRPairingTests.m */,
+				8874C1312B69C7060084BEFD /* MTRMetricsTests.m */,
+				510CECA6297F72470064E0B3 /* MTROperationalCertificateIssuerTests.m */,
 				5142E39729D377F000A206F0 /* MTROTAProviderTests.m */,
-				51A2F1312A00402A00F03298 /* MTRDataValueParserTests.m */,
-				51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */,
-				519498312A25581C00B3BABE /* MTRSetupPayloadSerializerTests.m */,
-				5143851D2A65885500EDC8E6 /* MTRSwiftPairingTests.swift */,
-				51E0FC0F2ACBBF230001E197 /* MTRSwiftDeviceTests.swift */,
+				51742B4D29CB6B88009974FE /* MTRPairingTests.m */,
 				51E95DF72A78110900A434F0 /* MTRPerControllerStorageTests.m */,
-				518D3F842AA14006008E0007 /* MTRControllerAdvertisingTests.m */,
 				51D0B1292B61766F006E3511 /* MTRServerEndpointTests.m */,
-				B202529D2459E34F00F97062 /* Info.plist */,
-				5143851C2A65885400EDC8E6 /* MatterTests-Bridging-Header.h */,
+				B2F53AF1245B0DCF0010745E /* MTRSetupPayloadParserTests.m */,
+				519498312A25581C00B3BABE /* MTRSetupPayloadSerializerTests.m */,
+				51E0FC0F2ACBBF230001E197 /* MTRSwiftDeviceTests.swift */,
+				5143851D2A65885500EDC8E6 /* MTRSwiftPairingTests.swift */,
+				997DED1926955D0200975E97 /* MTRThreadOperationalDatasetTests.mm */,
+				5A7947DD27BEC3F500434CF2 /* MTRXPCListenerSampleTests.m */,
+				5A6FEC9C27B5E48800F25F42 /* MTRXPCProtocolTests.m */,
+				51189FC72A33ACE900184508 /* TestHelpers */,
 			);
 			path = CHIPTests;
 			sourceTree = "<group>";
@@ -1396,6 +1396,34 @@
 		B45373AD2A9FE9BF00807602 /* libwebsockets */ = {
 			isa = PBXGroup;
 			children = (
+				B45373B42A9FEA9000807602 /* adopt.c */,
+				B45373CA2A9FEB0C00807602 /* alloc.c */,
+				B45373DB2A9FEB5300807602 /* base64-decode.c */,
+				B45373CB2A9FEB0C00807602 /* buflist.c */,
+				B45373B62A9FEA9000807602 /* close.c */,
+				B45373CD2A9FEB0C00807602 /* context.c */,
+				B45373E22A9FEBA400807602 /* date.c */,
+				B45373B92A9FEA9000807602 /* dummy-callback.c */,
+				B45373E32A9FEBA400807602 /* header.c */,
+				B45373CC2A9FEB0C00807602 /* libwebsockets.c */,
+				B45373CE2A9FEB0C00807602 /* logs.c */,
+				B45373D02A9FEB0C00807602 /* lws_dll2.c */,
+				B45373B32A9FEA9000807602 /* network.c */,
+				B45373E02A9FEB7F00807602 /* ops-h1.c */,
+				B45373EA2A9FEBDB00807602 /* ops-listen.c */,
+				B45373EC2A9FEBEC00807602 /* ops-pipe.c */,
+				B45373EE2A9FEBFE00807602 /* ops-raw-skt.c */,
+				B45373F02A9FEC1A00807602 /* ops-ws.c */,
+				B45373B52A9FEA9000807602 /* output.c */,
+				B45373E42A9FEBA400807602 /* parsers.c */,
+				B45373D82A9FEB3800807602 /* poll.c */,
+				B45373BC2A9FEA9100807602 /* pollfd.c */,
+				B45373F12A9FEC1A00807602 /* server-ws.c */,
+				B45373E82A9FEBC100807602 /* server.c */,
+				B45373B22A9FEA9000807602 /* service.c */,
+				B45373DA2A9FEB5300807602 /* sha-1.c */,
+				B45373BB2A9FEA9100807602 /* sorted-usec-list.c */,
+				B45373DE2A9FEB6F00807602 /* system.c */,
 				B45373F52A9FEC4F00807602 /* unix-caps.c */,
 				B45373F72A9FEC4F00807602 /* unix-fds.c */,
 				B45373F92A9FEC4F00807602 /* unix-init.c */,
@@ -1403,34 +1431,6 @@
 				B45373F62A9FEC4F00807602 /* unix-pipe.c */,
 				B45373F42A9FEC4F00807602 /* unix-service.c */,
 				B45373FA2A9FEC4F00807602 /* unix-sockets.c */,
-				B45373F02A9FEC1A00807602 /* ops-ws.c */,
-				B45373F12A9FEC1A00807602 /* server-ws.c */,
-				B45373EE2A9FEBFE00807602 /* ops-raw-skt.c */,
-				B45373EC2A9FEBEC00807602 /* ops-pipe.c */,
-				B45373EA2A9FEBDB00807602 /* ops-listen.c */,
-				B45373E82A9FEBC100807602 /* server.c */,
-				B45373E22A9FEBA400807602 /* date.c */,
-				B45373E32A9FEBA400807602 /* header.c */,
-				B45373E42A9FEBA400807602 /* parsers.c */,
-				B45373E02A9FEB7F00807602 /* ops-h1.c */,
-				B45373DE2A9FEB6F00807602 /* system.c */,
-				B45373DB2A9FEB5300807602 /* base64-decode.c */,
-				B45373DA2A9FEB5300807602 /* sha-1.c */,
-				B45373D82A9FEB3800807602 /* poll.c */,
-				B45373CA2A9FEB0C00807602 /* alloc.c */,
-				B45373CB2A9FEB0C00807602 /* buflist.c */,
-				B45373CD2A9FEB0C00807602 /* context.c */,
-				B45373CC2A9FEB0C00807602 /* libwebsockets.c */,
-				B45373CE2A9FEB0C00807602 /* logs.c */,
-				B45373D02A9FEB0C00807602 /* lws_dll2.c */,
-				B45373B42A9FEA9000807602 /* adopt.c */,
-				B45373B62A9FEA9000807602 /* close.c */,
-				B45373B92A9FEA9000807602 /* dummy-callback.c */,
-				B45373B32A9FEA9000807602 /* network.c */,
-				B45373B52A9FEA9000807602 /* output.c */,
-				B45373BC2A9FEA9100807602 /* pollfd.c */,
-				B45373B22A9FEA9000807602 /* service.c */,
-				B45373BB2A9FEA9100807602 /* sorted-usec-list.c */,
 				B45373B72A9FEA9000807602 /* vhost.c */,
 				B45373BA2A9FEA9000807602 /* wsi-timeout.c */,
 				B45373B82A9FEA9000807602 /* wsi.c */,
@@ -1788,54 +1788,65 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B45373C32A9FEA9100807602 /* wsi.c in Sources */,
-				B45373D42A9FEB0C00807602 /* context.c in Sources */,
-				B45373D32A9FEB0C00807602 /* libwebsockets.c in Sources */,
-				B45373C12A9FEA9100807602 /* close.c in Sources */,
-				039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */,
-				B45373E72A9FEBA400807602 /* parsers.c in Sources */,
-				B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */,
-				88FA79902B7BE42500CD4B6F /* MTRMetricsCollector.mm in Sources */,
-				B45373BF2A9FEA9100807602 /* adopt.c in Sources */,
-				B45373F32A9FEC1A00807602 /* server-ws.c in Sources */,
+				0395470F2992DB37006D42A8 /* complete.c in Sources */,
+				03F430A82994112B00166449 /* editline.c in Sources */,
 				03F430AA2994113500166449 /* sysunix.c in Sources */,
+				B45373BF2A9FEA9100807602 /* adopt.c in Sources */,
+				B45373D12A9FEB0C00807602 /* alloc.c in Sources */,
+				B45373DD2A9FEB5300807602 /* base64-decode.c in Sources */,
+				B45373D22A9FEB0C00807602 /* buflist.c in Sources */,
+				B45373C12A9FEA9100807602 /* close.c in Sources */,
+				B45373D42A9FEB0C00807602 /* context.c in Sources */,
+				B45373E52A9FEBA400807602 /* date.c in Sources */,
 				B45373C42A9FEA9100807602 /* dummy-callback.c in Sources */,
+				B45373E62A9FEBA400807602 /* header.c in Sources */,
+				B45373D32A9FEB0C00807602 /* libwebsockets.c in Sources */,
+				B45373D52A9FEB0C00807602 /* logs.c in Sources */,
+				B45373D72A9FEB0C00807602 /* lws_dll2.c in Sources */,
+				B45373BE2A9FEA9100807602 /* network.c in Sources */,
+				B45373E12A9FEB7F00807602 /* ops-h1.c in Sources */,
+				B45373EB2A9FEBDB00807602 /* ops-listen.c in Sources */,
+				B45373ED2A9FEBEC00807602 /* ops-pipe.c in Sources */,
+				B45373EF2A9FEBFE00807602 /* ops-raw-skt.c in Sources */,
+				B45373F22A9FEC1A00807602 /* ops-ws.c in Sources */,
+				B45373C02A9FEA9100807602 /* output.c in Sources */,
+				B45373E72A9FEBA400807602 /* parsers.c in Sources */,
+				B45373D92A9FEB3800807602 /* poll.c in Sources */,
+				B45373C72A9FEA9100807602 /* pollfd.c in Sources */,
+				B45373F32A9FEC1A00807602 /* server-ws.c in Sources */,
+				B45373E92A9FEBC100807602 /* server.c in Sources */,
+				B45373BD2A9FEA9100807602 /* service.c in Sources */,
+				B45373DC2A9FEB5300807602 /* sha-1.c in Sources */,
+				B45373C62A9FEA9100807602 /* sorted-usec-list.c in Sources */,
+				B45373DF2A9FEB6F00807602 /* system.c in Sources */,
+				B45373FC2A9FEC4F00807602 /* unix-caps.c in Sources */,
+				B45373FE2A9FEC4F00807602 /* unix-fds.c in Sources */,
+				B45374002A9FEC4F00807602 /* unix-init.c in Sources */,
+				B45373FF2A9FEC4F00807602 /* unix-misc.c in Sources */,
+				B45373FD2A9FEC4F00807602 /* unix-pipe.c in Sources */,
+				B45373FB2A9FEC4F00807602 /* unix-service.c in Sources */,
+				B45374012A9FEC4F00807602 /* unix-sockets.c in Sources */,
+				B45373C22A9FEA9100807602 /* vhost.c in Sources */,
+				B45373C52A9FEA9100807602 /* wsi-timeout.c in Sources */,
+				B45373C32A9FEA9100807602 /* wsi.c in Sources */,
+				039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */,
+				B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */,
 				75A202E62BA8DBAC00A771DD /* reporting.cpp in Sources */,
 				514C79EE2B62ADCD00DD6D7B /* ember-compatibility-functions.cpp in Sources */,
 				039145E82993179300257B3E /* GetCommissionerNodeIdCommand.mm in Sources */,
 				0395469F2991DFC5006D42A8 /* json_reader.cpp in Sources */,
 				514C79F42B62ED5500DD6D7B /* attribute-storage.cpp in Sources */,
-				B45373D22A9FEB0C00807602 /* buflist.c in Sources */,
-				B45373D72A9FEB0C00807602 /* lws_dll2.c in Sources */,
-				B45373FE2A9FEC4F00807602 /* unix-fds.c in Sources */,
-				B45373C72A9FEA9100807602 /* pollfd.c in Sources */,
-				B45373BE2A9FEA9100807602 /* network.c in Sources */,
-				B45373BD2A9FEA9100807602 /* service.c in Sources */,
 				0395469E2991DFC5006D42A8 /* json_writer.cpp in Sources */,
 				03FB93E02A46200A0048CB35 /* DiscoverCommissionablesCommand.mm in Sources */,
-				B45373EF2A9FEBFE00807602 /* ops-raw-skt.c in Sources */,
 				516411332B6BF77700E67C05 /* MTRServerAccessControl.mm in Sources */,
 				037C3DD52991C2E200B7EEE2 /* CHIPCommandBridge.mm in Sources */,
 				516411312B6BF70300E67C05 /* DataModelHandler.cpp in Sources */,
-				B45373E12A9FEB7F00807602 /* ops-h1.c in Sources */,
-				B45373EB2A9FEBDB00807602 /* ops-listen.c in Sources */,
 				0382FA2C2992F06C00247BBB /* Commands.cpp in Sources */,
-				B45373FD2A9FEC4F00807602 /* unix-pipe.c in Sources */,
-				B45373C52A9FEA9100807602 /* wsi-timeout.c in Sources */,
 				B4E2621E2AA0D02D00DBA5BC /* WaitForCommissioneeCommand.mm in Sources */,
 				03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */,
 				B45373AA2A9FE73400807602 /* WebSocketServer.cpp in Sources */,
-				B45373E62A9FEBA400807602 /* header.c in Sources */,
-				B45374002A9FEC4F00807602 /* unix-init.c in Sources */,
-				B45373DF2A9FEB6F00807602 /* system.c in Sources */,
-				B45373FC2A9FEC4F00807602 /* unix-caps.c in Sources */,
 				B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */,
-				B45373ED2A9FEBEC00807602 /* ops-pipe.c in Sources */,
-				B45373C02A9FEA9100807602 /* output.c in Sources */,
-				0395470F2992DB37006D42A8 /* complete.c in Sources */,
 				B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */,
-				B45373FF2A9FEC4F00807602 /* unix-misc.c in Sources */,
-				B45373D92A9FEB3800807602 /* poll.c in Sources */,
 				037C3DC12991BD5100B7EEE2 /* SetupPayloadParseCommand.mm in Sources */,
 				037C3DBF2991BD5100B7EEE2 /* OTAProviderDelegate.mm in Sources */,
 				037C3DD02991BD5200B7EEE2 /* InteractiveCommands.mm in Sources */,
@@ -1843,37 +1854,23 @@
 				037C3DBC2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.mm in Sources */,
 				0382FA2A2992F05E00247BBB /* Command.cpp in Sources */,
 				039546A12991DFC5006D42A8 /* json_value.cpp in Sources */,
-				0382FA322992FDCE00247BBB /* MTRFramework.mm in Sources */,
 				0382FA302992F40C00247BBB /* ComplexArgumentParser.cpp in Sources */,
-				B45373DD2A9FEB5300807602 /* base64-decode.c in Sources */,
 				039145E12993102B00257B3E /* main.mm in Sources */,
 				037C3DD42991BD5200B7EEE2 /* logging.mm in Sources */,
-				B45374012A9FEC4F00807602 /* unix-sockets.c in Sources */,
-				03F430A82994112B00166449 /* editline.c in Sources */,
 				512431282BA0C8BF000BC136 /* SetMRPParametersCommand.mm in Sources */,
 				512431292BA0C8BF000BC136 /* ResetMRPParametersCommand.mm in Sources */,
-				B45373E92A9FEBC100807602 /* server.c in Sources */,
 				037C3DB32991BD5000B7EEE2 /* OpenCommissioningWindowCommand.mm in Sources */,
 				037C3DAE2991BD4F00B7EEE2 /* PairingCommandBridge.mm in Sources */,
 				514C79FD2B62F94C00DD6D7B /* ota-provider.cpp in Sources */,
-				B45373FB2A9FEC4F00807602 /* unix-service.c in Sources */,
-				B45373F22A9FEC1A00807602 /* ops-ws.c in Sources */,
 				037C3DCA2991BD5100B7EEE2 /* CHIPCommandStorageDelegate.mm in Sources */,
 				037C3DCF2991BD5200B7EEE2 /* MTRError.mm in Sources */,
 				037C3DC72991BD5100B7EEE2 /* CHIPToolKeypair.mm in Sources */,
-				B45373E52A9FEBA400807602 /* date.c in Sources */,
 				514C79F72B62F0B900DD6D7B /* util.cpp in Sources */,
-				B45373DC2A9FEB5300807602 /* sha-1.c in Sources */,
-				B45373D12A9FEB0C00807602 /* alloc.c in Sources */,
-				B45373C62A9FEA9100807602 /* sorted-usec-list.c in Sources */,
 				037C3DB62991BD5000B7EEE2 /* ModelCommandBridge.mm in Sources */,
 				516411322B6BF75700E67C05 /* MTRIMDispatch.mm in Sources */,
-				B45373C22A9FEA9100807602 /* vhost.c in Sources */,
 				037C3DB42991BD5000B7EEE2 /* DeviceControllerDelegateBridge.mm in Sources */,
 				039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */,
-				B45373D52A9FEB0C00807602 /* logs.c in Sources */,
 				514C79F12B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
-				0382FA312992FD6E00247BBB /* MTRLogging.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1971,6 +1968,7 @@
 				51D0B12A2B61766F006E3511 /* MTRServerEndpointTests.m in Sources */,
 				7596A8512878709F004DAE0E /* MTRAsyncCallbackQueueTests.m in Sources */,
 				997DED1A26955D0200975E97 /* MTRThreadOperationalDatasetTests.mm in Sources */,
+				3D3928D72BBCEA3D00CDEBB2 /* MTRAvailabilityTests.m in Sources */,
 				518D3F852AA14006008E0007 /* MTRControllerAdvertisingTests.m in Sources */,
 				51C8E3F82825CDB600D47D00 /* MTRTestKeys.m in Sources */,
 				51C984622A61CE2A00B0AD9A /* MTRFabricInfoChecker.m in Sources */,
@@ -2031,10 +2029,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					CHIP_HAVE_CONFIG_H,
-					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					"CONFIG_USE_INTERACTIVE_MODE=1",
-					"MTR_NO_AVAILABILITY=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples/darwin-framework-tool",
@@ -2104,10 +2101,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					CHIP_HAVE_CONFIG_H,
-					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					"CONFIG_USE_INTERACTIVE_MODE=1",
-					"MTR_NO_AVAILABILITY=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples//darwin-framework-tool",
@@ -2178,23 +2174,20 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -2205,11 +2198,14 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
 					"$(inherited)",
+					"DEBUG=1",
+					"MTR_NO_AVAILABILITY=1",
+					"MTR_ENABLE_PROVISIONAL=1",
+					"MTR_ENABLE_UNSTABLE_API=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -2233,7 +2229,6 @@
 					"-Wformat",
 					"-Wformat-nonliteral",
 					"-Wformat-security",
-					"-Wconversion",
 				);
 			};
 			name = Debug;
@@ -2248,10 +2243,9 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					CHIP_HAVE_CONFIG_H,
 					"$(inherited)",
+					CHIP_HAVE_CONFIG_H,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-					"MTR_ENABLE_PROVISIONAL=1",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALLHDRS_SCRIPT_PHASE = YES;
@@ -2321,10 +2315,6 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"MTR_NO_AVAILABILITY=1",
-				);
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2351,23 +2341,20 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
@@ -2377,9 +2364,14 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"MTR_NO_AVAILABILITY=1",
+					"MTR_ENABLE_PROVISIONAL=1",
+					"MTR_ENABLE_UNSTABLE_API=1",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -2402,7 +2394,6 @@
 					"-Wformat",
 					"-Wformat-nonliteral",
 					"-Wformat-security",
-					"-Wconversion",
 				);
 			};
 			name = Release;
@@ -2417,10 +2408,9 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					CHIP_HAVE_CONFIG_H,
 					"$(inherited)",
+					CHIP_HAVE_CONFIG_H,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-					"MTR_ENABLE_PROVISIONAL=1",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALLHDRS_SCRIPT_PHASE = YES;
@@ -2491,10 +2481,6 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"MTR_NO_AVAILABILITY=1",
-				);
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

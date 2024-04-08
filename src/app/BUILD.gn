@@ -122,7 +122,7 @@ source_set("global-attributes") {
   ]
 }
 
-source_set("subscription-manager") {
+source_set("subscription-info-provider") {
   sources = [ "SubscriptionsInfoProvider.h" ]
 
   public_deps = [ "${chip_root}/src/lib/core" ]
@@ -207,9 +207,10 @@ static_library("interaction-model") {
     ":app_config",
     ":constants",
     ":paths",
-    ":subscription-manager",
+    ":subscription-info-provider",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/app/util:callbacks",
@@ -249,6 +250,7 @@ static_library("interaction-model") {
     public_deps += [
       ":global-attributes",
       "${chip_root}/src/access",
+      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]

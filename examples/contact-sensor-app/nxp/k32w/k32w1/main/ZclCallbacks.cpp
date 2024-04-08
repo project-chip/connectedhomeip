@@ -28,7 +28,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
 
 #if CONFIG_DIAG_LOGS_DEMO
 #include "DiagnosticLogsProviderDelegateImpl.h"
