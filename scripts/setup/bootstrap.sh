@@ -68,7 +68,7 @@ _submodules_need_updating() {
   )
 
   for path in "${_SUBMODULE_PATHS[@]}"; do
-    if git submodule status $path | grep -E '^-' >/dev/null 2>&1; then 
+    if git submodule status "$path" | grep -E '^-' >/dev/null 2>&1; then 
       echo "git shows that $path has changes"
       unset _SUBMODULE_PATHS
       return 0 # Success
