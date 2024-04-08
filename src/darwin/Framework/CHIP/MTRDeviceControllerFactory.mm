@@ -543,10 +543,9 @@ static void ShutdownOnExit()
         // state is brought up live on factory init, and not when it comes time
         // to actually start a controller, and does not actually clean itself up
         // until its refcount (which starts as 0) goes to 0.
-        if (!startingController) {
-            _controllerFactory->RetainSystemState();
-            _controllerFactory->ReleaseSystemState();
-        }
+        // TODO: Don't cause a stack shutdown and restart if startingController
+        _controllerFactory->RetainSystemState();
+        _controllerFactory->ReleaseSystemState();
 
         self->_advertiseOperational = startupParams.shouldStartServer;
         self->_running = YES;
