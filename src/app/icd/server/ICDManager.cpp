@@ -42,7 +42,8 @@ static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider)
+                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider,
+                      TestEventTriggerDelegate * testEventTriggerDelegate)
 {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     VerifyOrDie(storage != nullptr);
@@ -51,6 +52,9 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(exchangeManager != nullptr);
     VerifyOrDie(subInfoProvider != nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    VerifyOrDie(testEventTriggerDelegate);
+    testEventTriggerDelegate->AddHandler(this);
 
 #if CHIP_CONFIG_ENABLE_ICD_LIT
     // LIT ICD Verification Checks
@@ -87,8 +91,11 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     UpdateOperationState(OperationalState::IdleMode);
 }
 
-void ICDManager::Shutdown()
+void ICDManager::Shutdown(TestEventTriggerDelegate * testEventTriggerDelegate)
 {
+    VerifyOrDie(testEventTriggerDelegate);
+    testEventTriggerDelegate->RemoveHandler(this);
+
     ICDNotifier::GetInstance().Unsubscribe(this);
 
     // cancel any running timer of the icd
@@ -641,6 +648,27 @@ void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
     {
         DeviceLayer::SystemLayer().ExtendTimerTo(activeModeJitterThreshold, OnTransitionToIdle, this);
     }
+}
+
+CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
+{
+    ICDTestEventTriggerEvent trigger = static_cast<ICDTestEventTriggerEvent>(eventTrigger);
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+
+    switch (trigger)
+    {
+    case ICDTestEventTriggerEvent::kAddActiveModeReq:
+        SetKeepActiveModeRequirements(KeepActiveFlag::kTestEventTriggerActiveMode, true);
+        break;
+    case ICDTestEventTriggerEvent::kRemoveActiveModeReq:
+        SetKeepActiveModeRequirements(KeepActiveFlag::kTestEventTriggerActiveMode, false);
+        break;
+    default:
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
+
+    return err;
 }
 
 ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)

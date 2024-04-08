@@ -17,6 +17,7 @@
  */
 #include <app/EventManagement.h>
 #include <app/SubscriptionsInfoProvider.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
 #include <app/icd/server/ICDNotifier.h>
@@ -52,6 +53,8 @@ constexpr NodeId kClientNodeId11        = 0x100001;
 constexpr NodeId kClientNodeId12        = 0x100002;
 constexpr NodeId kClientNodeId21        = 0x200001;
 constexpr NodeId kClientNodeId22        = 0x200002;
+
+const uint8_t kTestKey[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
 constexpr uint8_t kKeyBuffer1a[] = {
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
@@ -91,6 +94,22 @@ private:
     bool mHasPersistedSubscription = false;
 };
 
+class TestEventDelegate : public TestEventTriggerDelegate
+{
+public:
+    TestEventDelegate() { mEnableKey = ByteSpan{ kTestKey }; };
+
+    explicit TestEventDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
+
+    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override
+    {
+        return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
+    }
+
+private:
+    ByteSpan mEnableKey;
+};
+
 class TestContext : public chip::Test::AppContext
 {
 public:
@@ -115,8 +134,10 @@ public:
     // Performs setup for each individual test in the test suite
     CHIP_ERROR SetUp() override
     {
+
         ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
-        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider);
+        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider,
+                         &mTestEventDelagate);
         mICDManager.RegisterObserver(&mICDStateObserver);
         return CHIP_NO_ERROR;
     }
@@ -124,7 +145,7 @@ public:
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-        mICDManager.Shutdown();
+        mICDManager.Shutdown(&mTestEventDelagate);
         chip::Test::AppContext::TearDown();
     }
 
@@ -134,6 +155,7 @@ public:
     TestSubscriptionsInfoProvider mSubInfoProvider;
     TestPersistentStorageDelegate testStorage;
     TestICDStateObserver mICDStateObserver;
+    TestEventDelegate mTestEventDelagate;
 
 private:
     System::Clock::ClockBase * mRealClock;
@@ -514,9 +536,9 @@ public:
         uint32_t counter  = ICDConfigurationData::GetInstance().GetICDCounter().GetValue();
 
         // Shut down and reinit ICDManager to increment counter
-        ctx->mICDManager.Shutdown();
+        ctx->mICDManager.Shutdown(&(ctx->mTestEventDelagate));
         ctx->mICDManager.Init(&(ctx->testStorage), &(ctx->GetFabricTable()), &(ctx->mKeystore), &(ctx->GetExchangeManager()),
-                              &(ctx->mSubInfoProvider));
+                              &(ctx->mSubInfoProvider), &(ctx->mTestEventDelagate));
         ctx->mICDManager.RegisterObserver(&(ctx->mICDStateObserver));
 
         NL_TEST_ASSERT_EQUALS(aSuite, counter + ICDConfigurationData::kICDCounterPersistenceIncrement,
@@ -692,6 +714,26 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11));
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    static void TestHandleTestEventTriggerActiveModeReq(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        // Verify That ICDManager starts in Idle
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Add ActiveMode req for the Test event trigger event
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDManager::ICDTestEventTriggerEvent::kAddActiveModeReq));
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Advance clock by the ActiveModeDuration and check that the device is still in ActiveMode
+        AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDuration() + 1_ms32);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Remove req and device should go to IdleMode
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDManager::ICDTestEventTriggerEvent::kRemoveActiveModeReq));
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+    }
 };
 
 } // namespace app
@@ -710,6 +752,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
     NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
     NL_TEST_DEF("TestShouldCheckInMsgsBeSentAtActiveModeFunction", TestICDManager::TestShouldCheckInMsgsBeSentAtActiveModeFunction),
+    NL_TEST_DEF("TestHandleTestEventTriggerActiveModeReq", TestICDManager::TestHandleTestEventTriggerActiveModeReq),
     NL_TEST_SENTINEL(),
 };
 

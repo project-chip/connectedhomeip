@@ -146,6 +146,10 @@ source_set("constants") {
   ]
 }
 
+source_set("test-event-trigger") {
+  sources = [ "TestEventTriggerDelegate.h" ]
+}
+
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
 # which in tern depens on the interaction-model.
 # Using source_set prevents the unit test to build correctly.
