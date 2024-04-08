@@ -66,8 +66,8 @@ struct InternalFlashFactoryData
     // the application code at runtime anyway.
     constexpr size_t FactoryDataBlockBegin()
     {
-        // calculate the nearest multiple of CONFIG_FPROTECT_BLOCK_SIZE smaller than PM_FACTORY_DATA_ADDRESS
-        return PM_FACTORY_DATA_ADDRESS & (-CONFIG_FPROTECT_BLOCK_SIZE);
+        // calculate the nearest multiple of CONFIG_FPROTECT_BLOCK_SIZE smaller than FACTORY_DATA_ADDRESS
+        return FACTORY_DATA_ADDRESS & (-CONFIG_FPROTECT_BLOCK_SIZE);
     }
 
     constexpr size_t FactoryDataBlockSize()
@@ -75,7 +75,7 @@ struct InternalFlashFactoryData
         // calculate the factory data end address rounded up to the nearest multiple of CONFIG_FPROTECT_BLOCK_SIZE
         // and make sure we do not overlap with settings partition
         constexpr size_t kFactoryDataBlockEnd =
-            (PM_FACTORY_DATA_ADDRESS + PM_FACTORY_DATA_SIZE + CONFIG_FPROTECT_BLOCK_SIZE - 1) & (-CONFIG_FPROTECT_BLOCK_SIZE);
+            (FACTORY_DATA_ADDRESS + FACTORY_DATA_SIZE + CONFIG_FPROTECT_BLOCK_SIZE - 1) & (-CONFIG_FPROTECT_BLOCK_SIZE);
         static_assert(kFactoryDataBlockEnd <= PM_SETTINGS_STORAGE_ADDRESS,
                       "FPROTECT memory block, which contains factory data"
                       "partition overlaps with the settings partition."
@@ -88,7 +88,7 @@ struct InternalFlashFactoryData
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite()
     {
 #ifdef CONFIG_FPROTECT
-        int ret = fprotect_area(FACTORY_DATA_ADDRESS, FACTORY_DATA_SIZE);
+        int ret = fprotect_area(FactoryDataBlockBegin(), FactoryDataBlockSize());
         return System::MapErrorZephyr(ret);
 #else
         return CHIP_ERROR_NOT_IMPLEMENTED;
