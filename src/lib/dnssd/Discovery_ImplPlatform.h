@@ -94,7 +94,7 @@ private:
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
     OperationalResolveDelegate * mOperationalDelegate = nullptr;
 
-    friend class Global<DiscoveryImplPlatform>;
+    friend Global<DiscoveryImplPlatform>;
     static Global<DiscoveryImplPlatform> sManager;
 };
 
