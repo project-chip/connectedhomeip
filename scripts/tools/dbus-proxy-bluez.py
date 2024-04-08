@@ -17,9 +17,9 @@
 
 import logging
 import os.path
+import typing
 from argparse import ArgumentParser
 from collections import namedtuple
-import typing
 
 from gi.repository import Gio, GLib
 
