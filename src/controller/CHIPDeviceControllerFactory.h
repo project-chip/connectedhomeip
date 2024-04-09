@@ -205,7 +205,9 @@ public:
     //
     // This should only be invoked if a matching call to RetainSystemState() was called prior.
     //
-    void ReleaseSystemState();
+    // Returns true if stack was shut down in response to this call, or false otherwise.
+    //
+    bool ReleaseSystemState();
 
     //
     // Retrieve a read-only pointer to the system state object that contains pointers to key stack
