@@ -24,6 +24,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <type_traits>
+
 namespace chip {
 namespace app {
 namespace InteractionModel {
@@ -80,7 +82,7 @@ EventNumber EmitEvent(E & emittor, const T & aEventData, EndpointId aEndpoint)
     return eventNumber;
 }
 
-template <typename E, typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = false>
+template <typename E, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
 EventNumber EmitEvent(E & emittor, const T & aEventData, EndpointId aEndpoint)
 {
     internal::SimpleEventLoggingDelegate<T> eventData(aEventData);
