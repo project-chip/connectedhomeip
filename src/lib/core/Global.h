@@ -29,6 +29,8 @@
 namespace chip {
 namespace detail {
 
+#if CHIP_CONFIG_GLOBALS_LAZY_INIT
+
 struct NonAtomicOnce
 {
     bool mInitialized = false;
@@ -55,6 +57,8 @@ struct AtomicOnce
     void call(void (*func)(void *), void * context) { std::call_once(mOnce, func, context); }
 #endif
 };
+
+#endif // CHIP_CONFIG_GLOBALS_LAZY_INIT
 
 } // namespace detail
 
