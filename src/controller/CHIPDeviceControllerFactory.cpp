@@ -392,9 +392,9 @@ void DeviceControllerFactory::RetainSystemState()
     (void) mSystemState->Retain();
 }
 
-void DeviceControllerFactory::ReleaseSystemState()
+bool DeviceControllerFactory::ReleaseSystemState()
 {
-    mSystemState->Release();
+    return mSystemState->Release();
 }
 
 DeviceControllerFactory::~DeviceControllerFactory()
