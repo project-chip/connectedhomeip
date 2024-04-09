@@ -73,7 +73,7 @@ class MetadataReader:
     Attributes:
 
     env: str
-       A dictionary that reprsents a environment configuration in
+       A dictionary that represents a environment configuration in
        YAML format. 
     """
 
