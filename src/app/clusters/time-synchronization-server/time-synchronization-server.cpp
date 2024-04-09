@@ -438,9 +438,9 @@ void TimeSynchronizationServer::AttemptToGetTime()
     }
 }
 
-void TimeSynchronizationServer::Init()
+void TimeSynchronizationServer::Init(PersistentStorageDelegate & persistentStorage)
 {
-    mTimeSyncDataProvider.Init(Server::GetInstance().GetPersistentStorage());
+    mTimeSyncDataProvider.Init(persistentStorage);
 
     Structs::TrustedTimeSourceStruct::Type tts;
     if (mTimeSyncDataProvider.LoadTrustedTimeSource(tts) == CHIP_NO_ERROR)
@@ -1329,7 +1329,7 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
 
 void MatterTimeSynchronizationPluginServerInitCallback()
 {
-    TimeSynchronizationServer::Instance().Init();
+    TimeSynchronizationServer::Instance().Init(Server::GetInstance().GetPersistentStorage());
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
 

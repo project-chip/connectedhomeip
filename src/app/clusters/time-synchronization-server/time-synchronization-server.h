@@ -66,7 +66,7 @@ class TimeSynchronizationServer : public FabricTable::Delegate
 {
 public:
     TimeSynchronizationServer();
-    void Init();
+    void Init(PersistentStorageDelegate & persistentStorage);
     void Shutdown();
 
     static TimeSynchronizationServer & Instance(void);
