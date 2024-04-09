@@ -19,6 +19,7 @@
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
 
+#include <app/interaction-model/actions.h>
 #include <app/interaction-model/invoke_responder.h>
 #include <app/interaction-model/operation_types.h>
 
@@ -37,6 +38,18 @@ class Model
 {
 public:
     virtual ~Model() = default;
+
+    // `actions` pointers  will be guaranteed valid until Shutdown is called()
+    virtual CHIP_ERROR Startup(InteractionModelActions actions)
+    {
+        mActions = actions;
+        return CHIP_NO_ERROR;
+    }
+    virtual CHIP_ERROR Shutdown() = 0;
+
+    // During the transition phase, we expect a large subset of code to require access to
+    // event emitting, path marking and other operations
+    virtual InteractionModelActions CurrentActions() { return mActions; }
 
     /// List reading has specific handling logic:
     ///   `state` contains in/out data about the current list reading. MUST start with kInvalidListIndex on first call
@@ -93,6 +106,9 @@ public:
     ///         - `UnsupportedAccess` for permission errors (ACL or fabric scoped with invalid fabric)
     ///         - `NeedsTimedInteraction` if the invoke requires timed interaction support
     virtual CHIP_ERROR Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments, InvokeReply & reply) = 0;
+
+private:
+    InteractionModelActions mActions = { nullptr };
 };
 
 } // namespace InteractionModel

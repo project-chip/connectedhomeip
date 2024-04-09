@@ -16,28 +16,20 @@
  */
 #pragma once
 
-#include <messaging/ExchangeContext.h>
+#include <app/interaction-model/events.h>
+#include <app/interaction-model/paths.h>
+#include <app/interaction-model/request_context.h>
 
 namespace chip {
 namespace app {
 namespace InteractionModel {
 
-// Context for a currently executing request
-class RequestContext
+/// Actual provided data for data models to interface with the interaction model environment
+struct InteractionModelActions
 {
-public:
-    virtual ~RequestContext() = default;
-
-    /// Valid ONLY during synchronous handling of a Read/Write/Invoke
-    ///
-    /// Used sparringly, however some operations will require these:
-    ///   - Operational Credentials aborting communications on removed fabrics
-    ///   - General Commissioning failsafe handling
-    ///   - BDX operations and data transfer
-    ///
-    /// Callers MUST check for null here (e.g. unit tests mocks may set this to
-    /// nullptr due to object complexity)
-    virtual Messaging::ExchangeContext * CurrentExchange() = 0;
+    Events * events;
+    Paths * paths;
+    RequestContext * requestContext;
 };
 
 } // namespace InteractionModel
