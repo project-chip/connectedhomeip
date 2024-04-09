@@ -168,7 +168,8 @@ def main():
             failures.append(f"Measured test case failure: {idx} {t}")
 
     test_runner.Shutdown()
-    print(f"Test of tests: run {len(TEST_CASES)}, test response correct: {len(TEST_CASES) - len(failures)} test response incorrect: {len(failures)}")
+    print(
+        f"Test of tests: run {len(TEST_CASES)}, test response correct: {len(TEST_CASES) - len(failures)} test response incorrect: {len(failures)}")
     for f in failures:
         print(f)
 
