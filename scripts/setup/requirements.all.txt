@@ -42,7 +42,6 @@ mypy==0.971
 mypy-protobuf==3.5.0
 protobuf==4.24.4
 types-protobuf==4.24.0.2
-PyGObject
 
 cryptography
 

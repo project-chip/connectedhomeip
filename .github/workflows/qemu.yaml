@@ -141,7 +141,8 @@ jobs:
             - name: Run ble commission test using the python parser sending commands to chip-tool
               run: |
                 ./scripts/run_in_vm.sh \
-                "./scripts/run_in_build_env.sh \
+                "scripts/run_in_build_env.sh 'pip3 install -r scripts/setup/requirements.ble-wifi-testing.txt' && \
+                ./scripts/run_in_build_env.sh \
                 \"./scripts/tests/run_test_suite.py \
                   --runner chip_tool_python \
                   --target TestCommissionerNodeId \
