@@ -69,12 +69,6 @@ class MetadataReader:
     """
     A class to parse run arguments from the test scripts and 
     resolve them to environment specific values.
-
-    Attributes:
-
-    env: str
-       A dictionary that represents a environment configuration in
-       YAML format. 
     """
 
     def __init__(self, env_yaml_file_path: str):
@@ -138,7 +132,7 @@ class MetadataReader:
 
             metadata_dict[run_arg] = run_arg_val
 
-    def __read_args__(self, run_args_lines: List[str], metadata_dict: Dict[str, str]) -> None:
+    def __read_args__(self, run_args_lines: List[str]) -> Dict[str, str]:
         """
         Parses a list of lines and extracts argument
         values from it.
@@ -146,13 +140,22 @@ class MetadataReader:
         Parameters:
 
         run_args_lines:
-          Line in test script header that contains run argumment definition
+          Line in test script header that contains run argument definition.
+          Each line will contain a list of run arguments separated by a space.
+          Line below is one example of what the run argument line will look like:
+          "app/all-clusters discriminator KVS storage-path"
 
-        metadata_dict:
-          Dictionary where the extracted arguments will be stored.
-          This represents the side effect of this function.
+          In this case the line defines that app, discriminator, KVS, and storage-path
+          are the arguments that should be used with this run.
+
+          An argument can be defined multiple times in the same line or in different lines.
+          The last definition will override any previous definition. For example,
+          "KVS/kvs1 KVS/kvs2 KVS/kvs3" line will lead to KVS value of kvs3.
         """
+        metadata_dict={}
+        
         for run_line in run_args_lines:
+            print(run_line)
             for run_arg_word in run_line.strip().split():
                 '''
                 We expect the run arg to be defined in one of the 
@@ -165,6 +168,8 @@ class MetadataReader:
                 '''
                 run_arg = run_arg_word.split('/', 1)[0]
                 metadata_dict[run_arg] = run_arg_word
+
+        return metadata_dict
 
     def parse_script(self, py_script_path: str) -> List[Metadata]:
         """
@@ -204,15 +209,14 @@ class MetadataReader:
                 elif args_match:
                     runs_arg_lines[args_match.group(1)].append(args_match.group(2))
 
-        for run in runs_arg_lines:
-            metadata_dict = {}
-            self.__read_args__(runs_arg_lines[run], metadata_dict)
+        for run, line in runs_arg_lines.items():
+            metadata_dict = self.__read_args__(line)
             self.__resolve_env_vals__(metadata_dict)
 
             # store the run value and script location in the
             # metadata object
-            metadata_dict['py_script_path'] = str(py_script_path)
-            metadata_dict['run'] = str(run)
+            metadata_dict['py_script_path'] = py_script_path
+            metadata_dict['run'] = run
 
             metadata = Metadata()
 
