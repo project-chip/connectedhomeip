@@ -1215,7 +1215,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             connectionBridge->connect(commissioner, nodeID);
         }
         errorHandler:^(NSError * error) {
-            completion(nullptr, chip::NullOptional, error);
+            completion(nullptr, chip::NullOptional, error, nil);
         }];
 }
 
@@ -1226,20 +1226,20 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             chip::CommissioneeDeviceProxy * deviceProxy;
             CHIP_ERROR err = commissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
             if (err != CHIP_NO_ERROR) {
-                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err]);
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err], nil);
                 return;
             }
 
             chip::Optional<chip::SessionHandle> session = deviceProxy->GetSecureSession();
             if (!session.HasValue() || !session.Value()->AsSecureSession()->IsPASESession()) {
-                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
                 return;
             }
 
-            completion(deviceProxy->GetExchangeManager(), session, nil);
+            completion(deviceProxy->GetExchangeManager(), session, nil, nil);
         }
         errorHandler:^(NSError * error) {
-            completion(nullptr, chip::NullOptional, error);
+            completion(nullptr, chip::NullOptional, error, nil);
         }];
 }
 
@@ -1619,7 +1619,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // that we are running.
     [self getSessionForNode:deviceID
                  completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                      // Create an MTRBaseDevice for the node id involved, now that our
                      // CASE session is primed.  We don't actually care about the session
                      // information here.
