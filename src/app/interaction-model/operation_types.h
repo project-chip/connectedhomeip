@@ -17,10 +17,10 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BitFlags.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/ConcreteAttributePath.h>
 
 #include <cstdint>
 
@@ -29,50 +29,59 @@ namespace app {
 namespace InteractionModel {
 
 /// Contains common flags among all interaction model operations: read/write/invoke
-enum class OperationFlags: uint32_t {
-    kInternal = 0x0001,  // Internal request for data changes (can bypass checks/ACL etc.)
+enum class OperationFlags : uint32_t
+{
+    kInternal = 0x0001, // Internal request for data changes (can bypass checks/ACL etc.)
 };
 
-/// This information is available for ALL interactions: read/write/invoke 
-struct OperationRequest {
-  OperationFlags                   operationFlags;
-  chip::Access::SubjectDescriptor  subjectDescriptor;    // Current authentication data
+/// This information is available for ALL interactions: read/write/invoke
+struct OperationRequest
+{
+    OperationFlags operationFlags;
+    chip::Access::SubjectDescriptor subjectDescriptor; // Current authentication data
 };
 
-enum class ReadFlags: uint32_t {
-    kFabricFiltered           = 0x0001,  // reading is perfomed fabric-filtered
+enum class ReadFlags : uint32_t
+{
+    kFabricFiltered = 0x0001, // reading is perfomed fabric-filtered
 };
 
-struct ReadAttributeRequest : OperationRequest {
+struct ReadAttributeRequest : OperationRequest
+{
     ConcreteAttributePath path;
     Optional<DataVersion> dataVersion;
-    BitFlags<ReadFlags>   readFlags;
+    BitFlags<ReadFlags> readFlags;
 };
 
-struct ReadState {
+struct ReadState
+{
     // When reading lists, reading will start at this index.
     // As list data is read, this index is incremented
     ListIndex listEncodeStart = kInvalidListIndex;
 };
 
-enum class WriteFlags: uint32_t {
-    kTimed         = 0x0001,  // Received as a 2nd command after a timed invoke
-    kListBegin     = 0x0002,  // This is the FIRST list data element in a series of data
-    kListEnd       = 0x0004,  // This is the LAST list element to write
+enum class WriteFlags : uint32_t
+{
+    kTimed     = 0x0001, // Received as a 2nd command after a timed invoke
+    kListBegin = 0x0002, // This is the FIRST list data element in a series of data
+    kListEnd   = 0x0004, // This is the LAST list element to write
 };
 
-struct WriteAttributeRequest : OperationRequest {
-    ConcreteDataAttributePath path;   // NOTE: this also contains LIST operation options (i.e. "data" path type)
+struct WriteAttributeRequest : OperationRequest
+{
+    ConcreteDataAttributePath path; // NOTE: this also contains LIST operation options (i.e. "data" path type)
     BitFlags<WriteFlags> writeFlags;
 };
 
-enum class InvokeFlags: uint32_t {
-    kTimed        = 0x0001,  // Received as a 2nd command after a timed invoke
+enum class InvokeFlags : uint32_t
+{
+    kTimed = 0x0001, // Received as a 2nd command after a timed invoke
 };
 
-struct InvokeRequest : OperationRequest {
-    ConcreteCommandPath   path;
-    Optional<GroupId>     groupRequestId;       // set if and only if this was a group request
+struct InvokeRequest : OperationRequest
+{
+    ConcreteCommandPath path;
+    Optional<GroupId> groupRequestId; // set if and only if this was a group request
     BitFlags<InvokeFlags> writeFlags;
 };
 
