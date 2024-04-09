@@ -54,8 +54,6 @@ constexpr NodeId kClientNodeId12        = 0x100002;
 constexpr NodeId kClientNodeId21        = 0x200001;
 constexpr NodeId kClientNodeId22        = 0x200002;
 
-const uint8_t kTestKey[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-
 constexpr uint8_t kKeyBuffer1a[] = {
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
 };
@@ -94,22 +92,6 @@ private:
     bool mHasPersistedSubscription = false;
 };
 
-class TestEventDelegate : public TestEventTriggerDelegate
-{
-public:
-    TestEventDelegate() { mEnableKey = ByteSpan{ kTestKey }; };
-
-    explicit TestEventDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
-
-    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override
-    {
-        return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
-    }
-
-private:
-    ByteSpan mEnableKey;
-};
-
 class TestContext : public chip::Test::AppContext
 {
 public:
@@ -136,8 +118,7 @@ public:
     {
 
         ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
-        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider,
-                         &mTestEventDelagate);
+        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider);
         mICDManager.RegisterObserver(&mICDStateObserver);
         return CHIP_NO_ERROR;
     }
@@ -145,7 +126,7 @@ public:
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-        mICDManager.Shutdown(&mTestEventDelagate);
+        mICDManager.Shutdown();
         chip::Test::AppContext::TearDown();
     }
 
@@ -155,7 +136,6 @@ public:
     TestSubscriptionsInfoProvider mSubInfoProvider;
     TestPersistentStorageDelegate testStorage;
     TestICDStateObserver mICDStateObserver;
-    TestEventDelegate mTestEventDelagate;
 
 private:
     System::Clock::ClockBase * mRealClock;
@@ -536,9 +516,9 @@ public:
         uint32_t counter  = ICDConfigurationData::GetInstance().GetICDCounter().GetValue();
 
         // Shut down and reinit ICDManager to increment counter
-        ctx->mICDManager.Shutdown(&(ctx->mTestEventDelagate));
+        ctx->mICDManager.Shutdown();
         ctx->mICDManager.Init(&(ctx->testStorage), &(ctx->GetFabricTable()), &(ctx->mKeystore), &(ctx->GetExchangeManager()),
-                              &(ctx->mSubInfoProvider), &(ctx->mTestEventDelagate));
+                              &(ctx->mSubInfoProvider));
         ctx->mICDManager.RegisterObserver(&(ctx->mICDStateObserver));
 
         NL_TEST_ASSERT_EQUALS(aSuite, counter + ICDConfigurationData::kICDCounterPersistenceIncrement,
