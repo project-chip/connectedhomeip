@@ -347,7 +347,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mICDManager.RegisterObserver(&app::DnssdServer::Instance());
 
     mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
-                     chip::app::InteractionModelEngine::GetInstance(), mTestEventTriggerDelegate);
+                     chip::app::InteractionModelEngine::GetInstance());
+
+    // Register Test Event Trigger Handler
+    mTestEventTriggerDelegate->AddHandler(&mICDManager);
+
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -592,7 +596,9 @@ void Server::Shutdown()
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Shutdown(mTestEventTriggerDelegate);
+    // Remove Test Event Trigger Handler
+    mTestEventTriggerDelegate->RemoveHandler(&mICDManager);
+    mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code

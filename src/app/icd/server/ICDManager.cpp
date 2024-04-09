@@ -42,8 +42,7 @@ static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider,
-                      TestEventTriggerDelegate * testEventTriggerDelegate)
+                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider)
 {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     VerifyOrDie(storage != nullptr);
@@ -52,9 +51,6 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(exchangeManager != nullptr);
     VerifyOrDie(subInfoProvider != nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-    VerifyOrDie(testEventTriggerDelegate);
-    testEventTriggerDelegate->AddHandler(this);
 
 #if CHIP_CONFIG_ENABLE_ICD_LIT
     // LIT ICD Verification Checks
@@ -91,11 +87,8 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     UpdateOperationState(OperationalState::IdleMode);
 }
 
-void ICDManager::Shutdown(TestEventTriggerDelegate * testEventTriggerDelegate)
+void ICDManager::Shutdown()
 {
-    VerifyOrDie(testEventTriggerDelegate);
-    testEventTriggerDelegate->RemoveHandler(this);
-
     ICDNotifier::GetInstance().Unsubscribe(this);
 
     // cancel any running timer of the icd

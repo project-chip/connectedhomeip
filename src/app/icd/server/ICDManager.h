@@ -93,9 +93,8 @@ public:
 
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * manager,
-              TestEventTriggerDelegate * testEventTriggerDelegate);
-    void Shutdown(TestEventTriggerDelegate * testEventTriggerDelegate);
+              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * manager);
+    void Shutdown();
     void UpdateICDMode();
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
