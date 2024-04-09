@@ -148,14 +148,14 @@ def test_discovery_fn():
         # Run the Linux tv-app and write the output to file
         tv_app_rel_path = 'out/tv-app/chip-tv-app'
         tv_app_abs_path = os.path.abspath(tv_app_rel_path)
-        p1 = subprocess.Popen(tv_app_abs_path, stdout=fd1, stderr=subprocess.PIPE, text=True)
+        subprocess.Popen(tv_app_abs_path, stdout=fd1, stderr=subprocess.PIPE, text=True)
 
         time.sleep(5)
 
         # Run the Linux tv-casting-app and write the output to file
         tv_casting_app_rel_path = 'out/tv-casting-app/chip-tv-casting-app'
         tv_casting_app_abs_path = os.path.abspath(tv_casting_app_rel_path)
-        p2 = subprocess.Popen(tv_casting_app_abs_path, stdout=fd2, stderr=subprocess.PIPE, text=True)
+        subprocess.Popen(tv_casting_app_abs_path, stdout=fd2, stderr=subprocess.PIPE, text=True)
 
     # Wait for the processes to finish writing before attempting to read
     time.sleep(15)
