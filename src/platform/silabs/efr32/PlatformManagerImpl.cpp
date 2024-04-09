@@ -167,9 +167,8 @@ void MigrateCounterConfigs(void)
     constexpr uint32_t kOldConfigKey_BootCount             = SilabsConfigKey(SilabsConfig::kMatterCounter_KeyBase, 0x00);
     constexpr uint32_t kOldConfigKey_TotalOperationalHours = SilabsConfigKey(SilabsConfig::kMatterCounter_KeyBase, 0x01);
 
-    MigrationManager::GetMigrationInstance().MigrateUint32(kOldConfigKey_BootCount, SilabsConfig::kConfigKey_BootCount);
-    MigrationManager::GetMigrationInstance().MigrateUint32(kOldConfigKey_TotalOperationalHours,
-                                                           SilabsConfig::kConfigKey_TotalOperationalHours);
+    MigrationManager::MigrateUint32(kOldConfigKey_BootCount, SilabsConfig::kConfigKey_BootCount);
+    MigrationManager::MigrateUint32(kOldConfigKey_TotalOperationalHours, SilabsConfig::kConfigKey_TotalOperationalHours);
 }
 } // namespace Silabs
 } // namespace DeviceLayer
