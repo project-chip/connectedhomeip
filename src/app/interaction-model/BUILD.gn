@@ -23,6 +23,7 @@ source_set("interaction-model") {
   deps = [
     "${chip_root}/src/access:types",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:error",
