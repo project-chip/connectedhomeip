@@ -261,11 +261,13 @@ source_set("events") {
   sources = [
     "EventHeader.h",
     "EventLoggingTypes.h",
+    "EventLoggingDelegate.h",
   ]
 
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
+    "${chip_root}/src/lib/core",
   ]
 }
 
@@ -291,7 +293,6 @@ static_library("app") {
     "DeferredAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
-    "EventLoggingDelegate.h",
     "EventManagement.cpp",
     "EventManagement.h",
     "FailSafeContext.cpp",
