@@ -16,6 +16,8 @@ name: Build Chef CI examples on all platforms
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
