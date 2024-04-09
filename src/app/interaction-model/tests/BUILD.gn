@@ -15,9 +15,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  test_sources = [
-    "TestEventEmitting.cpp",
-  ]
+  test_sources = [ "TestEventEmitting.cpp" ]
 
   cflags = [ "-Wconversion" ]
 

@@ -260,8 +260,8 @@ static_library("interaction-model") {
 source_set("events") {
   sources = [
     "EventHeader.h",
-    "EventLoggingTypes.h",
     "EventLoggingDelegate.h",
+    "EventLoggingTypes.h",
   ]
 
   deps = [
