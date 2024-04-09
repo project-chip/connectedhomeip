@@ -209,6 +209,9 @@ public:
     //
     bool ReleaseSystemState();
 
+    // Like RetainSystemState(), but will re-initialize the system state first if necessary.
+    CHIP_ERROR InitAndRetainSystemState();
+
     //
     // Retrieve a read-only pointer to the system state object that contains pointers to key stack
     // singletons. If the pointer is null, it indicates that the DeviceControllerFactory has yet to
@@ -272,7 +275,7 @@ private:
     DeviceControllerFactory() {}
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
     CHIP_ERROR InitSystemState(FactoryInitParams params);
-    CHIP_ERROR InitSystemState();
+    CHIP_ERROR ReinitSystemStateIfNecessary();
     void ControllerInitialized(const DeviceController & controller);
 
     uint16_t mListenPort;
