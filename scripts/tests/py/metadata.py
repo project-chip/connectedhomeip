@@ -152,8 +152,8 @@ class MetadataReader:
           The last definition will override any previous definition. For example,
           "KVS/kvs1 KVS/kvs2 KVS/kvs3" line will lead to KVS value of kvs3.
         """
-        metadata_dict={}
-        
+        metadata_dict = {}
+
         for run_line in run_args_lines:
             for run_arg_word in run_line.strip().split():
                 '''
