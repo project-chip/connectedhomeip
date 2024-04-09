@@ -212,7 +212,6 @@ static_library("interaction-model") {
     ":constants",
     ":paths",
     ":subscription-info-provider",
-    ":test-event-trigger",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:manager",
