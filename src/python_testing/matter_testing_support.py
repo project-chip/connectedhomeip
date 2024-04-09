@@ -1754,5 +1754,5 @@ def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTest
 
 
 def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
-    if not run_tests_internal(test_class, matter_test_config, hooks, default_controller, external_stack):
+    if not run_tests_no_exit(test_class, matter_test_config, hooks, default_controller, external_stack):
         sys.exit(1)
