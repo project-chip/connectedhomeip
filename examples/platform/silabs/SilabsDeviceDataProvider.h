@@ -37,12 +37,6 @@ public:
         Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>(ConfigurationManagerImpl::GetDefaultInstance())
     {}
 
-// TODO Remove once Commander supports (doesn't erase) NVM3 for 917
-#ifdef SIWX917_USE_COMISSIONABLE_DATA
-    void setupPayload(uint8_t * outBuf);
-    CHIP_ERROR FlashFactoryData();
-#endif /* SIWX917_USE_COMISSIONABLE_DATA */
-
     static SilabsDeviceDataProvider & GetDeviceDataProvider();
     CHIP_ERROR GetSetupPayload(MutableCharSpan & payloadBuf);
     // ===== Members functions that implement the CommissionableDataProvider

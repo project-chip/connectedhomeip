@@ -34,9 +34,6 @@ declare_args() {
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_transition = true
 
-  # use commissionable data for SiWx917
-  siwx917_commissionable_data = false
-
   #default WiFi SSID
   chip_default_wifi_ssid = ""
 
@@ -150,10 +147,6 @@ config("siwx917-common-config") {
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
-  }
-
-  if (siwx917_commissionable_data) {
-    defines += [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
   }
 
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
