@@ -381,12 +381,8 @@ void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource
         }
         return;
     }
-    mGranularity  = granularity;
-    Status status = TimeSource::Set(kRootEndpointId, timeSource);
-    if (!(status == Status::Success || status == Status::UnsupportedAttribute))
-    {
-        ChipLogError(Zcl, "Writing TimeSource failed.");
-    }
+    mGranularity = granularity;
+    mTimeSource  = timeSource;
 }
 
 void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessful)
@@ -395,11 +391,7 @@ void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessfu
     {
         mGranularity = GranularityEnum::kMillisecondsGranularity;
         // Non-matter SNTP because we know it's external and there's only one source
-        Status status = TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
-        if (!(status == Status::Success || status == Status::UnsupportedAttribute))
-        {
-            ChipLogError(Zcl, "Writing TimeSource failed.");
-        }
+        mTimeSource = TimeSourceEnum::kNonMatterSNTP;
     }
     else
     {
@@ -796,13 +788,8 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
         return err;
     }
     GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
-    mGranularity  = static_cast<GranularityEnum>(to_underlying(granularity) - 1);
-    Status status = TimeSource::Set(ep, source);
-    if (!(status == Status::Success || status == Status::UnsupportedAttribute))
-    {
-        ChipLogError(Zcl, "Writing TimeSource failed.");
-        return StatusIB(status).ToChipError();
-    }
+    mGranularity = static_cast<GranularityEnum>(to_underlying(granularity) - 1);
+    mTimeSource  = source;
     return CHIP_NO_ERROR;
 }
 

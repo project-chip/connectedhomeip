@@ -27,7 +27,6 @@
 #include <app/AppConfig.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
-#include <app/util/config.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/TLV.h>
 
@@ -140,6 +139,7 @@ private:
     TimeSyncDataProvider::TimeZoneObj mTimeZoneObj{ Span<TimeSyncDataProvider::TimeZoneStore>(mTz), 0 };
     TimeSyncDataProvider::DSTOffsetObj mDstOffsetObj{ DataModel::List<Structs::DSTOffsetStruct::Type>(mDst), 0 };
     GranularityEnum mGranularity = GranularityEnum::kNoTimeGranularity;
+    TimeSourceEnum mTimeSource   = TimeSourceEnum::kNone;
 
     TimeSyncDataProvider::TimeZoneStore mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
     Structs::DSTOffsetStruct::Type mDst[CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE];
