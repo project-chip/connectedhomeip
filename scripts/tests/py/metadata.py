@@ -155,7 +155,6 @@ class MetadataReader:
         metadata_dict={}
         
         for run_line in run_args_lines:
-            print(run_line)
             for run_arg_word in run_line.strip().split():
                 '''
                 We expect the run arg to be defined in one of the 
