@@ -157,6 +157,8 @@ def _GetInDevelopmentTests() -> Set[str]:
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
+        "Test_TC_TMP_2_1",  # Test incorrectly implemented as it relies on saving value that may be null, which maybe
+                            # incorrectly used in future response value checks.
     }
 
 
