@@ -37,7 +37,7 @@ and attributes.
 An example code snippet showing the translation of the TLV into API calls to the
 ClusterLogic class:
 
-```c++
+```
 CHIP_ERROR DiscoBallServer::Read(const ConcreteReadAttributePath & aPath,
     AttributeValueEncoder & aEncoder)
 {
