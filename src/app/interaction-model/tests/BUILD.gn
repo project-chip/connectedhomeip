@@ -12,28 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-source_set("interaction-model") {
-  sources = [
-    "actions.h",
-    "events.h",
-    "invoke_responder.h",
-    "iter_types.h",
-    "model.h",
-    "operation_types.h",
-    "paths.h",
-    "request_context.h",
+chip_test_suite("tests") {
+  test_sources = [
+    "TestEventEmitting.cpp",
   ]
 
-  deps = [
-    "${chip_root}/src/access:types",
-    "${chip_root}/src/app:paths",
-    "${chip_root}/src/app/MessageDef",
-    "${chip_root}/src/app/data-model",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/core:error",
-    "${chip_root}/src/lib/core:types",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging",
-  ]
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [ "${chip_root}/src/app/interaction-model" ]
 }
