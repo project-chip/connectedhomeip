@@ -225,18 +225,11 @@ struct ContextSnapshot {
     return self;
 }
 
-- (NSString *)_lockedSelfDescription:(const ContextSnapshot &)context
-{
-    os_unfair_lock_assert_owner(&_lock);
-
-    return [NSString stringWithFormat:@"%@, items count: %tu", context.description, _items.count];
-}
-
 - (NSString *)description
 {
     ContextSnapshot context(self);
     std::lock_guard lock(_lock);
-    return [NSString stringWithFormat:@"<%@ context: %@>", self.class, [self _lockedSelfDescription:context]];
+    return [NSString stringWithFormat:@"<%@ context: %@, items count: %tu>", self.class, context.description, _items.count];
 }
 
 - (void)enqueueWorkItem:(MTRAsyncWorkItem *)item
@@ -268,9 +261,9 @@ struct ContextSnapshot {
         // Logging the description once is enough because other log messages
         // related to the work item (execution, completion etc) can easily be
         // correlated using the unique id.
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> enqueued work item [%llu]: %@", [self _lockedSelfDescription:context], item.uniqueID, description);
+        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@, items count: %tu> enqueued work item [%llu]: %@", context.description, _items.count, item.uniqueID, description);
     } else {
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> enqueued work item [%llu]", [self _lockedSelfDescription:context], item.uniqueID);
+        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@, items count: %tu> enqueued work item [%llu]", context.description, _items.count, item.uniqueID);
     }
 
     [self _callNextReadyWorkItemWithContext:context];
@@ -304,7 +297,7 @@ struct ContextSnapshot {
     } else {
         [workItem markComplete];
         [_items removeObjectAtIndex:0];
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> completed work item [%llu]", [self _lockedSelfDescription:context], workItem.uniqueID);
+        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@, items count: %tu> completed work item [%llu]", context.description, _items.count, workItem.uniqueID);
     }
 
     // when "concurrency width" is implemented this will be decremented instead
