@@ -23,10 +23,7 @@
 
 #pragma once
 
-#include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
-#include <messaging/ExchangeContext.h>
-#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace app {
