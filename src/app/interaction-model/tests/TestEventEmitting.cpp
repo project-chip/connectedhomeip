@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-// FIXME: include the rest?
+#include <app/interaction-model/events.h>
 
 #include <gtest/gtest.h>
 

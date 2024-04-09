@@ -16,16 +16,13 @@
  */
 #pragma once
 
+#include <app/EventLoggingDelegate.h>
+#include <app/EventLoggingTypes.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-// TODO: figure out proper dependencies here because src/app is NOT ok
-
-#include <app/EventLoggingDelegate.h>
-#include <app/EventLoggingTypes.h>
 
 namespace chip {
 namespace app {

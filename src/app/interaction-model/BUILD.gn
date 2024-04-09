@@ -25,7 +25,7 @@ source_set("interaction-model") {
     "request_context.h",
   ]
 
-  deps = [
+  public_deps = [
     "${chip_root}/src/access:types",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app:events",
