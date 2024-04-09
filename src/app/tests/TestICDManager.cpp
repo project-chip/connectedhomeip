@@ -67,6 +67,13 @@ constexpr uint8_t kKeyBuffer2b[] = {
     0xf2, 0xe2, 0xd2, 0xc2, 0xb2, 0xa2, 0x92, 0x82, 0x72, 0x62, 0x52, 0x42, 0x32, 0x22, 0x12, 0x02
 };
 
+// Taken from the ICDManager Implementation
+enum class ICDTestEventTriggerEvent : uint64_t
+{
+    kAddActiveModeReq    = 0x0046'0000'00000001,
+    kRemoveActiveModeReq = 0x0046'0000'00000002,
+};
+
 class TestICDStateObserver : public app::ICDStateObserver
 {
 public:
@@ -703,7 +710,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Add ActiveMode req for the Test event trigger event
-        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDManager::ICDTestEventTriggerEvent::kAddActiveModeReq));
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kAddActiveModeReq));
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance clock by the ActiveModeDuration and check that the device is still in ActiveMode
@@ -711,7 +718,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Remove req and device should go to IdleMode
-        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDManager::ICDTestEventTriggerEvent::kRemoveActiveModeReq));
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kRemoveActiveModeReq));
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
     }
 };

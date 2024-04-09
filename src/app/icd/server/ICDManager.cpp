@@ -28,6 +28,14 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <stdlib.h>
 
+namespace {
+enum class ICDTestEventTriggerEvent : uint64_t
+{
+    kAddActiveModeReq    = 0x0046'0000'00000001,
+    kRemoveActiveModeReq = 0x0046'0000'00000002,
+};
+} // namespace
+
 namespace chip {
 namespace app {
 

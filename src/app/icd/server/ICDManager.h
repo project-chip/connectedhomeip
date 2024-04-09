@@ -200,12 +200,6 @@ protected:
     uint8_t mOpenExchangeContextCount = 0;
 
 private:
-    enum class ICDTestEventTriggerEvent : uint64_t
-    {
-        kAddActiveModeReq    = 0x0046'0000'00000001,
-        kRemoveActiveModeReq = 0x0046'0000'00000002,
-    };
-
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     bool ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID);
 
