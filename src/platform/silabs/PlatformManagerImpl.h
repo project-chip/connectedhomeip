@@ -65,9 +65,16 @@ public:
     void HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData);
 #endif
 
-    System::Clock::Timestamp GetStartTime() { return mStartTime; }
+    System::Clock::Timestamp GetStartTime()
+    {
+        return mStartTime;
+    }
 
 private:
+    // ===== Members for internal use
+
+    static void UpdateOperationalHours(System::Layer * systemLayer, void * appState);
+
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack(void);
