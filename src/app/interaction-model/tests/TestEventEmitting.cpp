@@ -34,11 +34,13 @@ using AccessControlEntryChangedType = chip::app::Clusters::AccessControl::Events
 
 constexpr uint32_t kFakeSoftwareVersion = 0x1234abcd;
 
+/// Keeps the "last event" in-memory to allow tests to validate
+/// that event writing and encoding worked.
 class LogOnlyEvents : public Events
 {
 public:
-    virtual CHIP_ERROR EmitEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
-                                 EventNumber & generatedEventNumber)
+    CHIP_ERROR EmitEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
+                         EventNumber & generatedEventNumber) override
     {
         TLV::TLVWriter writer;
         TLV::TLVType outerType;
