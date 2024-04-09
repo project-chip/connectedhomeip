@@ -933,6 +933,7 @@ nfds
 NitricOxideConcentrationMeasurement
 NitrogenDioxideConcentrationMeasurement
 nl
+nltest
 NLUnitTest
 NLUnitTests
 nmcli
@@ -1493,6 +1494,7 @@ utils
 UUID
 ux
 validator
+valgrind
 vcom
 VCP
 Vectorcall

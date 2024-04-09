@@ -3,7 +3,7 @@
 There are several test utilities that can be used to simulate or force behavior
 on devices for the purposes of testing.
 
-When using any of these utilties it is important to inject the errors at the
+When using any of these utilities it is important to inject the errors at the
 point where they are running through the MOST code that they can.
 
 If the cluster uses the [ClusterLogic](./unit_testing_clusters.md) pattern, this
@@ -53,8 +53,8 @@ To use NamedPipes
 -   Derive from NamedPipeCommandDelegate
 -   Implement the OnEventCommandReceived(const char \* json) function
 -   Instantiate and start a NamedPipeCommands object to receive commands and
-    pass in the NamedPipeCommandDelegate and a file path basename
--   (while running) Write to the file (basename_pid) to trigger the actions
+    pass in the NamedPipeCommandDelegate and a file path base name
+-   (while running) Write to the file (baseName_pid) to trigger the actions
 
 For a good example, see Air Quality:
 
