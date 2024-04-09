@@ -283,16 +283,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     initParams.reportScheduler = &sReportScheduler;
 
-#if SILABS_TEST_EVENT_TRIGGER_ENABLED
-    if (Encoding::HexToBytes(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY, strlen(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY),
-                             sTestEventTriggerEnableKey,
-                             TestEventTriggerDelegate::kEnableKeyLength) != TestEventTriggerDelegate::kEnableKeyLength)
-    {
-        SILABS_LOG("Failed to convert the EnableKey string to octstr type value");
-        memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
-    }
+#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     // TODO(#31723): Show to customers that they can do `Server::GetInstance().GetTestEventTriggerDelegate().AddHandler()`
-    static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
@@ -301,13 +294,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // instead of the default (insecure) one.
     gOperationalKeystore.Init();
     initParams.operationalKeystore = &gOperationalKeystore;
-#endif
-
-#ifdef PERFORMANCE_TEST_ENABLED
-    // Set up Test Event Trigger command of the General Diagnostics cluster. Used only in performance testing
-    // TODO(#31723): Show to customers that they can do `Server::GetInstance().GetTestEventTriggerDelegate().AddHandler()`
-    static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults

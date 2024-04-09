@@ -17,6 +17,7 @@
  */
 
 #include "SilabsTestEventTriggerDelegate.h"
+#include "SilabsDeviceDataProvider.h"
 
 using namespace ::chip::DeviceLayer;
 
@@ -24,7 +25,14 @@ namespace chip {
 
 bool SilabsTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKey) const
 {
-    return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
+    uint8_t mEnableKey[TestEventTriggerDelegate::kEnableKeyLength];
+    MutableByteSpan enableKeySpan(mEnableKey);
+
+    // Return false if we were not able to get the enableKey
+    VerifyOrReturnValue(
+        Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetTestEventTriggerKey(enableKeySpan) == CHIP_NO_ERROR, false);
+
+    return (!enableKeySpan.empty() && enableKeySpan.data_equal(enableKey));
 }
 
 } // namespace chip

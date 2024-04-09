@@ -510,6 +510,43 @@ CHIP_ERROR SilabsDeviceDataProvider::GetProductLabel(char * buf, size_t bufSize)
     return SilabsConfig::ReadConfigValueStr(SilabsConfig::KConfigKey_ProductLabel, buf, bufSize, productLabelLen);
 }
 
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+/**
+ * @brief Reads the test event trigger key from NVM. If the key isn't present, returns default value if defined.
+ *
+ * @param[out] keySpan output buffer. Must be at least large enough for 16 bytes (ken length)
+ * @return CHIP_ERROR
+ */
+CHIP_ERROR SilabsDeviceDataProvider::GetTestEventTriggerKey(MutableByteSpan & keySpan)
+{
+    constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    size_t keyLength                  = 0;
+
+    VerifyOrReturnError(keySpan.size() >= kEnableKeyLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, keySpan.data(), kEnableKeyLength,
+                                           keyLength);
+#ifndef NDEBUG
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+
+        constexpr char enableKey[] = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
+        if (Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), kEnableKeyLength) != kEnableKeyLength)
+        {
+            // enableKey Hex String doesn't have the correct length
+            memset(keySpan.data(), 0, keySpan.size());
+            return CHIP_ERROR_INTERNAL;
+        }
+        err = CHIP_NO_ERROR;
+    }
+#endif // NDEBUG
+
+    keySpan.reduce_size(kEnableKeyLength);
+    return err;
+}
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+
 SilabsDeviceDataProvider & SilabsDeviceDataProvider::GetDeviceDataProvider()
 {
     static SilabsDeviceDataProvider sDataProvider;

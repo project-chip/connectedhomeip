@@ -68,6 +68,9 @@ public:
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductURL(char * buf, size_t bufSzie) override;
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
+
+    // ===== Member functions that are Silabs Specific
+    CHIP_ERROR GetTestEventTriggerKey(MutableByteSpan & keySpan);
 };
 
 } // namespace Silabs
