@@ -113,7 +113,7 @@ _bootstrap_or_activate() {
     local _PIGWEED_CIPD_JSON="$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json"
     mkdir -p "$_PW_ACTUAL_ENVIRONMENT_ROOT"
     local _GENERATED_PIGWEED_CIPD_JSON="$_PW_ACTUAL_ENVIRONMENT_ROOT/pigweed.json"
-    scripts/setup/gen_pigweed_cipd_json.py -i $_PIGWEED_CIPD_JSON -o $_GENERATED_PIGWEED_CIPD_JSON
+    $_CHIP_ROOT/scripts/setup/gen_pigweed_cipd_json.py -i $_PIGWEED_CIPD_JSON -o $_GENERATED_PIGWEED_CIPD_JSON
 
     if test -n "$GITHUB_ACTION"; then
         tee <<EOF >"${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip.conf"

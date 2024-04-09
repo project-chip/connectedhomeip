@@ -79,7 +79,7 @@ public:
     CHIP_ERROR StopScan();
 
     /// Check if the scanner is active
-    bool IsScanning() const { return mScannerState == ChipDeviceScannerState::SCANNER_SCANNING; }
+    bool IsScanning() const { return mScannerState == ChipDeviceScannerState::SCANNING; }
 
     /// Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
     void OnDeviceAdded(BluezDevice1 & device) override;
@@ -87,11 +87,11 @@ public:
     void OnDeviceRemoved(BluezDevice1 & device) override {}
 
 private:
-    enum ChipDeviceScannerState
+    enum class ChipDeviceScannerState
     {
-        SCANNER_UNINITIALIZED,
-        SCANNER_INITIALIZED,
-        SCANNER_SCANNING
+        UNINITIALIZED,
+        INITIALIZED,
+        SCANNING
     };
 
     CHIP_ERROR StartScanImpl();
@@ -108,7 +108,7 @@ private:
     GAutoPtr<BluezAdapter1> mAdapter;
 
     ChipDeviceScannerDelegate * mDelegate = nullptr;
-    ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
+    ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::UNINITIALIZED;
     GAutoPtr<GCancellable> mCancellable;
 };
 
