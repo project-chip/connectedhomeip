@@ -215,6 +215,10 @@ static void ShutdownOnExit()
         return nil;
     }
 
+    // Start the work queue and leave it running. There is no performance
+    // cost to having an idle dispatch queue, and it simplifies our logic.
+    DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+
     _running = NO;
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
@@ -326,6 +330,7 @@ static void ShutdownOnExit()
 
 - (void)cleanupStartupObjects
 {
+    assertChipStackLockedByCurrentThread();
     MTR_LOG_INFO("Cleaning startup objects in controller factory");
 
     // Make sure the deinit order here is the reverse of the init order in
@@ -379,7 +384,7 @@ static void ShutdownOnExit()
 
     __block NSMutableArray<MTRFabricInfo *> * fabricList;
     __block BOOL listFilled = NO;
-    auto fillListBlock = ^{
+    dispatch_sync(_chipWorkQueue, ^{
         FabricTable fabricTable;
         CHIP_ERROR err = [self _initFabricTable:fabricTable];
         if (err != CHIP_NO_ERROR) {
@@ -399,22 +404,13 @@ static void ShutdownOnExit()
         }
 
         listFilled = YES;
-    };
-
-    if ([_controllers count] > 0) {
-        // We have a controller running already, so our task queue is live.
-        // Make sure we run on that queue so we don't race against it.
-        dispatch_sync(_chipWorkQueue, fillListBlock);
-    } else {
-        // Not currently running the task queue; just run the block directly.
-        fillListBlock();
-    }
+    });
 
     if (listFilled == NO) {
         return nil;
     }
 
-    return [NSArray arrayWithArray:fabricList];
+    return fabricList;
 }
 
 - (BOOL)startControllerFactory:(MTRDeviceControllerFactoryParams *)startupParams error:(NSError * __autoreleasing *)error
@@ -433,18 +429,13 @@ static void ShutdownOnExit()
         return YES;
     }
 
-    // Register any tracing backends. This has to be done before starting the event loop to run registering
-    // the tracing backend in the right queue context
-    StartupMetricsCollection();
-
-    DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
-
     __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             return;
         }
 
+        StartupMetricsCollection();
         InitializeServerAccessControl();
 
         if (startupParams.hasStorage) {
@@ -550,17 +541,17 @@ static void ShutdownOnExit()
         self->_running = YES;
     });
 
-    // Make sure to stop the event loop again before returning, so we are not running it while we don't have any controllers.
-    DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
-
     if (![self isRunning]) {
-        [self cleanupStartupObjects];
+        dispatch_sync(_chipWorkQueue, ^{
+            [self cleanupStartupObjects];
+        });
         if (error != nil) {
             *error = [MTRError errorForCHIPErrorCode:errorCode];
         }
+        return NO;
     }
 
-    return [self isRunning];
+    return YES;
 }
 
 - (void)stopControllerFactory
@@ -575,10 +566,12 @@ static void ShutdownOnExit()
         [_controllers[0] shutdown];
     }
 
-    MTR_LOG_INFO("Shutting down the Matter controller factory");
-    _controllerFactory->Shutdown();
+    dispatch_sync(_chipWorkQueue, ^{
+        MTR_LOG_INFO("Shutting down the Matter controller factory");
+        _controllerFactory->Shutdown();
 
-    [self cleanupStartupObjects];
+        [self cleanupStartupObjects];
+    });
 
     // NOTE: we do not call cleanupInitObjects because we can be restarted, and
     // that does not re-create the objects that we create inside init.
@@ -686,9 +679,6 @@ static void ShutdownOnExit()
     }
 
     if ([_controllers count] == 0) {
-        // Bringing up the first controller.  Start the event loop now.  If we
-        // fail to bring it up, its cleanup will stop the event loop again.
-        chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
         dispatch_sync(_chipWorkQueue, ^{
             self->_operationalBrowser = new MTROperationalBrowser(self, self->_chipWorkQueue);
         });
@@ -701,8 +691,9 @@ static void ShutdownOnExit()
     os_unfair_lock_unlock(&_controllersLock);
 
     __block MTRDeviceControllerStartupParamsInternal * params = nil;
-    __block CHIP_ERROR fabricError = CHIP_NO_ERROR;
+    __block CHIP_ERROR fabricError = CHIP_ERROR_INTERNAL;
 
+    // Create a temporary FabricTable instance for the fabricChecker logic.
     // We want the block to end up with just a pointer to the fabric table,
     // since we know our on-stack instance will outlive the block.
     FabricTable fabricTableInstance;
@@ -1039,18 +1030,6 @@ static void ShutdownOnExit()
         return;
     }
 
-    if (_groupDataProvider != nullptr) {
-        dispatch_sync(_chipWorkQueue, ^{
-            FabricIndex idx = [controller fabricIndex];
-            if (idx != kUndefinedFabricIndex) {
-                // Clear out out group keys for this fabric index, just in case fabric
-                // indices get reused later.  If a new controller is started on the
-                // same fabric it will be handed the IPK at that point.
-                self->_groupDataProvider->RemoveGroupKeys(idx);
-            }
-        });
-    }
-
     os_unfair_lock_lock(&_controllersLock);
     // Make sure to set _controllerBeingShutDown and do the remove in the same
     // locked section, so there is never a time when the controller is gone from
@@ -1060,60 +1039,45 @@ static void ShutdownOnExit()
     [_controllers removeObject:controller];
     os_unfair_lock_unlock(&_controllersLock);
 
-    // Snapshot the controller's fabric index, if any, before it clears it
-    // out in shutDownCppController.
-    __block FabricIndex controllerFabricIndex = controller.fabricIndex;
+    // Do the controller shutdown on the Matter work queue.
+    dispatch_sync(_chipWorkQueue, ^{
+        FabricIndex fabricIndex = controller.fabricIndex;
+        if (fabricIndex != kUndefinedFabricIndex) {
+            // Clear out out group keys for this fabric index, in case fabric
+            // indices get reused later.  If a new controller is started on the
+            // same fabric it will be handed the IPK at that point.
+            self->_groupDataProvider->RemoveGroupKeys(fabricIndex);
+        }
 
-    // This block runs either during sync dispatch to the Matter queue or after
-    // Matter queue shutdown, so it can touch any of our members without
-    // worrying about locking, since nothing else will race it.
-    auto sharedCleanupBlock = ^{
-        assertChipStackLockedByCurrentThread();
+        if (_otaProviderDelegateBridge) {
+            _otaProviderDelegateBridge->ControllerShuttingDown(controller);
+        }
 
         [controller shutDownCppController];
 
         self->_controllerBeingShutDown = nil;
         if (self->_controllerBeingStarted == controller) {
-            controllerFabricIndex = self->_nextAvailableFabricIndex;
             self->_controllerBeingStarted = nil;
         }
-    };
 
-    if ([_controllers count] == 0) {
-        dispatch_sync(_chipWorkQueue, ^{
+        // If there are no other controllers left, we can shut down some things.
+        if (_controllers.count == 0) {
             delete self->_operationalBrowser;
             self->_operationalBrowser = nullptr;
-        });
-        // That was our last controller.  Stop the event loop before it
-        // shuts down, because shutdown of the last controller will tear
-        // down most of the world.
-        DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
 
-        if (_otaProviderDelegateBridge) {
-            _otaProviderDelegateBridge->Shutdown();
-            _otaProviderDelegateBridge.reset();
-        }
-
-        if (_otaProviderEndpoint != nil) {
-            [_otaProviderEndpoint unregisterMatterEndpoint];
-            [_otaProviderEndpoint invalidate];
-
-            [self removeServerEndpoint:_otaProviderEndpoint];
-
-            _otaProviderEndpoint = nil;
-        }
-
-        sharedCleanupBlock();
-    } else {
-        // Do the controller shutdown on the Matter work queue.
-        dispatch_sync(_chipWorkQueue, ^{
             if (_otaProviderDelegateBridge) {
-                _otaProviderDelegateBridge->ControllerShuttingDown(controller);
+                _otaProviderDelegateBridge->Shutdown();
+                _otaProviderDelegateBridge.reset();
             }
 
-            sharedCleanupBlock();
-        });
-    }
+            if (_otaProviderEndpoint != nil) {
+                [_otaProviderEndpoint unregisterMatterEndpoint];
+                [_otaProviderEndpoint invalidate];
+                [self removeServerEndpoint:_otaProviderEndpoint];
+                _otaProviderEndpoint = nil;
+            }
+        }
+    });
 
     [controller deinitFromFactory];
 }
