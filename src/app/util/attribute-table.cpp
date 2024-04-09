@@ -262,9 +262,9 @@ Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, Attribut
 
     // We don't know how to size our buffer for strings in general, but if the
     // string happens to fit into our fixed-size buffer, great.
-    size_t valueSize              = metadata->size;
-    constexpr size_t maxValueSize = 16; // ipv6adr
-    if (valueSize > maxValueSize)
+    size_t valueSize               = metadata->size;
+    constexpr size_t kMaxValueSize = 16; // ipv6adr
+    if (valueSize > kMaxValueSize)
     {
         if (emberAfIsStringAttributeType(attributeType) || emberAfIsLongStringAttributeType(attributeType))
         {
@@ -279,8 +279,8 @@ Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, Attribut
         return Status::ConstraintError;
     }
 
-    uint8_t oldValueBuffer[maxValueSize];
-    // Cast to uint16_t is safe, because we checked valueSize <= maxValueSize above.
+    uint8_t oldValueBuffer[kMaxValueSize];
+    // Cast to uint16_t is safe, because we checked valueSize <= kMaxValueSize above.
     if (emberAfReadAttribute(endpoint, cluster, attributeID, oldValueBuffer, static_cast<uint16_t>(valueSize)) != Status::Success)
     {
         // We failed to read the old value, so flag the value as changing to be safe.
@@ -292,13 +292,19 @@ Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, Attribut
     {
         size_t oldLength = emberAfStringLength(oldValueBuffer);
         size_t newLength = emberAfStringLength(newValueData);
-        *isChanging      = (oldLength != newLength) || (memcmp(oldValueBuffer + 1, newValueData + 1, oldLength) != 0);
+        // The first byte of the buffer is the string length, so comparing
+        // oldLength to newLength handles comparing that byte, and the oldLength
+        // bytes of actual data start one byte into the buffer.
+        *isChanging = (oldLength != newLength) || (memcmp(oldValueBuffer + 1, newValueData + 1, oldLength) != 0);
     }
     else if (emberAfIsLongStringAttributeType(attributeType))
     {
         size_t oldLength = emberAfLongStringLength(oldValueBuffer);
         size_t newLength = emberAfLongStringLength(newValueData);
-        *isChanging      = (oldLength != newLength) || (memcmp(oldValueBuffer + 2, newValueData + 2, oldLength) != 0);
+        // The first two bytes of the buffer are the string length, so comparing
+        // oldLength to newLength handles comparing those bytes, and the oldLength
+        // bytes of actual data start two bytes into the buffer.
+        *isChanging = (oldLength != newLength) || (memcmp(oldValueBuffer + 2, newValueData + 2, oldLength) != 0);
     }
     else
     {
