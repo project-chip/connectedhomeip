@@ -27,6 +27,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::InteractionModel;
 
+using StartUpEventType = chip::app::Clusters::BasicInformation::Events::StartUp::Type;
+
 constexpr uint32_t kFakeSoftwareVersion = 0x1234abcd;
 
 class LogOnlyEvents : public Events
@@ -35,32 +37,37 @@ public:
     virtual CHIP_ERROR EmitEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
                                  EventNumber & generatedEventNumber)
     {
-
+        mLastOptions         = options;
         generatedEventNumber = ++mCurrentEventNumber;
-
         return CHIP_NO_ERROR;
     }
 
     EventNumber CurrentEventNumber() const { return mCurrentEventNumber; }
+    const EventOptions & LastOptions() const { return mLastOptions; }
 
 private:
     EventNumber mCurrentEventNumber = 0;
+    EventOptions mLastOptions;
 };
 
 } // namespace
 
-TEST(TestInteractionModelEventEmitting, TodoTest)
+TEST(TestInteractionModelEventEmitting, TestBasicType)
 {
     LogOnlyEvents logOnlyEvents;
     Events * events = &logOnlyEvents;
 
-    chip::app::Clusters::BasicInformation::Events::StartUp::Type event{ kFakeSoftwareVersion };
+    StartUpEventType event{ kFakeSoftwareVersion };
 
-    EventNumber n1 = events->EmitEvent(event, 0);
+    EventNumber n1 = events->EmitEvent(event, 0 /* EndpointId */);
     ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
-
+    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+              ConcreteEventPath(0 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 
     EventNumber n2 = events->EmitEvent(event, 1);
     ASSERT_EQ(n2, logOnlyEvents.CurrentEventNumber());
     ASSERT_NE(n1, logOnlyEvents.CurrentEventNumber());
+
+    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+              ConcreteEventPath(1 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 }
