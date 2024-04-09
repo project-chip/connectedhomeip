@@ -94,6 +94,7 @@ gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 
     // We can use it to update the state of the advertisement in the CHIP layer.
     ChipLogDetail(DeviceLayer, "BLE advertisement stopped by BlueZ");
     mIsAdvertising = false;
+    bluez_leadvertisement1_complete_release(aAdv, aInvocation);
     BLEManagerImpl::NotifyBLEPeripheralAdvReleased();
     return TRUE;
 }

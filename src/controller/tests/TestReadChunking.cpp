@@ -31,6 +31,7 @@
 #include <app/tests/AppTestContext.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <controller/InvokeInteraction.h>
 #include <functional>
 #include <lib/core/ErrorStr.h>

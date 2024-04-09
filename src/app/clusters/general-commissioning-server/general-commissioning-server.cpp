@@ -27,7 +27,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>

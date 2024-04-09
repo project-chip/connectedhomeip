@@ -395,7 +395,7 @@ void BLEManagerImpl::ConfigureAdvertisements(void)
                                   .primChanMap  = GAP_ADV_CHAN_ALL,
                                   .peerAddrType = PEER_ADDRTYPE_PUBLIC_OR_PUBLIC_ID,
                                   .peerAddr     = { 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa },
-                                  .filterPolicy = GAP_ADV_WL_POLICY_ANY_REQ,
+                                  .filterPolicy = GAP_ADV_AL_POLICY_ANY_REQ,
                                   .txPower      = GAP_ADV_TX_POWER_NO_PREFERENCE,
                                   .primPhy      = GAP_ADV_PRIM_PHY_1_MBPS,
                                   .secPhy       = GAP_ADV_SEC_PHY_1_MBPS,
@@ -1309,7 +1309,7 @@ CHIP_ERROR BLEManagerImpl::ProcessParamUpdate(uint16_t connHandle)
     BLEMGR_LOG("BLEMGR: ProcessParamUpdate");
 
     req.connectionHandle = connHandle;
-    req.connLatency      = DEFAULT_DESIRED_SLAVE_LATENCY;
+    req.connLatency      = DEFAULT_DESIRED_PERIPHERAL_LATENCY;
     req.connTimeout      = DEFAULT_DESIRED_CONN_TIMEOUT;
     req.intervalMin      = DEFAULT_DESIRED_MIN_CONN_INTERVAL;
     req.intervalMax      = DEFAULT_DESIRED_MAX_CONN_INTERVAL;

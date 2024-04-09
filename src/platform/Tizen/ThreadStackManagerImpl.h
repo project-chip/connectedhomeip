@@ -103,8 +103,6 @@ public:
 
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
-    CHIP_ERROR _JoinerStart();
-
     void _ResetThreadNetworkDiagnosticsCounts();
 
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);

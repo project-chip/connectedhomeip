@@ -574,12 +574,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallScan(ThreadStackManagerImpl * self)
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);

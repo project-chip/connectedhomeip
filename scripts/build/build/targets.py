@@ -24,10 +24,10 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.k32w import K32WApp, K32WBoard, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
+from builders.nxp import NxpApp, NxpBoard, NxpBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.rw61x import RW61XApp, RW61XBuilder
@@ -409,6 +409,7 @@ def BuildInfineonTarget():
     # modifiers
     target.AppendModifier('ota', enable_ota_requestor=True)
     target.AppendModifier('updateimage', update_image=True)
+    target.AppendModifier('trustm', enable_trustm=True)
 
     return target
 
@@ -469,51 +470,29 @@ def BuildASRTarget():
     return target
 
 
-def BuildK32WTarget():
-    target = BuildTarget('k32w', K32WBuilder)
+def BuildNxpTarget():
+    target = BuildTarget('nxp', NxpBuilder)
 
     # boards
     target.AppendFixedTargets([
-        TargetPart('k32w0', board=K32WBoard.K32W0),
-        TargetPart('k32w1', board=K32WBoard.K32W1)
+        TargetPart('k32w0', board=NxpBoard.K32W0),
+        TargetPart('k32w1', board=NxpBoard.K32W1)
     ])
 
     # apps
     target.AppendFixedTargets([
-        TargetPart('light', app=K32WApp.LIGHT, release=True),
-        TargetPart('shell', app=K32WApp.SHELL, release=True),
-        TargetPart('lock', app=K32WApp.LOCK, release=True),
-        TargetPart('contact', app=K32WApp.CONTACT, release=True)
+        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('(k32w0|k32w1)'),
+        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1)')
     ])
 
-    target.AppendModifier(name="se05x", se05x=True)
-    target.AppendModifier(name="no-ble", disable_ble=True)
-    target.AppendModifier(name="no-ota", disable_ota=True)
-    target.AppendModifier(name="low-power", low_power=True).OnlyIfRe("-nologs")
-    target.AppendModifier(name="nologs", disable_logs=True)
-    target.AppendModifier(name="crypto-platform", crypto_platform=True)
-    target.AppendModifier(
-        name="tokenizer", tokenizer=True).ExceptIfRe("-nologs")
-    target.AppendModifier(name="openthread-ftd", openthread_ftd=True)
-
-    return target
-
-
-def BuildCC13x2x7Target():
-    target = BuildTarget('ti', TIBuilder)
-
-    # board
-    target.AppendFixedTargets([
-        TargetPart('cc13x2x7_26x2x7', board=TIBoard.LP_CC2652R7),
-    ])
-
-    target.AppendFixedTargets([
-        TargetPart('lighting', app=TIApp.LIGHTING),
-        TargetPart('lock', app=TIApp.LOCK),
-        TargetPart('pump', app=TIApp.PUMP),
-        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER),
-    ])
-    target.AppendModifier(name="mtd", openthread_ftd=False)
+    target.AppendModifier(name="factory", enable_factory_data=True)
+    target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor')
+    target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
+    target.AppendModifier(name="fro32k", use_fro32k=True).OnlyIfRe('k32w0')
+    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('k32w1-lighting')
+    target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('k32w0')
+    target.AppendModifier(name="rotating-id", enable_rotating_id=True)
+    target.AppendModifier(name="sw-v2", has_sw_version_2=True)
 
     return target
 
@@ -792,7 +771,6 @@ BUILD_TARGETS = [
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
     Buildcc32xxTarget(),
-    BuildCC13x2x7Target(),
     BuildCC13x4Target(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
@@ -804,7 +782,7 @@ BUILD_TARGETS = [
     BuildIMXTarget(),
     BuildInfineonTarget(),
     BuildRW61XTarget(),
-    BuildK32WTarget(),
+    BuildNxpTarget(),
     BuildMbedTarget(),
     BuildMW320Target(),
     BuildNrfTarget(),

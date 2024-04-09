@@ -643,6 +643,8 @@ HomePods
 hostapd
 hostname
 href
+HSM
+hsm
 HTTPS
 HW
 hwadr
@@ -668,6 +670,7 @@ ifdef
 ifdefs
 IGMP
 ihex
+Illuminance
 IlluminanceMeasurement
 IM
 imager
@@ -964,6 +967,7 @@ objcopy
 OccupancySensing
 OctetString
 OECORE
+OID
 ol
 Onboarding
 onboardingcodes
@@ -985,6 +989,7 @@ openweave
 OperationalCredentials
 operationalDataset
 opkg
+OPTIGA
 optionMask
 optionOverride
 optionsMask
@@ -1428,6 +1433,7 @@ transitionTime
 TransportMgrBase
 TriggerEffect
 TRNG
+trustm
 TrustedRootCertificates
 tsan
 TSG

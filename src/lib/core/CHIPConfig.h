@@ -462,16 +462,6 @@
 #endif // CHIP_CONFIG_ENABLE_CONDITION_LOGGING
 
 /**
- *  @def CHIP_EXCHANGE_NODE_ID_LOGGING
- *
- *  @brief
- *    If asserted (1), enable logging of node IDs in exchange context.
- */
-#ifndef CHIP_EXCHANGE_NODE_ID_LOGGING
-#define CHIP_EXCHANGE_NODE_ID_LOGGING 0
-#endif // CHIP_EXCHANGE_NODE_ID_LOGGING
-
-/**
  *  @def CHIP_CONFIG_TEST
  *
  *  @brief

@@ -31,6 +31,7 @@
 #include <app/icd/server/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <crypto/SessionKeystore.h>
+#include <functional>
 #include <lib/support/BitFlags.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -79,6 +80,17 @@ public:
         ICDModeChange,
     };
 
+    /**
+     * @brief Verifier template function
+     *        This type can be used to implement specific verifiers that can be used in the CheckInMessagesWouldBeSent function.
+     *        The goal is to avoid having multiple functions that implement the iterator loop with only the check changing.
+     *
+     * @return true if at least one Check-In message would be sent
+     *         false No Check-In messages would be sent
+     */
+
+    using ShouldCheckInMsgsBeSentFunction = bool(FabricIndex aFabricIndex, NodeId subjectID);
+
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
               Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * manager);
@@ -122,12 +134,26 @@ public:
 
     /**
      * @brief Trigger the ICDManager to send Check-In message if necessary
+     *
+     * @param[in] function to use to determine if we need to send check-in messages
      */
-    void TriggerCheckInMessages();
+    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & function);
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    /**
+     * @brief Set mSubCheckInBootCheckExecuted to true
+     *        Function allows the InteractionModelEngine to notify the ICDManager that the boot up subscription resumption has been
+     *        completed.
+     */
+    void SetBootUpResumeSubscriptionExecuted() { mIsBootUpResumeSubscriptionExecuted = true; };
+#endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-#ifdef CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
+#if !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    bool GetIsBootUpResumeSubscriptionExecuted() { return mIsBootUpResumeSubscriptionExecuted; };
+#endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #endif
 
     // Implementation of ICDListener functions.
@@ -166,14 +192,18 @@ protected:
 
 private:
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+    bool ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID);
+
     /**
      * @brief Function checks if at least one client registration would require a Check-In message
      *
+     * @param[in] function  function to use to determine if a Check-In message would be sent for a given registration
+     *
      * @return true At least one registration would require an Check-In message if we were entering ActiveMode.
-     * @return false None of the registration would require a Check-In message either because there are no registration or because
-     *               they all have associated subscriptions.
+     * @return false None of the registration would require a Check-In message either because there are no registration or
+     * because they all have associated subscriptions.
      */
-    bool CheckInMessagesWouldBeSent();
+    bool CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsgsBeSentFunction> & function);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     KeepActiveFlags mKeepActiveFlags{ 0 };
@@ -184,6 +214,9 @@ private:
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+#if !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    bool mIsBootUpResumeSubscriptionExecuted = false;
+#endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
     Messaging::ExchangeManager * mExchangeManager  = nullptr;

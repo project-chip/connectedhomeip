@@ -29,6 +29,8 @@ extern "C" {
 #include "em_core.h"
 #include "rsi_board.h"
 #include "sl_event_handler.h"
+#include "sl_si91x_button.h"
+#include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
 void soc_pll_config(void);
@@ -45,6 +47,11 @@ void soc_pll_config(void);
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
+#if SL_ICD_ENABLED
+namespace {
+bool btn0_pressed = false;
+}
+#endif /* SL_ICD_ENABLED */
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
 SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
@@ -56,7 +63,7 @@ CHIP_ERROR SilabsPlatform::Init(void)
     // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
     NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
 
-#if !CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifndef SL_ICD_ENABLED
     // Configuration the clock rate
     soc_pll_config();
 #endif
@@ -110,6 +117,27 @@ void SilabsPlatform::StartScheduler()
 extern "C" {
 void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
+#if SL_ICD_ENABLED
+    // This is to make sure we get a one-press and one-release event for the button
+    // Hardware modification will be required for this to work permanently
+    // Currently the btn0 is pull-up resistor due to which is sends a release event on every wakeup
+    if (btn == SL_BUTTON_BTN0_NUMBER)
+    {
+        if (btnAction == BUTTON_PRESSED)
+        {
+            btn0_pressed = true;
+        }
+        else if ((btnAction == BUTTON_RELEASED) && (btn0_pressed == false))
+        {
+            // if the btn was not pressed and only a release event came, ignore it
+            return;
+        }
+        else if ((btnAction == BUTTON_RELEASED) && (btn0_pressed == true))
+        {
+            btn0_pressed = false;
+        }
+    }
+#endif /* SL_ICD_ENABLED */
     if (Silabs::GetPlatform().mButtonCallback == nullptr)
     {
         return;

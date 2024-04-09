@@ -551,8 +551,9 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt.HasValue() && (&mExchangeCtxt.Value().Get() == ec),
                    ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
-    ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
-                 to_underlying(mState));
+    ChipLogError(SecureChannel,
+                 "CASESession timed out while waiting for a response from peer " ChipLogFormatScopedNodeId ". Current state was %u",
+                 ChipLogValueScopedNodeId(ScopedNodeId(mPeerNodeId, mFabricIndex)), to_underlying(mState));
     MATTER_TRACE_COUNTER("CASETimeout");
     // Discard the exchange so that Clear() doesn't try aborting it.  The
     // exchange will handle that.
