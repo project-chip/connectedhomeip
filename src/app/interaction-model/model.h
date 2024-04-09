@@ -21,8 +21,8 @@
 
 #include <app/interaction-model/actions.h>
 #include <app/interaction-model/invoke_responder.h>
-#include <app/interaction-model/operation_types.h>
 #include <app/interaction-model/iter_types.h>
+#include <app/interaction-model/operation_types.h>
 
 namespace chip {
 namespace app {
