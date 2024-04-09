@@ -75,7 +75,7 @@ EventNumber EmitEvent(E & emittor, const T & aEventData, EndpointId aEndpoint)
     CHIP_ERROR err = emittor.EmitEvent(&eventData, eventOptions, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(EventLogging, "Failed to log event: %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(EventLogging, "Failed to log event: %" CHIP_ERROR_FORMAT, err.Format());
         return kInvalidEventId;
     }
 
@@ -94,7 +94,7 @@ EventNumber EmitEvent(E & emittor, const T & aEventData, EndpointId aEndpoint)
     CHIP_ERROR err = emittor.EmitEvent(&eventData, eventOptions, eventNumber);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(EventLogging, "Failed to log event: %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(EventLogging, "Failed to log event: %" CHIP_ERROR_FORMAT, err.Format());
         return kInvalidEventId;
     }
 
