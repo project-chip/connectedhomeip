@@ -307,7 +307,7 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 }
 
 } // namespace app
-//
+
 namespace Test {
 
 void ResetVersion()
