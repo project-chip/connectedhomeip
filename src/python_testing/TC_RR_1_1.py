@@ -871,4 +871,4 @@ class TC_RR_1_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main(maximize_cert_chains=True, controller_cat_tags=[0x0001_0001])
+    default_matter_test_main()
