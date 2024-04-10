@@ -585,6 +585,8 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
+getter
+getters
 GetInDevelopmentTests
 GetIP
 getManualTests
@@ -904,6 +906,7 @@ Multicast
 multilib
 Multiprotocol
 multithreaded
+mutex
 mutexes
 mv
 MX
