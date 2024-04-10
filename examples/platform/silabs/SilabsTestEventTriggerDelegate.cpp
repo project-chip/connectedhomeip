@@ -25,7 +25,7 @@ namespace chip {
 
 bool SilabsTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKey) const
 {
-    uint8_t mEnableKey[TestEventTriggerDelegate::kEnableKeyLength];
+    uint8_t enableKey[TestEventTriggerDelegate::kEnableKeyLength];
     MutableByteSpan enableKeySpan(mEnableKey);
 
     // Return false if we were not able to get the enableKey
