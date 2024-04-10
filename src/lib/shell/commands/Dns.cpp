@@ -83,26 +83,47 @@ public:
 
     AddressResolve::NodeLookupHandle & Handle() { return mSelfHandle; }
 
+    void LogOperationalNodeDiscovered(const Dnssd::OperationalNodeData nodeData)
+    {
+        if (!nodeData.IsValid())
+        {
+            streamer_printf(streamer_get(), "DNS browse failed - not found valid services \r\n");
+            return;
+        }
+        streamer_printf(streamer_get(), "DNS browse operational succeeded: \r\n");
+        streamer_printf(streamer_get(), "   Node ID: " ChipLogFormatX64 "-" ChipLogFormatX64 "\r\n",
+                        ChipLogValueX64(nodeData.peerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.peerId.GetNodeId()));
+        streamer_printf(streamer_get(), "   hasZeroTTL: %s\r\n", nodeData.hasZeroTTL ? "true" : "false");
+    }
+
     void OnNodeDiscovered(const Dnssd::DiscoveredNodeData & discNodeData) override
     {
-        if (!discNodeData.Is<Dnssd::CommissionNodeData>())
+        if (!discNodeData.Is<Dnssd::CommissionNodeData>() && !discNodeData.Is<Dnssd::OperationalNodeData>())
         {
-            streamer_printf(streamer_get(), "DNS browse failed - not commission type node \r\n");
+            streamer_printf(streamer_get(), "DNS browse failed - invalid node info \r\n");
             return;
         }
 
-        Dnssd::CommissionNodeData nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+        if (discNodeData.Is<Dnssd::OperationalNodeData>()) 
+        {
+            LogOperationalNodeDiscovered(discNodeData.Get<Dnssd::OperationalNodeData>());
+            return;
+        } 
+
+        auto nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+         
         if (!nodeData.IsValid())
         {
             streamer_printf(streamer_get(), "DNS browse failed - not found valid services \r\n");
             return;
         }
 
+        streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
+        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
+
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1];
         Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
 
-        streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
-        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
         streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.vendorId);
         streamer_printf(streamer_get(), "   Product ID: %u\r\n", nodeData.productId);
         streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.longDiscriminator);
@@ -237,6 +258,16 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
     return sResolverProxy.DiscoverCommissioners(filter);
 }
 
+CHIP_ERROR BrowseOperationalHandler(int argc, char ** argv)
+{
+    Dnssd::DiscoveryFilter filter;
+    VerifyOrReturnError(ParseSubType(argc, argv, filter), CHIP_ERROR_INVALID_ARGUMENT);
+
+    streamer_printf(streamer_get(), "Browsing operational...\r\n");
+
+    return sResolverProxy.DiscoverOperationalNodes(filter);
+}
+
 CHIP_ERROR BrowseHandler(int argc, char ** argv)
 {
     if (argc == 0)
@@ -271,13 +302,14 @@ void RegisterDnsCommands()
           "Browse Matter commissionable nodes. Usage: dns browse commissionable [subtype]" },
         { &BrowseCommissionerHandler, "commissioner",
           "Browse Matter commissioner nodes. Usage: dns browse commissioner [subtype]" },
+        { &BrowseOperationalHandler, "operational", "Browse Matter operational nodes. Usage: dns browse operational" },
     };
 
     static const shell_command_t sDnsSubCommands[] = {
         { &ResolveHandler, "resolve",
           "Resolve the DNS service. Usage: dns resolve <fabric-id> <node-id> (e.g. dns resolve 5544332211 1)" },
         { &BrowseHandler, "browse",
-          "Browse DNS services published by Matter nodes. Usage: dns browse <commissionable|commissioner>" },
+          "Browse DNS services published by Matter nodes. Usage: dns browse <commissionable|commissioner|operational>" },
     };
 
     static const shell_command_t sDnsCommand = { &DnsHandler, "dns", "Dns client commands" };

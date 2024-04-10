@@ -137,7 +137,8 @@ SerializedQNameIterator StoredServerName::Get() const
     return SerializedQNameIterator(BytesRange(mNameBuffer, mNameBuffer + sizeof(mNameBuffer)), mNameBuffer);
 }
 
-CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const mdns::Minimal::SrvRecord & srv)
+CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
+                                                  const mdns::Minimal::SrvRecord & srv)
 {
     AutoInactiveResetter inactiveReset(*this);
 
@@ -167,6 +168,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
 
     switch (mServiceNameType)
     {
+    /* All known dnssd records for MATTER are filled into DnssdNodeData */
     case ServiceNameType::kOperational:
         mSpecificResolutionData.Set<OperationalNodeData>();
         {
@@ -183,6 +185,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
             {
                 return err;
             }
+            mSpecificResolutionData.Get<OperationalNodeData>().hasZeroTTL = (ttl == 0);
         }
 
         LogFoundOperationalSrvRecord(mSpecificResolutionData.Get<OperationalNodeData>().peerId, mTargetHostName.Get());
@@ -304,7 +307,7 @@ CHIP_ERROR IncrementalResolver::OnTxtRecord(const ResourceData & data, BytesRang
         }
     }
 
-    if (IsActiveBrowseParse())
+    if (IsActiveCommissionParse())
     {
         TxtParser<CommissionNodeData> delegate(mSpecificResolutionData.Get<CommissionNodeData>());
         if (!ParseTxtRecord(data.GetData(), &delegate))
@@ -341,17 +344,37 @@ CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const I
     return CHIP_NO_ERROR;
 }
 
+template <class NodeType> 
+CHIP_ERROR IncrementalResolver::Set(DiscoveredNodeData &output)
+{
+    VerifyOrReturnError(mSpecificResolutionData.Is<NodeType>(), CHIP_ERROR_INCORRECT_STATE);
+    output.Set<NodeType>();
+    auto & nodeData = output.Get<NodeType>();
+    nodeData = mSpecificResolutionData.Get<NodeType>();
+    CommonResolutionData & resolutionData = nodeData;
+    resolutionData = mCommonResolutionData;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 {
-    VerifyOrReturnError(IsActiveBrowseParse(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsActive(), CHIP_ERROR_INCORRECT_STATE);
 
     IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
-    outputData.Set<CommissionNodeData>();
-    CommissionNodeData & nodeData         = outputData.Get<CommissionNodeData>();
-    nodeData                              = mSpecificResolutionData.Get<CommissionNodeData>();
-    CommonResolutionData & resolutionData = nodeData;
-    resolutionData                        = mCommonResolutionData;
+    
+    if (IsActiveCommissionParse())
+    {
+        ReturnErrorOnFailure(Set<CommissionNodeData>(outputData));
+    }
+    else if (IsActiveOperationalParse())
+    {
+        ReturnErrorOnFailure(Set<OperationalNodeData>(outputData));
+    }
+    else
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
     ResetToInactive();
 

@@ -194,11 +194,15 @@ struct CommonResolutionData
 };
 
 /// Data that is specific to Operational Discovery of nodes
-struct OperationalNodeData
+struct OperationalNodeData : public CommonResolutionData
 {
     PeerId peerId;
-
-    void Reset() { peerId = PeerId(); }
+    bool hasZeroTTL;
+    void Reset()
+    {
+        CommonResolutionData::Reset();
+        peerId = PeerId();
+    }
 };
 
 inline constexpr size_t kMaxDeviceNameLen         = 32;
@@ -297,12 +301,13 @@ struct ResolvedNodeData
     }
 };
 
-using DiscoveredNodeData = Variant<CommissionNodeData>;
+using DiscoveredNodeData = Variant<CommissionNodeData, OperationalNodeData>;
 
-/// Callbacks for discovering nodes advertising non-operational status:
+/// Callbacks for discovering nodes advertising both operational and non-operational status:
 ///   - Commissioners
 ///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
 ///     connected to thread/wifi or devices with a commissioning window open)
+///   - Operational nodes
 class DiscoverNodeDelegate
 {
 public:

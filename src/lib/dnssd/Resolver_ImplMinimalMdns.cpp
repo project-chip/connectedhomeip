@@ -213,7 +213,7 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
             continue;
         }
 
-        CHIP_ERROR err = resolver.InitializeParsing(data.GetName(), srv);
+        CHIP_ERROR err = resolver.InitializeParsing(data.GetName(), data.GetTtlSeconds(), srv);
         if (err != CHIP_NO_ERROR)
         {
             // Receiving records that we do not need to parse is normal:
@@ -370,7 +370,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
         if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
         {
-            if (resolver->IsActiveBrowseParse())
+            if (resolver->IsActiveCommissionParse())
             {
                 // Browse wants IP addresses
                 ScheduleIpAddressResolve(resolver->GetTargetHostName());
@@ -399,7 +399,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         }
 
         // SUCCESS. Call the delegates
-        if (resolver->IsActiveBrowseParse())
+        if (resolver->IsActiveCommissionParse())
         {
             MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
             DiscoveredNodeData nodeData;
@@ -452,19 +452,49 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         else if (resolver->IsActiveOperationalParse())
         {
             MATTER_TRACE_SCOPE("Active operational delegate call", "MinMdnsResolver");
-            ResolvedNodeData nodeData;
+            ResolvedNodeData nodeResolvedData;
+            CHIP_ERROR err = CHIP_ERROR_UNINITIALIZED;
 
-            CHIP_ERROR err = resolver->Take(nodeData);
+            if (mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionableNode))
+            {
+                DiscoveredNodeData nodeData;
+                err = resolver->Take(nodeData);
+                if (!nodeData.Is<OperationalNodeData>()) {
+                    err = CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+                if (mDiscoveryContext != nullptr && err == CHIP_NO_ERROR)
+                {
+                    mDiscoveryContext->OnNodeDiscovered(nodeData);
+                    auto opNodeData = nodeData.Get<OperationalNodeData>();
+                    nodeResolvedData.resolutionData  = static_cast<CommonResolutionData>(opNodeData);
+                    nodeResolvedData.operationalData = opNodeData;
+                }
+                else
+                {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
+                    ChipLogError(Discovery, "No delegate to report commissioning node discovery");
+#endif
+                }
+            }
+            else
+            {
+                err = resolver->Take(nodeResolvedData);
+            }
+
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
                 continue;
             }
 
-            mActiveResolves.Complete(nodeData.operationalData.peerId);
+            mActiveResolves.Complete(nodeResolvedData.operationalData.peerId);
             if (mOperationalDelegate != nullptr)
             {
-                mOperationalDelegate->OnOperationalNodeResolved(nodeData);
+                mOperationalDelegate->OnOperationalNodeResolved(nodeResolvedData);
             }
             else
             {
