@@ -34,7 +34,7 @@ namespace internal {
 constexpr EmberAfAttributeMetadata DefaultAttributeMetadata(chip::AttributeId id)
 {
     return EmberAfAttributeMetadata{
-        .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(0u),
+        .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(static_cast<uint32_t>(0)),
         .attributeId   = id,
         .size          = 4,
         .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
