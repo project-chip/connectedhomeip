@@ -2256,6 +2256,7 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-fno-c++-static-destructors",
+					"-DCHIP_CONFIG_GLOBALS_NO_DESTRUCT=1",
 				);
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[sdk=*]" = (
@@ -2421,6 +2422,7 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-fno-c++-static-destructors",
+					"-DCHIP_CONFIG_GLOBALS_NO_DESTRUCT=1",
 				);
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[sdk=*]" = (

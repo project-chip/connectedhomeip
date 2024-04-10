@@ -405,17 +405,16 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
     if (nodeData.resolutionData.numIPs == 0)
     {
         ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s",
-                     nodeData.commissionData.instanceName);
+                     nodeData.nodeData.instanceName);
         return;
     }
     if (nodeData.resolutionData.port == 0)
     {
-        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s",
-                     nodeData.commissionData.instanceName);
+        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s", nodeData.nodeData.instanceName);
         return;
     }
 
-    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.commissionData.instanceName);
+    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.nodeData.instanceName);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)
     {
         ChipLogDetail(AppServer, "OnCommissionableNodeFound instance: name=%s old_state=%d new_state=%d", client->GetInstanceName(),
@@ -458,17 +457,17 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
         if (!foundV6)
         {
             ChipLogError(AppServer, "OnCommissionableNodeFound no v6 returned for instance name=%s",
-                         nodeData.commissionData.instanceName);
+                         nodeData.nodeData.instanceName);
             client->SetPeerAddress(
                 chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        client->SetDeviceName(nodeData.commissionData.deviceName);
-        client->SetLongDiscriminator(nodeData.commissionData.longDiscriminator);
-        client->SetVendorId(nodeData.commissionData.vendorId);
-        client->SetProductId(nodeData.commissionData.productId);
-        client->SetRotatingId(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen);
+        client->SetDeviceName(nodeData.nodeData.deviceName);
+        client->SetLongDiscriminator(nodeData.nodeData.longDiscriminator);
+        client->SetVendorId(nodeData.nodeData.vendorId);
+        client->SetProductId(nodeData.nodeData.productId);
+        client->SetRotatingId(nodeData.nodeData.rotatingId, nodeData.nodeData.rotatingIdLen);
 
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)

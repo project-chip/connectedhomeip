@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/TestEventTriggerDelegate.h>
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -100,6 +101,8 @@ void InitializeChip(nlTestSuite * suite)
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
     initParams.reportScheduler = &sReportScheduler;
+    static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     err = chip::Server::GetInstance().Init(initParams);
 

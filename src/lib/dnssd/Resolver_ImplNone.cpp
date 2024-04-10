@@ -40,11 +40,7 @@ public:
     {
         ChipLogError(Discovery, "Failed to stop resolving node ID: dnssd resolving not available");
     }
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

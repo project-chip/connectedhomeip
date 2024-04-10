@@ -16,16 +16,11 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
-
 #include <app/icd/server/ICDServerConfig.h>
 
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-#include <app/icd/server/ICDCheckInSender.h>   // nogncheck
-#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
-#endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
-
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/SubscriptionsInfoProvider.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>
@@ -37,6 +32,11 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <system/SystemClock.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDCheckInSender.h>   // nogncheck
+#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
+#endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
 
 namespace chip {
 namespace Crypto {
@@ -54,7 +54,7 @@ class TestICDManager;
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
-class ICDManager : public ICDListener
+class ICDManager : public ICDListener, public TestEventTriggerHandler
 {
 public:
     // This structure is used for the creation an ObjectPool of ICDStateObserver pointers
@@ -129,6 +129,15 @@ public:
      */
     uint32_t StayActiveRequest(uint32_t stayActiveDuration);
 
+    /**
+     * @brief TestEventTriggerHandler for the ICD feature set
+     *
+     * @param eventTrigger Event trigger to handle.
+     * @return CHIP_ERROR CHIP_NO_ERROR - No erros during the processing
+     *                    CHIP_ERROR_INVALID_ARGUMENT - eventTrigger isn't a valid value
+     */
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
+
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     void SendCheckInMsgs();
 
@@ -165,13 +174,13 @@ public:
     void OnSubscriptionReport() override;
 
 protected:
+    friend class TestICDManager;
+
     /**
      * @brief Hepler function that extends the Active Mode duration as well as the Active Mode Jitter timer for the transition to
      * iddle mode.
      */
     void ExtendActiveMode(System::Clock::Milliseconds16 extendDuration);
-
-    friend class TestICDManager;
 
     static void OnIdleModeDone(System::Layer * aLayer, void * appState);
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);

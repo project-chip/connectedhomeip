@@ -139,25 +139,15 @@ using namespace chip::Tracing::DarwinFramework;
 {
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
-
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
     }
+    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
-    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
-    if (!factory.isRunning) {
-        auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
-
-        if (![factory startControllerFactory:params error:error]) {
-            return nil;
-        }
-    }
-
-    auto * parametersForFactory = static_cast<MTRDeviceControllerParameters *>(parameters);
-
-    return [factory initializeController:self withParameters:parametersForFactory error:error];
+    // MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
+    return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
