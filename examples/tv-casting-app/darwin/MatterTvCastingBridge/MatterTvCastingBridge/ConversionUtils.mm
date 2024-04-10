@@ -48,20 +48,20 @@
                            outDiscoveredNodeData:(chip::Dnssd::DiscoveredNodeData &)outDiscoveredNodeData
 {
     // setting CommissionNodeData
-    outDiscoveredNodeData.commissionData.deviceType = objCDiscoveredNodeData.deviceType;
-    outDiscoveredNodeData.commissionData.vendorId = objCDiscoveredNodeData.vendorId;
-    outDiscoveredNodeData.commissionData.productId = objCDiscoveredNodeData.productId;
-    outDiscoveredNodeData.commissionData.longDiscriminator = objCDiscoveredNodeData.longDiscriminator;
-    outDiscoveredNodeData.commissionData.commissioningMode = objCDiscoveredNodeData.commissioningMode;
-    outDiscoveredNodeData.commissionData.pairingHint = objCDiscoveredNodeData.pairingHint;
-    memset(outDiscoveredNodeData.commissionData.deviceName, '\0', sizeof(outDiscoveredNodeData.commissionData.deviceName));
+    outDiscoveredNodeData.nodeData.deviceType = objCDiscoveredNodeData.deviceType;
+    outDiscoveredNodeData.nodeData.vendorId = objCDiscoveredNodeData.vendorId;
+    outDiscoveredNodeData.nodeData.productId = objCDiscoveredNodeData.productId;
+    outDiscoveredNodeData.nodeData.longDiscriminator = objCDiscoveredNodeData.longDiscriminator;
+    outDiscoveredNodeData.nodeData.commissioningMode = objCDiscoveredNodeData.commissioningMode;
+    outDiscoveredNodeData.nodeData.pairingHint = objCDiscoveredNodeData.pairingHint;
+    memset(outDiscoveredNodeData.nodeData.deviceName, '\0', sizeof(outDiscoveredNodeData.nodeData.deviceName));
     if (objCDiscoveredNodeData.deviceName != nullptr) {
-        chip::Platform::CopyString(outDiscoveredNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
+        chip::Platform::CopyString(outDiscoveredNodeData.nodeData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
             [objCDiscoveredNodeData.deviceName UTF8String]);
     }
-    outDiscoveredNodeData.commissionData.rotatingIdLen = objCDiscoveredNodeData.rotatingIdLen;
+    outDiscoveredNodeData.nodeData.rotatingIdLen = objCDiscoveredNodeData.rotatingIdLen;
     memcpy(
-        outDiscoveredNodeData.commissionData.rotatingId, objCDiscoveredNodeData.rotatingId, objCDiscoveredNodeData.rotatingIdLen);
+        outDiscoveredNodeData.nodeData.rotatingId, objCDiscoveredNodeData.rotatingId, objCDiscoveredNodeData.rotatingIdLen);
 
     // setting CommonResolutionData
     outDiscoveredNodeData.resolutionData.port = objCDiscoveredNodeData.port;
@@ -121,17 +121,17 @@
     DiscoveredNodeData * objCDiscoveredNodeData = [DiscoveredNodeData new];
 
     // from CommissionNodeData
-    objCDiscoveredNodeData.deviceType = cppDiscoveredNodedata->commissionData.deviceType;
-    objCDiscoveredNodeData.vendorId = cppDiscoveredNodedata->commissionData.vendorId;
-    objCDiscoveredNodeData.productId = cppDiscoveredNodedata->commissionData.productId;
-    objCDiscoveredNodeData.longDiscriminator = cppDiscoveredNodedata->commissionData.longDiscriminator;
-    objCDiscoveredNodeData.commissioningMode = cppDiscoveredNodedata->commissionData.commissioningMode;
-    objCDiscoveredNodeData.pairingHint = cppDiscoveredNodedata->commissionData.pairingHint;
-    objCDiscoveredNodeData.deviceName = [NSString stringWithCString:cppDiscoveredNodedata->commissionData.deviceName
+    objCDiscoveredNodeData.deviceType = cppDiscoveredNodedata->nodeData.deviceType;
+    objCDiscoveredNodeData.vendorId = cppDiscoveredNodedata->nodeData.vendorId;
+    objCDiscoveredNodeData.productId = cppDiscoveredNodedata->nodeData.productId;
+    objCDiscoveredNodeData.longDiscriminator = cppDiscoveredNodedata->nodeData.longDiscriminator;
+    objCDiscoveredNodeData.commissioningMode = cppDiscoveredNodedata->nodeData.commissioningMode;
+    objCDiscoveredNodeData.pairingHint = cppDiscoveredNodedata->nodeData.pairingHint;
+    objCDiscoveredNodeData.deviceName = [NSString stringWithCString:cppDiscoveredNodedata->nodeData.deviceName
                                                            encoding:NSUTF8StringEncoding];
-    objCDiscoveredNodeData.rotatingIdLen = cppDiscoveredNodedata->commissionData.rotatingIdLen;
-    objCDiscoveredNodeData.rotatingId = cppDiscoveredNodedata->commissionData.rotatingId;
-    objCDiscoveredNodeData.instanceName = [NSString stringWithCString:cppDiscoveredNodedata->commissionData.instanceName
+    objCDiscoveredNodeData.rotatingIdLen = cppDiscoveredNodedata->nodeData.rotatingIdLen;
+    objCDiscoveredNodeData.rotatingId = cppDiscoveredNodedata->nodeData.rotatingId;
+    objCDiscoveredNodeData.instanceName = [NSString stringWithCString:cppDiscoveredNodedata->nodeData.instanceName
                                                              encoding:NSUTF8StringEncoding];
 
     // from CommonResolutionData
