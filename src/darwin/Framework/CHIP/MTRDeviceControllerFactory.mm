@@ -1049,18 +1049,10 @@ static void ShutdownOnExit()
             self->_groupDataProvider->RemoveGroupKeys(fabricIndex);
         }
 
-        if (_otaProviderDelegateBridge) {
-            _otaProviderDelegateBridge->ControllerShuttingDown(controller);
-        }
-
-        [controller shutDownCppController];
-
-        self->_controllerBeingShutDown = nil;
-        if (self->_controllerBeingStarted == controller) {
-            self->_controllerBeingStarted = nil;
-        }
-
         // If there are no other controllers left, we can shut down some things.
+        // Do this before we shut down the controller itself, because the
+        // OtaProviderDelegateBridge uses some services provided by the system
+        // state without retaining it.
         if (_controllers.count == 0) {
             delete self->_operationalBrowser;
             self->_operationalBrowser = nullptr;
@@ -1076,6 +1068,15 @@ static void ShutdownOnExit()
                 [self removeServerEndpoint:_otaProviderEndpoint];
                 _otaProviderEndpoint = nil;
             }
+        } else if (_otaProviderDelegateBridge) {
+            _otaProviderDelegateBridge->ControllerShuttingDown(controller);
+        }
+
+        [controller shutDownCppController];
+
+        self->_controllerBeingShutDown = nil;
+        if (self->_controllerBeingStarted == controller) {
+            self->_controllerBeingStarted = nil;
         }
     });
 
