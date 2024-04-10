@@ -179,7 +179,7 @@ tests:
 '''
 
 _BASIC_ARITHMATIC_ARG_RESULTS = [6, 6, 2, 2, 8, 8, 2, 2]
-basic_arithmatic_yaml ='''
+basic_arithmatic_yaml = '''
 name: Test Cluster Tests
 
 config:
