@@ -89,6 +89,7 @@ public:
     CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, GranularityEnum granularity, TimeSourceEnum source);
     CHIP_ERROR GetLocalTime(chip::EndpointId ep, DataModel::Nullable<uint64_t> & localTime);
     GranularityEnum & GetGranularity() { return mGranularity; }
+    TimeSourceEnum & GetTimeSource() { return mTimeSource; }
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 

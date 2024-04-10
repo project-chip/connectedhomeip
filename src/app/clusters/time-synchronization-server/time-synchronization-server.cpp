@@ -1084,6 +1084,9 @@ CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath &
     case Granularity::Id: {
         return aEncoder.Encode(TimeSynchronizationServer::Instance().GetGranularity());
     }
+    case TimeSource::Id: {
+        return aEncoder.Encode(TimeSynchronizationServer::Instance().GetTimeSource());
+    }
     case TrustedTimeSource::Id: {
         return ReadTrustedTimeSource(aPath.mEndpointId, aEncoder);
     }
