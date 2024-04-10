@@ -315,7 +315,6 @@ CHIP_ERROR PsaKdf::InitOperation(psa_key_id_t hkdfKey, const ByteSpan & salt, co
 CHIP_ERROR PsaKdf::DeriveBytes(const MutableByteSpan & output)
 {
     psa_status_t status = psa_key_derivation_output_bytes(&mOperation, output.data(), output.size());
-
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;

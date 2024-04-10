@@ -28,6 +28,5 @@ assert(
     !chip_external_mbedtls || chip_crypto == "mbedtls" || chip_crypto == "psa",
     "Use of external mbedtls requires the mbedtls or psa crypto impl")
 
-assert(
-    !chip_crypto_psa_spake2p || chip_crypto == "psa",
-    "Use of psa spake2+ requires the psa crypto impl")
+assert(!chip_crypto_psa_spake2p || chip_crypto == "psa",
+       "Use of psa spake2+ requires the psa crypto impl")

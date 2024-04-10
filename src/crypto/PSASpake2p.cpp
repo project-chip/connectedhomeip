@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -181,7 +181,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(uint8_t * out, size_t * out_len)
+CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key)
 {
     auto & keyId = key.AsMutable<psa_key_id_t>();
 
@@ -191,7 +191,7 @@ CHIP_ERROR PSASpake2p_P256_SHA256_HKDF_HMAC::GetKeys(uint8_t * out, size_t * out
     psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
     psa_set_key_algorithm(&attributes, PSA_ALG_HKDF(PSA_ALG_SHA_256));
 
-    psa_status_t status = psa_pake_get_shared_key(&mOperation, &attributes, &keyId);
+    psa_status_t status = psa_pake_get_shared_key(&(mOperation), &attributes, &keyId);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
