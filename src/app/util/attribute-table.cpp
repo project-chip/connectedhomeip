@@ -292,19 +292,23 @@ Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, Attribut
     {
         size_t oldLength = emberAfStringLength(oldValueBuffer);
         size_t newLength = emberAfStringLength(newValueData);
-        // The first byte of the buffer is the string length, so comparing
-        // oldLength to newLength handles comparing that byte, and the oldLength
-        // bytes of actual data start one byte into the buffer.
-        *isChanging = (oldLength != newLength) || (memcmp(oldValueBuffer + 1, newValueData + 1, oldLength) != 0);
+        // The first byte of the buffer is the string length, and
+        // oldLength/newLength refer to the number of bytes after that.  We want
+        // to include that first byte in our comparison, because null and empty
+        // string have different values there but both return 0 from
+        // emberAfStringLength.
+        *isChanging = (oldLength != newLength) || (memcmp(oldValueBuffer, newValueData, oldLength + 1) != 0);
     }
     else if (emberAfIsLongStringAttributeType(attributeType))
     {
         size_t oldLength = emberAfLongStringLength(oldValueBuffer);
         size_t newLength = emberAfLongStringLength(newValueData);
-        // The first two bytes of the buffer are the string length, so comparing
-        // oldLength to newLength handles comparing those bytes, and the oldLength
-        // bytes of actual data start two bytes into the buffer.
-        *isChanging = (oldLength != newLength) || (memcmp(oldValueBuffer + 2, newValueData + 2, oldLength) != 0);
+        // The first two bytes of the buffer are the string length, and
+        // oldLength/newLength refer to the number of bytes after that.  We want
+        // to include those first two bytes in our comparison, because null and
+        // empty string have different values there but both return 0 from
+        // emberAfLongStringLength.
+        *isChanging = (oldLength != newLength) || (memcmp(oldValueBuffer, newValueData, oldLength + 2) != 0);
     }
     else
     {
