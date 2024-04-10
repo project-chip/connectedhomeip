@@ -771,7 +771,7 @@ static NSString * const sAttributesKey = @"attributes";
     [self _changeState:MTRDeviceStateUnknown];
 }
 
-- (void)_handleSubscriptionReset
+- (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
     std::lock_guard lock(_lock);
     // if there is no delegate then also do not retry
@@ -790,17 +790,29 @@ static NSString * const sAttributesKey = @"attributes";
 
     self.reattemptingSubscription = YES;
 
+    NSTimeInterval secondsToWait;
     if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
         _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS;
+        secondsToWait = _lastSubscriptionAttemptWait;
+    } else if (retryDelay != nil) {
+        // The device responded but is currently busy. Reset our backoff
+        // counter, so that we don't end up waiting for a long time if the next
+        // attempt fails for some reason, and retry after whatever time period
+        // the device told us to use.
+        _lastSubscriptionAttemptWait = 0;
+        secondsToWait = retryDelay.doubleValue;
+        MTR_LOG_INFO("%@ resetting resubscribe attempt counter, and delaying by the server-provided delay: %f",
+            self, secondsToWait);
     } else {
         _lastSubscriptionAttemptWait *= 2;
         if (_lastSubscriptionAttemptWait > MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS) {
             _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS;
         }
+        secondsToWait = _lastSubscriptionAttemptWait;
     }
 
-    MTR_LOG_DEFAULT("%@ scheduling to reattempt subscription in %u seconds", self, _lastSubscriptionAttemptWait);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
+    MTR_LOG_DEFAULT("%@ scheduling to reattempt subscription in %f seconds", self, secondsToWait);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (secondsToWait * NSEC_PER_SEC)), self.queue, ^{
         os_unfair_lock_lock(&self->_lock);
         [self _reattemptSubscriptionNowIfNeeded];
         os_unfair_lock_unlock(&self->_lock);
@@ -1133,12 +1145,13 @@ static NSString * const sAttributesKey = @"attributes";
     [_deviceController
         getSessionForNode:_nodeID.unsignedLongLongValue
                completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                   const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                   const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error,
+                   NSNumber * _Nullable retryDelay) {
                    if (error != nil) {
                        MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
                        dispatch_async(self.queue, ^{
                            [self _handleSubscriptionError:error];
-                           [self _handleSubscriptionReset];
+                           [self _handleSubscriptionReset:retryDelay];
                        });
                        return;
                    }
@@ -1193,7 +1206,7 @@ static NSString * const sAttributesKey = @"attributes";
 
                            dispatch_async(self.queue, ^{
                                // OnDone
-                               [self _handleSubscriptionReset];
+                               [self _handleSubscriptionReset:nil];
                            });
                            os_unfair_lock_unlock(&self->_lock);
                        },
@@ -1300,7 +1313,7 @@ static NSString * const sAttributesKey = @"attributes";
                        MTR_LOG_ERROR("%@ SendAutoResubscribeRequest error %@", self, error);
                        dispatch_async(self.queue, ^{
                            [self _handleSubscriptionError:error];
-                           [self _handleSubscriptionReset];
+                           [self _handleSubscriptionReset:nil];
                        });
 
                        return;
