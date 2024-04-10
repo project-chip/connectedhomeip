@@ -54,9 +54,12 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include "SilabsDeviceDataProvider.h"
-#include "SilabsTestEventTriggerDelegate.h"
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
+
+#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#include "SilabsTestEventTriggerDelegate.h"
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
@@ -219,12 +222,6 @@ void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event
     }
 }
 
-#if SILABS_TEST_EVENT_TRIGGER_ENABLED
-static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
-                                                                                          0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
-                                                                                          0xcc, 0xdd, 0xee, 0xff };
-#endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
-
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     CHIP_ERROR err;
@@ -284,10 +281,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.reportScheduler = &sReportScheduler;
 
 #if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
-    // TODO(#31723): Show to customers that they can do `Server::GetInstance().GetTestEventTriggerDelegate().AddHandler()`
     static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-#endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 #if CHIP_CRYPTO_PLATFORM && !(defined(SLI_SI91X_MCU_INTERFACE))
     // When building with EFR32 crypto, use the opaque key store

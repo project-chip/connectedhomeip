@@ -95,11 +95,10 @@ config("chip_examples_project_config") {
 }
 
 config("test-event-trigger-config") {
-  defines = [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLED" ]
-
-  if (sl_test_event_trigger_enable_key != "") {
-    defines += [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${sl_test_event_trigger_enable_key}\"" ]
-  }
+  defines = [
+    "SL_MATTER_TEST_EVENT_TRIGGER_ENABLED",
+    "SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${sl_test_event_trigger_enable_key}\"",
+  ]
 }
 
 source_set("test-event-trigger") {
@@ -233,6 +232,7 @@ config("silabs-wifi-config") {
   if (sl_wfx_config_softap) {
     defines += [ "SL_WFX_CONFIG_SOFTAP" ]
   }
+
   if (sl_wfx_config_scan) {
     defines += [ "SL_WFX_CONFIG_SCAN" ]
   }
@@ -240,6 +240,7 @@ config("silabs-wifi-config") {
   if (chip_enable_wifi_ipv4) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
   }
+
   if (rs91x_wpa3_transition) {
     # TODO: Change this macro once WF200 support is provided
     defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]

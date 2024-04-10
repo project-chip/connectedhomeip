@@ -23,7 +23,7 @@ check_system_includes = true
 default_args = {
   target_cpu = "arm"
   target_os = "freertos"
-  chip_openthread_ftd = false
+  chip_openthread_ftd = true
 
   import("//openthread.gni")
 }
