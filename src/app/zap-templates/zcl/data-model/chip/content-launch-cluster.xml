@@ -26,6 +26,24 @@ limitations under the License.
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
+    <features>
+      <feature bit="0" code="CS" name="ContentSearch" summary="Device supports content search (non-app specific)">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="UP" name="URLPlayback" summary="Device supports basic URL-based file playback">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="AS" name="AdvancedSeek" summary="Enables clients to implement more advanced media seeking behavior in their user interface, such as for example a &quot;seek bar&quot;.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="TT" name="TextTracks" summary="Device or app supports Text Tracks.">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="AT" name="AudioTracks" summary="Device or app supports Audio Tracks.">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="array" entryType="char_string" length="254" writable="false" optional="true">AcceptHeader</attribute>
     <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0"                       writable="false"  optional="true">SupportedStreamingProtocols</attribute>
 

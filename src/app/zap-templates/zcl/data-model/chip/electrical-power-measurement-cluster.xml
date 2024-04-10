@@ -33,6 +33,31 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
     <description>This cluster provides a mechanism for querying data about electrical power as measured by the server.</description>
+
+    <features>
+      <feature bit="0" code="DIRC" name="DirectCurrent" summary="Supports measurement of direct current">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="ALTC" name="AlternatingCurrent" summary="Supports measurement of alternating current">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="POLY" name="PolyphasePower" summary="Supports polyphase measurements">
+        <optionalConform>
+          <feature name="ALTC"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="HARM" name="Harmonics" summary="Supports measurement of AC harmonics">
+        <optionalConform>
+          <feature name="ALTC"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PWRQ" name="PowerQuality" summary="Supports measurement of AC harmonic phases">
+        <optionalConform>
+          <feature name="ALTC"/>
+        </optionalConform>
+      </feature>
+    </features>
+
     <!--Attributes-->
     <attribute code="0x0000" side="server" define="POWER_MODE" type="PowerModeEnum" min="0x00" max="0x02">PowerMode</attribute>
     <attribute code="0x0001" side="server" define="NUMBER_OF_MEASUREMENT_TYPES" type="int8u" min="1">NumberOfMeasurementTypes</attribute>

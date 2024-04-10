@@ -107,6 +107,24 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="6"/>
 
+    <features>
+      <feature bit="0" code="HS" name="Hue/Saturation" summary="Supports color specification via hue/saturation.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="EHUE" name="Enhanced Hue" summary="Enhanced hue is supported.">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="CL" name="Color loop" summary="Color loop is supported.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="XY" name="XY" summary="Supports color specification via XY.">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="CT" name="Color temperature" summary="Supports specification of color temperature.">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="COLOR_CONTROL_CURRENT_HUE" type="int8u" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">CurrentHue</attribute>
     <!-- CURRENT_HUE -->
     <attribute side="server" code="0x0001" define="COLOR_CONTROL_CURRENT_SATURATION" type="int8u" min="0x00" max="0xFE" writable="false" reportable="true" default="0x00" optional="true">CurrentSaturation</attribute>

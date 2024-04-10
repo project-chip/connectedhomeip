@@ -105,6 +105,18 @@ limitations under the License.
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
 
+        <features>
+            <feature bit="0" code="WI" name="WiFiNetworkInterface" summary="Wi-Fi related features">
+            <optionalConform choice="a"/>
+            </feature>
+            <feature bit="1" code="TH" name="ThreadNetworkInterface" summary="Thread related features">
+            <optionalConform choice="a"/>
+            </feature>
+            <feature bit="2" code="ET" name="EthernetNetworkInterface" summary="Ethernet related features">
+            <optionalConform choice="a"/>
+            </feature>
+        </features>
+
         <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="int8u" writable="false" optional="false">
             <description>MaxNetworks</description>
             <access op="read" privilege="administer"/>

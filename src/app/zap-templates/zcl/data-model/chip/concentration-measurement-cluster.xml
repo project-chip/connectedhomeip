@@ -29,6 +29,35 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
+    <features>
+      <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+        <optionalConform>
+          <feature name="LEV"/>
+        </optionalConform>
+      </feature>
+      <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+      <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+        <optionalConform>
+          <feature name="MEA"/>
+        </optionalConform>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>

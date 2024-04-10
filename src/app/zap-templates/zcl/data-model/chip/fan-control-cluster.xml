@@ -85,6 +85,27 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
+    <features>
+      <feature bit="0" code="SPD" name="MultiSpeed" summary="0-SpeedMax Fan Speeds">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="AUT" name="Auto" summary="Automatic mode supported for fan speed">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="RCK" name="Rocking" summary="Rocking movement supported">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="WND" name="Wind" summary="Wind emulation supported">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="STEP" name="Step" summary="Step command supported">
+        <optionalConform/>
+      </feature>
+      <feature bit="5" code="DIR" name="AirflowDirection" summary="Airflow Direction attribute is supported">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeEnum" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
     <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceEnum" min="0" max="5" writable="false" default="2" optional="false">FanModeSequence</attribute>
     <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="percent" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>

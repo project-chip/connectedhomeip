@@ -36,6 +36,15 @@ limitations under the License.
     <!-- Cluster feature map -->
     <globalAttribute side="server" code="0xFFFC" type="Feature" value="3" />
 
+    <features>
+      <feature bit="0" code="SMOKE" name="SmokeAlarm" summary="Supports Smoke alarm">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="CO" name="COAlarm" summary="Supports CO alarm">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+    </features>
+
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="EXPRESSED_STATE" type="ExpressedStateEnum" writable="false" optional="false">ExpressedState</attribute>
     <attribute side="server" code="0x0001" define="SMOKE_STATE" type="AlarmStateEnum" writable="false" optional="true">SmokeState</attribute>

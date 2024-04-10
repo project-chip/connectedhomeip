@@ -32,6 +32,22 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
     <description>This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.</description>
+
+    <features>
+      <feature bit="0" code="IMPE" name="ImportedEnergy" summary="Measurement of energy imported by the server">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="EXPE" name="ExportedEnergy" summary="Measurement of energy provided by the server">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="2" code="CUME" name="CumulativeEnergy" summary="Measurements are cumulative">
+        <optionalConform choice="b" more="true"/>
+      </feature>
+      <feature bit="3" code="PERE" name="PeriodicEnergy" summary="Measurements are periodic">
+        <optionalConform choice="b" more="true"/>
+      </feature>
+    </features>
+
     <!--Attributes-->
     <attribute code="0x0000" side="server" define="ACCURACY" type="MeasurementAccuracyStruct">Accuracy</attribute>
     <attribute code="0x0001" side="server" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" optional="true" isNullable="true">CumulativeEnergyImported</attribute>

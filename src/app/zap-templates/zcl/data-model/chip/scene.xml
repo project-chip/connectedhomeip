@@ -51,6 +51,12 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <features>
+      <feature bit="0" code="SN" name="SceneNames" summary="The ability to store a name for a scene.">
+        <optionalConform/>
+      </feature>
+    </features>
    
     <attribute side="server" code="0x0000" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
     <attribute side="server" code="0x0001" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16" writable="false" optional="false">SceneTableSize</attribute>

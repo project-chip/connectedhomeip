@@ -55,6 +55,13 @@ limitations under the License.
     <description>This cluster is used to configure a valve.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
+    <features>
+      <feature bit="0" code="TS" name="TimeSync" summary="UTC time is used for time indications"/>
+      <feature bit="1" code="LVL" name="Level" summary="Device supports setting the specific position of the valve">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <!-- min max definition for attribute size larger than 2 bytes is not allowed by zap codegen https://github.com/project-chip/zap/issues/1187 -->
     <!-- Therefore, this check needs to be done in code. -->
     <attribute side="server" code="0x0000" define="OPEN_DURATION" type="elapsed_s" isNullable="true" writable="false" optional="false">OpenDuration</attribute>

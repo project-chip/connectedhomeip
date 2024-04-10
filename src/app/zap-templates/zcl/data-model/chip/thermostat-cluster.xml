@@ -290,6 +290,45 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="6"/>
 
+    <features>
+      <feature bit="0" code="HEAT" name="Heating" summary="Thermostat is capable of managing a heating device">
+        <otherwiseConform>
+          <mandatoryConform>
+            <feature name="AUTO"/>
+          </mandatoryConform>
+          <optionalConform choice="a" more="true"/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="1" code="COOL" name="Cooling" summary="Thermostat is capable of managing a cooling device">
+        <otherwiseConform>
+          <mandatoryConform>
+            <feature name="AUTO"/>
+          </mandatoryConform>
+          <optionalConform choice="a" more="true"/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="2" code="OCC" name="Occupancy" summary="Supports Occupied and Unoccupied setpoints">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="SCH" name="ScheduleConfiguration" summary="Supports remote configuration of a weekly schedule of setpoint transitions">
+        <otherwiseConform>
+          <optionalConform>
+            <condition name="Zigbee"/>
+          </optionalConform>
+          <deprecateConform/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="4" code="SB" name="Setback" summary="Supports configurable setback (or span)">
+        <optionalConform/>
+      </feature>
+      <feature bit="5" code="AUTO" name="AutoMode" summary="Supports a System Mode of Auto">
+        <optionalConform/>
+      </feature>
+      <feature bit="6" code="LTNE" name="LocalTemperatureNotExposed" summary="Thermostat does not expose the LocalTemperature Value in the LocalTemperature attribute">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <!-- Attributes -->
 
     <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="temperature" writable="false" reportable="true" optional="false" isNullable="true">LocalTemperature</attribute>

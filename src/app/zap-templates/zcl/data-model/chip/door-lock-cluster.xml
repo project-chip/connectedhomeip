@@ -64,6 +64,61 @@ limitations under the License.
             <featureBit tag="ALBU" bit="14">true</featureBit> <!-- TODO: Depends on ALIRO -->
         </globalAttribute>
 
+        <features>
+            <feature bit="0" code="PIN" name="PINCredential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
+            <optionalConform/>
+            </feature>
+            <feature bit="1" code="RID" name="RFIDCredential" summary="Lock supports RFID credentials">
+            <optionalConform/>
+            </feature>
+            <feature bit="2" code="FGP" name="FingerCredentials" summary="Lock supports finger related credentials (fingerprint, finger vein)">
+            <otherwiseConform>
+                <provisionalConform/>
+                <optionalConform/>
+            </otherwiseConform>
+            </feature>
+            <feature bit="3" code="LOG" name="Logging" summary="Lock supports local/on-lock logging when Events are not supported">
+            <optionalConform/>
+            </feature>
+            <feature bit="4" code="WDSCH" name="WeekDayAccessSchedules" summary="Lock supports week day user access schedules">
+            <optionalConform/>
+            </feature>
+            <feature bit="5" code="DPS" name="DoorPositionSensor" summary="Lock supports a door position sensor that indicates door's state">
+            <optionalConform/>
+            </feature>
+            <feature bit="6" code="FACE" name="FaceCredentials" summary="Lock supports face related credentials (face, iris, retina)">
+            <otherwiseConform>
+                <provisionalConform/>
+                <optionalConform/>
+            </otherwiseConform>
+            </feature>
+            <feature bit="7" code="COTA" name="CredentialOverTheAirAccess" summary="PIN codes over-the-air supported for lock/unlock operations">
+            <optionalConform/>
+            </feature>
+            <feature bit="8" code="USR" name="User" summary="Lock supports the user commands and database">
+            <optionalConform>
+                <orTerm>
+                <feature name="PIN"/>
+                <feature name="RID"/>
+                <feature name="FGP"/>
+                <feature name="FACE"/>
+                </orTerm>
+            </optionalConform>
+            </feature>
+            <feature bit="9" code="NOT" name="Notification" summary="Operation and Programming Notifications">
+            <optionalConform/>
+            </feature>
+            <feature bit="10" code="YDSCH" name="YearDayAccessSchedules" summary="Lock supports year day user access schedules">
+            <optionalConform/>
+            </feature>
+            <feature bit="11" code="HDSCH" name="HolidaySchedules" summary="Lock supports holiday schedules">
+            <optionalConform/>
+            </feature>
+            <feature bit="12" code="UBOLT" name="Unbolting" summary="Lock supports unbolting">
+            <optionalConform/>
+            </feature>
+        </features>
+
         <!-- The principle behind  mandatory/optional is the following:
          1. If attribute/command is marked as mandatory it should be mandatory here.
          2. If attribute/command is marked as optional it should be optional here.

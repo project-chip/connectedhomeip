@@ -71,6 +71,33 @@ limitations under the License.
         <!-- Current cluster version -->
         <globalAttribute side="either" code="0xFFFD" value="2"/>
 
+        <features>
+            <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
+            <otherwiseConform>
+                <provisionalConform/>
+                <mandatoryConform>
+                <feature name="LITS"/>
+                </mandatoryConform>
+                <optionalConform/>
+            </otherwiseConform>
+            </feature>
+            <feature bit="1" code="UAT" name="UserActiveModeTrigger" summary="Device supports the user active mode trigger feature.">
+            <otherwiseConform>
+                <provisionalConform/>
+                <mandatoryConform>
+                <feature name="LITS"/>
+                </mandatoryConform>
+                <optionalConform/>
+            </otherwiseConform>
+            </feature>
+            <feature bit="2" code="LITS" name="LongIdleTimeSupport" summary="Device supports operating as a Long Idle Time ICD.">
+            <otherwiseConform>
+                <provisionalConform/>
+                <optionalConform/>
+            </otherwiseConform>
+            </feature>
+        </features>
+
         <attribute side="server" code="0x00" define="IDLE_MODE_DURATION" type="int32u" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeDuration</attribute>
         <attribute side="server" code="0x01" define="ACTIVE_MODE_DURATION" type="int32u" default="300" writable="false" optional="false" isNullable="false">ActiveModeDuration</attribute>
         <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>

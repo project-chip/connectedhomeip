@@ -39,6 +39,12 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
+    <features>
+      <feature bit="0" code="GN" name="GroupNames" summary="The ability to store a name for a group.">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80" writable="false" optional="false">NameSupport</attribute>
 
     <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">
