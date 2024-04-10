@@ -82,9 +82,9 @@ static_library("SiWx917") {
       "${silabs_platform_dir}/multi-ota/OTAMultiImageProcessorImpl.h",
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.cpp",
       "${silabs_platform_dir}/multi-ota/OTATlvProcessor.h",
-      "${silabs_platform_dir}/multi-ota/SiWx917/OTAFirmwareProcessor.cpp",
-      "${silabs_platform_dir}/multi-ota/SiWx917/OTAFirmwareProcessor.h",
-      "${silabs_platform_dir}/multi-ota/SiWx917/OTAHooks.cpp",
+      "${silabs_platform_dir}/multi-ota/SiWx917/OTAFirmwareProcessor917.cpp",
+      "${silabs_platform_dir}/multi-ota/SiWx917/OTAFirmwareProcessor917.h",
+      "${silabs_platform_dir}/multi-ota/SiWx917/OTAHooks917.cpp",
     ]
   } else if (chip_enable_ota_requestor) {
     sources += [
