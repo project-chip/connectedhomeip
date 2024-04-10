@@ -16,7 +16,6 @@
 #
 
 import logging
-import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
@@ -86,7 +85,6 @@ class TC_FAN_3_3(MatterBaseTest):
         if rock_support & Clusters.FanControl.Bitmaps.RockBitmap.kRockLeftRight:
             self.step(3)
             await self.write_rock_setting(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockLeftRight)
-            time.sleep(1)
 
             self.step(4)
             rock_setting = await self.read_rock_setting(endpoint=endpoint)
@@ -104,7 +102,6 @@ class TC_FAN_3_3(MatterBaseTest):
         if rock_support & Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown:
             self.step(6)
             await self.write_rock_setting(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockUpDown)
-            time.sleep(1)
 
             self.step(7)
             rock_setting = await self.read_rock_setting(endpoint=endpoint)
@@ -121,7 +118,6 @@ class TC_FAN_3_3(MatterBaseTest):
         if rock_support & Clusters.FanControl.Bitmaps.RockBitmap.kRockRound:
             self.step(9)
             await self.write_rock_setting(endpoint=endpoint, rock_setting=Clusters.FanControl.Bitmaps.RockBitmap.kRockRound)
-            time.sleep(1)
 
             self.step(10)
             rock_setting = await self.read_rock_setting(endpoint=endpoint)
