@@ -131,7 +131,7 @@ public:
 
 private:
     MdnsContexts() = default;
-    friend class Global<MdnsContexts>;
+    friend Global<MdnsContexts>;
     static Global<MdnsContexts> sInstance;
 
     std::vector<GenericContext *> mContexts;
