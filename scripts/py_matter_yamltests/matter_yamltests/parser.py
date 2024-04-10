@@ -1223,7 +1223,7 @@ class TestStep:
             # But some other tests were relying on the fact that the expression was put 'as if' in
             # the generated code and was resolved before being sent over the wire. For such
             # expressions (e.g 'myVar + 1') we need to compute it before sending it over the wire.
-            delimiter_regex = "(\ |\+|\-|\*|\/|\%)"
+            delimiter_regex = "(\ |\(|\)|\+|\-|\*|\/|\%)"
             tokens = re.split(delimiter_regex, value)
             if len(tokens) == 0:
                 return value
