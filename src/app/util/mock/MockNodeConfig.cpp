@@ -91,6 +91,13 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
     mEmberEndpoint.cluster      = mEmberClusters.data();
 }
 
+MockEndpointConfig::MockEndpointConfig(const MockEndpointConfig & other) :
+    id(other.id), clusters(other.clusters), mEmberClusters(other.mEmberClusters), mEmberEndpoint(other.mEmberEndpoint)
+{
+    // fix self-referencing pointers
+    mEmberEndpoint.cluster = mEmberClusters.data();
+}
+
 const MockClusterConfig * MockEndpointConfig::clusterById(ClusterId clusterId, ptrdiff_t * outIndex) const
 {
     return findById(clusters, clusterId, outIndex);
