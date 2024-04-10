@@ -348,6 +348,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr,
                      chip::app::InteractionModelEngine::GetInstance());
+
+    // Register Test Event Trigger Handler
+    mTestEventTriggerDelegate->AddHandler(&mICDManager);
+
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -592,6 +596,8 @@ void Server::Shutdown()
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Remove Test Event Trigger Handler
+    mTestEventTriggerDelegate->RemoveHandler(&mICDManager);
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
