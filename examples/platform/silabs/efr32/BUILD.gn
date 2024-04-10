@@ -112,6 +112,7 @@ source_set("test-event-trigger") {
 
   public_deps = [
     ":silabs-factory-data-provider",
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
