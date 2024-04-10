@@ -85,6 +85,7 @@ executable("${sample_name}") {
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_EVENT_SERVICE=1",
       "PW_RPC_LIGHTING_SERVICE=1",
       "PW_RPC_TRACING_SERVICE=1",
     ]
@@ -112,6 +113,7 @@ executable("${sample_name}") {
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:event_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:rpc_services",
     ]

@@ -48,6 +48,10 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 #include "pigweed/rpc_services/Device.h"
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 
+#if defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
+#include "pigweed/rpc_services/Event.h"
+#endif // defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
+
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 #include "pigweed/rpc_services/Lighting.h"
 #endif // defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
@@ -159,6 +163,10 @@ Descriptor descriptor_service;
 NrfDevice device_service;
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 
+#if defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
+Event event_service;
+#endif // defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
+
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 Lighting lighting_service;
 #endif // defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
@@ -200,6 +208,10 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
     server.RegisterService(device_service);
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
+
+#if defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
+    server.RegisterService(event_service);
+#endif // defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
     server.RegisterService(lighting_service);

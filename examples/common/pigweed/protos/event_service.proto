@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+
+package chip.rpc;
+
+message EventSetRequest {
+  uint32 endpoint_id = 1;
+  uint32 cluster_id = 2;
+  uint32 event_id = 3;
+  std::string event_payload = 4;
+}
+
+message EventSetResponse {
+  uint64 event_number = 1;
+}
+
+message EventGetRequest {
+  uint32 endpoint_id = 1;
+}
+
+message EventGetResponse {
+  uint32 event_id = 1;
+}
+
+service Event {
+  // Set will return generated event number (caused by change) if all supported fields are successfully applied, any
+  // unsupported fields will be ignored.
+  rpc Set(EventSetRequest) returns (EventSetResponse){}
+
+  // Get will return the latest event number
+  rpc Get(EventGetRequest) returns (EventGetResponse){}
+}

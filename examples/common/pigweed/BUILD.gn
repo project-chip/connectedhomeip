@@ -72,6 +72,13 @@ pw_proto_library("button_service") {
   prefix = "button_service"
 }
 
+pw_proto_library("event_service") {
+  sources = [ "protos/event_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "event_service"
+}
+
 pw_proto_library("lighting_service") {
   sources = [ "protos/lighting_service.proto" ]
   deps = [ "$dir_pw_protobuf:common_protos" ]
