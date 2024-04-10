@@ -99,7 +99,7 @@ public:
     /// method.
     bool IsActive() const { return mSpecificResolutionData.Valid(); }
 
-    bool IsActiveCommissionParse() const { return mSpecificResolutionData.Is<CommissionNodeData>(); }
+    bool IsActiveBrowseParse() const { return mSpecificResolutionData.Is<DnssdNodeData>(); }
     bool IsActiveOperationalParse() const { return mSpecificResolutionData.Is<OperationalNodeData>(); }
 
     ServiceNameType GetCurrentType() const { return mServiceNameType; }
@@ -143,7 +143,7 @@ public:
 
     /// Take the current value of the object and clear it once returned.
     ///
-    /// Object must be in `IsActiveCommissionParse()` for this to succeed.
+    /// Object must be in `IsActiveBrowseParse()` for this to succeed.
     /// Data will be returned (and cleared) even if not yet complete based
     /// on `GetMissingRequiredInformation()`. This method takes as much data as
     /// it was parsed so far.
@@ -170,7 +170,7 @@ private:
     /// Input data MUST have GetType() == QType::TXT
     CHIP_ERROR OnTxtRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
 
-    /// Notify that a new IP addres has been found.
+    /// Notify that a new IP address has been found.
     ///
     /// This is to be called on both A (if IPv4 support is enabled) and AAAA
     /// addresses.
@@ -178,7 +178,7 @@ private:
     /// Prerequisite: IP address belongs to the right nost name
     CHIP_ERROR OnIpAddress(Inet::InterfaceId interface, const Inet::IPAddress & addr);
 
-    using ParsedRecordSpecificData = Variant<OperationalNodeData, CommissionNodeData>;
+    using ParsedRecordSpecificData = Variant<OperationalNodeData, DnssdNodeData>;
 
     StoredServerName mRecordName;     // Record name for what is parsed (SRV/PTR/TXT)
     StoredServerName mTargetHostName; // `Target` for the SRV record
