@@ -307,7 +307,13 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 }
 
 } // namespace app
+//
 namespace Test {
+
+void ResetVersion()
+{
+    dataVersion = 0;
+}
 
 void BumpVersion()
 {
@@ -405,6 +411,17 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
     ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
     return attributeReport.EndOfAttributeReportIB();
+}
+
+void SetMockNodeConfig(const MockNodeConfig & config)
+{
+    mockConfig = &config;
+}
+
+/// Resets the mock attribute storage to the default configuration.
+void ResetMockNodeConfig()
+{
+    mockConfig = nullptr;
 }
 
 } // namespace Test
