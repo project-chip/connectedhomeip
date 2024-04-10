@@ -57,9 +57,9 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
 
-#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
-#include "SilabsTestEventTriggerDelegate.h"
-#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#include "SilabsTestEventTriggerDelegate.h" // nogncheck
+#endif
 
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
@@ -280,7 +280,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     initParams.reportScheduler = &sReportScheduler;
 
-#if SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED

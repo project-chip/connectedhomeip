@@ -78,10 +78,11 @@ config("chip_examples_project_config") {
 }
 
 config("test-event-trigger-config") {
-  defines = [
-    "SL_MATTER_TEST_EVENT_TRIGGER_ENABLED",
-    "SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${sl_test_event_trigger_enable_key}\"",
-  ]
+  defines = [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLED" ]
+
+  if (is_debug) {
+    defines += [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${sl_test_event_trigger_enable_key}\"" ]
+  }
 }
 
 source_set("test-event-trigger") {
