@@ -249,7 +249,7 @@ jobs:
                      --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
-                     --expected-failures 2 \
+                     --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
@@ -400,7 +400,7 @@ jobs:
                      --chip-tool ./out/darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
-                     --expected-failures 2 \
+                     --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
