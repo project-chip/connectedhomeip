@@ -178,8 +178,8 @@ tests:
           value: TestEnum.UnknownEnumValue(0)
 '''
 
-_BASIC_ARITHMATIC_ARG_RESULTS = [6, 6, 2, 2, 8, 8, 2, 2]
-basic_arithmatic_yaml = '''
+_BASIC_ARITHMETIC_ARG_RESULTS = [6, 6, 2, 2, 8, 8, 2, 2]
+basic_arithmetic_yaml = '''
 name: Test Cluster Tests
 
 config:
@@ -278,6 +278,17 @@ class TestYamlParser(unittest.TestCase):
             self.assertEqual(test_step.cluster, 'Test')
             self.assertEqual(test_step.endpoint, 1)
 
+    def test_basic_arithmetic(self):
+        parser_config = TestParserConfig(None, self._definitions)
+
+        yaml_parser = TestParser(basic_arithmetic_yaml, parser_config)
+        for idx, test_step in enumerate(yaml_parser.tests):
+            values = test_step.arguments['values']
+            self.assertEqual(len(values), 1)
+            value = values[0]
+            self.assertEqual(value['name'], 'arg')
+            self.assertEqual(value['value'], _BASIC_ARITHMETIC_ARG_RESULTS[idx])
+
     def test_config_override(self):
         config_override = {'nodeId': 12345,
                            'cluster': 'TestOverride', 'endpoint': 4}
@@ -288,17 +299,6 @@ class TestYamlParser(unittest.TestCase):
             self.assertEqual(test_step.node_id, 12345)
             self.assertEqual(test_step.cluster, 'TestOverride')
             self.assertEqual(test_step.endpoint, 4)
-
-    def test_config_override(self):
-        parser_config = TestParserConfig(None, self._definitions)
-
-        yaml_parser = TestParser(basic_arithmatic_yaml, parser_config)
-        for idx, test_step in enumerate(yaml_parser.tests):
-            values = test_step.arguments['values']
-            self.assertEqual(len(values), 1)
-            value = values[0]
-            self.assertEqual(value['name'], 'arg')
-            self.assertEqual(value['value'], _BASIC_ARITHMATIC_ARG_RESULTS[idx])
 
     def test_config_override_unknown_field(self):
         config_override = {'unknown_field': 1}
