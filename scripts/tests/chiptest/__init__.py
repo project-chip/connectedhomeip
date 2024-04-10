@@ -157,8 +157,6 @@ def _GetInDevelopmentTests() -> Set[str]:
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_TMP_2_1",  # Test incorrectly implemented as it relies on saving value that may be null, which maybe
-                            # incorrectly used in future response value checks.
     }
 
 
@@ -166,6 +164,8 @@ def _GetChipToolUnsupportedTests() -> Set[str]:
     """Tests that fail in chip-tool for some reason"""
     return {
         "TestDiagnosticLogsDownloadCommand",  # chip-tool does not implement a bdx download command.
+        "Test_TC_TMP_2_1",  # Test incorrectly implemented as it relies on saving value that may be null, which maybe
+                            # incorrectly used in future response value checks.
     }
 
 
@@ -219,6 +219,8 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_SC_4_1",  # darwin-framework-tool does not support dns-sd commands.
         "Test_TC_SC_5_2",  # darwin-framework-tool does not support group commands.
         "Test_TC_S_2_3",  # darwin-framework-tool does not support group commands.
+        "Test_TC_TMP_2_1",  # Test incorrectly implemented as it relies on saving value that may be null, which maybe
+                            # incorrectly used in future response value checks.
     }
 
 
@@ -272,6 +274,8 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_EEVSEM_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_EEVSEM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "TestDiagnosticLogsDownloadCommand.yaml",  # chip-repl does not implement the bdx download command
+        "Test_TC_TMP_2_1",  # Test incorrectly implemented as it relies on saving value that may be null, which maybe
+                            # incorrectly used in future response value checks.
     }
 
 
