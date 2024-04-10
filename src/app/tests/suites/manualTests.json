@@ -289,10 +289,7 @@
     ],
     "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
     "TemperatureControl": [],
-    "TemperatureMeasurement": [
-        "Test_TC_TMP_2_1",
-        "Test_TC_TMP_2_2"
-    ],
+    "TemperatureMeasurement": ["Test_TC_TMP_2_1", "Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],
     "ThreadNetworkDiagnostics": ["Test_TC_DGTHREAD_2_5"],
