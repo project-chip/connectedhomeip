@@ -167,7 +167,19 @@ EOF
 # bootstrap or run_in_build_env.sh can be executed in a build env
 _ORIGINAL_PW_ENVIRONMENT_ROOT="$PW_ENVIRONMENT_ROOT"
 
+# pigweed does not seem to handle pwd involving symlinks very well.
+original_pwd=$PWD
+if hash realpath 2>/dev/null; then
+    realpwd="$(realpath "$PWD")"
+    if [ "$realpwd" != "$PWD" ]; then
+        echo "Warning: $PWD contains symlinks, using $realpwd instead"
+        cd "$realpwd"
+    fi
+fi
+
 _bootstrap_or_activate "$0"
+
+cd $original_pwd
 
 if [ "$_ACTION_TAKEN" = "bootstrap" ]; then
     # By default, install all extra pip dependencies even if slow. -p/--platform
