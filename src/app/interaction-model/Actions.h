@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#include <app/interaction-model/events.h>
-#include <app/interaction-model/paths.h>
-#include <app/interaction-model/request_context.h>
+#include <app/interaction-model/Events.h>
+#include <app/interaction-model/Paths.h>
+#include <app/interaction-model/RequestContext.h>
 
 namespace chip {
 namespace app {

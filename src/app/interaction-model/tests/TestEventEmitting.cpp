@@ -18,7 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Decode.h>
-#include <app/interaction-model/events.h>
+#include <app/interaction-model/Events.h>
 #include <lib/support/CodeUtils.h>
 
 #include <gtest/gtest.h>

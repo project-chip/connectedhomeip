@@ -19,10 +19,10 @@
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
 
-#include <app/interaction-model/actions.h>
-#include <app/interaction-model/invoke_responder.h>
-#include <app/interaction-model/iter_types.h>
-#include <app/interaction-model/operation_types.h>
+#include <app/interaction-model/Actions.h>
+#include <app/interaction-model/InvokeResponder.h>
+#include <app/interaction-model/IterationTypes.h>
+#include <app/interaction-model/OperationTypes.h>
 
 namespace chip {
 namespace app {
