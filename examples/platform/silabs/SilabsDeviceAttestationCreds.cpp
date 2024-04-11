@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 #include "SilabsDeviceAttestationCreds.h"
-#include "MigrationManager.h"
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/silabs/MigrationManager.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <psa/crypto.h>
 
@@ -172,18 +172,6 @@ DeviceAttestationCredentialsProvider * GetSilabsDacProvider()
 
 namespace DeviceLayer {
 namespace Silabs {
-namespace {
-
-void MigrateUint32(uint32_t old_key, uint32_t new_key)
-{
-    uint32_t value = 0;
-    if (SilabsConfig::ConfigValueExists(old_key) && (CHIP_NO_ERROR == SilabsConfig::ReadConfigValue(old_key, value)))
-    {
-        SilabsConfig::WriteConfigValue(new_key, value);
-    }
-}
-
-} // namespace
 
 void MigrateDacProvider(void)
 {
