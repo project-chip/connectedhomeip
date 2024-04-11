@@ -75,6 +75,15 @@ void MigrationManager::MigrateUint32(uint32_t old_key, uint32_t new_key)
     }
 }
 
+void MigrateCounterConfigs(void)
+{
+    constexpr uint32_t kOldConfigKey_BootCount             = SilabsConfigKey(SilabsConfig::kMatterCounter_KeyBase, 0x00);
+    constexpr uint32_t kOldConfigKey_TotalOperationalHours = SilabsConfigKey(SilabsConfig::kMatterCounter_KeyBase, 0x01);
+
+    MigrateUint32(kOldConfigKey_BootCount, SilabsConfig::kConfigKey_BootCount);
+    MigrateUint32(kOldConfigKey_TotalOperationalHours, SilabsConfig::kConfigKey_TotalOperationalHours);
+}
+
 MigrationManager & MigrationManager::GetMigrationInstance()
 {
     static MigrationManager sMigrationManager;

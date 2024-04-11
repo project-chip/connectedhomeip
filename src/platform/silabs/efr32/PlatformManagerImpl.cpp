@@ -24,7 +24,6 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "<platform/MigrationManager.h>"
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
@@ -160,16 +159,5 @@ void PlatformManagerImpl::HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wf
 }
 #endif
 
-namespace Silabs {
-
-void MigrateCounterConfigs(void)
-{
-    constexpr uint32_t kOldConfigKey_BootCount             = SilabsConfigKey(SilabsConfig::kMatterCounter_KeyBase, 0x00);
-    constexpr uint32_t kOldConfigKey_TotalOperationalHours = SilabsConfigKey(SilabsConfig::kMatterCounter_KeyBase, 0x01);
-
-    MigrationManager::MigrateUint32(kOldConfigKey_BootCount, SilabsConfig::kConfigKey_BootCount);
-    MigrationManager::MigrateUint32(kOldConfigKey_TotalOperationalHours, SilabsConfig::kConfigKey_TotalOperationalHours);
-}
-} // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip
