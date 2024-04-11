@@ -30,7 +30,7 @@ public:
 
     /// Valid ONLY during synchronous handling of a Read/Write/Invoke
     ///
-    /// Used sparringly, however some operations will require these. An example
+    /// Used sparingly, however some operations will require these. An example
     /// usage is "Operational Credentials aborting communications on removed fabrics"
     ///
     /// Callers MUST check for null here (e.g. unit tests mocks may set this to

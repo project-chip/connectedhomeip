@@ -43,7 +43,7 @@ struct OperationRequest
 
 enum class ReadFlags : uint32_t
 {
-    kFabricFiltered = 0x0001, // reading is perfomed fabric-filtered
+    kFabricFiltered = 0x0001, // reading is performed fabric-filtered
 };
 
 struct ReadAttributeRequest : OperationRequest
