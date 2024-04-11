@@ -46,7 +46,7 @@ uint8_t flag = RPS_HEADER;
 namespace chip {
 
 // Define static memebers
-//bool OTAFirmwareProcessor::mReset                                                      = false;
+bool OTAFirmwareProcessor::mReset                                                      = false;
 uint32_t OTAFirmwareProcessor::mWriteOffset                                            = 0;
 uint16_t OTAFirmwareProcessor::writeBufOffset                                          = 0;
 uint8_t OTAFirmwareProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
@@ -109,7 +109,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
                     // should be set to true in HandleProcessBlock
                     if (status == SL_STATUS_FW_UPDATE_DONE)
                     {
-                        //mReset = true;
+                        mReset = true;
                     }
                     else
                     {
@@ -142,14 +142,14 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
 {
     // This reboots the device
-    // if (mReset)
-    // {
-    //     ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
-    //     // send system reset request to reset the MCU and upgrade the m4 image
-    //     ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
-    //     // Reboots the device
-    //     sl_si91x_soc_soft_reset();
-    // }  
+    if (mReset)
+    {
+        ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
+        // send system reset request to reset the MCU and upgrade the m4 image
+        ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
+        // Reboots the device
+        sl_si91x_soc_soft_reset();
+    }  
     return CHIP_NO_ERROR;
 }
 
@@ -173,7 +173,7 @@ CHIP_ERROR OTAFirmwareProcessor::FinalizeAction()
         {
             if (status == SL_STATUS_FW_UPDATE_DONE)
             {
-                // mReset = true;
+                mReset = true;
             }
             else
             {
