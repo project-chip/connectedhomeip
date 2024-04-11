@@ -365,7 +365,7 @@ public:
 
     [self.deviceController getSessionForNode:self.nodeID
                                   completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                                      NSError * _Nullable error) {
+                                      NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                                       if (error != nil) {
                                           dispatch_async(queue, ^{
                                               errorHandler(error);
@@ -1603,7 +1603,7 @@ exit:
     [self.deviceController
         getSessionForNode:self.nodeID
                completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                   NSError * _Nullable error) {
+                   NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                    if (error != nil) {
                        dispatch_async(queue, ^{
                            reportHandler(nil, error);

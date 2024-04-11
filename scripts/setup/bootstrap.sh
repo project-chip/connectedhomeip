@@ -56,6 +56,29 @@ _install_additional_pip_requirements() {
     unset _SETUP_PLATFORM
 }
 
+_submodules_need_updating() {
+  # Validates if a set of submodules that should always be checked out are up to date.
+
+  # Pigweed will be up to date on an initial setup, however it may change over time.
+  # The rest are a small subset of things that are always checked out (have no platform attachment).
+  _SUBMODULE_PATHS=(
+    "third_party/pigweed/repo"
+    "third_party/openthread/repo"
+    "third_party/editline/repo"
+  )
+
+  for submodule_path in "${_SUBMODULE_PATHS[@]}"; do
+    if git submodule status "$submodule_path" | grep -E '^-' >/dev/null 2>&1; then 
+      echo "git shows that $submodule_path has changes"
+      unset _SUBMODULE_PATHS
+      return 0 # Success
+    fi
+  done
+
+  unset _SUBMODULE_PATHS
+  return 1 # Failure
+}
+
 _bootstrap_or_activate() {
     if [ -n "$BASH" ]; then
         local _BOOTSTRAP_PATH="${BASH_SOURCE[0]}"
@@ -163,6 +186,20 @@ unset -f _bootstrap_or_activate
 unset -f _install_additional_pip_requirements
 
 pw_cleanup
+
+if _submodules_need_updating; then
+  # yellow output
+  if which tput >/dev/null; then tput setaf 3; fi
+
+  echo "Some submodules seem out of date."
+  echo "For a clean checkout, consider running:"
+  echo "   ./scripts/checkout_submodules.py --shallow --platform <your-platform>"
+  echo "OR for a full checkout:"
+  echo "   git submodules update -f --init --recursive"
+
+  # reset output
+  if which tput >/dev/null; then tput sgr0; fi
+fi
 
 unset _ACTION_TAKEN
 unset _CHIP_ROOT

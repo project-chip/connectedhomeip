@@ -24,7 +24,7 @@ app_data_model = "${chip_root}/examples/lock-app/lock-common"
 # ICD Default configurations
 chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
-sl_use_subscription_synching = true
+sl_use_subscription_syncing = true
 
 # ICD Matter Configuration flags
 sl_idle_mode_duration_s = 600  # 10min Idle Mode Duration
