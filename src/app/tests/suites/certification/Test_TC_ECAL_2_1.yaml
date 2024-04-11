@@ -1,0 +1,148 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+name: 262.2.1. [TC-ECAL-2.1] Attributes with server as DUT
+
+PICS:
+    - ECAL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Energy Calendar"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads the CalendarID attribute from the DUT"
+      PICS: ECAL.S.A0000
+      command: "readAttribute"
+      attribute: "CalendarID"
+      response:
+          constraints:
+              type: int32u
+
+    - label: "Step 3: TH reads the Name attribute from the DUT"
+      PICS: ECAL.S.A0001
+      command: "readAttribute"
+      attribute: "Name"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 12
+
+    - label: "Step 4: TH reads the ProviderID attribute from the DUT"
+      PICS: ECAL.S.A0002
+      command: "readAttribute"
+      attribute: "ProviderID"
+      response:
+          constraints:
+              type: int32u
+
+    - label: "Step 5: TH reads the EventID attribute from the DUT"
+      PICS: ECAL.S.A0003
+      command: "readAttribute"
+      attribute: "EventID"
+      response:
+          constraints:
+              type: int32u
+
+    - label: "Step 6: TH reads the StartDate attribute from the DUT"
+      PICS: ECAL.S.A0004
+      command: "readAttribute"
+      attribute: "StartDate"
+      response:
+          constraints:
+              type: epoch_s
+
+    - label: "Step 7: TH reads the TimeReference attribute from the DUT"
+      PICS: ECAL.S.A0005
+      command: "readAttribute"
+      attribute: "TimeReference"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 8: TH reads the CalendarPeriods attribute from the DUT"
+      PICS: ECAL.S.A0006
+      command: "readAttribute"
+      attribute: "CalendarPeriods"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 9: TH reads the SpecialDays attribute from the DUT"
+      PICS: ECAL.S.A0008
+      command: "readAttribute"
+      attribute: "SpecialDays"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 10: TH reads the CurrentDay attribute from the DUT"
+      PICS: ECAL.S.A0007
+      command: "readAttribute"
+      attribute: "CurrentDay"
+      response:
+          constraints:
+              type: DayStruct
+
+    - label: "Step 11: TH reads the NextDay attribute from the DUT"
+      PICS: ECAL.S.A0009
+      command: "readAttribute"
+      attribute: "NextDay"
+      response:
+          constraints:
+              type: DayStruct
+
+    - label: "Step 12: TH reads the CurrentTransition attribute from the DUT"
+      PICS: ECAL.S.A000A
+      command: "readAttribute"
+      attribute: "CurrentTransition"
+      response:
+          constraints:
+              type: TransitionStruct 
+
+    - label: "Step 13: TH reads the PeakPeriodStatus attribute from the DUT"
+      PICS: ECAL.S.A000B
+      command: "readAttribute"
+      attribute: "PeakPeriodStatus"
+      response:
+          constraints:
+              type: PeakPeriodStatusStruct 
+
+    - label: "Step 14: TH reads the PeakPeriodStartTime attribute from the DUT"
+      PICS: ECAL.S.A000B
+      command: "readAttribute"
+      attribute: "PeakPeriodStartTime"
+      response:
+          constraints:
+              type: epoch_s
+
+    - label: "Step 15: TH reads the PeakPeriodEndTime attribute from the DUT"
+      PICS: ECAL.S.A000D
+      command: "readAttribute"
+      attribute: "PeakPeriodEndTime"
+      response:
+          constraints:
+              type: epoch_s
