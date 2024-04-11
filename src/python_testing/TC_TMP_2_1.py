@@ -71,8 +71,8 @@ class TC_TMP_2_1(MatterBaseTest):
 
         self.step(5)
         if min_measured_value != NullValue:
-            asserts.assert_greater_equal(min_measured_value, -27315, "")
-            asserts.assert_less(min_measured_value, max_bound)
+            asserts.assert_greater_equal(min_measured_value, -27315, "MinMeasuredValue is out of range")
+            asserts.assert_less(min_measured_value, max_bound, "MinMeasuredValue is out of range")
         else:
             self.mark_current_step_skipped()
 
