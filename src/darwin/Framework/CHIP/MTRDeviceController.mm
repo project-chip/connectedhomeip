@@ -593,7 +593,7 @@ using namespace chip::Tracing::DarwinFramework;
     if (_controllerDataStore) {
         // If the storage delegate supports the bulk read API, then a dictionary of nodeID => cluster data dictionary would be passed to the handler. Otherwise this would be a no-op, and stored attributes for MTRDevice objects will be loaded lazily in -deviceForNodeID:.
         [_controllerDataStore startUpWithClusterDataHandler:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
-            MTR_LOG_INFO("Loaded %lu nodes from storage", static_cast<unsigned long>(clusterDataByNode.count));
+            MTR_LOG_INFO("Loaded attribute values for %lu nodes from storage", static_cast<unsigned long>(clusterDataByNode.count));
             for (NSNumber * nodeID in clusterDataByNode) {
                 MTRDevice * device = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
                 NSDictionary * clusterData = clusterDataByNode[nodeID];
