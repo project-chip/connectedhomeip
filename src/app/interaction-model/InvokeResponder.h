@@ -36,8 +36,48 @@ public:
     InvokeResponder(const InvokeResponder &)             = delete;
     InvokeResponder & operator=(const InvokeResponder &) = delete;
 
-    virtual DataModel::WrappedStructEncoder & ReplyEncoder() = 0; // write the invoke reply
-    virtual CHIP_ERROR Complete(CHIP_ERROR error) = 0; // Complete the response (e.g. CHIP_NO_ERROR or CHIP_IM_GLOBAL_STATUS(...))
+    /// Flush any pending replies before encoding the current reply.
+    ///
+    /// MAY be called at most once.
+    ///
+    /// This function is intended to provided the ability to retry sending a reply
+    /// if a reply encoding fails due to insufficient buffer.
+    ///
+    /// Call this if `Complete(...)` returns CHIP_ERROR_BUFFER_TOO_SMALL and try
+    /// again. If reply data is needed, the complete ReplyEncoder + Complete
+    /// call chain MUST be re-run.
+    virtual CHIP_ERROR FlushPendingReplies() = 0;
+
+    /// Reply with a data payload.
+    ///
+    /// MUST be called at most once per reply.
+    /// Can be called a 2nd time after a `FlushPendingReplies()` call
+    ///
+    ///   - replyCommandId must correspond with the data encoded in the returned encoder
+    ///   - Complete(CHIP_NO_ERROR) MUST be called to flush the reply
+    virtual DataModel::WrappedStructEncoder & ReplyEncoder(CommandId replyCommandId) = 0;
+
+    /// Signal completing of the reply.
+    ///
+    /// MUST be called exactly once to signal a reply to be sent.
+    /// If this returns CHIP_ERROR_BUFFER_TOO_SMALL, this can be called a 2nd time after
+    /// a FlushPendingReplies.
+    ///
+    /// Argument behavior:
+    ///  - If an ERROR is given (i.e. NOT CHIP_NO_ERROR) an error response will be given to the
+    ///    command.
+    ///  - If CHIP_NO_ERROR is given:
+    ///    - if a ReplyEncoder() was called, a data reply will be sent
+    ///    - if no ReplyEncoder() was called, a Success reply will be sent
+    ///
+    /// Returns success/failure state. One error code MUST be handled in particular:
+    ///
+    ///   - CHIP_ERROR_BUFFER_TOO_SMALL will return IF AND ONLY IF the responder was unable
+    ///     to fully serialize the given reply/error data.
+    ///
+    ///     If such an error is returned, the caller MUST retry by calling
+    ///
+    virtual CHIP_ERROR Complete(CHIP_ERROR error) = 0;
 };
 
 /// Enforces that once acquired, Complete will be called on the underlying writer
@@ -57,21 +97,66 @@ public:
         }
     }
 
-    DataModel::WrappedStructEncoder & ReplyEncoder() { return mWriter->ReplyEncoder(); }
+    /// Direct access to reply encoding.
+    ///
+    /// Use this only in conjunction with the other Raw* calls
+    DataModel::WrappedStructEncoder & RawReplyEncoder(CommandId replyCommandId) { 
+      return mWriter->ReplyEncoder(replyCommandId); 
+    }
 
+    /// Direct access to flushing replies
+    ///
+    /// Use this only in conjunction with the other Raw* calls
+    CHIP_ERROR RawFlushPendingReplies() {
+      return mWriter->FlushPendingReplies();
+    }
+
+    /// Call "Complete" without the automatic retries.
+    ///
+    /// Use this in conjunction with the other Raw* calls
+    CHIP_ERROR RawComplete(CHIP_ERROR error) {
+      return mWriter->Complete(error);
+    }
+
+    /// Complete the given command.
+    ///
+    /// Automatically handles retries for sending.
     CHIP_ERROR Complete(CHIP_ERROR error)
     {
         mCompleted = true;
+        CHIP_ERROR err = mWriter->Complete(error);
+        
+        if (err != CHIP_ERROR_BUFFER_TOO_SMALL) {
+           return err;
+        }
+
+        // retry once. Failure to flush is permanent.
+        ReturnErrorOnFailure(mWriter->FlushPendingReplies());
         return mWriter->Complete(error);
+
+        return err;
     }
 
     /// Sends the specified data structure as a response
-    template <class ReplyData>
+    ///
+    /// This version of the send has built-in RETRY and handles
+    /// Flush/Complete automatically.
+    ///
+    template <typename ReplyData>
     CHIP_ERROR Send(const ReplyData & data)
     {
-        CHIP_ERROR err = data.Encode(ReplyEncoder());
+        CHIP_ERROR err = data.Encode(ReplyEncoder(ReplyData::GetCommandId()));
         LogErrorOnFailure(err);
-        return Complete(err);
+        err = mWriter->Complete(err);
+        if (err != CHIP_ERROR_BUFFER_TOO_SMALL) {
+           return err;
+        }
+
+        // retry once. Failure to flush is permanent.
+        ReturnErrorOnFailure(mWriter->FlushPendingReplies());
+        err = data.Encode(ReplyEncoder(ReplyData::GetCommandId()));
+        LogErrorOnFailure(err);
+        return mWriter->Complete(err);
     }
 
 private:
