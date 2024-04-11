@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // clusterDataByNode a dictionary: nodeID => cluster data dictionary
 typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNode);
+
 /**
  * Asks the data store to load cluster data for nodes in bulk, if the storageDelegate supports it.
  */
