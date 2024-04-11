@@ -277,6 +277,7 @@ def _GetPurposefulFailureTests() -> Set[str]:
     """Tests that fail in YAML on purpose."""
     return {
         "TestPurposefulFailureEqualities.yaml",
+        "TestPurposefulFailureExtraReportingOnToggle.yaml",
         "TestPurposefulFailureNotNullConstraint.yaml",
     }
 

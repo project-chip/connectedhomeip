@@ -61,6 +61,10 @@ struct MockEndpointConfig
 {
     MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {});
 
+    // Cluster-config is self-referntial: mEmberCluster.clusters references  mEmberClusters
+    MockEndpointConfig(const MockEndpointConfig & other);
+    MockEndpointConfig & operator=(const MockEndpointConfig &) = delete;
+
     const MockClusterConfig * clusterById(ClusterId clusterId, ptrdiff_t * outIndex = nullptr) const;
     const EmberAfEndpointType * emberEndpoint() const { return &mEmberEndpoint; }
 

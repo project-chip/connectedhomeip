@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -43,6 +44,17 @@
 chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                                 chip::AttributeId attributeID, uint8_t * dataPtr,
                                                                 EmberAfAttributeType dataType);
+
+/**
+ * A version of emberAfWriteAttribute that allows controlling when the attribute
+ * should be marked dirty.  This is an overload, not an optional argument, to
+ * reduce codesize at all the callsites that want to write without doing
+ * anything special to control the dirty marking.
+ */
+chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                                chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                                EmberAfAttributeType dataType,
+                                                                chip::app::MarkAttributeDirty markDirty);
 
 /**
  * @brief Read the attribute value, performing all the checks.
