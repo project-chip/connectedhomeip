@@ -23,13 +23,13 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/WriteClient.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/DataModelHandler.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/ErrorStr.h>

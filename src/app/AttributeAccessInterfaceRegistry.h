@@ -15,8 +15,8 @@
  */
 #pragma once
 
-#include <app/util/af-types.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/util/af-types.h>
 
 /**
  * Register an attribute access override.  It will remain registered until the
@@ -40,7 +40,7 @@ void unregisterAttributeAccessOverride(chip::app::AttributeAccessInterface * att
 /**
  * Unregister all attribute access interfaces that match this given endpoint.
  */
-void unregisterAttributeAccessOverrideForEndpoint(EmberAfDefinedEndpoint *definedEndpoint);
+void unregisterAttributeAccessOverrideForEndpoint(EmberAfDefinedEndpoint * definedEndpoint);
 
 namespace chip {
 namespace app {

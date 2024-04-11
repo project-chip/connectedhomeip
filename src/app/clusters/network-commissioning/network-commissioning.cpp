@@ -22,13 +22,13 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPConfig.h>

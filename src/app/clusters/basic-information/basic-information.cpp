@@ -20,10 +20,10 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SpecificationDefinedRevisions.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>
