@@ -243,7 +243,7 @@ static NSString * const sAttributesKey = @"attributes";
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[MTRDeviceClusterData class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
 
