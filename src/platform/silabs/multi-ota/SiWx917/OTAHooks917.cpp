@@ -22,6 +22,9 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include <platform/silabs/multi-ota/SiWx917/OTAFirmwareProcessor917.h>
+#if OTA_TEST_CUSTOM_TLVS
+#include <platform/silabs/multi-ota/OTACustomProcessor.h>
+#endif
 
 CHIP_ERROR chip::OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor)
 {
