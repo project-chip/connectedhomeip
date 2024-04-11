@@ -30,10 +30,8 @@ public:
 
     /// Valid ONLY during synchronous handling of a Read/Write/Invoke
     ///
-    /// Used sparringly, however some operations will require these:
-    ///   - Operational Credentials aborting communications on removed fabrics
-    ///   - General Commissioning failsafe handling
-    ///   - BDX operations and data transfer
+    /// Used sparringly, however some operations will require these. An example
+    /// usage is "Operational Credentials aborting communications on removed fabrics"
     ///
     /// Callers MUST check for null here (e.g. unit tests mocks may set this to
     /// nullptr due to object complexity)
