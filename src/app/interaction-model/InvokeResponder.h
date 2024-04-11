@@ -100,34 +100,29 @@ public:
     /// Direct access to reply encoding.
     ///
     /// Use this only in conjunction with the other Raw* calls
-    DataModel::WrappedStructEncoder & RawReplyEncoder(CommandId replyCommandId) { 
-      return mWriter->ReplyEncoder(replyCommandId); 
-    }
+    DataModel::WrappedStructEncoder & RawReplyEncoder(CommandId replyCommandId) { return mWriter->ReplyEncoder(replyCommandId); }
 
     /// Direct access to flushing replies
     ///
     /// Use this only in conjunction with the other Raw* calls
-    CHIP_ERROR RawFlushPendingReplies() {
-      return mWriter->FlushPendingReplies();
-    }
+    CHIP_ERROR RawFlushPendingReplies() { return mWriter->FlushPendingReplies(); }
 
     /// Call "Complete" without the automatic retries.
     ///
     /// Use this in conjunction with the other Raw* calls
-    CHIP_ERROR RawComplete(CHIP_ERROR error) {
-      return mWriter->Complete(error);
-    }
+    CHIP_ERROR RawComplete(CHIP_ERROR error) { return mWriter->Complete(error); }
 
     /// Complete the given command.
     ///
     /// Automatically handles retries for sending.
     CHIP_ERROR Complete(CHIP_ERROR error)
     {
-        mCompleted = true;
+        mCompleted     = true;
         CHIP_ERROR err = mWriter->Complete(error);
-        
-        if (err != CHIP_ERROR_BUFFER_TOO_SMALL) {
-           return err;
+
+        if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            return err;
         }
 
         // retry once. Failure to flush is permanent.
@@ -148,8 +143,9 @@ public:
         CHIP_ERROR err = data.Encode(ReplyEncoder(ReplyData::GetCommandId()));
         LogErrorOnFailure(err);
         err = mWriter->Complete(err);
-        if (err != CHIP_ERROR_BUFFER_TOO_SMALL) {
-           return err;
+        if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            return err;
         }
 
         // retry once. Failure to flush is permanent.
