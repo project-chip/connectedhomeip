@@ -30,6 +30,8 @@
 
 #include "sdkconfig.h"
 
+#include <lib/core/Optional.h>
+
 #if CONFIG_BT_BLUEDROID_ENABLED
 
 #include "esp_bt.h"
