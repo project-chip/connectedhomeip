@@ -18,8 +18,6 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRLogging_Internal.h"
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
 static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
 
@@ -115,5 +113,3 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
     }
 }
 @end
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
