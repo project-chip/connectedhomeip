@@ -178,7 +178,7 @@ tests:
           value: TestEnum.UnknownEnumValue(0)
 '''
 
-_BASIC_ARITHMETIC_ARG_RESULTS = [6, 6, 2, 2, 8, 8, 2, 2, 0]
+_BASIC_ARITHMETIC_ARG_RESULTS = [6, 6, 2, 2, 8, 8, 2, 2, 1]
 basic_arithmetic_yaml = '''
 name: Test Cluster Tests
 
@@ -250,7 +250,7 @@ tests:
       arguments:
           values:
               - name: "arg"
-                value: (myVariable -3)/ 2
+                value: (myVariable +3)/7
 '''
 
 
