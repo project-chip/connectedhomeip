@@ -184,6 +184,6 @@ class ManualOnboardingPayloadGenerator(private val payloadContents: OnboardingPa
       throw OnboardingPayloadException("The outBuffer has insufficient size")
     }
 
-    val unused = String.format("%0${len}d", number).toCharArray(buffer, offset, 0, len)
+    String.format("%0${len}d", number).toCharArray(buffer, offset, 0, len)
   }
 }
