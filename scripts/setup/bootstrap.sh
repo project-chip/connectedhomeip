@@ -57,10 +57,10 @@ _install_additional_pip_requirements() {
 }
 
 _submodules_need_updating() {
-  # Validates if a set o submodules that should always be checked out are up to date
+  # Validates if a set of submodules that should always be checked out are up to date.
 
-  # Pigweed will be up to date on an initial setup, however it may change over time
-  # the rest are a small subset of things that are always checked out (have no platform attachment)
+  # Pigweed will be up to date on an initial setup, however it may change over time.
+  # The rest are a small subset of things that are always checked out (have no platform attachment).
   _SUBMODULE_PATHS=(
     "third_party/pigweed/repo"
     "third_party/openthread/repo"
