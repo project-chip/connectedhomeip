@@ -209,6 +209,8 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
 
 CHIP_ERROR OTAMultiImageProcessorImpl::RegisterProcessor(uint32_t tag, OTATlvProcessor * processor)
 {
+
+    ChipLogDetail(SoftwareUpdate, "RegisterProcessor with tag: %ld", tag);
     auto pair = mProcessorMap.find(tag);
     if (pair != mProcessorMap.end())
     {

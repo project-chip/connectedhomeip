@@ -109,7 +109,6 @@ static_library("efr32") {
       sources += [
         "${silabs_platform_dir}/multi-ota/SiWx917/OTAFirmwareProcessor917.cpp",
         "${silabs_platform_dir}/multi-ota/SiWx917/OTAFirmwareProcessor917.h",
-        "${silabs_platform_dir}/multi-ota/SiWx917/OTAHooks917.cpp",
       ]
     }
 
