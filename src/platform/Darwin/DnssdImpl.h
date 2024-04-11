@@ -297,6 +297,12 @@ struct ResolveContext : public GenericContext
      */
     static void SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext);
 
+    /**
+     * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
+     *
+     */
+    void CancelSRPTimer();
+
 private:
     /**
      * Try reporting the results we got on the provided interface index.
@@ -306,12 +312,6 @@ private:
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult);
 
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
-
-    /**
-     * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
-     *
-     */
-    void CancelSRPTimer();
 };
 
 } // namespace Dnssd

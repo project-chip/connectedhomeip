@@ -272,6 +272,12 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
     if (flags & kDNSServiceFlagsMoreComing)
     {
+        // If we have a timer running and we have resolved on the SRP domain but the kDNSServiceFlagsMoreComing
+        // is set, we need to cancel the timer so we don't pre-emptively call finalize().
+        if (sdCtx->isSRPTimerRunning && !sdCtx->shouldStartSRPTimerForResolve)
+        {
+            sdCtx->CancelSRPTimer();
+        }
         return;
     }
 
