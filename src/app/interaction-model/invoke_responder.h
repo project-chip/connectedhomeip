@@ -24,7 +24,7 @@ namespace app {
 namespace InteractionModel {
 
 /// Aids in writing invoke replies:
-///   - Has access to the TLV writer of the response data content
+///   - Has access to the raw data encoder for response data content (via `ReplyEncoder`)
 ///   - `Complete` handling:
 ///      - MUST be called exactly once
 ///      - called with an error, makes TLV data written to be discarded (Invokes may only either

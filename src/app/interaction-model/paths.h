@@ -22,6 +22,17 @@ namespace chip {
 namespace app {
 namespace InteractionModel {
 
+/// Handles path attributes for interaction models.
+///
+/// It allows a user of the class to mark specific parths
+/// as having changed. The intended use is for some listener to
+/// perform operations as a result of something having changed,
+/// usually by forwarding updates (e.g. in case of subscriptions
+/// that cover that path).
+///
+/// Methods on this class MUCH be called from within the matter
+/// main loop as they will likely trigger interaction model
+/// internal updates and subscription event updates.
 class Paths
 {
 public:
