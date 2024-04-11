@@ -492,10 +492,7 @@ ResolveContext::ResolveContext(DiscoverNodeDelegate * delegate, chip::Inet::IPAd
 
 ResolveContext::~ResolveContext()
 {
-    if (isSRPTimerRunning)
-    {
-        CancelSRPTimer();
-    }
+    CancelSRPTimerIfRunning();
 }
 
 void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
@@ -647,10 +644,14 @@ void ResolveContext::SRPTimerExpiredCallback(chip::System::Layer * systemLayer, 
     sdCtx->Finalize();
 }
 
-void ResolveContext::CancelSRPTimer()
+void ResolveContext::CancelSRPTimerIfRunning()
 {
-    DeviceLayer::SystemLayer().CancelTimer(SRPTimerExpiredCallback, static_cast<void *>(this));
-    ChipLogProgress(Discovery, "SRP resolve timer for %s cancelled; resolve timed out", instanceName.c_str());
+    if (isSRPTimerRunning)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(SRPTimerExpiredCallback, static_cast<void *>(this));
+        ChipLogProgress(Discovery, "SRP resolve timer for %s cancelled; resolve timed out", instanceName.c_str());
+        isSRPTimerRunning = false;
+    }
 }
 
 CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const struct sockaddr * address)

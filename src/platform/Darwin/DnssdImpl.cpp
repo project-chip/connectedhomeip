@@ -272,6 +272,13 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
     if (flags & kDNSServiceFlagsMoreComing)
     {
+        // If we now don't need to have a timer while we wait for SRP results, ensure that there is no such
+        // timer running.  Otherwise the timer could fire before we get the rest of the results that flags
+        // say are coming, and trigger a finalize before we have all the data that is already available.
+        if (!sdCtx->shouldStartSRPTimerForResolve)
+        {
+            sdCtx->CancelSRPTimerIfRunning();
+        }
         return;
     }
 
