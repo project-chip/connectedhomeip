@@ -71,7 +71,7 @@ struct MockClusterConfig
     MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes = {},
                       std::initializer_list<MockEventConfig> aEvents = {});
 
-    // Cluster-config is self-referntial: mEmberCluster.attributes references  mAttributeMetaData.data()
+    // Cluster-config is self-referential: mEmberCluster.attributes references  mAttributeMetaData.data()
     MockClusterConfig(const MockClusterConfig & other);
     MockClusterConfig & operator=(const MockClusterConfig &) = delete;
 
@@ -92,7 +92,7 @@ struct MockEndpointConfig
 {
     MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {});
 
-    // Endpoint-config is self-referntial: mEmberEndpoint.clusters references  mEmberClusters.data()
+    // Endpoint-config is self-referential: mEmberEndpoint.clusters references  mEmberClusters.data()
     MockEndpointConfig(const MockEndpointConfig & other);
     MockEndpointConfig & operator=(const MockEndpointConfig &) = delete;
 
