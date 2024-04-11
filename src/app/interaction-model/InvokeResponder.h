@@ -32,7 +32,7 @@ namespace InteractionModel {
 class InvokeResponder
 {
 public:
-    virtual ~InvokeResponder()                           = default;
+    virtual ~InvokeResponder() = default;
 
     // Copying not allowed since underlying requirement is that on deletion of this
     // object, a reply will be sent.
