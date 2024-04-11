@@ -52,12 +52,13 @@ mgm24:
     - version: "2.1"
       file: "efr32mg24_psa123_nvm3k2.s37"
 
-Si917Commonflash:
+si917:
+  alias: [ siwg917 ]
   ram_addr: 0x400
   flash_addr: 0x8202000
   stack_size: 0x4FC00
   firmware:
-    - version: "1.0"
+    - version: "1.3"
       file: "si917.rps"
     - version: "2.0"
       file: "si917.rps"

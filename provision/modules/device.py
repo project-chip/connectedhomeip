@@ -28,10 +28,10 @@ class Device:
 
         # Load the device configuration
         info = None
-        y = _util.YamlFile(filename).read()
         pn = part_num.lower()
+        y = _util.YamlFile(filename).read()
         for x in y:
-            if pn.startswith(x.lower()):
+            if self.match(pn, x, y):
                 self.label = x
                 info = y[x]
                 break
@@ -57,3 +57,14 @@ class Device:
                 _util.fail("Missing firmware for \"{}\" in version \"{}\"".format(part_num, version))
 
             self.firmware = paths.base("images/{}".format(image))
+
+    def match(self, pn, id, y):
+        if pn.startswith(id.lower()):
+            return True
+        if ('alias' in y):
+            alias = y['alias']
+            if alias:
+                for a in alias:
+                    if pn.startswith(a.lower()):
+                        return True
+        return False

@@ -342,7 +342,8 @@ class AutoCommand(Command):
         ID.kDiscriminator,
         ID.kSpake2pPasscode,
         ID.kUniqueId,
-        ID.kSetupPayload
+        ID.kSetupPayload,
+        ID.kHwVersionStr
     ]
 
     def __init__(self, paths, args):

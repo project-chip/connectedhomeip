@@ -43,12 +43,12 @@ class ProvisionManager:
         # Compute defaults
         if ('auto' == action) or ('binary' == action):
             self.computeDefaults(paths, args)
-        # Export arguments (including generated values)
-        args.export()
 
         # Stop
         if args.value(ID.kStop):
             _util.warn("Stop requested.")
+            # Export arguments (including generated values)
+            args.export()
             exit(0)
 
         # Connection string
@@ -63,6 +63,9 @@ class ProvisionManager:
 
         # Exchange data
         self.protocol.execute(paths, args, chan)
+
+        # Export arguments (including returned values)
+        args.export()
 
         # Production Firmware
         if _chan.Channel.BLE != chan.type:

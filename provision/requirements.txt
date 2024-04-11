@@ -1,3 +1,4 @@
-pylink-square==1.2.0
+bleak==0.21.1
 ecdsa==0.18.0
-PyYAML==6.0
+pylink-square==1.2.0
+PyYAML==6.0.1

@@ -1,4 +1,5 @@
 import os
+import time
 import shutil
 import datetime
 import base64
@@ -40,28 +41,44 @@ class Commander:
         _, ext = os.path.splitext(image_path)
         if '.rps' == ext:
             self.execute(['rps', 'load', image_path], False, True)
+            # Si917 needs time to start
+            time.sleep(1)
         else:
             self.execute(['flash' , image_path], False, True)
-        self.execute(['device', 'reset'], False, True)
+            self.execute(['device', 'reset'], False, True)
 
 
 class DeviceInfo:
+
     def __init__(self, text):
         if text is None: _util.fail("Missing device info")
-        lines = text.decode('utf-8').splitlines()
-        d = dict(map(str.strip, x.split(':')) for x in lines[0:len(lines)-1])
-        self.part = d['Part Number'].lower()
-        self.uid = d['Unique ID']
-        self.revision = d['Die Revision']
-        self.version = d['Production Ver']
-        self.flash_size = self.parseSize(d['Flash Size'])
+        d = self.parseLines(text.decode('utf-8').splitlines())
+        self.part = self.parseField(d, 'Part Number')
+        self.uid = self.parseField(d, 'Unique ID')
+        self.revision = self.parseField(d, 'Die Revision')
+        self.version = self.parseField(d, 'Production Ver')
+        self.flash_size = self.parseSize(d, 'Flash Size')
         self.family = self.part[0:9].lower()
 
-    def parseSize(self, text):
+    def parseLines(self, lines):
+        m = {}
+        for l in lines:
+            pair = l.split(':')
+            if len(pair) > 1:
+                m[pair[0].strip()] = pair[1].strip().lower()
+        return m
+
+    def parseField(self, d, tag, default_value = '?'):
+        v =  tag in d and d[tag] or default_value
+        return isinstance(v, str) and v.lower() or v
+
+    def parseSize(self, d, tag):
+        text = self.parseField(d, tag, '0')
+        if text is None: return 0
         parts = text.split()
         value = int(parts[0])
         multiplier = 1
-        if 'kb' == parts[1].lower():
+        if len(parts) > 0 and ('kb' == parts[1].lower()):
             multiplier = 1024
         return value * multiplier
 
