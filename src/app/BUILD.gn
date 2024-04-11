@@ -284,12 +284,6 @@ static_library("attribute-access") {
     "AttributeAccessInterfaceRegistry.h",
   ]
 
-  # TODO: double-check if this is still a thing:
-  # TODO: the following items cannot be included due to platform includes not being
-  #       able to depend on src/app
-  #       Name with _ so that linter does not recognize it
-  # "_AttributeAccessInterface._h",
-
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
