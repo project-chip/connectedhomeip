@@ -24,7 +24,6 @@
 
 #pragma once
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace DeviceLayer {

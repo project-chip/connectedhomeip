@@ -19,6 +19,7 @@
 #include <app/icd/server/ICDServerConfig.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/icd/server/ICDConfigurationData.h>
@@ -26,7 +27,6 @@
 #include <app/icd/server/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <crypto/SessionKeystore.h>
-#include <functional>
 #include <lib/support/BitFlags.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>

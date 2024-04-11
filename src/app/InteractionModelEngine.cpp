@@ -31,6 +31,7 @@
 #include "access/SubjectDescriptor.h"
 #include <app/AppConfig.h>
 #include <app/RequiredPrivilege.h>
+#include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
 #include <app/util/ember-compatibility-functions.h>
 #include <app/util/endpoint-config-api.h>

@@ -712,9 +712,5 @@ private:
     uint32_t mMagic = 0;
 };
 
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj);
-
-
 } // namespace app
 } // namespace chip
