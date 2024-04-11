@@ -301,7 +301,7 @@ struct ResolveContext : public GenericContext
      * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
      *
      */
-    void CancelSRPTimer();
+    void CancelSRPTimerIfRunning();
 
 private:
     /**
