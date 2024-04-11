@@ -39,7 +39,7 @@ constexpr uint32_t kFakeSoftwareVersion = 0x1234abcd;
 class LogOnlyEvents : public Events
 {
 public:
-    CHIP_ERROR EmitEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
+    CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
                          EventNumber & generatedEventNumber) override
     {
         TLV::TLVWriter writer;
@@ -100,7 +100,7 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
 
     StartUpEventType event{ kFakeSoftwareVersion };
 
-    EventNumber n1 = events->EmitEvent(event, 0 /* EndpointId */);
+    EventNumber n1 = events->GenerateEvent(event, 0 /* EndpointId */);
     ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
     ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
               ConcreteEventPath(0 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
@@ -115,7 +115,7 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
     ASSERT_EQ(err, CHIP_NO_ERROR);
     ASSERT_EQ(decoded_event.softwareVersion, kFakeSoftwareVersion);
 
-    EventNumber n2 = events->EmitEvent(event, 1);
+    EventNumber n2 = events->GenerateEvent(event, 1);
     ASSERT_EQ(n2, logOnlyEvents.CurrentEventNumber());
     ASSERT_NE(n1, logOnlyEvents.CurrentEventNumber());
 
@@ -137,12 +137,12 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     event.adminNodeID     = chip::app::DataModel::MakeNullable(kTestNodeId);
     event.adminPasscodeID = chip::app::DataModel::MakeNullable(kTestPasscode);
 
-    EventNumber n1 = events->EmitEvent(event, 0 /* EndpointId */);
+    EventNumber n1 = events->GenerateEvent(event, 0 /* EndpointId */);
     // encoding without a fabric ID MUST fail for fabric events
     ASSERT_EQ(n1, kInvalidEventId);
 
     event.fabricIndex = kTestFabricIndex;
-    n1                = events->EmitEvent(event, 0 /* EndpointId */);
+    n1                = events->GenerateEvent(event, 0 /* EndpointId */);
 
     ASSERT_NE(n1, kInvalidEventId);
     ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
