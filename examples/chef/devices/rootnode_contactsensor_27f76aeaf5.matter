@@ -2147,10 +2147,10 @@ endpoint 1 {
   server cluster PowerSource {
     ram      attribute status default = 1;
     ram      attribute order default = 1;
-    ram      attribute description default = "Battery";
-    ram      attribute batVoltage default = 120;
-    ram      attribute batPercentRemaining default = 100;
-    ram      attribute batTimeRemaining default = 10;
+    ram      attribute description default = "Primary Battery";
+    ram      attribute batVoltage default = 4100;
+    ram      attribute batPercentRemaining default = 95;
+    ram      attribute batTimeRemaining default = 5184000;
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded default = 0;
     ram      attribute batReplaceability default = 1;
@@ -2170,7 +2170,6 @@ endpoint 1 {
     ram      attribute stateValue default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
-    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
