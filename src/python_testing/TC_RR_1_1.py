@@ -20,6 +20,7 @@ import logging
 import math
 import queue
 import random
+import string
 import time
 from typing import Any, Dict, List, Set
 
@@ -37,7 +38,7 @@ from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
 
 
 def generate_controller_name(fabric_index: int, controller_index: int):
-    return f"RD{fabric_index}{string.ascii_uppercase[controller_index]))}"
+    return f"RD{fabric_index}{string.ascii_uppercase[controller_index]}"
 
 
 class TC_RR_1_1(MatterBaseTest):
@@ -225,8 +226,7 @@ class TC_RR_1_1(MatterBaseTest):
         logging.info("Step 2: Setting the Label field for each fabric and BasicInformation.NodeLabel to 32 characters")
 
         for fabric in fabric_table:
-            # Client is client A for each fabric to set the Label field
-            client_name = "RD%dA" % fabric.fabricIndex
+            client_name = generate_controller_name(fabric.fabricIndex, 0)
             client = client_by_name[client_name]
 
             # Send the UpdateLabel command
@@ -451,8 +451,7 @@ class TC_RR_1_1(MatterBaseTest):
             fabric_unique_clients: List[Any] = []
 
             for fabric in fabric_table:
-                # Client is client A for each fabric
-                client_name = "RD%dA" % fabric.fabricIndex
+                client_name = generate_controller_name(fabric.fabricIndex, 0)
                 fabric_unique_clients.append(client_by_name[client_name])
 
             # Step 13: Write and verify indicated_max_group_keys_per_fabric group keys to all fabrics.
@@ -695,8 +694,7 @@ class TC_RR_1_1(MatterBaseTest):
                        fabric_table: List[
                            Clusters.OperationalCredentials.Structs.FabricDescriptorStruct]):
         for fabric in fabric_table:
-            # Client is client A for each fabric
-            client_name = "RD%dA" % fabric.fabricIndex
+            client_name = generate_controller_name(fabric.fabricIndex, 0)
             client = client_by_name[client_name]
 
             acl = self.build_acl(enable_access_to_group_cluster)
