@@ -46,10 +46,7 @@ namespace chip {
 class SilabsTestEventTriggerDelegate : public TestEventTriggerDelegate, TestEventTriggerHandler
 {
 public:
-    explicit SilabsTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey)
-    {
-        VerifyOrDie(AddHandler(this) == CHIP_NO_ERROR);
-    }
+    explicit SilabsTestEventTriggerDelegate() { VerifyOrDie(AddHandler(this) == CHIP_NO_ERROR); }
 
     /**
      * @brief Checks to see if `enableKey` provided matches value chosen by the manufacturer.
@@ -69,9 +66,6 @@ public:
         // WARNING: LEGACY SUPPORT ONLY, DO NOT EXTEND FOR STANDARD CLUSTERS
         return (emberAfHandleEventTrigger(eventTrigger)) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-private:
-    ByteSpan mEnableKey;
 };
 
 } // namespace chip

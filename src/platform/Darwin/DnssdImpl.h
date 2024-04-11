@@ -131,7 +131,7 @@ public:
 
 private:
     MdnsContexts() = default;
-    friend class Global<MdnsContexts>;
+    friend Global<MdnsContexts>;
     static Global<MdnsContexts> sInstance;
 
     std::vector<GenericContext *> mContexts;
@@ -274,8 +274,8 @@ struct ResolveContext : public GenericContext
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
                    const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
                    std::shared_ptr<uint32_t> && consumerCounterToUse);
-    ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
-                   const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
+    ResolveContext(DiscoverNodeDelegate * delegate, chip::Inet::IPAddressType cbAddressType, const char * instanceNameToResolve,
+                   std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;

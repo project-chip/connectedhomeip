@@ -16,6 +16,8 @@ name: Build example - Ameba
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
@@ -36,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-ameba:46
+            image: ghcr.io/project-chip/chip-build-ameba:47
             options: --user root
 
         steps:

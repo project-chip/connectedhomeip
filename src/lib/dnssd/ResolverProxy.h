@@ -44,11 +44,11 @@ public:
     CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPoint = nullptr);
     void Shutdown();
 
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate)
+    void SetDiscoveryDelegate(DiscoverNodeDelegate * delegate)
     {
         if (mContext != nullptr)
         {
-            mContext->SetCommissioningDelegate(delegate);
+            mContext->SetDiscoveryDelegate(delegate);
         }
     }
 

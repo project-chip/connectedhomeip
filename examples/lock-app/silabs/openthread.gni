@@ -28,7 +28,7 @@ openthread_external_platform =
 # ICD Default configurations
 chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
-sl_use_subscription_synching = true
+sl_use_subscription_syncing = true
 
 # Openthread Configuration flags
 sl_ot_idle_interval_ms = 5000  # 5s Idle Intervals
