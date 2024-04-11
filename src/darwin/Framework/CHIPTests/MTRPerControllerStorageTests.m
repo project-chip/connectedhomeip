@@ -1235,7 +1235,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(222) },
         @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(223) },
     };
-    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * bulkTestclusterDataDictionary = @{
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * bulkTestClusterDataDictionary = @{
         bulkTestClusterPath11 : bulkTestClusterData11,
         bulkTestClusterPath12 : bulkTestClusterData12,
         bulkTestClusterPath13 : bulkTestClusterData13,
