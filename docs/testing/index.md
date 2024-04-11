@@ -31,7 +31,7 @@ product as a black box.
 
 Unit tests run on small pieces (“units”) of business logic. They do not use an
 external controller and instead test at the public interface of the class or
-function. For cluster, this requires an API that separates the cluster logic
+function. For clusters, this requires an API that separates the cluster logic
 from the global ember and message delivery layers.
 
 ![](./img/unit_tests.png)

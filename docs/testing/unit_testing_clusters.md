@@ -30,8 +30,8 @@ The ClusterServerClass is a **Very** light wrapper over ClusterLogic. It
 translates Interaction Model wire format handling into API calls for cluster
 logic methods.
 
-This class iImplements both the AttributeAccessInterface and the CommandHandler
-interfaces so ClusterLogic properly handles data dependencies between command
+This class implements both the AttributeAccessInterface and the CommandHandler
+interfaces so ClusterLogic properly handles data dependencies between commands
 and attributes.
 
 An example code snippet showing the translation of the TLV into API calls to the
@@ -60,9 +60,9 @@ CHIP_ERROR DiscoBallServer::Read(const ConcreteReadAttributePath & aPath,
 The ClusterLogic class is for all the code that is SHARED between platforms. It
 does NOT include any TLV parsing or direct calls to Ember/IM/LogEvent etc.
 
-The class should include attribute getter/setters and handlers for all commands.
+The class should include attribute getters/setters and handlers for all commands.
 
-The class receive “plain data” Matter requests from ClusterServer class,
+The class receives “plain data” Matter requests from ClusterServer class,
 performs required common actions, and calls driver class to perform platform- or
 hardware-specific actions. It also receives driver updates (e.g.
 application-driven value changes) from the ClusterDriver class and updates state
@@ -108,9 +108,9 @@ The ClusterDriver is called by the ClusterLogic class and is used to translate
 attribute changes and commands into application actions. It also reports
 external changes back to the ClusterLogic class.
 
-The API design for this class with vary by the cluster, but it si generally
+The API design for this class will vary by the cluster, but it is generally
 recommended to use a generic API where possible, so the API ports easily to
-other platforms. For example an attribute changed callback with the changes
+other platforms, for example an attribute changed callback with the changes
 listed. It is important to be careful about the design and revisit this early if
 issues arise.
 
@@ -150,7 +150,7 @@ Important tests to consider:
     -   Correctness can mostly be validated by inspection if it’s trivial.
 -   Important tests
     -   Errors when ClusterLogic instances aren’t properly registered.
-    -   Flow through to ClusterLogic for all reads/writes/command.
+    -   Flow through to ClusterLogic for all reads/writes/commands.
 -   Can unit test this class by generating the TLV / path for input, parsing the
     TLV output.
 
