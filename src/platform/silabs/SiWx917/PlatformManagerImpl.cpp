@@ -27,6 +27,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/MigrationManager.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
@@ -40,7 +41,6 @@
 
 #include "AppConfig.h"
 #include "FreeRTOS.h"
-#include "MigrationManager.h"
 
 using namespace chip::DeviceLayer::Internal;
 

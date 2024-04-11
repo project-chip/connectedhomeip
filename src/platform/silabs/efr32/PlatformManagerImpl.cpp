@@ -24,6 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include "<platform/MigrationManager.h>"
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
@@ -36,7 +37,6 @@
 
 #include "AppConfig.h"
 #include "FreeRTOS.h"
-#include "MigrationManager.h"
 
 using namespace chip::DeviceLayer::Internal;
 
