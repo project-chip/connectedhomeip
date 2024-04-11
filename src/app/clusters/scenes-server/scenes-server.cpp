@@ -24,6 +24,7 @@
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>

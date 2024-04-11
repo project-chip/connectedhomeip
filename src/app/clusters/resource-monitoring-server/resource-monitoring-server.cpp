@@ -26,6 +26,7 @@
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>

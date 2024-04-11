@@ -23,6 +23,7 @@
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SpecificationDefinedRevisions.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>

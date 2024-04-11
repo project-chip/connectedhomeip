@@ -27,6 +27,7 @@
 #include <app/CommandHandler.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>

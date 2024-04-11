@@ -28,6 +28,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/TLV.h>

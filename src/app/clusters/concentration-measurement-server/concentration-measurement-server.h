@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/IntrusiveList.h>
 #include <type_traits>

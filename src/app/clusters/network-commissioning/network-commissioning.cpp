@@ -28,6 +28,7 @@
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPConfig.h>

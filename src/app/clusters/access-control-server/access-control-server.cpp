@@ -26,6 +26,7 @@
 #include <app/data-model/Encode.h>
 #include <app/server/AclStorage.h>
 #include <app/server/Server.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;

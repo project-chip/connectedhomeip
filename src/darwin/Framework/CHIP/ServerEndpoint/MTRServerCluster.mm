@@ -37,6 +37,7 @@
 
 // TODO: These attribute-*.h bits are a hack that should eventually go away.
 #include <app/util/attribute-metadata.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
