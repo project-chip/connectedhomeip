@@ -110,7 +110,7 @@ public:
 
     /// Emits the given event
     virtual CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
-                                 EventNumber & generatedEventNumber) = 0;
+                                     EventNumber & generatedEventNumber) = 0;
 
     // Convenience methods for event logging using cluster-object structures
     // On error, these log and return kInvalidEventId

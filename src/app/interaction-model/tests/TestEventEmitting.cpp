@@ -40,7 +40,7 @@ class LogOnlyEvents : public Events
 {
 public:
     CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
-                         EventNumber & generatedEventNumber) override
+                             EventNumber & generatedEventNumber) override
     {
         TLV::TLVWriter writer;
         TLV::TLVType outerType;
