@@ -24,16 +24,13 @@
  * needs to use HDLC/UART for another purpose like the RPC server.
  */
 
-#include <FreeRTOS.h>
-
-#include "semphr.h"
-#include <pw_hdlc/encoder.h>
-#include <pw_stream/sys_io_stream.h>
-#include <pw_sys_io_efr32/init.h>
-
+#include "PigweedLogger.h"
 #include "pw_span/span.h"
 #include <cassert>
 #include <cstdint>
+#include <pw_hdlc/encoder.h>
+#include <pw_stream/sys_io_stream.h>
+#include <pw_sys_io_efr32/init.h>
 #include <string_view>
 
 namespace PigweedLogger {
@@ -44,7 +41,7 @@ constexpr size_t kWriteBufferSize = 128; // Buffer for constructing HDLC frames
 
 // Exclusive access to the backend is needed to make sure that log messages coming
 // from different threads are not interwoven.
-SemaphoreHandle_t sLoggerLock;
+osMutexId_t sLoggerLock;
 
 static pw::stream::SysIoWriter sWriter;
 static size_t sWriteBufferPos;
@@ -60,7 +57,7 @@ static void send(void)
 
 void init(void)
 {
-    sLoggerLock = xSemaphoreCreateMutex();
+    sLoggerLock = osMutexNew(nullptr);
     assert(sLoggerLock != NULL);
 
     pw_sys_io_Init();
@@ -68,7 +65,7 @@ void init(void)
 
 int putString(const char * buffer, size_t size)
 {
-    xSemaphoreTake(sLoggerLock, portMAX_DELAY);
+    osMutexAcquire(sLoggerLock, osWaitForever);
     assert(sWriteBufferPos < kWriteBufferSize);
 
     for (size_t i = 0; i < size; ++i)
@@ -90,11 +87,11 @@ int putString(const char * buffer, size_t size)
             send();
     }
 
-    xSemaphoreGive(sLoggerLock);
+    osMutexRelease(sLoggerLock);
     return size;
 }
 
-SemaphoreHandle_t * GetSemaphore()
+osMutexId_t * GetMutex()
 {
     return &sLoggerLock;
 }

@@ -23,6 +23,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestBleErrorStr.cpp",
     "TestBleUUID.cpp",
+    "TestBtpEngine.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
