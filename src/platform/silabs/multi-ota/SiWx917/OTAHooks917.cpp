@@ -21,7 +21,7 @@
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#include <platform/silabs/multi-ota/efr32/OTAFirmwareProcessor.h>
+#include <platform/silabs/multi-ota/SiWx917/OTAFirmwareProcessor917.h>
 
 CHIP_ERROR chip::OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor)
 {

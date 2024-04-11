@@ -18,7 +18,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
-#include <platform/silabs/multi-ota/efr32/OTAFirmwareProcessor.h>
+#include <platform/silabs/multi-ota/SiWx917/OTAFirmwareProcessor917.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include "wfx_host_events.h"

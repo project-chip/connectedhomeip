@@ -24,6 +24,14 @@
 
 namespace chip {
 
+typedef enum
+{
+    APPLICATION = 1,
+    BOOTLOADER = 2,
+    FACTORY_DATA = 3,
+    WIFI_917_TA_M4 = 4,
+} OTAImageType;
+
 #define CHIP_ERROR_TLV_PROCESSOR(e)                                                                                                \
     ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e, __FILE__, __LINE__)
 
