@@ -67,9 +67,9 @@ _submodules_need_updating() {
     "third_party/editline/repo"
   )
 
-  for path in "${_SUBMODULE_PATHS[@]}"; do
-    if git submodule status "$path" | grep -E '^-' >/dev/null 2>&1; then 
-      echo "git shows that $path has changes"
+  for submodule_path in "${_SUBMODULE_PATHS[@]}"; do
+    if git submodule status "$submodule_path" | grep -E '^-' >/dev/null 2>&1; then 
+      echo "git shows that $submodule_path has changes"
       unset _SUBMODULE_PATHS
       return 0 # Success
     fi
