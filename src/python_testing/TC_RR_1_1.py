@@ -37,7 +37,7 @@ from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
 
 
 def generate_controller_name(fabric_index: int, controller_index: int):
-    return f"RD{fabric_index}{str(chr(ord('A') + controller_index))}"
+    return f"RD{fabric_index}{string.ascii_uppercase[controller_index]))}"
 
 
 class TC_RR_1_1(MatterBaseTest):
