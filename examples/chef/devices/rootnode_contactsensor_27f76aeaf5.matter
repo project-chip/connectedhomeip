@@ -2155,7 +2155,8 @@ endpoint 1 {
     ram      attribute batReplacementNeeded default = 0;
     ram      attribute batReplaceability default = 1;
     ram      attribute batPresent default = 1;
-    ram      attribute batChargeState default = 2;
+    ram      attribute batCapacity default = 350;
+    ram      attribute batChargeState default = 4;
     ram      attribute batFunctionalWhileCharging default = 1;
     callback attribute endpointList;
     callback attribute generatedCommandList;
