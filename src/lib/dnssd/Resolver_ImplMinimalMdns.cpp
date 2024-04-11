@@ -285,8 +285,7 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override;
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) override;
     CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
@@ -386,7 +385,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         }
 
         // SUCCESS. Call the delegates
-        if (resolver->IsActiveCommissionParse())
+        if (resolver->IsActiveBrowseParse())
         {
             MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
             DiscoveredNodeData nodeData;
@@ -412,13 +411,15 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             case IncrementalResolver::ServiceNameType::kCommissioner:
                 discoveredNodeIsRelevant = mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionerNode);
                 mActiveResolves.CompleteCommissioner(nodeData);
+                nodeData.nodeType = DiscoveryType::kCommissionerNode;
                 break;
             case IncrementalResolver::ServiceNameType::kCommissionable:
                 discoveredNodeIsRelevant = mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionableNode);
                 mActiveResolves.CompleteCommissionable(nodeData);
+                nodeData.nodeType = DiscoveryType::kCommissionableNode;
                 break;
             default:
-                ChipLogError(Discovery, "Unexpected type for commission data parsing");
+                ChipLogError(Discovery, "Unexpected type for browse data parsing");
                 continue;
             }
 
@@ -685,20 +686,12 @@ void MinMdnsResolver::ExpireIncrementalResolvers()
     }
 }
 
-CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context)
+CHIP_ERROR MinMdnsResolver::StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
 {
     // minmdns currently supports only one discovery context at a time so override the previous context
     SetDiscoveryContext(&context);
 
-    return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
-}
-
-CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context)
-{
-    // minmdns currently supports only one discovery context at a time so override the previous context
-    SetDiscoveryContext(&context);
-
-    return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
+    return BrowseNodes(type, filter);
 }
 
 CHIP_ERROR MinMdnsResolver::StopDiscovery(DiscoveryContext & context)

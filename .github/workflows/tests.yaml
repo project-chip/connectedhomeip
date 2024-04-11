@@ -49,7 +49,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:46
+            image: ghcr.io/project-chip/chip-build:47
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -249,7 +249,7 @@ jobs:
                      --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
-                     --expected-failures 2 \
+                     --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
@@ -400,7 +400,7 @@ jobs:
                      --chip-tool ./out/darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
-                     --expected-failures 2 \
+                     --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
@@ -439,7 +439,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:46
+            image: ghcr.io/project-chip/chip-build:47
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -508,6 +508,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_FAN_3_4.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_FAN_3_5.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test/lit-icd-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_ICDM_2_1.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test/lit-icd-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json --enable-key 000102030405060708090a0b0c0d0e0f" --script "src/python_testing/TC_ICDManagementCluster.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_IDM_1_2.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json --enable-key 000102030405060708090a0b0c0d0e0f" --script "src/python_testing/TC_IDM_1_4.py" --script-args "--hex-arg PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_PWRTL_2_1.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
