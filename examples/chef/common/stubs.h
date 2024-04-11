@@ -28,6 +28,12 @@ class AttributeDelegate
 {
 public:
     AttributeDelegate (ClusterId clusterId) : mClusterId(clusterId) {}
+
+    virtual ~AttributeDelegate() {}
+    /**
+     * xxxx 
+     */
+    virtual chip::Protocols::InteractionModel::Status PreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value) { return chip::Protocols::InteractionModel::Status::Success; }
     /**
      * xxxx 
      */
@@ -40,8 +46,6 @@ public:
      * xxxx 
      */
     virtual Protocols::InteractionModel::Status ExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, uint16_t maxReadLength) {return Protocols::InteractionModel::Status::Success;} 
-
-    virtual ~AttributeDelegate() {}
 
 private:
     ClusterId mClusterId;

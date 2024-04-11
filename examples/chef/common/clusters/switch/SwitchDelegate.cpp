@@ -141,8 +141,10 @@ class SwitchAttributeDelegate : public AttributeDelegate
 public:
     SwitchAttributeDelegate (ClusterId clusterId) : AttributeDelegate(clusterId) {}
 
-    void PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value) override;
+    chip::Protocols::InteractionModel::Status PreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value) override;
 
+    void PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value) override;
+    
 private:
 };
 
@@ -154,6 +156,16 @@ SwitchEventHandler * GetSwitchEventHandler(EndpointId endpointId)
     }
 
     return gSwitchEventHandlers[endpointId];
+}
+
+chip::Protocols::InteractionModel::Status SwitchAttributeDelegate::PreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value)
+{
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+printf("\033[41m %s, %d \033[0m \n", __func__, __LINE__);
+    ChipLogProgress(Zcl, "SwitchAttributeDelegate::PostAttributeChangeCallback Endpoint: %d, Cluster: " ChipLogFormatMEI ", Type: %u, length %u", attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId), type, size);
+
+
+    return ret;
 }
 
 void SwitchAttributeDelegate::PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value)
