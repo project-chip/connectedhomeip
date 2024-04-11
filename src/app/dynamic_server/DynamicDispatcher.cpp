@@ -189,13 +189,6 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     return aWriteHandler->AddStatus(aPath, status);
 }
 
-// No attribute access overrides on iOS and Android for now.
-// TODO (#16806): This function can be moved to InteractionModelEngine.
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
-{
-    return nullptr;
-}
-
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)
 {
     // This command passed ServerClusterCommandExists so we know it's one of our

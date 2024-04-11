@@ -343,12 +343,5 @@ bool IsFlatCompositionForEndpoint(EndpointId endpoint);
  */
 bool IsTreeCompositionForEndpoint(EndpointId endpoint);
 
-/**
- *  Get the registered attribute access override. nullptr when attribute access override is not found.
- *
- * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
- */
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
-
 } // namespace app
 } // namespace chip
