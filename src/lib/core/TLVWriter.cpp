@@ -300,7 +300,7 @@ CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf)
 
 CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf, uint32_t len)
 {
-#if CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE
+#if defined(CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE) && CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE
     // Spec requirement: A.11.2. UTF-8 and Octet Strings
     //
     // For UTF-8 strings, the value octets SHALL encode a valid
