@@ -1259,7 +1259,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     dispatch_sync(_storageQueue, ^{
         [storageDelegate controller:controller storeValues:testBulkValues securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
     });
-    // Verify that the store resluted in the correct values
+    // Verify that the store resulted in the correct values
     dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
     for (MTRClusterPath * path in dataStoreClusterData) {
         XCTAssertEqualObjects(bulkTestclusterDataDictionary[path], dataStoreClusterData[path]);
