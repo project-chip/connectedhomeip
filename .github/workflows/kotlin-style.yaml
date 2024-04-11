@@ -26,10 +26,13 @@ jobs:
         # Detekt seems not to like circular symlinks, so we set up
         # explicit paths below
         #
-        # - `examples/android/CHIPTest` is excluded because detekt seems to hang on
-        #    them (unclear why)
+        # In particular, if symlinks exist and recurse, detekt tries to
+        # follow, so for example `examples/android/CHIPTest` as a path
+        # will never end (and eventually run out of HEAP) because
+        # `examples/android/CHIPTest/third_party/connectedhomeip` is
+        # circular
         with:
-          args: --parallel --build-upon-default-config --config kotlin-detect-config.yaml --input examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java
+          args: --parallel --build-upon-default-config --config kotlin-detect-config.yaml --input examples/android/CHIPTest/app,examples/android/CHIPTool,examples/java-matter-controller/java,src/controller/java
 
   ktlint:
     name: "Format check"
