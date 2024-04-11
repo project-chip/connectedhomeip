@@ -23,7 +23,7 @@
 
 namespace chip {
 
-class OTAFirmwareProcessor : public OTATlvProcessor
+class OTAWiFiFirmwareProcessor : public OTATlvProcessor
 {
 public:
     struct Descriptor

@@ -18,7 +18,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
-#include <platform/silabs/multi-ota/SiWx917/OTAFirmwareProcessor917.h>
+#include <platform/silabs/multi-ota/SiWx917/OTAWiFiFirmwareProcessor.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include "wfx_host_events.h"
@@ -46,12 +46,12 @@ uint8_t flag = RPS_HEADER;
 namespace chip {
 
 // Define static memebers
-bool OTAFirmwareProcessor::mReset                                                      = false;
-uint32_t OTAFirmwareProcessor::mWriteOffset                                            = 0;
-uint16_t OTAFirmwareProcessor::writeBufOffset                                          = 0;
-uint8_t OTAFirmwareProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
+bool OTAWiFiFirmwareProcessor::mReset                                                      = false;
+uint32_t OTAWiFiFirmwareProcessor::mWriteOffset                                            = 0;
+uint16_t OTAWiFiFirmwareProcessor::writeBufOffset                                          = 0;
+uint8_t OTAWiFiFirmwareProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
 
-CHIP_ERROR OTAFirmwareProcessor::Init()
+CHIP_ERROR OTAWiFiFirmwareProcessor::Init()
 {
     ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
@@ -62,7 +62,7 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAFirmwareProcessor::Clear()
+CHIP_ERROR OTAWiFiFirmwareProcessor::Clear()
 {
     OTATlvProcessor::ClearInternal();
     mAccumulator.Clear();
@@ -74,7 +74,7 @@ CHIP_ERROR OTAFirmwareProcessor::Clear()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
+CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
     int32_t status        = SL_STATUS_OK;
     if (!mDescriptorProcessed)
@@ -128,7 +128,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
+CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
     ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.data())));
@@ -139,7 +139,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
+CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
 {
     // This reboots the device
     if (mReset)
@@ -153,7 +153,7 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAFirmwareProcessor::FinalizeAction()
+CHIP_ERROR OTAWiFiFirmwareProcessor::FinalizeAction()
 {
     int32_t status        = SL_STATUS_OK;
 
