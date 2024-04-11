@@ -60,7 +60,8 @@ CHIP_ERROR DiscoBallServer::Read(const ConcreteReadAttributePath & aPath,
 The ClusterLogic class is for all the code that is SHARED between platforms. It
 does NOT include any TLV parsing or direct calls to Ember/IM/LogEvent etc.
 
-The class should include attribute getters/setters and handlers for all commands.
+The class should include attribute getters/setters and handlers for all
+commands.
 
 The class receives “plain data” Matter requests from ClusterServer class,
 performs required common actions, and calls driver class to perform platform- or
