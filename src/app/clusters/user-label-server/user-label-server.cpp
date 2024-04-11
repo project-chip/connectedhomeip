@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/server/Server.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/CodeUtils.h>
