@@ -164,7 +164,6 @@ class TC_RR_1_1(MatterBaseTest):
                 dev_ctrl, node_id=self.dut_node_id, endpoint=0,
                 attribute=Clusters.OperationalCredentials.Attributes.Fabrics, fabricFiltered=False)
             current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
-            print(fabrics)
             for fabric in fabrics:
                 if fabric.fabricIndex == current_fabric_index:
                     continue
