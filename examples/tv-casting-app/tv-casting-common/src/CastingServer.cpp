@@ -20,6 +20,7 @@
 #include "ConversionUtils.h"
 
 #include "app/clusters/bindings/BindingManager.h"
+#include <app/server/Dnssd.h>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -193,6 +194,29 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::
 {
     // TODO: expose options to the higher layer
     Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+    if (mUdcCommissionerPasscodeEnabled)
+    {
+        id.SetCommissionerPasscode(true);
+        if (mUdcCommissionerPasscodeReady)
+        {
+            id.SetCommissionerPasscodeReady(true);
+            id.SetInstanceName(mUdcCommissionerPasscodeInstanceName);
+            mUdcCommissionerPasscodeReady = false;
+        }
+        else
+        {
+            CHIP_ERROR err = app::DnssdServer::Instance().GetCommissionableInstanceName(
+                mUdcCommissionerPasscodeInstanceName, sizeof(mUdcCommissionerPasscodeInstanceName));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+            else
+            {
+                id.SetInstanceName(mUdcCommissionerPasscodeInstanceName);
+            }
+        }
+    }
     return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
 }
 
