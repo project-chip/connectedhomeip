@@ -98,7 +98,7 @@ ghapi==1.0.3
     # via -r requirements.memory.txt
 humanfriendly==10.0
     # via coloredlogs
-idf-component-manager==1.2.2
+idf-component-manager==1.5.2
     # via -r requirements.esp32.txt
 idna==3.4
     # via requests
@@ -290,3 +290,10 @@ setuptools==68.0.0
     # via
     #   pip-tools
     #   west
+
+# Manual edits:
+
+# Higher versions depend on proto-plus, which break
+# nanopb code generation (due to name conflict of the 'proto' module)
+google-api-core==2.17.0
+
