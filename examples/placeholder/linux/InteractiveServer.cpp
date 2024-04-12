@@ -25,6 +25,7 @@
 #include <platform/logging/LogV.h>
 
 #include <string>
+#include <vector>
 
 using namespace chip::DeviceLayer;
 
