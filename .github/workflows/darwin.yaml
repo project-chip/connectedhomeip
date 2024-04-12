@@ -75,9 +75,6 @@ jobs:
                 options: # We don't need a full matrix
                     - flavor: asan
                       arguments: -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES
-                    - flavor: asan-global-storage
-                      arguments: -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES
-                      defines: MTR_PER_CONTROLLER_STORAGE_ENABLED=0
                     - flavor: tsan
                       arguments: -enableThreadSanitizer YES
         steps:

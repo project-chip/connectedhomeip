@@ -119,18 +119,14 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 @implementation MTRDeviceTests
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 static BOOL slocalTestStorageEnabledBeforeUnitTest;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 + (void)setUp
 {
     XCTestExpectation * pairingExpectation = [[XCTestExpectation alloc] initWithDescription:@"Pairing Complete"];
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
     slocalTestStorageEnabledBeforeUnitTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
     MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = YES;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -181,13 +177,11 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 {
     ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), nil, kTimeoutInSeconds);
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
     // Restore testing setting to previous state, and remove all persisted attributes
     MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = slocalTestStorageEnabledBeforeUnitTest;
     [sController.controllerDataStore clearAllStoredAttributes];
     NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
     XCTAssertEqual(storedAttributesAfterClear.count, 0);
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
@@ -2839,7 +2833,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqualObjects(cluster.endpointID, @(0));
 }
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 - (void)test031_MTRDeviceAttributeCacheLocalTestStorage
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -2912,7 +2905,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesAfterSecondSubscription.count - attributesReportedWithSecondSubscription;
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 - (void)test032_MTRPathClassesEncoding
 {

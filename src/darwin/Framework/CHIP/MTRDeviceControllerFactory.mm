@@ -19,13 +19,8 @@
 
 #import <Matter/MTRDefines.h>
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-#import <Matter/MTRDeviceControllerParameters.h>
-#else
-#import "MTRDeviceControllerParameters_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 #import <Matter/MTRClusterConstants.h>
+#import <Matter/MTRDeviceControllerParameters.h>
 #import <Matter/MTRServerCluster.h>
 
 #import "MTRCertificates.h"
