@@ -140,18 +140,17 @@ tests:
                         ]
 
     - label:
-          "Step 4b: Read the feature dependent(ECAL.S.F02) attribute in
+          "Step 4b: Read the feature dependent(ECAL.S.F03) attribute in
           AttributeList"
-      PICS: ECAL.S.F02
+      PICS: ECAL.S.F03
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [
-                         0x000B, # PeakPeriodStatus
-                         0x000C, # PeakPeriodStartTime
-                         0x000D  # PeakPeriodEndTime
+                         0x000A, # CurrentPeakPeriod
+                         0x000B  # NextPeakPeriod
                         ]
 
     - label: "Step 5: Read the global attribute: EventList"
