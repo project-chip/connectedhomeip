@@ -36,15 +36,6 @@ declare_args() {
   use_smu2_dynamic = false
   use_hw_sha256 = false
   use_hw_aes = false
-
-  # ICD Matter Configuration flags
-  chip_ot_idle_interval_ms = 2000  # 2s Idle Intervals
-  chip_ot_active_interval_ms = 500  # 500ms Active Intervals
-
-  nxp_idle_mode_interval_s = 600  # 10min Idle Mode Interval
-  nxp_active_mode_interval_ms = 10000  # 10s Active Mode Interval
-  nxp_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
-  nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 }
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
@@ -270,12 +261,12 @@ template("k32w1_sdk") {
       "gConnectPowerLeveldBm_c=0",
 
       #move these platform specific defines to args.gni
-      "NXP_OT_IDLE_INTERVAL=${chip_ot_idle_interval_ms}",
-      "NXP_OT_ACTIVE_INTERVAL=${chip_ot_active_interval_ms}",
+      "NXP_OT_IDLE_INTERVAL=${nxp_ot_idle_interval_ms}",
+      "NXP_OT_ACTIVE_INTERVAL=${nxp_ot_active_interval_ms}",
       "NXP_ICD_ENABLED=1",
       "NXP_ACTIVE_MODE_THRESHOLD=${nxp_active_mode_threshold_ms}",
-      "NXP_ACTIVE_MODE_INTERVAL=${nxp_active_mode_interval_ms}",
-      "NXP_IDLE_MODE_INTERVAL=${nxp_idle_mode_interval_s}",
+      "NXP_ACTIVE_MODE_DURATION_MS=${nxp_active_mode_duration_ms}",
+      "NXP_IDLE_MODE_DURATION_SEC=${nxp_idle_mode_duration_s}",
       "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
 
@@ -356,6 +347,15 @@ template("k32w1_sdk") {
 
     if (use_hw_aes) {
       defines += [ "USE_HW_AES" ]
+    }
+
+    if (nxp_software_version != "") {
+      defines +=
+          [ "NXP_CONFIG_DEVICE_SOFTWARE_VERSION=${nxp_software_version}" ]
+    }
+
+    if (nxp_software_version_string != "") {
+      defines += [ "NXP_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${nxp_software_version_string}\"" ]
     }
 
     if (defined(invoker.defines)) {
