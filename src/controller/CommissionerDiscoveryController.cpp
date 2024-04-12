@@ -623,7 +623,7 @@ void CommissionerDiscoveryController::CommissioningFailed(CHIP_ERROR error)
     }
     if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kCommissioningNode)
     {
-        ChipLogError(AppServer, "UX CommissioningFailed: invalid state %hhu", client->GetUDCClientProcessingState());
+        ChipLogError(AppServer, "UX CommissioningFailed: invalid state");
         return;
     }
     client->SetUDCClientProcessingState(UDCClientProcessingState::kCommissioningFailed);
