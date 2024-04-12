@@ -62,9 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId name="Wi"/>
+    <clusterId id="0x0451" name="Wi"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="TODO" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="WIFINM" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0001" name="SSID" type="octstr" default="null">
       <access read="true" readPrivilege="view"/>

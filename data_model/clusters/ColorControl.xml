@@ -107,6 +107,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
       <optionalConform/>
       <constraint type="between" from="0" to="65534"/>
     </attribute>
