@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock" revision="8">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock" revision="7">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1811 1812 1821"/>
     <revision revision="2" summary="CCB 2430"/>
@@ -66,7 +66,6 @@ Davis, CA 95616, USA
     <revision revision="5"/>
     <revision revision="6" summary="New data model format and notation. Added User features. General cleanup of functionality"/>
     <revision revision="7" summary="Added support for European door locks (unbolt feature)"/>
-    <revision revision="8" summary="Added support for Aliro credential provisioning"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0101" name="Door Lock"/>
@@ -104,19 +103,14 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="8" code="USR" name="User" summary="Lock supports the user commands and database">
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="ALIRO"/>
-        </mandatoryConform>
-        <optionalConform>
-          <orTerm>
-            <feature name="PIN"/>
-            <feature name="RID"/>
-            <feature name="FGP"/>
-            <feature name="FACE"/>
-          </orTerm>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform>
+        <orTerm>
+          <feature name="PIN"/>
+          <feature name="RID"/>
+          <feature name="FGP"/>
+          <feature name="FACE"/>
+        </orTerm>
+      </optionalConform>
     </feature>
     <feature bit="9" code="NOT" name="Notification" summary="Operation and Programming Notifications">
       <optionalConform/>
@@ -129,14 +123,6 @@ Davis, CA 95616, USA
     </feature>
     <feature bit="12" code="UBOLT" name="Unbolting" summary="Lock supports unbolting">
       <optionalConform/>
-    </feature>
-    <feature bit="13" code="ALIRO" name="AliroProvisioning" summary="Lock supports Aliro credential provisioning as defined in ref_Aliro">
-      <optionalConform/>
-    </feature>
-    <feature bit="14" code="ALBU" name="AliroBLEUWB" summary="Lock supports the Bluetooth LE + UWB Access Control Flow as defined in ref_Aliro">
-      <optionalConform>
-        <feature name="ALIRO"/>
-      </optionalConform>
     </feature>
   </features>
   <dataTypes>
@@ -218,23 +204,6 @@ Davis, CA 95616, USA
       <item value="5" name="Face" summary="Face identifier credential type">
         <mandatoryConform>
           <feature name="FACE"/>
-        </mandatoryConform>
-      </item>
-      <item value="6" name="AliroCredentialIssuerKey" summary="A Credential Issuer public key as defined in ref_Aliro">
-        <mandatoryConform>
-          <feature name="ALIRO"/>
-        </mandatoryConform>
-      </item>
-      <item value="7" name="AliroEvictableEndpointKey" summary="An Endpoint public key as defined in ref_Aliro which can
-                            be evicted if space is needed for another endpoint key">
-        <mandatoryConform>
-          <feature name="ALIRO"/>
-        </mandatoryConform>
-      </item>
-      <item value="8" name="AliroNonEvictableEndpointKey" summary="An Endpoint public key as defined in ref_Aliro which cannot
-                            be evicted if space is needed for another endpoint key">
-        <mandatoryConform>
-          <feature name="ALIRO"/>
         </mandatoryConform>
       </item>
     </enum>
@@ -368,21 +337,6 @@ Davis, CA 95616, USA
       <item value="10" name="Face" summary="Lock user face information was added, cleared, or modified.">
         <mandatoryConform>
           <feature name="FACE"/>
-        </mandatoryConform>
-      </item>
-      <item value="11" name="AliroCredentialIssuerKey" summary="An Aliro credential issuer key credential was added, cleared, or modified.">
-        <mandatoryConform>
-          <feature name="ALIRO"/>
-        </mandatoryConform>
-      </item>
-      <item value="12" name="AliroEvictableEndpointKey" summary="An Aliro endpoint key credential which can be evicted credential was added, cleared, or modified.">
-        <mandatoryConform>
-          <feature name="ALIRO"/>
-        </mandatoryConform>
-      </item>
-      <item value="13" name="AliroNonEvictableEndpointKey" summary="An Aliro endpoint key credential which cannot be evicted was added, cleared, or modified.">
-        <mandatoryConform>
-          <feature name="ALIRO"/>
         </mandatoryConform>
       </item>
     </enum>
@@ -532,11 +486,6 @@ Davis, CA 95616, USA
         <optionalConform>
           <feature name="USR"/>
         </optionalConform>
-      </item>
-      <item value="10" name="Aliro" summary="User change operation was a step-up credential provisioning as defined in ref_Aliro">
-        <mandatoryConform>
-          <feature name="ALIRO"/>
-        </mandatoryConform>
       </item>
     </enum>
     <enum name="SoundVolumeEnum">
@@ -1108,81 +1057,6 @@ Davis, CA 95616, USA
           <feature name="RID"/>
         </andTerm>
       </optionalConform>
-    </attribute>
-    <attribute id="0x0080" name="AliroReaderVerificationKey" type="octstr" default="null">
-      <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="ALIRO"/>
-      </mandatoryConform>
-      <constraint type="maxLength" value="65"/>
-    </attribute>
-    <attribute id="0x0081" name="AliroReaderGroupIdentifier" type="octstr" default="null">
-      <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="ALIRO"/>
-      </mandatoryConform>
-      <constraint type="maxLength" value="16"/>
-    </attribute>
-    <attribute id="0x0082" name="AliroReaderGroupSubIdentifier" type="octstr">
-      <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="ALIRO"/>
-      </mandatoryConform>
-      <constraint type="maxLength" value="16"/>
-    </attribute>
-    <attribute id="0x0083" name="AliroExpeditedTransactionSupportedProtocolVersions" type="list" default="empty">
-      <entry type="octstr">
-        <constraint type="maxLength" value="2"/>
-      </entry>
-      <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="ALIRO"/>
-      </mandatoryConform>
-      <constraint type="maxCount" value="16"/>
-    </attribute>
-    <attribute id="0x0084" name="AliroGroupResolvingKey" type="octstr" default="null">
-      <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="ALBU"/>
-      </mandatoryConform>
-      <constraint type="maxLength" value="16"/>
-    </attribute>
-    <attribute id="0x0085" name="AliroSupportedBLEUWBProtocolVersions" type="list" default="empty">
-      <entry type="octstr">
-        <constraint type="maxLength" value="2"/>
-      </entry>
-      <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="ALBU"/>
-      </mandatoryConform>
-      <constraint type="maxCount" value="16"/>
-    </attribute>
-    <attribute id="0x0086" name="AliroBLEAdvertisingVersion" type="uint8" default="0">
-      <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="ALBU"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0087" name="NumberOfAliroCredentialIssuerKeysSupported" type="uint16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="ALIRO"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0088" name="NumberOfAliroEndpointKeysSupported" type="uint16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="ALIRO"/>
-      </mandatoryConform>
     </attribute>
   </attributes>
   <commands>
@@ -2059,13 +1933,6 @@ Davis, CA 95616, USA
         <optionalConform/>
         <constraint type="desc"/>
       </field>
-      <field id="5" name="CredentialData" type="octstr">
-        <quality nullable="true"/>
-        <optionalConform>
-          <feature name="ALIRO"/>
-        </optionalConform>
-        <constraint type="desc"/>
-      </field>
     </command>
     <command id="0x26" name="ClearCredential" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" timed="true"/>
@@ -2091,36 +1958,6 @@ Davis, CA 95616, USA
           </andTerm>
         </optionalConform>
       </field>
-    </command>
-    <command id="0x28" name="SetAliroReaderConfig" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
-      <mandatoryConform>
-        <feature name="ALIRO"/>
-      </mandatoryConform>
-      <field id="0" name="SigningKey" type="octstr">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
-      </field>
-      <field id="1" name="VerificationKey" type="octstr">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="65"/>
-      </field>
-      <field id="2" name="GroupIdentifier" type="octstr">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
-      </field>
-      <field id="3" name="GroupResolvingKey" type="octstr">
-        <mandatoryConform>
-          <feature name="ALBU"/>
-        </mandatoryConform>
-        <constraint type="maxLength" value="16"/>
-      </field>
-    </command>
-    <command id="0x29" name="ClearAliroReaderConfig" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
-      <mandatoryConform>
-        <feature name="ALIRO"/>
-      </mandatoryConform>
     </command>
   </commands>
   <events>

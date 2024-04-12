@@ -57,7 +57,6 @@ Davis, CA 95616, USA
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0029" name="Casting Video Client" revision="2">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
     <revision revision="1" summary="Initial release of this document"/>
     <revision revision="2" summary="Added Content App Observer, Messages and Content Control Clusters"/>
   </revisionHistory>
