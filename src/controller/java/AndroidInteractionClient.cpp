@@ -24,7 +24,6 @@
 #include "AndroidInteractionClient.h"
 
 #include "AndroidCallbacks.h"
-#include "AndroidDeviceControllerWrapper.h"
 
 #include <lib/support/jsontlv/JsonToTlv.h>
 
