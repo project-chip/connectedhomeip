@@ -47,8 +47,5 @@ void ResetVersion();
 /// be returned by emberAfDataVersionStorage
 DataVersion GetVersion();
 
-/// Resets the mock attribute storage to the default configuration.
-void ResetMockNodeConfig();
-
 } // namespace Test
 } // namespace chip

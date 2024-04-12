@@ -56,17 +56,17 @@ constexpr chip::EndpointId kTestEndpoint2 = chip::Test::kMockEndpoint2;
 constexpr chip::EndpointId kTestEndpoint3 = chip::Test::kMockEndpoint3;
 
 // Test Attribute ID
-constexpr uint32_t kOnOffAttId               = 0x0000;
-constexpr uint32_t kCurrentLevelId           = 0x0000;
-constexpr uint32_t kCurrentFrequencyId       = 0x0004;
-constexpr uint32_t kCurrentSaturationId      = 0x0001;
-constexpr uint32_t kCurrentXId               = 0x0003;
-constexpr uint32_t kCurrentYId               = 0x0004;
-constexpr uint32_t kColorTemperatureMiredsId = 0x0007;
-constexpr uint32_t kEnhancedCurrentHueId     = 0x4000;
-constexpr uint32_t kColorLoopActiveId        = 0x4002;
-constexpr uint32_t kColorLoopDirectionId     = 0x4003;
-constexpr uint32_t kColorLoopTimeId          = 0x4004;
+constexpr uint32_t kOnOffAttId               = app::Clusters::OnOff::Attributes::OnOff::Id;
+constexpr uint32_t kCurrentLevelId           = app::Clusters::LevelControl::Attributes::CurrentLevel::Id;
+constexpr uint32_t kCurrentFrequencyId       = app::Clusters::LevelControl::Attributes::CurrentFrequency::Id;
+constexpr uint32_t kCurrentSaturationId      = app::Clusters::ColorControl::Attributes::CurrentSaturation::Id;
+constexpr uint32_t kCurrentXId               = app::Clusters::ColorControl::Attributes::CurrentX::Id;
+constexpr uint32_t kCurrentYId               = app::Clusters::ColorControl::Attributes::CurrentY::Id;
+constexpr uint32_t kColorTemperatureMiredsId = app::Clusters::ColorControl::Attributes::ColorTemperatureMireds::Id;
+constexpr uint32_t kEnhancedCurrentHueId     = app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::Id;
+constexpr uint32_t kColorLoopActiveId        = app::Clusters::ColorControl::Attributes::ColorLoopActive::Id;
+constexpr uint32_t kColorLoopDirectionId     = app::Clusters::ColorControl::Attributes::ColorLoopDirection::Id;
+constexpr uint32_t kColorLoopTimeId          = app::Clusters::ColorControl::Attributes::ColorLoopTime::Id;
 
 // Test Group ID
 constexpr chip::GroupId kGroup1 = 0x101;

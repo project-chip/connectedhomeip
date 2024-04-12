@@ -22,8 +22,6 @@
 using namespace chip::Test;
 using namespace chip::app::Clusters::Globals::Attributes;
 
-static const MockNodeConfig * mockConfig = nullptr;
-
 const MockNodeConfig & DefaultMockNodeConfig()
 {
     // clang-format off
@@ -68,12 +66,27 @@ const MockNodeConfig & DefaultMockNodeConfig()
     return config;
 }
 
+// Getter function to access the config
+const MockNodeConfig & MockNodeConfigRAII::GetConfig() const
+{
+    return (configHandle != nullptr) ? *configHandle : DefaultMockNodeConfig();
+}
+
+// Setter function to set the config
+void MockNodeConfigRAII::SetConfig(const MockNodeConfig * newConfig)
+{
+    configHandle = newConfig;
+}
+
+// Instance of RAII wrapper
+static MockNodeConfigRAII mockNodeConfigRAII;
+
 const MockNodeConfig & GetMockNodeConfig()
 {
-    return (mockConfig != nullptr) ? *mockConfig : DefaultMockNodeConfig();
+    return mockNodeConfigRAII.GetConfig();
 }
 
 void SetMockNodeConfig(const MockNodeConfig * config)
 {
-    mockConfig = config;
+    mockNodeConfigRAII.SetConfig(config);
 }

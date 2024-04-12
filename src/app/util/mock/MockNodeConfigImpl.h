@@ -20,6 +20,22 @@
 
 #include <app/util/mock/MockNodeConfig.h>
 
+// RAII wrapper class for MockNodeConfig
+class MockNodeConfigRAII
+{
+    using MockNodeConfig = chip::Test::MockNodeConfig;
+
+public:
+    explicit MockNodeConfigRAII(const MockNodeConfig * config = nullptr) : configHandle(config) {}
+    ~MockNodeConfigRAII() { configHandle = nullptr; };
+
+    const MockNodeConfig & GetConfig() const;
+    void SetConfig(const MockNodeConfig * newConfig);
+
+private:
+    const chip::Test::MockNodeConfig * configHandle;
+};
+
 const chip::Test::MockNodeConfig & GetMockNodeConfig();
 
 void SetMockNodeConfig(const chip::Test::MockNodeConfig * config);
