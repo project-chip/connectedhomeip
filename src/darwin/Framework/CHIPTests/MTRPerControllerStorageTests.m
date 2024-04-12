@@ -28,8 +28,6 @@
 #import "MTRTestPerControllerStorage.h"
 #import "MTRTestResetCommissioneeHelper.h"
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
@@ -1971,5 +1969,3 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 }
 
 @end
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED

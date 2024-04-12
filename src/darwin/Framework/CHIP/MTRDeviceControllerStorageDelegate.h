@@ -18,12 +18,6 @@
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 
-#if defined(MTR_INTERNAL_INCLUDE) && defined(MTR_INCLUDED_FROM_UMBRELLA_HEADER)
-#error Internal includes should not happen from the umbrella header
-#endif
-
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)
-
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, MTRStorageSecurityLevel) {
@@ -71,9 +65,7 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
  *    and are provided to describe the data should the storage delegate choose to
  *    implement separating storage location by security level and sharing type.
  */
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 MTR_NEWLY_AVAILABLE
-#endif
 @protocol MTRDeviceControllerStorageDelegate <NSObject>
 @required
 /**
@@ -133,13 +125,8 @@ MTR_NEWLY_AVAILABLE
        sharingType:(MTRStorageSharingType)sharingType;
 @end
 
-// TODO: FIXME: Is this a sane place to put this API?
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 MTR_EXTERN MTR_NEWLY_AVAILABLE
-#endif
     NSSet<Class> *
     MTRDeviceControllerStorageClasses(void);
 
 NS_ASSUME_NONNULL_END
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)

@@ -20,6 +20,8 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/media-input-server/media-input-server.h>
+
+#include <string>
 #include <vector>
 
 class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate

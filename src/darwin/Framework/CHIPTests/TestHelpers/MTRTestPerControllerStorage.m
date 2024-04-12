@@ -18,8 +18,6 @@
 
 #import "MTRTestPerControllerStorage.h"
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 @interface MTRTestPerControllerStorage ()
 @property (nonatomic, readonly) NSMutableDictionary<NSString *, NSData *> * storage;
 @end
@@ -116,5 +114,3 @@
 }
 
 @end
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED

@@ -17,6 +17,7 @@
  */
 #include <app/EventManagement.h>
 #include <app/SubscriptionsInfoProvider.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
 #include <app/icd/server/ICDNotifier.h>
@@ -64,6 +65,13 @@ constexpr uint8_t kKeyBuffer2a[] = {
 };
 constexpr uint8_t kKeyBuffer2b[] = {
     0xf2, 0xe2, 0xd2, 0xc2, 0xb2, 0xa2, 0x92, 0x82, 0x72, 0x62, 0x52, 0x42, 0x32, 0x22, 0x12, 0x02
+};
+
+// Taken from the ICDManager Implementation
+enum class ICDTestEventTriggerEvent : uint64_t
+{
+    kAddActiveModeReq    = 0x0046'0000'00000001,
+    kRemoveActiveModeReq = 0x0046'0000'00000002,
 };
 
 class TestICDStateObserver : public app::ICDStateObserver
@@ -115,6 +123,7 @@ public:
     // Performs setup for each individual test in the test suite
     CHIP_ERROR SetUp() override
     {
+
         ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
         mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider);
         mICDManager.RegisterObserver(&mICDStateObserver);
@@ -692,6 +701,26 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11));
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    static void TestHandleTestEventTriggerActiveModeReq(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        // Verify That ICDManager starts in Idle
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Add ActiveMode req for the Test event trigger event
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kAddActiveModeReq));
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Advance clock by the ActiveModeDuration and check that the device is still in ActiveMode
+        AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDuration() + 1_ms32);
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Remove req and device should go to IdleMode
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kRemoveActiveModeReq));
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+    }
 };
 
 } // namespace app
@@ -710,6 +739,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
     NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
     NL_TEST_DEF("TestShouldCheckInMsgsBeSentAtActiveModeFunction", TestICDManager::TestShouldCheckInMsgsBeSentAtActiveModeFunction),
+    NL_TEST_DEF("TestHandleTestEventTriggerActiveModeReq", TestICDManager::TestHandleTestEventTriggerActiveModeReq),
     NL_TEST_SENTINEL(),
 };
 

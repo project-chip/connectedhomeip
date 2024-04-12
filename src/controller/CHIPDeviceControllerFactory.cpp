@@ -305,6 +305,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerRCAC                       = params.controllerRCAC;
     controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
     controllerParams.removeFromFabricTableOnShutdown      = params.removeFromFabricTableOnShutdown;
+    controllerParams.deleteFromFabricTableOnShutdown      = params.deleteFromFabricTableOnShutdown;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
@@ -391,9 +392,9 @@ void DeviceControllerFactory::RetainSystemState()
     (void) mSystemState->Retain();
 }
 
-void DeviceControllerFactory::ReleaseSystemState()
+bool DeviceControllerFactory::ReleaseSystemState()
 {
-    mSystemState->Release();
+    return mSystemState->Release();
 }
 
 DeviceControllerFactory::~DeviceControllerFactory()

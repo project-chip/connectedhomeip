@@ -17,37 +17,6 @@
 
 	/delete-node/ leds;
 	/delete-node/ pwm_leds;
-
-	keys {
-		/delete-node/ button_1;
-		/delete-node/ button_3;
-		compatible = "gpio-keys";
-		key_1: button_1 {
-			gpios = <&gpiod 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_2: button_2 {
-			gpios = <&gpiod 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_3: button_3 {
-			gpios = <&gpiod 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_4: button_4 {
-			gpios = <&gpiof 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-
-		key_matrix_col1: key_matrix_col1 {
-			gpios = <&gpiod 6 GPIO_ACTIVE_HIGH>;
-		};
-		key_matrix_col2: key_matrix_col2 {
-			gpios = <&gpiof 6 GPIO_ACTIVE_HIGH>;
-		};
-		key_matrix_row1: key_matrix_row1 {
-			gpios = <&gpiod 2 GPIO_PULL_DOWN>;
-		};
-		key_matrix_row2: key_matrix_row2 {
-			gpios = <&gpiod 7 GPIO_PULL_DOWN>;
-		};
-	};
 };
 
 &pwm0 {
