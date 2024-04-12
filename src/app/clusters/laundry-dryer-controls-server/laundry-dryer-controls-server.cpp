@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 

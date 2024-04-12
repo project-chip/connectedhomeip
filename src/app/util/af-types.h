@@ -24,7 +24,6 @@
  */
 
 #include <stdbool.h> // For bool
-#include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
 #include <app/util/basic-types.h>

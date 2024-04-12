@@ -275,14 +275,32 @@ source_set("events") {
   ]
 }
 
+static_library("attribute-access") {
+  sources = [
+    "AttributeAccessInterface.cpp",
+    "AttributeAccessInterface.h",
+    "AttributeAccessInterfaceCache.h",
+    "AttributeAccessInterfaceRegistry.cpp",
+    "AttributeAccessInterfaceRegistry.h",
+  ]
+
+  deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 # Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
 # This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
 static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "AttributeAccessInterface.cpp",
-    "AttributeAccessInterfaceCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePersistenceProvider.h",
@@ -315,15 +333,11 @@ static_library("app") {
     # "CommandHandler._h"
     # "ReadHandler._h",
     # "WriteHandler._h"
-
-    # TODO: the following items cannot be included due to platform includes not being
-    #       able to depend on src/app
-    #       Name with _ so that linter does not recognize it
-    # "_AttributeAccessInterface._h",
   ]
 
   public_deps = [
     ":app_config",
+    ":attribute-access",
     ":constants",
     ":global-attributes",
     ":interaction-model",

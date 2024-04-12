@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/BitFlags.h>
 #include <platform/ThreadStackManager.h>

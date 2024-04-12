@@ -267,11 +267,6 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
 namespace chip {
 namespace app {
 
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
-{
-    return nullptr;
-}
-
 EndpointId EnabledEndpointsWithServerCluster::operator*() const
 {
     return emberAfEndpointFromIndex(mEndpointIndex);
