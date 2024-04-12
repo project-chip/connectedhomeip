@@ -24,14 +24,9 @@
 #import <Matter/MTRBaseDevice.h> // for MTRClusterPath
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDeviceControllerParameters.h>
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTRServerEndpoint.h>
-
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-#import <Matter/MTRDeviceControllerParameters.h>
-#else
-#import "MTRDeviceControllerParameters_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #import "MTRDeviceControllerFactory.h"
 

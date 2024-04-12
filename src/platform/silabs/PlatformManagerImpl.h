@@ -68,6 +68,10 @@ public:
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
+    // ===== Members for internal use
+
+    static void UpdateOperationalHours(System::Layer * systemLayer, void * appState);
+
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack(void);

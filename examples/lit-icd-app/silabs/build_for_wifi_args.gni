@@ -26,7 +26,7 @@ app_data_model = "${chip_root}/examples/lit-icd-app/lit-icd-common"
 # ICD Default configurations
 chip_enable_icd_server = true
 chip_subscription_timeout_resumption = false
-sl_use_subscription_synching = true
+sl_use_subscription_syncing = true
 icd_enforce_sit_slow_poll_limit = true
 chip_enable_icd_lit = true
 

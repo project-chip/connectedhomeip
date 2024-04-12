@@ -15,12 +15,7 @@
  *    limitations under the License.
  */
 #import <Matter/MTRDefines.h>
-
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerParameters.h>
-#else
-#import "MTRDeviceControllerParameters_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #import "MTRDeviceController_Internal.h"
 
@@ -139,25 +134,15 @@ using namespace chip::Tracing::DarwinFramework;
 {
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
-
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
     }
+    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
-    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
-    if (!factory.isRunning) {
-        auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
-
-        if (![factory startControllerFactory:params error:error]) {
-            return nil;
-        }
-    }
-
-    auto * parametersForFactory = static_cast<MTRDeviceControllerParameters *>(parameters);
-
-    return [factory initializeController:self withParameters:parametersForFactory error:error];
+    // MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
+    return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
@@ -179,11 +164,9 @@ using namespace chip::Tracing::DarwinFramework;
             }
 
             id<MTRDeviceControllerStorageDelegate> storageDelegateToUse = storageDelegate;
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
             if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
                 storageDelegateToUse = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:storageDelegate];
             }
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
             _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
                                                                             storageDelegate:storageDelegateToUse
                                                                        storageDelegateQueue:storageDelegateQueue];
@@ -191,7 +174,6 @@ using namespace chip::Tracing::DarwinFramework;
                 return nil;
             }
         } else {
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
             if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
                 dispatch_queue_t localTestStorageQueue = dispatch_queue_create("org.csa-iot.matter.framework.devicecontroller.localteststorage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
                 MTRDeviceControllerLocalTestStorage * localTestStorage = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:nil];
@@ -202,7 +184,6 @@ using namespace chip::Tracing::DarwinFramework;
                     return nil;
                 }
             }
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
         }
 
         // Ensure the otaProviderDelegate, if any, is valid.
@@ -1215,7 +1196,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             connectionBridge->connect(commissioner, nodeID);
         }
         errorHandler:^(NSError * error) {
-            completion(nullptr, chip::NullOptional, error);
+            completion(nullptr, chip::NullOptional, error, nil);
         }];
 }
 
@@ -1226,20 +1207,20 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             chip::CommissioneeDeviceProxy * deviceProxy;
             CHIP_ERROR err = commissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
             if (err != CHIP_NO_ERROR) {
-                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err]);
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err], nil);
                 return;
             }
 
             chip::Optional<chip::SessionHandle> session = deviceProxy->GetSecureSession();
             if (!session.HasValue() || !session.Value()->AsSecureSession()->IsPASESession()) {
-                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
                 return;
             }
 
-            completion(deviceProxy->GetExchangeManager(), session, nil);
+            completion(deviceProxy->GetExchangeManager(), session, nil, nil);
         }
         errorHandler:^(NSError * error) {
-            completion(nullptr, chip::NullOptional, error);
+            completion(nullptr, chip::NullOptional, error, nil);
         }];
 }
 
@@ -1619,7 +1600,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // that we are running.
     [self getSessionForNode:deviceID
                  completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                      // Create an MTRBaseDevice for the node id involved, now that our
                      // CASE session is primed.  We don't actually care about the session
                      // information here.

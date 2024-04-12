@@ -13,14 +13,20 @@
 # limitations under the License.
 
 name: Lint Code Base
+
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+        'pull_request' && github.event.number) || (github.event_name ==
+        'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 jobs:
@@ -29,7 +35,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:46
+            image: ghcr.io/project-chip/chip-build:47
 
         steps:
             - name: Checkout
@@ -40,7 +46,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
+                  platform: linux
 
             - name: Check for orphaned gn files
               if: always()
@@ -100,7 +106,6 @@ jobs:
                      --known-failure app/reporting/reporting.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
-                     --known-failure app/TestEventTriggerDelegate.h \
                      --known-failure app/util/attribute-storage.cpp \
                      --known-failure app/util/attribute-storage.h \
                      --known-failure app/util/attribute-storage-detail.h \
@@ -171,7 +176,8 @@ jobs:
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
-            - name: Check for use of PRI*8, which are not supported on some libcs.
+            - name:
+                  Check for use of PRI*8, which are not supported on some libcs.
               if: always()
               run: |
                   git grep -I -n "PRI.8" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
@@ -179,7 +185,9 @@ jobs:
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
-            - name: Check for use of PRI*16, which are not supported on some libcs.
+            - name:
+                  Check for use of PRI*16, which are not supported on some
+                  libcs.
               if: always()
               run: |
                   git grep -I -n "PRI.16" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
@@ -187,7 +195,9 @@ jobs:
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
-            - name: Check for use of PRI*64, which are not supported on some libcs.
+            - name:
+                  Check for use of PRI*64, which are not supported on some
+                  libcs.
               if: always()
               run: |
                   # TODO: MessageDefHelper should ideally not be excluded here.
@@ -227,7 +237,9 @@ jobs:
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
-            - name: Check for use of 0x%u and the like, which lead to misleading output.
+            - name:
+                  Check for use of 0x%u and the like, which lead to misleading
+                  output.
               if: always()
               run: |
                   git grep -I -n '0x%[0-9l.-]*[^0-9lxX".-]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
@@ -235,14 +247,18 @@ jobs:
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
-            - name: Check for use of '"0x" PRIu*' and the like, which lead to misleading output.
+            - name:
+                  Check for use of '"0x" PRIu*' and the like, which lead to
+                  misleading output.
               if: always()
               run: |
                   git grep -I -n '0x%[0-9-]*" *PRI[^xX]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.
-            - name: Check for use of NSLog instead of Matter logging in Matter framework
+            - name:
+                  Check for use of NSLog instead of Matter logging in Matter
+                  framework
               if: always()
               run: |
                   git grep -n 'NSLog(' -- src/darwin/Framework/CHIP && exit 1 || exit 0
@@ -251,7 +267,9 @@ jobs:
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself, as well as excluding the files
             # that implement the type-safe accessors
-            - name: Check for use of 'emberAfReadAttribute' instead of the type-safe getters
+            - name:
+                  Check for use of 'emberAfReadAttribute' instead of the
+                  type-safe getters
               if: always()
               run: |
                   git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
@@ -261,7 +279,9 @@ jobs:
             # to avoid our grep regexp matching itself, as well as excluding the files
             # that implement the type-safe accessors, attribute writing from the wire, and some
             # Pigweed RPC code that seems hard to update.
-            - name: Check for use of 'emberAfWriteAttribute' instead of the type-safe setters
+            - name:
+                  Check for use of 'emberAfWriteAttribute' instead of the
+                  type-safe setters
               if: always()
               run: |
                   git grep -I -n 'emberAfWriteAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)examples/common/pigweed/rpc_services/Attributes.h' ':(exclude)src/app/util/attribute-table.h' ':(exclude)src/app/util/ember-compatibility-functions.cpp' && exit 1 || exit 0
@@ -275,7 +295,9 @@ jobs:
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
-            - name: Check for use of "SuccessOrExit(CHIP_ERROR_*)", which should probably be "SuccessOrExit(err = CHIP_ERROR_*)"
+            - name:
+                  Check for use of "SuccessOrExit(CHIP_ERROR_*)", which should
+                  probably be "SuccessOrExit(err = CHIP_ERROR_*)"
               if: always()
               run: |
                   git grep -I -n 'SuccessOrExit(CHIP_ERROR' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
@@ -283,14 +305,19 @@ jobs:
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
-            - name: Check for use of "SuccessOrExit(something-without-assignment(", which should probably be "SuccessOrExit(err = something("
+            - name:
+                  Check for use of
+                  "SuccessOrExit(something-without-assignment(", which should
+                  probably be "SuccessOrExit(err = something("
               if: always()
               run: |
                   git grep -I -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.
-            - name: Check for use of "using namespace" outside of a class/function in headers.
+            - name:
+                  Check for use of "using namespace" outside of a class/function
+                  in headers.
               if: always()
               run: |
                   # Various platforms have `using namespace chip::Ble` in their BLEManager* headers; just exclude those for now.
