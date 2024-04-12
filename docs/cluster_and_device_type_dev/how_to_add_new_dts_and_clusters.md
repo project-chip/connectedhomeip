@@ -165,7 +165,7 @@ related SDK tests.
             2. In the `attributeAccessInterfaceAttributes` entry, add your new
                entry
                `"XYZ Mode": [ "SupportedModes", "CurrentMode", "FeatureMap" ]` -
-               this will mean ZAP won't autogen code to handle these attributes
+               this will mean ZAP won't generate code to handle these attributes
         10. In
             [src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json):
             1. Add your `XYZ_MODE_CLUSTER: []` to `ClientDirectories: { }`
