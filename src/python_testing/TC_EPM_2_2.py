@@ -71,31 +71,37 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
         time.sleep(3)
 
         self.step("4a")
+        # Active power is Mandatory
         active_power = await self.check_epm_attribute_in_range("ActivePower", 980000, 1020000)  # 1kW +/- 20W
 
         self.step("4b")
-        active_current = await self.check_epm_attribute_in_range("ActiveCurrent", 3848, 4848)    # 4.348 A +/- 500mA
+        if self.pics_guard(self.check_pics("EPM.S.A0005")):
+            active_current = await self.check_epm_attribute_in_range("ActiveCurrent", 3848, 4848)    # 4.348 A +/- 500mA
 
         self.step("4c")
-        voltage = await self.check_epm_attribute_in_range("Voltage", 229000, 231000)      # 230V +/- 1V
+        if self.pics_guard(self.check_pics("EPM.S.A0004")):
+            voltage = await self.check_epm_attribute_in_range("Voltage", 229000, 231000)      # 230V +/- 1V
 
         self.step("5")
         # After 3 seconds...
         time.sleep(3)
 
         self.step("5a")
+        # Active power is Mandatory
         active_power2 = await self.check_epm_attribute_in_range("ActivePower", 980000, 1020000)  # 1kW +/- 20W
         asserts.assert_not_equal(active_power, active_power2,
                                  f"Expected ActivePower readings to have changed {active_power}, {active_power2}")
 
         self.step("5b")
-        active_current2 = await self.check_epm_attribute_in_range("ActiveCurrent", 3848, 4848)    # 4.348 A +/- 500mA
-        asserts.assert_not_equal(active_current, active_current2,
-                                 f"Expected ActiveCurrent readings to have changed {active_current}, {active_current2}")
+        if self.pics_guard(self.check_pics("EPM.S.A0005")):
+            active_current2 = await self.check_epm_attribute_in_range("ActiveCurrent", 3848, 4848)    # 4.348 A +/- 500mA
+            asserts.assert_not_equal(active_current, active_current2,
+                                     f"Expected ActiveCurrent readings to have changed {active_current}, {active_current2}")
 
         self.step("5c")
-        voltage2 = await self.check_epm_attribute_in_range("Voltage", 229000, 231000)      # 230V +/- 1V
-        asserts.assert_not_equal(voltage, voltage2, f"Expected Voltage readings to have changed {voltage}, {voltage2}")
+        if self.pics_guard(self.check_pics("EPM.S.A0004")):
+            voltage2 = await self.check_epm_attribute_in_range("Voltage", 229000, 231000)      # 230V +/- 1V
+            asserts.assert_not_equal(voltage, voltage2, f"Expected Voltage readings to have changed {voltage}, {voltage2}")
 
         self.step("6")
         await self.send_test_event_trigger_stop_fake_readings()
