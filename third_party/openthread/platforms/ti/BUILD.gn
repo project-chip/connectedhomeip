@@ -83,9 +83,7 @@ source_set("ot-ti-cert") {
   if ("" != ot_ti_lib_dir) {
     library_dir = ot_ti_lib_dir
   } else {
-    if ("${ti_simplelink_device_family}" == "cc13x4_26x4") {
-      library_dir = "${openthread_ti_root}/libs/LP_EM_CC1354P10_6"
-    }
+    library_dir = "${openthread_ti_root}/libs/${ti_simplelink_device_family}"
   }
 
   if (chip_openthread_ftd) {
