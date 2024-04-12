@@ -761,9 +761,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
-    beaconRxCount = mBeaconRxCount;
-
-    return CHIP_NO_ERROR;
+    if(DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted()){
+        beaconRxCount = mBeaconRxCount;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
