@@ -79,7 +79,7 @@ bool registerAttributeAccessOverride(AttributeAccessInterface * attrOverride)
     {
         if (cur->Matches(*attrOverride))
         {
-            ChipLogError(Zcl, "Duplicate attribute override registration failed");
+            ChipLogError(InteractionModel, "Duplicate attribute override registration failed");
             return false;
         }
     }
