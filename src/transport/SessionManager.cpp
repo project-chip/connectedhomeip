@@ -60,15 +60,15 @@ Global<GroupPeerTable> gGroupPeerTable;
 
 /// RAII class for iterators that guarantees that Release() will be called
 /// on the underlying type
-template <typename ReleasableIterator>
-class AutoReleaseGroupIterator
+template <typename Releasable>
+class AutoRelease
 {
 public:
-    AutoReleaseGroupIterator(ReleasableIterator * iter) : mIter(iter) {}
-    ~AutoReleaseGroupIterator() { Release(); }
+    AutoRelease(Releasable * iter) : mIter(iter) {}
+    ~AutoRelease() { Release(); }
 
-    ReleasableIterator * operator->() { return mIter; }
-    const ReleasableIterator * operator->() const { return mIter; }
+    Releasable * operator->() { return mIter; }
+    const Releasable * operator->() const { return mIter; }
 
     bool IsNull() const { return mIter == nullptr; }
 
@@ -80,7 +80,7 @@ public:
     }
 
 private:
-    ReleasableIterator * mIter;
+    Releasable * mIter;
 };
 
 // Helper function that strips off the interface ID from a peer address that is
@@ -918,7 +918,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     // Trial decryption with GroupDataProvider
     Credentials::GroupDataProvider::GroupSession groupContext;
 
-    AutoReleaseGroupIterator<Credentials::GroupDataProvider::GroupSessionIterator> iter(
+    AutoRelease<Credentials::GroupDataProvider::GroupSessionIterator> iter(
         groups->IterateGroupSessions(partialPacketHeader.GetSessionId()));
 
     if (iter.IsNull())
