@@ -124,7 +124,7 @@ MTR_NEWLY_AVAILABLE
 
 /**
  * Store a list of keys/value pairs in the form of a dictionary. Returns whether
- * the store succeeded. Specifically, if any keys in this dictionary fails to store,
+ * the store succeeded. Specifically, if any keys in this dictionary fail to store,
  * the storage delegate should return NO.
  */
 - (BOOL)controller:(MTRDeviceController *)controller
