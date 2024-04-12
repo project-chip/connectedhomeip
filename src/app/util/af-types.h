@@ -297,3 +297,15 @@ typedef chip::Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeCh
 #define MAX_INT16U_VALUE (0xFFFF)
 
 /** @} END addtogroup */
+
+namespace chip {
+namespace app {
+
+enum class MarkAttributeDirty
+{
+    kIfChanged,
+    kNo,
+};
+
+} // namespace app
+} // namespace chip

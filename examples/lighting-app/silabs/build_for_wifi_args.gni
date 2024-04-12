@@ -18,6 +18,9 @@ silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 chip_enable_openthread = false
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
+# Not needed for the Lighting-app
+chip_enable_read_client = false
+
 chip_enable_ota_requestor = true
 app_data_model =
     "${chip_root}/examples/lighting-app/silabs/data_model:silabs-lighting"

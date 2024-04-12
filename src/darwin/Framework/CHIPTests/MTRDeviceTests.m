@@ -2914,6 +2914,50 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 }
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
+- (void)test032_MTRPathClassesEncoding
+{
+    NSError * encodeError;
+    NSData * encodedData;
+    NSError * decodeError;
+    id decodedValue;
+
+    // Test attribute path encode / decode
+    MTRAttributePath * originalAttributePath = [MTRAttributePath attributePathWithEndpointID:@(101) clusterID:@(102) attributeID:@(103)];
+    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalAttributePath requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError);
+
+    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRAttributePath class]] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError);
+    XCTAssertTrue([decodedValue isKindOfClass:[MTRAttributePath class]]);
+
+    MTRAttributePath * decodedAttributePath = decodedValue;
+    XCTAssertEqualObjects(originalAttributePath, decodedAttributePath);
+
+    // Test event path encode / decode
+    MTREventPath * originalEventPath = [MTREventPath eventPathWithEndpointID:@(201) clusterID:@(202) eventID:@(203)];
+    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalEventPath requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError);
+
+    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTREventPath class]] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError);
+    XCTAssertTrue([decodedValue isKindOfClass:[MTREventPath class]]);
+
+    MTREventPath * decodedEventPath = decodedValue;
+    XCTAssertEqualObjects(originalEventPath, decodedEventPath);
+
+    // Test command path encode / decode
+    MTRCommandPath * originalCommandPath = [MTRCommandPath commandPathWithEndpointID:@(301) clusterID:@(302) commandID:@(303)];
+    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalCommandPath requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError);
+
+    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRCommandPath class]] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError);
+    XCTAssertTrue([decodedValue isKindOfClass:[MTRCommandPath class]]);
+
+    MTRCommandPath * decodedCommandPath = decodedValue;
+    XCTAssertEqualObjects(originalCommandPath, decodedCommandPath);
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase

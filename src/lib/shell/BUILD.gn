@@ -89,8 +89,7 @@ static_library("shell") {
       "MainLoopDefault.cpp",
       "streamer_bouffalolab.cpp",
     ]
-  } else if (chip_device_platform == "cc13x2_26x2" ||
-             chip_device_platform == "cc13x4_26x4") {
+  } else if (chip_device_platform == "cc13x4_26x4") {
     sources += [
       "MainLoopDefault.cpp",
       "streamer_cc13x4_26x4.cpp",
