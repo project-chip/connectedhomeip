@@ -75,20 +75,6 @@ source_set("libopenthread-ti") {
   ]
 }
 
-pw_python_action("ot-ti-cert-dl") {
-  script = "download_openthread_library.py"
-  args = [
-    "https://github.com/TexasInstruments/ot-ti",
-    "v1.3.0.1-tiopenthread-1.0",
-    rebase_path("${target_out_dir}/artifacts"),
-    rebase_path("${target_out_dir}/artifacts/${ti_simplelink_board}/lib/"),
-  ]
-  outputs = [
-    "${target_out_dir}/artifacts/${ti_simplelink_board}/lib/libopenthread-ftd.a",
-    "${target_out_dir}/artifacts/${ti_simplelink_board}/lib/libopenthread-mtd.a",
-  ]
-}
-
 source_set("ot-ti-cert") {
   sources = []
   public_configs = [ ":openthread_ti_config" ]
@@ -97,13 +83,14 @@ source_set("ot-ti-cert") {
   if ("" != ot_ti_lib_dir) {
     library_dir = ot_ti_lib_dir
   } else {
-    library_dir = "${target_out_dir}/artifacts/${ti_simplelink_board}"
-    deps += [ ":ot-ti-cert-dl" ]
+    if ("${ti_simplelink_device_family}" == "cc13x4_26x4") {
+      library_dir = "${openthread_ti_root}/libs/LP_EM_CC1354P10_6"
+    }
   }
 
   if (chip_openthread_ftd) {
-    libs = [ "${library_dir}/lib/libopenthread-ftd.a" ]
+    libs = [ "${library_dir}/libopenthread-ftd.a" ]
   } else {
-    libs = [ "${library_dir}/lib/libopenthread-mtd.a" ]
+    libs = [ "${library_dir}/libopenthread-mtd.a" ]
   }
 }
