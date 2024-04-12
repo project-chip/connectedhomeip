@@ -120,7 +120,7 @@ int main(int argc, char * argv[])
     opt.payload.commissioningFlow = CommissioningFlow::kStandard;
     opt.payload.rendezvousInformation.Emplace().ClearAll();
     opt.payload.rendezvousInformation.Emplace().Set(RendezvousInformationFlag::kOnNetwork);
-    opt.mWiFi                = false;
+    opt.mWiFi                = true;
     opt.mThread              = false;
     opt.KVS                  = cfg->kvs_path;
     opt.payload.productID    = cfg->product_id;

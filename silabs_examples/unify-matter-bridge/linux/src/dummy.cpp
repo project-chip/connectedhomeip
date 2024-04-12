@@ -19,5 +19,3 @@ void ApplicationInit()
 void ApplicationShutdown() {}
 
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback() {}
-
-void MatterWiFiNetworkDiagnosticsPluginServerInitCallback() {}
