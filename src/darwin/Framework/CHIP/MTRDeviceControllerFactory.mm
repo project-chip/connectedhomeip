@@ -69,13 +69,9 @@ using namespace chip::Controller;
 
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorSessionResumptionStorageInit = @"Init failure while creating a session resumption storage delegate";
-static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
-static NSString * const kErrorControllersInit = @"Init controllers array failure";
-static NSString * const kErrorCertificateValidityPolicyInit = @"Init certificate validity policy failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
 static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
-static NSString * const kErrorSessionKeystoreInit = @"Init failure while initializing session keystore";
 
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit()
@@ -97,13 +93,13 @@ MTR_DIRECT_MEMBERS
     dispatch_queue_t _chipWorkQueue;
     DeviceControllerFactory * _controllerFactory;
 
-    Credentials::IgnoreCertificateValidityPeriodPolicy * _certificateValidityPolicy;
-    Crypto::RawKeySessionKeystore * _sessionKeystore;
+    Credentials::IgnoreCertificateValidityPeriodPolicy _certificateValidityPolicy;
+    Crypto::RawKeySessionKeystore _sessionKeystore;
     // We use TestPersistentStorageDelegate just to get an in-memory store to back
     // our group data provider impl.  We initialize this store correctly on every
     // controller startup, so don't need to actually persist it.
-    TestPersistentStorageDelegate * _groupStorageDelegate;
-    Credentials::GroupDataProviderImpl * _groupDataProvider;
+    TestPersistentStorageDelegate _groupStorageDelegate;
+    Credentials::GroupDataProviderImpl _groupDataProvider;
 
     // _usingPerControllerStorage is only written once, during controller
     // factory start.  After that it is only read, and can be read from
@@ -201,46 +197,22 @@ MTR_DIRECT_MEMBERS
     // cost to having an idle dispatch queue, and it simplifies our logic.
     DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
-    _running = NO;
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
-    _controllersLock = OS_UNFAIR_LOCK_INIT;
 
-    _sessionKeystore = new chip::Crypto::RawKeySessionKeystore();
-    if ([self checkForInitError:(_sessionKeystore != nullptr) logMsg:kErrorSessionKeystoreInit]) {
-        return nil;
-    }
-
-    _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
-    if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {
-        return nil;
-    }
-
+    // Initialize our default-constructed GroupDataProviderImpl.
     // For now default args are fine, since we are just using this for the IPK.
-    _groupDataProvider = new chip::Credentials::GroupDataProviderImpl();
-    if ([self checkForInitError:(_groupDataProvider != nullptr) logMsg:kErrorGroupProviderInit]) {
-        return nil;
-    }
+    _groupDataProvider.SetStorageDelegate(&_groupStorageDelegate);
+    _groupDataProvider.SetSessionKeystore(&_sessionKeystore);
+    CHIP_ERROR err = _groupDataProvider.Init();
+    VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified,
+                       "GroupDataProviderImpl::Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
 
-    _groupDataProvider->SetStorageDelegate(_groupStorageDelegate);
-    _groupDataProvider->SetSessionKeystore(_sessionKeystore);
-    CHIP_ERROR errorCode = _groupDataProvider->Init();
-    if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorGroupProviderInit]) {
-        return nil;
-    }
-
+    _controllersLock = OS_UNFAIR_LOCK_INIT;
     _controllers = [[NSMutableArray alloc] init];
-    if ([self checkForInitError:(_controllers != nil) logMsg:kErrorControllersInit]) {
-        return nil;
-    }
 
-    _certificateValidityPolicy = new Credentials::IgnoreCertificateValidityPeriodPolicy();
-    if ([self checkForInitError:(_certificateValidityPolicy != nil) logMsg:kErrorCertificateValidityPolicyInit]) {
-        return nil;
-    }
-
-    _serverEndpoints = [[NSMutableArray alloc] init];
     _serverEndpointsLock = OS_UNFAIR_LOCK_INIT;
+    _serverEndpoints = [[NSMutableArray alloc] init];
 
     return self;
 }
@@ -248,7 +220,7 @@ MTR_DIRECT_MEMBERS
 - (void)dealloc
 {
     [self stopControllerFactory];
-    [self cleanupInitObjects];
+    _groupDataProvider.Finish();
 }
 
 - (void)_assertCurrentQueueIsNotMatterQueue
@@ -269,45 +241,6 @@ MTR_DIRECT_MEMBERS
     }
 
     return NO;
-}
-
-- (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
-{
-    if (condition) {
-        return NO;
-    }
-
-    MTR_LOG_ERROR("Error: %@", logMsg);
-
-    [self cleanupInitObjects];
-
-    return YES;
-}
-
-- (void)cleanupInitObjects
-{
-    _controllers = nil;
-
-    if (_groupDataProvider) {
-        _groupDataProvider->Finish();
-        delete _groupDataProvider;
-        _groupDataProvider = nullptr;
-    }
-
-    if (_groupStorageDelegate) {
-        delete _groupStorageDelegate;
-        _groupStorageDelegate = nullptr;
-    }
-
-    if (_sessionKeystore) {
-        delete _sessionKeystore;
-        _sessionKeystore = nullptr;
-    }
-
-    if (_certificateValidityPolicy) {
-        delete _certificateValidityPolicy;
-        _certificateValidityPolicy = nullptr;
-    }
 }
 
 - (void)cleanupStartupObjects
@@ -485,12 +418,12 @@ MTR_DIRECT_MEMBERS
         }
         params.enableServerInteractions = startupParams.shouldStartServer;
 
-        params.groupDataProvider = _groupDataProvider;
-        params.sessionKeystore = _sessionKeystore;
+        params.groupDataProvider = &_groupDataProvider;
+        params.sessionKeystore = &_sessionKeystore;
         params.fabricIndependentStorage = _persistentStorageDelegate;
         params.operationalKeystore = _keystore;
         params.opCertStore = _opCertStore;
-        params.certificateValidityPolicy = _certificateValidityPolicy;
+        params.certificateValidityPolicy = &_certificateValidityPolicy;
         params.sessionResumptionStorage = _sessionResumptionStorage;
         errorCode = _controllerFactory->Init(params);
         if (errorCode != CHIP_NO_ERROR) {
@@ -1025,7 +958,7 @@ MTR_DIRECT_MEMBERS
             // Clear out out group keys for this fabric index, in case fabric
             // indices get reused later.  If a new controller is started on the
             // same fabric it will be handed the IPK at that point.
-            self->_groupDataProvider->RemoveGroupKeys(fabricIndex);
+            self->_groupDataProvider.RemoveGroupKeys(fabricIndex);
         }
 
         // If there are no other controllers left, we can shut down some things.
@@ -1269,9 +1202,9 @@ MTR_DIRECT_MEMBERS
     return _persistentStorageDelegate;
 }
 
-- (Credentials::GroupDataProvider *)groupData
+- (Credentials::GroupDataProvider *)groupDataProvider
 {
-    return _groupDataProvider;
+    return &_groupDataProvider;
 }
 
 @end

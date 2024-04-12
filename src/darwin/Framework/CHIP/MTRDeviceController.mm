@@ -551,7 +551,7 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         errorCode = chip::Credentials::SetSingleIpkEpochKey(
-            _factory.groupData, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
+            _factory.groupDataProvider, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
         if ([self checkForStartError:errorCode logMsg:kErrorIPKInit]) {
             return;
         }

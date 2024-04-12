@@ -126,7 +126,7 @@ MTR_DIRECT_MEMBERS
 - (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
 
 @property (readonly) chip::PersistentStorageDelegate * storageDelegate;
-@property (readonly) chip::Credentials::GroupDataProvider * groupData;
+@property (readonly) chip::Credentials::GroupDataProvider * groupDataProvider;
 
 @end
 
