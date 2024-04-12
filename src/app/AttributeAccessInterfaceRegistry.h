@@ -40,7 +40,7 @@ void unregisterAttributeAccessOverride(chip::app::AttributeAccessInterface * att
 /**
  * Unregister all attribute access interfaces that match this given endpoint.
  */
-void unregisterAttributeAccessOverrideForEndpoint(EmberAfDefinedEndpoint * definedEndpoint);
+void unregisterAllAttributeAccessOverridesForEndpoint(EmberAfDefinedEndpoint * definedEndpoint);
 
 namespace chip {
 namespace app {

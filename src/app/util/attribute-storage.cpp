@@ -425,7 +425,7 @@ static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     // endpoint.
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(definedEndpoint->endpoint);
 
-    unregisterAttributeAccessOverrideForEndpoint(definedEndpoint);
+    unregisterAllAttributeAccessOverridesForEndpoint(definedEndpoint);
 }
 
 // Calls the init functions.

@@ -66,7 +66,7 @@ void unregisterAttributeAccessOverride(AttributeAccessInterface * attrOverride)
     UnregisterMatchingAttributeAccessInterfaces([attrOverride](AttributeAccessInterface * entry) { return entry == attrOverride; });
 }
 
-void unregisterAttributeAccessOverrideForEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
+void unregisterAllAttributeAccessOverridesForEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 {
     UnregisterMatchingAttributeAccessInterfaces(
         [endpoint = definedEndpoint->endpoint](AttributeAccessInterface * entry) { return entry->MatchesEndpoint(endpoint); });
