@@ -186,7 +186,7 @@ related SDK tests.
     1. [cluster_test_plan_template.adoc](https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/template/cluster_test_plan_template.adoc)
     2. [test_plan_template.adoc](https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/template/test_plan_template.adoc)
 
-    Also, join this private Slack channel: `csg-tt-test-plans`
+    Also, ask to join the private `csg-tt-test-plans` Slack channel.
 
 5. Note: the CHIP-Tool reference client is generated from XML
 6. If applicable, add tests:
