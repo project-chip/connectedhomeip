@@ -649,6 +649,9 @@ private:
     InstanceNameResolver * mInstanceNameResolver         = nullptr;
     UserConfirmationProvider * mUserConfirmationProvider = nullptr;
 
+    void HandleNewUDC(const Transport::PeerAddress & source, IdentificationDeclaration & id);
+    void HandleUDCCancel(IdentificationDeclaration & id);
+    void HandleUDCCommissionerPasscodeReady(IdentificationDeclaration & id);
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
     UDCClients<kMaxUDCClients> mUdcClients; // < Active UDC clients

@@ -68,6 +68,10 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
     // Add callback to send Content casting commands after commissioning completes
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(this);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
     mInited = true;
     return CHIP_NO_ERROR;
 }
@@ -190,6 +194,13 @@ void CastingServer::OnCommissioningSessionEstablishmentStarted()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+void CastingServer::OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
+                                                     chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
+{
+    ChipLogProgress(AppServer, "CastingServer::OnCommissionerDeclarationMessage");
+    // TODO: call a mCommissioningCallbacks
+}
+
 CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner)
 {
     // TODO: expose options to the higher layer

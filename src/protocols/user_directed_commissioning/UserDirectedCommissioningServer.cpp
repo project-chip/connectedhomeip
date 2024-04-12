@@ -61,59 +61,28 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     IdentificationDeclaration id;
     id.ReadPayload(udcPayload, sizeof(udcPayload));
 
-    char * instanceName = (char *) id.GetInstanceName();
-
-    ChipLogProgress(AppServer, "UDC instance=%s ", id.GetInstanceName());
-
-    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
     if (id.GetCancelPasscode())
     {
-        ChipLogProgress(AppServer, "UDC instance cancel received");
-        if (client == nullptr)
-        {
-            ChipLogProgress(AppServer, "UDC no matching instance found");
-            return;
-        }
-        id.DebugLog();
-        mUdcClients.MarkUDCClientActive(client);
-
-        // Call the registered mUserConfirmationProvider, if any.
-        if (mUserConfirmationProvider != nullptr)
-        {
-            mUserConfirmationProvider->OnCancel(*client);
-        }
-
-        // reset this entry so that the client can try again without waiting an hour
-        client->Reset();
+        HandleUDCCancel(id);
         return;
     }
 
     if (id.GetCommissionerPasscodeReady())
     {
-        ChipLogProgress(AppServer, "UDC instance commissioner passcode ready received");
-        if (client == nullptr)
-        {
-            ChipLogProgress(AppServer, "UDC no matching instance found");
-            return;
-        }
-        if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kWaitingForCommissionerPasscodeReady)
-        {
-            ChipLogProgress(AppServer, "UDC instance not in waiting for passcode ready state");
-            return;
-        }
-        id.DebugLog();
-        mUdcClients.MarkUDCClientActive(client);
-        client->SetUDCClientProcessingState(UDCClientProcessingState::kObtainingOnboardingPayload);
-
-        // Call the registered mUserConfirmationProvider, if any.
-        if (mUserConfirmationProvider != nullptr)
-        {
-            mUserConfirmationProvider->OnCommissionerPasscodeReady(*client);
-        }
+        HandleUDCCommissionerPasscodeReady(id);
         return;
     }
 
-    if (client == nullptr) // how about CDC?
+    HandleNewUDC(source, id);
+}
+
+void UserDirectedCommissioningServer::HandleNewUDC(const Transport::PeerAddress & source, IdentificationDeclaration & id)
+{
+    char * instanceName = (char *) id.GetInstanceName();
+    ChipLogProgress(AppServer, "HandleNewUDC instance=%s ", id.GetInstanceName());
+
+    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
+    if (client == nullptr)
     {
         ChipLogProgress(AppServer, "UDC new instance state received");
 
@@ -156,8 +125,60 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
             ChipLogError(AppServer, "UserDirectedCommissioningServer::OnMessageReceived no mInstanceNameResolver registered");
         }
     }
-
     mUdcClients.MarkUDCClientActive(client);
+}
+
+void UserDirectedCommissioningServer::HandleUDCCancel(IdentificationDeclaration & id)
+{
+    char * instanceName = (char *) id.GetInstanceName();
+    ChipLogProgress(AppServer, "HandleUDCCancel instance=%s ", id.GetInstanceName());
+
+    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
+    if (client == nullptr)
+    {
+        ChipLogProgress(AppServer, "UDC no matching instance found");
+        return;
+    }
+    id.DebugLog();
+    mUdcClients.MarkUDCClientActive(client);
+
+    // Call the registered mUserConfirmationProvider, if any.
+    if (mUserConfirmationProvider != nullptr)
+    {
+        mUserConfirmationProvider->OnCancel(*client);
+    }
+
+    // reset this entry so that the client can try again without waiting an hour
+    client->Reset();
+    return;
+}
+
+void UserDirectedCommissioningServer::HandleUDCCommissionerPasscodeReady(IdentificationDeclaration & id)
+{
+    char * instanceName = (char *) id.GetInstanceName();
+    ChipLogProgress(AppServer, "HandleUDCCommissionerPasscodeReady instance=%s ", id.GetInstanceName());
+
+    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
+    if (client == nullptr)
+    {
+        ChipLogProgress(AppServer, "UDC no matching instance found");
+        return;
+    }
+    if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kWaitingForCommissionerPasscodeReady)
+    {
+        ChipLogProgress(AppServer, "UDC instance not in waiting for passcode ready state");
+        return;
+    }
+    id.DebugLog();
+    mUdcClients.MarkUDCClientActive(client);
+    client->SetUDCClientProcessingState(UDCClientProcessingState::kObtainingOnboardingPayload);
+
+    // Call the registered mUserConfirmationProvider, if any.
+    if (mUserConfirmationProvider != nullptr)
+    {
+        mUserConfirmationProvider->OnCommissionerPasscodeReady(*client);
+    }
+    return;
 }
 
 CHIP_ERROR UserDirectedCommissioningServer::SendCDCMessage(CommissionerDeclaration cd, chip::Transport::PeerAddress peerAddress)

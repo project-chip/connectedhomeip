@@ -49,7 +49,7 @@ inline constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = ch
  *  and then have it send TV Casting/Media related commands. This is to be instantiated
  *  as a singleton and is to be used across Linux, Android and iOS.
  */
-class CastingServer : public AppDelegate
+class CastingServer : public AppDelegate, chip::Protocols::UserDirectedCommissioning::CommissionerDeclarationHandler
 {
 public:
     CastingServer(CastingServer & other)  = delete;
@@ -61,9 +61,15 @@ public:
     CHIP_ERROR InitBindingHandlers();
     void InitAppDelegation();
 
-    void SetCommissionerPasscodeEnabled(bool enabled) { mUdcCommissionerPasscodeEnabled = enabled; };
-
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    void SetCommissionerPasscodeEnabled(bool enabled)
+    {
+        mUdcCommissionerPasscodeEnabled = enabled;
+    };
     void SetCommissionerPasscodeReady() { mUdcCommissionerPasscodeReady = true; };
+    void OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
+                                          chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     CHIP_ERROR DiscoverCommissioners(chip::Controller::DeviceDiscoveryDelegate * deviceDiscoveryDelegate = nullptr);
     const chip::Dnssd::DiscoveredNodeData *
@@ -474,9 +480,11 @@ private:
     PersistenceManager mPersistenceManager;
     bool mInited        = false;
     bool mUdcInProgress = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     bool mUdcCommissionerPasscodeEnabled                                                           = false;
     bool mUdcCommissionerPasscodeReady                                                             = false;
     char mUdcCommissionerPasscodeInstanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1] = "";
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     chip::Dnssd::DiscoveredNodeData mStrNodeDataList[kMaxCachedVideoPlayers];
     TargetVideoPlayerInfo mActiveTargetVideoPlayerInfo;
