@@ -69,7 +69,7 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
  *
  * 3) Security level and sharing type will always be the same for any given key value
  *    and are provided to describe the data should the storage delegate choose to
- *    implement if separating storage location by security level and sharing type.
+ *    implement separating storage location by security level and sharing type.
  */
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 MTR_NEWLY_AVAILABLE
