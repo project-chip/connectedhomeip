@@ -110,10 +110,19 @@ public:
     }
 
     /**
-     * @brief Signals application that UTCTime has changed through the timesync cluster.
+     * @brief Signals application that UTCTime has changed through the timesync cluster. This gets called when
+     * time is available for the first time or is updated. Therefore, @param time will always have a valid value.
+     * The negative case of time being unavailable is handled by NotifyTimeFailure().
      */
     virtual void UTCTimeAvailabilityChanged(uint64_t time) {}
+    /**
+     * @brief Signals application that a new trusted time source is available. The application can then decide
+     * if it wants to attempt to query for time from this source.
+     */
     virtual void TrustedTimeSourceAvailabilityChanged(bool available, GranularityEnum granularity) {}
+    /**
+     * @brief Signals application that fetching time has failed. The reason is not relevant.
+     */
     virtual void NotifyTimeFailure() {}
 
     virtual ~Delegate() = default;
