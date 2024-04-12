@@ -153,16 +153,16 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (void)fetchAttributeDataForAllDevices:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler
 {
-    __block NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNode = nil;
+    __block NSDictionary<NSString *, id> * dataStoreSecureLocalValues = nil;
     dispatch_sync(_storageDelegateQueue, ^{
         if ([self->_storageDelegate respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
-            NSDictionary<NSString *, id> * dataStoreSecureLocalValues = [self->_storageDelegate valuesForController:self->_controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
-
-            clusterDataByNode = [self _getClusterDataFromSecureLocalValues:dataStoreSecureLocalValues];
+            dataStoreSecureLocalValues = [self->_storageDelegate valuesForController:self->_controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
         }
     });
 
-    clusterDataHandler(clusterDataByNode);
+    if (dataStoreSecureLocalValues.count) {
+        clusterDataHandler([self _getClusterDataFromSecureLocalValues:dataStoreSecureLocalValues]);
+    }
 }
 
 - (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByNodeID:(NSNumber *)nodeID
