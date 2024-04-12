@@ -26,6 +26,8 @@
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <nlunit-test.h>
 
+#include <string>
+
 namespace {
 
 using namespace chip::Encoding;

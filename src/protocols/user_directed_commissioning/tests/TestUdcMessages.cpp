@@ -86,15 +86,15 @@ void TestUDCServerUserConfirmationProvider(nlTestSuite * inSuite, void * inConte
     nodeData1.resolutionData.port         = 5540;
     nodeData1.resolutionData.ipAddress[0] = address;
     nodeData1.resolutionData.numIPs       = 1;
-    Platform::CopyString(nodeData1.commissionData.instanceName, instanceName1);
+    Platform::CopyString(nodeData1.nodeData.instanceName, instanceName1);
 
     Dnssd::DiscoveredNodeData nodeData2;
-    nodeData2.resolutionData.port              = 5540;
-    nodeData2.resolutionData.ipAddress[0]      = address;
-    nodeData2.resolutionData.numIPs            = 1;
-    nodeData2.commissionData.longDiscriminator = disc2;
-    Platform::CopyString(nodeData2.commissionData.instanceName, instanceName2);
-    Platform::CopyString(nodeData2.commissionData.deviceName, deviceName2);
+    nodeData2.resolutionData.port         = 5540;
+    nodeData2.resolutionData.ipAddress[0] = address;
+    nodeData2.resolutionData.numIPs       = 1;
+    nodeData2.nodeData.longDiscriminator  = disc2;
+    Platform::CopyString(nodeData2.nodeData.instanceName, instanceName2);
+    Platform::CopyString(nodeData2.nodeData.deviceName, deviceName2);
 
     // test empty UserConfirmationProvider
     udcServer.OnCommissionableNodeFound(nodeData2);

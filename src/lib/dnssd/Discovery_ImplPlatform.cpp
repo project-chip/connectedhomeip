@@ -340,7 +340,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
 void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
 {
     auto & resolutionData = nodeData.resolutionData;
-    auto & commissionData = nodeData.commissionData;
+    auto & commissionData = nodeData.nodeData;
 
     Platform::CopyString(resolutionData.hostName, mHostName);
     Platform::CopyString(commissionData.instanceName, mName);
@@ -741,6 +741,21 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, 
     }
 
     return error;
+}
+
+CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
+{
+    switch (type)
+    {
+    case DiscoveryType::kCommissionableNode:
+        return DiscoverCommissionableNodes(filter, context);
+    case DiscoveryType::kCommissionerNode:
+        return DiscoverCommissioners(filter, context);
+    case DiscoveryType::kOperational:
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 }
 
 CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryContext & context)

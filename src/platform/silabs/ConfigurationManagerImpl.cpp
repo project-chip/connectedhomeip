@@ -255,7 +255,9 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     SilabsConfig::RunConfigUnitTest();
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)

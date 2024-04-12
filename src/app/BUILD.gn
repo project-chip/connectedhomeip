@@ -146,6 +146,10 @@ source_set("constants") {
   ]
 }
 
+source_set("test-event-trigger") {
+  sources = [ "TestEventTriggerDelegate.h" ]
+}
+
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
 # which in tern depens on the interaction-model.
 # Using source_set prevents the unit test to build correctly.
@@ -250,6 +254,7 @@ static_library("interaction-model") {
     public_deps += [
       ":global-attributes",
       "${chip_root}/src/access",
+      "${chip_root}/src/app/dynamic_server:mock-codegen-includes",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]
@@ -259,12 +264,14 @@ static_library("interaction-model") {
 source_set("events") {
   sources = [
     "EventHeader.h",
+    "EventLoggingDelegate.h",
     "EventLoggingTypes.h",
   ]
 
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
+    "${chip_root}/src/lib/core",
   ]
 }
 
@@ -290,7 +297,6 @@ static_library("app") {
     "DeferredAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
-    "EventLoggingDelegate.h",
     "EventManagement.cpp",
     "EventManagement.h",
     "FailSafeContext.cpp",

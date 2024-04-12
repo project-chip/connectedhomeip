@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "TextFormat.h"
+
 #include <algorithm>
 #include <json/json.h>
 

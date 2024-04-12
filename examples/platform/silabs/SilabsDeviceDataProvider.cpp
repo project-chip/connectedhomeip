@@ -23,12 +23,7 @@
 #include <setup_payload/Base38Encode.h>
 #include <setup_payload/SetupPayload.h>
 
-#ifdef SIWX917_USE_COMISSIONABLE_DATA
-#include "DeviceConfig.h"
-#include "silabs_utils.h"
-#include <setup_payload/Base38Decode.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#endif // SIWX917_USE_COMISSIONABLE_DATA
+#include <string>
 
 namespace chip {
 namespace DeviceLayer {
@@ -36,142 +31,6 @@ namespace Silabs {
 
 // using namespace chip::Credentials;
 using namespace chip::DeviceLayer::Internal;
-
-// TODO Remove once Commander supports (doesn't erase) NVM3 for 917
-#ifdef SIWX917_USE_COMISSIONABLE_DATA
-void SilabsDeviceDataProvider::setupPayload(uint8_t * outBuf)
-{
-    SetupPayload payload;
-    std::string result;
-    ChipError err   = CHIP_NO_ERROR;
-    payload.version = 0;
-    payload.discriminator.SetLongValue(discriminatorValue);
-    payload.setUpPINCode = passcode;
-    payload.rendezvousInformation.SetValue(static_cast<RendezvousInformationFlags>(rendezvousFlag));
-    payload.commissioningFlow = static_cast<CommissioningFlow>(commissionableFlow);
-    payload.vendorID          = vendorId;
-    payload.productID         = productId;
-
-    QRCodeSetupPayloadGenerator generator(payload);
-    err = generator.payloadBase38Representation(result);
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("Failed to get the payload: %d", err);
-    }
-    SILABS_LOG("Payload value in string format : %s", result.c_str());
-    std::vector<uint8_t> result1;
-    // skipping the MT: from the payload during decoding
-    err = base38Decode(result.substr(3), result1);
-    if (err == CHIP_NO_ERROR)
-    {
-        for (uint8_t i = 0; i < result1.size(); i++)
-        {
-            outBuf[i] = result1.at(i);
-        }
-    }
-}
-
-// writing to the flash based on the value given in the DeviceConfig.h
-CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
-{
-    // flashing the value to the nvm3 section of the flash
-    // TODO: remove this once it is removed SiWx917 have the nvm3 simiplicity commander support
-    CHIP_ERROR err;
-    // Checking for the value of CM and flag
-    if ((commissionableFlow > 3) || (rendezvousFlag > 7))
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-    if (discriminatorValue != 0)
-    {
-        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_SetupDiscriminator, discriminatorValue);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    uint8_t payload[kTotalPayloadDataSizeInBytes];
-    setupPayload(payload);
-    err = SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_SetupPayloadBitSet, payload, kTotalPayloadDataSizeInBytes);
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-    if (spake2Interation != 0)
-    {
-        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_Spake2pIterationCount, spake2Interation);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    if (spake2Salt != NULL)
-    {
-        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Spake2pSalt, spake2Salt);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    if (spake2Verifier != NULL)
-    {
-        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Spake2pVerifier, spake2Verifier);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    if (productId != 0)
-    {
-        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_ProductId, productId);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    if (vendorId != 0)
-    {
-        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_VendorId, vendorId);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    if (strlen(productName) != 0)
-    {
-        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_ProductName, productName);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    if (strlen(vendorName) != 0)
-    {
-        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_VendorName, vendorName);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    if (strlen(hwVersionString) != 0)
-    {
-        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_HardwareVersionString, hwVersionString);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    if (rotatingId != 0)
-    {
-        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_UniqueId, rotatingId);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-#endif
 
 CHIP_ERROR SilabsDeviceDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
@@ -507,6 +366,43 @@ CHIP_ERROR SilabsDeviceDataProvider::GetProductLabel(char * buf, size_t bufSize)
     size_t productLabelLen = 0; // without counting null-terminator
     return SilabsConfig::ReadConfigValueStr(SilabsConfig::KConfigKey_ProductLabel, buf, bufSize, productLabelLen);
 }
+
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+/**
+ * @brief Reads the test event trigger key from NVM. If the key isn't present, returns default value if defined.
+ *
+ * @param[out] keySpan output buffer. Must be at least large enough for 16 bytes (ken length)
+ * @return CHIP_ERROR
+ */
+CHIP_ERROR SilabsDeviceDataProvider::GetTestEventTriggerKey(MutableByteSpan & keySpan)
+{
+    constexpr size_t kEnableKeyLength = 16; // Expected byte size of the EnableKey
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    size_t keyLength                  = 0;
+
+    VerifyOrReturnError(keySpan.size() >= kEnableKeyLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Test_Event_Trigger_Key, keySpan.data(), kEnableKeyLength,
+                                           keyLength);
+#ifndef NDEBUG
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+
+        constexpr char enableKey[] = SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY;
+        if (Encoding::HexToBytes(enableKey, strlen(enableKey), keySpan.data(), kEnableKeyLength) != kEnableKeyLength)
+        {
+            // enableKey Hex String doesn't have the correct length
+            memset(keySpan.data(), 0, keySpan.size());
+            return CHIP_ERROR_INTERNAL;
+        }
+        err = CHIP_NO_ERROR;
+    }
+#endif // NDEBUG
+
+    keySpan.reduce_size(kEnableKeyLength);
+    return err;
+}
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 SilabsDeviceDataProvider & SilabsDeviceDataProvider::GetDeviceDataProvider()
 {

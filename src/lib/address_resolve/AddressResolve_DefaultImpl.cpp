@@ -97,7 +97,8 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
 {
     const System::Clock::Timestamp elapsed = now - mRequestStartTime;
 
-    ChipLogProgress(Discovery, "Checking node lookup status after %lu ms", static_cast<unsigned long>(elapsed.count()));
+    ChipLogProgress(Discovery, "Checking node lookup status for " ChipLogFormatPeerId " after %lu ms",
+                    ChipLogValuePeerId(mRequest.GetPeerId()), static_cast<unsigned long>(elapsed.count()));
 
     // We are still within the minimal search time. Wait for more results.
     if (elapsed < mRequest.GetMinLookupTime())
@@ -186,9 +187,11 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     handle.ResetForLookup(mTimeSource.GetMonotonicTimestamp(), request);
-    ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(request.GetPeerId()));
+    auto & peerId = request.GetPeerId();
+    ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(peerId));
     mActiveLookups.PushBack(&handle);
     ReArmTimer();
+    ChipLogProgress(Discovery, "Lookup started for " ChipLogFormatPeerId, ChipLogValuePeerId(peerId));
     return CHIP_NO_ERROR;
 }
 

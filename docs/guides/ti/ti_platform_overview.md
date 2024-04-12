@@ -103,9 +103,9 @@ handled by the platform implementation files.
 Sample Matter applications are provided for the TI platform. These can be used
 as reference for your own application.
 
--   [lock-app](../../../examples/lock-app/cc13x2x7_26x2x7/README.md)
--   [pump-app](../../../examples/pump-app/cc13x2x7_26x2x7/README.md)
--   [pump-controller-app](../../../examples/pump-controller-app/cc13x2x7_26x2x7/README.md)
+-   [lock-app](../../../examples/lock-app/cc13x4_26x4/README.md)
+-   [pump-app](../../../examples/pump-app/cc13x4_26x4/README.md)
+-   [pump-controller-app](../../../examples/pump-controller-app/cc13x4_26x4/README.md)
 
 <hr>
 

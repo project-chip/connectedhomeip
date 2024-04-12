@@ -110,21 +110,21 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         Json::Value jsonVal;
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->commissionData.rotatingId, dnsSdInfo->commissionData.rotatingIdLen,
-                                            rotatingId, sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen, rotatingId,
+                                            sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
-        jsonVal["instanceName"]       = dnsSdInfo->commissionData.instanceName;
+        jsonVal["instanceName"]       = dnsSdInfo->nodeData.instanceName;
         jsonVal["hostName"]           = dnsSdInfo->resolutionData.hostName;
         jsonVal["port"]               = dnsSdInfo->resolutionData.port;
-        jsonVal["longDiscriminator"]  = dnsSdInfo->commissionData.longDiscriminator;
-        jsonVal["vendorId"]           = dnsSdInfo->commissionData.vendorId;
-        jsonVal["productId"]          = dnsSdInfo->commissionData.productId;
-        jsonVal["commissioningMode"]  = dnsSdInfo->commissionData.commissioningMode;
-        jsonVal["deviceType"]         = dnsSdInfo->commissionData.deviceType;
-        jsonVal["deviceName"]         = dnsSdInfo->commissionData.deviceName;
-        jsonVal["pairingInstruction"] = dnsSdInfo->commissionData.pairingInstruction;
-        jsonVal["pairingHint"]        = dnsSdInfo->commissionData.pairingHint;
+        jsonVal["longDiscriminator"]  = dnsSdInfo->nodeData.longDiscriminator;
+        jsonVal["vendorId"]           = dnsSdInfo->nodeData.vendorId;
+        jsonVal["productId"]          = dnsSdInfo->nodeData.productId;
+        jsonVal["commissioningMode"]  = dnsSdInfo->nodeData.commissioningMode;
+        jsonVal["deviceType"]         = dnsSdInfo->nodeData.deviceType;
+        jsonVal["deviceName"]         = dnsSdInfo->nodeData.deviceName;
+        jsonVal["pairingInstruction"] = dnsSdInfo->nodeData.pairingInstruction;
+        jsonVal["pairingHint"]        = dnsSdInfo->nodeData.pairingHint;
         if (dnsSdInfo->resolutionData.GetMrpRetryIntervalIdle().HasValue())
         {
             jsonVal["mrpRetryIntervalIdle"] = dnsSdInfo->resolutionData.GetMrpRetryIntervalIdle().Value().count();
@@ -152,7 +152,7 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         {
             jsonVal["isICDOperatingAsLIT"] = dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value();
         }
-        if (dnsSdInfo->commissionData.rotatingIdLen > 0)
+        if (dnsSdInfo->nodeData.rotatingIdLen > 0)
         {
             jsonVal["rotatingId"] = rotatingId;
         }
@@ -174,22 +174,22 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
             continue;
         }
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->commissionData.rotatingId, dnsSdInfo->commissionData.rotatingIdLen,
-                                            rotatingId, sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen, rotatingId,
+                                            sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
-        ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->commissionData.instanceName);
+        ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->nodeData.instanceName);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->resolutionData.hostName);
         ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->resolutionData.port);
-        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->commissionData.longDiscriminator);
-        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->commissionData.vendorId);
-        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->commissionData.productId);
-        ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->commissionData.commissioningMode);
-        ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->commissionData.deviceType);
-        ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->commissionData.deviceName);
+        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->nodeData.longDiscriminator);
+        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->nodeData.vendorId);
+        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->nodeData.productId);
+        ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->nodeData.commissioningMode);
+        ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->nodeData.deviceType);
+        ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->nodeData.deviceName);
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
-        ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->commissionData.pairingInstruction);
-        ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->commissionData.pairingHint);
+        ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->nodeData.pairingInstruction);
+        ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->nodeData.pairingHint);
         if (dnsSdInfo->resolutionData.GetMrpRetryIntervalIdle().HasValue())
         {
             ChipLogProgress(Discovery, "\tMrp Interval idle\t%u",

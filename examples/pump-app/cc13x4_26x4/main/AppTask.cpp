@@ -32,7 +32,7 @@
 
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
