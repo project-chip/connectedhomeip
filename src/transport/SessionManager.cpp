@@ -918,7 +918,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     // Trial decryption with GroupDataProvider
     Credentials::GroupDataProvider::GroupSession groupContext;
 
-    AutoReleaseGroupIterator<Credentials::GroupDataProvider::GroupSessionIterator> iter(groups->IterateGroupSessions(partialPacketHeader.GetSessionId());
+    AutoReleaseGroupIterator<Credentials::GroupDataProvider::GroupSessionIterator> iter(
+        groups->IterateGroupSessions(partialPacketHeader.GetSessionId()));
 
     if (iter.IsNull())
     {
