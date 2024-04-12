@@ -94,32 +94,33 @@ static void ShutdownOnExit()
 
 MTR_DIRECT_MEMBERS
 @implementation MTRDeviceControllerFactory {
-
-    MTRServerEndpoint * _otaProviderEndpoint;
-    std::unique_ptr<MTROTAProviderDelegateBridge> _otaProviderDelegateBridge;
-
     dispatch_queue_t _chipWorkQueue;
     DeviceControllerFactory * _controllerFactory;
-    PersistentStorageDelegate * _persistentStorageDelegate;
+
+    Credentials::IgnoreCertificateValidityPeriodPolicy * _certificateValidityPolicy;
     Crypto::RawKeySessionKeystore * _sessionKeystore;
-// We use TestPersistentStorageDelegate just to get an in-memory store to back
-// our group data provider impl.  We initialize this store correctly on every
-// controller startup, so don't need to actually persist it.
+    // We use TestPersistentStorageDelegate just to get an in-memory store to back
+    // our group data provider impl.  We initialize this store correctly on every
+    // controller startup, so don't need to actually persist it.
     TestPersistentStorageDelegate * _groupStorageDelegate;
     Credentials::GroupDataProviderImpl * _groupDataProvider;
-    NSMutableArray<MTRDeviceController *> * _controllers;
+
+    // _usingPerControllerStorage is only written once, during controller
+    // factory start.  After that it is only read, and can be read from
+    // arbitrary threads.
+    BOOL _usingPerControllerStorage;
+    PersistentStorageDelegate * _persistentStorageDelegate;
+    MTRSessionResumptionStorageBridge * _sessionResumptionStorage;
     PersistentStorageOperationalKeystore * _keystore;
     Credentials::PersistentStorageOpCertStore * _opCertStore;
     MTROperationalBrowser * _operationalBrowser;
 
-// productAttestationAuthorityCertificates and certificationDeclarationCertificates are just copied
-// from MTRDeviceControllerFactoryParams.
+    // productAttestationAuthorityCertificates and certificationDeclarationCertificates are just copied
+    // from MTRDeviceControllerFactoryParams.
     NSArray<MTRCertificateDERBytes> * _Nullable _productAttestationAuthorityCertificates;
     NSArray<MTRCertificateDERBytes> * _Nullable _certificationDeclarationCertificates;
 
     BOOL _advertiseOperational;
-    Credentials::IgnoreCertificateValidityPeriodPolicy * _certificateValidityPolicy;
-    MTRSessionResumptionStorageBridge * _sessionResumptionStorage;
 
 // Lock used to serialize access to the "controllers" array and the
 // "_controllerBeingStarted" and "_controllerBeingShutDown" ivars, since those
@@ -151,23 +152,8 @@ MTR_DIRECT_MEMBERS
 //    must lock.
 // D. Locking around reads not from the Matter queue is OK but not required.
     os_unfair_lock _controllersLock;
-
-    id<MTROTAProviderDelegate> _Nullable _otaProviderDelegate;
-    dispatch_queue_t _Nullable _otaProviderDelegateQueue;
-
-    MTRDiagnosticLogsDownloader * _Nullable _diagnosticLogsDownloader;
-
-    // _usingPerControllerStorage is only written once, during controller
-    // factory start.  After that it is only read, and can be read from
-    // arbitrary threads.
-    BOOL _usingPerControllerStorage;
-
-    // See documentation for controllersLock above for the rules for accessing
-    // _controllerBeingStarted.
+    NSMutableArray<MTRDeviceController *> * _controllers;
     MTRDeviceController * _controllerBeingStarted;
-
-    // See documentation for controllersLock above for the rules for access
-    // _controllerBeingShutDown.
     MTRDeviceController * _controllerBeingShutDown;
 
     // Next available fabric index.  Only valid when _controllerBeingStarted is
@@ -175,6 +161,13 @@ MTR_DIRECT_MEMBERS
     // is only accessed on the Matter queue or after the Matter queue has shut
     // down.
     FabricIndex _nextAvailableFabricIndex;
+
+    id<MTROTAProviderDelegate> _Nullable _otaProviderDelegate;
+    dispatch_queue_t _Nullable _otaProviderDelegateQueue;
+    MTRServerEndpoint * _otaProviderEndpoint;
+    std::unique_ptr<MTROTAProviderDelegateBridge> _otaProviderDelegateBridge;
+
+    MTRDiagnosticLogsDownloader * _Nullable _diagnosticLogsDownloader;
 
     // Array of all server endpoints across all controllers, used to ensure
     // in an atomic way that endpoint IDs are unique.
