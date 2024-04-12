@@ -55,16 +55,15 @@ void CapAttributeID(AttributeValuePairType & aVPair, const EmberAfAttributeMetad
 // https://github.com/project-chip/connectedhomeip/issues/24177
 CHIP_ERROR ValidateAttributePath(EndpointId endpoint, ClusterId cluster, AttributeValuePairType & aVPair)
 {
-    bool attIndex = emberAfContainsAttribute(endpoint, cluster, aVPair.attributeID);
-    if (!attIndex)
+    const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, cluster, aVPair.attributeID);
+
+    if (nullptr == metadata)
     {
         return CHIP_ERROR_UNSUPPORTED_ATTRIBUTE;
     }
 
-    EmberAfAttributeMetadata metadata = *emberAfLocateAttributeMetadata(endpoint, cluster, aVPair.attributeID);
-
     // Cap value based on the attribute type size
-    CapAttributeID(aVPair, &metadata);
+    CapAttributeID(aVPair, metadata);
 
     return CHIP_NO_ERROR;
 }
