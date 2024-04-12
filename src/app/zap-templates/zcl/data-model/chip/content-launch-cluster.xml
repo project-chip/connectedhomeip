@@ -194,12 +194,4 @@ limitations under the License.
     <field name="HLS" mask="0x2"/>
   </bitmap>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x050a"/>
-    <field name="ContentSearch" mask="0x1"/>
-    <field name="URLPlayback" mask="0x2"/>
-    <field name="AdvancedSeek" mask="0x3"/>
-    <field name="TextTracks" mask="0x4"/>
-    <field name="AudioTracks" mask="0x5"/>
-  </bitmap>
 </configurator>

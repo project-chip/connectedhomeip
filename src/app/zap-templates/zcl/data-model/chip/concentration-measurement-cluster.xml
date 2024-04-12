@@ -297,26 +297,6 @@ limitations under the License.
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
-  <!-- Feature Map -->
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x040c"/>
-    <cluster code="0x040d" />
-    <cluster code="0x0413" />
-    <cluster code="0x0415" />
-    <cluster code="0x042a" />
-    <cluster code="0x042b" />
-    <cluster code="0x042c" />
-    <cluster code="0x042d" />
-    <cluster code="0x042e" />
-    <cluster code="0x042f" />
-    <field name="Numeric Measurement" mask="0x01" />
-    <field name="Level Indication" mask="0x02" />
-    <field name="Medium Level" mask="0x04" />
-    <field name="Critical Level" mask="0x08" />
-    <field name="Peak Measurement" mask="0x10" />
-    <field name="Average Measurement" mask="0x20" />
-  </bitmap>
-
   <!-- Cluster Data Types -->
   <enum name="LevelValueEnum" type="enum8">
     <cluster code="0x040c"/>

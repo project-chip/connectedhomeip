@@ -157,9 +157,4 @@ limitations under the License.
     <item value="3" name="Critical" />
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x005C" />
-    <field name="Smoke Alarm" mask="0x01" />
-    <field name="CO alarm" mask="0x02" />
-  </bitmap>
 </configurator>

@@ -17,12 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x005F" />
-    <field name="PowerAsNumber"       mask="0x01" />
-    <field name="PowerInWatts"        mask="0x02" />
-    <field name="PowerNumberLimits"   mask="0x04" />
-  </bitmap>
 
   <cluster apiMaturity="provisional">
     <name>Microwave Oven Control</name>

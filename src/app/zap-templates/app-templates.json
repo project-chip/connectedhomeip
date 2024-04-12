@@ -1,6 +1,7 @@
 {
     "name": "CHIP Application templates",
     "version": "chip-v1",
+    "requiredFeatureLevel": 102,
     "helpers": [
         "partials/helper.js",
         "common/ListHelper.js",

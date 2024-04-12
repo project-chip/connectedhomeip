@@ -88,14 +88,6 @@ limitations under the License.
         <item name="ClientIdentifier" type="octet_string" length="20" optional="true" isNullable="true"/>
     </struct>
 
-    <bitmap name="Feature" type="bitmap32">
-      <cluster code="0x0031"/>
-      <field name="WiFiNetworkInterface" mask="0x1"/>
-      <field name="ThreadNetworkInterface" mask="0x2"/>
-      <field name="EthernetNetworkInterface" mask="0x4"/>
-      <field name="PerDeviceCredentials" mask="0x8"/>
-    </bitmap>
-
     <cluster>
         <name>Network Commissioning</name>
         <domain>CHIP</domain>

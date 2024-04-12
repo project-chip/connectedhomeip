@@ -23,11 +23,6 @@ limitations under the License.
     <item name="UseActiveLocale" value="0xFF"/>                   
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x002c"/>
-    <field name="CalendarFormat" mask="0x1"/>
-  </bitmap>
-
   <enum name="CalendarTypeEnum" type="enum8">
     <cluster code="0x002c"/>
     <item name="Buddhist" value="0x00"/>

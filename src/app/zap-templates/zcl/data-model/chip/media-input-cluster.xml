@@ -81,9 +81,5 @@ limitations under the License.
     <item name="Other" value="0x0B"/>
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0507"/>
-    <field name="NameUpdates" mask="0x1"/>
-  </bitmap>
 
 </configurator>

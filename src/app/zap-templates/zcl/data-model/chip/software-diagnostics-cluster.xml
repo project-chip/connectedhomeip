@@ -45,8 +45,5 @@ limitations under the License.
       <field id="2" name="FaultRecording" type="octet_string" length="1024" optional="true"/>
     </event>    
   </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0034"/>
-    <field name="Watermarks" mask="0x1"/>
-  </bitmap>   
+
 </configurator>

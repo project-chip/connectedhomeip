@@ -208,12 +208,4 @@ limitations under the License.
     <field name="Recorded" mask="0x4"/>
   </bitmap>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0504"/>
-    <field name="ChannelList" mask="0x1"/>
-    <field name="LineupInfo"  mask="0x2"/>
-    <field name="ElectronicGuide" mask="0x4"/>
-    <field name="RecordProgram"  mask="0x8"/>
-  </bitmap>
-
 </configurator>

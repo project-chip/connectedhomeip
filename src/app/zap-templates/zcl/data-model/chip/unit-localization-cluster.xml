@@ -40,8 +40,5 @@ limitations under the License.
         <access op="write" role="manage"/>
     </attribute>
   </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x002d"/>
-    <field name="TemperatureUnit" mask="0x1"/>
-  </bitmap>
+
 </configurator>

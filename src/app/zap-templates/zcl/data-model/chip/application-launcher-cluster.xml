@@ -81,9 +81,4 @@ limitations under the License.
     <item name="AppNotAvailable" value="0x01"/>
     <item name="SystemBusy" value="0x02"/>
   </enum>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x050c"/>
-    <field name="ApplicationPlatform" mask="0x1"/>
-  </bitmap>
 </configurator>

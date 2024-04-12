@@ -17,13 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0097"/>
-    <field name="ReceivedConfirmation" mask="0x1"/>
-    <field name="ConfirmationResponse" mask="0x2"/>
-    <field name="ConfirmationReply" mask="0x4"/>
-    <field name="ProtectedMessages" mask="0x8"/>
-  </bitmap>
 
   <bitmap name="MessageControlBitmap" type="bitmap8">
     <cluster code="0x0097"/>

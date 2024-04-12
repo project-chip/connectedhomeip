@@ -99,13 +99,6 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x002F"/>
-    <field name="Wired" mask="0x1"/>
-    <field name="Battery" mask="0x2"/>
-    <field name="Rechargeable" mask="0x4"/>
-    <field name="Replaceable" mask="0x8"/>
-  </bitmap>
 
   <enum name="WiredFaultEnum" type="enum8">
     <cluster code="0x002F"/>

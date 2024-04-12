@@ -124,13 +124,4 @@ limitations under the License.
     <item name="RatingNameDesc" type="char_string" optional="true"/>
   </struct>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x050F"/>
-    <field name="ScreenTime" mask="0x1"/>
-    <field name="PINManagement"  mask="0x2"/>
-    <field name="BlockUnrated" mask="0x4"/>
-    <field name="OnDemandContentRating"  mask="0x8"/>
-    <field name="ScheduledContentRating"  mask="0x10"/>
-  </bitmap>
-
 </configurator>

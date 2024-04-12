@@ -17,11 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0033"/>
-    <field name="DataModelTest" mask="0x1"/>
-  </bitmap>
-
   <enum name="HardwareFaultEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>

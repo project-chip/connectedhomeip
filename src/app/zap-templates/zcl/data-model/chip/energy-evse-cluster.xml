@@ -242,13 +242,5 @@ limitations under the License.
       <field id="0" name="UID" type="octet_string" length="10" apiMaturity="provisional"/>
     </event>
   </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0099"/>
-    <field name="ChargingPreferences" mask="0x01"/>
-    <field name="SoCReporting" mask="0x02"/>
-    <field name="PlugAndCharge" mask="0x04"/>
-    <field name="RFID" mask="0x08"/>
-    <field name="V2X" mask="0x10"/>
-  </bitmap>
 
 </configurator>

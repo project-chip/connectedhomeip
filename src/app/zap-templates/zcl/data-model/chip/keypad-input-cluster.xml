@@ -152,11 +152,5 @@ limitations under the License.
     <item name="Data" value="0x76"/>
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0509"/>
-    <field name="NavigationKeyCodes" mask="0x1"/>
-    <field name="LocationKeys" mask="0x2"/>
-    <field name="NumberKeys" mask="0x4"/>
-  </bitmap>
 
 </configurator>

@@ -58,12 +58,6 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x009B"/>
-    <field name="EnergyBalance" mask="0x1"/>
-    <field name="LowPowerModeSensitivity" mask="0x2"/>
-  </bitmap>
-
   <enum name="EnergyPriorityEnum" type="enum8">
     <cluster code="0x009B"/>
     <item name="Comfort" value="0x00"/>

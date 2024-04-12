@@ -16,13 +16,6 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0091"/>
-    <field name="ImportedEnergy" mask="0x01"/>
-    <field name="ExportedEnergy" mask="0x02"/>
-    <field name="CumulativeEnergy" mask="0x04"/>
-    <field name="PeriodicEnergy" mask="0x08"/>
-  </bitmap>
   <cluster apiMaturity="provisional">
     <name>Electrical Energy Measurement</name>
     <domain>Measurement &amp; Sensing</domain>

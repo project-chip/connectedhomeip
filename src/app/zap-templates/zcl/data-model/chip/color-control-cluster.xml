@@ -15,14 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0300" />
-    <field name="HueAndSaturation" mask="0x01" />
-    <field name="EnhancedHue" mask="0x02" />
-    <field name="ColorLoop" mask="0x04" />
-    <field name="XY" mask="0x08" />
-    <field name="ColorTemperature" mask="0x10" />
-  </bitmap>
+
 
   <enum name="HueDirection" type="enum8">
     <cluster code="0x0300"/>

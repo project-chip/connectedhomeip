@@ -65,8 +65,5 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0050"/>
-    <field name="OnOff" mask="0x1"/>
-  </bitmap>
+
 </configurator>

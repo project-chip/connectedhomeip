@@ -839,18 +839,6 @@ limitations under the License.
         <field mask="0x10" name="PINChanged" />
     </bitmap>
 
-    <!-- RemoteProgrammingEventMask attribute bit meaning set -->
-    <bitmap name="DlRemoteProgrammingEventMask" type="bitmap16">
-        <cluster code="0x0101" />
-        <field mask="0x01" name="Unknown" />
-        <field mask="0x02" name="ProgrammingPINChanged" />
-        <field mask="0x04" name="PINAdded" />
-        <field mask="0x08" name="PINCleared" />
-        <field mask="0x10" name="PINChanged" />
-        <field mask="0x20" name="RFIDCodeAdded" />
-        <field mask="0x40" name="RFIDCodeCleared" />
-    </bitmap>
-
     <!-- RFIDProgrammingEventMask attribute bit meaning set -->
     <bitmap name="DlRFIDProgrammingEventMask" type="bitmap16">
         <cluster code="0x0101" />
@@ -869,25 +857,6 @@ limitations under the License.
         <item value="0x89" name="ResourceExhausted" />
         <item value="0x8B" name="NotFound" />
     </enum>
-
-    <bitmap name="Feature" type="bitmap32">
-        <cluster code="0x0101" />
-        <field name="PIN Credential" mask="0x01" />
-        <field name="RFID Credential" mask="0x02" />
-        <field name="Finger Credentials" mask="0x04" />
-        <field name="Logging" mask="0x08" />
-        <field name="Week Day Access Schedules" mask="0x10" />
-        <field name="Door Position Sensor" mask="0x20" />
-        <field name="Face Credentials" mask="0x40" />
-        <field name="Credentials Over-the-Air Access" mask="0x80" />
-        <field name="User" mask="0x100" />
-        <field name="Notification" mask="0x200" />
-        <field name="Year Day Access Schedules" mask="0x400" />
-        <field name="Holiday Schedules" mask="0x800" />
-        <field name="Unbolt" mask="0x1000" />
-        <field name="AliroProvisioning" mask="0x2000" />
-        <field name="AliroBLEUWB" mask="0x4000" />
-    </bitmap>
 
     <enum name="DoorLockSetPinOrIdStatus" type="enum8">
         <cluster code="0x0101"/>

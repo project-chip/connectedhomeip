@@ -17,16 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="Energy Management"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0096"/>
-    <field name="EnrollmentGroups" mask="0x1"/>
-    <field name="TemperatureOffset" mask="0x2"/>
-    <field name="TemperatureSetpoint" mask="0x4"/>
-    <field name="LoadAdjustment" mask="0x8"/>
-    <field name="DutyCycle" mask="0x10"/>
-    <field name="PowerSavings" mask="0x20"/>
-    <field name="HeatingSource" mask="0x40"/>
-  </bitmap>
 
   <bitmap name="DeviceClassBitmap" type="bitmap32">
     <cluster code="0x0096"/>

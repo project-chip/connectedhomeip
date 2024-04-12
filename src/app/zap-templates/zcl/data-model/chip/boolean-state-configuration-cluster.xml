@@ -17,14 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0080"/>
-    <field name="Visual" mask="0x1"/>
-    <field name="Audible" mask="0x2"/>
-    <field name="AlarmSuppress" mask="0x4"/>
-    <field name="SensitivityLevel" mask="0x8"/>
-  </bitmap>
-
   <bitmap name="AlarmModeBitmap" type="bitmap8">
     <cluster code="0x0080"/>
     <field name="Visual" mask="0x1"/>

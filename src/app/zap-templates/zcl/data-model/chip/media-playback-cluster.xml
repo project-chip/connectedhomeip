@@ -180,14 +180,6 @@ limitations under the License.
     <item name="SeekOutOfRange"         value="0x05"/>
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0506"/>
-    <field name="AdvancedSeek" mask="0x1"/>
-    <field name="VariableSpeed" mask="0x2"/>
-    <field name="TextTracks" mask="0x4"/>
-    <field name="AudioTracks" mask="0x8"/>
-    <field name="AudioAdvance" mask="0x10"/>
-  </bitmap>
 
   <enum name="CharacteristicEnum" type="enum8">
     <cluster code="0x0506"/>

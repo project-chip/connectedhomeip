@@ -69,9 +69,4 @@ limitations under the License.
     </command>
 
   </cluster>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x003c" />
-    <field name="Basic" mask="0x01" />
-  </bitmap>
 </configurator>

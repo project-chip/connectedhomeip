@@ -16,20 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="HVAC"/>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0201"/>
-    <field name="Heating" mask="0x1"/>
-    <field name="Cooling" mask="0x2"/>
-    <field name="Occupancy" mask="0x4"/>
-    <field name="ScheduleConfiguration" mask="0x8"/>
-    <field name="Setback" mask="0x10"/>
-    <field name="AutoMode" mask="0x20"/>
-    <field name="LocalTemperatureNotExposed" mask="0x40"/>
-    <field name="MatterScheduleConfiguration" mask="0x80"/>
-    <field name="Presets" mask="0x100"/>
-    <field name="Setpoints" mask="0x200"/>
-    <field name="QueuedPresetsSupported" mask="0x400"/>
-  </bitmap>
+
 
   <bitmap name="ACErrorCodeBitmap" type="bitmap32">
     <cluster code="0x0201"/>

@@ -169,11 +169,5 @@ limitations under the License.
       <field id="1" name="Previous" type="NetworkFaultEnum" array="true"/>
     </event>    
   </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0035"/>
-    <field name="PacketCounts" mask="0x1"/>
-    <field name="ErrorCounts" mask="0x2"/>
-    <field name="MLECounts" mask="0x4"/>
-    <field name="MACCounts" mask="0x8"/>
-  </bitmap>  
+
 </configurator>

@@ -44,15 +44,6 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="AIR_QUALITY" type="AirQualityEnum" min="0" max="6" writable="false" isNullable="false" default="0" optional="false">AirQuality</attribute>
   </cluster>
 
-  <!-- Feature Map -->
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x005B" />
-    <field name="Fair" mask="0x01" />
-    <field name="Moderate" mask="0x02" />
-    <field name="VeryPoor" mask="0x04" />
-    <field name="ExtremelyPoor" mask="0x08" />
-  </bitmap>
-
   <!-- Cluster Data Types -->
   <enum name="AirQualityEnum" type="enum8">
     <cluster code="0x005B" />

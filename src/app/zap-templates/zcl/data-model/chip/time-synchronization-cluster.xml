@@ -17,13 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0038"/>
-    <field name="TimeZone" mask="0x1"/>
-    <field name="NTPClient" mask="0x2"/>
-    <field name="NTPServer" mask="0x4"/>
-    <field name="TimeSyncClient" mask="0x8"/>
-  </bitmap>
 
   <!-- NOTE: This type is not defined as an enum in the spec, but the Status Codes section
   of this cluster defines these status codes, and we're choosing to represent them as an enum. -->

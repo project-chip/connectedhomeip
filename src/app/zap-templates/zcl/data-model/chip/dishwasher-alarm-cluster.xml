@@ -60,9 +60,4 @@ limitations under the License.
         <field id="3" name="Mask" type="AlarmBitmap" />
     </event>
   </cluster>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x005D" />
-    <field name="Reset" mask="0x01" />
-  </bitmap>
 </configurator>

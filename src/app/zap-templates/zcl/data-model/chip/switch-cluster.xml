@@ -96,13 +96,5 @@ Interactions with the switch device are exposed as attributes (for the latching 
 
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x003B" />
-    <field name="Latching Switch" mask="0x1" />
-    <field name="Momentary Switch" mask="0x2" />
-    <field name="Momentary Switch Release" mask="0x4" />
-    <field name="Momentary Switch LongPress" mask="0x8" />
-    <field name="Momentary Switch MultiPress" mask="0x10" />
-  </bitmap>
 
 </configurator>

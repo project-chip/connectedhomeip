@@ -29,11 +29,6 @@ limitations under the License.
     <item name="Rate200G" value="0x08"/>
     <item name="Rate400G" value="0x09"/>
   </enum>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0037"/>
-    <field name="PacketCounts" mask="0x1"/>
-    <field name="ErrorCounts" mask="0x2"/>
-  </bitmap>
   <cluster>
     <domain>General</domain>
     <name>Ethernet Network Diagnostics</name>

@@ -233,12 +233,4 @@ limitations under the License.
     <field mask="0x0800" name="Protection"/>
   </bitmap>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0102"/>
-    <field mask="0x01" name="Lift" />
-    <field mask="0x02" name="Tilt" />
-    <field mask="0x04" name="PositionAwareLift"/>
-    <field mask="0x08" name="AbsolutePosition"/>
-    <field mask="0x10" name="PositionAwareTilt"/>
-  </bitmap>
 </configurator>

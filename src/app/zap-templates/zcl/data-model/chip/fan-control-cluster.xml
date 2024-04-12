@@ -17,16 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="HVAC"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0202" />
-    <field name="MultiSpeed" mask="0x01" />
-    <field name="Auto" mask="0x02" />
-    <field name="Rocking" mask="0x04" />
-    <field name="Wind" mask="0x08" />
-    <field name="Step" mask="0x10" />
-    <field name="Airflow Direction" mask="0x20" />
-  </bitmap>
-
   <enum name="FanModeEnum" type="enum8">
     <cluster code="0x0202"/>
     <item name="Off" value="0x00"/>

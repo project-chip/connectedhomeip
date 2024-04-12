@@ -17,11 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0081"/>
-    <field name="TimeSync" mask="0x01"/>
-    <field name="Level" mask="0x02"/>
-  </bitmap>
 
   <bitmap name="ValveFaultBitmap" type="bitmap16">
     <cluster code="0x0081"/>

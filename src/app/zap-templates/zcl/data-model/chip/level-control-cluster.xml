@@ -17,12 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <bitmap name="Feature" type="bitmap32">
-      <cluster code="0x0008"/>
-      <field name="OnOff" mask="0x1"/>
-      <field name="Lighting" mask="0x2"/>
-      <field name="Frequency" mask="0x4"/>
-  </bitmap>
 
   <enum name="MoveModeEnum" type="enum8">
     <cluster code="0x0008"/>

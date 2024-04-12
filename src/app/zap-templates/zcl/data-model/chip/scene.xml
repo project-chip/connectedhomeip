@@ -201,8 +201,4 @@ limitations under the License.
     </command>
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0062" />
-    <field name="SceneNames" mask="0x01" />
-  </bitmap>
 </configurator>

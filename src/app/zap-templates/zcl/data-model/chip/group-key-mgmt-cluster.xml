@@ -36,11 +36,6 @@ limitations under the License.
     <item name="CacheAndSync" value="0x01"/>
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-      <cluster code="0x003F"/>
-      <field name="CacheAndSync" mask="0x1"/>
-  </bitmap>
-
   <struct name="GroupKeySetStruct">
     <cluster code="0x003F"/>
     <item fieldId="0" name="GroupKeySetID" type="int16u"/>
