@@ -22,6 +22,8 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include <platform/silabs/multi-ota/OTAFirmwareProcessor.h>
+#include <platform/silabs/multi-ota/OTAFactoryDataProcessor.h>
+
 #if OTA_TEST_CUSTOM_TLVS
 #include <platform/silabs/multi-ota/OTACustomProcessor.h>
 #endif
@@ -37,11 +39,14 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor
 CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
 {
     static chip::OTAFirmwareProcessor sApplicationProcessor;
+    static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
 
     sApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
+    sFactoryDataProcessor.RegisterDescriptorCallback(ProcessDescriptor);
 
     auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
-    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(1, &sApplicationProcessor));
+    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kApplicationProcessor), &sApplicationProcessor));
+    ReturnErrorOnFailure(imageProcessor.RegisterProcessor(static_cast<uint32_t>(OTAProcessorTag::kFactoryDataProcessor), &sFactoryDataProcessor));
 
 #if OTA_TEST_CUSTOM_TLVS
     static chip::OTACustomProcessor customProcessor1;

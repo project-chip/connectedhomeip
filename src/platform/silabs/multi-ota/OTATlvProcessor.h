@@ -62,6 +62,14 @@ struct OTATlvHeader
     uint32_t length;
 };
 
+// TLV tags synced with ota files generate by scripts/tools/silabs/ota/ota_image_tool.py
+enum class OTAProcessorTag
+{
+    kApplicationProcessor = 1, 
+    kBootloaderProcessor = 2 ,
+    kFactoryDataProcessor = 3
+};
+
 /**
  * This class defines an interface for a Matter TLV processor.
  * Instances of derived classes can be registered as processors

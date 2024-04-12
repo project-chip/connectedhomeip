@@ -96,7 +96,7 @@ class DacPKey(FileArgument):
         assert (self.private_key is not None)
         return self.private_key
 
-    def generate_private_key(self, password, use_sss_blob=False):
+    def generate_private_key(self, password, use_sss_blob=True):
         if use_sss_blob:
             self.private_key = self.val
         else:

@@ -32,8 +32,6 @@ extern "C" {
 
 /// No error, operation OK
 #define SL_BOOTLOADER_OK 0L
-// TODO: more descriptive error codes
-#define SL_OTA_ERROR 1L
 
 namespace chip {
 

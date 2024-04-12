@@ -62,7 +62,7 @@
                 }
             ],
             "path": "./binaries/ext_flash_ota_entry_example.bin"
-        }
+        },
         {
             "tag": 11,
             "descriptor": [

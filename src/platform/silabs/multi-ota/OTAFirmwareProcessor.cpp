@@ -32,8 +32,6 @@ extern "C" {
 
 /// No error, operation OK
 #define SL_BOOTLOADER_OK 0L
-// TODO: more descriptive error codes
-#define SL_OTA_ERROR 1L
 
 namespace chip {
 
@@ -129,9 +127,6 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
             if (err)
             {
                 ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage() error: %ld", err);
-                // TODO: add this somewhere
-                // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
                 return CHIP_ERROR_CANCELLED;
             }
             mWriteOffset += kAlignmentBytes;

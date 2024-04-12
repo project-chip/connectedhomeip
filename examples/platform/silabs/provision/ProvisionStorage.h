@@ -211,7 +211,11 @@ public:
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & value);
     CHIP_ERROR GetDeviceAttestationCSR(uint16_t vid, uint16_t pid, const CharSpan &cn, MutableCharSpan & csr);
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message, MutableByteSpan & signature);
-
+    
+    CHIP_ERROR SetCertificationDeclaration(const ByteSpan & value);
+    CHIP_ERROR SetProductAttestationIntermediateCert(const ByteSpan & value);
+    CHIP_ERROR SetDeviceAttestationCert(const ByteSpan & value);
+    CHIP_ERROR SetDeviceAttestationKey(const ByteSpan & value);
     //
     // Other
     //
@@ -252,10 +256,7 @@ private:
     CHIP_ERROR GetSpake2pVerifier(char * value, size_t max, size_t &size);
     // DeviceAttestationCredentialsProvider
     CHIP_ERROR SetFirmwareInformation(const ByteSpan & value);
-    CHIP_ERROR SetCertificationDeclaration(const ByteSpan & value);
-    CHIP_ERROR SetProductAttestationIntermediateCert(const ByteSpan & value);
-    CHIP_ERROR SetDeviceAttestationCert(const ByteSpan & value);
-    CHIP_ERROR SetDeviceAttestationKey(const ByteSpan & value);
+
     // Other
     CHIP_ERROR SetProvisionVersion(const char * value, size_t len);
     CHIP_ERROR GetProvisionVersion(char * value, size_t max, size_t &size);
