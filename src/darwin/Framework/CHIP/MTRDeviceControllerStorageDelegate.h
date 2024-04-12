@@ -123,7 +123,7 @@ MTR_NEWLY_AVAILABLE
                                                                    sharingType:(MTRStorageSharingType)sharingType;
 
 /**
- * Store a list of keys/value pairs in the form of a dictionary. Returns whether
+ * Store a list of key/value pairs in the form of a dictionary. Returns whether
  * the store succeeded. Specifically, if any keys in this dictionary fail to store,
  * the storage delegate should return NO.
  */
