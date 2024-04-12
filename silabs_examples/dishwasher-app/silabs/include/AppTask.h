@@ -109,5 +109,4 @@ private:
 
     static void ActionInitiated(OperationalStateEnum action);
     static void ActionCompleted();
-    static void UpdateClusterState(intptr_t context);
 };
