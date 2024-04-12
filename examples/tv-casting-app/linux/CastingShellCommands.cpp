@@ -179,6 +179,8 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
 
         Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
         id.SetCommissionerPasscode(true);
+        id.SetVendorId(1244); // set non-standard vid-pid to prevent dummy content apps from returning a passcode
+        id.SetProductId(2234);
         if (argc > 3)
         {
             id.SetCommissionerPasscodeReady(strcmp(argv[3], "t") == 0);
