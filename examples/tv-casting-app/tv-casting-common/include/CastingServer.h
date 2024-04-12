@@ -62,10 +62,7 @@ public:
     void InitAppDelegation();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    void SetCommissionerPasscodeEnabled(bool enabled)
-    {
-        mUdcCommissionerPasscodeEnabled = enabled;
-    };
+    void SetCommissionerPasscodeEnabled(bool enabled) { mUdcCommissionerPasscodeEnabled = enabled; };
     void SetCommissionerPasscodeReady() { mUdcCommissionerPasscodeReady = true; };
     void OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
                                           chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) override;
