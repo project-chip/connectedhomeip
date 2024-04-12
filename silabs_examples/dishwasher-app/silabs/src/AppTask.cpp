@@ -183,8 +183,18 @@ void AppTask::ActionInitiated(OperationalStateEnum action)
         SILABS_LOG("Action error"); 
         action = OperationalStateEnum::kError;
     }
-    
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(&action));
+
+    PlatformMgr().LockChipStack();
+    CHIP_ERROR err = Clusters::OperationalState::GetInstance()->SetOperationalState(to_underlying(action));
+    PlatformMgr().UnlockChipStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("ERR: updating Operational state %x", err);
+    }
+    else
+    {
+        DishwasherMgr().UpdateOperationState(action);
+    } 
 }
 
 void AppTask::ActionCompleted()
@@ -192,21 +202,4 @@ void AppTask::ActionCompleted()
 #ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI((DishwasherMgr().GetOperationalState() == OperationalStateEnum::kRunning));
 #endif
-}
-
-void AppTask::UpdateClusterState(intptr_t context)
-{
-    uint8_t* newValue = reinterpret_cast<uint8_t*>(context);
-
-    // write the new on/off value
-    CHIP_ERROR err = Clusters::OperationalState::GetInstance()->SetOperationalState(*newValue);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("ERR: updating Operational state %x", err);
-    }
-    else
-    {
-        Clusters::OperationalState::GetDelegate()->PostAttributeChangeCallback(Attributes::OperationalState::Id, ZCL_INT8U_ATTRIBUTE_TYPE, sizeof(uint8_t), newValue);
-    }
 }

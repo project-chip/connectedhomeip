@@ -51,11 +51,12 @@ TimerHandle_t sDishwasherTimer;
 CHIP_ERROR DishwasherManager::Init()
 {
     sDishwasherLED.Init(DW_STATE_LED);
+    AppTask::GetAppTask().LinkAppLed(&sDishwasherLED);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     OperationalStateEnum state = static_cast<OperationalStateEnum>(OperationalState::GetInstance()->GetCurrentOperationalState());
-    UpdateOperationState(state);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    UpdateOperationState(state);
     return CHIP_NO_ERROR;
 }
 
