@@ -150,7 +150,6 @@ void UserDirectedCommissioningServer::HandleUDCCancel(IdentificationDeclaration 
 
     // reset this entry so that the client can try again without waiting an hour
     client->Reset();
-    return;
 }
 
 void UserDirectedCommissioningServer::HandleUDCCommissionerPasscodeReady(IdentificationDeclaration & id)
@@ -178,7 +177,6 @@ void UserDirectedCommissioningServer::HandleUDCCommissionerPasscodeReady(Identif
     {
         mUserConfirmationProvider->OnCommissionerPasscodeReady(*client);
     }
-    return;
 }
 
 CHIP_ERROR UserDirectedCommissioningServer::SendCDCMessage(CommissionerDeclaration cd, chip::Transport::PeerAddress peerAddress)
