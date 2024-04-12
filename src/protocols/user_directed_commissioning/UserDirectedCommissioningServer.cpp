@@ -66,7 +66,54 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     ChipLogProgress(AppServer, "UDC instance=%s ", id.GetInstanceName());
 
     UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
-    if (client == nullptr)
+    if (id.GetCancelPasscode())
+    {
+        ChipLogProgress(AppServer, "UDC instance cancel received");
+        if (client == nullptr)
+        {
+            ChipLogProgress(AppServer, "UDC no matching instance found");
+            return;
+        }
+        id.DebugLog();
+        mUdcClients.MarkUDCClientActive(client);
+
+        // Call the registered mUserConfirmationProvider, if any.
+        if (mUserConfirmationProvider != nullptr)
+        {
+            mUserConfirmationProvider->OnCancel(*client);
+        }
+
+        // reset this entry so that the client can try again without waiting an hour
+        client->Reset();
+        return;
+    }
+
+    if (id.GetCommissionerPasscodeReady())
+    {
+        ChipLogProgress(AppServer, "UDC instance commissioner passcode ready received");
+        if (client == nullptr)
+        {
+            ChipLogProgress(AppServer, "UDC no matching instance found");
+            return;
+        }
+        if (client->GetUDCClientProcessingState() != UDCClientProcessingState::kWaitingForCommissionerPasscodeReady)
+        {
+            ChipLogProgress(AppServer, "UDC instance not in waiting for passcode ready state");
+            return;
+        }
+        id.DebugLog();
+        mUdcClients.MarkUDCClientActive(client);
+        client->SetUDCClientProcessingState(UDCClientProcessingState::kObtainingOnboardingPayload);
+
+        // Call the registered mUserConfirmationProvider, if any.
+        if (mUserConfirmationProvider != nullptr)
+        {
+            mUserConfirmationProvider->OnCommissionerPasscodeReady(*client);
+        }
+        return;
+    }
+
+    if (client == nullptr) // how about CDC?
     {
         ChipLogProgress(AppServer, "UDC new instance state received");
 

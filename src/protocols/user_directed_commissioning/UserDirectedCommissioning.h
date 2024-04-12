@@ -448,6 +448,30 @@ public:
      */
     virtual void OnUserDirectedCommissioningRequest(UDCClientState state) = 0;
 
+    /**
+     * @brief
+     *   Called when an Identification Declaration UDC message has been received
+     * with the cancel flag set.
+     * It is expected that the implementer will tear down any dialog prompts for the
+     * commissionee instance (identified in the UDC client state argument).
+     *
+     *  @param[in]    state           The state for the UDC Client.
+     *
+     */
+    virtual void OnCancel(UDCClientState state) = 0;
+
+    /**
+     * @brief
+     *   Called when an Identification Declaration UDC message has been received
+     * with the commissioner passcode ready flag set.
+     * It is expected that the implementer will invoke commissioning on the
+     * commissionee instance (identified in the UDC client state argument).
+     *
+     *  @param[in]    state           The state for the UDC Client.
+     *
+     */
+    virtual void OnCommissionerPasscodeReady(UDCClientState state) = 0;
+
     virtual ~UserConfirmationProvider() = default;
 };
 
