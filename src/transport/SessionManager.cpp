@@ -917,7 +917,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
     // Trial decryption with GroupDataProvider
     Credentials::GroupDataProvider::GroupSession groupContext;
-    
+
     AutoReleaseGroupIterator<Credentials::GroupDataProvider::GroupSessionIterator> iter(groups->IterateGroupSessions(partialPacketHeader.GetSessionId());
 
     if (iter.IsNull())
@@ -1005,7 +1005,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, packetHeaderCopy.GetSourceNodeId().Value(),
                                        packetHeaderCopy.IsSecureSessionControlMsg(), counter))
     {
-
         if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {
             err = counter->VerifyOrTrustFirstGroup(packetHeaderCopy.GetMessageCounter());
