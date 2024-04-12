@@ -35,6 +35,14 @@ tests:
       PICS: OO.S.C00.Rsp
       command: "Off"
 
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
     - label: "Step 2b: after a few seconds, TH reads OnOff attribute from DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
@@ -45,6 +53,14 @@ tests:
     - label: "Step 3a: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       command: "On"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
 
     - label: "Step 3b: after a few seconds, TH reads OnOff attribute from DUT"
       PICS: OO.S.A0000
@@ -57,6 +73,14 @@ tests:
       PICS: OO.S.C01.Rsp
       command: "On"
 
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
     - label: "Step 3d: after a few seconds, TH reads OnOff attribute from DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
@@ -67,6 +91,14 @@ tests:
     - label: "Step 4a: TH sends Off command to DUT"
       PICS: OO.S.C00.Rsp
       command: "Off"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
 
     - label: "Step 4b: after a few seconds, TH reads OnOff attribute from DUT"
       PICS: OO.S.A0000
@@ -79,12 +111,39 @@ tests:
       PICS: OO.S.C00.Rsp
       command: "Off"
 
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
     - label: "Step 4d: after a few seconds, TH reads OnOff attribute from DUT"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
+
+    - label: "Step 5a: TH sends Toggle command to DUT"
+      PICS: OO.S.C02.Rsp
+      command: "Toggle"
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Step 5b: after a few seconds, TH reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
 
     - label: "Step 5c: TH sends Toggle command to DUT"
       PICS: OO.S.C02.Rsp
@@ -99,25 +158,6 @@ tests:
                 value: 1000
 
     - label: "Step 5d: after a few seconds, TH reads OnOff attribute from DUT"
-      PICS: OO.S.A0000
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 1
-
-    - label: "TH sends Toggle command to DUT"
-      PICS: OO.S.C02.Rsp
-      command: "Toggle"
-
-    - label: "Wait 1000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 1000
-
-    - label: "Check on/off attribute value is false after toggle command"
       PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
@@ -157,17 +197,6 @@ tests:
     # Skipped the step because the above test need manual input
     - label: "Step 6d: after a few seconds, TH reads OnOff attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000 && OO.M.ManuallyControlled
-      command: "readAttribute"
-      attribute: "OnOff"
-      response:
-          value: 0
-
-    - label: "Reset Off Command"
-      PICS: OO.S.C00.Rsp
-      command: "Off"
-
-    - label: "Check on/off attribute value is false after off command"
-      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
