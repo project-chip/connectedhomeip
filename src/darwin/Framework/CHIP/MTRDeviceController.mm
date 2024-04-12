@@ -592,16 +592,14 @@ using namespace chip::Tracing::DarwinFramework;
 
     if (_controllerDataStore) {
         // If the storage delegate supports the bulk read API, then a dictionary of nodeID => cluster data dictionary would be passed to the handler. Otherwise this would be a no-op, and stored attributes for MTRDevice objects will be loaded lazily in -deviceForNodeID:.
-        [_controllerDataStore startUpWithClusterDataHandler:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
-            MTR_LOG_INFO("Loaded attribute values for %lu nodes from storage", static_cast<unsigned long>(clusterDataByNode.count));
+        [_controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
+            MTR_LOG_INFO("Loaded attribute values for %lu nodes from storage for controller uuid %@", static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
+
+            std::lock_guard lock(self->_deviceMapLock);
             for (NSNumber * nodeID in clusterDataByNode) {
-                MTRDevice * device = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
                 NSDictionary * clusterData = clusterDataByNode[nodeID];
+                MTRDevice * device = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:clusterData];
                 MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), device);
-                if (clusterData.count) {
-                    [device setClusterData:clusterData];
-                }
-                self->_nodeIDToDeviceMap[nodeID] = device;
             }
         }];
     }
@@ -949,20 +947,25 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:self];
 }
 
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+// If prefetchedClusterData is not provided, load attributes individually from controller data store
+- (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
-    std::lock_guard lock(_deviceMapLock);
-    MTRDevice * deviceToReturn = _nodeIDToDeviceMap[nodeID];
-    if (!deviceToReturn) {
-        deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
-        // If we're not running, don't add the device to our map.  That would
-        // create a cycle that nothing would break.  Just return the device,
-        // which will be in exactly the state it would be in if it were created
-        // while we were running and then we got shut down.
-        if ([self isRunning]) {
-            _nodeIDToDeviceMap[nodeID] = deviceToReturn;
-        }
+    os_unfair_lock_assert_owner(&_deviceMapLock);
 
+    MTRDevice * deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
+    // If we're not running, don't add the device to our map.  That would
+    // create a cycle that nothing would break.  Just return the device,
+    // which will be in exactly the state it would be in if it were created
+    // while we were running and then we got shut down.
+    if ([self isRunning]) {
+        _nodeIDToDeviceMap[nodeID] = deviceToReturn;
+    }
+
+    if (prefetchedClusterData) {
+        if (prefetchedClusterData.count) {
+            [deviceToReturn setClusterData:prefetchedClusterData];
+        }
+    } else {
 #if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
         // Load persisted attributes if they exist.
         NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
@@ -977,6 +980,17 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         if (clusterData.count) {
             [deviceToReturn setClusterData:clusterData];
         }
+    }
+
+    return deviceToReturn;
+}
+
+- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+{
+    std::lock_guard lock(_deviceMapLock);
+    MTRDevice * deviceToReturn = _nodeIDToDeviceMap[nodeID];
+    if (!deviceToReturn) {
+        deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
     }
 
     return deviceToReturn;

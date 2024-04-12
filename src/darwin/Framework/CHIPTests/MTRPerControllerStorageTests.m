@@ -1037,6 +1037,23 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertFalse([controller3 isRunning]);
 }
 
+- (BOOL)_array:(NSArray *)one containsSameElementsAsArray:(NSArray *)other
+{
+    for (id object in one) {
+        if (![other containsObject:object]) {
+            return NO;
+        }
+    }
+
+    for (id object in other) {
+        if (![one containsObject:object]) {
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
 - (void)test008_TestDataStoreDirect
 {
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
@@ -1261,22 +1278,22 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     });
     // Verify that the store resulted in the correct values
     dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
-    for (MTRClusterPath * path in dataStoreClusterData) {
-        XCTAssertEqualObjects(bulkTestclusterDataDictionary[path], dataStoreClusterData[path]);
-    }
+    XCTAssertEqualObjects(dataStoreClusterData, bulkTestClusterDataDictionary);
+
+    // clear information before the next test
+    [controller.controllerDataStore clearStoredAttributesForNodeID:@(3001)];
 
     // Now test bulk store through data store
-    [controller.controllerDataStore storeClusterData:bulkTestclusterDataDictionary forNodeID:@(3001)];
+    [controller.controllerDataStore storeClusterData:bulkTestClusterDataDictionary forNodeID:@(3001)];
     dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
-    for (MTRClusterPath * path in dataStoreClusterData) {
-        XCTAssertEqualObjects(bulkTestclusterDataDictionary[path], dataStoreClusterData[path]);
-    }
+    XCTAssertEqualObjects(dataStoreClusterData, bulkTestClusterDataDictionary);
 
     // Now test bulk read directly from storage delegate
     NSDictionary<NSString *, id<NSSecureCoding>> * dataStoreBulkValues = [storageDelegate valuesForController:controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
-    XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _endpointIndexKeyForNodeID:@(3001)]], (@[ @(1), @(2) ]));
-    XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterIndexKeyForNodeID:@(3001) endpointID:@(1)]], (@[ @(1), @(2), @(3) ]));
-    XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterIndexKeyForNodeID:@(3001) endpointID:@(2)]], (@[ @(1), @(2) ]));
+    // Due to dictionary enumeration in storeClusterData:forNodeID:, the elements could be stored in a different order, but still be valid and equivalent
+    XCTAssertTrue(([self _array:(NSArray *) dataStoreBulkValues[[controller.controllerDataStore _endpointIndexKeyForNodeID:@(3001)]] containsSameElementsAsArray:@[ @(1), @(2) ]]));
+    XCTAssertTrue(([self _array:(NSArray *) dataStoreBulkValues[[controller.controllerDataStore _clusterIndexKeyForNodeID:@(3001) endpointID:@(1)]] containsSameElementsAsArray:@[ @(1), @(2), @(3) ]]));
+    XCTAssertTrue(([self _array:(NSArray *) dataStoreBulkValues[[controller.controllerDataStore _clusterIndexKeyForNodeID:@(3001) endpointID:@(2)]] containsSameElementsAsArray:@[ @(1), @(2) ]]));
     XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(1) clusterID:@(1)]], bulkTestClusterData11);
     XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(1) clusterID:@(2)]], bulkTestClusterData12);
     XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(1) clusterID:@(3)]], bulkTestClusterData13);

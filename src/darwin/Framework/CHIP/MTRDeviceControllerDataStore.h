@@ -52,9 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNode);
 
 /**
- * Asks the data store to load cluster data for nodes in bulk, if the storageDelegate supports it.
+ * Asks the data store to load cluster data for nodes in bulk. If the storageDelegate supports it, the handler will be called synchronously.
  */
-- (void)startUpWithClusterDataHandler:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler;
+- (void)fetchAttributeDataForAllDevices:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler;
 
 /**
  * Resumption info APIs.

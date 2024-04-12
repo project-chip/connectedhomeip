@@ -151,15 +151,18 @@ static bool IsValidCATNumber(id _Nullable value)
     return self;
 }
 
-- (void)startUpWithClusterDataHandler:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler
+- (void)fetchAttributeDataForAllDevices:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler
 {
+    __block NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNode = nil;
     dispatch_sync(_storageDelegateQueue, ^{
         if ([self->_storageDelegate respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
             NSDictionary<NSString *, id> * dataStoreSecureLocalValues = [self->_storageDelegate valuesForController:self->_controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
 
-            clusterDataHandler([self getClusterDataFromSecureLocalValues:dataStoreSecureLocalValues]);
+            clusterDataByNode = [self _getClusterDataFromSecureLocalValues:dataStoreSecureLocalValues];
         }
     });
+
+    clusterDataHandler(clusterDataByNode);
 }
 
 - (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByNodeID:(NSNumber *)nodeID
@@ -537,8 +540,6 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 }
 
 #pragma - Attribute Cache management
-
-#define ATTRIBUTE_CACHE_VERBOSE_LOGGING 1
 
 #ifndef ATTRIBUTE_CACHE_VERBOSE_LOGGING
 #define ATTRIBUTE_CACHE_VERBOSE_LOGGING 0
@@ -990,19 +991,49 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
 }
 
 // Utility for constructing dictionary of nodeID to cluster data from dictionary of storage keys
-- (nullable NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> *)getClusterDataFromSecureLocalValues:(NSDictionary<NSString *, id> *)secureLocalValues
+- (nullable NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> *)_getClusterDataFromSecureLocalValues:(NSDictionary<NSString *, id> *)secureLocalValues
 {
     NSMutableDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNodeToReturn = nil;
+
+    if (![secureLocalValues isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
 
     // Fetch node index
     NSArray<NSNumber *> * nodeIndex = secureLocalValues[sAttributeCacheNodeIndexKey];
 
+    if (![nodeIndex isKindOfClass:[NSArray class]]) {
+        return nil;
+    }
+
     for (NSNumber * nodeID in nodeIndex) {
+        if (![nodeID isKindOfClass:[NSNumber class]]) {
+            continue;
+        }
+
         NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterDataForNode = nil;
         NSArray<NSNumber *> * endpointIndex = secureLocalValues[[self _endpointIndexKeyForNodeID:nodeID]];
+
+        if (![endpointIndex isKindOfClass:[NSArray class]]) {
+            continue;
+        }
+
         for (NSNumber * endpointID in endpointIndex) {
+            if (![endpointID isKindOfClass:[NSNumber class]]) {
+                continue;
+            }
+
             NSArray<NSNumber *> * clusterIndex = secureLocalValues[[self _clusterIndexKeyForNodeID:nodeID endpointID:endpointID]];
+
+            if (![clusterIndex isKindOfClass:[NSArray class]]) {
+                continue;
+            }
+
             for (NSNumber * clusterID in clusterIndex) {
+                if (![clusterID isKindOfClass:[NSNumber class]]) {
+                    continue;
+                }
+
                 MTRDeviceClusterData * clusterData = secureLocalValues[[self _clusterDataKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID]];
                 if (!clusterData) {
                     continue;
@@ -1066,7 +1097,7 @@ static NSString * sAttributeCacheAttributeValueKeyPrefix = @"attrCacheAttributeV
                 BOOL storeFailed = ![self _storeClusterData:data forNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster];
                 if (storeFailed) {
                     storeFailures++;
-                    MTR_LOG_INFO("Store failed for clusterDAta @ node 0x%016llX endpoint %u cluster 0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue);
+                    MTR_LOG_INFO("Store failed for clusterData @ node 0x%016llX endpoint %u cluster 0x%08lX", nodeID.unsignedLongLongValue, path.endpoint.unsignedShortValue, path.cluster.unsignedLongValue);
                 }
             }
 
