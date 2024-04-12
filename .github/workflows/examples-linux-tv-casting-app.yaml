@@ -16,6 +16,8 @@ name: Test TV Casting Example
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
