@@ -58,6 +58,31 @@ using Transport::SecureSession;
 namespace {
 Global<GroupPeerTable> gGroupPeerTable;
 
+/// RAII class for iterators that guarantees that Release() will be called
+/// on the underlying type
+template <typename ReleasableIterator>
+class AutoReleaseGroupIterator
+{
+public:
+    AutoReleaseGroupIterator(ReleasableIterator * iter) : mIter(iter) {}
+    ~AutoReleaseGroupIterator() { Release(); }
+
+    ReleasableIterator * operator->() { return mIter; }
+    const ReleasableIterator * operator->() const { return mIter; }
+
+    bool IsNull() const { return mIter == nullptr; }
+
+    void Release()
+    {
+        VerifyOrReturn(mIter != nullptr);
+        mIter->Release();
+        mIter = nullptr;
+    }
+
+private:
+    ReleasableIterator * mIter;
+};
+
 // Helper function that strips off the interface ID from a peer address that is
 // not an IPv6 link-local address.  For any other address type we should rely on
 // the device's routing table to route messages sent.  Forcing messages down a
@@ -892,8 +917,10 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
     // Trial decryption with GroupDataProvider
     Credentials::GroupDataProvider::GroupSession groupContext;
-    auto iter = groups->IterateGroupSessions(partialPacketHeader.GetSessionId());
-    if (iter == nullptr)
+    
+    AutoReleaseGroupIterator<Credentials::GroupDataProvider::GroupSessionIterator> iter(groups->IterateGroupSessions(partialPacketHeader.GetSessionId());
+
+    if (iter.IsNull())
     {
         ChipLogError(Inet, "Failed to retrieve Groups iterator. Discarding everything");
         return;
@@ -940,7 +967,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         }
 #endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
-    iter->Release();
+    iter.Release();
 
     if (!decrypted)
     {
