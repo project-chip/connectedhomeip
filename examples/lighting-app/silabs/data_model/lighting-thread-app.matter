@@ -2767,7 +2767,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 5;
 
     handle command MoveToLevel;
     handle command Move;
