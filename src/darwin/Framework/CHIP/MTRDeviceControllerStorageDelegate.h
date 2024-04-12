@@ -112,7 +112,7 @@ MTR_NEWLY_AVAILABLE
  *
  * securityLevel and sharingType are provided as a hint for the storage delegate
  * to load from the right security level and sharing type, if the implementation
- * stores them separately. If the implementation includes keys from other
+ * stores them separately. If the implementation includes key/value pairs from other
  * security levels or sharing types, they will be ignored by the caller.
  *
  * The set of classes that might be decoded by this function is available by
