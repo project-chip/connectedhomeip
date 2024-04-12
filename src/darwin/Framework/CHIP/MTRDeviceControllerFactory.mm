@@ -84,33 +84,43 @@ static void ShutdownOnExit()
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
-@interface MTRDeviceControllerFactory () {
+@interface MTRDeviceControllerFactoryParams ()
+
+// Flag to keep track of whether our .storage is real consumer-provided storage
+// or just the fake thing we made up.
+@property (nonatomic, assign) BOOL hasStorage;
+
+@end
+
+MTR_DIRECT_MEMBERS
+@implementation MTRDeviceControllerFactory {
+
     MTRServerEndpoint * _otaProviderEndpoint;
     std::unique_ptr<MTROTAProviderDelegateBridge> _otaProviderDelegateBridge;
-}
 
-@property (atomic, readonly) dispatch_queue_t chipWorkQueue;
-@property (readonly) DeviceControllerFactory * controllerFactory;
-@property (readonly) PersistentStorageDelegate * persistentStorageDelegate;
-@property (readonly) Crypto::RawKeySessionKeystore * sessionKeystore;
+    dispatch_queue_t _chipWorkQueue;
+    DeviceControllerFactory * _controllerFactory;
+    PersistentStorageDelegate * _persistentStorageDelegate;
+    Crypto::RawKeySessionKeystore * _sessionKeystore;
 // We use TestPersistentStorageDelegate just to get an in-memory store to back
 // our group data provider impl.  We initialize this store correctly on every
 // controller startup, so don't need to actually persist it.
-@property (readonly) TestPersistentStorageDelegate * groupStorageDelegate;
-@property (readonly) Credentials::GroupDataProviderImpl * groupDataProvider;
-@property (readonly) NSMutableArray<MTRDeviceController *> * controllers;
-@property (readonly) PersistentStorageOperationalKeystore * keystore;
-@property (readonly) Credentials::PersistentStorageOpCertStore * opCertStore;
-@property (readonly) MTROperationalBrowser * operationalBrowser;
+    TestPersistentStorageDelegate * _groupStorageDelegate;
+    Credentials::GroupDataProviderImpl * _groupDataProvider;
+    NSMutableArray<MTRDeviceController *> * _controllers;
+    PersistentStorageOperationalKeystore * _keystore;
+    Credentials::PersistentStorageOpCertStore * _opCertStore;
+    MTROperationalBrowser * _operationalBrowser;
 
 // productAttestationAuthorityCertificates and certificationDeclarationCertificates are just copied
 // from MTRDeviceControllerFactoryParams.
-@property (readonly, nullable) NSArray<MTRCertificateDERBytes> * productAttestationAuthorityCertificates;
-@property (readonly, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
+    NSArray<MTRCertificateDERBytes> * _Nullable _productAttestationAuthorityCertificates;
+    NSArray<MTRCertificateDERBytes> * _Nullable _certificationDeclarationCertificates;
 
-@property (readonly) BOOL advertiseOperational;
-@property (nonatomic, readonly) Credentials::IgnoreCertificateValidityPeriodPolicy * certificateValidityPolicy;
-@property (readonly) MTRSessionResumptionStorageBridge * sessionResumptionStorage;
+    BOOL _advertiseOperational;
+    Credentials::IgnoreCertificateValidityPeriodPolicy * _certificateValidityPolicy;
+    MTRSessionResumptionStorageBridge * _sessionResumptionStorage;
+
 // Lock used to serialize access to the "controllers" array and the
 // "_controllerBeingStarted" and "_controllerBeingShutDown" ivars, since those
 // need to be touched from both whatever queue is starting controllers and from
@@ -140,29 +150,13 @@ static void ShutdownOnExit()
 // C. Apart from item A, accesses on the Matter queue must be reads only and
 //    must lock.
 // D. Locking around reads not from the Matter queue is OK but not required.
-@property (nonatomic, readonly) os_unfair_lock controllersLock;
+    os_unfair_lock _controllersLock;
 
-@property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
-@property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
+    id<MTROTAProviderDelegate> _Nullable _otaProviderDelegate;
+    dispatch_queue_t _Nullable _otaProviderDelegateQueue;
 
-@property (nonatomic, readonly) MTRDiagnosticLogsDownloader * diagnosticLogsDownloader;
+    MTRDiagnosticLogsDownloader * _Nullable _diagnosticLogsDownloader;
 
-- (BOOL)findMatchingFabric:(FabricTable &)fabricTable
-                    params:(MTRDeviceControllerStartupParams *)params
-                    fabric:(const FabricInfo * _Nullable * _Nonnull)fabric;
-
-- (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller;
-@end
-
-@interface MTRDeviceControllerFactoryParams ()
-
-// Flag to keep track of whether our .storage is real consumer-provided storage
-// or just the fake thing we made up.
-@property (nonatomic, assign) BOOL hasStorage;
-
-@end
-
-@implementation MTRDeviceControllerFactory {
     // _usingPerControllerStorage is only written once, during controller
     // factory start.  After that it is only read, and can be read from
     // arbitrary threads.
@@ -655,8 +649,8 @@ static void ShutdownOnExit()
     // Fall back to the factory-wide OTA provider delegate if one is not
     // provided in the startup params.
     if (otaProviderDelegate == nil) {
-        otaProviderDelegate = self.otaProviderDelegate;
-        otaProviderDelegateQueue = self.otaProviderDelegateQueue;
+        otaProviderDelegate = _otaProviderDelegate;
+        otaProviderDelegateQueue = _otaProviderDelegateQueue;
     }
 
     controller = [controller initWithFactory:self
@@ -822,13 +816,13 @@ static void ShutdownOnExit()
                                   [[MTRDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabricTable
                                                                                               fabricIndex:fabric->GetFabricIndex()
                                                                                                  keystore:self->_keystore
-                                                                                     advertiseOperational:self.advertiseOperational
+                                                                                     advertiseOperational:self->_advertiseOperational
                                                                                                    params:startupParams];
                               if (params == nil) {
                                   fabricError = CHIP_ERROR_NO_MEMORY;
                               } else {
-                                  params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
-                                  params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
+                                  params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
+                                  params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
                               }
 
                               return params;
@@ -878,13 +872,13 @@ static void ShutdownOnExit()
                               auto * params =
                                   [[MTRDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
                                                                                             keystore:self->_keystore
-                                                                                advertiseOperational:self.advertiseOperational
+                                                                                advertiseOperational:self->_advertiseOperational
                                                                                               params:startupParams];
                               if (params == nil) {
                                   fabricError = CHIP_ERROR_NO_MEMORY;
                               } else {
-                                  params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
-                                  params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
+                                  params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
+                                  params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
                               }
                               return params;
                           }
@@ -993,7 +987,7 @@ static void ShutdownOnExit()
         return;
     }
 
-    if (!self.advertiseOperational) {
+    if (!_advertiseOperational) {
         // No need to reset anything; we are not advertising the things that
         // would need to get reset.
         return;
@@ -1012,9 +1006,6 @@ static void ShutdownOnExit()
         });
     }
 }
-@end
-
-@implementation MTRDeviceControllerFactory (InternalMethods)
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller
 {
@@ -1259,7 +1250,7 @@ static void ShutdownOnExit()
                           startupParams:parameters
                           fabricChecker:^MTRDeviceControllerStartupParamsInternal *(
                               FabricTable * fabricTable, MTRDeviceController * controller, CHIP_ERROR & fabricError) {
-                              auto advertiseOperational = self.advertiseOperational && parameters.shouldAdvertiseOperational;
+                              auto advertiseOperational = self->_advertiseOperational && parameters.shouldAdvertiseOperational;
                               auto * params =
                                   [[MTRDeviceControllerStartupParamsInternal alloc] initForNewController:controller
                                                                                              fabricTable:fabricTable
@@ -1269,10 +1260,10 @@ static void ShutdownOnExit()
                                                                                                    error:fabricError];
                               if (params != nil) {
                                   if (params.productAttestationAuthorityCertificates == nil) {
-                                      params.productAttestationAuthorityCertificates = self.productAttestationAuthorityCertificates;
+                                      params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
                                   }
                                   if (params.certificationDeclarationCertificates == nil) {
-                                      params.certificationDeclarationCertificates = self.certificationDeclarationCertificates;
+                                      params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
                                   }
                               }
                               return params;

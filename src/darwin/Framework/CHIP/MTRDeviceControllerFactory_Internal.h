@@ -29,6 +29,7 @@
 #import <Matter/MTRServerEndpoint.h>
 
 #import "MTRDeviceControllerFactory.h"
+#import "MTRDefines_Internal.h"
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
@@ -44,7 +45,8 @@ namespace Credentials {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceControllerFactory (InternalMethods)
+MTR_DIRECT_MEMBERS
+@interface MTRDeviceControllerFactory ()
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller;
 
