@@ -124,7 +124,7 @@ tests:
               type: TransitionStruct 
 
     - label: "Step 13: TH reads the PeakPeriodStatus attribute from the DUT"
-      PICS: ECAL.S.A000B
+      PICS: ECAL.S.A000B && ECAL.S.F03
       command: "readAttribute"
       attribute: "PeakPeriodStatus"
       response:
@@ -132,7 +132,7 @@ tests:
               type: PeakPeriodStatusStruct 
 
     - label: "Step 14: TH reads the PeakPeriodStartTime attribute from the DUT"
-      PICS: ECAL.S.A000B
+      PICS: ECAL.S.A000B && ECAL.S.F03
       command: "readAttribute"
       attribute: "PeakPeriodStartTime"
       response:
@@ -140,7 +140,7 @@ tests:
               type: epoch_s
 
     - label: "Step 15: TH reads the PeakPeriodEndTime attribute from the DUT"
-      PICS: ECAL.S.A000D
+      PICS: ECAL.S.A000D && ECAL.S.F03
       command: "readAttribute"
       attribute: "PeakPeriodEndTime"
       response:
