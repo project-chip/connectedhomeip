@@ -19,6 +19,7 @@ import os
 import random
 
 import chip.clusters as Clusters
+from basic_composition_support import BasicCompositionTests
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import TLVReader
 from cryptography import x509
@@ -103,7 +104,7 @@ def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> tuple(
 # default is 'credentials/development/cd-certs'.
 
 
-class TC_DA_1_2(MatterBaseTest):
+class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
     def desc_TC_DA_1_2(self):
         return "Device Attestation Request Validation [DUT - Commissionee]"
 
@@ -163,6 +164,10 @@ class TC_DA_1_2(MatterBaseTest):
     async def test_TC_DA_1_2(self):
         is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
+
+        do_test_over_pase = self.user_params.get("use_pase_only", False)
+        if do_test_over_pase:
+            self.connect_over_pase(self.default_controller)
 
         # Commissioning - done
         self.step(0)
@@ -391,7 +396,7 @@ class TC_DA_1_2(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(12)
-        proxy = self.default_controller.GetConnectedDeviceSync(self.dut_node_id, False)
+        proxy = self.default_controller.GetConnectedDeviceSync(self.dut_node_id, do_test_over_pase)
         asserts.assert_equal(len(proxy.attestationChallenge), 16, "Attestation challenge is the wrong length")
         attestation_tbs = elements + proxy.attestationChallenge
 
