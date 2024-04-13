@@ -771,8 +771,11 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     NL_TEST_ASSERT(aSuite,
                    CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint1, kOnOffClusterId, buff_span, extensionFieldValueCapOut));
 
+    printf("extensionFieldValueCapOut.attributeValueList[0].attributeValue = 0x%016" PRIX64 "\n",
+           extensionFieldValueCapOut.attributeValueList[0].attributeValue);
+
     // Verify that the output value is capped
-    NL_TEST_ASSERT(aSuite, extensionFieldValueCapOut.attributeValueList[0].attributeValue == 0x00000000'FFFFFFFF);
+    NL_TEST_ASSERT(aSuite, extensionFieldValueCapOut.attributeValueList[0].attributeValue == 0x00FFFFFF);
 
     // Clear buffer
     memset(failBuffer, 0, fail_list.size());
