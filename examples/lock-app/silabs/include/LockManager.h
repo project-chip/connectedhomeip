@@ -48,8 +48,8 @@ struct HolidayScheduleInfo
 namespace EFR32DoorLock {
 namespace ResourceRanges {
 // Used to size arrays
-static constexpr uint16_t kMaxUsers                  = 10;
-static constexpr uint8_t kMaxCredentialsPerUser      = 10;
+static constexpr uint16_t kMaxUsers                  = 5;
+static constexpr uint8_t kMaxCredentialsPerUser      = 2;
 static constexpr uint8_t kMaxWeekdaySchedulesPerUser = 10;
 static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
 static constexpr uint8_t kMaxHolidaySchedules        = 10;
