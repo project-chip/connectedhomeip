@@ -762,7 +762,8 @@ public class ChipDeviceController {
 
   /* Shuts down all active subscriptions for the fabric at the given fabricIndex */
   public void shutdownSubscriptions(int fabricIndex) {
-    ChipInteractionClient.shutdownSubscriptions(deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
+    ChipInteractionClient.shutdownSubscriptions(
+        deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
   }
 
   /**
