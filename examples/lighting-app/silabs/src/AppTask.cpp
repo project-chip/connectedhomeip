@@ -40,7 +40,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef SL_CATALOG_SIMPLE_LED_LED1_PRESENT
+#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SL_CATALOG_LED_LED1_PRESENT))
 #define LIGHT_LED 1
 #else
 #define LIGHT_LED 0
