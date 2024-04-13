@@ -128,3 +128,14 @@ JNI_METHOD(void, extendableInvoke)
         ChipLogError(Controller, "JNI IM Batch Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
+
+JNI_METHOD(void, shutdownSubscriptions)
+(JNIEnv * env, jobject self, jlong handle, jobject fabricIndex, jobject peerNodeId, jobject subscriptionId)
+{
+    CHIP_ERROR err =
+        shutdownSubscriptions(env, handle, fabricIndex, peerNodeId, subscriptionId);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to shutdown subscriptions with Error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}

@@ -757,12 +757,12 @@ public class ChipDeviceController {
 
   /* Shuts down all active subscriptions. */
   public void shutdownSubscriptions() {
-    shutdownSubscriptions(deviceControllerPtr, null, null, null);
+    ChipInteractionClient.shutdownSubscriptions(deviceControllerPtr, null, null, null);
   }
 
   /* Shuts down all active subscriptions for the fabric at the given fabricIndex */
   public void shutdownSubscriptions(int fabricIndex) {
-    shutdownSubscriptions(deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
+    ChipInteractionClient.shutdownSubscriptions(deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
   }
 
   /**
@@ -772,7 +772,7 @@ public class ChipDeviceController {
    * @param peerNodeId the node ID of the device for which subscriptions should be canceled
    */
   public void shutdownSubscriptions(int fabricIndex, long peerNodeId) {
-    shutdownSubscriptions(
+    ChipInteractionClient.shutdownSubscriptions(
         deviceControllerPtr, Integer.valueOf(fabricIndex), Long.valueOf(peerNodeId), null);
   }
 
@@ -784,7 +784,7 @@ public class ChipDeviceController {
    * @param subscriptionId the ID of the subscription on the node which should be canceled
    */
   public void shutdownSubscriptions(int fabricIndex, long peerNodeId, long subscriptionId) {
-    shutdownSubscriptions(
+    ChipInteractionClient.shutdownSubscriptions(
         deviceControllerPtr,
         Integer.valueOf(fabricIndex),
         Long.valueOf(peerNodeId),
@@ -1530,12 +1530,6 @@ public class ChipDeviceController {
   private native long onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
   private native int getFabricIndex(long deviceControllerPtr);
-
-  private native void shutdownSubscriptions(
-      long deviceControllerPtr,
-      @Nullable Integer fabricIndex,
-      @Nullable Long peerNodeId,
-      @Nullable Long subscriptionId);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
 

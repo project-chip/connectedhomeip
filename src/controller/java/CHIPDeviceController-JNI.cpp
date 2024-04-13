@@ -1726,45 +1726,6 @@ JNI_METHOD(jint, getFabricIndex)(JNIEnv * env, jobject self, jlong handle)
     return wrapper->Controller()->GetFabricIndex();
 }
 
-JNI_METHOD(void, shutdownSubscriptions)
-(JNIEnv * env, jobject self, jobject handle, jobject fabricIndex, jobject peerNodeId, jobject subscriptionId)
-{
-    chip::DeviceLayer::StackLock lock;
-    if (fabricIndex == nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
-    {
-        app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
-        return;
-    }
-
-    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId == nullptr)
-    {
-        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
-        jlong jPeerNodeId = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
-        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex),
-                                                                          static_cast<chip::NodeId>(jPeerNodeId));
-        return;
-    }
-
-    if (fabricIndex != nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
-    {
-        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
-        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex));
-        return;
-    }
-
-    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId != nullptr)
-    {
-        jint jFabricIndex     = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
-        jlong jPeerNodeId     = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
-        jlong jSubscriptionId = chip::JniReferences::GetInstance().LongToPrimitive(subscriptionId);
-        app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
-            chip::ScopedNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex)),
-            static_cast<chip::SubscriptionId>(jSubscriptionId));
-        return;
-    }
-    ChipLogError(Controller, "Failed to shutdown subscriptions with correct input paramemeter");
-}
-
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;

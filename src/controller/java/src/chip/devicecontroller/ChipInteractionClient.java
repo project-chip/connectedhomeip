@@ -73,4 +73,10 @@ public class ChipInteractionClient {
       List<InvokeElement> invokeElementList,
       int timedRequestTimeoutMs,
       int imTimeoutMs);
+
+  static native void shutdownSubscriptions(
+      long deviceControllerPtr,
+      @Nullable Integer fabricIndex,
+      @Nullable Long peerNodeId,
+      @Nullable Long subscriptionId);
 }

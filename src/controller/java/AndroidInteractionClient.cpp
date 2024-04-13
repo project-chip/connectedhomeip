@@ -626,6 +626,45 @@ exit:
     return err;
 }
 
+CHIP_ERROR shutdownSubscriptions(JNIEnv * env, jlong handle, jobject fabricIndex, jobject peerNodeId, jobject subscriptionId)
+{
+    chip::DeviceLayer::StackLock lock;
+    if (fabricIndex == nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
+    {
+        app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+        return CHIP_NO_ERROR;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId == nullptr)
+    {
+        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        jlong jPeerNodeId = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex),
+                                                                          static_cast<chip::NodeId>(jPeerNodeId));
+        return CHIP_NO_ERROR;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
+    {
+        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex));
+        return CHIP_NO_ERROR;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId != nullptr)
+    {
+        jint jFabricIndex     = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        jlong jPeerNodeId     = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
+        jlong jSubscriptionId = chip::JniReferences::GetInstance().LongToPrimitive(subscriptionId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
+            chip::ScopedNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex)),
+            static_cast<chip::SubscriptionId>(jSubscriptionId));
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement,
                   jint timedRequestTimeoutMs, jint imTimeoutMs)
 {
