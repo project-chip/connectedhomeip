@@ -47,7 +47,7 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
 /**
  * Protocol for storing and retrieving controller-specific data.
  *
- * Implementations of this protocol MUST keep two things in mind:
+ * Implementations of this protocol MUST keep these things in mind:
  *
  * 1) The controller provided to the delegate methods may not be fully
  *    initialized when the callbacks are called.  The only safe thing to do with
@@ -60,6 +60,10 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
  *    this delegate, apart from de-serializing and serializing the items being
  *    stored and calling MTRDeviceControllerStorageClasses(), is likely to lead
  *    to deadlocks.
+ *
+ * 3) Security level and sharing type will always be the same for any given key value
+ *    and are provided to describe the data should the storage delegate choose to
+ *    implement separating storage location by security level and sharing type.
  */
 MTR_NEWLY_AVAILABLE
 @protocol MTRDeviceControllerStorageDelegate <NSObject>
@@ -67,10 +71,6 @@ MTR_NEWLY_AVAILABLE
 /**
  * Return the stored value for the given key, if any, for the provided
  * controller.  Returns nil if there is no stored value.
- *
- * securityLevel and dataType will always be the same for any given key value
- * and are just present here to help locate the data if storage location is
- * separated out by security level and data type.
  *
  * The set of classes that might be decoded by this function is available by
  * calling MTRDeviceControllerStorageClasses().
@@ -82,9 +82,6 @@ MTR_NEWLY_AVAILABLE
 
 /**
  * Store a value for the given key.  Returns whether the store succeeded.
- *
- * securityLevel and dataType will always be the same for any given key value
- * and are present here as a hint to how the value should be stored.
  */
 - (BOOL)controller:(MTRDeviceController *)controller
         storeValue:(id<NSSecureCoding>)value
@@ -94,15 +91,38 @@ MTR_NEWLY_AVAILABLE
 
 /**
  * Remove the stored value for the given key.  Returns whether the remove succeeded.
- *
- * securityLevel and dataType will always be the same for any given key value
- * and are just present here to help locate the data if storage location is
- * separated out by security level and data type.
  */
 - (BOOL)controller:(MTRDeviceController *)controller
     removeValueForKey:(NSString *)key
         securityLevel:(MTRStorageSecurityLevel)securityLevel
           sharingType:(MTRStorageSharingType)sharingType;
+
+@optional
+/**
+ * Return all keys and values stored, if any, for the provided controller, in a
+ * dictionary. Returns nil if there are no stored values.
+ *
+ * securityLevel and sharingType are provided as a hint for the storage delegate
+ * to load from the right security level and sharing type, if the implementation
+ * stores them separately. If the implementation includes key/value pairs from other
+ * security levels or sharing types, they will be ignored by the caller.
+ *
+ * The set of classes that might be decoded by this function is available by
+ * calling MTRDeviceControllerStorageClasses().
+ */
+- (nullable NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller
+                                                                 securityLevel:(MTRStorageSecurityLevel)securityLevel
+                                                                   sharingType:(MTRStorageSharingType)sharingType;
+
+/**
+ * Store a list of key/value pairs in the form of a dictionary. Returns whether
+ * the store succeeded. Specifically, if any keys in this dictionary fail to store,
+ * the storage delegate should return NO.
+ */
+- (BOOL)controller:(MTRDeviceController *)controller
+       storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values
+     securityLevel:(MTRStorageSecurityLevel)securityLevel
+       sharingType:(MTRStorageSharingType)sharingType;
 @end
 
 MTR_EXTERN MTR_NEWLY_AVAILABLE

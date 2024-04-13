@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)unitTestPruneEmptyStoredAttributesBranches;
 - (NSString *)_endpointIndexKeyForNodeID:(NSNumber *)nodeID;
 - (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
+- (NSString *)_clusterDataKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (NSString *)_attributeIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (NSString *)_attributeValueKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
 @end
@@ -52,6 +53,10 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Declarations for items compiled only for DEBUG configuration
 
 #ifdef DEBUG
+@interface MTRDeviceController (TestDebug)
+- (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
+@end
+
 @interface MTRBaseDevice (TestDebug)
 - (void)failSubscribers:(dispatch_queue_t)queue completion:(void (^)(void))completion;
 

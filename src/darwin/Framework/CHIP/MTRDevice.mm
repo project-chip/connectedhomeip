@@ -236,6 +236,20 @@ static NSString * const sAttributesKey = @"attributes";
     return [[MTRDeviceClusterData alloc] initWithDataVersion:_dataVersion attributes:_attributes];
 }
 
+- (BOOL)isEqualToClusterData:(MTRDeviceClusterData *)otherClusterData
+{
+    return [_dataVersion isEqual:otherClusterData.dataVersion] && [_attributes isEqual:otherClusterData.attributes];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if ([object class] != [self class]) {
+        return NO;
+    }
+
+    return [self isEqualToClusterData:object];
+}
+
 @end
 
 @interface MTRDevice ()
@@ -2249,6 +2263,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     std::lock_guard lock(_lock);
     [self _setAttributeValues:attributeValues reportChanges:reportChanges];
 }
+
+#ifdef DEBUG
+- (NSUInteger)unitTestAttributeCount
+{
+    std::lock_guard lock(_lock);
+    return _readCache.count;
+}
+#endif
 
 - (void)setClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData
 {

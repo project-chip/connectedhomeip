@@ -40,4 +40,15 @@ NS_ASSUME_NONNULL_BEGIN
           sharingType:(MTRStorageSharingType)sharingType;
 @end
 
+@interface MTRTestPerControllerStorageWithBulkReadWrite : MTRTestPerControllerStorage
+- (nullable NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller
+                                                                 securityLevel:(MTRStorageSecurityLevel)securityLevel
+                                                                   sharingType:(MTRStorageSharingType)sharingType;
+- (BOOL)controller:(MTRDeviceController *)controller
+       storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values
+     securityLevel:(MTRStorageSecurityLevel)securityLevel
+       sharingType:(MTRStorageSharingType)sharingType;
+
+@end
+
 NS_ASSUME_NONNULL_END

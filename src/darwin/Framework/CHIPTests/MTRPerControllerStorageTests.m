@@ -1035,6 +1035,23 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertFalse([controller3 isRunning]);
 }
 
+- (BOOL)_array:(NSArray *)one containsSameElementsAsArray:(NSArray *)other
+{
+    for (id object in one) {
+        if (![other containsObject:object]) {
+            return NO;
+        }
+    }
+
+    for (id object in other) {
+        if (![one containsObject:object]) {
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
 - (void)test008_TestDataStoreDirect
 {
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
@@ -1046,7 +1063,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
 
-    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
 
     NSNumber * nodeID = @(123);
     NSNumber * fabricID = @(456);
@@ -1103,6 +1120,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertEqual(dataStoreValues.count, 9);
 
     // Check values
+    NSUInteger unexpectedValues = 0;
     for (NSDictionary * responseValue in dataStoreValues) {
         MTRAttributePath * path = responseValue[MTRAttributePathKey];
         XCTAssertNotNil(path);
@@ -1132,8 +1150,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
             XCTAssertEqualObjects(value, @(212));
         } else if ([path.endpoint isEqualToNumber:@(2)] && [path.cluster isEqualToNumber:@(1)] && [path.attribute isEqualToNumber:@(3)]) {
             XCTAssertEqualObjects(value, @(213));
+        } else {
+            unexpectedValues++;
         }
     }
+    XCTAssertEqual(unexpectedValues, 0);
 
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(1001)];
     for (MTRClusterPath * path in testClusterData) {
@@ -1188,11 +1209,100 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     id testNodeIndex = [storageDelegate controller:controller valueForKey:@"attrCacheNodeIndex" securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
     XCTAssertNil(testNodeIndex);
 
+    // Now test bulk write
+    MTRClusterPath * bulkTestClusterPath11 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(1)];
+    MTRDeviceClusterData * bulkTestClusterData11 = [[MTRDeviceClusterData alloc] init];
+    bulkTestClusterData11.dataVersion = @(11);
+    bulkTestClusterData11.attributes = @{
+        @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(111) },
+        @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(112) },
+        @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(113) },
+    };
+    MTRClusterPath * bulkTestClusterPath12 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
+    MTRDeviceClusterData * bulkTestClusterData12 = [[MTRDeviceClusterData alloc] init];
+    bulkTestClusterData12.dataVersion = @(12);
+    bulkTestClusterData12.attributes = @{
+        @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(121) },
+        @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(122) },
+        @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(123) },
+    };
+    MTRClusterPath * bulkTestClusterPath13 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(3)];
+    MTRDeviceClusterData * bulkTestClusterData13 = [[MTRDeviceClusterData alloc] init];
+    bulkTestClusterData13.dataVersion = @(13);
+    bulkTestClusterData13.attributes = @{
+        @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(131) },
+        @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(132) },
+        @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(133) },
+    };
+    MTRClusterPath * bulkTestClusterPath21 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(1)];
+    MTRDeviceClusterData * bulkTestClusterData21 = [[MTRDeviceClusterData alloc] init];
+    bulkTestClusterData21.dataVersion = @(21);
+    bulkTestClusterData21.attributes = @{
+        @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(211) },
+        @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(212) },
+        @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(213) },
+    };
+    MTRClusterPath * bulkTestClusterPath22 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(2)];
+    MTRDeviceClusterData * bulkTestClusterData22 = [[MTRDeviceClusterData alloc] init];
+    bulkTestClusterData22.dataVersion = @(22);
+    bulkTestClusterData22.attributes = @{
+        @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(221) },
+        @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(222) },
+        @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(223) },
+    };
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * bulkTestClusterDataDictionary = @{
+        bulkTestClusterPath11 : bulkTestClusterData11,
+        bulkTestClusterPath12 : bulkTestClusterData12,
+        bulkTestClusterPath13 : bulkTestClusterData13,
+        bulkTestClusterPath21 : bulkTestClusterData21,
+        bulkTestClusterPath22 : bulkTestClusterData22,
+    };
+
+    // Manually construct what the total dictionary should look like
+    NSDictionary<NSString *, id<NSSecureCoding>> * testBulkValues = @{
+        @"attrCacheNodeIndex" : @[ @(3001) ],
+        [controller.controllerDataStore _endpointIndexKeyForNodeID:@(3001)] : @[ @(1), @(2) ],
+        [controller.controllerDataStore _clusterIndexKeyForNodeID:@(3001) endpointID:@(1)] : @[ @(1), @(2), @(3) ],
+        [controller.controllerDataStore _clusterIndexKeyForNodeID:@(3001) endpointID:@(2)] : @[ @(1), @(2) ],
+        [controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(1) clusterID:@(1)] : bulkTestClusterData11,
+        [controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(1) clusterID:@(2)] : bulkTestClusterData12,
+        [controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(1) clusterID:@(3)] : bulkTestClusterData13,
+        [controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(2) clusterID:@(1)] : bulkTestClusterData21,
+        [controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(2) clusterID:@(2)] : bulkTestClusterData22,
+    };
+    // Bulk store with delegate
+    dispatch_sync(_storageQueue, ^{
+        [storageDelegate controller:controller storeValues:testBulkValues securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
+    // Verify that the store resulted in the correct values
+    dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
+    XCTAssertEqualObjects(dataStoreClusterData, bulkTestClusterDataDictionary);
+
+    // clear information before the next test
+    [controller.controllerDataStore clearStoredAttributesForNodeID:@(3001)];
+
+    // Now test bulk store through data store
+    [controller.controllerDataStore storeClusterData:bulkTestClusterDataDictionary forNodeID:@(3001)];
+    dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
+    XCTAssertEqualObjects(dataStoreClusterData, bulkTestClusterDataDictionary);
+
+    // Now test bulk read directly from storage delegate
+    NSDictionary<NSString *, id<NSSecureCoding>> * dataStoreBulkValues = [storageDelegate valuesForController:controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    // Due to dictionary enumeration in storeClusterData:forNodeID:, the elements could be stored in a different order, but still be valid and equivalent
+    XCTAssertTrue(([self _array:(NSArray *) dataStoreBulkValues[[controller.controllerDataStore _endpointIndexKeyForNodeID:@(3001)]] containsSameElementsAsArray:@[ @(1), @(2) ]]));
+    XCTAssertTrue(([self _array:(NSArray *) dataStoreBulkValues[[controller.controllerDataStore _clusterIndexKeyForNodeID:@(3001) endpointID:@(1)]] containsSameElementsAsArray:@[ @(1), @(2), @(3) ]]));
+    XCTAssertTrue(([self _array:(NSArray *) dataStoreBulkValues[[controller.controllerDataStore _clusterIndexKeyForNodeID:@(3001) endpointID:@(2)]] containsSameElementsAsArray:@[ @(1), @(2) ]]));
+    XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(1) clusterID:@(1)]], bulkTestClusterData11);
+    XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(1) clusterID:@(2)]], bulkTestClusterData12);
+    XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(1) clusterID:@(3)]], bulkTestClusterData13);
+    XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(2) clusterID:@(1)]], bulkTestClusterData21);
+    XCTAssertEqualObjects(dataStoreBulkValues[[controller.controllerDataStore _clusterDataKeyForNodeID:@(3001) endpointID:@(2) clusterID:@(2)]], bulkTestClusterData22);
+
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 }
 
-- (void)test009_TestDataStoreMTRDevice
+- (void)doDataStoreMTRDeviceTestWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
 {
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -1204,8 +1314,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
-
-    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
 
     NSNumber * nodeID = @(123);
     NSNumber * fabricID = @(456);
@@ -1311,7 +1419,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     double storedAttributeDifferFromMTRDevicePercentage = storedAttributeDifferFromMTRDeviceCount * 100.0 / dataStoreValuesCount;
     XCTAssertTrue(storedAttributeDifferFromMTRDevicePercentage < 10.0);
 
-    // Now
+    // Now set up new delegate for the new device and verify that once subscription reestablishes, the data version filter loaded from storage will work
     __auto_type * newDelegate = [[MTRDeviceTestDelegate alloc] init];
 
     XCTestExpectation * newDeviceSubscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up for new device"];
@@ -1335,6 +1443,61 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
     ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)test009_TestDataStoreMTRDevice
+{
+    [self doDataStoreMTRDeviceTestWithStorageDelegate:[[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]]];
+}
+
+- (void)test010_TestDataStoreMTRDeviceWithBulkReadWrite
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    // First do the same test as the above
+    [self doDataStoreMTRDeviceTestWithStorageDelegate:storageDelegate];
+
+    // Then restart controller with same storage and see that bulk read through MTRDevice initialization works
+
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSNumber * nodeID = @(123);
+    NSNumber * fabricID = @(456);
+
+    NSError * error;
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:fabricID
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
+
+    // No need to commission device - just look at device count
+    NSDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [controller unitTestGetDeviceAttributeCounts];
+    XCTAssertTrue(deviceAttributeCounts.count > 0);
+    NSUInteger totalAttributes = 0;
+    for (NSNumber * nodeID in deviceAttributeCounts) {
+        totalAttributes += deviceAttributeCounts[nodeID].unsignedIntegerValue;
+    }
+    XCTAssertTrue(totalAttributes > 300);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
