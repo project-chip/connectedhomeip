@@ -81,6 +81,24 @@ source_set("android_chip_im_jni") {
     ldflags = [ "-Wl,--gc-sections" ]
   }
 
+  if (matter_enable_java_compilation) {
+    include_dirs = java_matter_controller_dependent_paths
+    if (current_os == "mac") {
+      deps += [ "${chip_root}/src/platform/Darwin" ]
+    } else {
+      deps += [ "${chip_root}/src/platform/Linux" ]
+    }
+
+    cflags = [
+      "-Wno-unknown-pragmas",
+      "-Wconversion",
+    ]
+
+    output_dir = "${root_out_dir}/lib/jni"
+  } else {
+    deps += [ "${chip_root}/src/platform/android" ]
+    output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+  }
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
