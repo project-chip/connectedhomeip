@@ -137,6 +137,24 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
 
 void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}
 
+
+chip::Protocols::InteractionModel::Status
+MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                 uint8_t * value)
+{
+    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
+
+    ChipLogProgress(Zcl, "MatterPostAttributeChangeCallback Endpoint: %d, Cluster: " ChipLogFormatMEI ", Type: %u, length %u", attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId), type, size);
+printf("\033[41m %s, %d \033[0m \n", __func__, __LINE__);
+
+    AttributeDelegate * delegate = GetApplicationAttributeDelegate(attributePath.mClusterId);
+    if (delegate) {
+        ret = delegate->PreAttributeChangeCallback(attributePath, type, size, value);
+    }
+
+    return ret; 
+}
+
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
