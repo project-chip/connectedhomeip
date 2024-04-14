@@ -379,6 +379,7 @@ void OTAMultiImageProcessorImpl::HandleFinalize(intptr_t context)
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ProcessFinalize()
 {
+    ChipLogProgress(SoftwareUpdate, "OTA MultiImage Processor Implementation");
     for (auto const & pair : this->mProcessorMap)
     {
         pair.second->FinalizeAction();
@@ -438,6 +439,8 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 #ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
 >>>>>>> ac92393594 (Added changes for the build errores)
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
+#else
+    
 #endif
 }
 
