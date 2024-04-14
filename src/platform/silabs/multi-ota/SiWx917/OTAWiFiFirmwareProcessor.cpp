@@ -141,6 +141,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
 {
+    ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Apply Action started");
     // This reboots the device
     if (mReset)
     {
@@ -149,14 +150,15 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
         // Reboots the device
         sl_si91x_soc_soft_reset();
-    }  
+    }
+    ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Apply Action completed");
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::FinalizeAction()
 {
     int32_t status        = SL_STATUS_OK;
-
+    ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Finalize Action started");
     // Pad the remainder of the write buffer with zeros and write it to bootloader storage
     if (writeBufOffset != 0)
     {
@@ -188,6 +190,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::FinalizeAction()
 
     }
 
+    ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Finalize Action completed");
     return status ? CHIP_ERROR_CANCELLED : CHIP_NO_ERROR;
 }
 
