@@ -26,10 +26,13 @@ examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
 declare_args() {
   # Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled
-  si91x_alarm_based_wakeup = false
+  si91x_alarm_based_periodic_wakeup = false
 
   # Periodic time at which the 917 SoC should wakeup
   si91x_alarm_periodic_time = 30
+
+  # enable 917 SoC M4 sleep wakeup
+  si917_m4_sleep_enabled = false
 }
 
 # Defines an siwx917 SDK build target.
@@ -206,7 +209,7 @@ template("siwx917_sdk") {
       "SPI_MULTI_SLAVE=1",
       "SYSCALLS_WRITE=1",
       "__STATIC_INLINE=static inline",
-      "SL_SI91X_SI917_RAM_MEM_CONFIG=2",
+      "SL_SI91X_SI917_RAM_MEM_CONFIG=3",
       "SL_SI91x_DUAL_INTERRUPTS_ERRATA=1",
       "EXT_IRQ_COUNT=75",
       "FLASH_PAGE_SIZE=1",
@@ -221,6 +224,7 @@ template("siwx917_sdk") {
       "SLI_SI91X_MCU_ENABLE_IPMU_APIS=1",
       "RADIO_CONFIG_DMP_SUPPORT=1",
       "configUSE_POSIX_ERRNO=1",
+      "NVM3_LOCK_OVERRIDE=1",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -271,6 +275,8 @@ template("siwx917_sdk") {
         "SI91X_SYSRTC_COUNT=1",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
+        "SL_ULP_TIMER",
+        "SL_SLEEP_TIMER",
       ]
     }
 
@@ -288,12 +294,17 @@ template("siwx917_sdk") {
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
         "SL_SI91X_MCU_WIRELESS_BASED_WAKEUP=1",
         "SL_SI91X_MCU_BUTTON_BASED_WAKEUP=1",
+        "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
       ]
 
-      if (si91x_alarm_based_wakeup) {
+      if (si91x_alarm_based_periodic_wakeup) {
+        defines += [ "ALARM_PERIODIC_TIME=${si91x_alarm_periodic_time}" ]
+      }
+
+      if (si917_m4_sleep_enabled) {
         defines += [
-          "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
-          "ALARM_PERIODIC_TIME=${si91x_alarm_periodic_time}",
+          "SI917_M4_SLEEP_ENABLED=1",
+          "XTAL_OFF",
         ]
       }
     }
@@ -532,7 +543,7 @@ template("siwx917_sdk") {
 
     if (chip_enable_icd_server) {
       sources += [
-        "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/src/sl_si91x_m4_ps.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/sl_si91x_m4_ps.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
       ]
