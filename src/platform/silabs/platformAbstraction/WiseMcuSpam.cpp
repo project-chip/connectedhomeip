@@ -16,39 +16,40 @@
  */
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
-#include <sl_si91x_button_pin_config.h>
 
 #include <FreeRTOS.h>
 #include <task.h>
 
+#include <app/icd/server/ICDServerConfig.h>
+
 #if SILABS_LOG_ENABLED
 #include "silabs_utils.h"
-#endif
+#endif // SILABS_LOG_ENABLED
 
 // TODO add includes ?
 extern "C" {
 #include "em_core.h"
 #include "rsi_board.h"
 #include "sl_event_handler.h"
+#include "sl_si91x_button.h"
+#include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
-#include "sl_si91x_button.h"
-void soc_pll_config(void);
-}
 
-#if SILABS_LOG_ENABLED
-#include "silabs_utils.h"
-#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
+void soc_pll_config(void);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+}
 
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
 namespace {
-    uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
+uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
 #if SL_ICD_ENABLED
-    bool btn0_pressed = false;
+bool btn0_pressed = false;
 #endif /* SL_ICD_ENABLED */
-}
+} // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
 SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
@@ -60,10 +61,10 @@ CHIP_ERROR SilabsPlatform::Init(void)
     // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
     NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
 
-#if !CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
     // Configuration the clock rate
     soc_pll_config();
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();
@@ -113,13 +114,19 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
     // This is to make sure we get a one-press and one-release event for the button
     // Hardware modification will be required for this to work permanently
     // Currently the btn0 is pull-up resistor due to which is sends a release event on every wakeup
-    if(btn == SL_BUTTON_BTN0_NUMBER) {
-        if(btnAction == BUTTON_PRESSED) {
+    if (btn == SL_BUTTON_BTN0_NUMBER)
+    {
+        if (btnAction == BUTTON_PRESSED)
+        {
             btn0_pressed = true;
-        } else if((btnAction == BUTTON_RELEASED) && (btn0_pressed == false)) {
+        }
+        else if ((btnAction == BUTTON_RELEASED) && (btn0_pressed == false))
+        {
             // if the btn was not pressed and only a release event came, ignore it
             return;
-        } else if((btnAction == BUTTON_RELEASED) && (btn0_pressed == true)) {
+        }
+        else if ((btnAction == BUTTON_RELEASED) && (btn0_pressed == true))
+        {
             btn0_pressed = false;
         }
     }
@@ -129,7 +136,7 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
         return;
     }
 
-    if(btn < SL_SI91x_BUTTON_COUNT)
+    if (btn < SL_SI91x_BUTTON_COUNT)
     {
         sButtonStates[btn] = btnAction;
     }
