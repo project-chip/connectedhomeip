@@ -20,6 +20,7 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
+#include <app/data-model/List.h> // So we can encode lists
 #include <lib/core/CHIPError.h>
 
 #include <type_traits>
