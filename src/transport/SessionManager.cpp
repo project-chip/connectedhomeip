@@ -57,6 +57,32 @@ using Transport::SecureSession;
 
 namespace {
 Global<GroupPeerTable> gGroupPeerTable;
+
+/// RAII class for iterators that guarantees that Release() will be called
+/// on the underlying type
+template <typename Releasable>
+class AutoRelease
+{
+public:
+    AutoRelease(Releasable * iter) : mIter(iter) {}
+    ~AutoRelease() { Release(); }
+
+    Releasable * operator->() { return mIter; }
+    const Releasable * operator->() const { return mIter; }
+
+    bool IsNull() const { return mIter == nullptr; }
+
+    void Release()
+    {
+        VerifyOrReturn(mIter != nullptr);
+        mIter->Release();
+        mIter = nullptr;
+    }
+
+private:
+    Releasable * mIter = nullptr;
+};
+
 } // namespace
 
 uint32_t EncryptedPacketBufferHandle::GetMessageCounter() const
@@ -868,8 +894,11 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
     // Trial decryption with GroupDataProvider
     Credentials::GroupDataProvider::GroupSession groupContext;
-    auto iter = groups->IterateGroupSessions(partialPacketHeader.GetSessionId());
-    if (iter == nullptr)
+
+    AutoRelease<Credentials::GroupDataProvider::GroupSessionIterator> iter(
+        groups->IterateGroupSessions(partialPacketHeader.GetSessionId()));
+
+    if (iter.IsNull())
     {
         ChipLogError(Inet, "Failed to retrieve Groups iterator. Discarding everything");
         return;
@@ -916,7 +945,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         }
 #endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
-    iter->Release();
+    iter.Release();
 
     if (!decrypted)
     {
@@ -954,7 +983,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         gGroupPeerTable->FindOrAddPeer(groupContext.fabric_index, packetHeaderCopy.GetSourceNodeId().Value(),
                                        packetHeaderCopy.IsSecureSessionControlMsg(), counter))
     {
-
         if (Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst == groupContext.security_policy)
         {
             err = counter->VerifyOrTrustFirstGroup(packetHeaderCopy.GetMessageCounter());
