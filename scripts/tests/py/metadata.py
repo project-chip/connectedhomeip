@@ -25,17 +25,8 @@ class Metadata:
     py_script_path: Optional[str] = None
     run: Optional[str] = None
     app: Optional[str] = None
-    factoryreset: bool = False
-    comissioning_method: Optional[str] = None
     discriminator: Optional[str] = None
-    kvs: Optional[str] = None
-    storage_path: Optional[str] = None
-    on_network_commission: Optional[str] = None
     passcode: Optional[str] = None
-    endpoint: Optional[str] = None
-    manual_code: Optional[str] = None
-    PICS: Optional[str] = None
-    tests: Optional[str] = None
 
     def copy_from_dict(self, attr_dict: Dict[str, str]) -> None:
         """
