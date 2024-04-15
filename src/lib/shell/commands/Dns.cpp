@@ -135,6 +135,10 @@ public:
         {
             streamer_printf(streamer_get(), "      %s\r\n", nodeData.resolutionData.ipAddress[i].ToString(ipAddressBuf));
         }
+        if (nodeData.resolutionData.port > 0)
+        {
+            streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.resolutionData.port);
+        }
     }
 
 private:
