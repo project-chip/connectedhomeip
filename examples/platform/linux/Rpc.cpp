@@ -21,6 +21,10 @@
 #include "pw_rpc_system_server/socket.h"
 
 #include <thread>
+#include <platform/PlatformManager.h>
+
+#include <map>
+#include "Rpc.h"
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 #include "pigweed/rpc_services/Attributes.h"
@@ -40,6 +44,63 @@
 
 #if defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
 #include "pigweed/rpc_services/Event.h"
+namespace chip {
+namespace rpc {
+
+struct EventsCallback {
+    chip::rpc::AppEventsHandler eventsCallback;
+    intptr_t eventsCallbackCtx;
+};
+
+static std::map<ClusterId, struct EventsCallback *> gEventsCallbackMap {};  
+
+struct EventsCallback * RpcFindEventsCallback(ClusterId clusterId)
+{
+    if (gEventsCallbackMap.find(clusterId) != gEventsCallbackMap.end()) {
+        return gEventsCallbackMap[clusterId];
+    }
+
+    return nullptr;
+}
+
+void __attribute__ ((unused)) RpcRegisterAppEventsHandler(ClusterId clusterId, chip::rpc::AppEventsHandler eventsCallback, intptr_t ctx) 
+{
+    if ( nullptr == RpcFindEventsCallback(clusterId) ) {
+        // Register new EventsCallback
+        gEventsCallbackMap[clusterId] = new EventsCallback{eventsCallback, ctx};
+        return;
+    }
+        
+    // TBD: print already registered
+}
+
+using namespace chip::rpc;
+void RpcEventsAsyncDispatcher(intptr_t arg) 
+{
+    struct EventsRequest * data = reinterpret_cast<struct EventsRequest *>(arg);
+printf("\033[41m %s , %d, endpoint=%d, clusterId=%d, events=%s \033[0m \n", __func__, __LINE__, data->endpointId, data->clusterId, data->events.c_str());
+
+    struct EventsCallback * eventsCallbackRecord = RpcFindEventsCallback(data->clusterId);
+    if ( nullptr == eventsCallbackRecord ) {
+        // TBD: Error cluster not registered
+        return;
+    }
+   
+    eventsCallbackRecord->eventsCallback(eventsCallbackRecord->eventsCallbackCtx, data);
+
+    delete data;
+}
+
+void RpcEventsSubscriber(EndpointId endpoint, ClusterId clusterId, std::string events) 
+{
+    struct EventsRequest * data = new EventsRequest{endpoint, clusterId, events};
+printf("\033[41m %s , %d \033[0m \n", __func__, __LINE__);
+    DeviceLayer::PlatformMgr().ScheduleWork(RpcEventsAsyncDispatcher, reinterpret_cast<intptr_t>(data));
+
+}	
+
+} // rpc
+} // chip
 #endif // defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
@@ -120,6 +181,7 @@ void RegisterServices(pw::rpc::Server & server)
 
 #if defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
     server.RegisterService(event_service);
+    event_service.RegisterEventsSubscriber(RpcEventsSubscriber);
 #endif // defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE

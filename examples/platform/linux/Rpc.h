@@ -21,6 +21,16 @@
 namespace chip {
 namespace rpc {
 
+struct EventsRequest {
+    EndpointId endpointId;
+    ClusterId clusterId;
+    std::string events;
+};
+
+using AppEventsHandler = void (*)(intptr_t ctx, struct EventsRequest * data);
+
+void __attribute__ ((unused)) RpcRegisterAppEventsHandler(ClusterId clusterId, chip::rpc::AppEventsHandler eventsCallback, intptr_t ctx);
+
 int Init(uint16_t rpcServerPort);
 
 } // namespace rpc

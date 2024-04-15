@@ -33,22 +33,10 @@ class Event final : public pw_rpc::nanopb::Event::Service<Event>
 public:
     ::pw::Status Set( const ::chip_rpc_EventSetRequest& request, ::chip_rpc_EventSetResponse& response)
     {
-        EndpointId endpointId = request.endpoint_id;
-        uint8_t newPosition   = 1 ; // to be parsed from request.event_payload
+printf("\033[41m %s, %d, request.endpoint_id=%d, request.cluster_id=%d, request.event_playload=%s \033[0m \n", __func__, __LINE__, request.endpoint_id, request.cluster_id, request.event_payload);
 
-printf("\033[41m %s, %d, request.event_playload=%s \033[0m \n", __func__, __LINE__, request.event_payload);
-        EventNumber eventNumber;
-        {
-            DeviceLayer::StackLock lock;
+        mEventsSubscriber(request.endpoint_id, request.cluster_id, request.event_payload);
 
-            // Update attribute first, then emit SwitchLatched event only on success.
-            RETURN_STATUS_IF_NOT_OK(app::Clusters::Switch::Attributes::CurrentPosition::Set(endpointId, newPosition));
-
-            chip::app::Clusters::Switch::Events::SwitchLatched::Type event{ newPosition };
-            RETURN_STATUS_IF_NOT_OK(app::LogEvent(event, endpointId, eventNumber));
-        }
-
-        response.event_number = static_cast<uint64_t>(eventNumber);
         return pw::OkStatus();
     }
 
@@ -66,6 +54,14 @@ printf("\033[41m %s, %d, request.event_playload=%s \033[0m \n", __func__, __LINE
         response.event_id = endpointId;
         return pw::OkStatus();
     }
+
+    using EventsSubscriber = void (*)(EndpointId endpointId, ClusterId clusterId, std::string events); 
+
+    void RegisterEventsSubscriber(EventsSubscriber subscriber) { mEventsSubscriber = subscriber; }
+
+private:
+    EventsSubscriber mEventsSubscriber;
+
 };
 
 } // namespace rpc
