@@ -17,9 +17,9 @@
  */
 #pragma once
 
+#include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
-#include <app/MessageDef/AttributeReportIBs.h>
 #include <lib/core/CHIPError.h>
 
 #include <type_traits>
