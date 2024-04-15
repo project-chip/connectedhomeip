@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
 #include <app/util/af-types.h>
 #include <app/util/att-storage.h>
 #include <app/util/attribute-metadata.h>
