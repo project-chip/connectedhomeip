@@ -93,8 +93,10 @@ the commissioning window again or the window can be opened by writing
 `commission` in the CLI when running the bridge. The commission command may also
 be used for multi-fabric commissioning.
 
-The Unify Matter Bridge uses the "On Network" commissioning method. For now,
-there is no Bluetooth commissioning support.
+The Unify Matter Bridge now supports both "On Network" commissioning method and
+bluetooth commissioning.
+
+### On Network Commissioning
 
 The commissioning procedure requires use of a pairing code. This pairing code is
 written to the console when running the Matter Bridge. Look for something
@@ -124,7 +126,7 @@ Raspberry Pi. Note that by default the bridge binds to the eth0 interface. If
 another interface is to be used, see the description of the command line
 arguments for setting [Network Interface](#network-interface).
 
-### Using the chip-tool to Commission
+#### Using the chip-tool for On Network Commission
 
 In the following procedure make sure to use the pairing code taken from the
 console output, as described above. To commission the Matter Bridge with the
@@ -134,6 +136,50 @@ console output, as described above. To commission the Matter Bridge with the
 chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 ```
 
+### Bluetooth Commissioning
+
+The commissioning procedure requires the use of Wi-Fi credentials(SSID, password), PIN code,
+and discriminator. This pin code and discriminator are written to the console when running
+the Matter Bridge. Look for something similar to '`Setup Pin Code (0 for UNKNOWN/ERROR)`',
+and '`Setup Discriminator (0xFFFF for UNKNOWN/ERROR)`' used as the pin code and
+discriminator in the following example. This pin code and discriminator can be used when
+commissioning with the CLI commissioning tool `chip-tool`.
+```bash
+[1712812027.852009][22228:22228] CHIP:DL: Device Configuration:
+[1712812027.852071][22228:22228] CHIP:DL:   Serial Number: TEST_SN
+[1712812027.852134][22228:22228] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+[1712812027.852176][22228:22228] CHIP:DL:   Product Id: 32769 (0x8001)
+[1712812027.852208][22228:22228] CHIP:DL:   Product Name: TEST_PRODUCT
+[1712812027.852244][22228:22228] CHIP:DL:   Hardware Version: 0
+[1712812027.852275][22228:22228] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 4000
+[1712812027.852303][22228:22228] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 4094 (0xFFE)
+```
+
+Additionally, the pin code and discriminator can be set with the argument "--umb.pin 4000 --umb.discriminator 4094" 
+while bringing up the unify matter bridge in stand-alone mode.
+
+```bash
+./unify-matter-bridge --umb.interface eth0 --umb.kvs ./matter-bridge.kvs --umb.pin 4000 --umb.discriminator 4094
+```
+
+It should be noted that the Wi-Fi credentials **must** be of the same network as the
+matter fabric. Note that by default the bridge binds to the eth0 interface. If
+another interface is to be used, see the description of the command line
+arguments for setting [Network Interface](#network-interface).
+
+#### Using the chip-tool for Bluetooth Commission
+
+In the following procedure make sure to use the pin code and discriminator taken
+from the console output, as described above. To commission the Matter Bridge with
+the `chip-tool` and assign the bridge the Node ID 1:
+
+```bash
+./chip-tool pairing ble-wifi 1 {SSID} {Password} {Pin code} {discriminator}
+```
+
+in the above example, the SSID and Password will be replaced with the Wifi SSID and password
+of the network to which matter fabric is connected. Pincode and discriminator are replaced
+with values derived from unify matter bridge logs as explained before.
 
 ### Using Google Nest Hub
 
