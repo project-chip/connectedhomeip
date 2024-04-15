@@ -37,6 +37,10 @@ public:
         mState                                    = state;
     }
 
+    void OnCancel(UDCClientState state) {}
+
+    void OnCommissionerPasscodeReady(UDCClientState state) {}
+
     void FindCommissionableNode(char * instanceName)
     {
         mFindCommissionableNodeCalled = true;
