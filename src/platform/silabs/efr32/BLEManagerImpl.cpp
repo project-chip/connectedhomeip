@@ -532,11 +532,12 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err;
-    sl_status_t ret;
-    uint32_t interval_min;
-    uint32_t interval_max;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    sl_status_t ret          = SL_STATUS_OK;
+    uint32_t interval_min    = 0;
+    uint32_t interval_max    = 0;
     uint16_t numConnectionss = NumConnections();
+    bool postAdvChangeEvent  = false;
     uint8_t connectableAdv =
         (numConnectionss < kMaxConnections) ? sl_bt_advertiser_connectable_scannable : sl_bt_advertiser_scannable_non_connectable;
 
@@ -548,6 +549,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     else
     {
         ChipLogDetail(DeviceLayer, "Start BLE advertisement");
+        postAdvChangeEvent = true;
     }
 
     err = ConfigureAdvertisingData();
@@ -586,18 +588,26 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     SuccessOrExit(err);
 
     sl_bt_advertiser_configure(advertising_set_handle, 1);
+
     ret = sl_bt_legacy_advertiser_start(advertising_set_handle, connectableAdv);
-
-    if (SL_STATUS_OK == ret)
-    {
-        if (mFlags.Has(Flags::kFastAdvertisingEnabled))
-        {
-            StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
-        }
-        mFlags.Set(Flags::kAdvertising);
-    }
-
     err = MapBLEError(ret);
+    SuccessOrExit(err);
+
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+    }
+    mFlags.Set(Flags::kAdvertising);
+
+    if (postAdvChangeEvent)
+    {
+        // Post CHIPoBLEAdvertisingChange event.
+        ChipDeviceEvent advChange;
+        advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+        advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
+
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
+    }
 
 exit:
     return err;
@@ -606,10 +616,11 @@ exit:
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    sl_status_t ret;
 
     if (mFlags.Has(Flags::kAdvertising))
     {
+        sl_status_t ret = SL_STATUS_OK;
+
         mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
@@ -617,12 +628,17 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         sl_bt_advertiser_delete_set(advertising_set_handle);
         advertising_set_handle = 0xff;
         err                    = MapBLEError(ret);
-        SuccessOrExit(err);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
         CancelBleAdvTimeoutTimer();
+
+        // Post CHIPoBLEAdvertisingChange event.
+        ChipDeviceEvent advChange;
+        advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+        advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+        err                                        = PlatformMgr().PostEvent(&advChange);
     }
 
-exit:
     return err;
 }
 
