@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,8 +28,10 @@ class TestMetadataReader(unittest.TestCase):
         # build the reader object
         self.reader = MetadataReader(path.join(path.dirname(__file__), "env_test.yaml"))
         with open(self.path_under_test, 'w', encoding='utf8') as test_file:
-            test_file.writelines(
-                ["# test-runner-runs: run1", "\n# test-runner-run/run1: app/all-clusters discriminator KVS storage-path commissioning-method discriminator passcode"])
+            test_file.writelines(''' 
+            # test-runner-runs: run1 
+            # test-runner-run/run1: app/all-clusters discriminator KVS storage-path commissioning-method discriminator passcode
+            ''')
 
     def test_parse_single_run(self):
 

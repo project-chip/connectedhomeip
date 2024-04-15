@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,11 +27,11 @@ class Metadata:
     app: Optional[str] = None
     factoryreset: bool = False
     comissioning_method: Optional[str] = None
-    discriminator: Optional[int] = None
+    discriminator: Optional[str] = None
     kvs: Optional[str] = None
     storage_path: Optional[str] = None
     on_network_commission: Optional[str] = None
-    passcode: Optional[int] = None
+    passcode: Optional[str] = None
     endpoint: Optional[str] = None
     manual_code: Optional[str] = None
     PICS: Optional[str] = None
@@ -83,7 +84,7 @@ class MetadataReader:
         with open(env_yaml_file_path) as stream:
             self.env = yaml.safe_load(stream)
 
-    def __resolve_env_vals__(self, metadata_dict: Dict[str, Union[str, bool]]) -> None:
+    def __resolve_env_vals__(self, metadata_dict: Dict[str, str]) -> None:
         """
         Resolves the argument defined in the test script to environment values.
         For example, if a test script defines "all_clusters" as the value for app
@@ -192,7 +193,7 @@ class MetadataReader:
         runs_def_ptrn = re.compile(r'^\s*#\s*test-runner-runs:\s*(.*)$')
         args_def_ptrn = re.compile(r'^\s*#\s*test-runner-run/([a-zA-Z0-9_]+):\s*(.*)$')
 
-        runs_arg_lines = {}
+        runs_arg_lines: Dict[str, List[str]] = {}
         runs_metadata = []
 
         with open(py_script_path, 'r', encoding='utf8') as py_script:
@@ -208,8 +209,8 @@ class MetadataReader:
                 elif args_match:
                     runs_arg_lines[args_match.group(1)].append(args_match.group(2))
 
-        for run, line in runs_arg_lines.items():
-            metadata_dict = self.__read_args__(line)
+        for run, lines in runs_arg_lines.items():
+            metadata_dict = self.__read_args__(lines)
             self.__resolve_env_vals__(metadata_dict)
 
             # store the run value and script location in the
