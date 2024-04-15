@@ -45,6 +45,7 @@
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
+#include <platform/LockTracker.h>
 #include <platform/PlatformManager.h>
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
@@ -252,6 +253,13 @@ static NSString * const sAttributesKey = @"attributes";
 
 @end
 
+// Minimal time to wait since our last resubscribe failure before we will allow
+// a read attempt to prod our subscription.
+//
+// TODO: Figure out a better value for this, but for now don't allow this to
+// happen more often than once every 10 minutes.
+#define MTRDEVICE_MIN_RESUBSCRIBE_DUE_TO_READ_INTERVAL_SECONDS (10 * 60)
+
 @interface MTRDevice ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 // protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
@@ -332,6 +340,11 @@ static NSString * const sAttributesKey = @"attributes";
     // as the read cache, should testing prove attribute storage by cluster is the better solution.
     NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * _clusterData;
     NSMutableSet<MTRClusterPath *> * _clustersToPersist;
+
+    // When we last failed to subscribe to the device (either via
+    // _setupSubscription or via the auto-resubscribe behavior of the
+    // ReadClient).  Nil if we have had no such failures.
+    NSDate * _Nullable _lastSubscriptionFailureTime;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -651,13 +664,26 @@ static NSString * const sAttributesKey = @"attributes";
 
 - (void)nodeMayBeAdvertisingOperational
 {
+    assertChipStackLockedByCurrentThread();
+
     MTR_LOG_DEFAULT("%@ saw new operational advertisement", self);
+
+    [self _triggerResubscribeWithReason:"operational advertisement seen"
+                    nodeLikelyReachable:YES];
+}
+
+// Trigger a resubscribe as needed.  nodeLikelyReachable should be YES if we
+// have reason to suspect the node is now reachable, NO if we have no idea
+// whether it might be.
+- (void)_triggerResubscribeWithReason:(const char *)reason nodeLikelyReachable:(BOOL)nodeLikelyReachable
+{
+    assertChipStackLockedByCurrentThread();
 
     // We might want to trigger a resubscribe on our existing ReadClient.  Do
     // that outside the scope of our lock, so we're not calling arbitrary code
-    // we don't control with the lock held.  This is safe, because when
-    // nodeMayBeAdvertisingOperational is called we are running on the Matter
-    // queue, and the ReadClient can't get destroyed while we are on that queue.
+    // we don't control with the lock held.  This is safe, because we are
+    // running on he Matter queue and the ReadClient can't get destroyed while
+    // we are on that queue.
     ReadClient * readClientToResubscribe = nullptr;
     SubscriptionCallback * subscriptionCallback = nullptr;
 
@@ -676,17 +702,65 @@ static NSString * const sAttributesKey = @"attributes";
     os_unfair_lock_unlock(&self->_lock);
 
     if (readClientToResubscribe) {
-        subscriptionCallback->ResetResubscriptionBackoff();
-        readClientToResubscribe->TriggerResubscribeIfScheduled("operational advertisement seen");
+        if (nodeLikelyReachable) {
+            // If we have reason to suspect the node is now reachable, reset the
+            // backoff timer, so that if this attempt fails we'll try again
+            // quickly; it's possible we'll just catch the node at a bad time
+            // here (e.g. still booting up), but should try again reasonably quickly.
+            subscriptionCallback->ResetResubscriptionBackoff();
+        }
+        readClientToResubscribe->TriggerResubscribeIfScheduled(reason);
     }
 }
 
-// Return YES if there's a valid delegate AND subscription is expected to report value
+// Return YES if there's a valid delegate.  As long as we have that, we are
+// responsible for dealing with the subscription bits, and doing read-throughs
+// when we can't establish a subscription won't help things either.
 - (BOOL)_subscriptionAbleToReport
 {
     std::lock_guard lock(_lock);
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    return (delegate != nil) && (_state == MTRDeviceStateReachable);
+    return (delegate != nil);
+}
+
+// Notification that read-through was skipped for an attribute read.
+- (void)_readThroughSkipped
+{
+    std::lock_guard lock(_lock);
+    if (_state == MTRDeviceStateReachable) {
+        // We're getting reports from the device, so there's nothing else to be
+        // done here.  We could skip this check, because our "try to
+        // resubscribe" code would be a no-op in this case, but then we'd have
+        // an extra dispatch in the common case of read-while-subscribed, which
+        // is not great for peformance.
+        return;
+    }
+
+    if (_lastSubscriptionFailureTime == nil) {
+        // No need to try to do anything here, because we have never failed a
+        // subscription attempt (so we might be in the middle of one now, and no
+        // need to prod things along).
+        return;
+    }
+
+    if ([[NSDate now] timeIntervalSinceDate:_lastSubscriptionFailureTime] < MTRDEVICE_MIN_RESUBSCRIBE_DUE_TO_READ_INTERVAL_SECONDS) {
+        // Not enough time has passed since we last tried.  Don't create extra
+        // network traffic.
+        //
+        // TODO: Do we need to worry about this being too spammy in the log if
+        // we keep getting reads while not subscribed?  We could add another
+        // backoff timer or counter for the log line...
+        MTR_LOG_DEBUG("%@ skipping resubscribe from skipped read-through: not enough time has passed since %@", self, _lastSubscriptionFailureTime);
+        return;
+    }
+
+    // Do the remaining work on the Matter queue, because we may want to touch
+    // ReadClient in there.  If the dispatch fails, that's fine; it means our
+    // controller has shut down, so nothing to be done.
+    [_deviceController asyncDispatchToMatterQueue:^{
+        [self _triggerResubscribeWithReason:"read-through skipped while not subscribed" nodeLikelyReachable:NO];
+    }
+                                     errorHandler:nil];
 }
 
 - (BOOL)_callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
@@ -783,15 +857,29 @@ static NSString * const sAttributesKey = @"attributes";
     std::lock_guard lock(_lock);
 
     [self _changeState:MTRDeviceStateUnknown];
+
+    // If we are here, then the ReadClient either just detected a subscription
+    // drop or just tried again and failed.  Either way, count it as "tried and
+    // failed to subscribe": in the latter case it's actually true, and in the
+    // former case we recently had a subscription and do not want to be forcing
+    // retries immediately.
+    _lastSubscriptionFailureTime = [NSDate now];
 }
 
 - (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
     std::lock_guard lock(_lock);
+
+    // If we are here, then either we failed to establish initil CASE, or we
+    // failed to send the initial SubscribeRequest message, or our ReadClient
+    // has given up completely.  Those all count as "we have tried and failed to
+    // subscribe".
+    _lastSubscriptionFailureTime = [NSDate now];
+
     // if there is no delegate then also do not retry
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
     if (!delegate) {
-        // NOTE: Do not log anythig here: we have been invalidated, and the
+        // NOTE: Do not log anything here: we have been invalidated, and the
         // Matter stack might already be torn down.
         return;
     }
@@ -1214,7 +1302,7 @@ static NSString * const sAttributesKey = @"attributes";
                            // Drop our pointer to the ReadClient immediately, since
                            // it's about to be destroyed and we don't want to be
                            // holding a dangling pointer.
-                           os_unfair_lock_lock(&self->_lock);
+                           std::lock_guard lock(self->_lock);
                            self->_currentReadClient = nullptr;
                            self->_currentSubscriptionCallback = nullptr;
 
@@ -1222,7 +1310,6 @@ static NSString * const sAttributesKey = @"attributes";
                                // OnDone
                                [self _handleSubscriptionReset:nil];
                            });
-                           os_unfair_lock_unlock(&self->_lock);
                        },
                        ^(void) {
                            MTR_LOG_DEFAULT("%@ got unsolicited message from publisher", self);
@@ -1616,6 +1703,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                         }];
         }];
         [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ 0x%llx 0x%llx", endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue];
+    } else {
+        [self _readThroughSkipped];
     }
 
     return attributeValueToReturn;
