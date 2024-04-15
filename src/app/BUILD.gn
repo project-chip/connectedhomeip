@@ -283,6 +283,7 @@ static_library("attribute-access") {
     "AttributeAccessInterfaceRegistry.h",
     "AttributeReportBuilder.cpp",
     "AttributeReportBuilder.h",
+    "AttributeValueDecoder.h",
     "AttributeValueEncoder.cpp",
     "AttributeValueEncoder.h",
   ]

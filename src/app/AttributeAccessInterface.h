@@ -18,21 +18,10 @@
 
 #pragma once
 
-#include <access/SubjectDescriptor.h>
 #include <app/AttributeReportBuilder.h>
 #include <app/AttributeValueEncoder.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/MessageDef/AttributeReportIBs.h>
-#include <app/data-model/DecodableList.h>
-#include <app/data-model/Decode.h>
-#include <app/data-model/Encode.h>
-#include <app/data-model/FabricScoped.h>
-#include <app/data-model/List.h> // So we can encode lists
-#include <app/data-model/TagBoundEncoder.h>
-#include <app/util/basic-types.h>
-#include <lib/core/Optional.h>
-#include <lib/core/TLV.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <app/AttributeValueDecoder.h>
+#include <lib/core/CHIPError.h>
 
 /**
  * Callback class that clusters can implement in order to interpose custom
@@ -46,50 +35,6 @@
  */
 namespace chip {
 namespace app {
-
-class AttributeValueDecoder
-{
-public:
-    AttributeValueDecoder(TLV::TLVReader & aReader, const Access::SubjectDescriptor & aSubjectDescriptor) :
-        mReader(aReader), mSubjectDescriptor(aSubjectDescriptor)
-    {}
-
-    template <typename T, typename std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
-    CHIP_ERROR Decode(T & aArg)
-    {
-        mTriedDecode = true;
-        return DataModel::Decode(mReader, aArg);
-    }
-
-    template <typename T, typename std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
-    CHIP_ERROR Decode(T & aArg)
-    {
-        mTriedDecode = true;
-        // The WriteRequest comes with no fabric index, this will happen when receiving a write request on a PASE session before
-        // AddNOC.
-        VerifyOrReturnError(AccessingFabricIndex() != kUndefinedFabricIndex, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
-        ReturnErrorOnFailure(DataModel::Decode(mReader, aArg));
-        aArg.SetFabricIndex(AccessingFabricIndex());
-        return CHIP_NO_ERROR;
-    }
-
-    bool TriedDecode() const { return mTriedDecode; }
-
-    /**
-     * The accessing fabric index for this write interaction.
-     */
-    FabricIndex AccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
-
-    /**
-     * The accessing subject descriptor for this write interaction.
-     */
-    const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
-
-private:
-    TLV::TLVReader & mReader;
-    bool mTriedDecode = false;
-    const Access::SubjectDescriptor mSubjectDescriptor;
-};
 
 class AttributeAccessInterface
 {
