@@ -118,35 +118,35 @@ MTR_DIRECT_MEMBERS
 
     BOOL _advertiseOperational;
 
-// Lock used to serialize access to the "controllers" array and the
-// "_controllerBeingStarted" and "_controllerBeingShutDown" ivars, since those
-// need to be touched from both whatever queue is starting controllers and from
-// the Matter queue.  The way this lock is used assumes that:
-//
-// 1) The only mutating accesses to the controllers array and the ivars happen
-//    when the current queue is not the Matter queue or in a block that was
-//    sync-dispatched to the Matter queue.  This is a good assumption, because
-//    the implementations of the functions that mutate these do sync dispatch to
-//    the Matter queue, which would deadlock if they were called when that queue
-//    was the current queue.
-//
-// 2) It's our API consumer's responsibility to serialize access to us from
-//    outside.
-//
-// These assumptions mean that if we are in a block that was sync-dispatched to
-// the Matter queue, that block cannot race with either the Matter queue nor the
-// non-Matter queue.  Similarly, if we are in a situation where the Matter queue
-// has been shut down, any accesses to the variables cannot race anything else.
-//
-// This means that:
-//
-// A. In a sync-dispatched block, or if the Matter queue has been shut down, we
-//    do not need to lock and can do read or write access.
-// B. Apart from item A, mutations of the array and ivars must happen outside the
-//    Matter queue and must lock.
-// C. Apart from item A, accesses on the Matter queue must be reads only and
-//    must lock.
-// D. Locking around reads not from the Matter queue is OK but not required.
+    // Lock used to serialize access to the "controllers" array and the
+    // "_controllerBeingStarted" and "_controllerBeingShutDown" ivars, since those
+    // need to be touched from both whatever queue is starting controllers and from
+    // the Matter queue.  The way this lock is used assumes that:
+    //
+    // 1) The only mutating accesses to the controllers array and the ivars happen
+    //    when the current queue is not the Matter queue or in a block that was
+    //    sync-dispatched to the Matter queue.  This is a good assumption, because
+    //    the implementations of the functions that mutate these do sync dispatch to
+    //    the Matter queue, which would deadlock if they were called when that queue
+    //    was the current queue.
+    //
+    // 2) It's our API consumer's responsibility to serialize access to us from
+    //    outside.
+    //
+    // These assumptions mean that if we are in a block that was sync-dispatched to
+    // the Matter queue, that block cannot race with either the Matter queue nor the
+    // non-Matter queue.  Similarly, if we are in a situation where the Matter queue
+    // has been shut down, any accesses to the variables cannot race anything else.
+    //
+    // This means that:
+    //
+    // A. In a sync-dispatched block, or if the Matter queue has been shut down, we
+    //    do not need to lock and can do read or write access.
+    // B. Apart from item A, mutations of the array and ivars must happen outside the
+    //    Matter queue and must lock.
+    // C. Apart from item A, accesses on the Matter queue must be reads only and
+    //    must lock.
+    // D. Locking around reads not from the Matter queue is OK but not required.
     os_unfair_lock _controllersLock;
     NSMutableArray<MTRDeviceController *> * _controllers;
     MTRDeviceController * _controllerBeingStarted;
@@ -206,7 +206,7 @@ MTR_DIRECT_MEMBERS
     _groupDataProvider.SetSessionKeystore(&_sessionKeystore);
     CHIP_ERROR err = _groupDataProvider.Init();
     VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified,
-                       "GroupDataProviderImpl::Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        "GroupDataProviderImpl::Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
 
     _controllersLock = OS_UNFAIR_LOCK_INIT;
     _controllers = [[NSMutableArray alloc] init];

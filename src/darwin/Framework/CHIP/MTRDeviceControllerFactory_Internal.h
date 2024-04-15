@@ -28,8 +28,8 @@
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTRServerEndpoint.h>
 
-#import "MTRDeviceControllerFactory.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceControllerFactory.h"
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
