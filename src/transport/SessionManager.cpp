@@ -80,7 +80,7 @@ public:
     }
 
 private:
-    Releasable * mIter;
+    Releasable * mIter = nullptr;
 };
 
 // Helper function that strips off the interface ID from a peer address that is
