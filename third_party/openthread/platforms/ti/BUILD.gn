@@ -19,17 +19,28 @@ import("//build_overrides/ti_simplelink_sdk.gni")
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 
+declare_args() {
+  ot_ti_lib_dir = ""
+}
+
 openthread_ti_root = "${chip_root}/third_party/openthread/ot-ti"
 
-config("openthread_cc13x2_cc26x2_config") {
+config("openthread_ti_config") {
   include_dirs = [
     "${openthread_root}/examples/platforms",
     "${openthread_root}/src/core",
     "${openthread_ti_root}/src",
   ]
+
+  public_configs = [ "${openthread_root}:openthread_config" ]
+  if (chip_openthread_ftd) {
+    public_configs += [ "${openthread_root}:openthread_ftd_config" ]
+  } else {
+    public_configs += [ "${openthread_root}:openthread_mtd_config" ]
+  }
 }
 
-source_set("libopenthread-cc13x2_cc26x2") {
+source_set("libopenthread-ti") {
   cflags = [
     "-Wno-address-of-packed-member",
     "-Wno-implicit-fallthrough",
@@ -44,10 +55,7 @@ source_set("libopenthread-cc13x2_cc26x2") {
   configs -= [ "${build_root}/config/compiler:std_default" ]
   configs += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_posix_config" ]
 
-  #configs += [ ":${sdk_target_name}_posix_config" ]
-  #configs += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk_posix_config" ]
   sources = [
-    #"${openthread_ti_root}/src/system.c",
     "${openthread_root}/examples/platforms/utils/code_utils.h",
     "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
     "${openthread_root}/examples/platforms/utils/link_metrics.h",
@@ -61,14 +69,26 @@ source_set("libopenthread-cc13x2_cc26x2") {
     "${openthread_ti_root}/src/radio.c",
     "${openthread_ti_root}/src/settings.c",
   ]
-
   public_configs = [
-    ":openthread_cc13x2_cc26x2_config",
+    ":openthread_ti_config",
     "${openthread_root}:openthread_config",
   ]
-  if (chip_openthread_ftd) {
-    public_configs += [ "${openthread_root}:openthread_ftd_config" ]
+}
+
+source_set("ot-ti-cert") {
+  sources = []
+  public_configs = [ ":openthread_ti_config" ]
+  deps = [ ":libopenthread-ti" ]
+
+  if ("" != ot_ti_lib_dir) {
+    library_dir = ot_ti_lib_dir
   } else {
-    public_configs += [ "${openthread_root}:openthread_mtd_config" ]
+    library_dir = "${openthread_ti_root}/libs/${ti_simplelink_device_family}"
+  }
+
+  if (chip_openthread_ftd) {
+    libs = [ "${library_dir}/libopenthread-ftd.a" ]
+  } else {
+    libs = [ "${library_dir}/libopenthread-mtd.a" ]
   }
 }
