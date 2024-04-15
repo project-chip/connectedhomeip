@@ -165,8 +165,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceReadRequestFieldIndex) {
     MTRDeviceReadRequestFieldParamsIndex = 1
 };
 
+typedef NS_ENUM(NSUInteger, MTRDeviceWriteRequestFieldIndex) {
+    MTRDeviceWriteRequestFieldPathIndex = 0,
+    MTRDeviceWriteRequestFieldValueIndex = 1,
+    MTRDeviceWriteRequestFieldTimeoutIndex = 2,
+    MTRDeviceWriteRequestFieldExpectedValueIDIndex = 3,
+};
+
 typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemBatchingID) {
     MTRDeviceWorkItemBatchingReadID = 1,
+    MTRDeviceWorkItemBatchingWriteID = 2,
 };
 
 typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
@@ -1658,6 +1666,50 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
+    NSNumber * nodeID = _nodeID;
+
+    // Write request data is an array of items (for now always length 1).  Each
+    // item is an array containing:
+    //
+    //   [ attribute path, value, timedWriteTimeout, expectedValueID ]
+    //
+    // where expectedValueID is stored as NSNumber and NSNull represents nil timeouts
+    auto * writeData = @[ attributePath, [value copy], timeout ?: [NSNull null], @(expectedValueID) ];
+
+    NSMutableArray<NSArray *> * writeRequests = [NSMutableArray arrayWithObject:writeData];
+
+    [workItem setBatchingID:MTRDeviceWorkItemBatchingWriteID data:writeRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
+        mtr_hide(self); // don't capture self accidentally
+        NSMutableArray<NSArray *> * writeRequestsCurrent = opaqueDataCurrent;
+        NSMutableArray<NSArray *> * writeRequestsNext = opaqueDataNext;
+
+        if (writeRequestsCurrent.count != 1) {
+            // Very unexpected!
+            MTR_LOG_ERROR("Batching write attribute work item [%llu]: Unexpected write request count %tu", workItemID, writeRequestsCurrent.count);
+            return MTRNotBatched;
+        }
+
+        MTRBatchingOutcome outcome = MTRNotBatched;
+        while (writeRequestsNext.count) {
+            // If paths don't match, we cannot replace the earlier write
+            // with the later one.
+            if (![writeRequestsNext[0][MTRDeviceWriteRequestFieldPathIndex]
+                    isEqual:writeRequestsCurrent[0][MTRDeviceWriteRequestFieldPathIndex]]) {
+                MTR_LOG_INFO("Batching write attribute work item [%llu]: cannot replace with next work item due to path mismatch", workItemID);
+                return outcome;
+            }
+
+            // Replace our one request with the first one from the next item.
+            auto writeItem = writeRequestsNext.firstObject;
+            [writeRequestsNext removeObjectAtIndex:0];
+            [writeRequestsCurrent replaceObjectAtIndex:0 withObject:writeItem];
+            MTR_LOG_INFO("Batching write attribute work item [%llu]: replaced with new write value %@ [0x%016llX]",
+                workItemID, writeItem, nodeID.unsignedLongLongValue);
+            outcome = MTRBatchedPartially;
+        }
+        NSCAssert(writeRequestsNext.count == 0, @"should have batched everything or returned early");
+        return MTRBatchedFully;
+    }];
     // The write operation will install a duplicate check handler, to return NO for "isDuplicate". Since a write operation may
     // change values, only read requests after this should be considered for duplicate requests.
     [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
@@ -1666,18 +1718,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }];
     [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         MTRBaseDevice * baseDevice = [self newBaseDevice];
+        // Make sure to use writeRequests here, because that's what our batching
+        // handler will modify as needed.
+        NSCAssert(writeRequests.count == 1, @"Incorrect number of write requests: %tu", writeRequests.count);
+
+        auto * request = writeRequests[0];
+        MTRAttributePath * path = request[MTRDeviceWriteRequestFieldPathIndex];
+
+        id timedWriteTimeout = request[MTRDeviceWriteRequestFieldTimeoutIndex];
+        if (timedWriteTimeout == [NSNull null]) {
+            timedWriteTimeout = nil;
+        }
+
         [baseDevice
-            writeAttributeWithEndpointID:endpointID
-                               clusterID:clusterID
-                             attributeID:attributeID
-                                   value:value
-                       timedWriteTimeout:timeout
+            writeAttributeWithEndpointID:path.endpoint
+                               clusterID:path.cluster
+                             attributeID:path.attribute
+                                   value:request[MTRDeviceWriteRequestFieldValueIndex]
+                       timedWriteTimeout:timedWriteTimeout
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   if (error) {
                                       MTR_LOG_ERROR("Write attribute work item [%llu] failed: %@", workItemID, error);
                                       if (useValueAsExpectedValue) {
-                                          [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+                                          NSNumber * expectedValueID = request[MTRDeviceWriteRequestFieldExpectedValueIDIndex];
+                                          [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID.unsignedLongLongValue];
                                       }
                                   }
                                   completion(MTRAsyncWorkComplete);
