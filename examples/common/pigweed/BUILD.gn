@@ -74,6 +74,7 @@ pw_proto_library("button_service") {
 
 pw_proto_library("event_service") {
   sources = [ "protos/event_service.proto" ]
+  inputs = [ "protos/event_service.options" ]
   deps = [ "$dir_pw_protobuf:common_protos" ]
   strip_prefix = "protos"
   prefix = "event_service"

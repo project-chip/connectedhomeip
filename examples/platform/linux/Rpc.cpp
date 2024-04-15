@@ -89,7 +89,7 @@ Device device_service;
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 
 #if defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
-BooleanState event_service;
+Event event_service;
 #endif // defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE

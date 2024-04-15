@@ -31,13 +31,12 @@ namespace rpc {
 class Event final : public pw_rpc::nanopb::Event::Service<Event>
 {
 public:
-    virtual ~Event() = default;
-
-    virtual pw::Status Set(const chip_rpc_EventSetRequest & request, chip_rpc_EventSetResponse & response)
+    ::pw::Status Set( const ::chip_rpc_EventSetRequest& request, ::chip_rpc_EventSetResponse& response)
     {
         EndpointId endpointId = request.endpoint_id;
         uint8_t newPosition   = 1 ; // to be parsed from request.event_payload
 
+printf("\033[41m %s, %d, request.event_playload=%s \033[0m \n", __func__, __LINE__, request.event_payload);
         EventNumber eventNumber;
         {
             DeviceLayer::StackLock lock;
@@ -53,10 +52,10 @@ public:
         return pw::OkStatus();
     }
 
-    virtual pw::Status Get(const chip_rpc_EventGetRequest & request, chip_rpc_EventGetResponse & response)
+    ::pw::Status Get( const ::chip_rpc_EventGetRequest& request, ::chip_rpc_EventGetResponse& response)
     {
         EndpointId endpointId = request.endpoint_id;
-        uint32 event_id = 1; // TBD
+        // uint32_t event_id = 1; // TBD
 
         {
             DeviceLayer::StackLock lock;
@@ -64,7 +63,7 @@ public:
             // RETURN_STATUS_IF_NOT_OK(app::Clusters::Switch::Attributes::StateValue::Get(endpointId, &state_value));
         }
 
-        response.state.event_id = event_id;
+        response.event_id = endpointId;
         return pw::OkStatus();
     }
 };

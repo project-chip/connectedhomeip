@@ -1,0 +1,1 @@
+chip.rpc.EventSetRequest.event_payload max_size:2048  // max event size

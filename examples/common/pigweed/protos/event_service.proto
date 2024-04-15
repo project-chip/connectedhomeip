@@ -1,14 +1,13 @@
 syntax = "proto3";
 
-import 'pw_protobuf_protos/common.proto';
-
 package chip.rpc;
+
+import 'pw_protobuf_protos/common.proto';
 
 message EventSetRequest {
   uint32 endpoint_id = 1;
   uint32 cluster_id = 2;
-  uint32 event_id = 3;
-  std::string event_payload = 4;
+  string event_payload = 3; // 
 }
 
 message EventSetResponse {
