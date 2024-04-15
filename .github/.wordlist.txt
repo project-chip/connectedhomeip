@@ -585,6 +585,8 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
+getter
+getters
 GetInDevelopmentTests
 GetIP
 getManualTests
@@ -907,6 +909,7 @@ Multicast
 multilib
 Multiprotocol
 multithreaded
+mutex
 mutexes
 mv
 MX
@@ -936,6 +939,7 @@ nfds
 NitricOxideConcentrationMeasurement
 NitrogenDioxideConcentrationMeasurement
 nl
+nltest
 NLUnitTest
 NLUnitTests
 nmcli
@@ -1499,6 +1503,7 @@ utils
 UUID
 ux
 validator
+valgrind
 vcom
 VCP
 Vectorcall
