@@ -159,16 +159,17 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::FinalizeAction()
 {
     int32_t status        = SL_STATUS_OK;
     ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Finalize Action started");
+
     // Pad the remainder of the write buffer with zeros and write it to bootloader storage
     if (writeBufOffset != 0)
     {
 
+        status = sl_si91x_fwup_load(writeBuffer, writeBufOffset);
         while (writeBufOffset != kAlignmentBytes)
         {
             writeBuffer[writeBufOffset] = 0;
             writeBufOffset++;
         }
-        status = sl_si91x_fwup_load(writeBuffer, writeBufOffset);
         ChipLogProgress(SoftwareUpdate, "status: 0x%lX", status);
 
         if (status != SL_STATUS_OK)
