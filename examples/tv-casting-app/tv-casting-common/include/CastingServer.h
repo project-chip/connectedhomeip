@@ -49,7 +49,11 @@ inline constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = ch
  *  and then have it send TV Casting/Media related commands. This is to be instantiated
  *  as a singleton and is to be used across Linux, Android and iOS.
  */
-class CastingServer : public AppDelegate, chip::Protocols::UserDirectedCommissioning::CommissionerDeclarationHandler
+class CastingServer : public AppDelegate
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    ,
+                      chip::Protocols::UserDirectedCommissioning::CommissionerDeclarationHandler
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 {
 public:
     CastingServer(CastingServer & other)  = delete;
