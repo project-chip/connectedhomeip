@@ -26,18 +26,12 @@
 #include "em_usart.h"
 
 #include "sl_status.h"
-
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "task.h"
+#include <cmsis_os2.h>
 
 #include "silabs_utils.h"
-
 #include "wfx_host_events.h"
-
 #include "rsi_driver.h"
 #include "rsi_wlan_non_rom.h"
-
 #include "rsi_bootup_config.h"
 #include "rsi_common_apis.h"
 #include "rsi_data_types.h"
@@ -51,13 +45,14 @@
 
 #include "dhcp_client.h"
 #include "lwip/nd6.h"
-#include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
 // TODO convert this file to cpp and use CodeUtils.h
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
+
+#define WFX_QUEUE_SIZE 10
 
 /* Rsi driver Task will use as its stack */
 StackType_t driverRsiTaskStack[WFX_RSI_WLAN_TASK_SZ] = { 0 };
@@ -84,11 +79,53 @@ uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
 extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
 #endif
 
+// DHCP Poll timer
+static osTimerId_t sDHCPTimer;
+static osMessageQueueId_t sWifiEventQueue = NULL;
 /*
  * This file implements the interface to the RSI SAPIs
  */
 static uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
 static wfx_wifi_scan_ext_t temp_reset;
+
+static void DHCPTimerEventHandler(void * arg)
+{
+    WfxEvent_t event;
+    event.eventType = WFX_EVT_DHCP_POLL;
+    WfxPostEvent(&event);
+}
+
+static void CancelDHCPTimer()
+{
+    osStatus_t status;
+
+    // Check if timer started
+    if (!osTimerIsRunning(sDHCPTimer))
+    {
+        SILABS_LOG("CancelDHCPTimer: timer not running");
+        return;
+    }
+
+    status = osTimerStop(sDHCPTimer);
+    if (status != osOK)
+    {
+        SILABS_LOG("CancelDHCPTimer: failed to stop timer with status: %d", status);
+    }
+}
+
+static void StartDHCPTimer(uint32_t timeout)
+{
+    osStatus_t status;
+
+    // Cancel timer if already started
+    CancelDHCPTimer();
+
+    status = osTimerStart(sDHCPTimer, pdMS_TO_TICKS(timeout));
+    if (status != osOK)
+    {
+        SILABS_LOG("StartDHCPTimer: failed to start timer with status: %d", status);
+    }
+}
 
 /******************************************************************
  * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
@@ -234,7 +271,7 @@ int32_t wfx_rsi_power_save()
  *********************************************************************/
 static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t len)
 {
-    SILABS_LOG("%s: status: %02x", __func__, status);
+    WfxEvent_t WfxEvent;
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
     if (status != RSI_SUCCESS)
     {
@@ -244,7 +281,10 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
         SILABS_LOG("%s: failed. retry: %d", __func__, wfx_rsi.join_retries);
         wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
         if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
-            xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+        {
+            WfxEvent.eventType = WFX_EVT_STA_START_JOIN;
+            WfxPostEvent(&WfxEvent);
+        }
     }
     else
     {
@@ -253,7 +293,8 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
          */
         memset(&temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
         SILABS_LOG("%s: join completed.", __func__);
-        xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
+        WfxEvent.eventType = WFX_EVT_STA_CONN;
+        WfxPostEvent(&WfxEvent);
         wfx_rsi.join_retries = 0;
         retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
     }
@@ -272,10 +313,12 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
 static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
 {
     SILABS_LOG("%s: error: failed status: %02x", __func__, status);
+    WfxEvent_t WfxEvent;
     wfx_rsi.join_retries += 1;
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
     is_wifi_disconnection_event = true;
-    xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+    WfxEvent.eventType = WFX_EVT_STA_START_JOIN;
+    WfxPostEvent(&WfxEvent);
 }
 /*************************************************************************************
  * @fn  wfx_rsi_wlan_pkt_cb(uint16_t status, uint8_t *buf, uint32_t len)
@@ -380,7 +423,22 @@ static int32_t wfx_rsi_init(void)
 
     SILABS_LOG("%s: WLAN: MAC %02x:%02x:%02x %02x:%02x:%02x", __func__, wfx_rsi.sta_mac.octet[0], wfx_rsi.sta_mac.octet[1],
                wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4], wfx_rsi.sta_mac.octet[5]);
-    wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
+    
+    // Create the message queue
+    sWifiEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WfxEvent_t), NULL);
+    if (sWifiEventQueue == NULL)
+    {
+        return SL_STATUS_ALLOCATION_FAILED;
+    }
+
+    // Create timer for DHCP polling
+    // TODO: Use LWIP timer instead of creating a new one here
+    sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, NULL, NULL);
+    if (sDHCPTimer == NULL)
+    {
+        return SL_STATUS_ALLOCATION_FAILED;
+    }
+
     /*
      * Register callbacks - We are only interested in the connectivity CBs
      */
@@ -552,6 +610,192 @@ static void wfx_rsi_do_join(void)
     }
 }
 
+/**  NotifyConnectivity
+ *   @brief Notify the application about the connectivity status if it has not been notified yet.
+ *          Helper function for HandleDHCPPolling.
+ */
+void NotifyConnectivity()
+{
+    if (!hasNotifiedWifiConnectivity)
+    {
+        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
+        hasNotifiedWifiConnectivity = true;
+    }
+}
+
+void HandleDHCPPolling()
+{
+    struct netif * sta_netif;
+    WfxEvent_t event;
+
+    sta_netif = wfx_get_netif(SL_WFX_STA_INTERFACE);
+    if (sta_netif == NULL)
+    {
+        // TODO: Notify the application that the interface is not set up or Chipdie here because we are in an unkonwn state
+        SILABS_LOG("HandleDHCPPolling: failed to get STA netif");
+        return;
+    }
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+    uint8_t dhcp_state = dhcpclient_poll(sta_netif);
+    if (dhcp_state == DHCP_ADDRESS_ASSIGNED && !hasNotifiedIPV4)
+    {
+        wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
+        hasNotifiedIPV4 = true;
+        NotifyConnectivity();
+    }
+    else if (dhcp_state == DHCP_OFF)
+    {
+        wfx_ip_changed_notify(IP_STATUS_FAIL);
+        hasNotifiedIPV4 = false;
+    }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+    /* Checks if the assigned IPv6 address is preferred by evaluating
+     * the first block of IPv6 address ( block 0)
+     */
+    if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
+    {
+        wfx_ipv6_notify(GET_IPV6_SUCCESS);
+        hasNotifiedIPV6 = true;
+        event.eventType = WFX_EVT_STA_DHCP_DONE;
+        WfxPostEvent(&event);
+        NotifyConnectivity();
+    }
+}
+
+/** ResetDHCPNotificationFlags
+ *  @brief Reset the flags that are used to notify the application about DHCP connectivity
+ *         and emits a WFX_EVT_STA_DO_DHCP event to trigger DHCP polling checks. Helper function for ProcessEvent.
+ */ 
+void ResetDHCPNotificationFlags()
+{
+    WfxEvent_t outEvent;
+
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+    hasNotifiedIPV4 = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    hasNotifiedIPV6             = false;
+    hasNotifiedWifiConnectivity = false;
+
+    outEvent.eventType = WFX_EVT_STA_DO_DHCP;
+    WfxPostEvent(&outEvent);
+}
+
+/** 
+ * @brief Post the WfxEvent to tue WiFiEventQueue to be process by the wfx_rsi_task
+ */
+void WfxPostEvent(WfxEvent_t * event)
+{
+    sl_status_t status = osMessageQueuePut(sWifiEventQueue, event, 0, 0);
+
+    if (status != osOK)
+    {
+        SILABS_LOG("WfxPostEvent: failed to post event with status: %d", status);
+        // TODO: Handle error, requeue event depending on queue size or notify relevant task, Chipdie, etc.
+    }
+}
+
+void ProcessEvent(WfxEvent_t inEvent)
+{
+    // Process event
+    switch (inEvent.eventType)
+    {
+    case WFX_EVT_STA_CONN:
+        SILABS_LOG("%s: starting LwIP STA", __func__);
+        wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
+        ResetDHCPNotificationFlags();
+        wfx_lwip_set_sta_link_up();
+        /* We need to get AP Mac - TODO */
+        // Uncomment once the hook into MATTER is moved to IP connectivty instead
+        // of AP connectivity.
+        // wfx_connected_notify(0, &wfx_rsi.ap_mac); // This
+        // is independant of IP connectivity.
+        break;
+    case WFX_EVT_STA_DISCONN:
+        // TODO: This event is not being posted anywhere, seems to be a dead code or we are missing something
+        wfx_rsi.dev_state &=
+            ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
+        SILABS_LOG("%s: disconnect notify", __func__);
+        /* TODO: Implement disconnect notify */
+        ResetDHCPNotificationFlags();
+        wfx_lwip_set_sta_link_down(); // Internally dhcpclient_poll(netif) ->
+                                      // wfx_ip_changed_notify(0) for IPV4
+#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
+        wfx_ip_changed_notify(IP_STATUS_FAIL);
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+        wfx_ipv6_notify(GET_IPV6_FAIL);
+        break;
+    case WFX_EVT_AP_START:
+        // TODO: Currently unimplemented
+        break;
+    case WFX_EVT_AP_STOP:
+        // TODO: Currently unimplemented
+        break;
+    case WFX_EVT_SCAN:
+#ifdef SL_WFX_CONFIG_SCAN
+        rsi_rsp_scan_t scan_rsp = { 0 };
+        int32_t status          = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
+
+        if (status)
+        {
+            SILABS_LOG("SSID scan failed: %02x ", status);
+        }
+        else
+        {
+            rsi_scan_info_t * scan;
+            wfx_wifi_scan_result_t ap;
+            for (int x = 0; x < scan_rsp.scan_count[0]; x++)
+            {
+                scan = &scan_rsp.scan_info[x];
+                // is it a scan all or target scan
+                if (!wfx_rsi.scan_ssid ||
+                    (wfx_rsi.scan_ssid && strcmp(wfx_rsi.scan_ssid, (char *) scan->ssid) == CMP_SUCCESS))
+                {
+                    strncpy(ap.ssid, (char *) scan->ssid, MIN(sizeof(ap.ssid), sizeof(scan->ssid)));
+                    ap.security = scan->security_mode;
+                    ap.rssi     = (-1) * scan->rssi_val;
+                    configASSERT(sizeof(ap.bssid) >= BSSID_MAX_STR_LEN);
+                    configASSERT(sizeof(scan->bssid) >= BSSID_MAX_STR_LEN);
+                    memcpy(ap.bssid, scan->bssid, BSSID_MAX_STR_LEN);
+                    (*wfx_rsi.scan_cb)(&ap);
+
+                    if (wfx_rsi.scan_ssid)
+                    {
+                        break; // we found the targeted ssid.
+                    }
+                }
+            }
+        }
+
+        /* Terminate with end of scan which is no ap sent back */
+        (*wfx_rsi.scan_cb)((wfx_wifi_scan_result_t *) 0);
+        wfx_rsi.scan_cb = (void (*)(wfx_wifi_scan_result_t *)) 0;
+
+        if (wfx_rsi.scan_ssid)
+        {
+            vPortFree(wfx_rsi.scan_ssid);
+            wfx_rsi.scan_ssid = (char *) 0;
+        }
+        break;
+#endif /* SL_WFX_CONFIG_SCAN */
+    case WFX_EVT_STA_START_JOIN:
+        // saving the AP related info
+        wfx_rsi_save_ap_info();
+        // Joining to the network
+        wfx_rsi_do_join();
+        break;
+    case WFX_EVT_STA_DO_DHCP:
+        StartDHCPTimer(WFX_RSI_DHCP_POLL_INTERVAL);
+        break;
+    case WFX_EVT_STA_DHCP_DONE:
+        CancelDHCPTimer();
+        break;
+    case WFX_EVT_DHCP_POLL:
+        HandleDHCPPolling();
+    default:
+        break;
+    }
+}
+
 /*********************************************************************************
  * @fn  void wfx_rsi_task(void *arg)
  * @brief
@@ -565,9 +809,6 @@ static void wfx_rsi_do_join(void)
 /* ARGSUSED */
 void wfx_rsi_task(void * arg)
 {
-    EventBits_t flags;
-    TickType_t last_dhcp_poll, now;
-    struct netif * sta_netif;
     (void) arg;
     uint32_t rsi_status = wfx_rsi_init();
     if (rsi_status != RSI_SUCCESS)
@@ -575,180 +816,22 @@ void wfx_rsi_task(void * arg)
         SILABS_LOG("%s: error: wfx_rsi_init with status: %02x", __func__, rsi_status);
         return;
     }
+    WfxEvent_t wfxEvent;
     wfx_lwip_start();
-    last_dhcp_poll = xTaskGetTickCount();
-    sta_netif      = wfx_get_netif(SL_WFX_STA_INTERFACE);
     wfx_started_notify();
 
-    SILABS_LOG("%s: starting event wait", __func__);
+    SILABS_LOG("Starting event loop");
     for (;;)
     {
-        /*
-         * This is the main job of this task.
-         * Wait for commands from the ConnectivityManager
-         * Make state changes (based on call backs)
-         */
-        flags = xEventGroupWaitBits(wfx_rsi.events,
-                                    WFX_EVT_STA_CONN | WFX_EVT_STA_DISCONN | WFX_EVT_STA_START_JOIN
-#ifdef SL_WFX_CONFIG_SOFTAP
-                                        | WFX_EVT_AP_START | WFX_EVT_AP_STOP
-#endif /* SL_WFX_CONFIG_SOFTAP */
-#ifdef SL_WFX_CONFIG_SCAN
-                                        | WFX_EVT_SCAN
-#endif /* SL_WFX_CONFIG_SCAN */
-                                        | 0,
-                                    pdTRUE,              /* Clear the bits */
-                                    pdFALSE,             /* Wait for any bit */
-                                    pdMS_TO_TICKS(250)); /* 250 mSec */
-
-        if (flags)
+        osStatus_t status = osMessageQueueGet(sWifiEventQueue, &wfxEvent, NULL, osWaitForever);
+        if (status == osOK)
         {
-            SILABS_LOG("%s: wait event encountered: %x", __func__, flags);
+            ProcessEvent(wfxEvent);
         }
-        /*
-         * Let's handle DHCP polling here
-         */
-        if (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED)
+        else
         {
-            if ((now = xTaskGetTickCount()) > (last_dhcp_poll + pdMS_TO_TICKS(250)))
-            {
-#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-                uint8_t dhcp_state = dhcpclient_poll(sta_netif);
-                if (dhcp_state == DHCP_ADDRESS_ASSIGNED && !hasNotifiedIPV4)
-                {
-                    wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-                    hasNotifiedIPV4 = true;
-                    if (!hasNotifiedWifiConnectivity)
-                    {
-                        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
-                        hasNotifiedWifiConnectivity = true;
-                    }
-                }
-                else if (dhcp_state == DHCP_OFF)
-                {
-                    wfx_ip_changed_notify(IP_STATUS_FAIL);
-                    hasNotifiedIPV4 = false;
-                }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-                /*
-                 * Checks if the assigned IPv6 address is preferred by evaluating
-                 * the first block of IPv6 address ( block 0)
-                 */
-                if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
-                {
-                    wfx_ipv6_notify(GET_IPV6_SUCCESS);
-                    hasNotifiedIPV6 = true;
-                    if (!hasNotifiedWifiConnectivity)
-                    {
-                        wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
-                        hasNotifiedWifiConnectivity = true;
-                    }
-                }
-                last_dhcp_poll = now;
-            }
+            SILABS_LOG("Failed to get event with status: %x", status);
         }
-        if (flags & WFX_EVT_STA_START_JOIN)
-        {
-            // saving the AP related info
-            wfx_rsi_save_ap_info();
-            // Joining to the network
-            wfx_rsi_do_join();
-        }
-        if (flags & WFX_EVT_STA_CONN)
-        {
-            /*
-             * Initiate the Join command (assuming we have been provisioned)
-             */
-            SILABS_LOG("%s: starting LwIP STA", __func__);
-            wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
-            hasNotifiedWifiConnectivity = false;
-#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-            hasNotifiedIPV4 = false;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
-            hasNotifiedIPV6 = false;
-            wfx_lwip_set_sta_link_up();
-            /* We need to get AP Mac - TODO */
-            // Uncomment once the hook into MATTER is moved to IP connectivty instead
-            // of AP connectivity. wfx_connected_notify(0, &wfx_rsi.ap_mac); // This
-            // is independant of IP connectivity.
-        }
-        if (flags & WFX_EVT_STA_DISCONN)
-        {
-            wfx_rsi.dev_state &=
-                ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
-            SILABS_LOG("%s: disconnect notify", __func__);
-            /* TODO: Implement disconnect notify */
-            wfx_lwip_set_sta_link_down(); // Internally dhcpclient_poll(netif) ->
-                                          // wfx_ip_changed_notify(0) for IPV4
-#if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-            wfx_ip_changed_notify(IP_STATUS_FAIL);
-            hasNotifiedIPV4 = false;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-            wfx_ipv6_notify(GET_IPV6_FAIL);
-            hasNotifiedIPV6             = false;
-            hasNotifiedWifiConnectivity = false;
-        }
-#ifdef SL_WFX_CONFIG_SCAN
-        if (flags & WFX_EVT_SCAN)
-        {
-            if (!(wfx_rsi.dev_state & WFX_RSI_ST_SCANSTARTED))
-            {
-                rsi_rsp_scan_t scan_rsp = { 0 };
-                int32_t status          = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
-
-                if (status)
-                {
-                    SILABS_LOG("SSID scan failed: %02x ", status);
-                }
-                else
-                {
-                    rsi_scan_info_t * scan;
-                    wfx_wifi_scan_result_t ap;
-                    for (int x = 0; x < scan_rsp.scan_count[0]; x++)
-                    {
-                        scan = &scan_rsp.scan_info[x];
-                        // is it a scan all or target scan
-                        if (!wfx_rsi.scan_ssid ||
-                            (wfx_rsi.scan_ssid && strcmp(wfx_rsi.scan_ssid, (char *) scan->ssid) == CMP_SUCCESS))
-                        {
-                            strncpy(ap.ssid, (char *) scan->ssid, MIN(sizeof(ap.ssid), sizeof(scan->ssid)));
-                            ap.security = scan->security_mode;
-                            ap.rssi     = (-1) * scan->rssi_val;
-                            configASSERT(sizeof(ap.bssid) >= BSSID_MAX_STR_LEN);
-                            configASSERT(sizeof(scan->bssid) >= BSSID_MAX_STR_LEN);
-                            memcpy(ap.bssid, scan->bssid, BSSID_MAX_STR_LEN);
-                            (*wfx_rsi.scan_cb)(&ap);
-
-                            if (wfx_rsi.scan_ssid)
-                            {
-                                break; // we found the targeted ssid.
-                            }
-                        }
-                    }
-                }
-
-                wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
-                /* Terminate with end of scan which is no ap sent back */
-                (*wfx_rsi.scan_cb)((wfx_wifi_scan_result_t *) 0);
-                wfx_rsi.scan_cb = (void (*)(wfx_wifi_scan_result_t *)) 0;
-
-                if (wfx_rsi.scan_ssid)
-                {
-                    vPortFree(wfx_rsi.scan_ssid);
-                    wfx_rsi.scan_ssid = (char *) 0;
-                }
-            }
-        }
-#endif /* SL_WFX_CONFIG_SCAN */
-#ifdef SL_WFX_CONFIG_SOFTAP
-        /* TODO */
-        if (flags & WFX_EVT_AP_START)
-        {
-        }
-        if (flags & WFX_EVT_AP_STOP)
-        {
-        }
-#endif /* SL_WFX_CONFIG_SOFTAP */
     }
 }
 
