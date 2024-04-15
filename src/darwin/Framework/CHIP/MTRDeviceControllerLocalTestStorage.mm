@@ -18,8 +18,6 @@
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRLogging_Internal.h"
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-
 static NSString * const kLocalTestUserDefaultDomain = @"org.csa-iot.matter.darwintest";
 static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
 
@@ -44,6 +42,7 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
     }
 }
 
+// TODO: Add another init argument for controller so that this can support multiple-controllers.
 - (instancetype)initWithPassThroughStorage:(id<MTRDeviceControllerStorageDelegate>)passThroughStorage
 {
     if (self = [super init]) {
@@ -81,8 +80,12 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
        sharingType:(MTRStorageSharingType)sharingType
 {
     if (sharingType == MTRStorageSharingTypeNotShared) {
-        NSError * error;
+        NSError * error = nil;
         NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:&error];
+        if (error) {
+            MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage storeValue: failed to convert value object to data %@", error);
+            return NO;
+        }
         NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
         [defaults setObject:data forKey:key];
         return YES;
@@ -114,6 +117,45 @@ static NSString * const kLocalTestUserDefaultEnabledKey = @"enableTestStorage";
         }
     }
 }
-@end
 
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+- (NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
+{
+    if (sharingType == MTRStorageSharingTypeNotShared) {
+        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+        return [defaults dictionaryRepresentation];
+    } else {
+        if (_passThroughStorage && [_passThroughStorage respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
+            return [_passThroughStorage valuesForController:controller securityLevel:securityLevel sharingType:sharingType];
+        } else {
+            MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage valuesForController: shared type but no pass-through storage");
+            return nil;
+        }
+    }
+}
+
+- (BOOL)controller:(MTRDeviceController *)controller storeValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values securityLevel:(MTRStorageSecurityLevel)securityLevel sharingType:(MTRStorageSharingType)sharingType
+{
+    if (sharingType == MTRStorageSharingTypeNotShared) {
+        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kLocalTestUserDefaultDomain];
+        BOOL success = YES;
+        for (NSString * key in values) {
+            NSError * error = nil;
+            NSData * data = [NSKeyedArchiver archivedDataWithRootObject:values[key] requiringSecureCoding:YES error:&error];
+            if (error) {
+                MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage storeValues: failed to convert value object to data %@", error);
+                success = NO;
+                continue;
+            }
+            [defaults setObject:data forKey:key];
+        }
+        return success;
+    } else {
+        if (_passThroughStorage && [_passThroughStorage respondsToSelector:@selector(controller:storeValues:securityLevel:sharingType:)]) {
+            return [_passThroughStorage controller:controller storeValues:values securityLevel:securityLevel sharingType:sharingType];
+        } else {
+            MTR_LOG_INFO("MTRDeviceControllerLocalTestStorage valuesForController: shared type but no pass-through storage");
+            return NO;
+        }
+    }
+}
+@end

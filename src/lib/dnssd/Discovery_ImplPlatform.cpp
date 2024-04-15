@@ -340,7 +340,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
 void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
 {
     auto & resolutionData = nodeData.resolutionData;
-    auto & commissionData = nodeData.commissionData;
+    auto & commissionData = nodeData.nodeData;
 
     Platform::CopyString(resolutionData.hostName, mHostName);
     Platform::CopyString(commissionData.instanceName, mName);
@@ -743,6 +743,21 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, 
     return error;
 }
 
+CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
+{
+    switch (type)
+    {
+    case DiscoveryType::kCommissionableNode:
+        return DiscoverCommissionableNodes(filter, context);
+    case DiscoveryType::kCommissionerNode:
+        return DiscoverCommissioners(filter, context);
+    case DiscoveryType::kOperational:
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+
 CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryContext & context)
 {
     if (!context.GetBrowseIdentifier().HasValue())
@@ -769,15 +784,19 @@ DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
     return sManager.get();
 }
 
-ServiceAdvertiser & chip::Dnssd::ServiceAdvertiser::Instance()
+#if CHIP_DNSSD_DEFAULT_PLATFORM
+
+ServiceAdvertiser & GetDefaultAdvertiser()
 {
     return DiscoveryImplPlatform::GetInstance();
 }
 
-Resolver & chip::Dnssd::Resolver::Instance()
+Resolver & GetDefaultResolver()
 {
     return DiscoveryImplPlatform::GetInstance();
 }
+
+#endif // CHIP_DNSSD_DEFAULT_PLATFORM
 
 } // namespace Dnssd
 } // namespace chip

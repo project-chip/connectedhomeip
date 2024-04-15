@@ -49,7 +49,7 @@ void callback_event(uint32_t event)
         break;
     case SL_USART_EVENT_RECEIVE_COMPLETE:
 #ifdef ENABLE_CHIP_SHELL
-        chip::NotifyShellProcessFromISR();
+        chip::NotifyShellProcess();
 #endif
     case SL_USART_EVENT_TRANSFER_COMPLETE:
         break;

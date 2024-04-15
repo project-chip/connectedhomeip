@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>

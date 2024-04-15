@@ -21,8 +21,7 @@
 #include "BaseApplication.h"
 #include "OTAConfig.h"
 #include <MatterConfig.h>
-
-#include <FreeRTOS.h>
+#include <cmsis_os2.h>
 
 #include <mbedtls/platform.h>
 
@@ -55,9 +54,12 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include "SilabsDeviceDataProvider.h"
-#include "SilabsTestEventTriggerDelegate.h"
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
+
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+#include "SilabsTestEventTriggerDelegate.h" // nogncheck
+#endif
 
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
@@ -80,26 +82,15 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#include "FreeRTOSConfig.h"
-#include "event_groups.h"
-#include "task.h"
-
 /**********************************************************
  * Defines
  *********************************************************/
-
-#define MAIN_TASK_STACK_SIZE (1024 * 5)
-#define MAIN_TASK_PRIORITY (configMAX_PRIORITIES - 1)
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials::Silabs;
 using namespace chip::DeviceLayer::Silabs;
-
-TaskHandle_t main_Task;
-volatile int apperror_cnt;
-static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -156,7 +147,20 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
 namespace {
-void application_start(void * unused)
+
+constexpr uint32_t kMainTaskStackSize = (1024 * 5);
+// Task is dynamically allocated with max priority. This task gets deleted once the inits are completed.
+constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
+                                           .attr_bits  = osThreadDetached,
+                                           .cb_mem     = NULL,
+                                           .cb_size    = 0U,
+                                           .stack_mem  = NULL,
+                                           .stack_size = kMainTaskStackSize,
+                                           .priority   = osPriorityRealtime7 };
+osThreadId_t sMainTaskHandle;
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+void ApplicationStart(void * unused)
 {
     CHIP_ERROR err = SilabsMatterConfig::InitMatter(BLE_DEV_NAME);
     if (err != CHIP_NO_ERROR)
@@ -175,7 +179,8 @@ void application_start(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
-    vTaskDelete(main_Task);
+    VerifyOrDie(osThreadTerminate(sMainTaskHandle) == osOK); // Deleting the main task should never fail.
+    sMainTaskHandle = nullptr;
 }
 } // namespace
 
@@ -183,8 +188,9 @@ void SilabsMatterConfig::AppInit()
 {
     GetPlatform().Init();
 
-    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
+    sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
     SILABS_LOG("Starting scheduler");
+    VerifyOrDie(sMainTaskHandle); // We can't proceed if the Main Task creation failed.
     GetPlatform().StartScheduler();
 
     // Should never get here.
@@ -215,12 +221,6 @@ void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event
 #endif
     }
 }
-
-#if SILABS_TEST_EVENT_TRIGGER_ENABLED
-static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
-                                                                                          0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
-                                                                                          0xcc, 0xdd, 0xee, 0xff };
-#endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
@@ -280,31 +280,16 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     initParams.reportScheduler = &sReportScheduler;
 
-#if SILABS_TEST_EVENT_TRIGGER_ENABLED
-    if (Encoding::HexToBytes(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY, strlen(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY),
-                             sTestEventTriggerEnableKey,
-                             TestEventTriggerDelegate::kEnableKeyLength) != TestEventTriggerDelegate::kEnableKeyLength)
-    {
-        SILABS_LOG("Failed to convert the EnableKey string to octstr type value");
-        memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
-    }
-    // TODO(#31723): Show to customers that they can do `Server::GetInstance().GetTestEventTriggerDelegate().AddHandler()`
-    static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+    static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-#endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
 #if CHIP_CRYPTO_PLATFORM && !(defined(SLI_SI91X_MCU_INTERFACE))
     // When building with EFR32 crypto, use the opaque key store
     // instead of the default (insecure) one.
     gOperationalKeystore.Init();
     initParams.operationalKeystore = &gOperationalKeystore;
-#endif
-
-#ifdef PERFORMANCE_TEST_ENABLED
-    // Set up Test Event Trigger command of the General Diagnostics cluster. Used only in performance testing
-    // TODO(#31723): Show to customers that they can do `Server::GetInstance().GetTestEventTriggerDelegate().AddHandler()`
-    static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults

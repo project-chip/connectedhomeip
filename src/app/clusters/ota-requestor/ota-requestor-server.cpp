@@ -21,6 +21,7 @@
  */
 
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/EventLogging.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>

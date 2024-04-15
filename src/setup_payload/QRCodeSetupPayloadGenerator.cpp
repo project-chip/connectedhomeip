@@ -37,6 +37,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 namespace chip {
 

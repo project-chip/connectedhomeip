@@ -145,8 +145,6 @@ protected:
     bool IsThreadAttachedNoLock(void);
     bool IsThreadInterfaceUpNoLock(void);
 
-    CHIP_ERROR _JoinerStart(void);
-
 private:
     // ===== Private members for use by this class only.
 
@@ -263,9 +261,6 @@ private:
                                                   otError error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-
-    static void OnJoinerComplete(otError aError, void * aContext);
-    void OnJoinerComplete(otError aError);
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };

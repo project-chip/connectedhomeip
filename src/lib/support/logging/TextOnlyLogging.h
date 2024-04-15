@@ -313,6 +313,14 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 #define ChipLogFormatScopedNodeId "<" ChipLogFormatX64 ", %d>"
 #define ChipLogValueScopedNodeId(id) ChipLogValueX64((id).GetNodeId()), (id).GetFabricIndex()
 
+/** Logging helpers for PeerId, which is a tuple of <Compressed Fabric Id, NodeId>
+ *
+ * This gets logged in the form that's used for the DNS-SD instance name for the
+ * peer.
+ */
+#define ChipLogFormatPeerId ChipLogFormatX64 "-" ChipLogFormatX64
+#define ChipLogValuePeerId(id) ChipLogValueX64((id).GetCompressedFabricId()), ChipLogValueX64((id).GetNodeId())
+
 /**
  * CHIP Logging Implementation internals.
  */

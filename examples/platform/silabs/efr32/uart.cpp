@@ -16,11 +16,9 @@
  *    limitations under the License.
  */
 #include "AppConfig.h"
-#include "FreeRTOS.h"
-#include "event_groups.h"
 #include "matter_shell.h"
-#include "semphr.h"
-#include "task.h"
+#include <cmsis_os2.h>
+#include <sl_cmsis_os2_common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -108,8 +106,6 @@ static uint16_t lastCount; // Nb of bytes already processed from the active dmaB
 #else
 #define UART_MAX_QUEUE_SIZE 25
 #endif
-#define UART_TASK_SIZE 256
-#define UART_TASK_NAME "UART"
 
 #ifdef CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
 #define UART_TX_MAX_BUF_LEN (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE + 2) // \r\n
@@ -117,9 +113,18 @@ static uint16_t lastCount; // Nb of bytes already processed from the active dmaB
 #define UART_TX_MAX_BUF_LEN (258)
 #endif
 
-static TaskHandle_t sUartTaskHandle;
-static StackType_t uartStack[UART_TASK_SIZE * sizeof(StackType_t)];
-static StaticTask_t uartTaskStruct;
+static constexpr uint32_t kUartTxCompleteFlag = 1;
+static osThreadId_t sUartTaskHandle;
+constexpr uint32_t kUartTaskSize = 1024;
+static uint8_t uartStack[kUartTaskSize];
+static osThread_t sUartTaskControlBlock;
+constexpr osThreadAttr_t kUartTaskAttr = { .name       = "UART",
+                                           .attr_bits  = osThreadDetached,
+                                           .cb_mem     = &sUartTaskControlBlock,
+                                           .cb_size    = osThreadCbSize,
+                                           .stack_mem  = uartStack,
+                                           .stack_size = kUartTaskSize,
+                                           .priority   = osPriorityRealtime };
 
 typedef struct
 {
@@ -127,9 +132,13 @@ typedef struct
     uint16_t length = 0;
 } UartTxStruct_t;
 
+static osMessageQueueId_t sUartTxQueue;
+static osMessageQueue_t sUartTxQueueStruct;
 uint8_t sUartTxQueueBuffer[UART_MAX_QUEUE_SIZE * sizeof(UartTxStruct_t)];
-static StaticQueue_t sUartTxQueueStruct;
-static QueueHandle_t sUartTxQueue;
+constexpr osMessageQueueAttr_t kUartTxQueueAttr = { .cb_mem  = &sUartTxQueueStruct,
+                                                    .cb_size = osMessageQueueCbSize,
+                                                    .mq_mem  = sUartTxQueueBuffer,
+                                                    .mq_size = sizeof(sUartTxQueueBuffer) };
 
 // Rx buffer for the receive Fifo
 static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
@@ -264,8 +273,8 @@ void uartConsoleInit(void)
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 
-    sUartTxQueue    = xQueueCreateStatic(UART_MAX_QUEUE_SIZE, sizeof(UartTxStruct_t), sUartTxQueueBuffer, &sUartTxQueueStruct);
-    sUartTaskHandle = xTaskCreateStatic(uartMainLoop, UART_TASK_NAME, UART_TASK_SIZE, nullptr, 30, uartStack, &uartTaskStruct);
+    sUartTxQueue    = osMessageQueueNew(UART_MAX_QUEUE_SIZE, sizeof(UartTxStruct_t), &kUartTxQueueAttr);
+    sUartTaskHandle = osThreadNew(uartMainLoop, nullptr, &kUartTaskAttr);
 
     assert(sUartTaskHandle);
     assert(sUartTxQueue);
@@ -291,7 +300,7 @@ void uartConsoleInit(void)
 void USART_IRQHandler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
-    chip::NotifyShellProcessFromISR();
+    chip::NotifyShellProcess();
 #elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
@@ -311,9 +320,8 @@ void USART_IRQHandler(void)
  */
 void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount)
 {
-    BaseType_t xHigherPriorityTaskWoken;
-
-    vTaskNotifyGiveFromISR(sUartTaskHandle, &xHigherPriorityTaskWoken) portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    // This function may be called from Interrupt Service Routines.
+    osThreadFlagsSet(sUartTaskHandle, kUartTxCompleteFlag);
 }
 
 /*
@@ -333,7 +341,7 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
     UARTDRV_Receive(vcom_handle, data, transferCount, UART_rx_callback);
 
 #ifdef ENABLE_CHIP_SHELL
-    chip::NotifyShellProcessFromISR();
+    chip::NotifyShellProcess();
 #elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
@@ -363,19 +371,9 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     memcpy(workBuffer.data, Buf, BufLength);
     workBuffer.length = BufLength;
 
-    if (xPortIsInsideInterrupt())
+    if (osMessageQueuePut(sUartTxQueue, &workBuffer, osPriorityNormal, 0) == osOK)
     {
-        BaseType_t xHigherPriorityTaskWoken;
-        xQueueSendFromISR(sUartTxQueue, &workBuffer, &xHigherPriorityTaskWoken);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         return BufLength;
-    }
-    else
-    {
-        if (pdTRUE == xQueueSend(sUartTxQueue, &workBuffer, portMAX_DELAY))
-        {
-            return BufLength;
-        }
     }
 
     return UART_CONSOLE_ERR;
@@ -400,19 +398,9 @@ int16_t uartLogWrite(const char * log, uint16_t length)
     memcpy(workBuffer.data + length, "\r\n", 2);
     workBuffer.length = length + 2;
 
-    if (xPortIsInsideInterrupt())
+    if (osMessageQueuePut(sUartTxQueue, &workBuffer, osPriorityNormal, 0) == osOK)
     {
-        BaseType_t xHigherPriorityTaskWoken;
-        xQueueSendFromISR(sUartTxQueue, &workBuffer, &xHigherPriorityTaskWoken);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         return length;
-    }
-    else
-    {
-        if (pdTRUE == xQueueSend(sUartTxQueue, &workBuffer, 0))
-        {
-            return length;
-        }
     }
 
     return UART_CONSOLE_ERR;
@@ -453,11 +441,11 @@ void uartMainLoop(void * args)
     while (1)
     {
 
-        BaseType_t eventReceived = xQueueReceive(sUartTxQueue, &workBuffer, portMAX_DELAY);
+        osStatus_t eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, osWaitForever);
         while (eventReceived == pdTRUE)
         {
             uartSendBytes(workBuffer.data, workBuffer.length);
-            eventReceived = xQueueReceive(sUartTxQueue, &workBuffer, 0);
+            eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);
         }
     }
 }
@@ -470,13 +458,14 @@ void uartMainLoop(void * args)
  */
 void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 {
-
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
+#endif // SL_CATALOG_POWER_MANAGER_PRESENT
+
 #if SL_UARTCTRL_MUX
     sl_wfx_host_pre_uart_transfer();
 #endif // SL_UARTCTRL_MUX
+
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
     // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
     // WF200 SPI IRQ
@@ -484,15 +473,16 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 #else
     // Non Blocking Transmit
     UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    osThreadFlagsWait(kUartTxCompleteFlag, osFlagsWaitAny, osWaitForever);
 #endif /* EFR32MG24 && WF200_WIFI */
+
 #if SL_UARTCTRL_MUX
     sl_wfx_host_post_uart_transfer();
 #endif // SL_UARTCTRL_MUX
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
+#endif // SL_CATALOG_POWER_MANAGER_PRESENT
 }
 
 #ifdef __cplusplus

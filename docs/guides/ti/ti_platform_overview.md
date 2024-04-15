@@ -48,8 +48,8 @@ In the TI example applications the Bluetooth Low Energy protocol is used to
 provision the Thread protocol to enable Matter communication. Then Thread is
 used for IP communication with other Matter devices.
 
-The TI applications leverage the Bluetooth Low Energy stack on the CC13X2 and
-CC26X2 families. This BLE software is distributed in binary form within the TI
+The TI applications leverage the Bluetooth Low Energy stack on the CC13XX and
+CC26XX families. This BLE software is distributed in binary form within the TI
 SimpleLink SDK. The BLE stack leverages code that is present in the device ROM
 for certain common BLE operations.
 
@@ -103,9 +103,9 @@ handled by the platform implementation files.
 Sample Matter applications are provided for the TI platform. These can be used
 as reference for your own application.
 
--   [lock-app](../../../examples/lock-app/cc13x2x7_26x2x7/README.md)
--   [pump-app](../../../examples/pump-app/cc13x2x7_26x2x7/README.md)
--   [pump-controller-app](../../../examples/pump-controller-app/cc13x2x7_26x2x7/README.md)
+-   [lock-app](../../../examples/lock-app/cc13x4_26x4/README.md)
+-   [pump-app](../../../examples/pump-app/cc13x4_26x4/README.md)
+-   [pump-controller-app](../../../examples/pump-controller-app/cc13x4_26x4/README.md)
 
 <hr>
 
