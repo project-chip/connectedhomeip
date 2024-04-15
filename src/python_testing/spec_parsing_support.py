@@ -349,7 +349,7 @@ class ClusterParser:
                 return CommandType.ACCEPTED
             raise Exception(f"Unknown direction: {element.attrib['direction']}")
         except KeyError:
-            return CommandType.ACCEPTED
+            return CommandType.UNKNOWN
 
     def parse_unknown_commands(self) -> list[XmlCommand]:
         commands = []
