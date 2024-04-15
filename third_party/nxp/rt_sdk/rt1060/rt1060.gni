@@ -1,0 +1,319 @@
+# Copyright (c) 2022 Project CHIP Authors
+# Copyright 2023 NXP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/nxp_sdk.gni")
+
+#allows to get common NXP SDK gn options
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+# Allows to get various RT gn options
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
+declare_args() {
+  evkname = "evkbmimxrt1060"
+  deviceBoardName = "MIMXRT1062"
+}
+
+COMPONENT_FILES_PATH = "${rt_sdk_root}/core/components"
+DRIVER_FILES_PATH = "${rt_sdk_root}/core/drivers"
+DRIVER_LPUART_FILES_PATH = "${DRIVER_FILES_PATH}/lpuart"
+DRIVER_LPI2C_FILES_PATH = "${DRIVER_FILES_PATH}/lpi2c"
+DRIVER_LPSPI_FILES_PATH = "${DRIVER_FILES_PATH}/lpspi"
+DRIVER_EDMA_FILES_PATH = "${DRIVER_FILES_PATH}/edma"
+DRIVER_DMAMUX_FILES_PATH = "${DRIVER_FILES_PATH}/dmamux"
+DRIVER_PIT_FILES_PATH = "${DRIVER_FILES_PATH}/pit"
+DRIVER_TRNG_FILES_PATH = "${DRIVER_FILES_PATH}/trng"
+DRIVER_FLEXSPI_FILES_PATH = "${DRIVER_FILES_PATH}/flexspi"
+DRIVER_IGPIO_FILES_PATH = "${DRIVER_FILES_PATH}/igpio"
+DRIVER_ENET_FILES_PATH = "${DRIVER_FILES_PATH}/enet"
+DRIVER_DCP_FILES_PATH = "${DRIVER_FILES_PATH}/dcp"
+DRIVER_WDOG_FILES_PATH = "${DRIVER_FILES_PATH}/wdog01"
+DRIVER_CACHE_FILES_PATH = "${DRIVER_FILES_PATH}/cache/armv7-m7"
+DRIVER_COMMON_FILES_PATH = "${DRIVER_FILES_PATH}/common"
+DRIVER_DEVICE_FILES_PATH =
+    "${rt_sdk_root}/core/devices/${deviceBoardName}/drivers"
+DRIVER_USDHC_FILES_PATH = "${DRIVER_FILES_PATH}/usdhc"
+COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
+COMPONENT_RNG_FILES_PATH = "${COMPONENT_FILES_PATH}/rng"
+COMPONENT_SILICON_ID_FILES_PATH = "${COMPONENT_FILES_PATH}/silicon_id"
+COMPONENT_UART_FILES_PATH = "${COMPONENT_FILES_PATH}/uart"
+COMPONENT_TIMER_FILES_PATH = "${COMPONENT_FILES_PATH}/timer"
+COMPONENT_GPIO_FILES_PATH = "${COMPONENT_FILES_PATH}/gpio"
+COMPONENT_SPI_FILES_PATH = "${COMPONENT_FILES_PATH}/spi"
+COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
+UTILITIES_FILES_PATH = "${rt_sdk_root}/core/utilities"
+UTILITIES_DEVICE_FILES_PATH =
+    "${rt_sdk_root}/core/devices/${deviceBoardName}/utilities"
+DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
+STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
+FSL_FLEXSPI_NOR_BOOT_FILES_PATH =
+    "${rt_sdk_root}/core/devices/${deviceBoardName}/xip"
+
+# Folder does not exist in the SDK for evkc so force it to become evkb
+WIRELESS_CONFIG_TEMPLATE_PATH =
+    "${rt_sdk_root}/core/boards/evkbmimxrt1060/wireless_config_template"
+
+template("rt1060_sdk_drivers") {
+  config("${target_name}_config") {
+    include_dirs = []
+    defines = []
+
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+
+    _rt1060_sdk_drivers_include_dirs = [
+      #Drivers files
+      "${DRIVER_DEVICE_FILES_PATH}",
+      "${rt_sdk_root}/core/devices/${deviceBoardName}",
+      "${COMPONENT_CRC_FILES_PATH}",
+      "${COMPONENT_RNG_FILES_PATH}",
+      "${COMPONENT_SILICON_ID_FILES_PATH}",
+      "${COMPONENT_UART_FILES_PATH}",
+      "${COMPONENT_TIMER_FILES_PATH}",
+      "${COMPONENT_GPIO_FILES_PATH}",
+      "${COMPONENT_SPI_FILES_PATH}",
+      "${COMPONENT_MEM_MANAGER_FILES_PATH}",
+      "${DRIVER_COMMON_FILES_PATH}",
+      "${DRIVER_LPUART_FILES_PATH}",
+      "${DRIVER_LPI2C_FILES_PATH}",
+      "${DRIVER_LPSPI_FILES_PATH}",
+      "${DRIVER_EDMA_FILES_PATH}",
+      "${DRIVER_DMAMUX_FILES_PATH}",
+      "${DRIVER_IGPIO_FILES_PATH}",
+      "${DRIVER_DCP_FILES_PATH}",
+      "${DRIVER_WDOG_FILES_PATH}",
+      "${DRIVER_ENET_FILES_PATH}",
+      "${DRIVER_CACHE_FILES_PATH}",
+      "${DRIVER_PIT_FILES_PATH}",
+      "${DRIVER_USDHC_FILES_PATH}",
+      "${DRIVER_TRNG_FILES_PATH}",
+      "${DRIVER_FLEXSPI_FILES_PATH}",
+      "${UTILITIES_FILES_PATH}",
+      "${UTILITIES_DEVICE_FILES_PATH}",
+      "${DEBUG_CONSOLE_FILES_PATH}",
+      "${STR_FILES_PATH}",
+
+      # XIP
+      "${rt_sdk_root}/core/boards/${evkname}/xip",
+      "${rt_sdk_root}/core/components/flash/mflash",
+      "${rt_sdk_root}/core/components/flash/mflash/mimxrt1062",
+      "${rt_sdk_root}/core/components/internal_flash",
+
+      # mdio
+      "${rt_sdk_root}/core/components/phy/mdio/enet",
+
+      # freertos
+      "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F",
+
+      # Framework
+      "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}",
+    ]
+
+    if (chip_enable_wifi || iwx12_transceiver) {
+      _rt1060_sdk_drivers_include_dirs += [ "${WIRELESS_CONFIG_TEMPLATE_PATH}" ]
+    }
+
+    ldflags = [
+      # mbedtls_hardware_poll is wrapped to another definition
+      "-Wl,--wrap=mbedtls_hardware_poll",
+    ]
+
+    libs = []
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+
+    if (k32w0_transceiver) {
+      defines += [
+        #Framework defines to support hdlc over UART on UART3 and a reset pin
+        "SPINEL_UART_INSTANCE=3",
+        "SPINEL_ENABLE_RX_RTS=1",
+        "SPINEL_ENABLE_TX_RTS=1",
+
+        #OTW configurations
+        "OTW_DIO5_PIN_PORT=1",
+        "OTW_DIO5_PIN_NUM=26",
+        "OTW_RESET_PIN_PORT=1",
+        "OTW_RESET_PIN_NUM=27",
+      ]
+    } else if (iwx12_transceiver) {
+      if (evkname != "evkcmimxrt1060") {
+          assert("iwx12_transceiver supported only on RT1060-EVKC")
+      }
+    }
+
+    defines += [
+      "CPU_${deviceBoardName}DVL6A",
+      "CPU_${deviceBoardName}DVL6A_cm7",
+    ]
+
+    if (chip_enable_ble) {
+      libs += [
+        #ethermind bt libs
+        "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/btdm/cm7f/gcc/libethermind_bt_core.a",
+        "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/btdm/cm7f/gcc/libethermind_bt_gatt.a",
+        "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/btdm/cm7f/gcc/libethermind_bt_protocol.a",
+        "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/btdm/cm7f/gcc/libethermind_bt_util.a",
+      ]
+      defines += [
+        # This flag must be defined here in order for the controller to only be initialized once for all (ble, ot, wifi)
+        "CONTROLLER_INIT_ESCAPE=1",
+      ]
+      _rt1060_sdk_drivers_include_dirs += [
+        # Adding bt_crypto includes as this is needed by bt_pal_smp.c
+        "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
+        "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto",
+      ]
+    }
+
+    if (chip_enable_matter_cli) {
+      #When the CLI is enabled the debug console should be moved in UART2 for RT1060
+      defines += [ "DEBUG_CONSOLE_UART_INDEX=2" ]
+    }
+
+    cflags = []
+
+    if (defined(invoker.cflags)) {
+      cflags += invoker.cflags
+    }
+
+    # Now add our "system-header" include dirs
+    foreach(include_dir, _rt1060_sdk_drivers_include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
+  }
+
+  source_set(target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(sources)) {
+      sources = []
+    }
+
+    sources += [
+      "${COMPONENT_CRC_FILES_PATH}/fsl_adapter_software_crc.c",
+      "${COMPONENT_SPI_FILES_PATH}/fsl_adapter_lpspi.c",
+      "${COMPONENT_GPIO_FILES_PATH}/fsl_adapter_igpio.c",
+      "${COMPONENT_MEM_MANAGER_FILES_PATH}/fsl_component_mem_manager.c",
+      "${COMPONENT_RNG_FILES_PATH}/fsl_adapter_trng.c",
+      "${COMPONENT_TIMER_FILES_PATH}/fsl_adapter_pit.c",
+      "${COMPONENT_UART_FILES_PATH}/fsl_adapter_lpuart.c",
+      "${DEBUG_CONSOLE_FILES_PATH}/fsl_debug_console.c",
+      "${DRIVER_CACHE_FILES_PATH}/fsl_cache.c",
+      "${DRIVER_COMMON_FILES_PATH}/fsl_common_arm.c",
+      "${DRIVER_DCP_FILES_PATH}/fsl_dcp.c",
+      "${DRIVER_DEVICE_FILES_PATH}/fsl_clock.c",
+      "${DRIVER_DMAMUX_FILES_PATH}/fsl_dmamux.c",
+      "${DRIVER_EDMA_FILES_PATH}/fsl_edma.c",
+      "${DRIVER_ENET_FILES_PATH}/fsl_enet.c",
+      "${DRIVER_FLEXSPI_FILES_PATH}/fsl_flexspi.c",
+      "${DRIVER_IGPIO_FILES_PATH}/fsl_gpio.c",
+      "${DRIVER_LPUART_FILES_PATH}/fsl_lpuart.c",
+      "${DRIVER_LPUART_FILES_PATH}/fsl_lpuart_edma.c",
+      "${DRIVER_LPI2C_FILES_PATH}/fsl_lpi2c.c",
+      "${DRIVER_LPSPI_FILES_PATH}/fsl_lpspi.c",
+      "${DRIVER_PIT_FILES_PATH}/fsl_pit.c",
+      "${DRIVER_TRNG_FILES_PATH}/fsl_trng.c",
+      "${DRIVER_USDHC_FILES_PATH}/fsl_usdhc.c",
+      "${DRIVER_WDOG_FILES_PATH}/fsl_wdog.c",
+
+      # comment fsl_str.c if using debug console light
+      #"${STR_FILES_PATH}/fsl_str.c",
+      # XIP
+      "${FSL_FLEXSPI_NOR_BOOT_FILES_PATH}/fsl_flexspi_nor_boot.c",
+      "${UTILITIES_DEVICE_FILES_PATH}/fsl_shell.c",
+
+      #sdk hook
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/mbedtls/ksdk_mbedtls_hook.c",
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/kernel.c",
+      "${rt_core_sdk_root}/components/internal_flash/fsl_adapter_flexspi_nor_flash.c",
+
+      # freertos files
+      # freertos
+      "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F/port.c",
+      "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
+      "${rt_sdk_root}/core/boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
+      "${rt_sdk_root}/core/components/flash/mflash/mimxrt1062/mflash_drv.c",
+
+      #startup files
+      "${rt_sdk_root}/core/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}.S",
+      "${rt_sdk_root}/core/devices/${deviceBoardName}/system_${deviceBoardName}.c",
+
+      # mdio
+      #"${rt_core_sdk_root}/components/phy/mdio/enet/fsl_enet_mdio.c",
+      # framework files
+      "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}/board_comp.c",
+      "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform.c",
+    ]
+
+    if (sdk_fsl_assert_support) {
+      sources += [ "${UTILITIES_FILES_PATH}/assert/fsl_assert.c" ]
+    }
+
+    if (chip_enable_wifi || iwx12_transceiver) {
+      sources += [
+        "${WIRELESS_CONFIG_TEMPLATE_PATH}/sdmmc_config.c",
+        "${WIRELESS_CONFIG_TEMPLATE_PATH}/wifi_bt_config.c",
+      ]
+    }
+
+    if (chip_enable_ble) {
+      sources += [
+        # Adding bt_crypto as this is needed by bt_pal_smp.c
+        "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto/bt_crypto.c",
+
+        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/hci_uart.c",
+      ]
+
+      # TODO transceiver initialization should be moved in the framework
+      if (k32w0_transceiver) {
+        # In case of k32w0 transceiver BLE serial link will be managed and initiliaze by the shared link with openthread
+        sources += [ "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller/controller_k32w.c" ]
+      } else {
+        sources += [ "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller/controller_wifi_nxp.c" ]
+      }
+    }
+
+    if (chip_enable_wifi) {
+      sources += [
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11ax.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11k.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11v.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_action.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_mbo.c",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/wifi-sdio.c",
+      ]
+    }
+
+    if (chip_enable_openthread) {
+      sources += [
+        "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_hdlc.c",
+        "${rt_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_ot.c",
+      ]
+    }
+
+    if (!defined(public_configs)) {
+      public_configs = []
+    }
+
+    if (!defined(public_deps)) {
+      public_deps = []
+    }
+
+    public_configs += [ ":${target_name}_config" ]
+    public_deps += [ nxp_sdk_target ]
+  }
+}

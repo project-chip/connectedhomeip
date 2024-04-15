@@ -48,6 +48,8 @@ template("bt_ble_target") {
       #edgefast_bluetooth
       "${rt_sdk_root}/middleware/edgefast_bluetooth/include",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting",
+      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo",
+      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform",
 
@@ -204,6 +206,10 @@ template("bt_ble_target") {
       #"${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_fops.c",
       "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_os.c",
     ]
+
+    if (is_sdk_2_15) {
+      sources += [ "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo/fifo.c" ]
+    }
 
     if (!defined(configs)) {
       configs = []

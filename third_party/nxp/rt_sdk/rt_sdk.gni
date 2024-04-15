@@ -23,9 +23,6 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")  # declares some sdk args such as
                                              # chip_with_ot_cli
 
 declare_args() {
-  # Location of the rt SDK.
-  rt_sdk_root = "${chip_root}/third_party/nxp/rt_sdk/repo/sdk-2.15"
-
   # Enables Matter over Ethernet support
   chip_enable_ethernet = false
 
@@ -80,6 +77,8 @@ declare_args() {
 
   # Describe the transceiver detail flags
   nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_USD"
+
+  rt_sdk_root = "${chip_root}/third_party/nxp/github_sdk/${sdk_repo}"
 }
 
 declare_args() {
