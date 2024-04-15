@@ -212,7 +212,7 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="4" name="Duration" type="uint16" default="0">
+      <field id="4" name="Duration" type="uint64" default="0">
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>

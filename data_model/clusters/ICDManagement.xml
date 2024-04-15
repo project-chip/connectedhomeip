@@ -91,9 +91,6 @@ Davis, CA 95616, USA
         <optionalConform/>
       </otherwiseConform>
     </feature>
-    <feature bit="2" code="LITS" name="LongIdleTimeSupport" summary="Device supports operating as a Long Idle Time ICD.">
-      <optionalConform/>
-    </feature>
   </features>
   <dataTypes>
     <number name="UserActiveModeTriggerBitmap" type=""/>
