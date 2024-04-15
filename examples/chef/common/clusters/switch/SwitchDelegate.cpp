@@ -21,7 +21,6 @@
 #include <app/server/Server.h>
 #include <app/util/att-storage.h>
 #include <platform/PlatformManager.h>
-#include "stubs.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -135,20 +134,6 @@ void SwitchEventHandler::OnSwitchMultiPressCompleteHandler(uint8_t previousPosit
 
 static std::map<int, SwitchEventHandler *> gSwitchEventHandlers{};
 
-
-class SwitchAttributeDelegate : public AttributeDelegate
-{
-public:
-    SwitchAttributeDelegate (ClusterId clusterId) : AttributeDelegate(clusterId) {}
-
-    chip::Protocols::InteractionModel::Status PreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value) override;
-
-    void PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value) override;
-    
-private:
-};
-
-
 SwitchEventHandler * GetSwitchEventHandler(EndpointId endpointId)
 {
     if (gSwitchEventHandlers.find(endpointId) == gSwitchEventHandlers.end()) {
@@ -158,41 +143,10 @@ SwitchEventHandler * GetSwitchEventHandler(EndpointId endpointId)
     return gSwitchEventHandlers[endpointId];
 }
 
-chip::Protocols::InteractionModel::Status SwitchAttributeDelegate::PreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value)
-{
-    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
-printf("\033[41m %s, %d \033[0m \n", __func__, __LINE__);
-    ChipLogProgress(Zcl, "SwitchAttributeDelegate::PostAttributeChangeCallback Endpoint: %d, Cluster: " ChipLogFormatMEI ", Type: %u, length %u", attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId), type, size);
-
-
-    return ret;
-}
-
-void SwitchAttributeDelegate::PostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size, uint8_t * value)
-{
-printf("\033[41m %s, %d \033[0m \n", __func__, __LINE__);
-    ChipLogProgress(Zcl, "SwitchAttributeDelegate::PostAttributeChangeCallback Endpoint: %d, Cluster: " ChipLogFormatMEI ", Type: %u, length %u", attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId), type, size);
-
-    switch (attributePath.mAttributeId) {
-    case Attributes::CurrentPosition::Id: {
-        SwitchEventHandler *eventHandler = GetSwitchEventHandler(attributePath.mEndpointId);
-        uint8_t newPosition = *value;
-
-        if (eventHandler) {
-            eventHandler->OnSwitchLatchedHandler(newPosition);
-        }
-        }
-        break;
-    default:
-        break;
-    }
-}
-
 void emberAfSwitchClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "Chef: emberAfSwitchClusterInitCallback");
     gSwitchEventHandlers[endpoint] = new SwitchEventHandler(endpoint);
-    RegisterApplicationAttributeDelegate(Switch::Id, new SwitchAttributeDelegate(Switch::Id));
 printf("\033[44m %s, %d, Switch::ID=%u \033[0m \n", __func__, __LINE__, Switch::Id);
 }
 

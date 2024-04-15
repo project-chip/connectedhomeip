@@ -19,35 +19,11 @@
 #include "chef-concentration-measurement.h"
 #endif
 
-#include "stubs.h"
-#include <map>
-
 using chip::app::DataModel::Nullable;
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-
-static std::map<ClusterId, AttributeDelegate * > gApplicationAttributeDelegates{}; 
-
-void chip::app::RegisterApplicationAttributeDelegate(ClusterId clusterId, AttributeDelegate * delegate)
-{
-   // TODO assert (gApplicationAttributeDelegates.find(clusterId) == gApplicationAttributeDelegates.end() )
-
-   gApplicationAttributeDelegates[clusterId] = delegate;
-
-}
-
-
-AttributeDelegate * GetApplicationAttributeDelegate(ClusterId clusterId)
-{
-    if (gApplicationAttributeDelegates.find(clusterId) == gApplicationAttributeDelegates.end()) {
-        return nullptr;
-    }
-
-    return gApplicationAttributeDelegates[clusterId];
-}
-
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
@@ -137,54 +113,25 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
 
 void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId) {}
 
-
-chip::Protocols::InteractionModel::Status
-MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                 uint8_t * value)
-{
-    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
-
-    ChipLogProgress(Zcl, "MatterPostAttributeChangeCallback Endpoint: %d, Cluster: " ChipLogFormatMEI ", Type: %u, length %u", attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId), type, size);
-printf("\033[41m %s, %d \033[0m \n", __func__, __LINE__);
-
-    AttributeDelegate * delegate = GetApplicationAttributeDelegate(attributePath.mClusterId);
-    if (delegate) {
-        ret = delegate->PreAttributeChangeCallback(attributePath, type, size, value);
-    }
-
-    return ret; 
-}
-
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-//    AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(Zcl, "MatterPostAttributeChangeCallback Endpoint: %d, Cluster: " ChipLogFormatMEI ", Type: %u, length %u", attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId), type, size);
-printf("\033[41m %s, %d \033[0m \n", __func__, __LINE__);
+    ClusterId clusterId     = attributePath.mClusterId;
+    AttributeId attributeId = attributePath.mAttributeId;
+    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    AttributeDelegate * delegate = GetApplicationAttributeDelegate(attributePath.mClusterId);
-    if (delegate) {
-        delegate->PostAttributeChangeCallback(attributePath, type, size, value);
-    }
-
-#if 0
-    switch (clusterId) {
-    case OnOff::Id:
-        ChipLogProgress(Zcl, "OnOff Cluster attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u", ChipLogValueMEI(attributeId),
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
+    {
+        ChipLogProgress(Zcl, "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u", ChipLogValueMEI(attributeId),
                         type, *value, size);
-        break;
-    case LevelControl::Id:
-        ChipLogProgress(Zcl, "Level Control Cluster attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
-        break;
-    case Switch::Id:
-        ChipLogProgress(Zcl, "Switch Cluster attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
-        break;
-    default:
-        break;
     }
-#endif
+    else if (clusterId == LevelControl::Id)
+    {
+        ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
+
+        // WIP Apply attribute change to Light
+    }
 }
 
 /** @brief OnOff Cluster Init
