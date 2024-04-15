@@ -32,6 +32,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <nlunit-test.h>
@@ -60,14 +61,12 @@ static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inC
 {
     std::atomic<int> counterRun{ 0 };
 
-    CHIP_ERROR err = PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().InitChipStack());
 
     // Start/stop the event loop task a few times.
     for (size_t i = 0; i < 3; i++)
     {
-        err = PlatformMgr().StartEventLoopTask();
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().StartEventLoopTask());
 
         std::atomic<int> counterSync{ 2 };
 
@@ -99,8 +98,7 @@ static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inC
         for (size_t t = 0; counterSync != 0 && t < 1000; t++)
             chip::test_utils::SleepMillis(1);
 
-        err = PlatformMgr().StopEventLoopTask();
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().StopEventLoopTask());
 
         // Sleep for a short time to allow the event loop to stop.
         // Note, in some platform implementations the event loop thread
@@ -115,26 +113,28 @@ static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inC
 }
 
 static bool stopRan;
+static CHIP_ERROR stopResult = CHIP_NO_ERROR;
 
 static void StopTheLoop(intptr_t)
 {
     // Testing the return value here would involve multi-threaded access to the
     // nlTestSuite, and it's not clear whether that's OK.
-    stopRan = true;
-    PlatformMgr().StopEventLoopTask();
+    stopRan    = true;
+    stopResult = PlatformMgr().StopEventLoopTask();
 }
 
 static void TestPlatformMgr_BasicRunEventLoop(nlTestSuite * inSuite, void * inContext)
 {
     stopRan = false;
 
-    CHIP_ERROR err = PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().InitChipStack());
 
     PlatformMgr().ScheduleWork(StopTheLoop);
 
+    NL_TEST_ASSERT(inSuite, !stopRan);
     PlatformMgr().RunEventLoop();
     NL_TEST_ASSERT(inSuite, stopRan);
+    NL_TEST_ASSERT_SUCCESS(inSuite, stopResult);
 
     PlatformMgr().Shutdown();
 }
@@ -152,12 +152,13 @@ static void TestPlatformMgr_RunEventLoopTwoTasks(nlTestSuite * inSuite, void * i
     stopRan  = false;
     sleepRan = false;
 
-    CHIP_ERROR err = PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().InitChipStack());
 
     PlatformMgr().ScheduleWork(SleepSome);
     PlatformMgr().ScheduleWork(StopTheLoop);
 
+    NL_TEST_ASSERT(inSuite, !stopRan);
+    NL_TEST_ASSERT(inSuite, !sleepRan);
     PlatformMgr().RunEventLoop();
     NL_TEST_ASSERT(inSuite, stopRan);
     NL_TEST_ASSERT(inSuite, sleepRan);
@@ -177,11 +178,12 @@ static void TestPlatformMgr_RunEventLoopStopBeforeSleep(nlTestSuite * inSuite, v
     stopRan  = false;
     sleepRan = false;
 
-    CHIP_ERROR err = PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().InitChipStack());
 
     PlatformMgr().ScheduleWork(StopAndSleep);
 
+    NL_TEST_ASSERT(inSuite, !stopRan);
+    NL_TEST_ASSERT(inSuite, !sleepRan);
     PlatformMgr().RunEventLoop();
     NL_TEST_ASSERT(inSuite, stopRan);
     NL_TEST_ASSERT(inSuite, sleepRan);
@@ -206,10 +208,8 @@ void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
 static void TestPlatformMgr_AddEventHandler(nlTestSuite * inSuite, void * inContext)
 {
-    CHIP_ERROR error;
     sEventRecieved = 0;
-    error          = PlatformMgr().AddEventHandler(DeviceEventHandler, 12345);
-    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().AddEventHandler(DeviceEventHandler, 12345));
 
 #if 0
     while (sEventRecieved == 0)

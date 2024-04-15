@@ -24,9 +24,7 @@
 @class MTRBaseDevice;
 @class MTRServerEndpoint; // Defined in MTRServerEndpoint.h, which imports MTRAccessGrant.h, which imports MTRBaseClusters.h, which imports this file, so we can't import it.
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 @class MTRDeviceControllerAbstractParameters;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -49,7 +47,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 /**
  * Initialize a device controller with the provided parameters.  This will:
  *
@@ -62,19 +59,16 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 /**
  * If true, the controller has not been shut down yet.
  */
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 /**
  * The ID assigned to this controller at creation time.
  */
 @property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 /**
  * Return the Node ID assigned to the controller.  Will return nil if the

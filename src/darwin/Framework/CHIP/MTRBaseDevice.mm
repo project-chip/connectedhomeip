@@ -365,7 +365,7 @@ public:
 
     [self.deviceController getSessionForNode:self.nodeID
                                   completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                                      NSError * _Nullable error) {
+                                      NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                                       if (error != nil) {
                                           dispatch_async(queue, ^{
                                               errorHandler(error);
@@ -1603,7 +1603,7 @@ exit:
     [self.deviceController
         getSessionForNode:self.nodeID
                completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                   NSError * _Nullable error) {
+                   NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                    if (error != nil) {
                        dispatch_async(queue, ^{
                            reportHandler(nil, error);
@@ -2597,6 +2597,7 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
+    [super encodeWithCoder:coder];
     [coder encodeObject:_attribute forKey:sAttributeKey];
 }
 
@@ -2663,6 +2664,35 @@ static NSString * const sAttributeKey = @"attributeKey";
     return ConcreteEventPath([self.endpoint unsignedShortValue], static_cast<ClusterId>([self.cluster unsignedLongValue]),
         static_cast<EventId>([self.event unsignedLongValue]));
 }
+
+static NSString * const sEventKey = @"eventKey";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super initWithCoder:decoder];
+    if (self == nil) {
+        return nil;
+    }
+
+    _event = [decoder decodeObjectOfClass:[NSNumber class] forKey:sEventKey];
+    if (_event && ![_event isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTREventPath decoded %@ for event, not NSNumber.", _event);
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [super encodeWithCoder:coder];
+    [coder encodeObject:_event forKey:sEventKey];
+}
 @end
 
 @implementation MTREventPath (Deprecated)
@@ -2717,6 +2747,35 @@ static NSString * const sAttributeKey = @"attributeKey";
 - (id)copyWithZone:(NSZone *)zone
 {
     return [MTRCommandPath commandPathWithEndpointID:self.endpoint clusterID:self.cluster commandID:_command];
+}
+
+static NSString * const sCommandKey = @"commandKey";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super initWithCoder:decoder];
+    if (self == nil) {
+        return nil;
+    }
+
+    _command = [decoder decodeObjectOfClass:[NSNumber class] forKey:sCommandKey];
+    if (_command && ![_command isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRCommandPath decoded %@ for command, not NSNumber.", _command);
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [super encodeWithCoder:coder];
+    [coder encodeObject:_command forKey:sCommandKey];
 }
 @end
 

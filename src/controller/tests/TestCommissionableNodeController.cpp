@@ -38,9 +38,10 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override { return ResolveNodeIdStatus; }
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override {}
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext &) override { return DiscoverCommissionersStatus; }
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext &) override
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext &) override
     {
+        if (DiscoveryType::kCommissionerNode == type)
+            return DiscoverCommissionersStatus;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
     CHIP_ERROR StopDiscovery(DiscoveryContext &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }

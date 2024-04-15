@@ -18,6 +18,7 @@
 
 #include "BDXDiagnosticLogsServerDelegate.h"
 
+#include <string>
 #include <unistd.h>
 
 constexpr const char kTmpDir[]          = "/tmp/";

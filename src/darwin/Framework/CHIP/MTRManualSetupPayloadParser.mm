@@ -24,6 +24,8 @@
 #import <setup_payload/ManualSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
 
+#include <string>
+
 @implementation MTRManualSetupPayloadParser {
     NSString * _decimalStringRepresentation;
     chip::ManualSetupPayloadParser * _chipManualSetupPayloadParser;

@@ -409,6 +409,7 @@ def BuildInfineonTarget():
     # modifiers
     target.AppendModifier('ota', enable_ota_requestor=True)
     target.AppendModifier('updateimage', update_image=True)
+    target.AppendModifier('trustm', enable_trustm=True)
 
     return target
 
@@ -492,25 +493,6 @@ def BuildNxpTarget():
     target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('k32w0')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True)
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
-
-    return target
-
-
-def BuildCC13x2x7Target():
-    target = BuildTarget('ti', TIBuilder)
-
-    # board
-    target.AppendFixedTargets([
-        TargetPart('cc13x2x7_26x2x7', board=TIBoard.LP_CC2652R7),
-    ])
-
-    target.AppendFixedTargets([
-        TargetPart('lighting', app=TIApp.LIGHTING),
-        TargetPart('lock', app=TIApp.LOCK),
-        TargetPart('pump', app=TIApp.PUMP),
-        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER),
-    ])
-    target.AppendModifier(name="mtd", openthread_ftd=False)
 
     return target
 
@@ -789,7 +771,6 @@ BUILD_TARGETS = [
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
     Buildcc32xxTarget(),
-    BuildCC13x2x7Target(),
     BuildCC13x4Target(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
