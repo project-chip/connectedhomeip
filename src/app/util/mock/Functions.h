@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/util/mock/MockNodeConfig.h>

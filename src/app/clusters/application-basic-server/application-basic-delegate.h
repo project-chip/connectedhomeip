@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <lib/support/CHIPMemString.h>
 
 #include <list>

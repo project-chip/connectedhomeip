@@ -16,8 +16,7 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>

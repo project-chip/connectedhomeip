@@ -19,6 +19,7 @@
 #include "app-common/zap-generated/ids/Clusters.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
+#include <app/AttributeValueDecoder.h>
 #include <app/tests/AppTestContext.h>
 #include <controller/WriteInteraction.h>
 #include <lib/core/ErrorStr.h>
