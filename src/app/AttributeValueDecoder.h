@@ -70,6 +70,5 @@ private:
     const Access::SubjectDescriptor mSubjectDescriptor;
 };
 
-
 } // namespace app
 } // namespace chip

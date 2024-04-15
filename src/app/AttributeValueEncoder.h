@@ -18,9 +18,9 @@
 
 #include <app/AttributeReportBuilder.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h>
-#include <app/MessageDef/AttributeReportIBs.h>
 
 #include <type_traits>
 

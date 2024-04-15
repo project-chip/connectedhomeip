@@ -19,8 +19,8 @@
 #pragma once
 
 #include <app/AttributeReportBuilder.h>
-#include <app/AttributeValueEncoder.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/AttributeValueEncoder.h>
 #include <lib/core/CHIPError.h>
 
 /**
