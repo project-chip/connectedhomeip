@@ -253,37 +253,37 @@ chip::Inet::IPAddress * CastingServer::getIpAddressForUDCRequest(chip::Inet::IPA
     return &ipAddresses[ipIndexToUse];
 }
 
-CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::DiscoveredNodeData * selectedCommissioner)
+CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::CommissionNodeData * selectedCommissioner)
 {
     mUdcInProgress = true;
     // Send User Directed commissioning request
     chip::Inet::IPAddress * ipAddressToUse =
-        getIpAddressForUDCRequest(selectedCommissioner->resolutionData.ipAddress, selectedCommissioner->resolutionData.numIPs);
+        getIpAddressForUDCRequest(selectedCommissioner->ipAddress, selectedCommissioner->numIPs);
     ReturnErrorOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-        *ipAddressToUse, selectedCommissioner->resolutionData.port, selectedCommissioner->resolutionData.interfaceId)));
-    mTargetVideoPlayerVendorId   = selectedCommissioner->nodeData.vendorId;
-    mTargetVideoPlayerProductId  = selectedCommissioner->nodeData.productId;
-    mTargetVideoPlayerDeviceType = selectedCommissioner->nodeData.deviceType;
-    mTargetVideoPlayerNumIPs     = selectedCommissioner->resolutionData.numIPs;
+        *ipAddressToUse, selectedCommissioner->port, selectedCommissioner->interfaceId)));
+    mTargetVideoPlayerVendorId   = selectedCommissioner->vendorId;
+    mTargetVideoPlayerProductId  = selectedCommissioner->productId;
+    mTargetVideoPlayerDeviceType = selectedCommissioner->deviceType;
+    mTargetVideoPlayerNumIPs     = selectedCommissioner->numIPs;
     for (size_t i = 0; i < mTargetVideoPlayerNumIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
     {
-        mTargetVideoPlayerIpAddress[i] = selectedCommissioner->resolutionData.ipAddress[i];
+        mTargetVideoPlayerIpAddress[i] = selectedCommissioner->ipAddress[i];
     }
     chip::Platform::CopyString(mTargetVideoPlayerDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
-                               selectedCommissioner->nodeData.deviceName);
+                               selectedCommissioner->deviceName);
     chip::Platform::CopyString(mTargetVideoPlayerHostName, chip::Dnssd::kHostNameMaxLength + 1,
-                               selectedCommissioner->resolutionData.hostName);
+                               selectedCommissioner->hostName);
     chip::Platform::CopyString(mTargetVideoPlayerInstanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1,
-                               selectedCommissioner->nodeData.instanceName);
-    mTargetVideoPlayerPort = selectedCommissioner->resolutionData.port;
+                               selectedCommissioner->instanceName);
+    mTargetVideoPlayerPort = selectedCommissioner->port;
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-const Dnssd::DiscoveredNodeData *
+const Dnssd::CommissionNodeData *
 CastingServer::GetDiscoveredCommissioner(int index, chip::Optional<TargetVideoPlayerInfo *> & outAssociatedConnectableVideoPlayer)
 {
-    const Dnssd::DiscoveredNodeData * discoveredNodeData = mCommissionableNodeController.GetDiscoveredCommissioner(index);
+    const Dnssd::CommissionNodeData * discoveredNodeData = mCommissionableNodeController.GetDiscoveredCommissioner(index);
     if (discoveredNodeData != nullptr)
     {
         for (size_t i = 0; i < kMaxCachedVideoPlayers && mCachedTargetVideoPlayerInfo[i].IsInitialized(); i++)

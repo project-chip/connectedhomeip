@@ -26,6 +26,7 @@
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/Variant.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
@@ -205,7 +206,7 @@ inline constexpr size_t kMaxRotatingIdLen         = 50;
 inline constexpr size_t kMaxPairingInstructionLen = 128;
 
 /// Data that is specific to commisionable/commissioning node discovery
-struct DnssdNodeData
+struct CommissionNodeData : public CommonResolutionData
 {
     size_t rotatingIdLen                                      = 0;
     uint32_t deviceType                                       = 0;
@@ -220,19 +221,22 @@ struct DnssdNodeData
     char deviceName[kMaxDeviceNameLen + 1]                    = {};
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
 
-    DnssdNodeData() {}
+    CommissionNodeData() {}
 
     void Reset()
     {
+        CommonResolutionData::Reset();
         // Let constructor clear things as default
-        this->~DnssdNodeData();
-        new (this) DnssdNodeData();
+        this->~CommissionNodeData();
+        new (this) CommissionNodeData();
     }
 
     bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
 
     void LogDetail() const
     {
+        CommonResolutionData::LogDetail();
+
         if (rotatingIdLen > 0)
         {
             char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
@@ -293,10 +297,13 @@ struct ResolvedNodeData
     }
 };
 
+using DiscoveredNodeData = Variant<CommissionNodeData>;
+
+#if 0
 struct DiscoveredNodeData
 {
     CommonResolutionData resolutionData;
-    DnssdNodeData nodeData;
+    CommissionNodeData nodeData;
     DiscoveryType nodeType;
 
     void Reset()
@@ -314,6 +321,7 @@ struct DiscoveredNodeData
         nodeData.LogDetail();
     }
 };
+#endif
 
 /// Callbacks for discovering nodes advertising non-operational status:
 ///   - Commissioners

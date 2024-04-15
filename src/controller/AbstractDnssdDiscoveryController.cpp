@@ -25,20 +25,24 @@
 namespace chip {
 namespace Controller {
 
-void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & discNodeData)
 {
+    VerifyOrReturn(discNodeData.Is<chip::Dnssd::CommissionNodeData>());
+
     auto discoveredNodes = GetDiscoveredNodes();
+    auto & nodeData = discNodeData.Get<chip::Dnssd::CommissionNodeData>();
     for (auto & discoveredNode : discoveredNodes)
     {
-        if (!discoveredNode.resolutionData.IsValid())
+
+        if (!discoveredNode.IsValid())
         {
             continue;
         }
         // TODO(#32576) Check if IP address are the same. Must account for `numIPs` in the list of `ipAddress`.
         // Additionally, must NOT assume that the ordering is consistent.
-        if (strcmp(discoveredNode.resolutionData.hostName, nodeData.resolutionData.hostName) == 0 &&
-            discoveredNode.resolutionData.port == nodeData.resolutionData.port &&
-            discoveredNode.resolutionData.numIPs == nodeData.resolutionData.numIPs)
+        if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 &&
+            discoveredNode.port == nodeData.port &&
+            discoveredNode.numIPs == nodeData.numIPs)
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
@@ -51,7 +55,7 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
     // Node not yet in the list
     for (auto & discoveredNode : discoveredNodes)
     {
-        if (!discoveredNode.resolutionData.IsValid())
+        if (!discoveredNode.IsValid())
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
@@ -61,7 +65,7 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
             return;
         }
     }
-    ChipLogError(Discovery, "Failed to add discovered node with hostname %s- Insufficient space", nodeData.resolutionData.hostName);
+    ChipLogError(Discovery, "Failed to add discovered node with hostname %s- Insufficient space", nodeData.hostName);
 }
 
 CHIP_ERROR AbstractDnssdDiscoveryController::SetUpNodeDiscovery()
@@ -74,11 +78,11 @@ CHIP_ERROR AbstractDnssdDiscoveryController::SetUpNodeDiscovery()
     return CHIP_NO_ERROR;
 }
 
-const Dnssd::DiscoveredNodeData * AbstractDnssdDiscoveryController::GetDiscoveredNode(int idx)
+const Dnssd::CommissionNodeData * AbstractDnssdDiscoveryController::GetDiscoveredNode(int idx)
 {
     // TODO(cecille): Add assertion about main loop.
     auto discoveredNodes = GetDiscoveredNodes();
-    if (0 <= idx && idx < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES && discoveredNodes.data()[idx].resolutionData.IsValid())
+    if (0 <= idx && idx < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES && discoveredNodes.data()[idx].IsValid())
     {
         return discoveredNodes.data() + idx;
     }

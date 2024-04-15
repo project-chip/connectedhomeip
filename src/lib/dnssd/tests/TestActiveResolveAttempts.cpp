@@ -124,7 +124,8 @@ TEST(TestActiveResolveAttempts, TestSingleBrowseAddRemove)
 
     // once complete, nothing to schedule
     Dnssd::DiscoveredNodeData data;
-    data.nodeData.longDiscriminator = 1234;
+    data.Set<chip::Dnssd::CommissionNodeData>();
+    data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator = 1234;
     attempts.CompleteCommissionable(data);
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().HasValue());
     EXPECT_FALSE(attempts.NextScheduled().HasValue());
@@ -372,7 +373,8 @@ TEST(TestActiveResolveAttempts, TestCombination)
     attempts.Complete(MakePeerId(2));
     attempts.Complete(MakePeerId(1));
     Dnssd::DiscoveredNodeData data;
-    data.nodeData.longDiscriminator = 1234;
+    data.Set<chip::Dnssd::CommissionNodeData>();
+    data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator = 1234;
     attempts.CompleteCommissionable(data);
 
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().HasValue());

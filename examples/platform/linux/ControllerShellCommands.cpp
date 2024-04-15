@@ -116,7 +116,7 @@ static CHIP_ERROR display(bool printHeader)
 
     for (int i = 0; i < 10; i++)
     {
-        const Dnssd::DiscoveredNodeData * next = GetDeviceCommissioner()->GetDiscoveredDevice(i);
+        const Dnssd::CommissionNodeData * next = GetDeviceCommissioner()->GetDiscoveredDevice(i);
         if (next == nullptr)
         {
             streamer_printf(sout, "  Entry %d null\r\n", i);
@@ -124,8 +124,8 @@ static CHIP_ERROR display(bool printHeader)
         else
         {
             streamer_printf(sout, "  Entry %d instanceName=%s host=%s longDiscriminator=%d vendorId=%d productId=%d\r\n", i,
-                            next->nodeData.instanceName, next->resolutionData.hostName, next->nodeData.longDiscriminator,
-                            next->nodeData.vendorId, next->nodeData.productId);
+                            next->instanceName, next->hostName, next->longDiscriminator,
+                            next->vendorId, next->productId);
         }
     }
 

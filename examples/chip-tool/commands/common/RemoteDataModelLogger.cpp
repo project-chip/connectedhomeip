@@ -204,12 +204,12 @@ CHIP_ERROR LogIssueNOCChain(const char * noc, const char * icac, const char * rc
     return gDelegate->LogJSON(valueStr.c_str());
 }
 
-CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::DiscoveredNodeData & nodeData)
+CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::CommissionNodeData & nodeData)
 {
     VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
 
-    auto & resolutionData = nodeData.resolutionData;
-    auto & commissionData = nodeData.nodeData;
+    auto & commissionData = nodeData;
+    auto & resolutionData = (chip::Dnssd::CommonResolutionData &)commissionData;
 
     if (!chip::CanCastTo<uint8_t>(resolutionData.numIPs))
     {

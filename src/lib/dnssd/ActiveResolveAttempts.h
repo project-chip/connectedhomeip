@@ -159,17 +159,17 @@ public:
             case chip::Dnssd::DiscoveryFilterType::kNone:
                 return true;
             case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
-                return browse.filter.code == static_cast<uint64_t>((data.nodeData.longDiscriminator >> 8) & 0x0F);
+                return browse.filter.code == static_cast<uint64_t>((data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator >> 8) & 0x0F);
             case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
-                return browse.filter.code == data.nodeData.longDiscriminator;
+                return browse.filter.code == data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator;
             case chip::Dnssd::DiscoveryFilterType::kVendorId:
-                return browse.filter.code == data.nodeData.vendorId;
+                return browse.filter.code == data.Get<chip::Dnssd::CommissionNodeData>().vendorId;
             case chip::Dnssd::DiscoveryFilterType::kDeviceType:
-                return browse.filter.code == data.nodeData.deviceType;
+                return browse.filter.code == data.Get<chip::Dnssd::CommissionNodeData>().deviceType;
             case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
-                return browse.filter.code == data.nodeData.commissioningMode;
+                return browse.filter.code == data.Get<chip::Dnssd::CommissionNodeData>().commissioningMode;
             case chip::Dnssd::DiscoveryFilterType::kInstanceName:
-                return strncmp(browse.filter.instanceName, data.nodeData.instanceName,
+                return strncmp(browse.filter.instanceName, data.Get<chip::Dnssd::CommissionNodeData>().instanceName,
                                chip::Dnssd::Commission::kInstanceNameMaxLength + 1) == 0;
             case chip::Dnssd::DiscoveryFilterType::kCommissioner:
             case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
