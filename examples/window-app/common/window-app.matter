@@ -1493,48 +1493,6 @@ cluster WiFiNetworkDiagnostics = 54 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
-/** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-cluster EthernetNetworkDiagnostics = 55 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum PHYRateEnum : enum8 {
-    kRate10M = 0;
-    kRate100M = 1;
-    kRate1G = 2;
-    kRate25G = 3;
-    kRate5G = 4;
-    kRate10G = 5;
-    kRate40G = 6;
-    kRate100G = 7;
-    kRate200G = 8;
-    kRate400G = 9;
-  }
-
-  bitmap Feature : bitmap32 {
-    kPacketCounts = 0x1;
-    kErrorCounts = 0x2;
-  }
-
-  readonly attribute optional nullable PHYRateEnum PHYRate = 0;
-  readonly attribute optional nullable boolean fullDuplex = 1;
-  readonly attribute optional int64u packetRxCount = 2;
-  readonly attribute optional int64u packetTxCount = 3;
-  readonly attribute optional int64u txErrCount = 4;
-  readonly attribute optional int64u collisionCount = 5;
-  readonly attribute optional int64u overrunCount = 6;
-  readonly attribute optional nullable boolean carrierDetect = 7;
-  readonly attribute optional int64u timeSinceReset = 8;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
-  command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
-}
-
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1; // NOTE: Default/not specifically set
@@ -2231,6 +2189,9 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute supportedWiFiBands;
+    callback attribute supportedThreadFeatures;
+    callback attribute threadVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -2374,20 +2335,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
 
     handle command ResetCounts;
-  }
-
-  server cluster EthernetNetworkDiagnostics {
-    callback attribute PHYRate;
-    callback attribute fullDuplex;
-    callback attribute packetRxCount;
-    callback attribute packetTxCount;
-    callback attribute txErrCount;
-    callback attribute collisionCount;
-    callback attribute overrunCount;
-    callback attribute carrierDetect;
-    callback attribute timeSinceReset;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster AdministratorCommissioning {

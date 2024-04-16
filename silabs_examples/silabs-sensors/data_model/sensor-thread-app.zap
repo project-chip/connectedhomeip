@@ -1719,6 +1719,38 @@
               "reportableChange": 0
             },
             {
+              "name": "SupportedThreadFeatures",
+              "code": 9,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ThreadCapabilitiesBitmap",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ThreadVersion",
+              "code": 10,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -1812,58 +1844,6 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "Diagnostic Logs",
-          "code": 50,
-          "mfgCode": null,
-          "define": "DIAGNOSTIC_LOGS_CLUSTER",
-          "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "RetrieveLogsRequest",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
               "reportableChange": 0
             }
           ]

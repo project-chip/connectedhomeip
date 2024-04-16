@@ -1527,6 +1527,7 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute supportedWiFiBands;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
 
