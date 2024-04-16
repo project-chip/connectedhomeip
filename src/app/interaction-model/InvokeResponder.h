@@ -103,7 +103,10 @@ public:
     /// Direct access to reply encoding.
     ///
     /// Use this only in conjunction with the other Raw* calls
-    DataModel::WrappedStructEncoder & RawResponseEncoder(CommandId replyCommandId) { return mWriter->ResponseEncoder(replyCommandId); }
+    DataModel::WrappedStructEncoder & RawResponseEncoder(CommandId replyCommandId)
+    {
+        return mWriter->ResponseEncoder(replyCommandId);
+    }
 
     /// Direct access to flushing replies
     ///
@@ -144,7 +147,8 @@ public:
     CHIP_ERROR Send(const ReplyData & data)
     {
         CHIP_ERROR err = data.Encode(ResponseEncoder(ReplyData::GetCommandId()));
-        if (err != CHIP_ERROR_BUFFER_TOO_SMALL) {
+        if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
             LogErrorOnFailure(err);
             err = mWriter->Complete(err);
         }
@@ -156,8 +160,22 @@ public:
         // retry once. Failure to flush is permanent.
         ReturnErrorOnFailure(mWriter->FlushPendingResponses());
         err = data.Encode(ResponseEncoder(ReplyData::GetCommandId()));
+
+        // If encoding fails, we will end up sending an error back to the other side
+        // the caller
         LogErrorOnFailure(err);
-        return mWriter->Complete(err);
+        if (err == CHIP_NO_ERROR)
+        {
+            err = mWriter->Complete(err);
+        }
+        else
+        {
+            // Error in "complete" is not something we can really forward anymore since
+            // we already got an error in Encode ... just log this.
+            LogErrorOnFailure(mWriter->Complete(err));
+        }
+
+        return err;
     }
 
 private:
