@@ -967,7 +967,7 @@ menu "CHIP Device Layer"
            help
                This option enables the system statistics to be sent to the insights cloud.
 
-      config MAX_PERMIT_LIST_SIZE
+        config MAX_PERMIT_LIST_SIZE
            int "Set permit list size for Insights traces"
            range 5 30
            depends on ESP_INSIGHTS_ENABLED

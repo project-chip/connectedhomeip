@@ -50,7 +50,6 @@ INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
 
 TOOLS = {}
 
-
 FACTORY_PARTITION_CSV = 'nvs_partition.csv'
 FACTORY_PARTITION_BIN = 'factory_partition.bin'
 NVS_KEY_PARTITION_BIN = 'nvs_key_partition.bin'
@@ -605,7 +604,6 @@ def get_args():
                         help='Do not generate the factory partition binary')
     parser.add_argument('--output_dir', type=str, default='bin', help='Created image output file path')
 
-
     parser.add_argument('-cf', '--commissioning-flow', type=any_base_int, default=0,
                         help='Device commissioning flow, 0:Standard, 1:User-Intent, 2:Custom. \
                                           Default is 0.', choices=[0, 1, 2])
@@ -670,6 +668,7 @@ def main():
     generate_factory_partiton_binary(args)
     if (args.discriminator and args.passcode):
         generate_onboarding_data(args)
+
 
 if __name__ == "__main__":
     logging.basicConfig(format='[%(asctime)s] [%(levelname)7s] - %(message)s', level=logging.INFO)
