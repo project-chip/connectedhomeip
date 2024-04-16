@@ -142,7 +142,7 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     ASSERT_EQ(n1, kInvalidEventId);
 
     event.fabricIndex = kTestFabricIndex;
-    n1                = events->GenerateEvent(event,  /* endpointId = */ 0);
+    n1                = events->GenerateEvent(event, /* endpointId = */ 0);
 
     ASSERT_NE(n1, kInvalidEventId);
     ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());

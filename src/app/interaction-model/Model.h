@@ -19,6 +19,9 @@
 #include <lib/core/TLVReader.h>
 #include <lib/core/TLVWriter.h>
 
+#include <app/AttributeValueDecoder.h>
+#include <app/AttributeValueEncoder.h>
+
 #include <app/interaction-model/Actions.h>
 #include <app/interaction-model/InvokeResponder.h>
 #include <app/interaction-model/IterationTypes.h>
@@ -67,8 +70,7 @@ public:
     ///      - to check for this, CHIP_ERROR provides:
     ///        - ::IsPart(ChipError::SdkPart::kIMGlobalStatus) -> bool
     ///        - ::GetSdkCode() -> uint8_t to translate to the actual code
-    virtual CHIP_ERROR ReadAttribute(const ReadAttributeRequest & request, ReadState & state,
-                                     chip::TLV::TLVWriter & attribute_data) = 0;
+    virtual CHIP_ERROR ReadAttribute(const ReadAttributeRequest & request, ReadState & state, AttributeValueEncoder & encoder) = 0;
 
     /// Requests a write of an attribute.
     ///
@@ -90,7 +92,7 @@ public:
     ///         - `UnsupportedWrite` for attempts to write read-only data
     ///         - `UnsupportedAccess` for ACL failures
     ///         - `NeedsTimedInteraction` for writes that are not timed however are required to be so
-    virtual CHIP_ERROR WriteAttribute(const WriteAttributeRequest & request, chip::TLV::TLVReader & attribute_data) = 0;
+    virtual CHIP_ERROR WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     /// `responder` is used to send back the reply.
     ///    - calling Reply() or ReplyAsync() will let the application control the reply
