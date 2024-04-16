@@ -1518,6 +1518,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ onTimeWriteSuccess, onTimePreviousValue ] timeout:10];
 
     // Test if errors are properly received
+    // TODO: We might stop reporting these altogether from MTRDevice, and then
+    // this test will need updating.
+    __auto_type * readThroughForUnknownAttributesParams = [[MTRReadParams alloc] init];
+    readThroughForUnknownAttributesParams.assumeUnknownAttributesReportable = NO;
     XCTestExpectation * attributeReportErrorExpectation = [self expectationWithDescription:@"Attribute read error"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
         for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
@@ -1526,8 +1530,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             }
         }
     };
+
     // use the nonexistent attribute and expect read error
-    [device readAttributeWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID params:nil];
+    [device readAttributeWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID params:readThroughForUnknownAttributesParams];
     [self waitForExpectations:@[ attributeReportErrorExpectation ] timeout:10];
 
     // Resubscription test setup

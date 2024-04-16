@@ -1627,7 +1627,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     // Send read request to device if any of the following are true:
     // 1. Subscription not in a state we can expect reports
-    // 2. The attribute has (or is assumed to have) the Changes Omitted quality, so we won't get reports for it.
+    // 2. The attribute has the Changes Omitted quality, so we won't get reports for it.
+    // 3. The attribute is not in the spec, and the read params asks to assume
+    //    an unknown attribute has the Changes Omitted quality.
     if (![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
         // Read requests container will be a mutable array of items, each being an array containing:
         //   [attribute request path, params]

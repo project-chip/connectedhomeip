@@ -287,6 +287,10 @@ class MTRSwiftDeviceTests : XCTestCase {
         wait(for: [ expectedValueReportedExpectation, expectedValueRemovedExpectation ], timeout: 5, enforceOrder: true)
         
         // Test if errors are properly received
+        // TODO: We might stop reporting these altogether from MTRDevice, and then
+        // this test will need updating.
+        let readThroughForUnknownAttributesParams = MTRReadParams()
+        readThroughForUnknownAttributesParams.shouldAssumeUnknownAttributesReportable = false;
         let attributeReportErrorExpectation = expectation(description: "Attribute read error")
         delegate.onAttributeDataReceived = { (data: [[ String: Any ]]) -> Void in
             for attributeReponseValue in data {
@@ -296,7 +300,7 @@ class MTRSwiftDeviceTests : XCTestCase {
             }
         }
         // use the nonexistent attribute and expect read error
-        device.readAttribute(withEndpointID: testEndpointID, clusterID: testClusterID, attributeID: testAttributeID, params: nil)
+        device.readAttribute(withEndpointID: testEndpointID, clusterID: testClusterID, attributeID: testAttributeID, params: readThroughForUnknownAttributesParams)
         wait(for: [ attributeReportErrorExpectation ], timeout: 10)
         
         // Resubscription test setup
