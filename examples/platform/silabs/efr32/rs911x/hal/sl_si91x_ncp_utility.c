@@ -87,10 +87,7 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
     if (SL_STATUS_OK == status)
     {
         SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
-    }
-#if SL_SPICTRL_MUX
-    xSemaphoreGive(spi_sem_sync_hdl);
-#endif // SL_SPICTRL_MUX
+    } 
     return status;
 }
 
