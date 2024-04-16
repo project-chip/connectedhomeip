@@ -2343,24 +2343,25 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 #endif
             }
 
-            // if expected values exists, purge and update read cache
-            NSArray * expectedValue = _expectedValueCache[attributePath];
-            if (expectedValue) {
-                previousValue = expectedValue[MTRDeviceExpectedValueFieldValueIndex];
-                _readCache[attributePath] = attributeDataValue;
-                shouldReportAttribute = NO;
-            } else if (readCacheValueChanged) {
-                // otherwise compare and update read cache
+            // Report the attribute if the attribute value is different from the read cache value.
+            if (readCacheValueChanged) {
                 previousValue = _readCache[attributePath];
-                _readCache[attributePath] = attributeDataValue;
                 shouldReportAttribute = YES;
             }
 
+            // Update the readCache with the attribute value.
+            _readCache[attributePath] = attributeDataValue;
+
             if (!shouldReportAttribute) {
+                NSArray * expectedValue = _expectedValueCache[attributePath];
+
+                // If an expected value exists, do not report the attribute during this time.
+                // When the expected value interval expires, the correct value will be reported.
                 if (expectedValue) {
-                    MTR_LOG_INFO("%@ report %@ value filtered - same as expected values", self, attributePath);
-                } else {
-                    MTR_LOG_INFO("%@ report %@ value filtered - same values as cache", self, attributePath);
+                    MTR_LOG_INFO("%@ report %@ value filtered - new expected value present. Do not report old value", self, attributePath);
+                } else
+                {
+                    MTR_LOG_INFO("%@ report %@ value filtered - same as read cache", self, attributePath);
                 }
             }
 
