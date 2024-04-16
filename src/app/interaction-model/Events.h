@@ -83,10 +83,10 @@ EventNumber GenerateEvent(E & emittor, const T & aEventData, EndpointId aEndpoin
 }
 
 template <typename E, typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
-EventNumber GenerateEvent(E & emittor, const T & aEventData, EndpointId aEndpoint)
+EventNumber GenerateEvent(E & emittor, const T & aEventData, EndpointId endpointId)
 {
     internal::SimpleEventLoggingDelegate<T> eventData(aEventData);
-    ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
+    ConcreteEventPath path(endpointId, aEventData.GetClusterId(), aEventData.GetEventId());
     EventOptions eventOptions;
     eventOptions.mPath     = path;
     eventOptions.mPriority = aEventData.GetPriorityLevel();
@@ -119,9 +119,9 @@ public:
     // Convenience methods for event logging using cluster-object structures
     // On error, these log and return kInvalidEventId
     template <typename T>
-    EventNumber GenerateEvent(const T & aEventData, EndpointId aEndpoint)
+    EventNumber GenerateEvent(const T & eventData, EndpointId endpointId)
     {
-        return internal::GenerateEvent(*this, aEventData, aEndpoint);
+        return internal::GenerateEvent(*this, eventData, endpointId);
     }
 };
 
