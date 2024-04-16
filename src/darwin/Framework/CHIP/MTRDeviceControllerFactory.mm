@@ -67,12 +67,6 @@
 using namespace chip;
 using namespace chip::Controller;
 
-static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
-static NSString * const kErrorSessionResumptionStorageInit = @"Init failure while creating a session resumption storage delegate";
-static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
-static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
-static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
-
 static bool sExitHandlerRegistered = false;
 static void ShutdownOnExit()
 {
@@ -228,21 +222,6 @@ MTR_DIRECT_MEMBERS
     VerifyOrDie(!DeviceLayer::PlatformMgrImpl().IsWorkQueueCurrentQueue());
 }
 
-- (BOOL)checkIsRunning:(NSError * __autoreleasing *)error
-{
-    [self _assertCurrentQueueIsNotMatterQueue];
-
-    if ([self isRunning]) {
-        return YES;
-    }
-
-    if (error != nil) {
-        *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-    }
-
-    return NO;
-}
-
 - (void)cleanupStartupObjects
 {
     assertChipStackLockedByCurrentThread();
@@ -293,7 +272,7 @@ MTR_DIRECT_MEMBERS
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    if (!self.isRunning) {
+    if (!_running) { // Note: reading _running from outside of the Matter work queue
         return nil;
     }
 
@@ -339,15 +318,12 @@ MTR_DIRECT_MEMBERS
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    if ([self isRunning]) {
-        MTR_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
-        return YES;
-    }
-
-    __block CHIP_ERROR errorCode = CHIP_NO_ERROR;
+    __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            return;
+        if (_running) {
+            // TODO: When treating a duplicate call as success we should validate parameters match
+            MTR_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
+            ExitNow(err = CHIP_NO_ERROR);
         }
 
         StartupMetricsCollection();
@@ -355,24 +331,15 @@ MTR_DIRECT_MEMBERS
 
         if (startupParams.hasStorage) {
             _persistentStorageDelegate = new (std::nothrow) MTRPersistentStorageDelegateBridge(startupParams.storage);
+            VerifyOrExit(_persistentStorageDelegate != nullptr, err = CHIP_ERROR_NO_MEMORY);
             _sessionResumptionStorage = nullptr;
             _usingPerControllerStorage = NO;
         } else {
             _persistentStorageDelegate = new (std::nothrow) MTRDemuxingStorage(self);
+            VerifyOrExit(_persistentStorageDelegate != nullptr, err = CHIP_ERROR_NO_MEMORY);
             _sessionResumptionStorage = new (std::nothrow) MTRSessionResumptionStorageBridge(self);
+            VerifyOrExit(_sessionResumptionStorage != nullptr, err = CHIP_ERROR_NO_MEMORY);
             _usingPerControllerStorage = YES;
-
-            if (_sessionResumptionStorage == nil) {
-                MTR_LOG_ERROR("Error: %@", kErrorSessionResumptionStorageInit);
-                errorCode = CHIP_ERROR_NO_MEMORY;
-                return;
-            }
-        }
-
-        if (_persistentStorageDelegate == nil) {
-            MTR_LOG_ERROR("Error: %@", kErrorPersistentStorageInit);
-            errorCode = CHIP_ERROR_NO_MEMORY;
-            return;
         }
 
         _otaProviderDelegate = startupParams.otaProviderDelegate;
@@ -383,63 +350,44 @@ MTR_DIRECT_MEMBERS
 
         // TODO: Allow passing a different keystore implementation via startupParams.
         _keystore = new PersistentStorageOperationalKeystore();
-        if (_keystore == nullptr) {
-            MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
-            errorCode = CHIP_ERROR_NO_MEMORY;
-            return;
-        }
-
-        errorCode = _keystore->Init(_persistentStorageDelegate);
-        if (errorCode != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Error: %@", kErrorKeystoreInit);
-            return;
-        }
+        VerifyOrExit(_keystore != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        SuccessOrExit((err = _keystore->Init(_persistentStorageDelegate)));
 
         // TODO Allow passing a different opcert store implementation via startupParams.
         _opCertStore = new Credentials::PersistentStorageOpCertStore();
-        if (_opCertStore == nullptr) {
-            MTR_LOG_ERROR("Error: %@", kErrorCertStoreInit);
-            errorCode = CHIP_ERROR_NO_MEMORY;
-            return;
-        }
-
-        errorCode = _opCertStore->Init(_persistentStorageDelegate);
-        if (errorCode != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Error: %@", kErrorCertStoreInit);
-            return;
-        }
+        VerifyOrExit(_opCertStore != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        SuccessOrExit((err = _opCertStore->Init(_persistentStorageDelegate)));
 
         _productAttestationAuthorityCertificates = [startupParams.productAttestationAuthorityCertificates copy];
         _certificationDeclarationCertificates = [startupParams.certificationDeclarationCertificates copy];
 
-        chip::Controller::FactoryInitParams params;
-        if (startupParams.port != nil) {
-            params.listenPort = [startupParams.port unsignedShortValue];
-        }
-        params.enableServerInteractions = startupParams.shouldStartServer;
+        {
+            chip::Controller::FactoryInitParams params;
+            if (startupParams.port != nil) {
+                params.listenPort = [startupParams.port unsignedShortValue];
+            }
+            params.enableServerInteractions = startupParams.shouldStartServer;
 
-        params.groupDataProvider = &_groupDataProvider;
-        params.sessionKeystore = &_sessionKeystore;
-        params.fabricIndependentStorage = _persistentStorageDelegate;
-        params.operationalKeystore = _keystore;
-        params.opCertStore = _opCertStore;
-        params.certificateValidityPolicy = &_certificateValidityPolicy;
-        params.sessionResumptionStorage = _sessionResumptionStorage;
-        errorCode = _controllerFactory->Init(params);
-        if (errorCode != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
-            return;
+            params.groupDataProvider = &_groupDataProvider;
+            params.sessionKeystore = &_sessionKeystore;
+            params.fabricIndependentStorage = _persistentStorageDelegate;
+            params.operationalKeystore = _keystore;
+            params.opCertStore = _opCertStore;
+            params.certificateValidityPolicy = &_certificateValidityPolicy;
+            params.sessionResumptionStorage = _sessionResumptionStorage;
+            SuccessOrExit((err = _controllerFactory->Init(params)));
         }
 
         // This needs to happen after DeviceControllerFactory::Init,
         // because that creates (lazily, by calling functions with
         // static variables in them) some static-lifetime objects.
         if (!sExitHandlerRegistered) {
-            int ret = atexit(ShutdownOnExit);
-            if (ret != 0) {
-                MTR_LOG_ERROR("Error registering exit handler: %d", ret);
-                return;
+            if (atexit(ShutdownOnExit) != 0) {
+                char error[128];
+                strerror_r(errno, error, sizeof(error));
+                MTR_LOG_ERROR("Warning: Failed to register atexit handler: %s", error);
             }
+            sExitHandlerRegistered = true;
         }
         HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
 
@@ -452,20 +400,24 @@ MTR_DIRECT_MEMBERS
         _controllerFactory->RetainSystemState();
         _controllerFactory->ReleaseSystemState();
 
-        self->_advertiseOperational = startupParams.shouldStartServer;
-        self->_running = YES;
-    });
+        _advertiseOperational = startupParams.shouldStartServer;
+        _running = YES;
+        err = CHIP_NO_ERROR;
 
-    if (![self isRunning]) {
-        dispatch_sync(_chipWorkQueue, ^{
+    exit:
+        if (err != CHIP_NO_ERROR) {
+            // Note: Since we have failed no later than _controllerFactory->Init(),
+            // there is no need to call _controllerFactory->Shutdown() here.
             [self cleanupStartupObjects];
-        });
+        }
+    });
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Failed to start Matter controller factory: %" CHIP_ERROR_FORMAT, err.Format());
         if (error != nil) {
-            *error = [MTRError errorForCHIPErrorCode:errorCode];
+            *error = [MTRError errorForCHIPErrorCode:err];
         }
         return NO;
     }
-
     return YES;
 }
 
@@ -473,26 +425,19 @@ MTR_DIRECT_MEMBERS
 {
     [self _assertCurrentQueueIsNotMatterQueue];
 
-    if (![self isRunning]) {
-        return;
-    }
-
     while ([_controllers count] != 0) {
         [_controllers[0] shutdown];
     }
 
     dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn(_running);
+
         MTR_LOG_INFO("Shutting down the Matter controller factory");
         _controllerFactory->Shutdown();
-
         [self cleanupStartupObjects];
+        _running = NO;
+        _advertiseOperational = NO;
     });
-
-    // NOTE: we do not call cleanupInitObjects because we can be restarted, and
-    // that does not re-create the objects that we create inside init.
-    // Maybe we should be creating them in startup?
-
-    _running = NO;
 }
 
 /**
@@ -540,7 +485,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    if (![self isRunning]) {
+    if (!_running) { // Note: reading _running from outside of the Matter work queue
         if (storageDelegate != nil) {
             MTR_LOG_DEFAULT("Auto-starting Matter controller factory in per-controller storage mode");
             auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
@@ -907,12 +852,6 @@ MTR_DIRECT_MEMBERS
 
 - (void)resetOperationalAdvertising
 {
-    if (![self checkIsRunning:nil]) {
-        // No need to reset anything; we are not running, so not
-        // advertising.
-        return;
-    }
-
     if (!_advertiseOperational) {
         // No need to reset anything; we are not advertising the things that
         // would need to get reset.
