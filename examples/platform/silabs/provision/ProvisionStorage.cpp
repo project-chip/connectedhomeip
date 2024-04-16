@@ -1,6 +1,5 @@
 #include "ProvisionStorage.h"
 #include "ProvisionProtocol.h"
-#include <CHIPProjectConfig.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
@@ -282,7 +281,7 @@ CHIP_ERROR Storage::Set(uint16_t id, const uint8_t *value, size_t size)
     case Parameters::ID::kManufacturingDate:
         if((nullptr == value) || (0 == size))
         {
-            return SetManufacturingDate("", 0);
+            return SetManufacturingDate("0000-00-00", 10);
         }
         else
         {
