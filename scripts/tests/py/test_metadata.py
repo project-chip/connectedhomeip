@@ -35,17 +35,17 @@ class TestMetadataReader(unittest.TestCase):
             actual = self.reader.parse_script(fp.name)
             self.assertEqual(actual, expected)
 
-
     def test_parse_single_run(self):
         self.assertMetadataParse(''' 
             # test-runner-runs: run1 
             # test-runner-run/run1: app/all-clusters discriminator passcode
             ''',
-            [
-                Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-                         discriminator=1234, run="run1", passcode=20202021)
-            ]
-        )
+                                 [
+                                     Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
+                                              discriminator=1234, run="run1", passcode=20202021)
+                                 ]
+                                 )
+
 
 if __name__ == "__main__":
     unittest.main()
