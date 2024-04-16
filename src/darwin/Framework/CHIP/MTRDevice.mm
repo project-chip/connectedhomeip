@@ -2355,7 +2355,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             if (!shouldReportAttribute) {
                 NSArray * expectedValue = _expectedValueCache[attributePath];
 
-                // If an expected value exists, do not report the attribute during this time.
+                // If an expected value exists, the attribute will not be reported at this time.
                 // When the expected value interval expires, the correct value will be reported.
                 if (expectedValue) {
                     MTR_LOG_INFO("%@ report %@ value filtered - new expected value present. Do not report old value", self, attributePath);
