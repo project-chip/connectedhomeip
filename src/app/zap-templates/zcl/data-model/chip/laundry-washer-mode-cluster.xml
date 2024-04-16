@@ -36,6 +36,12 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="2"/>
 
     <features>
+      <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+        <optionalConform/>
+      </feature>
+    </features>
+
+    <features>
       <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
         <optionalConform/>
       </feature>

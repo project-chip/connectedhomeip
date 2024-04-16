@@ -839,6 +839,18 @@ limitations under the License.
         <field mask="0x10" name="PINChanged" />
     </bitmap>
 
+    <!-- RemoteProgrammingEventMask attribute bit meaning set -->
+     <bitmap name="DlRemoteProgrammingEventMask" type="bitmap16">
+         <cluster code="0x0101" />
+         <field mask="0x01" name="Unknown" />
+         <field mask="0x02" name="ProgrammingPINChanged" />
+         <field mask="0x04" name="PINAdded" />
+         <field mask="0x08" name="PINCleared" />
+         <field mask="0x10" name="PINChanged" />
+         <field mask="0x20" name="RFIDCodeAdded" />
+         <field mask="0x40" name="RFIDCodeCleared" />
+     </bitmap>
+
     <!-- RFIDProgrammingEventMask attribute bit meaning set -->
     <bitmap name="DlRFIDProgrammingEventMask" type="bitmap16">
         <cluster code="0x0101" />

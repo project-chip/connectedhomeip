@@ -37,6 +37,15 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="1" />
 
+    <features>
+      <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="RINSE" name="Rinse" summary="Multiple rinse cycles supported">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="array" entryType="char_string"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
     <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="int8u"                                min="0x00" max="0x1F"   writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>
     <attribute side="server" code="0x0002" define="NUMBER_OF_RINSES"          type="NumberOfRinsesEnum"                                           writable="true"  isNullable="false"  optional="true">NumberOfRinses</attribute>
