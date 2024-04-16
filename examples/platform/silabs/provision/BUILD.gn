@@ -14,10 +14,10 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
 import("${efr32_sdk_build_root}/silabs_board.gni")
 
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
-
 
 config("provision-config") {
   include_dirs = [ "${chip_root}" ]
@@ -28,19 +28,18 @@ config("provision-config") {
   }
 }
 
-
 source_set("provision-common") {
   sources = [
     "${silabs_common_plat_dir}/provision/AttestationKey.h",
     "${silabs_common_plat_dir}/provision/ProvisionChannel.h",
-    "${silabs_common_plat_dir}/provision/ProvisionEncoder.h",
     "${silabs_common_plat_dir}/provision/ProvisionEncoder.cpp",
-    "${silabs_common_plat_dir}/provision/ProvisionManager.h",
+    "${silabs_common_plat_dir}/provision/ProvisionEncoder.h",
     "${silabs_common_plat_dir}/provision/ProvisionManager.cpp",
+    "${silabs_common_plat_dir}/provision/ProvisionManager.h",
     "${silabs_common_plat_dir}/provision/ProvisionProtocol.h",
     "${silabs_common_plat_dir}/provision/ProvisionProtocolV2.cpp",
-    "${silabs_common_plat_dir}/provision/ProvisionStorage.h",
     "${silabs_common_plat_dir}/provision/ProvisionStorage.cpp",
+    "${silabs_common_plat_dir}/provision/ProvisionStorage.h",
     "${silabs_common_plat_dir}/provision/ProvisionStorageCustom.cpp",
   ]
 
@@ -53,9 +52,7 @@ source_set("provision-common") {
   public_configs = [ ":provision-config" ]
 }
 
-
 source_set("provision-flash-only") {
-
   sources = [
     "${silabs_common_plat_dir}/provision/AttestationKeyMbed.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionStorageFlash.cpp",
@@ -64,9 +61,7 @@ source_set("provision-flash-only") {
   public_deps = [ ":provision-common" ]
 }
 
-
 static_library("provision-efr32") {
-
   sources = [
     "${silabs_common_plat_dir}/provision/AttestationKeyPSA.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionChannelEFR32BLE.cpp",
@@ -76,14 +71,19 @@ static_library("provision-efr32") {
   public_deps = [ ":provision-common" ]
 }
 
-
 static_library("provision-siwx917") {
-
   sources = [
-    "${silabs_common_plat_dir}/provision/AttestationKeyMbed.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionChannelSi917BLE.cpp",
     "${silabs_common_plat_dir}/provision/ProvisionStorageDefault.cpp",
   ]
+
+  if (sl_si91x_crypto_flavor == "tinycrypt") {
+    sources += [ "${silabs_common_plat_dir}/provision/AttestationKeyMbed.cpp" ]
+  }
+
+  if (sl_si91x_crypto_flavor == "psa") {
+    sources += [ "${silabs_common_plat_dir}/provision/AttestationKeyPSA.cpp" ]
+  }
 
   public_deps = [ ":provision-common" ]
 }

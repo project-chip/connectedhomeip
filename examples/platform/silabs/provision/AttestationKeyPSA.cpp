@@ -8,6 +8,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef SLI_SI91X_MCU_INTERFACE
+#include "sl_si91x_psa_wrap.h"
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
@@ -32,7 +36,6 @@ int destroyKey(uint32_t kid)
     return err;
 }
 
-
 int generateKey(uint32_t kid)
 {
     destroyKey(kid);
@@ -45,19 +48,21 @@ int generateKey(uint32_t kid)
     psa_set_key_algorithm(&attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
     psa_set_key_usage_flags(
         &attr, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
+#ifdef SLI_SI91X_MCU_INTERFACE
+    psa_set_key_lifetime(
+        &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, PSA_KEY_VOLATILE_PERSISTENT_WRAPPED));
+#else
     psa_set_key_lifetime(
         &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, sl_psa_get_most_secure_key_location()));
-
+#endif
     psa_key_id_t id = 0;
     psa_status_t err = psa_generate_key(&attr, &id);
     return err;
 }
 
-
 int importKey(uint32_t kid, const uint8_t * value, size_t size)
 {
     destroyKey(kid);
-
     psa_key_attributes_t attr = psa_key_attributes_init();
     psa_set_key_id(&attr, kid);
     psa_set_key_type(&attr, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
@@ -65,8 +70,13 @@ int importKey(uint32_t kid, const uint8_t * value, size_t size)
     psa_set_key_algorithm(&attr, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
     psa_set_key_usage_flags(
         &attr, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
+#ifdef SLI_SI91X_MCU_INTERFACE
+    psa_set_key_lifetime(
+        &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, PSA_KEY_VOLATILE_PERSISTENT_WRAPPED));
+#else
     psa_set_key_lifetime(
         &attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT, sl_psa_get_most_secure_key_location()));
+#endif
 
     psa_key_id_t id = 0;
     psa_status_t err = psa_import_key(&attr, value, size, &id);

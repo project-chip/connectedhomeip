@@ -511,7 +511,8 @@ CHIP_ERROR Storage::GetDeviceAttestationCert(MutableByteSpan & value)
     return err;
 }
 
-#ifdef SLI_SI91X_MCU_INTERFACE
+#if defined(SLI_SI91X_MCU_INTERFACE) && defined(SL_MBEDTLS_USE_TINYCRYPT)
+
 CHIP_ERROR Storage::SetDeviceAttestationKey(const ByteSpan & value)
 {
     return SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Creds_KeyId, value.data(), value.size());
@@ -545,7 +546,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
         return Examples::GetExampleDACProvider()->SignWithDeviceAttestationKey(message, signature);
 #else
         return CHIP_ERROR_NOT_FOUND;
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
     }
 }
 
@@ -569,7 +570,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
 {
     CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
     uint32_t kid = 0;
-
+  
     if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_Creds_KeyId))
     {
         ReturnErrorOnFailure(SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_KeyId, kid));

@@ -18,11 +18,14 @@ import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/silabs/wifi_args.gni")
+import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
 assert(chip_device_platform == "SiWx917")
+
 if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
@@ -81,7 +84,14 @@ static_library("SiWx917") {
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
-    sources += [ "CHIPCryptoPALTinyCrypt.cpp" ]
+    if (sl_si91x_crypto_flavor == "tinycrypt") {
+      sources += [ "CHIPCryptoPALTinyCrypt.cpp" ]
+    }
+
+    if (sl_si91x_crypto_flavor == "psa") {
+      sources += [ "${silabs_platform_dir}/efr32/CHIPCryptoPALPsaEfr32.cpp" ]
+    }
+
     public_deps += [
       "${chip_root}/src/crypto",
       "${mbedtls_root}:mbedtls",

@@ -16,10 +16,12 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${chip_root}/src/platform/silabs/wifi_args.gni")
 import("silabs_board.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
@@ -31,6 +33,8 @@ declare_args() {
   # Periodic time at which the 917 SoC should wakeup
   si91x_alarm_periodic_time = 30
 
+  # option to select the crypto library
+  sl_si91x_crypto_flavor = "tinycrypt"
   # enable 917 SoC M4 sleep wakeup
   si917_m4_sleep_enabled = false
 }
@@ -44,10 +48,17 @@ template("siwx917_sdk") {
   sdk_target_name = target_name
 
   config("${sdk_target_name}_config") {
+    defines = []
     include_dirs = []
     libs = []
+    cflags = []
+
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
+    }
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
     }
 
     # Treat these includes as system includes, so warnings in them are not fatal.
@@ -57,11 +68,8 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/service/device_init/inc",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/config",
-      "${chip_root}/third_party/mbedtls/repo/include",
-      "${chip_root}/third_party/mbedtls/repo/library",
 
       "${chip_root}/src/platform/silabs/rs911x",
 
@@ -151,8 +159,7 @@ template("siwx917_sdk") {
     # the content of these, only when changing the filename itself.
     # To fix this, these files are also manually depended upon in the source set
     # declared in siwx917_mbedtls_config further down this file.
-    defines = [
-      "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
+    defines += [
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "SL_HEAP_SIZE=32768",
@@ -177,8 +184,6 @@ template("siwx917_sdk") {
       "USE_NVM3=1",
       "SLI_SI91X_ENABLE_BLE=1",
       "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
-      "TINYCRYPT_PRIMITIVES",
-      "OPTIMIZE_TINYCRYPT_ASM",
       "__error_t_defined",
       "RSI_SAMPLE_HAL",
       "DEBUG_UART=1",
@@ -224,7 +229,6 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_CHIP_SHELL" ]
     }
 
-    import("${chip_root}/src/platform/silabs/wifi_args.gni")
     defines += [ "LWIP_NETIF_API=1" ]
     if (lwip_ipv4) {
       defines += [
@@ -317,11 +321,6 @@ template("siwx917_sdk") {
 
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
 
-    cflags = []
-    foreach(include_dir, _include_dirs) {
-      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
-    }
-
     cflags += [
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
@@ -335,23 +334,254 @@ template("siwx917_sdk") {
       "-Wno-unused-function",
     ]
 
-    if (defined(invoker.defines)) {
-      defines += invoker.defines
+    foreach(include_dir, _include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
   }
 
-  source_set("siwx917_mbedtls_config") {
-    # We're setting the mbedTLS config flags here as the siwx917_sdk target
-    # acts as the mbedTLS target for SiWx917 builds. We need this for the build
-    # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
-    # edited.
-    sources = [
-      "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
-    ]
+  assert(chip_crypto == "platform" &&
+             (sl_si91x_crypto_flavor == "tinycrypt" || sl_si91x_crypto_flavor == "psa"),
+         "sl_si91x_crypto_flavor must be tinycrypt or psa")
 
-    public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
+  if (chip_crypto == "platform") {
+    if (sl_si91x_crypto_flavor == "psa") {
+      _mbedtls_root = "${efr32_sdk_root}/util/third_party/mbedtls"
+
+      sl_si91x_psa_crypto_path =
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/"
+
+      config("sl_si91x_psa_crypto_config") {
+        defines = [
+          "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
+          "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=\"siwx917-chip-psa-config.h\"",
+
+          # WISECONNECT 3 SDK
+          "SLI_AEAD_DEVICE_SI91X=1",
+          "SLI_CIPHER_DEVICE_SI91X=1",
+          "SLI_ECDH_DEVICE_SI91X=1",
+          "SLI_MAC_DEVICE_SI91X=1",
+          "SLI_SHA_DEVICE_SI91X=1",
+          "SLI_TRNG_DEVICE_SI91X=1",
+          "SLI_SECURE_KEY_STORAGE_DEVICE_SI91X=1",
+          "SLI_ECDSA_DEVICE_SI91X=1",
+        ]
+
+        include_dirs = [
+          # WISECONNECT 3 SDK
+          "${sl_si91x_psa_crypto_path}/inc",
+          "${sl_si91x_psa_crypto_path}/aes/inc",
+          "${sl_si91x_psa_crypto_path}/aead/inc",
+          "${sl_si91x_psa_crypto_path}/ccm/inc",
+          "${sl_si91x_psa_crypto_path}/hmac/inc",
+          "${sl_si91x_psa_crypto_path}/mac/inc",
+          "${sl_si91x_psa_crypto_path}/sha/inc",
+          "${sl_si91x_psa_crypto_path}/wrap/inc",
+          "${sl_si91x_psa_crypto_path}/trng/inc",
+          "${sl_si91x_psa_crypto_path}/ecdh/inc",
+          "${sl_si91x_psa_crypto_path}/ecdsa/inc",
+          "${sl_si91x_psa_crypto_path}/mac/inc",
+          "${sl_si91x_psa_crypto_path}/gcm/inc",
+
+          # mbedTLS
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/inc",
+          "${efr32_sdk_root}/util/third_party/mbedtls/include",
+          "${efr32_sdk_root}/util/third_party/mbedtls/library",
+        ]
+      }
+
+      source_set("sl_si91x_psa_crypto") {
+        # We're setting the mbedTLS config flags here as the siwx917_sdk target
+        # acts as the mbedTLS target for SiWx917 builds. We need this for the build
+        # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
+        # edited.
+        sources = [
+          "${_mbedtls_root}/include/mbedtls/platform.h",
+          "${_mbedtls_root}/include/mbedtls/version.h",
+          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
+          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-psa-config.h",
+
+          # mbedtls
+          "${_mbedtls_root}/library/aes.c",
+          "${_mbedtls_root}/library/asn1parse.c",
+          "${_mbedtls_root}/library/asn1write.c",
+          "${_mbedtls_root}/library/base64.c",
+          "${_mbedtls_root}/library/bignum.c",
+          "${_mbedtls_root}/library/bignum_core.c",
+          "${_mbedtls_root}/library/ccm.c",
+          "${_mbedtls_root}/library/cipher.c",
+          "${_mbedtls_root}/library/cipher_wrap.c",
+          "${_mbedtls_root}/library/cmac.c",
+          "${_mbedtls_root}/library/constant_time.c",
+          "${_mbedtls_root}/library/ctr_drbg.c",
+          "${_mbedtls_root}/library/ecdh.c",
+          "${_mbedtls_root}/library/ecdsa.c",
+          "${_mbedtls_root}/library/ecjpake.c",
+          "${_mbedtls_root}/library/ecp.c",
+          "${_mbedtls_root}/library/ecp_curves.c",
+          "${_mbedtls_root}/library/entropy.c",
+          "${_mbedtls_root}/library/entropy_poll.c",
+          "${_mbedtls_root}/library/hkdf.c",
+          "${_mbedtls_root}/library/hmac_drbg.c",
+          "${_mbedtls_root}/library/md.c",
+          "${_mbedtls_root}/library/oid.c",
+          "${_mbedtls_root}/library/pem.c",
+          "${_mbedtls_root}/library/pk.c",
+          "${_mbedtls_root}/library/pk_wrap.c",
+          "${_mbedtls_root}/library/pkcs5.c",
+          "${_mbedtls_root}/library/pkparse.c",
+          "${_mbedtls_root}/library/pkwrite.c",
+          "${_mbedtls_root}/library/platform.c",
+          "${_mbedtls_root}/library/platform_util.c",
+          "${_mbedtls_root}/library/psa_crypto.c",
+          "${_mbedtls_root}/library/psa_crypto_aead.c",
+          "${_mbedtls_root}/library/psa_crypto_cipher.c",
+          "${_mbedtls_root}/library/psa_crypto_client.c",
+          "${_mbedtls_root}/library/psa_crypto_driver_wrappers_no_static.c",
+          "${_mbedtls_root}/library/psa_crypto_ecp.c",
+          "${_mbedtls_root}/library/psa_crypto_hash.c",
+          "${_mbedtls_root}/library/psa_crypto_mac.c",
+          "${_mbedtls_root}/library/psa_crypto_rsa.c",
+          "${_mbedtls_root}/library/psa_crypto_se.c",
+          "${_mbedtls_root}/library/psa_crypto_slot_management.c",
+          "${_mbedtls_root}/library/psa_crypto_storage.c",
+          "${_mbedtls_root}/library/psa_util.c",
+          "${_mbedtls_root}/library/sha256.c",
+          "${_mbedtls_root}/library/ssl_cache.c",
+          "${_mbedtls_root}/library/ssl_ciphersuites.c",
+          "${_mbedtls_root}/library/ssl_client.c",
+          "${_mbedtls_root}/library/ssl_cookie.c",
+          "${_mbedtls_root}/library/ssl_msg.c",
+          "${_mbedtls_root}/library/ssl_ticket.c",
+          "${_mbedtls_root}/library/ssl_tls.c",
+          "${_mbedtls_root}/library/ssl_tls12_client.c",
+          "${_mbedtls_root}/library/ssl_tls12_server.c",
+          "${_mbedtls_root}/library/threading.c",
+          "${_mbedtls_root}/library/x509.c",
+          "${_mbedtls_root}/library/x509_create.c",
+          "${_mbedtls_root}/library/x509_crl.c",
+          "${_mbedtls_root}/library/x509_crt.c",
+          "${_mbedtls_root}/library/x509_csr.c",
+          "${_mbedtls_root}/library/x509write_crt.c",
+          "${_mbedtls_root}/library/x509write_csr.c",
+          "${_mbedtls_root}/library/ecp_curves_new.c",
+          "${_mbedtls_root}/library/version.c",
+
+          # GECKO SDK
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/sl_psa_crypto.c",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/sli_psa_crypto.c",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_psa_trng.c",
+
+          # WISECONNECT 3 SDK
+          "${sl_si91x_psa_crypto_path}/aead/src/sl_si91x_psa_aead.c",
+          "${sl_si91x_psa_crypto_path}/aes/src/sl_si91x_aes.c",
+          "${sl_si91x_psa_crypto_path}/aes/src/sl_si91x_psa_aes.c",
+          "${sl_si91x_psa_crypto_path}/ccm/src/sl_si91x_ccm.c",
+          "${sl_si91x_psa_crypto_path}/ecdh/src/sl_si91x_ecdh.c",
+          "${sl_si91x_psa_crypto_path}/ecdh/src/sl_si91x_psa_ecdh.c",
+          "${sl_si91x_psa_crypto_path}/hmac/src/sl_si91x_hmac.c",
+          "${sl_si91x_psa_crypto_path}/mac/src/sl_si91x_psa_mac.c",
+          "${sl_si91x_psa_crypto_path}/sha/src/sl_si91x_psa_sha.c",
+          "${sl_si91x_psa_crypto_path}/sha/src/sl_si91x_sha.c",
+          "${sl_si91x_psa_crypto_path}/src/sli_si91x_crypto_driver_functions.c",
+          "${sl_si91x_psa_crypto_path}/trng/src/sl_si91x_psa_trng.c",
+          "${sl_si91x_psa_crypto_path}/wrap/src/sl_si91x_psa_wrap.c",
+          "${sl_si91x_psa_crypto_path}/wrap/src/sl_si91x_wrap.c",
+          "${sl_si91x_psa_crypto_path}/ecdsa/src/sl_si91x_ecdsa.c",
+          "${sl_si91x_psa_crypto_path}/ecdsa/src/sl_si91x_psa_ecdsa.c",
+          "${sl_si91x_psa_crypto_path}/gcm/src/sl_si91x_gcm.c",
+          ]
+
+        public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
+
+        public_configs = [
+          ":${sdk_target_name}_config",
+          ":sl_si91x_psa_crypto_config",
+        ]
+      }
+    }
+
+    if (sl_si91x_crypto_flavor == "tinycrypt") {
+      _mbedtls_root = "${mbedtls_root}/repo"
+
+      config("siwx917_tinycrypt_config") {
+        defines = [
+          "SL_MBEDTLS_USE_TINYCRYPT",
+          "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
+        ]
+
+        include_dirs = [
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
+          "${_mbedtls_root}/include",
+          "${_mbedtls_root}/library",
+          # GECKO SDK configuration included to be used in autogenerated files
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
+          "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
+        ]
+      }
+
+      source_set("siwx917_tinycrypt") {
+        sources = [
+          # config file
+          "${_mbedtls_root}/include/mbedtls/platform.h",
+          "${_mbedtls_root}/include/mbedtls/version.h",
+          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
+
+          # mbedtls
+          "${_mbedtls_root}/library/aes.c",
+          "${_mbedtls_root}/library/asn1parse.c",
+          "${_mbedtls_root}/library/asn1write.c",
+          "${_mbedtls_root}/library/base64.c",
+          "${_mbedtls_root}/library/bignum.c",
+          "${_mbedtls_root}/library/ccm.c",
+          "${_mbedtls_root}/library/cipher.c",
+          "${_mbedtls_root}/library/cipher_wrap.c",
+          "${_mbedtls_root}/library/constant_time.c",
+          "${_mbedtls_root}/library/ctr_drbg.c",
+          "${_mbedtls_root}/library/ecdh.c",
+          "${_mbedtls_root}/library/ecdsa.c",
+          "${_mbedtls_root}/library/ecp.c",
+          "${_mbedtls_root}/library/ecp_curves.c",
+          "${_mbedtls_root}/library/entropy.c",
+          "${_mbedtls_root}/library/hkdf.c",
+          "${_mbedtls_root}/library/hmac_drbg.c",
+          "${_mbedtls_root}/library/md.c",
+          "${_mbedtls_root}/library/pem.c",
+          "${_mbedtls_root}/library/pkcs5.c",
+          "${_mbedtls_root}/library/platform.c",
+          "${_mbedtls_root}/library/sha256.c",
+          "${_mbedtls_root}/library/sha512.c",
+          "${_mbedtls_root}/library/x509_create.c",
+          "${_mbedtls_root}/library/version.c",
+
+          # tinycrypt
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/error.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/oid.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk_wrap.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkparse.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkwrite.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
+          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
+        ]
+
+        public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
+
+        public_configs = [
+          ":${sdk_target_name}_config",
+          ":siwx917_tinycrypt_config",
+        ]
+      }
+    }
   }
-
   source_set(sdk_target_name) {
     sources = [
       # si91x component
@@ -446,46 +676,9 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/src/sl_si91x_led.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
-      # mbedtls
-      "${chip_root}/third_party/mbedtls/repo/library/aes.c",
-      "${chip_root}/third_party/mbedtls/repo/library/asn1parse.c",
-      "${chip_root}/third_party/mbedtls/repo/library/asn1write.c",
-      "${chip_root}/third_party/mbedtls/repo/library/base64.c",
-      "${chip_root}/third_party/mbedtls/repo/library/bignum.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ccm.c",
-      "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
-      "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
-      "${chip_root}/third_party/mbedtls/repo/library/constant_time.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecdh.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecdsa.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecp.c",
-      "${chip_root}/third_party/mbedtls/repo/library/ecp_curves.c",
-      "${chip_root}/third_party/mbedtls/repo/library/entropy.c",
-      "${chip_root}/third_party/mbedtls/repo/library/hkdf.c",
-      "${chip_root}/third_party/mbedtls/repo/library/hmac_drbg.c",
-      "${chip_root}/third_party/mbedtls/repo/library/md.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pem.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pkcs5.c",
-      "${chip_root}/third_party/mbedtls/repo/library/platform.c",
-      "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
-      "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
+      # STARTUP FILES
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/error.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/oid.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk_wrap.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkparse.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkwrite.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
-      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/src/startup_common_RS1xxxx.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c",
 
@@ -527,29 +720,38 @@ template("siwx917_sdk") {
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_time_period.c",
       ]
     }
+
     public_deps = [
-      ":siwx917_mbedtls_config",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
       "${segger_rtt_root}:segger_rtt_syscalls",
     ]
+    if (chip_crypto == "platform") {
+      if (sl_si91x_crypto_flavor == "tinycrypt") {
+        public_deps += [ ":siwx917_tinycrypt" ]
+      }
+
+      if (sl_si91x_crypto_flavor == "psa") {
+        public_deps += [ ":sl_si91x_psa_crypto" ]
+      }
+    }
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
     }
     if (invoker.enable_dic) {
       sources += [
-        "${chip_root}/third_party/mbedtls/repo/library/debug.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ecjpake.c",
-        "${chip_root}/third_party/mbedtls/repo/library/rsa.c",
-        "${chip_root}/third_party/mbedtls/repo/library/rsa_internal.c",
-        "${chip_root}/third_party/mbedtls/repo/library/sha1.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_ciphersuites.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_cli.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_msg.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_srv.c",
-        "${chip_root}/third_party/mbedtls/repo/library/ssl_tls.c",
-        "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
+        "${_mbedtls_root}/library/ecjpake.c",
+        "${_mbedtls_root}/library/rsa.c",
+        "${_mbedtls_root}/library/rsa_internal.c",
+        "${_mbedtls_root}/library/sha1.c",
+        "${_mbedtls_root}/library/ssl_ciphersuites.c",
+        "${_mbedtls_root}/library/ssl_cli.c",
+        "${_mbedtls_root}/library/ssl_msg.c",
+        "${_mbedtls_root}/library/ssl_srv.c",
+        "${_mbedtls_root}/library/ssl_tls.c",
+        "${_mbedtls_root}/library/x509.c",
+        "${efr32_sdk_build_root}/mqtt/stack/mqtt.c",
       ]
     }
 
