@@ -285,7 +285,6 @@ template("efr32_sdk") {
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
-      "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -309,6 +308,12 @@ template("efr32_sdk") {
 
       #"__STACK_SIZE=0",
     ]
+
+    if(silabs_log_enabled && chip_logging){
+      defines += [ "SILABS_LOG_ENABLED=1" ]
+    } else {
+      defines += [ "SILABS_LOG_ENABLED=0" ]
+    }
 
     # Temporary configuration to enable COAP specific configurations
     if (use_thread_coap_lib) {
