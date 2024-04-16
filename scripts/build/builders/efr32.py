@@ -230,7 +230,7 @@ class Efr32Builder(GnBuilder):
                 ['git', 'describe', '--always', '--dirty', '--exclude', '*']).decode('ascii').strip()
             branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
             self.extra_gn_options.append(
-                'sl_matter_version_str="v1.2-%s-%s"' % (branchName, shortCommitSha))
+                'sl_matter_version_str="v1.3-%s-%s"' % (branchName, shortCommitSha))
         if enable_917_soc:
             if use_rps_extension is False:
                 self.extra_gn_options.append('use_rps_extension=false')
