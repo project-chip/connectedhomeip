@@ -89,7 +89,6 @@ RUN set -x \
     wget \
     git-lfs \
     zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
     && : # last line
 
@@ -119,13 +118,12 @@ RUN case ${TARGETPLATFORM} in \
 
 # Python 3 and PIP
 RUN set -x \
-    && DEBIAN_FRONTEND=noninteractive  apt-get update \
-    && DEBIAN_FRONTEND=noninteractive  apt-get install -y libgirepository1.0-dev \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
+    && DEBIAN_FRONTEND=noninteractive  apt-get install -y \
+    libgirepository1.0-dev \
+    software-properties-common \
     && add-apt-repository universe \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3 get-pip.py \
-    && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 RUN set -x \
@@ -148,9 +146,9 @@ RUN set -x \
     && git clone https://github.com/google/bloaty.git \
     && mkdir -p bloaty/build \
     && cd bloaty/build \
-    && cmake ../ \
-    && make -j8 \
-    && make install \
+    && cmake -G Ninja ../ \
+    && ninja \
+    && ninja install \
     && cd ../.. \
     && rm -rf bloaty \
     && : # last line
@@ -298,5 +296,8 @@ RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
+# PIP requires MASON package compilation, which seems to require a JDK
+RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get install -fy openjdk-8-jdk
 
 RUN pip install --no-cache-dir python_lib/controller/python/chip*.whl
