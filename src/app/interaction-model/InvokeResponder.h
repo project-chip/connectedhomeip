@@ -144,8 +144,10 @@ public:
     CHIP_ERROR Send(const ReplyData & data)
     {
         CHIP_ERROR err = data.Encode(ResponseEncoder(ReplyData::GetCommandId()));
-        LogErrorOnFailure(err);
-        err = mWriter->Complete(err);
+        if (err != CHIP_ERROR_BUFFER_TOO_SMALL) {
+            LogErrorOnFailure(err);
+            err = mWriter->Complete(err);
+        }
         if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
         {
             return err;
