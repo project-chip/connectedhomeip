@@ -23,6 +23,7 @@
 
 #include <ble/Ble.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeInt.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -669,7 +670,10 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     params->attr = &sChipoBleAttributes[kCHIPoBLE_CCC_AttributeIndex];
     params->func = HandleTXIndicated;
     params->data = pBuf->Start();
-    params->len  = static_cast<uint16_t>(pBuf->DataLength());
+    // For BLE, the buffer is capped at UINT16_MAX. Nevertheless, have a verify
+    // check before the cast to uint16_t.
+    VerifyOrExit(CanCastTo<uint16_t>(pBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+    params->len = static_cast<uint16_t>(pBuf->DataLength());
 
     status = bt_gatt_indicate(conId, params);
     VerifyOrExit(status == 0, err = MapErrorZephyr(status));
@@ -848,6 +852,8 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
         return 0;
     }
 
+    // For BLE, the max payload size is limited to UINT16_MAX since the length
+    // field is 2 bytes long. So, the cast to uint16_t should be fine.
     return bt_gatt_attr_read(conId, attr, buf, len, offset, sInstance.c3CharDataBufferHandle->Start(),
                              static_cast<uint16_t>(sInstance.c3CharDataBufferHandle->DataLength()));
 }

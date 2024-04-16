@@ -483,7 +483,7 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
 
     while (!mSendQueue.IsNull())
     {
-        uint32_t bufLen = static_cast<uint32_t>(mSendQueue->DataLength());
+        size_t bufLen = mSendQueue->DataLength();
 
         ssize_t lenSentRaw = send(mSocket, mSendQueue->Start(), bufLen, sendFlags);
 
@@ -496,14 +496,13 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
             break;
         }
 
-        if (lenSentRaw < 0 || bufLen < static_cast<uint32_t>(lenSentRaw))
+        if (lenSentRaw < 0 || bufLen < static_cast<size_t>(lenSentRaw))
         {
             err = CHIP_ERROR_INCORRECT_STATE;
             break;
         }
 
-        // Cast is safe because bufLen is uint32_t.
-        uint32_t lenSent = static_cast<uint32_t>(lenSentRaw);
+        size_t lenSent = static_cast<size_t>(lenSentRaw);
 
         // Mark the connection as being active.
         MarkActive();

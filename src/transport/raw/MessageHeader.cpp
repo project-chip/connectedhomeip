@@ -366,7 +366,7 @@ CHIP_ERROR PacketHeader::EncodeBeforeData(const System::PacketBufferHandle & buf
 
 CHIP_ERROR PayloadHeader::Encode(uint8_t * data, size_t size, uint16_t * encode_size) const
 {
-    VerifyOrReturnError(size >= static_cast<size_t>(EncodeSizeBytes()), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(size >= EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t * p          = data;
     const uint8_t header = mExchangeFlags.Raw();

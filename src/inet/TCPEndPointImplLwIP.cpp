@@ -350,7 +350,7 @@ CHIP_ERROR TCPEndPointImplLwIP::DriveSendingImpl()
             do
             {
                 VerifyOrDie(!startOfUnsent.buffer.IsNull());
-
+                VerifyOrDie(CanCastTo<uint16_t>(startOfUnsent.buffer->DataLength()));
                 uint16_t bufDataLen = static_cast<uint16_t>(startOfUnsent.buffer->DataLength());
 
                 // Get a pointer to the start of unsent data within the first buffer on the unsent queue.
@@ -508,7 +508,7 @@ CHIP_ERROR TCPEndPointImplLwIP::AckReceive(size_t len)
     VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR res = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(len < UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -572,6 +572,7 @@ TCPEndPointImplLwIP::BufferOffset TCPEndPointImplLwIP::FindStartOfUnsent()
     while (leftToSkip > 0)
     {
         VerifyOrDie(!startOfUnsent.buffer.IsNull());
+        VerifyOrDie(CanCastTo<uint16_t>(startOfUnsent.buffer->DataLength()));
         uint16_t bufDataLen = static_cast<uint16_t>(startOfUnsent.buffer->DataLength());
         if (leftToSkip >= bufDataLen)
         {

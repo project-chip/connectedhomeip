@@ -117,8 +117,8 @@ void PacketBuffer::InternalCheck(const PacketBuffer * buffer)
         VerifyOrDieWithMsg(::chip::Platform::MemoryDebugCheckPointer(buffer, buffer->alloc_size + kStructureSize), chipSystemLayer,
                            "invalid packet buffer pointer");
         VerifyOrDieWithMsg(buffer->alloc_size >= buffer->ReservedSize() + buffer->len, chipSystemLayer,
-                           "packet buffer overflow %u < %u+%u", static_cast<uint32_t>(buffer->alloc_size), buffer->ReservedSize(),
-                           static_cast<uint32_t>(buffer->len));
+                           "packet buffer overflow %" PRIu32 " < %" PRIu32 " +%" PRIu32, static_cast<uint32_t>(buffer->alloc_size),
+                           static_cast<uint32_t>(buffer->ReservedSize()), static_cast<uint32_t>(buffer->len));
     }
 }
 #endif // CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
@@ -137,7 +137,7 @@ void PacketBufferHandle::InternalRightSize()
     // Reallocate only if enough space will be saved.
     const uint8_t * const start   = mBuffer->ReserveStart();
     const uint8_t * const payload = mBuffer->Start();
-    const size_t usedSize         = static_cast<size_t>(static_cast<uint32_t>(payload - start) + mBuffer->len);
+    const size_t usedSize         = static_cast<size_t>(payload - start + static_cast<ptrdiff_t>(mBuffer->len));
     if (usedSize + kRightSizingThreshold > mBuffer->alloc_size)
     {
         return;
@@ -204,16 +204,20 @@ void PacketBuffer::SetStart(uint8_t * aNewStart)
         aNewStart = kEnd;
 
     ptrdiff_t lDelta = aNewStart - static_cast<uint8_t *>(this->payload);
-    if (lDelta > static_cast<int32_t>(this->len))
-        lDelta = static_cast<int32_t>(this->len);
+    if (lDelta > 0 && this->len < static_cast<size_t>(lDelta))
+        lDelta = static_cast<ptrdiff_t>(this->len);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    this->len     = static_cast<uint16_t>(static_cast<int32_t>(this->len) - lDelta);
-    this->tot_len = static_cast<uint16_t>(static_cast<int32_t>(this->tot_len) - lDelta);
+    VerifyOrDieWithMsg((static_cast<ptrdiff_t>(this->len) - lDelta) <= UINT16_MAX, chipSystemLayer,
+                       "LwIP buffer length cannot exceed UINT16_MAX");
+    this->len = static_cast<uint16_t>(static_cast<ptrdiff_t>(this->len) - lDelta);
+    VerifyOrDieWithMsg((static_cast<ptrdiff_t>(this->tot_len) - lDelta) <= UINT16_MAX, chipSystemLayer,
+                       "LwIP buffer length cannot exceed UINT16_MAX");
+    this->tot_len = static_cast<uint16_t>(static_cast<ptrdiff_t>(this->tot_len) - lDelta);
 #else
-    this->len     = static_cast<size_t>(static_cast<int32_t>(this->len) - lDelta);
-    this->tot_len = static_cast<size_t>(static_cast<int32_t>(this->tot_len) - lDelta);
-#endif
+    this->len     = static_cast<size_t>(static_cast<ptrdiff_t>(this->len) - lDelta);
+    this->tot_len = static_cast<size_t>(static_cast<ptrdiff_t>(this->tot_len) - lDelta);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     this->payload = aNewStart;
 }
 
@@ -224,17 +228,18 @@ void PacketBuffer::SetDataLength(size_t aNewLen, PacketBuffer * aChainHead)
     if (aNewLen > kMaxDataLen)
         aNewLen = kMaxDataLen;
 
-    int32_t lDelta = static_cast<int32_t>(aNewLen) - static_cast<int32_t>(this->len);
+    ssize_t lDelta = static_cast<ssize_t>(aNewLen) - static_cast<ssize_t>(this->len);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    VerifyOrDieWithMsg(aNewLen < UINT16_MAX, chipSystemLayer, "LwIP buffer length cannot exceed UINT16_MAX");
-    this->len     = static_cast<uint16_t>(aNewLen);
-    this->tot_len = static_cast<uint16_t>(static_cast<int32_t>(this->tot_len) + lDelta);
+    VerifyOrDieWithMsg(aNewLen <= UINT16_MAX, chipSystemLayer, "LwIP buffer length cannot exceed UINT16_MAX");
+    this->len = static_cast<uint16_t>(aNewLen);
+    VerifyOrDieWithMsg((static_cast<ssize_t>(this->tot_len) + lDelta) <= UINT16_MAX, chipSystemLayer,
+                       "LwIP buffer length cannot exceed UINT16_MAX");
+    this->tot_len = static_cast<uint16_t>(static_cast<ssize_t>(this->tot_len) + lDelta);
 #else
     this->len     = aNewLen;
-    this->tot_len = static_cast<size_t>(static_cast<int32_t>(this->tot_len) + lDelta);
-#endif
-
+    this->tot_len = static_cast<size_t>(static_cast<ssize_t>(this->tot_len) + lDelta);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     // SetDataLength is often called after a client finished writing to the buffer,
     // so it's a good time to check for possible corruption.
     Check(this);
@@ -243,9 +248,11 @@ void PacketBuffer::SetDataLength(size_t aNewLen, PacketBuffer * aChainHead)
     {
         Check(aChainHead);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        aChainHead->tot_len = static_cast<uint16_t>(static_cast<int32_t>(aChainHead->tot_len) + lDelta);
+        VerifyOrDieWithMsg((static_cast<ssize_t>(aChainHead->tot_len) + lDelta) <= UINT16_MAX, chipSystemLayer,
+                           "LwIP buffer length cannot exceed UINT16_MAX");
+        aChainHead->tot_len = static_cast<uint16_t>(static_cast<ssize_t>(aChainHead->tot_len) + lDelta);
 #else
-        aChainHead->tot_len = static_cast<size_t>(static_cast<int32_t>(aChainHead->tot_len) + lDelta);
+        aChainHead->tot_len = static_cast<size_t>(static_cast<ssize_t>(aChainHead->tot_len) + lDelta);
 #endif
         aChainHead = aChainHead->ChainedBuffer();
     }
@@ -348,6 +355,8 @@ void PacketBuffer::CompactHead()
         lNextPacket.payload = static_cast<uint8_t *>(lNextPacket.payload) + lMoveLength;
         lAvailLength        = lAvailLength - lMoveLength;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+        VerifyOrDieWithMsg(CanCastTo<uint16_t>(this->len + lMoveLength), chipSystemLayer,
+                           "LwIP buffer length cannot exceed UINT16_MAX");
         this->len           = static_cast<uint16_t>(this->len + lMoveLength);
         lNextPacket.len     = static_cast<uint16_t>(lNextPacket.len - lMoveLength);
         lNextPacket.tot_len = static_cast<uint16_t>(lNextPacket.tot_len - lMoveLength);

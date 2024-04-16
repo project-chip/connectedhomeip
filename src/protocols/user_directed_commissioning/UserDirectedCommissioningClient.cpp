@@ -255,7 +255,7 @@ void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAdd
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    ChipLogProgress(AppServer, "CommissionerDeclaration DataLength()=%u", static_cast<uint16_t>(msg->DataLength()));
+    ChipLogProgress(AppServer, "CommissionerDeclaration DataLength()=%" PRIu32, static_cast<uint32_t>(msg->DataLength()));
 
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
     size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));

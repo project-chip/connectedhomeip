@@ -269,12 +269,12 @@ void TestDupBytes(TLVReader & reader, Tag tag, const uint8_t * expectedVal, uint
     chip::Platform::MemoryFree(val);
 }
 
-void TestBufferContents(const System::PacketBufferHandle & buffer, const uint8_t * expectedVal, uint32_t expectedLen)
+void TestBufferContents(const System::PacketBufferHandle & buffer, const uint8_t * expectedVal, size_t expectedLen)
 {
     System::PacketBufferHandle buf = buffer.Retain();
     while (!buf.IsNull())
     {
-        uint32_t len = static_cast<uint32_t>(buf->DataLength());
+        size_t len = buf->DataLength();
         EXPECT_LE(len, expectedLen);
 
         EXPECT_EQ(memcmp(buf->Start(), expectedVal, len), 0);

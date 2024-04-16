@@ -610,7 +610,7 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 
         ssize_t rcvLen = recvmsg(mSocket, &msgHeader, MSG_DONTWAIT);
 
-        if (rcvLen < 0)
+        if (rcvLen == -1)
         {
             lStatus = CHIP_ERROR_POSIX(errno);
         }

@@ -35,6 +35,7 @@
 
 #include <inet/IPPacketInfo.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 #include "TestInetCommon.h"
 
@@ -259,6 +260,7 @@ static bool HandleDataReceived(const PacketBufferHandle & aBuffer, TransferStats
     // If we are accumulating stats by packet rather than by size,
     // then increment by one (1) rather than the total buffer length.
 
+    VerifyOrReturnError(CanCastTo<uint32_t>(lTotalDataLength), false);
     aStats.mReceive.mActual += ((aStatsByPacket) ? 1 : static_cast<uint32_t>(lTotalDataLength));
 
     return true;

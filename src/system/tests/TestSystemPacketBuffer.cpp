@@ -34,6 +34,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -248,7 +249,7 @@ void TestSystemPacketBuffer::PrepareTestBuffer(BufferConfiguration * config, int
     }
     config->handle->payload = config->payload_ptr;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    VerifyOrDieWithMsg(config->init_len < UINT16_MAX, chipSystemLayer, "Max Length exceeded for LwIP based systems");
+    VerifyOrDieWithMsg(chip::CanCastTo<uint16_t>(config->init_len), chipSystemLayer, "Max Length exceeded for LwIP based systems");
 
     config->handle->len     = static_cast<uint16_t>(config->init_len);
     config->handle->tot_len = static_cast<uint16_t>(config->init_len);
@@ -324,8 +325,8 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNew)
             const pbuf * const pb = TO_LWIP_PBUF(buffer.Get());
             // NOLINTEND(bugprone-casting-through-void)
 
-            EXPECT_EQ(pb->len, 0);
-            EXPECT_EQ(pb->tot_len, 0);
+            EXPECT_EQ(pb->len, static_cast<size_t>(0));
+            EXPECT_EQ(pb->tot_len, static_cast<size_t>(0));
             EXPECT_EQ(pb->next, nullptr);
             EXPECT_EQ(pb->ref, 1);
         }
@@ -412,10 +413,10 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetStart)
 
             EXPECT_EQ(config.handle->payload, verify_start);
 
-            if (verify_start - config.payload_ptr > static_cast<int32_t>(config.init_len))
+            if (verify_start - config.payload_ptr > static_cast<ptrdiff_t>(config.init_len))
             {
                 // Set start to the beginning of payload, right after handle's header.
-                EXPECT_EQ(config.handle->len, 0);
+                EXPECT_EQ(config.handle->len, static_cast<size_t>(0));
             }
             else
             {
@@ -505,8 +506,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetDataLength)
                         EXPECT_EQ(config_2.handle.GetNext(), nullptr);
 
                         EXPECT_EQ(config_1.handle->tot_len,
-                                  static_cast<size_t>(static_cast<int32_t>(config_1.init_len) +
-                                                      static_cast<int32_t>(length) -
+                                  static_cast<size_t>(static_cast<int32_t>(config_1.init_len) + static_cast<int32_t>(length) -
                                                       static_cast<int32_t>(config_2.init_len)));
                     }
                 }
@@ -850,8 +850,8 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckConsumeHead)
             if (length > config.init_len)
             {
                 EXPECT_EQ(config.handle->payload, (config.payload_ptr + config.init_len));
-                EXPECT_EQ(config.handle->len, 0);
-                EXPECT_EQ(config.handle->tot_len, 0);
+                EXPECT_EQ(config.handle->len, static_cast<size_t>(0));
+                EXPECT_EQ(config.handle->tot_len, static_cast<size_t>(0));
             }
             else
             {
@@ -1028,8 +1028,7 @@ TEST_F(TestSystemPacketBuffer, CheckAlignPayload)
                 reserved_size = kAllocSize;
             }
 
-            const uint32_t payload_offset =
-                static_cast<uint32_t>(reinterpret_cast<uintptr_t>(config.handle->Start()) % length);
+            const uint32_t payload_offset = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(config.handle->Start()) % length);
             uint32_t payload_shift        = 0;
             if (payload_offset > 0)
                 payload_shift = static_cast<uint32_t>(length - payload_offset);

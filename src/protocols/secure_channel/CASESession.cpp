@@ -1579,8 +1579,8 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     TLV::TLVReader decryptedDataTlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    const uint8_t * buf   = msg->Start();
-    const uint32_t bufLen = static_cast<uint32_t>(msg->DataLength());
+    const uint8_t * buf = msg->Start();
+    const size_t bufLen = msg->DataLength();
 
     constexpr size_t kCaseOverheadForFutureTbeData = 128;
 

@@ -34,6 +34,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -346,6 +347,7 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
     if (rx_flags.Has(HeaderFlags::kEndMessage))
     {
         // Trim remainder, if any, of the received packet buffer based on sender-specified length of reassembled message.
+        VerifyOrExit(CanCastTo<uint16_t>(mRxBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
         int padding = static_cast<uint16_t>(mRxBuf->DataLength()) - mRxLength;
 
         if (padding > 0)
@@ -426,8 +428,9 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
             return false;
         }
 
-        mTxBuf    = std::move(data);
-        mTxState  = kState_InProgress;
+        mTxBuf   = std::move(data);
+        mTxState = kState_InProgress;
+        VerifyOrReturnError(CanCastTo<uint16_t>(mTxBuf->DataLength()), false);
         mTxLength = static_cast<uint16_t>(mTxBuf->DataLength());
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send whole message:");
