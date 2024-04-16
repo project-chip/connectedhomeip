@@ -696,7 +696,8 @@ discover available endpoints supported by a Casting Player.
 ### Connect to a Casting Player
 
 _{Complete Connection examples: [Linux](linux/simple-app-helper.cpp) |
-[iOS](darwin/TvCasting/TvCasting/MCConnectionExampleViewModel.swift)}_
+[Android](android/App/app/src/main/java/com/matter/casting/ConnectionExampleFragment.java)
+| [iOS](darwin/TvCasting/TvCasting/MCConnectionExampleViewModel.swift)}_
 
 Each `CastingPlayer` object created during
 [Discovery](#discover-casting-players) contains information such as
