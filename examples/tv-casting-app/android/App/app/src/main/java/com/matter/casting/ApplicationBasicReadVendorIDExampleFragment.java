@@ -23,24 +23,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
+import chip.devicecontroller.ChipClusters;
 import com.R;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.core.Endpoint;
 
-import java.util.List;
-import java.util.Optional;
-
-import chip.devicecontroller.ChipClusters;
-
-/** A {@link Fragment} to read the VendorID (from ApplicationBasic cluster) using the TV Casting App. */
+/**
+ * A {@link Fragment} to read the VendorID (from ApplicationBasic cluster) using the TV Casting App.
+ */
 public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
-  private static final String TAG = ApplicationBasicReadVendorIDExampleFragment.class.getSimpleName();
+  private static final String TAG =
+      ApplicationBasicReadVendorIDExampleFragment.class.getSimpleName();
 
   private final CastingPlayer selectedCastingPlayer;
 
@@ -74,9 +70,7 @@ public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
         v -> {
           Endpoint endpoint = EndpointSelectorExample.selectEndpointByVID(selectedCastingPlayer);
           if (endpoint == null) {
-            Log.e(
-                TAG,
-                "No Endpoint with sample vendorID found on CastingPlayer");
+            Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
             return;
           }
 
@@ -92,32 +86,33 @@ public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
 
           // call readVendorIDAttribute on the cluster object while passing in a
           // ChipClusters.IntegerAttributeCallback
-          cluster.readVendorIDAttribute(new ChipClusters.IntegerAttributeCallback() {
-              @Override
-              public void onSuccess(int value) {
+          cluster.readVendorIDAttribute(
+              new ChipClusters.IntegerAttributeCallback() {
+                @Override
+                public void onSuccess(int value) {
                   Log.d(TAG, "ReadVendorID success. Value: " + value);
                   new Handler(Looper.getMainLooper())
-                          .post(
-                                  () -> {
-                                      TextView vendorIdResult = getView().findViewById(R.id.vendorIdResult);
-                                      vendorIdResult.setText(
-                                              "Read VendorID result\nValue: " + value );
-                                  });
-              }
+                      .post(
+                          () -> {
+                            TextView vendorIdResult = getView().findViewById(R.id.vendorIdResult);
+                            vendorIdResult.setText("Read VendorID result\nValue: " + value);
+                          });
+                }
 
-              @Override
-              public void onError(Exception error) {
+                @Override
+                public void onError(Exception error) {
                   Log.e(TAG, "ReadVendorID failure " + error);
                   new Handler(Looper.getMainLooper())
-                          .post(
-                                  () -> {
-                                      TextView vendorIdResult = getView().findViewById(R.id.vendorIdResult);
-                                      vendorIdResult.setText("Read VendorID result\nError: " + error);
-                                  });
-              }
-          });
+                      .post(
+                          () -> {
+                            TextView vendorIdResult = getView().findViewById(R.id.vendorIdResult);
+                            vendorIdResult.setText("Read VendorID result\nError: " + error);
+                          });
+                }
+              });
         };
-    return inflater.inflate(R.layout.fragment_matter_application_basic_read_vendor_id, container, false);
+    return inflater.inflate(
+        R.layout.fragment_matter_application_basic_read_vendor_id, container, false);
   }
 
   @Override
