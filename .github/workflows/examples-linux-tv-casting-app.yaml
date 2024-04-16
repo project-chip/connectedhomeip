@@ -17,7 +17,7 @@ name: Test TV Casting Example
 on:
     push:
         branches-ignore:
-            - 'dependabot/**'
+            - "dependabot/**"
     pull_request:
     merge_group:
 
@@ -63,10 +63,11 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "scripts/examples/gn_build_example.sh examples/tv-casting-app/linux/ out/tv-casting-app"
 
-            - name: Test Discovery between Linux tv-casting-app and Linux tv-app
+            - name: Test casting from Linux tv-casting-app to Linux tv-app
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "python3 ./scripts/tests/run_tv_casting_test.py test-discovery"
+                    "python3 ./scripts/tests/run_tv_casting_test.py test-casting"
+              timeout-minutes: 1
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
