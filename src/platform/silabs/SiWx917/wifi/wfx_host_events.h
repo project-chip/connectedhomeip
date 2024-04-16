@@ -248,6 +248,10 @@ void wfx_ip_changed_notify(int got_ip);
 #if SL_ICD_ENABLED
 sl_status_t wfx_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
 void sl_button_on_change(uint8_t btn, uint8_t btnAction);
+#if SI917_M4_SLEEP_ENABLED
+void invoke_btn_press_event(void);
+bool wfx_is_sleep_ready(void);
+#endif /* SI917_M4_SLEEP_ENABLED */
 #endif /* SL_ICD_ENABLED */
 
 void wfx_ipv6_notify(int got_ip);

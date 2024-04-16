@@ -113,7 +113,11 @@ int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
 int32_t wfx_wifi_rsi_init(void);
 #if SL_ICD_ENABLED
-void sl_wfx_host_si91x_sleep_wakeup();
+#if SI917_M4_SLEEP_ENABLED
+// void sl_wfx_host_si91x_sleep_wakeup();
+void sl_wfx_host_si91x_sleep(uint16_t * sleep_time_ms);
+void vTaskPreSuppressTicksAndSleepProcessing(uint16_t * xExpectedIdleTime);
+#endif /* SI917_M4_SLEEP_ENABLED */
 #if SLI_SI917
 int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_si91x_performance_profile_t sl_si91x_wifi_state);
 #else
