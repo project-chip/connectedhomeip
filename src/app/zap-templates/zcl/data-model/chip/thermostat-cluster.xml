@@ -314,6 +314,18 @@ limitations under the License.
       <feature bit="6" code="LTNE" name="LocalTemperatureNotExposed" summary="Thermostat does not expose the LocalTemperature Value in the LocalTemperature attribute">
         <optionalConform/>
       </feature>
+      <feature bit="7" code="MSC" name="MatterScheduleConfiguration" summary="MatterScheduleConfiguration">
+        <optionalConform/>
+      </feature>
+      <feature bit="8" code="P" name="Presets" summary="Presets">
+        <optionalConform/>
+      </feature>
+      <feature bit="9" code="S" name="Setpoints" summary="Setpoints">
+        <optionalConform/>
+      </feature>
+      <feature bit="10" code="QPS" name="QueuedPresetsSupported" summary="QueuedPresetsSupported">
+        <optionalConform/>
+      </feature>
     </features>
 
     <!-- Attributes -->

@@ -68,5 +68,9 @@ limitations under the License.
     </command>
   </cluster>
 
-
+  <bitmap name="Feature" type="bitmap32">
+     <cluster code="0x0054"/>
+     <field name="NoFeatures" mask="0x0"/>
+     <!-- Feature OnOff with code 0x01 is deprecated -->
+   </bitmap>
 </configurator>

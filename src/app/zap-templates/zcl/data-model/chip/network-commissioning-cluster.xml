@@ -107,6 +107,9 @@ limitations under the License.
             <feature bit="2" code="ET" name="EthernetNetworkInterface" summary="Ethernet related features">
             <optionalConform choice="a"/>
             </feature>
+            <feature bit="3" code="PC" name="PerDeviceCredentials" summary="Device related features">
+            <optionalConform choice="a"/>
+            </feature>
         </features>
 
         <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="int8u" writable="false" optional="false">

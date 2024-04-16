@@ -101,7 +101,7 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="6"/>
 
     <features>
-      <feature bit="0" code="HS" name="Hue/Saturation" summary="Supports color specification via hue/saturation.">
+      <feature bit="0" code="HS" name="Hue And Saturation" summary="Supports color specification via hue/saturation.">
         <optionalConform/>
       </feature>
       <feature bit="1" code="EHUE" name="Enhanced Hue" summary="Enhanced hue is supported.">
