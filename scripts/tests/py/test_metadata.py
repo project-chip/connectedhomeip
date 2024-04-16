@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import tempfile
 import unittest
 from os import path
-import tempfile
 from typing import List
 
 from metadata import Metadata, MetadataReader
