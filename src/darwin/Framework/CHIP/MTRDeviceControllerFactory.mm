@@ -347,11 +347,11 @@ MTR_DIRECT_MEMBERS
 
         // TODO: Allow passing a different keystore implementation via startupParams.
         _keystore = new PersistentStorageOperationalKeystore();
-        SuccessOrExit((err = _keystore->Init(_persistentStorageDelegate)));
+        SuccessOrExit(err = _keystore->Init(_persistentStorageDelegate));
 
         // TODO Allow passing a different opcert store implementation via startupParams.
         _opCertStore = new Credentials::PersistentStorageOpCertStore();
-        SuccessOrExit((err = _opCertStore->Init(_persistentStorageDelegate)));
+        SuccessOrExit(err = _opCertStore->Init(_persistentStorageDelegate));
 
         _productAttestationAuthorityCertificates = [startupParams.productAttestationAuthorityCertificates copy];
         _certificationDeclarationCertificates = [startupParams.certificationDeclarationCertificates copy];
@@ -370,7 +370,7 @@ MTR_DIRECT_MEMBERS
             params.opCertStore = _opCertStore;
             params.certificateValidityPolicy = &_certificateValidityPolicy;
             params.sessionResumptionStorage = _sessionResumptionStorage;
-            SuccessOrExit((err = _controllerFactory->Init(params)));
+            SuccessOrExit(err = _controllerFactory->Init(params));
         }
 
         // This needs to happen after DeviceControllerFactory::Init,
