@@ -40,15 +40,6 @@ limitations under the License.
         <optionalConform/>
       </feature>
     </features>
-
-    <features>
-      <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
-        <optionalConform/>
-      </feature>
-      <feature bit="1" code="RINSE" name="Rinse" summary="Multiple rinse cycles supported">
-        <optionalConform/>
-      </feature>
-    </features>
     
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="array" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>
