@@ -27,8 +27,6 @@
 
 #include <ble/BleConfig.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-
 #include <ble/BtpEngine.h>
 
 #include <lib/support/BufferReader.h>
@@ -576,5 +574,3 @@ void BtpEngine::LogStateDebug() const
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* CONFIG_NETWORK_LAYER_BLE */

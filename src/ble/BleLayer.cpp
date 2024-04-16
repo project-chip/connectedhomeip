@@ -52,8 +52,6 @@
 
 #include <ble/BleConfig.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-
 #include <string.h>
 
 #include <ble/BLEEndPoint.h>
@@ -788,5 +786,3 @@ void BleLayer::OnConnectionError(void * appState, CHIP_ERROR err)
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* CONFIG_NETWORK_LAYER_BLE */

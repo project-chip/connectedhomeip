@@ -30,9 +30,7 @@
 
 #include <ble/BleConfig.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
 #include <lib/core/CHIPConfig.h>
-
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
@@ -1498,5 +1496,3 @@ void BLEEndPoint::HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, vo
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* CONFIG_NETWORK_LAYER_BLE */

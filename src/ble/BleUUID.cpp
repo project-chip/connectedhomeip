@@ -17,8 +17,6 @@
  */
 #include <ble/BleConfig.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-
 #include <cctype>
 #include <cstdint>
 #include <cstring>
@@ -78,5 +76,3 @@ bool StringToUUID(const char * str, ChipBleUUID & uuid)
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* CONFIG_NETWORK_LAYER_BLE */

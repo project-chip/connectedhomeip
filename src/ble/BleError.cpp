@@ -24,9 +24,6 @@
 #include <stddef.h>
 
 #include <ble/BleConfig.h>
-
-#if CONFIG_NETWORK_LAYER_BLE
-
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 
@@ -140,5 +137,3 @@ bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif // CONFIG_NETWORK_LAYER_BLE
