@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,36 +15,39 @@
 import os
 import unittest
 from os import path
+import tempfile
+from typing import List
 
 from metadata import Metadata, MetadataReader
 
 
 class TestMetadataReader(unittest.TestCase):
-    path_under_test = path_under_test = path.join(path.dirname(__file__), "simple_run_args.txt")
+    path_under_test = path.join(path.dirname(__file__), "simple_run_args.txt")
 
     def setUp(self):
-
         # build the reader object
         self.reader = MetadataReader(path.join(path.dirname(__file__), "env_test.yaml"))
-        with open(self.path_under_test, 'w', encoding='utf8') as test_file:
-            test_file.writelines(''' 
-            # test-runner-runs: run1 
-            # test-runner-run/run1: app/all-clusters discriminator KVS storage-path commissioning-method discriminator passcode
-            ''')
+
+    def assertMetadataParse(self, file_content: str, expected: List[Metadata]):
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as fp:
+            fp.write(file_content)
+            fp.close()
+            for e in expected:
+                e.py_script_path = fp.name
+            actual = self.reader.parse_script(fp.name)
+            self.assertEqual(actual, expected)
+
 
     def test_parse_single_run(self):
-
-        expected_runs_metadata = []
-
-        expected_runs_metadata.append(Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-                                               discriminator=1234, py_script_path=self.path_under_test, run="run1", passcode=20202021))
-
-        self.assertEqual(self.reader.parse_script(self.path_under_test), expected_runs_metadata)
-
-    def tearDown(self):
-        if os.path.exists(self.path_under_test):
-            os.remove(self.path_under_test)
-
+        self.assertMetadataParse(''' 
+            # test-runner-runs: run1 
+            # test-runner-run/run1: app/all-clusters discriminator passcode
+            ''',
+            [
+                Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
+                         discriminator=1234, py_script_path=self.path_under_test, run="run1", passcode=20202021)
+            ]
+        )
 
 if __name__ == "__main__":
     unittest.main()
