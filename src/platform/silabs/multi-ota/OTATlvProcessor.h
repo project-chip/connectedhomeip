@@ -24,14 +24,6 @@
 
 namespace chip {
 
-typedef enum
-{
-    APPLICATION = 1,
-    BOOTLOADER = 2,
-    FACTORY_DATA = 3,
-    WIFI_917_TA_M4 = 4,
-} OTAImageType;
-
 #define CHIP_ERROR_TLV_PROCESSOR(e)                                                                                                \
     ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e, __FILE__, __LINE__)
 
@@ -73,9 +65,13 @@ struct OTATlvHeader
 // TLV tags synced with ota files generate by scripts/tools/silabs/ota/ota_image_tool.py
 enum class OTAProcessorTag
 {
-    kApplicationProcessor = 1,
-    kBootloaderProcessor  = 2,
-    kFactoryDataProcessor = 3
+    kApplicationProcessor = 1, 
+    kBootloaderProcessor = 2 ,
+    kFactoryDataProcessor = 3,
+    kWiFiProcessor = 4,
+    kCustomProcessor1 = 8,
+    kCustomProcessor2 = 9,
+    kCustomProcessor3 = 10,
 };
 
 /**
