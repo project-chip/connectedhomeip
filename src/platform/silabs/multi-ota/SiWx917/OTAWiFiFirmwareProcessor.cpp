@@ -148,8 +148,10 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
         ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
+#ifdef SLI_SI91X_MCU_INTERFACE //only for SoC
         // Reboots the device
         sl_si91x_soc_soft_reset();
+#endif
     }
     ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Apply Action completed");
     return CHIP_NO_ERROR;

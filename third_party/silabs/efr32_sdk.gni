@@ -863,6 +863,13 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_event_handler.c",
       "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
     ]
+
+    if (chip_enable_multi_ota_requestor && use_SiWx917) {
+      sources += [
+       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c",
+      ]
+    }
+
     if (enable_dic) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
