@@ -25,7 +25,6 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <app/util/basic-types.h>
 #include <inet/IPAddress.h>
 #include <lib/support/Span.h>

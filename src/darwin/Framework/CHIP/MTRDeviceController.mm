@@ -15,12 +15,7 @@
  *    limitations under the License.
  */
 #import <Matter/MTRDefines.h>
-
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerParameters.h>
-#else
-#import "MTRDeviceControllerParameters_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #import "MTRDeviceController_Internal.h"
 
@@ -169,11 +164,9 @@ using namespace chip::Tracing::DarwinFramework;
             }
 
             id<MTRDeviceControllerStorageDelegate> storageDelegateToUse = storageDelegate;
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
             if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
                 storageDelegateToUse = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:storageDelegate];
             }
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
             _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
                                                                             storageDelegate:storageDelegateToUse
                                                                        storageDelegateQueue:storageDelegateQueue];
@@ -181,7 +174,6 @@ using namespace chip::Tracing::DarwinFramework;
                 return nil;
             }
         } else {
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
             if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
                 dispatch_queue_t localTestStorageQueue = dispatch_queue_create("org.csa-iot.matter.framework.devicecontroller.localteststorage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
                 MTRDeviceControllerLocalTestStorage * localTestStorage = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:nil];
@@ -192,7 +184,6 @@ using namespace chip::Tracing::DarwinFramework;
                     return nil;
                 }
             }
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
         }
 
         // Ensure the otaProviderDelegate, if any, is valid.
@@ -560,7 +551,7 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         errorCode = chip::Credentials::SetSingleIpkEpochKey(
-            _factory.groupData, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
+            _factory.groupDataProvider, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
         if ([self checkForStartError:errorCode logMsg:kErrorIPKInit]) {
             return;
         }
@@ -583,6 +574,20 @@ using namespace chip::Tracing::DarwinFramework;
         MTR_LOG_ERROR("operationalCertificateIssuer and operationalCertificateIssuerQueue must both be nil or both be non-nil");
         [self cleanupAfterStartup];
         return NO;
+    }
+
+    if (_controllerDataStore) {
+        // If the storage delegate supports the bulk read API, then a dictionary of nodeID => cluster data dictionary would be passed to the handler. Otherwise this would be a no-op, and stored attributes for MTRDevice objects will be loaded lazily in -deviceForNodeID:.
+        [_controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
+            MTR_LOG_INFO("Loaded attribute values for %lu nodes from storage for controller uuid %@", static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
+
+            std::lock_guard lock(self->_deviceMapLock);
+            for (NSNumber * nodeID in clusterDataByNode) {
+                NSDictionary * clusterData = clusterDataByNode[nodeID];
+                MTRDevice * device = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:clusterData];
+                MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), device);
+            }
+        }];
     }
 
     return YES;
@@ -928,20 +933,25 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:self];
 }
 
-- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+// If prefetchedClusterData is not provided, load attributes individually from controller data store
+- (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
 {
-    std::lock_guard lock(_deviceMapLock);
-    MTRDevice * deviceToReturn = _nodeIDToDeviceMap[nodeID];
-    if (!deviceToReturn) {
-        deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
-        // If we're not running, don't add the device to our map.  That would
-        // create a cycle that nothing would break.  Just return the device,
-        // which will be in exactly the state it would be in if it were created
-        // while we were running and then we got shut down.
-        if ([self isRunning]) {
-            _nodeIDToDeviceMap[nodeID] = deviceToReturn;
-        }
+    os_unfair_lock_assert_owner(&_deviceMapLock);
 
+    MTRDevice * deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
+    // If we're not running, don't add the device to our map.  That would
+    // create a cycle that nothing would break.  Just return the device,
+    // which will be in exactly the state it would be in if it were created
+    // while we were running and then we got shut down.
+    if ([self isRunning]) {
+        _nodeIDToDeviceMap[nodeID] = deviceToReturn;
+    }
+
+    if (prefetchedClusterData) {
+        if (prefetchedClusterData.count) {
+            [deviceToReturn setClusterData:prefetchedClusterData];
+        }
+    } else {
 #if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
         // Load persisted attributes if they exist.
         NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
@@ -961,6 +971,17 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return deviceToReturn;
 }
 
+- (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
+{
+    std::lock_guard lock(_deviceMapLock);
+    MTRDevice * deviceToReturn = _nodeIDToDeviceMap[nodeID];
+    if (!deviceToReturn) {
+        deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
+    }
+
+    return deviceToReturn;
+}
+
 - (void)removeDevice:(MTRDevice *)device
 {
     std::lock_guard lock(_deviceMapLock);
@@ -973,6 +994,18 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, nodeID.unsignedLongLongValue);
     }
 }
+
+#ifdef DEBUG
+- (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
+{
+    std::lock_guard lock(_deviceMapLock);
+    NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
+    for (NSNumber * nodeID in _nodeIDToDeviceMap) {
+        deviceAttributeCounts[nodeID] = @([_nodeIDToDeviceMap[nodeID] unitTestAttributeCount]);
+    }
+    return deviceAttributeCounts;
+}
+#endif
 
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {

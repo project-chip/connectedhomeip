@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CommandResponseHelper.h>
 
 namespace chip {

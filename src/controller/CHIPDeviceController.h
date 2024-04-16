@@ -956,6 +956,7 @@ private:
     static void OnArmFailSafeExtendedForDeviceAttestation(
         void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error);
+    void HandleDeviceAttestationCompleted();
 
     static void OnICDManagementRegisterClientResponse(
         void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);

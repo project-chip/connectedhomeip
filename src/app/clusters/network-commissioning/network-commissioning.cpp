@@ -22,6 +22,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>

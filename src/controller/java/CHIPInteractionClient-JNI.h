@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Texas Instruments Incorporated
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,9 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Overrides to default OpenThread configuration.
- *
- */
-
 #pragma once
+#include <jni.h>
 
-// Use the TI-supplied default platform configuration for remainder
-#include "openthread-core-cc13x4_26x4-config.h"
+jint AndroidChipInteractionJNI_OnLoad(JavaVM * jvm, void * reserved);
+
+void AndroidChipInteractionJNI_OnUnload(JavaVM * jvm, void * reserved);

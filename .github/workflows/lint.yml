@@ -96,7 +96,6 @@ jobs:
                      --known-failure app/app-platform/ContentAppPlatform.h \
                      --known-failure controller/ExamplePersistentStorage.cpp \
                      --known-failure controller/ExamplePersistentStorage.h \
-                     --known-failure app/AttributeAccessInterface.h \
                      --known-failure app/AttributeAccessToken.h \
                      --known-failure app/CommandHandler.h \
                      --known-failure app/CommandHandlerInterface.h \
@@ -107,11 +106,11 @@ jobs:
                      --known-failure app/reporting/tests/MockReportScheduler.cpp \
                      --known-failure app/reporting/tests/MockReportScheduler.h \
                      --known-failure app/util/attribute-storage.cpp \
-                     --known-failure app/util/attribute-storage.h \
                      --known-failure app/util/attribute-storage-detail.h \
+                     --known-failure app/util/attribute-storage.h \
                      --known-failure app/util/attribute-table.cpp \
-                     --known-failure app/util/attribute-table.h \
                      --known-failure app/util/attribute-table-detail.h \
+                     --known-failure app/util/attribute-table.h \
                      --known-failure app/util/binding-table.cpp \
                      --known-failure app/util/binding-table.h \
                      --known-failure app/util/config.h \
@@ -123,6 +122,7 @@ jobs:
                      --known-failure app/util/generic-callbacks.h \
                      --known-failure app/util/generic-callback-stubs.cpp \
                      --known-failure app/util/im-client-callbacks.h \
+                     --known-failure app/util/IMClusterCommandHandler.h \
                      --known-failure app/util/util.cpp \
                      --known-failure app/util/util.h \
                      --known-failure app/WriteHandler.h \

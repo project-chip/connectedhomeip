@@ -22,7 +22,6 @@
 
 #include "ContentAppAttributeDelegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/util/config.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>

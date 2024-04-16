@@ -145,6 +145,7 @@ source_set("silabs-factory-data-provider") {
 
   public_deps = [
     "${chip_root}/src/credentials",
+    "${chip_root}/src/lib/support",
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/setup_payload",
   ]

@@ -20,6 +20,7 @@
 #include "ConversionUtils.h"
 
 #include "app/clusters/bindings/BindingManager.h"
+#include <app/server/Dnssd.h>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -66,6 +67,10 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
 
     // Add callback to send Content casting commands after commissioning completes
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(this);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     mInited = true;
     return CHIP_NO_ERROR;
@@ -189,10 +194,40 @@ void CastingServer::OnCommissioningSessionEstablishmentStarted()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+void CastingServer::OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
+                                                     chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
+{
+    ChipLogProgress(AppServer, "CastingServer::OnCommissionerDeclarationMessage");
+    // TODO: call a mCommissioningCallbacks
+}
+
 CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner)
 {
     // TODO: expose options to the higher layer
     Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+    if (mUdcCommissionerPasscodeEnabled)
+    {
+        id.SetCommissionerPasscode(true);
+        if (mUdcCommissionerPasscodeReady)
+        {
+            id.SetCommissionerPasscodeReady(true);
+            id.SetInstanceName(mUdcCommissionerPasscodeInstanceName);
+            mUdcCommissionerPasscodeReady = false;
+        }
+        else
+        {
+            CHIP_ERROR err = app::DnssdServer::Instance().GetCommissionableInstanceName(
+                mUdcCommissionerPasscodeInstanceName, sizeof(mUdcCommissionerPasscodeInstanceName));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Failed to get mdns instance name error: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+            else
+            {
+                id.SetInstanceName(mUdcCommissionerPasscodeInstanceName);
+            }
+        }
+    }
     return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner, id);
 }
 

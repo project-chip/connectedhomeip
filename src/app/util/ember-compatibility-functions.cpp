@@ -17,6 +17,7 @@
 #include <app/util/ember-compatibility-functions.h>
 
 #include <access/AccessControl.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteEventPath.h>

@@ -39,7 +39,7 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
@@ -266,11 +266,6 @@ DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & a
 
 namespace chip {
 namespace app {
-
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
-{
-    return nullptr;
-}
 
 EndpointId EnabledEndpointsWithServerCluster::operator*() const
 {

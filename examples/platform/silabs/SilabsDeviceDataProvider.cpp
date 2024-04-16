@@ -18,6 +18,7 @@
 #include "SilabsDeviceDataProvider.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <setup_payload/Base38Encode.h>

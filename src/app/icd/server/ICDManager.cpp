@@ -26,7 +26,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/LockTracker.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <stdlib.h>
 
 namespace {
 enum class ICDTestEventTriggerEvent : uint64_t

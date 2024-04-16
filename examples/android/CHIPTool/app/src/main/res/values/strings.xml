@@ -31,6 +31,8 @@
     <string name="update_device_address_btn_text">Update address</string>
     <string name="update_device_address_failure">Device address update failed: %1$s</string>
     <string name="commissioned_device_id_text">Commissioned Device ID :</string>
+    <string name="icd_interaction_text">ICD Stay Active : </string>
+    <string name="icd_active_duration_hint_text">Duration</string>
 
     <string name="address_commissioning_title_text">Commission with IP address</string>
     <string name="default_discriminator">3840</string>

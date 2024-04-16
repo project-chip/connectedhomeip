@@ -67,7 +67,6 @@
 #endif
 
 using namespace ::chip;
-using namespace ::chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
