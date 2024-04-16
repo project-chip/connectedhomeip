@@ -21,7 +21,6 @@ from metadata import Metadata, MetadataReader
 
 
 class TestMetadataReader(unittest.TestCase):
-    path_under_test = path.join(path.dirname(__file__), "simple_run_args.txt")
 
     def setUp(self):
         # build the reader object
@@ -44,7 +43,7 @@ class TestMetadataReader(unittest.TestCase):
             ''',
             [
                 Metadata(app="out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app",
-                         discriminator=1234, py_script_path=self.path_under_test, run="run1", passcode=20202021)
+                         discriminator=1234, run="run1", passcode=20202021)
             ]
         )
 
