@@ -130,6 +130,9 @@ public:
     /// Complete the given command.
     ///
     /// Automatically handles retries for sending.
+    ///
+    /// Any error returned by this are final and not retriable
+    /// as a retry for CHIP_ERROR_BUFFER_TOO_SMALL is already built in.
     CHIP_ERROR Complete(CHIP_ERROR error)
     {
         VerifyOrReturnError(!mCompleted, CHIP_ERROR_INCORRECT_STATE);
@@ -151,6 +154,8 @@ public:
     /// This version of the send has built-in RETRY and handles
     /// Flush/Complete automatically.
     ///
+    /// Any error returned by this are final and not retriable
+    /// as a retry for CHIP_ERROR_BUFFER_TOO_SMALL is already built in.
     template <typename ReplyData>
     CHIP_ERROR Send(const ReplyData & data)
     {

@@ -97,6 +97,10 @@ public:
     ///    - returning a CHIP_NO_ERROR without reply/reply_async implies a Status::Success reply without data
     ///    - returning a CHIP_*_ERROR implies an error reply (error and data are mutually exclusive)
     ///
+    /// See InvokeReply/AutoCompleteInvokeResponder for details on how to send back replies and expected
+    /// error handling. If you require knowledge if a response was successfully sent, use the underlying
+    /// `reply` object instead of returning an error codes from Invoke.
+    ///
     /// Return codes
     ///   CHIP_IM_GLOBAL_STATUS(code):
     ///       - error codes that are translatable to specific IM codes
