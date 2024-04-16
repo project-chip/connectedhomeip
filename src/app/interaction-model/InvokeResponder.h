@@ -111,18 +111,28 @@ public:
     /// Direct access to flushing replies
     ///
     /// Use this only in conjunction with the other Raw* calls
-    CHIP_ERROR RawFlushPendingReplies() { return mWriter->FlushPendingResponses(); }
+    CHIP_ERROR RawFlushPendingReplies()
+    {
+        mCompleted = false;
+        return mWriter->FlushPendingResponses();
+    }
 
     /// Call "Complete" without the automatic retries.
     ///
     /// Use this in conjunction with the other Raw* calls
-    CHIP_ERROR RawComplete(CHIP_ERROR error) { return mWriter->Complete(error); }
+    CHIP_ERROR RawComplete(CHIP_ERROR error)
+    {
+        VerifyOrReturnError(!mCompleted, CHIP_ERROR_INCORRECT_STATE);
+        mCompleted = true;
+        return mWriter->Complete(error);
+    }
 
     /// Complete the given command.
     ///
     /// Automatically handles retries for sending.
     CHIP_ERROR Complete(CHIP_ERROR error)
     {
+        VerifyOrReturnError(!mCompleted, CHIP_ERROR_INCORRECT_STATE);
         mCompleted     = true;
         CHIP_ERROR err = mWriter->Complete(error);
 
@@ -134,8 +144,6 @@ public:
         // retry once. Failure to flush is permanent.
         ReturnErrorOnFailure(mWriter->FlushPendingResponses());
         return mWriter->Complete(error);
-
-        return err;
     }
 
     /// Sends the specified data structure as a response
@@ -146,6 +154,8 @@ public:
     template <typename ReplyData>
     CHIP_ERROR Send(const ReplyData & data)
     {
+        VerifyOrReturnError(!mCompleted, CHIP_ERROR_INCORRECT_STATE);
+        mCompleted     = true;
         CHIP_ERROR err = data.Encode(ResponseEncoder(ReplyData::GetCommandId()));
         if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
         {
