@@ -180,8 +180,13 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 /**
- * Set the Message Reliability Protocol parameters for all controllers.  This
- * allows control over retransmit delays to account for high-latency networks.
+ * Set the Message Reliability Protocol parameters for all controllers,
+ * including already-running ones.  This allows control over retransmit delays
+ * to account for high-latency networks.
+ *
+ * Since MRP parameters are communicated to peers during session setup, existing
+ * sessions will not be affected when this function is called, but all sessions
+ * established after the call will be.
  *
  * Setting all arguments to nil will reset to the MRP parameters to their
  * default values.
