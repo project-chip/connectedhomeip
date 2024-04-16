@@ -28,6 +28,7 @@
 #import "MTRCommandTimedCheck.h"
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -713,14 +714,34 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
-// Return YES if there's a valid delegate.  As long as we have that, we are
-// responsible for dealing with the subscription bits, and doing read-throughs
-// when we can't establish a subscription won't help things either.
+// Return YES if we are in a state where, apart from communication issues with
+// the device, we will be able to get reports via our subscription.
 - (BOOL)_subscriptionAbleToReport
 {
     std::lock_guard lock(_lock);
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    return (delegate != nil);
+    if (delegate == nil) {
+        // No delegate definitely means no subscription.
+        return NO;
+    }
+
+    // For unit testing only, matching logic in setDelegate
+#ifdef DEBUG
+    id testDelegate = delegate;
+    if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
+        if (![testDelegate unitTestShouldSetUpSubscriptionForDevice:self]) {
+            return NO;
+        }
+    }
+#endif
+
+    // Unfortunately, we currently have no subscriptions over our hacked-up XPC
+    // setup.  Try to detect that situation.
+    if ([_deviceController.class respondsToSelector:@selector(sharedControllerWithID:xpcConnectBlock:)]) {
+        return NO;
+    }
+
+    return YES;
 }
 
 // Notification that read-through was skipped for an attribute read.
