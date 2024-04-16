@@ -42,8 +42,8 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor
 #endif
 
 #if SL_WIFI
-    auto desc = static_cast<chip::OTAWiFiFirmwareProcessor::Descriptor *>(descriptor);
-    ChipLogDetail(SoftwareUpdate, "Descriptor: %ld, %s, %s", desc->version, desc->versionString, desc->buildDate);
+    auto descWiFi = static_cast<chip::OTAWiFiFirmwareProcessor::Descriptor *>(descriptor);
+    ChipLogDetail(SoftwareUpdate, "Descriptor: %ld, %s, %s", descWiFi->version, descWiFi->versionString, descWiFi->buildDate);
 #endif
 
     return CHIP_NO_ERROR;
