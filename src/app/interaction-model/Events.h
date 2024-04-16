@@ -108,7 +108,11 @@ class Events
 public:
     virtual ~Events() = default;
 
-    /// Emits the given event
+    /// Generates the given event.
+    /// 
+    /// Events are generally expected to be sent to subscribed clients and also
+    /// be available for read later until they get overwritten by new events
+    /// that are being generated.
     virtual CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
                                      EventNumber & generatedEventNumber) = 0;
 

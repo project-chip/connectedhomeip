@@ -24,7 +24,7 @@ namespace app {
 namespace InteractionModel {
 
 /// Aids in writing invoke replies:
-///   - Has access to the raw data encoder for response data content (via `ReplyEncoder`)
+///   - Has access to the raw data encoder for response data content (via `ResponseEncoder`)
 ///   - `Complete` handling:
 ///      - MUST be called exactly once
 ///      - called with an error, makes TLV data written to be discarded (Invokes may only either
@@ -47,31 +47,31 @@ public:
     /// if a reply encoding fails due to insufficient buffer.
     ///
     /// Call this if `Complete(...)` returns CHIP_ERROR_BUFFER_TOO_SMALL and try
-    /// again. If reply data is needed, the complete ReplyEncoder + Complete
+    /// again. If reply data is needed, the complete ResponseEncoder + Complete
     /// call chain MUST be re-run.
-    virtual CHIP_ERROR FlushPendingReplies() = 0;
+    virtual CHIP_ERROR FlushPendingResponses() = 0;
 
     /// Reply with a data payload.
     ///
     /// MUST be called at most once per reply.
-    /// Can be called a 2nd time after a `FlushPendingReplies()` call
+    /// Can be called a 2nd time after a `FlushPendingResponses()` call
     ///
-    ///   - replyCommandId must correspond with the data encoded in the returned encoder
+    ///   - responseCommandId must correspond with the data encoded in the returned encoder
     ///   - Complete(CHIP_NO_ERROR) MUST be called to flush the reply
-    virtual DataModel::WrappedStructEncoder & ReplyEncoder(CommandId replyCommandId) = 0;
+    virtual DataModel::WrappedStructEncoder & ResponseEncoder(CommandId responseCommandId) = 0;
 
     /// Signal completing of the reply.
     ///
     /// MUST be called exactly once to signal a reply to be sent.
     /// If this returns CHIP_ERROR_BUFFER_TOO_SMALL, this can be called a 2nd time after
-    /// a FlushPendingReplies.
+    /// a FlushPendingResponses.
     ///
     /// Argument behavior:
     ///  - If an ERROR is given (i.e. NOT CHIP_NO_ERROR) an error response will be given to the
     ///    command.
     ///  - If CHIP_NO_ERROR is given:
-    ///    - if a ReplyEncoder() was called, a data reply will be sent
-    ///    - if no ReplyEncoder() was called, a Success reply will be sent
+    ///    - if a ResponseEncoder() was called, a data reply will be sent
+    ///    - if no ResponseEncoder() was called, a Success reply will be sent
     ///
     /// Returns success/failure state. One error code MUST be handled in particular:
     ///
@@ -103,12 +103,12 @@ public:
     /// Direct access to reply encoding.
     ///
     /// Use this only in conjunction with the other Raw* calls
-    DataModel::WrappedStructEncoder & RawReplyEncoder(CommandId replyCommandId) { return mWriter->ReplyEncoder(replyCommandId); }
+    DataModel::WrappedStructEncoder & RawResponseEncoder(CommandId replyCommandId) { return mWriter->ResponseEncoder(replyCommandId); }
 
     /// Direct access to flushing replies
     ///
     /// Use this only in conjunction with the other Raw* calls
-    CHIP_ERROR RawFlushPendingReplies() { return mWriter->FlushPendingReplies(); }
+    CHIP_ERROR RawFlushPendingReplies() { return mWriter->FlushPendingResponses(); }
 
     /// Call "Complete" without the automatic retries.
     ///
@@ -129,7 +129,7 @@ public:
         }
 
         // retry once. Failure to flush is permanent.
-        ReturnErrorOnFailure(mWriter->FlushPendingReplies());
+        ReturnErrorOnFailure(mWriter->FlushPendingResponses());
         return mWriter->Complete(error);
 
         return err;
@@ -143,7 +143,7 @@ public:
     template <typename ReplyData>
     CHIP_ERROR Send(const ReplyData & data)
     {
-        CHIP_ERROR err = data.Encode(ReplyEncoder(ReplyData::GetCommandId()));
+        CHIP_ERROR err = data.Encode(ResponseEncoder(ReplyData::GetCommandId()));
         LogErrorOnFailure(err);
         err = mWriter->Complete(err);
         if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -152,8 +152,8 @@ public:
         }
 
         // retry once. Failure to flush is permanent.
-        ReturnErrorOnFailure(mWriter->FlushPendingReplies());
-        err = data.Encode(ReplyEncoder(ReplyData::GetCommandId()));
+        ReturnErrorOnFailure(mWriter->FlushPendingResponses());
+        err = data.Encode(ResponseEncoder(ReplyData::GetCommandId()));
         LogErrorOnFailure(err);
         return mWriter->Complete(err);
     }
