@@ -330,15 +330,12 @@ MTR_DIRECT_MEMBERS
         InitializeServerAccessControl();
 
         if (startupParams.hasStorage) {
-            _persistentStorageDelegate = new (std::nothrow) MTRPersistentStorageDelegateBridge(startupParams.storage);
-            VerifyOrExit(_persistentStorageDelegate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+            _persistentStorageDelegate = new MTRPersistentStorageDelegateBridge(startupParams.storage);
             _sessionResumptionStorage = nullptr;
             _usingPerControllerStorage = NO;
         } else {
-            _persistentStorageDelegate = new (std::nothrow) MTRDemuxingStorage(self);
-            VerifyOrExit(_persistentStorageDelegate != nullptr, err = CHIP_ERROR_NO_MEMORY);
-            _sessionResumptionStorage = new (std::nothrow) MTRSessionResumptionStorageBridge(self);
-            VerifyOrExit(_sessionResumptionStorage != nullptr, err = CHIP_ERROR_NO_MEMORY);
+            _persistentStorageDelegate = new MTRDemuxingStorage(self);
+            _sessionResumptionStorage = new MTRSessionResumptionStorageBridge(self);
             _usingPerControllerStorage = YES;
         }
 
@@ -350,12 +347,10 @@ MTR_DIRECT_MEMBERS
 
         // TODO: Allow passing a different keystore implementation via startupParams.
         _keystore = new PersistentStorageOperationalKeystore();
-        VerifyOrExit(_keystore != nullptr, err = CHIP_ERROR_NO_MEMORY);
         SuccessOrExit((err = _keystore->Init(_persistentStorageDelegate)));
 
         // TODO Allow passing a different opcert store implementation via startupParams.
         _opCertStore = new Credentials::PersistentStorageOpCertStore();
-        VerifyOrExit(_opCertStore != nullptr, err = CHIP_ERROR_NO_MEMORY);
         SuccessOrExit((err = _opCertStore->Init(_persistentStorageDelegate)));
 
         _productAttestationAuthorityCertificates = [startupParams.productAttestationAuthorityCertificates copy];
@@ -689,13 +684,8 @@ MTR_DIRECT_MEMBERS
                                                                                                  keystore:self->_keystore
                                                                                      advertiseOperational:self->_advertiseOperational
                                                                                                    params:startupParams];
-                              if (params == nil) {
-                                  fabricError = CHIP_ERROR_NO_MEMORY;
-                              } else {
-                                  params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
-                                  params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
-                              }
-
+                              params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
+                              params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
                               return params;
                           }
                                   error:error];
@@ -745,12 +735,8 @@ MTR_DIRECT_MEMBERS
                                                                                             keystore:self->_keystore
                                                                                 advertiseOperational:self->_advertiseOperational
                                                                                               params:startupParams];
-                              if (params == nil) {
-                                  fabricError = CHIP_ERROR_NO_MEMORY;
-                              } else {
-                                  params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
-                                  params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
-                              }
+                              params.productAttestationAuthorityCertificates = self->_productAttestationAuthorityCertificates;
+                              params.certificationDeclarationCertificates = self->_certificationDeclarationCertificates;
                               return params;
                           }
                                   error:error];

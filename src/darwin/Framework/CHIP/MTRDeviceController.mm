@@ -413,10 +413,6 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
-        if (_cppCommissioner == nullptr) {
-            [self checkForStartError:CHIP_ERROR_NO_MEMORY logMsg:kErrorCommissionerInit];
-            return;
-        }
 
         // nocBuffer might not be used, but if it is it needs to live
         // long enough (until after we are done using
