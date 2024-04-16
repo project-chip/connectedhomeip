@@ -24,7 +24,7 @@ namespace InteractionModel {
 
 /// Handles path attributes for interaction models.
 ///
-/// It allows a user of the class to mark specific parths
+/// It allows a user of the class to mark specific paths
 /// as having changed. The intended use is for some listener to
 /// perform operations as a result of something having changed,
 /// usually by forwarding updates (e.g. in case of subscriptions

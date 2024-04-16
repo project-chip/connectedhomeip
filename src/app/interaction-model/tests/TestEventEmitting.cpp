@@ -115,7 +115,7 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
     ASSERT_EQ(err, CHIP_NO_ERROR);
     ASSERT_EQ(decoded_event.softwareVersion, kFakeSoftwareVersion);
 
-    EventNumber n2 = events->GenerateEvent(event, 1);
+    EventNumber n2 = events->GenerateEvent(event, /* endpointId = */ 1);
     ASSERT_EQ(n2, logOnlyEvents.CurrentEventNumber());
     ASSERT_NE(n1, logOnlyEvents.CurrentEventNumber());
 
@@ -142,7 +142,7 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     ASSERT_EQ(n1, kInvalidEventId);
 
     event.fabricIndex = kTestFabricIndex;
-    n1                = events->GenerateEvent(event, 0 /* EndpointId */);
+    n1                = events->GenerateEvent(event,  /* endpointId = */ 0);
 
     ASSERT_NE(n1, kInvalidEventId);
     ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
