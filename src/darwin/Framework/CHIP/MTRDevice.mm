@@ -2360,8 +2360,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // if needed.
                 if (expectedValue) {
                     MTR_LOG_INFO("%@ report %@ value filtered - expected value still present", self, attributePath);
-                } else
-                {
+                } else {
                     MTR_LOG_INFO("%@ report %@ value filtered - same as read cache", self, attributePath);
                 }
             }
