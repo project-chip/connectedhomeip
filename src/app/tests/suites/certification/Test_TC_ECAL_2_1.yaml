@@ -71,35 +71,28 @@ tests:
       attribute: "StartDate"
       response:
           constraints:
-              type: epoch_s
+              type: date
 
-    - label: "Step 7: TH reads the TimeReference attribute from the DUT"
+    - label: "Step 7: TH reads the CalendarPeriods attribute from the DUT"
       PICS: ECAL.S.A0005
-      command: "readAttribute"
-      attribute: "TimeReference"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 2
-
-    - label: "Step 8: TH reads the CalendarPeriods attribute from the DUT"
-      PICS: ECAL.S.A0006
       command: "readAttribute"
       attribute: "CalendarPeriods"
       response:
           constraints:
               type: list
+              minLength: 1
+              maxLength: 4
 
-    - label: "Step 9: TH reads the SpecialDays attribute from the DUT"
-      PICS: ECAL.S.A0008
+    - label: "Step 8: TH reads the SpecialDays attribute from the DUT"
+      PICS: ECAL.S.A0006
       command: "readAttribute"
       attribute: "SpecialDays"
       response:
           constraints:
               type: list
+              maxLength: 50
 
-    - label: "Step 10: TH reads the CurrentDay attribute from the DUT"
+    - label: "Step 9: TH reads the CurrentDay attribute from the DUT"
       PICS: ECAL.S.A0007
       command: "readAttribute"
       attribute: "CurrentDay"
@@ -107,42 +100,34 @@ tests:
           constraints:
               type: DayStruct
 
-    - label: "Step 11: TH reads the NextDay attribute from the DUT"
-      PICS: ECAL.S.A0009
+    - label: "Step 10: TH reads the NextDay attribute from the DUT"
+      PICS: ECAL.S.A0008
       command: "readAttribute"
       attribute: "NextDay"
       response:
           constraints:
               type: DayStruct
 
-    - label: "Step 12: TH reads the CurrentTransition attribute from the DUT"
-      PICS: ECAL.S.A000A
+    - label: "Step 11: TH reads the CurrentTransition attribute from the DUT"
+      PICS: ECAL.S.A0009
       command: "readAttribute"
       attribute: "CurrentTransition"
       response:
           constraints:
               type: TransitionStruct 
 
-    - label: "Step 13: TH reads the PeakPeriodStatus attribute from the DUT"
-      PICS: ECAL.S.A000B && ECAL.S.F03
+    - label: "Step 12: TH reads the CurrentPeakPeriod attribute from the DUT"
+      PICS: ECAL.S.A000A
       command: "readAttribute"
-      attribute: "PeakPeriodStatus"
+      attribute: "CurrentPeakPeriod"
       response:
           constraints:
-              type: PeakPeriodStatusStruct 
+              type: PeakPeriodStruct 
 
-    - label: "Step 14: TH reads the PeakPeriodStartTime attribute from the DUT"
-      PICS: ECAL.S.A000B && ECAL.S.F03
+    - label: "Step 13: TH reads the NextPeakPeriod attribute from the DUT"
+      PICS: ECAL.S.A000B
       command: "readAttribute"
-      attribute: "PeakPeriodStartTime"
+      attribute: "NextPeakPeriod"
       response:
           constraints:
-              type: epoch_s
-
-    - label: "Step 15: TH reads the PeakPeriodEndTime attribute from the DUT"
-      PICS: ECAL.S.A000D && ECAL.S.F03
-      command: "readAttribute"
-      attribute: "PeakPeriodEndTime"
-      response:
-          constraints:
-              type: epoch_s
+              type: PeakPeriodStruct
