@@ -351,7 +351,10 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     if (aPath.mAttributeId == MockAttributeId(4))
     {
         AttributeEncodeState state = (apEncoderState == nullptr ? AttributeEncodeState() : *apEncoderState);
-        AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, dataVersion, false, state);
+        Access::SubjectDescriptor subject;
+        subject.fabricIndex = aAccessingFabricIndex;
+
+        AttributeValueEncoder valueEncoder(aAttributeReports, subject, aPath, dataVersion, false /* isFabricFiltered */, state);
 
         CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             for (int i = 0; i < 6; i++)

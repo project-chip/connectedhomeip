@@ -49,15 +49,35 @@ constexpr ClusterId kRandomClusterId     = 0xaa;
 constexpr AttributeId kRandomAttributeId = 0xcc;
 constexpr DataVersion kRandomDataVersion = 0x99;
 constexpr FabricIndex kTestFabricIndex   = 1;
+constexpr NodeId kFakeNodeId             = 1;
 constexpr TLV::Tag kFabricIndexTag       = TLV::ContextTag(254);
+
+Access::SubjectDescriptor DescriptorWithFabric(FabricIndex fabricIndex)
+{
+    Access::SubjectDescriptor result;
+
+    result.fabricIndex = fabricIndex;
+    result.subject     = kFakeNodeId;
+
+    if (fabricIndex == kUndefinedFabricIndex)
+    {
+        result.authMode = Access::AuthMode::kCase;
+    }
+    else
+    {
+        result.authMode = Access::AuthMode::kPase;
+    }
+    return result;
+}
 
 template <size_t N>
 struct LimitedTestSetup
 {
     LimitedTestSetup(nlTestSuite * aSuite, const FabricIndex aFabricIndex = kUndefinedFabricIndex,
                      const AttributeEncodeState & aState = AttributeEncodeState()) :
-        encoder(builder, aFabricIndex, ConcreteAttributePath(kRandomEndpointId, kRandomClusterId, kRandomAttributeId),
-                kRandomDataVersion, aFabricIndex != kUndefinedFabricIndex, aState)
+        encoder(builder, DescriptorWithFabric(aFabricIndex),
+                ConcreteAttributePath(kRandomEndpointId, kRandomClusterId, kRandomAttributeId), kRandomDataVersion,
+                aFabricIndex != kUndefinedFabricIndex, aState)
     {
         writer.Init(buf);
         {
