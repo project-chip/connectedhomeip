@@ -61,11 +61,13 @@ Access::SubjectDescriptor DescriptorWithFabric(FabricIndex fabricIndex)
 
     if (fabricIndex == kUndefinedFabricIndex)
     {
-        result.authMode = Access::AuthMode::kCase;
+        // Make it seem somewhat valid: a fabric index is not available in PASE
+        // before AddNOC
+        result.authMode = Access::AuthMode::kPase;
     }
     else
     {
-        result.authMode = Access::AuthMode::kPase;
+        result.authMode = Access::AuthMode::kCase;
     }
     return result;
 }
