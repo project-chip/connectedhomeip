@@ -82,34 +82,40 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 
     while (blockReadOffset < block.size())
     {
-        memcpy(&writeBuffer, block.data(), kAlignmentBytes);
-        blockReadOffset += kAlignmentBytes;
-        if (flag == RPS_HEADER)
+        writeBuffer[writeBufOffset] = *((block.data()) + blockReadOffset);
+        writeBufOffset++;
+        blockReadOffset++;
+        if (writeBufOffset == kAlignmentBytes)
         {
-            // Send RPS header which is received as first chunk
-            status = sl_si91x_fwup_start(writeBuffer);
-            status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
-            flag   = RPS_DATA;
-        }
-        else if (flag == RPS_DATA)
-        {
-            // Send RPS content
-            status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
-            if (status != SL_STATUS_OK)
+            writeBufOffset = 0;
+            
+            if (flag == RPS_HEADER)
             {
-                // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value
-                // should be set to true in HandleProcessBlock
-                if (status == SL_STATUS_FW_UPDATE_DONE)
+                // Send RPS header which is received as first chunk
+                status = sl_si91x_fwup_start(writeBuffer);
+                status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
+                flag   = RPS_DATA;
+            }
+            else if (flag == RPS_DATA)
+            {
+                // Send RPS content
+                status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
+                if (status != SL_STATUS_OK)
                 {
-                    mReset = true;
-                }
-                else
-                {
-                    ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error %ld", status);
-                    // TODO: add this somewhere
-                    // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                    // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
-                    return CHIP_ERROR_CANCELLED;
+                    // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value
+                    // should be set to true in HandleProcessBlock
+                    if (status == SL_STATUS_FW_UPDATE_DONE)
+                    {
+                        mReset = true;
+                    }
+                    else
+                    {
+                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error %ld", status);
+                        // TODO: add this somewhere
+                        // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+                        // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
+                        return CHIP_ERROR_CANCELLED;
+                    }
                 }
             }
         }
