@@ -28,8 +28,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <lib/support/CodeUtils.h>
 #include <gtest/gtest.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 #include <system/SystemClock.h>
 
