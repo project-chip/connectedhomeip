@@ -21,11 +21,10 @@
  *      This file contains functions for working with BLE Layer errors.
  */
 
-#include <stddef.h>
+#define _CHIP_BLE_BLE_H
+#include "BleError.h"
 
-#include <ble/BleConfig.h>
-#include <ble/BleError.h>
-#include <ble/BleLayer.h>
+#include <lib/core/ErrorStr.h>
 
 namespace chip {
 namespace Ble {

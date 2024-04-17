@@ -25,20 +25,29 @@
  *
  */
 
-#include <stdint.h>
-#include <string.h>
+#define _CHIP_BLE_BLE_H
+#include "BLEEndPoint.h"
 
-#include <ble/BleConfig.h>
+#include <cstdint>
+#include <cstring>
+#include <utility>
 
-#include <lib/core/CHIPConfig.h>
 #include <lib/support/BitFlags.h>
-#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
 
-#include <ble/BLEEndPoint.h>
-#include <ble/BleLayer.h>
-#include <ble/BtpEngine.h>
+#include "BleApplicationDelegate.h"
+#include "BleConfig.h"
+#include "BleError.h"
+#include "BleLayer.h"
+#include "BleLayerDelegate.h"
+#include "BlePlatformDelegate.h"
+#include "BleRole.h"
+#include "BleUUID.h"
+#include "BtpEngine.h"
 
 // Define below to enable extremely verbose, BLE end point-specific debug logging.
 #undef CHIP_BLE_END_POINT_DEBUG_LOGGING_ENABLED

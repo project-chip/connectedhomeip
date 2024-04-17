@@ -15,13 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <ble/BleConfig.h>
+
+#define _CHIP_BLE_BLE_H
+#include "BleUUID.h"
 
 #include <cctype>
 #include <cstdint>
 #include <cstring>
-
-#include "BleUUID.h"
 
 namespace chip {
 namespace Ble {
