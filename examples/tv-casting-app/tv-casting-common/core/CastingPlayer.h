@@ -56,13 +56,14 @@ public:
     char deviceName[chip::Dnssd::kMaxDeviceNameLen + 1]                    = {};
     char hostName[chip::Dnssd::kHostNameMaxLength + 1]                     = {};
     char instanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
-    unsigned int numIPs; // number of valid IP addresses
+    unsigned int numIPs; // Number of valid IP addresses
     chip::Inet::IPAddress ipAddresses[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
     chip::Inet::InterfaceId interfaceId;
     uint16_t port;
     uint16_t productId;
     uint16_t vendorId;
     uint32_t deviceType;
+    uint8_t commissionerPasscode = 0; // Indicates whether a CastingPlayer supports the Commissioner-Generated Passcode feature.
 
     chip::NodeId nodeId           = 0;
     chip::FabricIndex fabricIndex = 0;
@@ -112,6 +113,11 @@ public:
      * @return true if this CastingPlayer is connected to the CastingApp
      */
     bool IsConnected() const { return mConnectionState == CASTING_PLAYER_CONNECTED; }
+
+    /**
+     * @return true if this CastingPlayer supports the Commissioner-Generated Passcode feature.
+     */
+    bool IsCommissionerPasscodeSupported() const { return mAttributes.commissionerPasscode != 0; }
 
     /**
      * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new session
@@ -181,6 +187,8 @@ public:
     uint16_t GetVendorId() const { return mAttributes.vendorId; }
 
     uint32_t GetDeviceType() const { return mAttributes.deviceType; }
+
+    uint8_t GetCommissionerPasscode() const { return mAttributes.commissionerPasscode; }
 
     chip::NodeId GetNodeId() const { return mAttributes.nodeId; }
 

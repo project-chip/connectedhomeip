@@ -236,6 +236,7 @@ bool CastingPlayer::ContainsDesiredEndpoint(core::CastingPlayer * cachedCastingP
 
 void CastingPlayer::LogDetail() const
 {
+    ChipLogProgress(AppServer, "CastingPlayer::LogDetail() called");
     if (strlen(mAttributes.id) != 0)
     {
         ChipLogDetail(AppServer, "\tID: %s", mAttributes.id);
@@ -281,6 +282,7 @@ void CastingPlayer::LogDetail() const
     {
         ChipLogDetail(AppServer, "\tDevice Type: %" PRIu32, mAttributes.deviceType);
     }
+    ChipLogDetail(AppServer, "\tCommissioner Passcode feature supported: %u", mAttributes.commissionerPasscode);
     if (mAttributes.nodeId > 0)
     {
         ChipLogDetail(AppServer, "\tNode ID: 0x" ChipLogFormatX64, ChipLogValueX64(mAttributes.nodeId));

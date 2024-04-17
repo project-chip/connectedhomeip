@@ -47,6 +47,7 @@ public class MatterCastingPlayer implements CastingPlayer {
   private int productId;
   private int vendorId;
   private long deviceType;
+  private boolean commissionerPasscodeSupported;
   protected long _cppCastingPlayer;
 
   public MatterCastingPlayer(
@@ -59,7 +60,8 @@ public class MatterCastingPlayer implements CastingPlayer {
       int port,
       int productId,
       int vendorId,
-      long deviceType) {
+      long deviceType,
+      boolean commissionerPasscodeSupported) {
     this.connected = connected;
     this.deviceId = deviceId;
     this.hostName = hostName;
@@ -70,6 +72,7 @@ public class MatterCastingPlayer implements CastingPlayer {
     this.productId = productId;
     this.vendorId = vendorId;
     this.deviceType = deviceType;
+    this.commissionerPasscodeSupported = commissionerPasscodeSupported;
   }
 
   /**
@@ -129,6 +132,11 @@ public class MatterCastingPlayer implements CastingPlayer {
   @Override
   public long getDeviceType() {
     return this.deviceType;
+  }
+
+  @Override
+  public boolean isCommissionerPasscodeSupported() {
+    return this.commissionerPasscodeSupported;
   }
 
   @Override
