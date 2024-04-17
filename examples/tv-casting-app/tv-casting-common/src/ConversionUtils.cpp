@@ -22,7 +22,7 @@ CHIP_ERROR ConvertToDiscoveredNodeData(TargetVideoPlayerInfo * inPlayer, chip::D
 {
     if (inPlayer == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
-    
+
     outDiscNodeData.Set<chip::Dnssd::CommissionNodeData>();
     auto & outNodeData = outDiscNodeData.Get<chip::Dnssd::CommissionNodeData>();
 
