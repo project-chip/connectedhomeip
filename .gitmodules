@@ -318,7 +318,7 @@
 [submodule "third_party/st/STM32CubeWB"]
 	path = third_party/st/STM32CubeWB
 	url = https://github.com/STMicroelectronics/STM32CubeWB.git
-	branch = v1.17.0
+	branch = v1.18.0
 	platforms = stm32
 [submodule "p6/lwip-network-interface-integration"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip-network-interface-integration
