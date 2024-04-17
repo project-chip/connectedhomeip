@@ -379,7 +379,6 @@ void OTAMultiImageProcessorImpl::HandleFinalize(intptr_t context)
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ProcessFinalize()
 {
-    ChipLogProgress(SoftwareUpdate, "OTA MultiImage Processor Implementation");
     for (auto const & pair : this->mProcessorMap)
     {
         pair.second->FinalizeAction();
