@@ -39,7 +39,9 @@ extern "C" {
 #include "sl_bt_stack_config.h"
 #include "sl_bt_stack_init.h"
 #include "timers.h"
+#include <algorithm>
 #include <ble/CHIPBleServiceData.h>
+#include <crypto/RandUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
@@ -106,6 +108,8 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
 
+bd_addr randomizedAddr = { 0 };
+
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -132,6 +136,19 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+
+    if (std::all_of(randomizedAddr.addr, randomizedAddr.addr + (sizeof(randomizedAddr.addr) / sizeof(uint8_t)),
+                    [](uint8_t i) { return i == 0; }))
+    {
+        // Since random address configured, generate one
+        // Copy random value to address. We don't care of the ordering since it's a random value.
+        uint64_t random = Crypto::GetRandU64();
+        memcpy(&randomizedAddr, &random, sizeof(randomizedAddr));
+
+        // Set MSB to 11 to properly - BLE Static Device Address requirement
+        randomizedAddr.addr[5] |= 0xC0;
+    }
+
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
@@ -484,14 +501,13 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
             ChipLogError(DeviceLayer, "sl_bt_advertiser_create_set() failed: %s", ErrorStr(err));
         });
 
-        bd_addr randomizedAddr = {};
-        ret = sl_bt_advertiser_set_random_address(advertising_set_handle, sl_bt_gap_random_resolvable_address, randomizedAddr,
-                                                  &randomizedAddr);
+        ret =
+            sl_bt_advertiser_set_random_address(advertising_set_handle, sl_bt_gap_static_address, randomizedAddr, &randomizedAddr);
         VerifyOrExit(ret == SL_STATUS_OK, {
             err = MapBLEError(ret);
             ChipLogError(DeviceLayer, "sl_bt_advertiser_set_random_address() failed: %s", ErrorStr(err));
         });
-        ChipLogDetail(DeviceLayer, "BLE Resolvable private random address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
+        ChipLogDetail(DeviceLayer, "BLE Static Device Address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
                       randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
                       randomizedAddr.addr[0]);
     }
@@ -625,6 +641,8 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
         ret = sl_bt_advertiser_stop(advertising_set_handle);
+        sl_bt_advertiser_clear_random_address(advertising_set_handle);
+
         sl_bt_advertiser_delete_set(advertising_set_handle);
         advertising_set_handle = 0xff;
         err                    = MapBLEError(ret);
