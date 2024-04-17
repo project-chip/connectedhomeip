@@ -71,11 +71,11 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
 
         {
             ChipDeviceEvent event{ .Type                      = DeviceEventType::kServiceConnectivityChange,
-                                   .ServiceConnectivityChange = {
-                                       .Overall   = { .Result = event.ServiceConnectivityChange.ViaThread.Result },
-                                       .ViaThread = { .Result = (haveServiceConnectivity) ? kConnectivity_Established
-                                                                                          : kConnectivity_Lost } } };
-            CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+                                   .ServiceConnectivityChange = { .ViaThread = { .Result = (haveServiceConnectivity)
+                                                                                     ? kConnectivity_Established
+                                                                                     : kConnectivity_Lost } } };
+            event.ServiceConnectivityChange.Overall.Result = event.ServiceConnectivityChange.ViaThread.Result;
+            CHIP_ERROR status                              = PlatformMgr().PostEvent(&event);
             if (status != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "Failed to post thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
