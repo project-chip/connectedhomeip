@@ -550,10 +550,11 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     {
         const TimeSyncDataProvider::TimeZoneStore & tzStore = GetTimeZone()[0];
         lastTz.offset                                       = tzStore.timeZone.offset;
-        if (tzStore.timeZone.name.HasValue() && sizeof(name) >= sizeof(tzStore.name))
+        chip::MutableCharSpan tempSpan(name, sizeof(name));
+        if (tzStore.timeZone.name.HasValue() &&
+            CHIP_NO_ERROR == CopyCharSpanToMutableCharSpan(tzStore.timeZone.name.Value(), tempSpan))
         {
-            lastTz.name.SetValue(CharSpan(name));
-            memcpy(name, tzStore.name, sizeof(tzStore.name));
+            lastTz.name.SetValue(CharSpan(tempSpan.data(), tempSpan.size()));
         }
     }
 
@@ -654,7 +655,6 @@ CHIP_ERROR TimeSynchronizationServer::ClearTimeZone()
 {
     InitTimeZone();
     ReturnErrorOnFailure(mTimeSyncDataProvider.StoreTimeZone(GetTimeZone()));
-    emitTimeZoneStatusEvent(GetDelegate()->GetEndpoint());
     return CHIP_NO_ERROR;
 }
 
@@ -698,7 +698,7 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
 
     for (i = 0; i < mDstOffsetObj.validSize; i++)
     {
-        const auto & dstItem = GetDSTOffset()[i];
+        const auto & dstItem = mDstOffsetObj.dstOffsetList[i];
         // list should be sorted by validStarting
         // validUntil shall be larger than validStarting
         if (!dstItem.validUntil.IsNull() && dstItem.validStarting >= dstItem.validUntil.Value())
