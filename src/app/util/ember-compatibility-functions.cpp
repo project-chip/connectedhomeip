@@ -430,8 +430,13 @@ CHIP_ERROR ReadViaAccessInterface(SubjectDescriptor subjectDescriptor, bool aIsF
                                   AttributeEncodeState * aEncoderState, AttributeAccessInterface * aAccessInterface,
                                   bool * aTriedEncode)
 {
-    AttributeEncodeState state = (aEncoderState == nullptr ? AttributeEncodeState() : *aEncoderState);
-    DataVersion version        = 0;
+    AttributeEncodeState state;
+    if (aEncoderState != nullptr)
+    {
+        state = *aEncoderState;
+    }
+
+    DataVersion version = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath, version));
     AttributeValueEncoder valueEncoder(aAttributeReports, subjectDescriptor, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
