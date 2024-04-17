@@ -21,13 +21,37 @@
 namespace chip {
 namespace app {
 
-/**
- * Maintains the internal state of list encoding
- */
+/// Maintains the internal state of list encoding
+///
+/// List encoding is generally assumed incremental and chunkable (i.e.
+/// partial encoding is ok.). For this purpose the class maintains two
+/// pieces of data:
+///   - AllowPartialData tracks if partial encoding is acceptable in the
+///     current encoding state (to be used for atomic/non-atomic list item writes)
+///   - CurrentEncodingListIndex representing the list index that is next
+///     to be encoded in the output. kInvalidListIndex means that a new list
+///     encoding has been started.
 class AttributeEncodeState
 {
 public:
     AttributeEncodeState() = default;
+
+    /// Allows the encode state to be initialized from an OPTIONAL
+    /// other encoding state
+    ///
+    /// if other is nullptr, this is the same as the default initializer.
+    AttributeEncodeState(AttributeEncodeState * other)
+    {
+        if (other != nullptr)
+        {
+            *this = *other;
+        }
+        else
+        {
+            mCurrentEncodingListIndex = kInvalidListIndex;
+            mAllowPartialData         = false;
+        }
+    }
 
     bool AllowPartialData() const { return mAllowPartialData; }
     ListIndex CurrentEncodingListIndex() const { return mCurrentEncodingListIndex; }

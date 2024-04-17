@@ -350,11 +350,7 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     // Attribute 4 acts as a large attribute to trigger chunking.
     if (aPath.mAttributeId == MockAttributeId(4))
     {
-        AttributeEncodeState state;
-        if (apEncoderState != nullptr)
-        {
-            state = *apEncoderState;
-        }
+        AttributeEncodeState state(apEncoderState);
         Access::SubjectDescriptor subject;
         subject.fabricIndex = aAccessingFabricIndex;
 

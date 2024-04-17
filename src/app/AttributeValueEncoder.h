@@ -17,8 +17,8 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
-#include <app/AttributeReportBuilder.h>
 #include <app/AttributeEncodeState.h>
+#include <app/AttributeReportBuilder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model/FabricScoped.h>
@@ -141,7 +141,7 @@ public:
         if (err == CHIP_NO_ERROR)
         {
             // The Encode procedure finished without any error, clear the state.
-            mEncodeState = AttributeEncodeState();
+            mEncodeState.Reset();
         }
         return err;
     }

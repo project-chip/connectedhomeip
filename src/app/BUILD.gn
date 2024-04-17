@@ -277,8 +277,8 @@ source_set("events") {
 
 static_library("attribute-access") {
   sources = [
-    "AttributeAccessInterfaceCache.h",
     "AttributeAccessInterface.h",
+    "AttributeAccessInterfaceCache.h",
     "AttributeAccessInterfaceRegistry.cpp",
     "AttributeAccessInterfaceRegistry.h",
     "AttributeEncodeState.h",
