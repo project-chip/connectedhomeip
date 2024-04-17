@@ -68,7 +68,8 @@ public class ContentLauncherLaunchURLExampleFragment extends Fragment {
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     this.launchUrlButtonClickListener =
         v -> {
-          Endpoint endpoint = EndpointSelectorExample.selectEndpointByVID(selectedCastingPlayer);
+          Endpoint endpoint =
+              EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
           if (endpoint == null) {
             Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
             return;

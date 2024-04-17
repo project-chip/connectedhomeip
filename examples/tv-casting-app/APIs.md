@@ -688,7 +688,7 @@ func startDiscovery() {
 }
 ```
 
-Note: You will need to connect with a Casting Player as described below to see
+Note: You will need to connect with a Casting Player as described below to se
 the list of Endpoints that they support. Refer to the
 [Connection](#connect-to-a-casting-player) section for details on how to
 discover available endpoints supported by a Casting Player.
@@ -864,7 +864,7 @@ On Android, it can select an `Endpoint` as shown below.
 ```java
 private static final Integer SAMPLE_ENDPOINT_VID = 65521;
 
-private Endpoint selectEndpoint()
+private Endpoint selectFirstEndpointByVID()
 {
     Endpoint endpoint = null;
     if(selectedCastingPlayer != null)

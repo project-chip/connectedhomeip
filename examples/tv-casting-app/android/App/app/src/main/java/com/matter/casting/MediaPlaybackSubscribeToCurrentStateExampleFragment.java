@@ -70,7 +70,7 @@ public class MediaPlaybackSubscribeToCurrentStateExampleFragment extends Fragmen
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    Endpoint endpoint = EndpointSelectorExample.selectEndpointByVID(selectedCastingPlayer);
+    Endpoint endpoint = EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
     if (endpoint == null) {
       Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
       return inflater.inflate(

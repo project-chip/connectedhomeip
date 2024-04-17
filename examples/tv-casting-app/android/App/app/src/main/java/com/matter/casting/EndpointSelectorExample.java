@@ -10,7 +10,11 @@ public class EndpointSelectorExample {
   private static final String TAG = EndpointSelectorExample.class.getSimpleName();
   private static final Integer SAMPLE_ENDPOINT_VID = 65521;
 
-  public static Endpoint selectEndpointByVID(CastingPlayer selectedCastingPlayer) {
+  /**
+   * Returns the first Endpoint in the list of Endpoints associated with the selectedCastingPlayer
+   * whose VendorID matches the EndpointSelectorExample.SAMPLE_ENDPOINT_VID
+   */
+  public static Endpoint selectFirstEndpointByVID(CastingPlayer selectedCastingPlayer) {
     Endpoint endpoint = null;
     if (selectedCastingPlayer != null) {
       List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();

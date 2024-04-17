@@ -68,7 +68,8 @@ public class ApplicationBasicReadVendorIDExampleFragment extends Fragment {
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     this.readButtonClickListener =
         v -> {
-          Endpoint endpoint = EndpointSelectorExample.selectEndpointByVID(selectedCastingPlayer);
+          Endpoint endpoint =
+              EndpointSelectorExample.selectFirstEndpointByVID(selectedCastingPlayer);
           if (endpoint == null) {
             Log.e(TAG, "No Endpoint with sample vendorID found on CastingPlayer");
             return;
