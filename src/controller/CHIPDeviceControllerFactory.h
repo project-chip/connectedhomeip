@@ -210,7 +210,7 @@ public:
     bool ReleaseSystemState();
 
     // Like RetainSystemState(), but will re-initialize the system state first if necessary.
-    CHIP_ERROR InitAndRetainSystemState();
+    CHIP_ERROR EnsureAndRetainSystemState();
 
     //
     // Retrieve a read-only pointer to the system state object that contains pointers to key stack

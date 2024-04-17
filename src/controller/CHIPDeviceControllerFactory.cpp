@@ -388,7 +388,7 @@ bool DeviceControllerFactory::ReleaseSystemState()
     return mSystemState->Release();
 }
 
-CHIP_ERROR DeviceControllerFactory::InitAndRetainSystemState()
+CHIP_ERROR DeviceControllerFactory::EnsureAndRetainSystemState()
 {
     ReturnErrorOnFailure(ReinitSystemStateIfNecessary());
     RetainSystemState();
