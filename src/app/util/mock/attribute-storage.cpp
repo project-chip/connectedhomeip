@@ -358,7 +358,7 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         Access::SubjectDescriptor subject;
         subject.fabricIndex = aAccessingFabricIndex;
 
-        AttributeValueEncoder valueEncoder(aAttributeReports, subject, aPath, dataVersion, false /* isFabricFiltered */, state);
+        AttributeValueEncoder valueEncoder(aAttributeReports, subject, aPath, dataVersion, /* aIsFabricFiltered = */ false, state);
 
         CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             for (int i = 0; i < 6; i++)
