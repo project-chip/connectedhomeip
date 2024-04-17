@@ -288,11 +288,11 @@ private:
      */
     void EnsureListEnded();
 
-    bool mTriedEncode = false;
     AttributeReportIBs::Builder & mAttributeReportIBsBuilder;
     const Access::SubjectDescriptor mSubjectDescriptor;
     ConcreteDataAttributePath mPath;
     DataVersion mDataVersion;
+    bool mTriedEncode = false;
     bool mIsFabricFiltered = false;
     // mEncodingInitialList is true if we're encoding a list and we have not
     // started chunking it yet, so we're encoding a single attribute report IB
@@ -300,8 +300,8 @@ private:
     bool mEncodingInitialList = false;
     // mEncodedAtLeastOneListItem becomes true once we successfully encode a list item.
     bool mEncodedAtLeastOneListItem = false;
-    AttributeEncodeState mEncodeState;
     ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
+    AttributeEncodeState mEncodeState;
 };
 
 } // namespace app
