@@ -86,8 +86,7 @@ void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::Commissi
 
     chip::Platform::CopyString(attributes.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1, nodeData.deviceName);
     chip::Platform::CopyString(attributes.hostName, chip::Dnssd::kHostNameMaxLength + 1, nodeData.hostName);
-    chip::Platform::CopyString(attributes.instanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1,
-                               nodeData.instanceName);
+    chip::Platform::CopyString(attributes.instanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1, nodeData.instanceName);
 
     attributes.numIPs = (unsigned int) nodeData.numIPs;
     for (unsigned j = 0; j < attributes.numIPs; j++)

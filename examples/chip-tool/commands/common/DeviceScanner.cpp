@@ -64,7 +64,7 @@ void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
     ChipLogProgress(chipTool, "OnNodeDiscovered (MDNS): discriminator: %u, vendorId: %u, productId: %u", discriminator, vendorId,
                     productId);
 
-    auto & resolutionData = (CommonResolutionData &)commissionData;
+    auto & resolutionData = (CommonResolutionData &) commissionData;
 
     auto & instanceData  = mDiscoveredResults[commissionData.instanceName];
     auto & interfaceData = instanceData[resolutionData.interfaceId.GetPlatformInterface()];

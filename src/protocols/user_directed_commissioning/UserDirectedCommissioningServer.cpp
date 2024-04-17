@@ -476,8 +476,7 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
     Dnssd::CommissionNodeData nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
     if (nodeData.numIPs == 0)
     {
-        ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s",
-                     nodeData.instanceName);
+        ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s", nodeData.instanceName);
         return;
     }
     if (nodeData.port == 0)
@@ -501,16 +500,14 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
             if (nodeData.ipAddress[i].IsIPv4())
             {
                 foundV4 = true;
-                client->SetPeerAddress(
-                    chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
+                client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
                 break;
             }
         }
         // use IPv6 as last resort
         if (!foundV4)
         {
-            client->SetPeerAddress(
-                chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
+            client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
         }
 #else  // INET_CONFIG_ENABLE_IPV4
        // if we only support V6, then try to find a v6 address
@@ -520,18 +517,15 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
             if (nodeData.ipAddress[i].IsIPv6())
             {
                 foundV6 = true;
-                client->SetPeerAddress(
-                    chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
+                client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
                 break;
             }
         }
         // last resort, try with what we have
         if (!foundV6)
         {
-            ChipLogError(AppServer, "OnCommissionableNodeFound no v6 returned for instance name=%s",
-                         nodeData.instanceName);
-            client->SetPeerAddress(
-                chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
+            ChipLogError(AppServer, "OnCommissionableNodeFound no v6 returned for instance name=%s", nodeData.instanceName);
+            client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 

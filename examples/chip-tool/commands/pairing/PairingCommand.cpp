@@ -484,7 +484,7 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & 
     // Ignore nodes with closed commissioning window
     VerifyOrReturn(nodeData.commissioningMode != 0);
 
-    auto & resolutionData = (chip::Dnssd::CommonResolutionData &)nodeData;
+    auto & resolutionData = (chip::Dnssd::CommonResolutionData &) nodeData;
 
     const uint16_t port = resolutionData.port;
     char buf[chip::Inet::IPAddress::kMaxStringLength];

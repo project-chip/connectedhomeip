@@ -159,7 +159,8 @@ public:
             case chip::Dnssd::DiscoveryFilterType::kNone:
                 return true;
             case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
-                return browse.filter.code == static_cast<uint64_t>((data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator >> 8) & 0x0F);
+                return browse.filter.code ==
+                    static_cast<uint64_t>((data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator >> 8) & 0x0F);
             case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
                 return browse.filter.code == data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator;
             case chip::Dnssd::DiscoveryFilterType::kVendorId:

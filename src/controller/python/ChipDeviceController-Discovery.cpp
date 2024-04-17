@@ -110,8 +110,7 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         Json::Value jsonVal;
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId,
-                                            sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
         jsonVal["instanceName"]       = dnsSdInfo->instanceName;
@@ -174,8 +173,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
             continue;
         }
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId,
-                                            sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
         ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->instanceName);
@@ -192,8 +190,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
         ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
         if (dnsSdInfo->GetMrpRetryIntervalIdle().HasValue())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u",
-                            dnsSdInfo->GetMrpRetryIntervalIdle().Value().count());
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle().Value().count());
         }
         else
         {
@@ -201,8 +198,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
         }
         if (dnsSdInfo->GetMrpRetryIntervalActive().HasValue())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval active\t%u",
-                            dnsSdInfo->GetMrpRetryIntervalActive().Value().count());
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive().Value().count());
         }
         else
         {
@@ -211,8 +207,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
         if (dnsSdInfo->isICDOperatingAsLIT.HasValue())
         {
-            ChipLogProgress(Discovery, "\tICD is operating as a\t%s",
-                            dnsSdInfo->isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+            ChipLogProgress(Discovery, "\tICD is operating as a\t%s", dnsSdInfo->isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
         }
         for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
         {

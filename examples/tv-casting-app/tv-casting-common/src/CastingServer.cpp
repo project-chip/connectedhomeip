@@ -259,8 +259,8 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::Commission
     // Send User Directed commissioning request
     chip::Inet::IPAddress * ipAddressToUse =
         getIpAddressForUDCRequest(selectedCommissioner->ipAddress, selectedCommissioner->numIPs);
-    ReturnErrorOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-        *ipAddressToUse, selectedCommissioner->port, selectedCommissioner->interfaceId)));
+    ReturnErrorOnFailure(SendUserDirectedCommissioningRequest(
+        chip::Transport::PeerAddress::UDP(*ipAddressToUse, selectedCommissioner->port, selectedCommissioner->interfaceId)));
     mTargetVideoPlayerVendorId   = selectedCommissioner->vendorId;
     mTargetVideoPlayerProductId  = selectedCommissioner->productId;
     mTargetVideoPlayerDeviceType = selectedCommissioner->deviceType;
@@ -269,10 +269,8 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::Commission
     {
         mTargetVideoPlayerIpAddress[i] = selectedCommissioner->ipAddress[i];
     }
-    chip::Platform::CopyString(mTargetVideoPlayerDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
-                               selectedCommissioner->deviceName);
-    chip::Platform::CopyString(mTargetVideoPlayerHostName, chip::Dnssd::kHostNameMaxLength + 1,
-                               selectedCommissioner->hostName);
+    chip::Platform::CopyString(mTargetVideoPlayerDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1, selectedCommissioner->deviceName);
+    chip::Platform::CopyString(mTargetVideoPlayerHostName, chip::Dnssd::kHostNameMaxLength + 1, selectedCommissioner->hostName);
     chip::Platform::CopyString(mTargetVideoPlayerInstanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1,
                                selectedCommissioner->instanceName);
     mTargetVideoPlayerPort = selectedCommissioner->port;

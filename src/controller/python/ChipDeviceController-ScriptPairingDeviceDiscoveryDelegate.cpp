@@ -38,9 +38,8 @@ void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::Commi
     // Stop Mdns discovery.
     mActiveDeviceCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
 
-    Inet::InterfaceId interfaceId =
-        nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId : Inet::InterfaceId::Null();
-    auto peerAddress = Transport::PeerAddress::UDP(nodeData.ipAddress[0], port, interfaceId);
+    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId : Inet::InterfaceId::Null();
+    auto peerAddress              = Transport::PeerAddress::UDP(nodeData.ipAddress[0], port, interfaceId);
 
     RendezvousParameters keyExchangeParams = RendezvousParameters().SetSetupPINCode(mSetupPasscode).SetPeerAddress(peerAddress);
 

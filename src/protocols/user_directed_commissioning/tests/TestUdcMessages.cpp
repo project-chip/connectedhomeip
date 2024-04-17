@@ -89,18 +89,18 @@ void TestUDCServerUserConfirmationProvider(nlTestSuite * inSuite, void * inConte
     Dnssd::DiscoveredNodeData discNodeData1;
     discNodeData1.Set<CommissionNodeData>();
     Dnssd::CommissionNodeData & nodeData1 = discNodeData1.Get<CommissionNodeData>();
-    nodeData1.port         = 5540;
-    nodeData1.ipAddress[0] = address;
-    nodeData1.numIPs       = 1;
+    nodeData1.port                        = 5540;
+    nodeData1.ipAddress[0]                = address;
+    nodeData1.numIPs                      = 1;
     Platform::CopyString(nodeData1.instanceName, instanceName1);
 
     Dnssd::DiscoveredNodeData discNodeData2;
     discNodeData2.Set<CommissionNodeData>();
     Dnssd::CommissionNodeData & nodeData2 = discNodeData2.Get<CommissionNodeData>();
-    nodeData2.port         = 5540;
-    nodeData2.ipAddress[0] = address;
-    nodeData2.numIPs       = 1;
-    nodeData2.longDiscriminator  = disc2;
+    nodeData2.port                        = 5540;
+    nodeData2.ipAddress[0]                = address;
+    nodeData2.numIPs                      = 1;
+    nodeData2.longDiscriminator           = disc2;
     Platform::CopyString(nodeData2.instanceName, instanceName2);
     Platform::CopyString(nodeData2.deviceName, deviceName2);
 

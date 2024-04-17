@@ -352,8 +352,7 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     }
 
     // The advertisement may not include a product id.
-    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.productId) &&
-        mPayloadProductID != nodeData.productId)
+    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.productId) && mPayloadProductID != nodeData.productId)
     {
         ChipLogProgress(Controller, "Discovered device does not match our product id.");
         return false;
@@ -388,7 +387,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
 
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
-    NotifyCommissionableDeviceDiscovered((Dnssd::CommonResolutionData &)nodeData.Get<Dnssd::CommissionNodeData>());
+    NotifyCommissionableDeviceDiscovered((Dnssd::CommonResolutionData &) nodeData.Get<Dnssd::CommissionNodeData>());
 }
 
 void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonResolutionData & resolutionData)

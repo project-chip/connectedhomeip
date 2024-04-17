@@ -26,10 +26,10 @@ CHIP_ERROR ConvertToDiscoveredNodeData(TargetVideoPlayerInfo * inPlayer, chip::D
     outDiscNodeData.Set<chip::Dnssd::CommissionNodeData>();
     auto & outNodeData = outDiscNodeData.Get<chip::Dnssd::CommissionNodeData>();
 
-    outNodeData.vendorId     = inPlayer->GetVendorId();
-    outNodeData.productId    = static_cast<uint16_t>(inPlayer->GetProductId());
-    outNodeData.deviceType   = inPlayer->GetDeviceType();
-    outNodeData.numIPs = inPlayer->GetNumIPs();
+    outNodeData.vendorId   = inPlayer->GetVendorId();
+    outNodeData.productId  = static_cast<uint16_t>(inPlayer->GetProductId());
+    outNodeData.deviceType = inPlayer->GetDeviceType();
+    outNodeData.numIPs     = inPlayer->GetNumIPs();
 
     const chip::Inet::IPAddress * ipAddresses = inPlayer->GetIpAddresses();
     if (ipAddresses != nullptr)

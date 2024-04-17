@@ -124,8 +124,7 @@ static CHIP_ERROR display(bool printHeader)
         else
         {
             streamer_printf(sout, "  Entry %d instanceName=%s host=%s longDiscriminator=%d vendorId=%d productId=%d\r\n", i,
-                            next->instanceName, next->hostName, next->longDiscriminator,
-                            next->vendorId, next->productId);
+                            next->instanceName, next->hostName, next->longDiscriminator, next->vendorId, next->productId);
         }
     }
 

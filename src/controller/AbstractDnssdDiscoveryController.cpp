@@ -30,7 +30,7 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
     VerifyOrReturn(discNodeData.Is<chip::Dnssd::CommissionNodeData>());
 
     auto discoveredNodes = GetDiscoveredNodes();
-    auto & nodeData = discNodeData.Get<chip::Dnssd::CommissionNodeData>();
+    auto & nodeData      = discNodeData.Get<chip::Dnssd::CommissionNodeData>();
     for (auto & discoveredNode : discoveredNodes)
     {
 
@@ -40,8 +40,7 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
         }
         // TODO(#32576) Check if IP address are the same. Must account for `numIPs` in the list of `ipAddress`.
         // Additionally, must NOT assume that the ordering is consistent.
-        if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 &&
-            discoveredNode.port == nodeData.port &&
+        if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 && discoveredNode.port == nodeData.port &&
             discoveredNode.numIPs == nodeData.numIPs)
         {
             discoveredNode = nodeData;
