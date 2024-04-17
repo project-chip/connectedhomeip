@@ -137,15 +137,17 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
+    // Check that an address was not already configured at boot.
+    // This covers the init-shutdown-init case to comply with the BLE address change at boot only requirement
     if (std::all_of(randomizedAddr.addr, randomizedAddr.addr + (sizeof(randomizedAddr.addr) / sizeof(uint8_t)),
                     [](uint8_t i) { return i == 0; }))
     {
-        // Since random address configured, generate one
-        // Copy random value to address. We don't care of the ordering since it's a random value.
+        // Since a random address is not configured, configure one
         uint64_t random = Crypto::GetRandU64();
+        // Copy random value to address. We don't care of the ordering since it's a random value.
         memcpy(&randomizedAddr, &random, sizeof(randomizedAddr));
 
-        // Set MSB to 11 to properly - BLE Static Device Address requirement
+        // Set two MSBs to 11 to properly the address - BLE Static Device Address requirement
         randomizedAddr.addr[5] |= 0xC0;
     }
 
