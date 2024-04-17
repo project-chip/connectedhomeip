@@ -400,7 +400,7 @@ public:
 
     static Server & GetInstance()
     {
-        static Server* sServer = new Server();
+        static Server sServer = new Server();
         return *sServer;
     }
 
