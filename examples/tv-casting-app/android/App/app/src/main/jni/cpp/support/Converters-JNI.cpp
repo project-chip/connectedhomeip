@@ -25,6 +25,30 @@ namespace support {
 
 using namespace chip;
 
+jobject convertLongFromCppToJava(jlong value)
+{
+    ChipLogProgress(AppServer, "convertLongFromCppToJava called");
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, nullptr, ChipLogError(AppServer, "Could not get JNIEnv for current thread"));
+
+    jclass responseTypeClass = env->FindClass("java/lang/Long");
+    if (responseTypeClass == nullptr)
+    {
+        ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+        env->ExceptionClear();
+        return nullptr;
+    }
+
+    jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(J)V");
+    if (constructor == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to access Long constructor");
+        env->ExceptionClear();
+        return nullptr;
+    }
+    return env->NewObject(responseTypeClass, constructor, value);
+}
+
 jobject convertMatterErrorFromCppToJava(CHIP_ERROR inErr)
 {
     ChipLogProgress(AppServer, "convertMatterErrorFromCppToJava() called");
