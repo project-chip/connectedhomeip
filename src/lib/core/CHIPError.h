@@ -166,7 +166,8 @@ public:
 #else
     constexpr ChipError(SdkPart part, uint8_t code) : mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0) {}
     constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line) :
-        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line){}
+        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+    {}
 #endif // __cplusplus >= 202002L
 
     /**
@@ -195,9 +196,7 @@ public:
         mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
     {}
 #else
-        explicit constexpr ChipError(StorageType error) : mError(error) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0)
-    {
-    }
+    explicit constexpr ChipError(StorageType error) : mError(error) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0) {}
     explicit constexpr ChipError(StorageType error, const char * file, unsigned int line) :
         mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
     {}
