@@ -14,12 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import subprocess
 import sys
 import time
 
 import click
+
+# Configure logging format.
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s - %(message)s')
 
 LINUX_TV_APP_LOGS = './scripts/tests/Linux-tv-app-logs.txt'
 LINUX_TV_CASTING_APP_LOGS = './scripts/tests/Linux-tv-casting-app-logs.txt'
@@ -33,28 +37,31 @@ DEVICE_TYPE = 35
 
 # Dump the logs to the console in the case of an error.
 def dump_logs_to_console(log_file):
+
     if log_file == LINUX_TV_CASTING_APP_LOGS:
-        print('Dumping Linux TV Casting App Logs to Console.')
+        logging.debug('Dumping Linux TV Casting App Logs to Console.')
     elif log_file == LINUX_TV_APP_LOGS:
-        print('Dumping Linux TV App Logs to Console.')
+        logging.debug('Dumping Linux TV App Logs to Console.')
 
     with open(log_file, 'r') as file:
         logs = file.read()
-        print(logs)
+        logging.debug(logs)
 
 
 # Remove the log files once the script is done running.
 def remove_log_file(log_file):
+
     if os.path.exists(log_file):
         os.remove(log_file)
     else:
-        print("The file does not exist.")
+        logging.error('The file does not exist.')
 
 
 # Whenever a failure is discovered, we should print 'Discovery failed!',
 # dump the logs, clean up the log files, exit on error.
 def handle_discovery_failure():
-    print('Discovery failed!\n')
+
+    logging.error('Discovery failed!\n')
 
     dump_logs_to_console(LINUX_TV_CASTING_APP_LOGS)
     dump_logs_to_console(LINUX_TV_APP_LOGS)
@@ -67,7 +74,8 @@ def handle_discovery_failure():
 
 # Helper function to extract the integer value from a string.
 def extract_value_from_string(line):
-    value = line.split(":")[-1].strip().replace('\x1b[0m', '')
+
+    value = line.split(':')[-1].strip().replace('\x1b[0m', '')
     value = int(value)
 
     return value
@@ -76,21 +84,30 @@ def extract_value_from_string(line):
 # Check if the discovered value matches the expected value.
 # Returns False if the value does not match, True otherwise.
 def validate_value(expected_value, line, value_name):
+
     # Extract the integer value from the string
     value = extract_value_from_string(line)
 
     # If the discovered value does not match the expected value,
     # print the error and return False.
     if value != expected_value:
-        print(f'{value_name} does not match the expected value!')
-        print(f'Expected {value_name}: {expected_value}')
+        logging.error(f'{value_name} does not match the expected value!')
+        logging.error(f'Expected {value_name}: {expected_value}')
         line = line.rstrip('\n')
-        print(line)
+        logging.error(line)
 
         return False
 
     # Return True if the value matches the expected value
     return True
+
+
+# Tear down the processes once done running.
+def tear_down(processes):
+
+    for process in processes:
+        process.terminate()
+        process.wait()
 
 
 # Test if the Linux tv-casting-app is able to discover the Linux tv-app.
@@ -121,17 +138,20 @@ def test_discovery_fn():
 
         # Read the output as we get it from the tv-casting-app process
         for line in tv_casting_app_process.stdout:
+
             # Write the line to the Linux tv-casting-app log file
             fd2.write(line)
 
             # Fail fast if "No commissioner discovered" string found
             if "No commissioner discovered" in line:
+
                 line = line.rstrip('\n')
-                print(line)
+                logging.error(line)
                 handle_discovery_failure()
 
             # Look for 'Discovered Commissioner'
             if "Discovered Commissioner" in line:
+
                 line = line.rstrip('\n')
                 valid_discovered_commissioner_str = line
 
@@ -192,11 +212,12 @@ def test_discovery_fn():
                 # We only print the discovered commissioner that has valid vendor id, product id,
                 # and device type. Remove the log files once done.
                 if valid_vendor_id and valid_product_id and valid_device_type:
-                    print(valid_discovered_commissioner_str)
-                    print(valid_vendor_id_str)
-                    print(valid_product_id_str)
-                    print(valid_device_type_str)
-                    print('Discovery success!')
+
+                    logging.info(valid_discovered_commissioner_str)
+                    logging.info(valid_vendor_id_str)
+                    logging.info(valid_product_id_str)
+                    logging.info(valid_device_type_str)
+                    logging.info('Discovery success!')
 
                     remove_log_file(LINUX_TV_CASTING_APP_LOGS)
                     remove_log_file(LINUX_TV_APP_LOGS)
@@ -204,11 +225,7 @@ def test_discovery_fn():
                     break
 
         # Tear down the processes.
-        tv_app_process.terminate()
-        tv_app_process.wait()
-
-        tv_casting_app_process.terminate()
-        tv_casting_app_process.wait()
+        tear_down([tv_app_process, tv_casting_app_process])
 
 
 @click.group()
