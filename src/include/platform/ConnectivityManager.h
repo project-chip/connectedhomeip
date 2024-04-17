@@ -138,8 +138,9 @@ public:
 
     enum BLEAdvertisingMode
     {
-        kFastAdvertising = 0,
-        kSlowAdvertising = 1,
+        kFastAdvertising     = 0,
+        kSlowAdvertising     = 1,
+        kExtendedAdvertising = 2,
     };
 
     enum class SEDIntervalMode
