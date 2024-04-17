@@ -31,9 +31,8 @@
 #if CONFIG_BT_NIMBLE_ENABLED
 
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #endif
-#include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>

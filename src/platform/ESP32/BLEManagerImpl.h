@@ -68,8 +68,7 @@ struct ble_gatt_char_context
 
 #include "ble/Ble.h"
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-#include <ble/BleLayer.h>
-#include <ble/BleUUID.h>
+#include <ble/Ble.h>
 #include <platform/ESP32/ChipDeviceScanner.h>
 #endif
 
