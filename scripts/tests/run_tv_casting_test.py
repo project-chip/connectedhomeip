@@ -85,7 +85,7 @@ def extract_value_from_string(line):
 # Returns False if the value does not match, True otherwise.
 def validate_value(expected_value, line, value_name):
 
-    # Extract the integer value from the string
+    # Extract the integer value from the string.
     value = extract_value_from_string(line)
 
     # If the discovered value does not match the expected value,
@@ -98,7 +98,7 @@ def validate_value(expected_value, line, value_name):
 
         return False
 
-    # Return True if the value matches the expected value
+    # Return True if the value matches the expected value.
     return True
 
 
@@ -119,46 +119,46 @@ def test_discovery_fn():
 
     with open(LINUX_TV_APP_LOGS, 'w') as fd1, open(LINUX_TV_CASTING_APP_LOGS, 'w') as fd2:
 
-        # Run the Linux tv-app and write the output to file
+        # Run the Linux tv-app and write the output to file.
         tv_app_rel_path = 'out/tv-app/chip-tv-app'
         tv_app_abs_path = os.path.abspath(tv_app_rel_path)
         tv_app_process = subprocess.Popen(tv_app_abs_path, stdout=fd1, stderr=subprocess.PIPE, text=True)
 
         time.sleep(RUN_INTERVAL)
 
-        # Run the Linux tv-casting-app
+        # Run the Linux tv-casting-app.
         tv_casting_app_rel_path = 'out/tv-casting-app/chip-tv-casting-app'
         tv_casting_app_abs_path = os.path.abspath(tv_casting_app_rel_path)
         tv_casting_app_process = subprocess.Popen(
             tv_casting_app_abs_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-        # Initialize variables
+        # Initialize variables.
         continue_parsing = False
         valid_discovered_commissioner_str = ''
 
-        # Read the output as we get it from the tv-casting-app process
+        # Read the output as we get it from the tv-casting-app process.
         for line in tv_casting_app_process.stdout:
 
-            # Write the line to the Linux tv-casting-app log file
+            # Write the line to the Linux tv-casting-app log file.
             fd2.write(line)
 
-            # Fail fast if "No commissioner discovered" string found
+            # Fail fast if "No commissioner discovered" string found.
             if "No commissioner discovered" in line:
 
                 line = line.rstrip('\n')
                 logging.error(line)
                 handle_discovery_failure()
 
-            # Look for 'Discovered Commissioner'
+            # Look for 'Discovered Commissioner'.
             if "Discovered Commissioner" in line:
 
                 line = line.rstrip('\n')
                 valid_discovered_commissioner_str = line
 
-                # Continue parsing the content that belongs to the "Discovered Commissioner"
+                # Continue parsing the content that belongs to the "Discovered Commissioner".
                 continue_parsing = True
 
-                # Initialize variables to store the information of interest
+                # Initialize variables to store the information of interest.
                 valid_vendor_id = False
                 valid_product_id = False
                 valid_device_type = False
@@ -169,7 +169,7 @@ def test_discovery_fn():
 
             if continue_parsing:
 
-                # Check if the Vendor ID, Product ID, and Device Type match the expected values
+                # Check if the Vendor ID, Product ID, and Device Type match the expected values.
                 if "Vendor ID:" in line:
 
                     # If the value of the Vendor ID does not match the expected value, then
