@@ -191,6 +191,9 @@ private:
 #endif
     static int SaveIntKeysToFS(void);
     static int SaveStringKeysToFS(void);
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+    static CHIP_ERROR InitStorageWearStats(void);
+#endif
 };
 
 } // namespace Internal
