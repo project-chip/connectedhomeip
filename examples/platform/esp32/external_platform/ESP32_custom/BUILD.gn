@@ -29,6 +29,7 @@ declare_args() {
   chip_bt_bluedroid_enabled = true
   chip_max_discovered_ip_addresses = 5
   chip_enable_route_hook = false
+  chip_max_device_name_len = 32
 }
 
 buildconfig_header("custom_buildconfig") {
@@ -61,6 +62,7 @@ buildconfig_header("custom_buildconfig") {
     "EXTERNAL_PLATFORMMANAGERIMPL_HEADER=<external_platform/ESP32_custom/PlatformManagerImpl.h>",
     "CHIP_CONFIG_SOFTWARE_VERSION_NUMBER=${chip_config_software_version_number}",
     "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}",
+    "CHIP_DEVICE_CONFIG_MAX_DEVICE_NAME_LEN=${chip_max_device_name_len}",
   ]
 
   if (chip_enable_ota_requestor) {
