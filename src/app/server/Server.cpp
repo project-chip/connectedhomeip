@@ -87,6 +87,8 @@ public:
 
 namespace chip {
 
+Server Server::sServer;
+
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_NUM_EVENT_LOGGING_BUFFERS 3
 static uint8_t sInfoEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE];
