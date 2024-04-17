@@ -40,7 +40,7 @@ public:
     /// other encoding state
     ///
     /// if other is nullptr, this is the same as the default initializer.
-    AttributeEncodeState(AttributeEncodeState * other)
+    AttributeEncodeState(const AttributeEncodeState * other)
     {
         if (other != nullptr)
         {
