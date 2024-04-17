@@ -41,17 +41,6 @@ using chip::Dnssd::TextEntry;
 
 namespace {
 
-struct DnssdContext
-{
-    std::atomic<bool> mTimeoutExpired{ false };
-
-    intptr_t mBrowseIdentifier = 0;
-
-    unsigned int mBrowsedServicesCount  = 0;
-    unsigned int mResolvedServicesCount = 0;
-    bool mEndOfInput                    = false;
-};
-
 class TestDnssdResolveServerDelegate : public mdns::Minimal::ServerDelegate, public mdns::Minimal::ParserDelegate
 {
 public:
@@ -96,11 +85,19 @@ public: // protected
         chip::DeviceLayer::PlatformMgr().Shutdown();
         chip::Platform::MemoryShutdown();
     }
+
+    std::atomic<bool> mTimeoutExpired{ false };
+
+    intptr_t mBrowseIdentifier = 0;
+
+    unsigned int mBrowsedServicesCount  = 0;
+    unsigned int mResolvedServicesCount = 0;
+    bool mEndOfInput                    = false;
 };
 
 static void Timeout(chip::System::Layer * systemLayer, void * context)
 {
-    auto * ctx = static_cast<DnssdContext *>(context);
+    auto * ctx = static_cast<TestDnssd *>(context);
     ChipLogError(DeviceLayer, "mDNS test timeout, is avahi daemon running?");
     ctx->mTimeoutExpired = true;
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
@@ -109,15 +106,11 @@ static void Timeout(chip::System::Layer * systemLayer, void * context)
 static void HandleResolve(void * context, DnssdService * result, const chip::Span<chip::Inet::IPAddress> & addresses,
                           CHIP_ERROR error)
 {
-    auto * ctx = static_cast<DnssdContext *>(context);
+    auto * ctx = static_cast<TestDnssd *>(context);
     char addrBuf[100];
 
-    ASSERT_NE(result, nullptr);
+    EXPECT_NE(result, nullptr);
     EXPECT_EQ(error, CHIP_NO_ERROR);
-
-    // The NL_TEST_ASSERT above will not abort the test, so we need to
-    // explicitly abort it here to avoid dereferencing a null pointer.
-    VerifyOrReturn(result != nullptr, );
 
     if (!addresses.empty())
     {
@@ -147,7 +140,7 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
 
 static void HandleBrowse(void * context, DnssdService * services, size_t servicesSize, bool finalBrowse, CHIP_ERROR error)
 {
-    auto * ctx   = static_cast<DnssdContext *>(context);
+    auto * ctx = static_cast<TestDnssd *>(context);
 
     // Make sure that we will not be called again after end-of-input is set
     EXPECT_EQ(ctx->mEndOfInput, false);
@@ -177,7 +170,7 @@ static void DnssdErrorCallback(void * context, CHIP_ERROR error)
 
 void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
 {
-    auto * ctx = static_cast<DnssdContext *>(context);
+    auto * ctx = static_cast<TestDnssd *>(context);
     EXPECT_EQ(error, CHIP_NO_ERROR);
 
     EXPECT_EQ(ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolUdp, chip::Inet::IPAddressType::kAny,
@@ -194,8 +187,6 @@ void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
 // services by querying for all of these records separately.
 TEST_F(TestDnssd, TestDnssdBrowse)
 {
-    DnssdContext context;
-
     mdns::Minimal::SetDefaultAddressPolicy();
 
     mdns::Minimal::Server<10> server;
@@ -236,18 +227,18 @@ TEST_F(TestDnssd, TestDnssdBrowse)
     auto endpoints = mdns::Minimal::GetAddressPolicy()->GetListenEndpoints();
     EXPECT_EQ(server.Listen(chip::DeviceLayer::UDPEndPointManager(), endpoints.get(), 5353), CHIP_NO_ERROR);
 
-    EXPECT_EQ(chip::Dnssd::ChipDnssdInit(TestDnssdBrowse_DnssdInitCallback, DnssdErrorCallback, &context), CHIP_NO_ERROR);
-    EXPECT_EQ(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(5), Timeout, &context), CHIP_NO_ERROR);
+    EXPECT_EQ(chip::Dnssd::ChipDnssdInit(TestDnssdBrowse_DnssdInitCallback, DnssdErrorCallback, this), CHIP_NO_ERROR);
+    EXPECT_EQ(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(5), Timeout, this), CHIP_NO_ERROR);
 
     ChipLogProgress(DeviceLayer, "Start EventLoop");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     ChipLogProgress(DeviceLayer, "End EventLoop");
 
-    EXPECT_TRUE(context.mResolvedServicesCount > 0);
-    EXPECT_TRUE(!context.mTimeoutExpired);
+    EXPECT_GT(mResolvedServicesCount, 0);
+    EXPECT_FALSE(mTimeoutExpired);
 
     // Stop browsing so we can safely shutdown DNS-SD
-    chip::Dnssd::ChipDnssdStopBrowse(context.mBrowseIdentifier);
+    chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
 
     chip::Dnssd::ChipDnssdShutdown();
 }
@@ -259,7 +250,7 @@ static void HandlePublish(void * context, const char * type, const char * instan
 
 static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR error)
 {
-    auto * ctx = static_cast<DnssdContext *>(context);
+    auto * ctx = static_cast<TestDnssd *>(context);
     EXPECT_EQ(error, CHIP_NO_ERROR);
 
     DnssdService service{};
@@ -277,7 +268,7 @@ static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR
     service.mSubTypes      = nullptr;
     service.mSubTypeSize   = 0;
 
-    EXPECT_EQ(ChipDnssdPublishService(&service, HandlePublish, context), CHIP_NO_ERROR);
+    EXPECT_EQ(ChipDnssdPublishService(&service, HandlePublish, nullptr), CHIP_NO_ERROR);
 
     EXPECT_EQ(ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
                               chip::Inet::InterfaceId::Null(), HandleBrowse, context, &ctx->mBrowseIdentifier),
@@ -291,20 +282,18 @@ static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR
 // here we only verify that the server implementation can publish services.
 TEST_F(TestDnssd, TestDnssdPublishService)
 {
-    DnssdContext context;
-
-    EXPECT_EQ(chip::Dnssd::ChipDnssdInit(TestDnssdPublishService_DnssdInitCallback, DnssdErrorCallback, &context), CHIP_NO_ERROR);
-    EXPECT_EQ(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(5), Timeout, &context), CHIP_NO_ERROR);
+    EXPECT_EQ(chip::Dnssd::ChipDnssdInit(TestDnssdPublishService_DnssdInitCallback, DnssdErrorCallback, this), CHIP_NO_ERROR);
+    EXPECT_EQ(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(5), Timeout, this), CHIP_NO_ERROR);
 
     ChipLogProgress(DeviceLayer, "Start EventLoop");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     ChipLogProgress(DeviceLayer, "End EventLoop");
 
-    EXPECT_TRUE(context.mResolvedServicesCount > 0);
-    EXPECT_TRUE(!context.mTimeoutExpired);
+    EXPECT_GT(mResolvedServicesCount, 0);
+    EXPECT_FALSE(mTimeoutExpired);
 
     // Stop browsing so we can safely shutdown DNS-SD
-    chip::Dnssd::ChipDnssdStopBrowse(context.mBrowseIdentifier);
+    chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
 
     chip::Dnssd::ChipDnssdShutdown();
 }

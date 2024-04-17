@@ -79,5 +79,5 @@ TEST(TestThreadStackManager, TestThreadStackManager)
     chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
     chip::Platform::MemoryShutdown();
 
-    ASSERT_TRUE(eventReceived);
+    EXPECT_TRUE(eventReceived);
 }

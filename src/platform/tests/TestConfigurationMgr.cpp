@@ -31,6 +31,7 @@
 #include <gtest/gtest.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+
 #include <platform/BuildTime.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -50,6 +51,7 @@ struct TestConfigurationMgr : ::testing::Test
 {
     static void SetUpTestSuite()
     {
+        // ConfigurationManager is initialized from PlatformManager indirectly
         CHIP_ERROR err = chip::Platform::MemoryInit();
         EXPECT_EQ(err, CHIP_NO_ERROR);
         err = PlatformMgr().InitChipStack();
@@ -89,7 +91,7 @@ TEST_F(TestConfigurationMgr, SerialNumber)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EXPECT_EQ(strlen(buf), 12u);
-    ASSERT_STREQ(buf, serialNumber);
+    EXPECT_STREQ(buf, serialNumber);
 
     err = ConfigurationMgr().StoreSerialNumber(serialNumber, 5);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -98,7 +100,7 @@ TEST_F(TestConfigurationMgr, SerialNumber)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EXPECT_EQ(strlen(buf), 5u);
-    ASSERT_STREQ(buf, "89051");
+    EXPECT_STREQ(buf, "89051");
 }
 
 TEST_F(TestConfigurationMgr, UniqueId)
@@ -115,7 +117,7 @@ TEST_F(TestConfigurationMgr, UniqueId)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EXPECT_EQ(strlen(buf), 14u);
-    ASSERT_STREQ(buf, uniqueId);
+    EXPECT_STREQ(buf, uniqueId);
 
     err = ConfigurationMgr().StoreUniqueId(uniqueId, 7);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -124,7 +126,7 @@ TEST_F(TestConfigurationMgr, UniqueId)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EXPECT_EQ(strlen(buf), 7u);
-    ASSERT_STREQ(buf, "67MXAZ0");
+    EXPECT_STREQ(buf, "67MXAZ0");
 }
 
 TEST_F(TestConfigurationMgr, ManufacturingDate)
@@ -265,8 +267,8 @@ TEST_F(TestConfigurationMgr, FirmwareBuildTime)
         const char * timeOfDay = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
 
         // Check that strings look good.
-        EXPECT_TRUE(!BUILD_DATE_IS_BAD(date));
-        EXPECT_TRUE(!BUILD_TIME_IS_BAD(timeOfDay));
+        EXPECT_FALSE(BUILD_DATE_IS_BAD(date));
+        EXPECT_FALSE(BUILD_TIME_IS_BAD(timeOfDay));
         if (BUILD_DATE_IS_BAD(date) || BUILD_TIME_IS_BAD(timeOfDay))
         {
             break;
@@ -299,8 +301,8 @@ TEST_F(TestConfigurationMgr, FirmwareBuildTime)
         }
 
         // Verify match.
-        ASSERT_STREQ(date, parsedDate);
-        ASSERT_STREQ(timeOfDay, parsedTimeOfDay);
+        EXPECT_STREQ(date, parsedDate);
+        EXPECT_STREQ(timeOfDay, parsedTimeOfDay);
     } while (false);
 
     // Generate random chip epoch times and verify that our BuildTime.h parser
@@ -333,8 +335,8 @@ TEST_F(TestConfigurationMgr, FirmwareBuildTime)
         }
 
         // Check that strings look good.
-        EXPECT_TRUE(!BUILD_DATE_IS_BAD(date));
-        EXPECT_TRUE(!BUILD_TIME_IS_BAD(timeOfDay));
+        EXPECT_FALSE(BUILD_DATE_IS_BAD(date));
+        EXPECT_FALSE(BUILD_TIME_IS_BAD(timeOfDay));
         if (BUILD_DATE_IS_BAD(date) || BUILD_TIME_IS_BAD(timeOfDay))
         {
             continue;
@@ -374,7 +376,7 @@ TEST_F(TestConfigurationMgr, CountryCode)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     EXPECT_EQ(countryCodeLen, strlen(countryCode));
-    ASSERT_STREQ(buf, countryCode);
+    EXPECT_STREQ(buf, countryCode);
 }
 
 TEST_F(TestConfigurationMgr, GetPrimaryMACAddress)
@@ -464,7 +466,3 @@ TEST_F(TestConfigurationMgr, GetProductId)
 }
 
 } // namespace
-
-/**
- *  Main
- */

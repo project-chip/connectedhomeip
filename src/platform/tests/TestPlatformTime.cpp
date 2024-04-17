@@ -29,7 +29,6 @@
 #include <string.h>
 
 #include <lib/support/CodeUtils.h>
-
 #include <gtest/gtest.h>
 #include <lib/support/UnitTestUtils.h>
 #include <system/SystemClock.h>
@@ -76,7 +75,7 @@ TEST(TestDevice, GetMonotonicMicroseconds)
         // verify that timers don't fire early
         EXPECT_GT(Tdelta, (Tdelay - margin));
         // verify they're not too late
-        //        NL_TEST_ASSERT(inSuite, Tdelta < (Tdelay + margin));
+        //        EXPECT_LT(Tdelta, (Tdelay + margin));
         numOfTestsRan++;
     }
     EXPECT_GT(numOfTestsRan, 0);
@@ -110,12 +109,8 @@ TEST(TestDevice, GetMonotonicMilliseconds)
         // verify that timers don't fire early
         EXPECT_GT(Tdelta, (Tdelay - margin));
         // verify they're not too late
-        //        NL_TEST_ASSERT(inSuite, Tdelta < (Tdelay + margin));
+        //        EXPECT_LT(Tdelta, (Tdelay + margin));
         numOfTestsRan++;
     }
     EXPECT_GT(numOfTestsRan, 0);
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */

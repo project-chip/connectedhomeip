@@ -53,8 +53,7 @@ public:
     static void SetUpTestSuite()
     {
         CHIP_ERROR error = chip::Platform::MemoryInit();
-        if (error != CHIP_NO_ERROR)
-            FAIL() << "Failed to initialize memory";
+        EXPECT_EQ(error, CHIP_NO_ERROR);
 
         // Setup a fake commissionable data provider since required by internals of several
         // Device/SystemLayer components.
@@ -62,11 +61,7 @@ public:
         chip::DeviceLayer::SetCommissionableDataProvider(&commissionable_data_provider);
     }
 
-    static void TearDownTestSuite()
-    {
-        chip::Platform::MemoryShutdown();
-        SUCCEED();
-    }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestPlatformMgr, InitShutdown)
@@ -199,8 +194,8 @@ TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
         SleepSome(arg);
     });
 
-    EXPECT_TRUE(!stopRan);
-    EXPECT_TRUE(!sleepRan);
+    EXPECT_FALSE(stopRan);
+    EXPECT_FALSE(sleepRan);
     PlatformMgr().RunEventLoop();
     EXPECT_TRUE(stopRan);
     EXPECT_TRUE(sleepRan);

@@ -50,11 +50,8 @@ struct TestConnectivityMgr : public ::testing::Test
 
     static void SetUpTestSuite()
     {
-        // ConfigurationManager is initialized from PlatformManager indirectly
-        CHIP_ERROR err = PlatformMgr().InitChipStack();
+        auto err = chip::Platform::MemoryInit();
         EXPECT_EQ(err, CHIP_NO_ERROR);
-        err = chip::Platform::MemoryInit();
-        ASSERT_EQ(err, CHIP_NO_ERROR);
     }
 
     static void TearDownTestSuite()
@@ -63,6 +60,12 @@ struct TestConnectivityMgr : public ::testing::Test
         chip::DeviceLayer::PlatformMgr().Shutdown();
     }
 };
+TEST_F(TestConnectivityMgr, Init)
+{
+    // ConfigurationManager is initialized from PlatformManager indirectly
+    CHIP_ERROR err = PlatformMgr().InitChipStack();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
 
 TEST_F(TestConnectivityMgr, GetNetworkInterfaces)
 {
@@ -72,7 +75,7 @@ TEST_F(TestConnectivityMgr, GetNetworkInterfaces)
 
     err = GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    ASSERT_NE(netifs, nullptr);
+    EXPECT_NE(netifs, nullptr);
 
     GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
 }

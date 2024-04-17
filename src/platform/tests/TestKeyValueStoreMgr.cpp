@@ -39,7 +39,7 @@ struct TestKeyValueStoreMgr : public ::testing::Test
     static void SetUpTestSuite()
     {
         CHIP_ERROR err = chip::Platform::MemoryInit();
-        ASSERT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
     }
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
