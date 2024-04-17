@@ -41,15 +41,6 @@ limitations under the License.
       <feature bit="4" code="SCR" name="ScheduledContentRating" summary="Supports managing content controls based upon rating threshold for scheduled content.">
         <optionalConform/>
       </feature>
-      <feature bit="5" code="BC" name="BlockChannels" summary="Supports managing a set of channels that are prohibited.">
-        <optionalConform/>
-      </feature>
-      <feature bit="6" code="BA" name="BlockApplications" summary="Supports managing a set of applications that are prohibited.">
-        <optionalConform/>
-      </feature>
-      <feature bit="7" code="BTW" name="BlockContentTimeWindow" summary="Supports managing content controls based upon setting time window in which all contents and applications SHALL be blocked.">
-        <optionalConform/>
-      </feature>
     </features>
 
     <attribute side="server" code="0x0000" define="ENABLED" type="boolean" writable="false" optional="false">Enabled</attribute>

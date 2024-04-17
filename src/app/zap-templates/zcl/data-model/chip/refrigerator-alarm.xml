@@ -29,12 +29,6 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <features>
-      <feature bit="0" code="RESET" name="Reset" summary="Supports the ability to reset alarms">
-        <disallowConform/>
-      </feature>
-    </features>
-
     <attribute side="server" code="0x0000" define="MASK" type="AlarmBitmap" default="0" writable="false" optional="false">Mask</attribute>
     <attribute side="server" code="0x0002" define="STATE" type="AlarmBitmap" default="0" writable="false" optional="false">State</attribute>
     <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">Supported</attribute>

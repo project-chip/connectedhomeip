@@ -65,10 +65,10 @@ limitations under the License.
         </globalAttribute>
 
         <features>
-            <feature bit="0" code="PIN" name="PINCredential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
+            <feature bit="0" code="PIN" name="PinCredential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
             <optionalConform/>
             </feature>
-            <feature bit="1" code="RID" name="RFIDCredential" summary="Lock supports RFID credentials">
+            <feature bit="1" code="RID" name="RfidCredential" summary="Lock supports RFID credentials">
             <optionalConform/>
             </feature>
             <feature bit="2" code="FGP" name="FingerCredentials" summary="Lock supports finger related credentials (fingerprint, finger vein)">
@@ -92,7 +92,7 @@ limitations under the License.
                 <optionalConform/>
             </otherwiseConform>
             </feature>
-            <feature bit="7" code="COTA" name="CredentialOverTheAirAccess" summary="PIN codes over-the-air supported for lock/unlock operations">
+            <feature bit="7" code="COTA" name="CredentialsOverTheAirAccess" summary="PIN codes over-the-air supported for lock/unlock operations">
             <optionalConform/>
             </feature>
             <feature bit="8" code="USR" name="User" summary="Lock supports the user commands and database">
@@ -114,7 +114,13 @@ limitations under the License.
             <feature bit="11" code="HDSCH" name="HolidaySchedules" summary="Lock supports holiday schedules">
             <optionalConform/>
             </feature>
-            <feature bit="12" code="UBOLT" name="Unbolting" summary="Lock supports unbolting">
+            <feature bit="12" code="UBOLT" name="Unbolt" summary="Lock supports unbolting">
+            <optionalConform/>
+            </feature>
+            <feature bit="13" code="ALIRO" name="AliroProvisioning" summary="AliroProvisioning">
+            <optionalConform/>
+            </feature>
+            <feature bit="14" code="ALBU" name="AliroBLEUWB" summary="AliroBLEUWB">
             <optionalConform/>
             </feature>
         </features>
