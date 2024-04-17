@@ -110,7 +110,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             path.mAttributeId =
                 static_cast<AttributeId>(path.mAttributeId + (i / 2) + (responseDirective == kSendManyDataResponsesWrongPath));
             AttributeEncodeState state;
-            if (apEncoderState == nullptr)
+            if (apEncoderState != nullptr)
             {
                 state = *apEncoderState;
             }
@@ -128,7 +128,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::ListFabricScoped::Id)
         {
             AttributeEncodeState state;
-            if (apEncoderState == nullptr)
+            if (apEncoderState != nullptr)
             {
                 state = *apEncoderState;
             }
@@ -148,7 +148,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id)
         {
             AttributeEncodeState state;
-            if (apEncoderState == nullptr)
+            if (apEncoderState != nullptr)
             {
                 state = *apEncoderState;
             }
@@ -184,7 +184,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             aPath.mAttributeId == app::Clusters::IcdManagement::Attributes::OperatingMode::Id)
         {
             AttributeEncodeState state;
-            if (apEncoderState == nullptr)
+            if (apEncoderState != nullptr)
             {
                 state = *apEncoderState;
             }
