@@ -398,10 +398,9 @@ public:
         return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;
     }
 
-    static Server & GetInstance()
-    {
-        static Server sServer = new Server();
-        return *sServer;
+    static Server & GetInstance() {
+      static Server sServer = new Server();
+      return *sServer;
     }
 
 private:
