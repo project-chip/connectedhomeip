@@ -36,67 +36,11 @@ public:
 
     static ESP32DeviceInfoProvider & GetDefaultInstance();
 
-    struct FixedLabelEntry
-    {
-        EndpointId endpointId;
-        CharSpan label;
-        CharSpan value;
-    };
-
-    /**
-     * @brief API to set the supported calendar types
-     *
-     * @param[in] supportedCalendarTypes Span of type chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum
-     *              containing the supported calendar types. The underlying data must remain allocated throughout
-     *              the lifetime of the device, as the API does not make a copy.
-     *
-     * @return CHIP_ERROR indicating the success or failure of the operation.
-     */
-    CHIP_ERROR SetSupportedCalendarTypes(const Span<CalendarType> & supportedCalendarTypes)
-    {
-        VerifyOrReturnError(!supportedCalendarTypes.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-        mSupportedCalendarTypes = supportedCalendarTypes;
-        return CHIP_NO_ERROR;
-    }
-
-    /**
-     * @brief API to set the supported Locales
-     *
-     * @param[in] supportedLocales Span of type chip::CharSpan containing the supported locales.
-     *              The underlying data must remain allocated throughout the lifetime of the device,
-     *              as the API does not make a copy.
-     *
-     * @return CHIP_ERROR indicating the success or failure of the operation.
-     */
-    CHIP_ERROR SetSupportedLocales(const Span<CharSpan> & supportedLocales)
-    {
-        VerifyOrReturnError(!supportedLocales.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-        mSupportedLocales = supportedLocales;
-        return CHIP_NO_ERROR;
-    }
-
-    /**
-     * @brief API to set the fixed labels
-     *
-     * @param[in] fixedLabels Span of type chip::DeviceLayer::ESP32DeviceInfoProvider::FixedLabelEntry
-     *              containing the fixed labels for supported endpoints.
-     *              The underlying data must remain allocated throughout the lifetime of the device,
-     *              as the API does not make a copy.
-     *
-     * @return CHIP_ERROR indicating the success or failure of the operation.
-     */
-    CHIP_ERROR SetFixedLabels(const Span<FixedLabelEntry> & supportedFixedLabels)
-    {
-        VerifyOrReturnError(!supportedFixedLabels.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-        mFixedLabels = supportedFixedLabels;
-        return CHIP_NO_ERROR;
-    }
-
 protected:
     class FixedLabelIteratorImpl : public FixedLabelIterator
     {
     public:
-        FixedLabelIteratorImpl(EndpointId endpoint, const Span<FixedLabelEntry> & labels);
+        FixedLabelIteratorImpl(EndpointId endpoint);
         size_t Count() override;
         bool Next(FixedLabelType & output) override;
         void Release() override { chip::Platform::Delete(this); }
@@ -104,7 +48,8 @@ protected:
     private:
         EndpointId mEndpoint = 0;
         size_t mIndex        = 0;
-        Span<FixedLabelEntry> mLabels;
+        char mFixedLabelNameBuf[kMaxLabelNameLength + 1];
+        char mFixedLabelValueBuf[kMaxLabelValueLength + 1];
     };
 
     class UserLabelIteratorImpl : public UserLabelIterator
@@ -127,27 +72,27 @@ protected:
     class SupportedLocalesIteratorImpl : public SupportedLocalesIterator
     {
     public:
-        SupportedLocalesIteratorImpl(const Span<CharSpan> & locales);
+        SupportedLocalesIteratorImpl() = default;
         size_t Count() override;
         bool Next(CharSpan & output) override;
-        void Release() override { chip::Platform::Delete(this); }
+        void Release() override;
 
     private:
         size_t mIndex = 0;
-        Span<CharSpan> mLocales;
+        char mLocaleBuf[kMaxActiveLocaleLength + 1];
     };
 
     class SupportedCalendarTypesIteratorImpl : public SupportedCalendarTypesIterator
     {
     public:
-        SupportedCalendarTypesIteratorImpl(const Span<CalendarType> & calendarTypes);
+        SupportedCalendarTypesIteratorImpl();
         size_t Count() override;
         bool Next(CalendarType & output) override;
         void Release() override { chip::Platform::Delete(this); }
 
     private:
-        size_t mIndex = 0;
-        Span<CalendarType> mCalendarTypes;
+        size_t mIndex                    = 0;
+        uint32_t mSupportedCalendarTypes = 0;
     };
 
     CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override;
@@ -157,10 +102,6 @@ protected:
 
 private:
     static constexpr size_t UserLabelTLVMaxSize() { return TLV::EstimateStructOverhead(kMaxLabelNameLength, kMaxLabelValueLength); }
-
-    Span<CalendarType> mSupportedCalendarTypes;
-    Span<CharSpan> mSupportedLocales;
-    Span<FixedLabelEntry> mFixedLabels;
 };
 
 } // namespace DeviceLayer

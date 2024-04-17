@@ -41,27 +41,22 @@ ESP32DeviceInfoProvider & ESP32DeviceInfoProvider::GetDefaultInstance(void)
 
 DeviceInfoProvider::FixedLabelIterator * ESP32DeviceInfoProvider::IterateFixedLabel(EndpointId endpoint)
 {
-    return chip::Platform::New<FixedLabelIteratorImpl>(endpoint, mFixedLabels);
+    return chip::Platform::New<FixedLabelIteratorImpl>(endpoint);
 }
 
-ESP32DeviceInfoProvider::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint, const Span<FixedLabelEntry> & labels) :
-    mEndpoint(endpoint), mLabels(labels)
+ESP32DeviceInfoProvider::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
 {
     mIndex = 0;
 }
 
 size_t ESP32DeviceInfoProvider::FixedLabelIteratorImpl::Count()
 {
-    size_t count = 0;
-    for (size_t i = 0; i < mLabels.size(); i++)
-    {
-        const FixedLabelEntry & entry = mLabels.data()[i];
+    char keyBuf[ESP32Config::kMaxConfigKeyNameLength];
+    uint32_t count = 0;
 
-        if (entry.endpointId == mEndpoint)
-        {
-            count++;
-        }
-    }
+    VerifyOrReturnValue(ESP32Config::KeyAllocator::FixedLabelCount(keyBuf, sizeof(keyBuf), mEndpoint) == CHIP_NO_ERROR, 0);
+    ESP32Config::Key key(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
+    VerifyOrReturnValue(ESP32Config::ReadConfigValue(key, count) == CHIP_NO_ERROR, 0);
     return count;
 }
 
@@ -69,18 +64,35 @@ bool ESP32DeviceInfoProvider::FixedLabelIteratorImpl::Next(FixedLabelType & outp
 {
     ChipLogDetail(DeviceLayer, "Get the fixed label with index:%u at endpoint:%d", static_cast<unsigned>(mIndex), mEndpoint);
 
-    while (mIndex < mLabels.size())
-    {
-        const FixedLabelEntry & entry = mLabels.data()[mIndex++];
-        if (entry.endpointId == mEndpoint)
-        {
-            output.label = entry.label;
-            output.value = entry.value;
-            return true;
-        }
-    }
+    char keyBuf[ESP32Config::kMaxConfigKeyNameLength];
+    size_t keyOutLen   = 0;
+    size_t valueOutLen = 0;
 
-    return false;
+    memset(mFixedLabelNameBuf, 0, sizeof(mFixedLabelNameBuf));
+    memset(mFixedLabelValueBuf, 0, sizeof(mFixedLabelValueBuf));
+
+    VerifyOrReturnValue(
+        ESP32Config::KeyAllocator::FixedLabelKey(keyBuf, sizeof(keyBuf), mEndpoint, static_cast<uint16_t>(mIndex)) == CHIP_NO_ERROR,
+        false);
+    ESP32Config::Key keyKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
+    VerifyOrReturnValue(
+        ESP32Config::ReadConfigValueStr(keyKey, mFixedLabelNameBuf, sizeof(mFixedLabelNameBuf), keyOutLen) == CHIP_NO_ERROR, false);
+
+    VerifyOrReturnValue(ESP32Config::KeyAllocator::FixedLabelValue(keyBuf, sizeof(keyBuf), mEndpoint,
+                                                                   static_cast<uint16_t>(mIndex)) == CHIP_NO_ERROR,
+                        false);
+    ESP32Config::Key valueKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
+    VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(valueKey, mFixedLabelValueBuf, sizeof(mFixedLabelValueBuf), valueOutLen) ==
+                            CHIP_NO_ERROR,
+                        false);
+
+    output.label = CharSpan::fromCharString(mFixedLabelNameBuf);
+    output.value = CharSpan::fromCharString(mFixedLabelValueBuf);
+    ChipLogDetail(DeviceLayer, "Fixed label with index:%u at endpoint:%d, %s:%s", static_cast<unsigned>(mIndex), mEndpoint,
+                  mFixedLabelNameBuf, mFixedLabelValueBuf);
+
+    mIndex++;
+    return true;
 }
 
 CHIP_ERROR ESP32DeviceInfoProvider::SetUserLabelLength(EndpointId endpoint, size_t val)
@@ -180,47 +192,82 @@ bool ESP32DeviceInfoProvider::UserLabelIteratorImpl::Next(UserLabelType & output
 
 DeviceInfoProvider::SupportedLocalesIterator * ESP32DeviceInfoProvider::IterateSupportedLocales()
 {
-    return chip::Platform::New<SupportedLocalesIteratorImpl>(mSupportedLocales);
-}
-
-ESP32DeviceInfoProvider::SupportedLocalesIteratorImpl::SupportedLocalesIteratorImpl(const Span<CharSpan> & locales)
-{
-    mLocales = locales;
+    return chip::Platform::New<SupportedLocalesIteratorImpl>();
 }
 
 size_t ESP32DeviceInfoProvider::SupportedLocalesIteratorImpl::Count()
 {
-    return mLocales.empty() ? 0 : mLocales.size();
+    uint32_t count = 0;
+    CHIP_ERROR err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_SupportedLocaleSize, count);
+    if (err != CHIP_NO_ERROR)
+    {
+        return 0;
+    }
+    return count;
 }
 
 bool ESP32DeviceInfoProvider::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
-    VerifyOrReturnValue(mIndex < mLocales.size(), false);
-    output = mLocales.data()[mIndex++];
+    char keyBuf[ESP32Config::kMaxConfigKeyNameLength];
+    size_t keyOutLen = 0;
+    memset(mLocaleBuf, 0, sizeof(mLocaleBuf));
+
+    VerifyOrReturnValue(ESP32Config::KeyAllocator::Locale(keyBuf, sizeof(keyBuf), static_cast<uint16_t>(mIndex)) == CHIP_NO_ERROR,
+                        false);
+    ESP32Config::Key keyKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
+    VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(keyKey, mLocaleBuf, sizeof(mLocaleBuf), keyOutLen) == CHIP_NO_ERROR, false);
+
+    output = CharSpan::fromCharString(mLocaleBuf);
+    mIndex++;
     return true;
+}
+
+void ESP32DeviceInfoProvider::SupportedLocalesIteratorImpl::Release()
+{
+    chip::Platform::Delete(this);
 }
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * ESP32DeviceInfoProvider::IterateSupportedCalendarTypes()
 {
-    return chip::Platform::New<SupportedCalendarTypesIteratorImpl>(mSupportedCalendarTypes);
+    return chip::Platform::New<SupportedCalendarTypesIteratorImpl>();
 }
 
-ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::SupportedCalendarTypesIteratorImpl(
-    const Span<CalendarType> & calendarTypes)
+ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::SupportedCalendarTypesIteratorImpl()
 {
-    mCalendarTypes = calendarTypes;
+    CHIP_ERROR err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_SupportedCalTypes, mSupportedCalendarTypes);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to read supported calendar types: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 size_t ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::Count()
 {
-    return mCalendarTypes.empty() ? 0 : mCalendarTypes.size();
+    size_t count = 0;
+    for (uint8_t i = 0; i < to_underlying(app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue); i++)
+    {
+        if (mSupportedCalendarTypes & (1 << i))
+        {
+            count++;
+        }
+    }
+    ChipLogDetail(DeviceLayer, "Supported calendar types count:%u", count);
+    return count;
 }
 
 bool ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
-    VerifyOrReturnValue(mIndex < mCalendarTypes.size(), false);
-    output = mCalendarTypes.data()[mIndex++];
-    return true;
+    while (mIndex < to_underlying(app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue))
+    {
+        if (mSupportedCalendarTypes & (1 << mIndex))
+        {
+            output = static_cast<CalendarType>(mIndex);
+            mIndex++;
+            return true;
+        }
+        mIndex++;
+    }
+    return false;
 }
 
 } // namespace DeviceLayer

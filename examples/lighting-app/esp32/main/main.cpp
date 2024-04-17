@@ -92,31 +92,6 @@ DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
 
 #if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
-
-using namespace app::Clusters::TimeFormatLocalization;
-using CalendarType = app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
-
-CalendarType supportedCalendarTyppes[] = {
-    CalendarTypeEnum::kGregorian, CalendarTypeEnum::kCoptic,  CalendarTypeEnum::kBuddhist,
-    CalendarTypeEnum::kEthiopian, CalendarTypeEnum::kChinese,
-};
-
-CharSpan supportedLocales[] = {
-    CharSpan::fromCharString("en-US"),
-    CharSpan::fromCharString("en-EU"),
-    CharSpan::fromCharString("en-IN"),
-};
-
-struct ESP32DeviceInfoProvider::FixedLabelEntry fixedLabels[] = {
-    { 0, CharSpan::fromCharString("Room"), CharSpan::fromCharString("Bedroom 2") },
-    { 0, CharSpan::fromCharString("Orientation"), CharSpan::fromCharString("North") },
-    { 0, CharSpan::fromCharString("Direction"), CharSpan::fromCharString("Up") },
-};
-
-Span<CalendarType> sSupportedCalendarTypes(supportedCalendarTyppes);
-Span<CharSpan> sSupportedLocales(supportedLocales);
-Span<ESP32DeviceInfoProvider::FixedLabelEntry> sFixedLabels(fixedLabels);
-
 #else
 DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
@@ -216,12 +191,6 @@ extern "C" void app_main()
         return;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-#ifdef CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
-    gExampleDeviceInfoProvider.SetSupportedLocales(sSupportedLocales);
-    gExampleDeviceInfoProvider.SetSupportedCalendarTypes(sSupportedCalendarTypes);
-    gExampleDeviceInfoProvider.SetFixedLabels(sFixedLabels);
-#endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 

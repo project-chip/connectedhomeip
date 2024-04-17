@@ -72,6 +72,12 @@ ESP32 specific implementation of `DeviceInstanceInfoProvider`.
 [Component config → CHIP Device Layer → Commissioning options → Use ESP32 Device
 Instance Info Provider]
 
+Enable config option `CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER` to use ESP32
+specific implementation of `DeviceInfoProvider`.
+
+[Component config → CHIP Device Layer → Commissioning options → Use ESP32 Device
+Info Provider]
+
 ESP32 implementation reads factory data from nvs partition, chip-factory data
 must be flashed into the configured nvs partition. Factory partition can be
 configured using `CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL` option, default

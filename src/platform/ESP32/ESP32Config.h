@@ -159,7 +159,29 @@ inline bool ESP32Config::Key::operator==(const Key & other) const
 class ESP32Config::KeyAllocator
 {
 public:
+    static CHIP_ERROR Locale(char * key, size_t size, uint16_t index)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "locale/%x", index) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
+    static CHIP_ERROR FixedLabelCount(char * key, size_t size, uint16_t endpoint)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "fl-sz/%x", endpoint) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
+    static CHIP_ERROR FixedLabelKey(char * key, size_t size, uint16_t endpoint, uint16_t index)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "fl-k/%x/%x", endpoint, index) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
+    static CHIP_ERROR FixedLabelValue(char * key, size_t size, uint16_t endpoint, uint16_t index)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "fl-v/%x/%x", endpoint, index) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
+
     // Supported modes
+
     static CHIP_ERROR SupportedModesCount(char * key, size_t size, uint16_t endpoint)
     {
         VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
