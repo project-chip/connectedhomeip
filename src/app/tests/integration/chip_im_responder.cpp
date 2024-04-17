@@ -123,8 +123,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeEncodeState * apEncoderState)
 {
-    ReturnErrorOnFailure(AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1));
-    return CHIP_NO_ERROR;
+    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0).Encode(kTestFieldValue1);
 }
 
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
