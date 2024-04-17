@@ -2342,25 +2342,26 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [attributesToPersist addObject:attributeResponseValueToPersist];
 #endif
             }
-
-            // if expected values exists, purge and update read cache
             NSArray * expectedValue = _expectedValueCache[attributePath];
-            if (expectedValue) {
-                previousValue = expectedValue[MTRDeviceExpectedValueFieldValueIndex];
-                _readCache[attributePath] = attributeDataValue;
-                shouldReportAttribute = NO;
-            } else if (readCacheValueChanged) {
-                // otherwise compare and update read cache
+
+            // Report the attribute if a read would get a changed value.  This happens
+            // when our cached value changes and no expected value exists.
+            if (readCacheValueChanged && !expectedValue) {
                 previousValue = _readCache[attributePath];
-                _readCache[attributePath] = attributeDataValue;
                 shouldReportAttribute = YES;
             }
 
+            // Now that we have grabbed previousValue, update the readCache with the attribute value.
+            _readCache[attributePath] = attributeDataValue;
+
             if (!shouldReportAttribute) {
+                // If an expected value exists, the attribute will not be reported at this time.
+                // When the expected value interval expires, the correct value will be reported,
+                // if needed.
                 if (expectedValue) {
-                    MTR_LOG_INFO("%@ report %@ value filtered - same as expected values", self, attributePath);
+                    MTR_LOG_INFO("%@ report %@ value filtered - expected value still present", self, attributePath);
                 } else {
-                    MTR_LOG_INFO("%@ report %@ value filtered - same values as cache", self, attributePath);
+                    MTR_LOG_INFO("%@ report %@ value filtered - same as read cache", self, attributePath);
                 }
             }
 

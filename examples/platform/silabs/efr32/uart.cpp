@@ -442,7 +442,7 @@ void uartMainLoop(void * args)
     {
 
         osStatus_t eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, osWaitForever);
-        while (eventReceived == pdTRUE)
+        while (eventReceived == osOK)
         {
             uartSendBytes(workBuffer.data, workBuffer.length);
             eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);
