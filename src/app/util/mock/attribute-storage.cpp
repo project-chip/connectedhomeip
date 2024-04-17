@@ -136,8 +136,8 @@ const uint8_t mockAttribute4[256]  = {
 
 EmberAfAttributeMetadata mockmetadata = { .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(static_cast<uint32_t>(0)),
                                           .attributeId   = 0,
-                                          .size          = sizeof(uint32_t),
-                                          .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
+                                          .size          = sizeof(int32_t),
+                                          .attributeType = ZCL_INT32S_ATTRIBUTE_TYPE,
                                           .mask          = ATTRIBUTE_MASK_MIN_MAX }; // namespace
 
 } // namespace Test
