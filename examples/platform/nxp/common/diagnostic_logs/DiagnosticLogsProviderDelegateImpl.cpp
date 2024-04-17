@@ -142,7 +142,7 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     VerifyOrReturnValue(buffer.Get() != nullptr, 0);
 
     err = Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), buffer.Get(), sizeForIntent);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0);
+    VerifyOrReturnValue(err == CHIP_ERROR_BUFFER_TOO_SMALL, 0);
 
     return sizeForIntent;
 }
