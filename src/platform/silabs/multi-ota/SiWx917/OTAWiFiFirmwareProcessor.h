@@ -39,7 +39,6 @@ public:
     CHIP_ERROR FinalizeAction() override;
     static bool mReset;
     static constexpr size_t kAlignmentBytes = 64;
-    static uint32_t mWriteOffset; // End of last written block
     // Bootloader storage API requires the buffer size to be a multiple of 4.
     static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4)));
     // Offset indicates how far the write buffer has been filled
