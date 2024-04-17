@@ -193,7 +193,7 @@ else
                 shift
                 ;;
             --icd)
-                optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
+                optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false sl_enable_test_event_trigger=true"
                 shift
                 ;;
             --low-power)
