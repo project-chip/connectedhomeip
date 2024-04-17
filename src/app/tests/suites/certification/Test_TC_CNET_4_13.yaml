@@ -40,7 +40,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1: TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds
+          "Step 1: TH sends ArmFailSafecommand to the DUT with ExpiryLengthSeconds
           set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
@@ -50,19 +50,19 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: TH readsNetworksattribute from theDUT and saves thenumber of
+          "Step 2: TH reads Networks attribute from the DUT and saves the number of
           entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
-          ./chip-tool network-commissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label:
-          "Step 3: TH calculates thenumber ofremainingnetwork slots
-          as'MaxNetworksValue' -'NumNetworks'and saves as'RemainingNetworkSlots'"
+          "Step 3: TH calculates the number ofremaining network slots
+          as 'MaxNetworksValue' - 'NumNetworks' and saves as 'RemainingNetworkSlots'"
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
@@ -81,7 +81,7 @@ tests:
 
     - label:
           "Step 4: TH calculates the midpoint of the network list as
-          floor(('MaxNetwor ksValue' + 1)/2) and saves as 'Midpoint'"
+          floor(('MaxNetworksValue' + 1)/2) and saves as 'Midpoint'"
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
@@ -89,7 +89,7 @@ tests:
 
     - label:
           "Step 5: TH sends ArmFailSafe command to the DUT with the
-          ExpiryLengthSeco nds field set to 900"
+          ExpiryLengthSeconds field set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
@@ -99,10 +99,10 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: TH sendsAddOrUpdateWiFiNetworkcommand to theDUT. This
-          stepshould be repeated'RemainingNetworkSlots' times usingDIFFERENT
-          SSIDand credentialvalues and theBreadcrumb fieldset to 1. Note
-          thatthese credentialsare NOT requiredto be connectable."
+          "Step 2: TH sends AddOrUpdateWiFiNetworkcommand to the DUT. This
+          step should be repeated 'RemainingNetworkSlots' times using DIFFERENT
+          SSID and credentialvalues and the Breadcrumb fieldset to 1. Note
+          that these credentials are NOT required to be connectable."
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:63686970736574757035 matter123 1 0 --Breadcrumb 1
@@ -112,8 +112,89 @@ tests:
       disabled: true
 
     - label:
-          "Step 6: TH readsNetworksattribute from theDUT and saves thelist
-          as'OriginalNetworkList'"
+          "Step 6: TH readsNetworks attribute from the DUT and saves the list
+          as 'OriginalNetworkList'"
+      PICS: CNET.S.A0001
+      verification: |
+          ./chip-tool networkcommissioning read networks 1 0
+
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
+          ( Pre-Condition)
+      disabled: true
+
+    - label: "Step 7: TH sends the CommissioningComplete command to the DUT"
+      verification: |
+          ./chip-tool generalcommissioning CommissioningComplete 1 0
+
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
+          ( Pre-Condition)
+      disabled: true
+
+    - label:
+          "Step 8: TH sends ReorderNetwork Command to the DUT with the
+          following fields: 1. NetworkID is PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID 2.
+          NetworkIndex is 'MaxNetworksValue' 3. Breadcrumb is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+          ./chip-tool  networkcommissioning reorder-network  hex:47524C50726976617465 1 0 --Breadcrumb 2
+
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
+          ( Pre-Condition)
+      disabled: true
+
+    - label:
+          "Step 9: TH reads Breadcumb attribute from the General Commissioning
+          Cluster"
+      verification: |
+          ./chip-tool generalcommissioning read breadcrumb 1 0
+
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
+          ( Pre-Condition)
+      disabled: true
+
+    - label:
+          "Step 10: TH sends ReorderNetwork Command to the DUT with
+          the following fields: 1. NetworkID is a NetworkID value NOT present
+          in 'OriginalNetworkList' 2.NetworkIndex is'Midpoint' 3.Breadcrumb is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
+          ( Pre-Condition)
+      disabled: true
+
+    - label:
+          "Step 11: TH reads Breadcumb attribute from the General Commissioning
+          Cluster"
+      verification: |
+          ./chip-tool generalcommissioning read breadcrumb 1 0
+
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
+          ( Pre-Condition)
+      disabled: true
+
+    - label:
+          "Step 12: TH sends ReorderNetwork Command to the DUT with the
+          following fields: 1. NetworkID is PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID 2.
+          NetworkIndex is 'Midpoint' 3. Breadcrumb is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+          ./chip-tool  networkcommissioning reorder-network  hex:47524C50726976617465 1 0 --Breadcrumb 2
+
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
+          ( Pre-Condition)
+      disabled: true
+
+    - label:
+          "Step 13: TH reads Breadcrumb attribute from
+          the GeneralCommissioning Cluster"
+      verification: |
+          ./chip-tool generalcommissioning read breadcrumb 1 0
+
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
+          ( Pre-Condition)
+      disabled: true
+
+    - label: "Step 14: TH reads Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
@@ -123,80 +204,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 7: TH sends ReorderNetwo rk Command to the DUT with the
-          following fields: 1. NetworkID is PIXIT.CNET .WIFI_1ST_ ACCESSPOI
-          NT_SSID 2. NetworkIn dex is 'MaxNetwo rksValue' 3. Breadcrum b is 2"
-      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
-      verification: |
-          ./chip-tool network-commissioning read networks 1 0
-
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
-          ( Pre-Condition)
-      disabled: true
-
-    - label:
-          "Step 8: TH reads Breadcumb attribute from the General Commissioning
-          Cluster"
-      verification: |
-          ./chip-tool generalcommissioning read breadcrumb 1 0
-
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
-          ( Pre-Condition)
-      disabled: true
-
-    - label:
-          "Step 9: TH sendsReorderNetwork Commandto the DUTwith
-          thefollowingfields: 1. NetworkIDis aNetworkIDvalue NOTpresent
-          in'OriginalNetworkList'2.NetworkIn dex is'Midpoint'3.Breadcrumb is 2"
-      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
-      verification: |
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
-          ( Pre-Condition)
-      disabled: true
-
-    - label:
-          "Step 10: TH reads Breadcumb attribute from the General Commissioning
-          Cluster"
-      verification: |
-          ./chip-tool generalcommissioning read breadcrumb 1 0
-
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
-          ( Pre-Condition)
-      disabled: true
-
-    - label:
-          "Step 11: TH sends ReorderNetwo rk Command to the DUT with the
-          following fields: 1. NetworkID is PIXIT.CNET .WIFI_1ST_ ACCESSPOI
-          NT_SSID 2. NetworkIn dex is 'Midpoint' 3. Breadcrum b is 2"
-      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
-      verification: |
-          ./chip-tool  networkcommissioning reorder-network  hex:47524C50726976617465 1 0 --Breadcrumb 1
-
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
-          ( Pre-Condition)
-      disabled: true
-
-    - label:
-          "Step 12: TH readsBreadcumbattribute from
-          theGeneralCommissioningCluster"
-      verification: |
-          ./chip-tool generalcommissioning read breadcrumb 1 0
-
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
-          ( Pre-Condition)
-      disabled: true
-
-    - label: "Step 13: TH readsNetworksattribute list fromthe DUT"
-      PICS: CNET.S.A0001
-      verification: |
-          ./chip-tool network-commissioning read networks 1 0
-
-          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
-          ( Pre-Condition)
-      disabled: true
-
-    - label:
-          "Step 14: TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds
+          "Step 15: TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
           set to 0"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
@@ -205,18 +213,18 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "Step 15: TH readsNetworksattribute list fromthe DUT"
+    - label: "Step 16: TH reads Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
-          ./chip-tool network-commissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label:
-          "Step 16: TH sends ArmFailSafe command to the DUT with
-          ExpiryLengthSeco nds set to 900"
+          "Step 17: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
@@ -226,10 +234,10 @@ tests:
       disabled: true
 
     - label:
-          "Step 17: TH sendsAddOrUpdateWiFiNetworkcommand to theDUT. This
-          stepshould be repeated'RemainingNetworkSlots' times usingDIFFERENT
-          SSIDand credentialvalues and Breadcrumb fieldset to 1. Note thatthese
-          credentialsare NOT requiredto be connectable."
+          "Step 18: TH sends AddOrUpdateWiFiNetwork command to the DUT. This
+          step should be repeated 'RemainingNetworkSlots' times using DIFFERENT
+          SSID and credential values and Breadcrumb field set to 1. Note that these
+          credentials are NOT required to be connectable."
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
@@ -237,9 +245,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 18: TH sendsReorderNetwork Commandto the DUTwith
-          thefollowingfields: 1.
-          NetworkIDisPIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID2.NetworkIndex is
+          "Step 19: TH sends ReorderNetwork Command to the DUT with
+          the following fields: 1.
+          NetworkID is PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID2.NetworkIndex is
           'Midpoint'3.Breadcrumb is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
       verification: |
@@ -247,7 +255,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "Step 19: TH sends the CommissioningCo mplete command to the DUT"
+    - label: "Step 20: TH sends the CommissioningComplete command to the DUT"
       verification: |
           ./chip-tool generalcommissioning CommissioningComplete 1 0
 
@@ -256,7 +264,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 20: TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds
+          "Step 21: TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
           set to 0"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
@@ -265,10 +273,10 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "Step 21: TH readsNetworksattribute list fromthe DUT"
+    - label: "Step 22: TH reads Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
-          ./chip-tool network-commissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
