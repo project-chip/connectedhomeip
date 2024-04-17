@@ -39,9 +39,9 @@ extern "C" {
 #include "sl_bt_stack_config.h"
 #include "sl_bt_stack_init.h"
 #include "timers.h"
-#include <algorithm>
 #include <ble/CHIPBleServiceData.h>
 #include <crypto/RandUtils.h>
+#include <cstring>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
@@ -116,11 +116,8 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err;
-
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(BleLayer::Init(this, this, &DeviceLayer::SystemLayer()));
 
     memset(mBleConnections, 0, sizeof(mBleConnections));
     memset(mIndConfId, kUnusedIndex, sizeof(mIndConfId));
@@ -139,8 +136,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     // Check that an address was not already configured at boot.
     // This covers the init-shutdown-init case to comply with the BLE address change at boot only requirement
-    if (std::all_of(randomizedAddr.addr, randomizedAddr.addr + (sizeof(randomizedAddr.addr) / sizeof(uint8_t)),
-                    [](uint8_t i) { return i == 0; }))
+    bd_addr temp = { 0 };
+    if (memcmp(&randomizedAddr, &temp, sizeof(bd_addr)) == 0)
     {
         // Since a random address is not configured, configure one
         uint64_t random = Crypto::GetRandU64();
@@ -152,9 +149,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     }
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::_NumConnections(void)
