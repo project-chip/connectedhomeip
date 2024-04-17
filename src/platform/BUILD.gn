@@ -81,6 +81,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Define the default number of ip addresses to discover
     chip_max_discovered_ip_addresses = 5
 
+    # Maximum length of the deviceName in the node discovery data
+    chip_max_device_name_len = 32
+
     # Allows enabling dynamic setting of the local MRP configuration, for
     # devices with multiple radios that have different sleep behavior for
     # different radios.
@@ -380,7 +383,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${chip_device_config_device_product_id}" ]
     }
 
-    defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
+    defines += [
+      "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}",
+      "CHIP_DEVICE_CONFIG_MAX_DEVICE_NAME_LEN=${chip_max_device_name_len}",
+    ]
 
     visibility = [
       ":platform_config_header",

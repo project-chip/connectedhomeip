@@ -200,7 +200,7 @@ struct OperationalNodeData
     void Reset() { peerId = PeerId(); }
 };
 
-inline constexpr size_t kMaxDeviceNameLen         = 32;
+inline constexpr size_t kMaxDeviceNameLen         = CHIP_DEVICE_CONFIG_MAX_DEVICE_NAME_LEN;
 inline constexpr size_t kMaxRotatingIdLen         = 50;
 inline constexpr size_t kMaxPairingInstructionLen = 128;
 

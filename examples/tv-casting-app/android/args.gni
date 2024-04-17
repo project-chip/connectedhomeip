@@ -34,4 +34,6 @@ chip_config_network_layer_ble = false
 
 chip_max_discovered_ip_addresses = 20
 
+chip_max_device_name_len = 128
+
 enable_rtti = true
