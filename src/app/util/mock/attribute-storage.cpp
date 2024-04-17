@@ -80,7 +80,7 @@ uint8_t mockAttribute4[256]  = {
 };
 
 const uint8_t defaultValueData[] = { 0x01, 0x02, 0x03, 0x04 };
-const uint8_t minValueData[]     = { 0x00, 0x00, 0x00, 0x00 };
+const uint8_t minValueData[]     = { 0xFF, 0xFF, 0xFF, 0xFF };
 #if CHIP_CONFIG_BIG_ENDIAN_TARGET
 const uint8_t maxValueData[] = { 0x00, 0xFF, 0xFF, 0xFF }; // Equivalent, in big-endian, to 0x00FFFFFF
 #else
@@ -91,8 +91,8 @@ EmberAfAttributeMinMaxValue minMaxValue = { defaultValueData, minValueData, maxV
 
 EmberAfAttributeMetadata mockmetadata = { .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(&minMaxValue),
                                           .attributeId   = 0,
-                                          .size          = sizeof(uint32_t),
-                                          .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
+                                          .size          = sizeof(int32_t),
+                                          .attributeType = ZCL_INT32S_ATTRIBUTE_TYPE,
                                           .mask          = ATTRIBUTE_MASK_MIN_MAX }; // namespace
 
 } // namespace

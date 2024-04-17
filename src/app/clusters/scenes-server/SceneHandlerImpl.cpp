@@ -26,47 +26,24 @@ namespace {
 using ConcreteAttributePath  = app::ConcreteAttributePath;
 using AttributeValuePairType = app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type;
 
-/// IsAttributeTypeValid
-/// @brief Check if the attribute type is valid for a scene extension field value according to the spec.
-/// @param type Type of the attribute's metadata
-/// @return
-bool IsSceneValidAttributeType(EmberAfAttributeType type)
-{
-    return (type == ZCL_INT8U_ATTRIBUTE_TYPE || type == ZCL_INT16U_ATTRIBUTE_TYPE || type == ZCL_INT32U_ATTRIBUTE_TYPE ||
-            type == ZCL_INT64U_ATTRIBUTE_TYPE || type == ZCL_INT8S_ATTRIBUTE_TYPE || type == ZCL_INT16S_ATTRIBUTE_TYPE ||
-            type == ZCL_INT32S_ATTRIBUTE_TYPE || type == ZCL_INT64S_ATTRIBUTE_TYPE);
-}
-
-/// IsSignedAttribute
-/// @brief Compare the attribute type to the signed attribute types in ZCL and return true if it is signed.
-/// @param attributeType metadata's attribute type
-/// @return
-bool IsSignedAttribute(EmberAfAttributeType attributeType)
-{
-    return (attributeType >= ZCL_INT8S_ATTRIBUTE_TYPE && attributeType <= ZCL_INT64S_ATTRIBUTE_TYPE);
-}
-
 /// ConvertByteArrayToUInt64
 /// @brief Helper function to convert a byte array to a uint64_t value
 /// @param EmberAfDefaultAttributeValue & defaultValue
 /// @param len Length of the byte array
-/// @return uint64_t Value
+/// @return uint64_t or int64_t Value
 /// @note The attribute table supports 8 bytes only for unsigned integers, 4 bytes is the maximum for signed integers
-uint64_t ConvertByteArrayToUInt64(const EmberAfDefaultAttributeValue & defaultValue, uint16_t len)
+template <typename Type>
+Type ConvertByteArrayToType(const EmberAfDefaultAttributeValue & defaultValue, uint16_t len)
 {
     if (len <= 2)
     {
-        return static_cast<uint64_t>(defaultValue.defaultValue);
+        return static_cast<Type>(defaultValue.defaultValue);
     }
     else
     {
-        uint64_t result     = 0;
-        const uint8_t * val = defaultValue.ptrToDefaultValue;
-        for (size_t i = 0; i < len; i++)
-        {
-            result = (result << 8) | val[(CHIP_CONFIG_BIG_ENDIAN_TARGET ? i : (len - 1) - i)];
-        }
-        return result;
+        Type sValue = 0;
+        memcpy(&sValue, defaultValue.ptrToDefaultValue, sizeof(Type));
+        return app::NumericAttributeTraits<Type>::StorageToWorking(sValue);
     }
 }
 
@@ -76,32 +53,37 @@ uint64_t ConvertByteArrayToUInt64(const EmberAfDefaultAttributeValue & defaultVa
 /// @param[in] aVPair   AttributeValuePairType
 /// @param[in] metadata  EmberAfAttributeMetadata
 ///
+template <typename Type>
 void CapAttributeID(AttributeValuePairType & aVPair, const EmberAfAttributeMetadata * metadata)
 {
     // Calculate the maximum value that can be represented with the given number of bytes
-    uint64_t maxValue = 0;
+    Type maxValue = 0;
 
     // Check if the attribute type is signed
-    if (IsSignedAttribute(metadata->attributeType))
+    if (metadata->IsSignedIntegerAttribute())
     {
-        maxValue = (1ULL << ((emberAfAttributeSize(metadata) * 8) - 1)) - 1;
+        maxValue = static_cast<Type>((1ULL << (emberAfAttributeSize(metadata) * 8 - 1)) - 1);
     }
     else
     {
-        maxValue = (1ULL << (emberAfAttributeSize(metadata) * 8)) - 1;
+        maxValue = static_cast<Type>((1ULL << (emberAfAttributeSize(metadata) * 8)) - 1);
     }
 
     // Check metadata for min and max values
-    if ((metadata->mask & ATTRIBUTE_MASK_MIN_MAX) && metadata->defaultValue.ptrToMinMaxValue)
+    if (metadata->HasMinMax())
     {
         const EmberAfAttributeMinMaxValue * minMaxValue = metadata->defaultValue.ptrToMinMaxValue;
-        uint64_t minVal = ConvertByteArrayToUInt64(minMaxValue->minValue, emberAfAttributeSize(metadata));
-        uint64_t maxVal = ConvertByteArrayToUInt64(minMaxValue->maxValue, emberAfAttributeSize(metadata));
+        Type minVal = ConvertByteArrayToType<Type>(minMaxValue->minValue, emberAfAttributeSize(metadata));
+        Type maxVal = ConvertByteArrayToType<Type>(minMaxValue->maxValue, emberAfAttributeSize(metadata));
 
-        // Cap based on minValue
-        if (minVal > aVPair.attributeValue)
+        // Cap based on minimum value
+        if (minVal > static_cast<Type>(aVPair.attributeValue))
         {
-            aVPair.attributeValue = minVal;
+            uint64_t sValue = 0;
+            memcpy(&sValue, &minVal, sizeof(Type));
+            aVPair.attributeValue = app::NumericAttributeTraits<uint64_t>::StorageToWorking(sValue);
+            // We assume the max is >= min therefore we can return
+            return;
         }
 
         // Adjust maxValue if greater than the meta data's max value
@@ -112,9 +94,23 @@ void CapAttributeID(AttributeValuePairType & aVPair, const EmberAfAttributeMetad
     }
 
     // Cap based on maximum value
-    if (aVPair.attributeValue > maxValue)
+    if (metadata->IsSignedIntegerAttribute())
     {
-        aVPair.attributeValue = maxValue;
+        if (static_cast<int64_t>(aVPair.attributeValue) > static_cast<int64_t>(maxValue))
+        {
+            uint64_t sValue = 0;
+            memcpy(&sValue, &maxValue, sizeof(Type));
+            aVPair.attributeValue = app::NumericAttributeTraits<uint64_t>::StorageToWorking(sValue);
+        }
+    }
+    else
+    {
+        if (static_cast<uint64_t>(aVPair.attributeValue) > static_cast<uint64_t>(maxValue))
+        {
+            uint64_t sValue = 0;
+            memcpy(&sValue, &maxValue, sizeof(Type));
+            aVPair.attributeValue = app::NumericAttributeTraits<uint64_t>::StorageToWorking(sValue);
+        }
     }
 }
 
@@ -122,7 +118,7 @@ void CapAttributeID(AttributeValuePairType & aVPair, const EmberAfAttributeMetad
 /// @param[in] endpoint   Endpoint ID
 /// @param[in] clusterID  Cluster ID
 /// @param[in] aVPair     AttributeValuePairType, will be mutated to cap the value if it is out of range
-/// @return CHIP_ERROR_UNSUPPORTED_ATTRIBUTE if the attribute does not exist for a given cluster or is not scenable
+/// @return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) if the attribute does not exist for a given cluster or is not scenable
 /// @note This will allways fail for global list attributes. If we do want to make them scenable someday, we will need to
 ///       use a different validation method.
 // TODO: Add check for "S" quality to determine if the attribute is scenable once suported :
@@ -133,16 +129,38 @@ CHIP_ERROR ValidateAttributePath(EndpointId endpoint, ClusterId cluster, Attribu
 
     if (nullptr == metadata)
     {
-        return CHIP_ERROR_UNSUPPORTED_ATTRIBUTE;
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
 
-    if (!IsSceneValidAttributeType(metadata->attributeType))
+    switch (metadata->attributeType)
     {
-        return CHIP_ERROR_UNSUPPORTED_ATTRIBUTE;
+    case ZCL_INT8U_ATTRIBUTE_TYPE:
+        CapAttributeID<uint8_t>(aVPair, metadata);
+        break;
+    case ZCL_INT16U_ATTRIBUTE_TYPE:
+        CapAttributeID<uint16_t>(aVPair, metadata);
+        break;
+    case ZCL_INT32U_ATTRIBUTE_TYPE:
+        CapAttributeID<uint32_t>(aVPair, metadata);
+        break;
+    case ZCL_INT64U_ATTRIBUTE_TYPE:
+        CapAttributeID<uint64_t>(aVPair, metadata);
+        break;
+    case ZCL_INT8S_ATTRIBUTE_TYPE:
+        CapAttributeID<int8_t>(aVPair, metadata);
+        break;
+    case ZCL_INT16S_ATTRIBUTE_TYPE: // fallthrough
+        CapAttributeID<int16_t>(aVPair, metadata);
+        break;
+    case ZCL_INT32S_ATTRIBUTE_TYPE:
+        CapAttributeID<int32_t>(aVPair, metadata);
+        break;
+    case ZCL_INT64S_ATTRIBUTE_TYPE:
+        CapAttributeID<int64_t>(aVPair, metadata);
+        break;
+    default:
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
     }
-
-    // Cap value based on the attribute type size
-    CapAttributeID(aVPair, metadata);
 
     return CHIP_NO_ERROR;
 }

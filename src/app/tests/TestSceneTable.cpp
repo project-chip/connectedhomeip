@@ -723,10 +723,10 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     memset(failBuffer, 0, fail_list.size());
     memset(buffer, 0, buff_span.size());
 
-    // Test Serialize Add of an attribute value that is greater than the mock attribute size (size of uint32_t)
-    OOPairs[0].attributeValue = 0xFFFFFFFF'FFFFFFFF;
+    // Test Serialize Add of an attribute value that is greater than the mock attribute max (Max int32_t value)
+    OOPairs[0].attributeValue = 0x7FFFFFFF'FFFFFFFF;
 
-    // EFS to test caping of value once a variable above the mock attribute size is serialize
+    // EFS to test caping of value once a variable above the mock attribute size is serialized
     app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldValueCapOut;
     app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldValueCapIn;
 
@@ -754,14 +754,44 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite,
                    CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint1, kOnOffClusterId, buff_span, extensionFieldValueCapOut));
 
-    printf("extensionFieldValueCapOut.attributeValueList[0].attributeValue = 0x%016" PRIX64 "\n",
-           extensionFieldValueCapOut.attributeValueList[0].attributeValue);
-
     // Verify that the output value is capped
     NL_TEST_ASSERT(aSuite, extensionFieldValueCapOut.attributeValueList[0].attributeValue == 0x00FFFFFF);
 
     // Clear buffer
-    memset(failBuffer, 0, fail_list.size());
+    memset(buffer, 0, buff_span.size());
+
+    // Test Serialize Add of an attribute value that is smaller than the mock attribute min (-2)
+    OOPairs[0].attributeValue = 0xFFFFFFFF'FFFFFFFE;
+
+    extensionFieldValueCapOut.clusterID          = kOnOffClusterId;
+    extensionFieldValueCapOut.attributeValueList = OOPairs;
+
+    /// Setup of input EFS (by temporary using the output one)
+    buff_span = MutableByteSpan(buffer);
+    writer.Init(buff_span);
+    NL_TEST_ASSERT(
+        aSuite, CHIP_NO_ERROR == app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldValueCapOut.attributeValueList));
+
+    reader.Init(buffer);
+    extensionFieldValueCapIn.clusterID = kOnOffClusterId;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldValueCapIn.attributeValueList.Decode(reader));
+
+    // Verify that the initial value is not capped
+    auto iterator = extensionFieldValueCapIn.attributeValueList.begin();
+    iterator.Next();
+    pair = iterator.GetValue();
+    NL_TEST_ASSERT(aSuite, pair.attributeValue == OOPairs[0].attributeValue);
+
+    // Verify that we cap the value to the mock attribute size when serializing
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));
+    NL_TEST_ASSERT(aSuite,
+                   CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint1, kOnOffClusterId, buff_span, extensionFieldValueCapOut));
+
+    // Verify that the output value is capped to -1 (0xFFFFFFFF)
+    NL_TEST_ASSERT(aSuite, extensionFieldValueCapOut.attributeValueList[0].attributeValue == 0xFFFFFFFF);
+
+    // Clear buffer
     memset(buffer, 0, buff_span.size());
 };
 
