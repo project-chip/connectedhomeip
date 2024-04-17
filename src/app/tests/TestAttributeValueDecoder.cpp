@@ -23,7 +23,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueDecoder.h>
 #include <app/MessageDef/AttributeDataIB.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>

@@ -40,6 +40,8 @@ extern "C" {
 #include "sl_bt_stack_init.h"
 #include "timers.h"
 #include <ble/CHIPBleServiceData.h>
+#include <crypto/RandUtils.h>
+#include <cstring>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
@@ -106,17 +108,16 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
 
+bd_addr randomizedAddr = { 0 };
+
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err;
-
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(BleLayer::Init(this, this, &DeviceLayer::SystemLayer()));
 
     memset(mBleConnections, 0, sizeof(mBleConnections));
     memset(mIndConfId, kUnusedIndex, sizeof(mIndConfId));
@@ -132,10 +133,23 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
-exit:
-    return err;
+    // Check that an address was not already configured at boot.
+    // This covers the init-shutdown-init case to comply with the BLE address change at boot only requirement
+    bd_addr temp = { 0 };
+    if (memcmp(&randomizedAddr, &temp, sizeof(bd_addr)) == 0)
+    {
+        // Since a random address is not configured, configure one
+        uint64_t random = Crypto::GetRandU64();
+        // Copy random value to address. We don't care of the ordering since it's a random value.
+        memcpy(&randomizedAddr, &random, sizeof(randomizedAddr));
+
+        // Set two MSBs to 11 to properly the address - BLE Static Device Address requirement
+        randomizedAddr.addr[5] |= 0xC0;
+    }
+
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::_NumConnections(void)
@@ -484,14 +498,13 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
             ChipLogError(DeviceLayer, "sl_bt_advertiser_create_set() failed: %s", ErrorStr(err));
         });
 
-        bd_addr randomizedAddr = {};
-        ret = sl_bt_advertiser_set_random_address(advertising_set_handle, sl_bt_gap_random_resolvable_address, randomizedAddr,
-                                                  &randomizedAddr);
+        ret =
+            sl_bt_advertiser_set_random_address(advertising_set_handle, sl_bt_gap_static_address, randomizedAddr, &randomizedAddr);
         VerifyOrExit(ret == SL_STATUS_OK, {
             err = MapBLEError(ret);
             ChipLogError(DeviceLayer, "sl_bt_advertiser_set_random_address() failed: %s", ErrorStr(err));
         });
-        ChipLogDetail(DeviceLayer, "BLE Resolvable private random address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
+        ChipLogDetail(DeviceLayer, "BLE Static Device Address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
                       randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
                       randomizedAddr.addr[0]);
     }
@@ -532,11 +545,12 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err;
-    sl_status_t ret;
-    uint32_t interval_min;
-    uint32_t interval_max;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    sl_status_t ret          = SL_STATUS_OK;
+    uint32_t interval_min    = 0;
+    uint32_t interval_max    = 0;
     uint16_t numConnectionss = NumConnections();
+    bool postAdvChangeEvent  = false;
     uint8_t connectableAdv =
         (numConnectionss < kMaxConnections) ? sl_bt_advertiser_connectable_scannable : sl_bt_advertiser_scannable_non_connectable;
 
@@ -548,6 +562,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     else
     {
         ChipLogDetail(DeviceLayer, "Start BLE advertisement");
+        postAdvChangeEvent = true;
     }
 
     err = ConfigureAdvertisingData();
@@ -586,18 +601,26 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     SuccessOrExit(err);
 
     sl_bt_advertiser_configure(advertising_set_handle, 1);
+
     ret = sl_bt_legacy_advertiser_start(advertising_set_handle, connectableAdv);
-
-    if (SL_STATUS_OK == ret)
-    {
-        if (mFlags.Has(Flags::kFastAdvertisingEnabled))
-        {
-            StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
-        }
-        mFlags.Set(Flags::kAdvertising);
-    }
-
     err = MapBLEError(ret);
+    SuccessOrExit(err);
+
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+    }
+    mFlags.Set(Flags::kAdvertising);
+
+    if (postAdvChangeEvent)
+    {
+        // Post CHIPoBLEAdvertisingChange event.
+        ChipDeviceEvent advChange;
+        advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+        advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
+
+        ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
+    }
 
 exit:
     return err;
@@ -606,23 +629,31 @@ exit:
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    sl_status_t ret;
 
     if (mFlags.Has(Flags::kAdvertising))
     {
+        sl_status_t ret = SL_STATUS_OK;
+
         mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
         ret = sl_bt_advertiser_stop(advertising_set_handle);
+        sl_bt_advertiser_clear_random_address(advertising_set_handle);
+
         sl_bt_advertiser_delete_set(advertising_set_handle);
         advertising_set_handle = 0xff;
         err                    = MapBLEError(ret);
-        SuccessOrExit(err);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
         CancelBleAdvTimeoutTimer();
+
+        // Post CHIPoBLEAdvertisingChange event.
+        ChipDeviceEvent advChange;
+        advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+        advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+        err                                        = PlatformMgr().PostEvent(&advChange);
     }
 
-exit:
     return err;
 }
 

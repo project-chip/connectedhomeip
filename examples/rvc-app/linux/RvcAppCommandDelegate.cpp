@@ -20,6 +20,7 @@
 #include <platform/PlatformManager.h>
 
 #include "rvc-device.h"
+#include <string>
 #include <utility>
 
 using namespace chip;

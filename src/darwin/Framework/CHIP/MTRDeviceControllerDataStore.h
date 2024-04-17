@@ -17,12 +17,8 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
-#import <Matter/MTRDevice_Internal.h>
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#else
-#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDevice_Internal.h>
 
 #include <lib/core/CHIPError.h>
 
@@ -47,6 +43,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable instancetype)initWithController:(MTRDeviceController *)controller
                             storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                        storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue;
+
+// clusterDataByNode a dictionary: nodeID => cluster data dictionary
+typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNode);
+
+/**
+ * Asks the data store to load cluster data for nodes in bulk. If the storageDelegate supports it, the handler will be called synchronously.
+ * If the storageDelegate does not support it, the handler will not be called at all.
+ */
+- (void)fetchAttributeDataForAllDevices:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler;
 
 /**
  * Resumption info APIs.

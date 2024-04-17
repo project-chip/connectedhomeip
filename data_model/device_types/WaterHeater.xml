@@ -71,10 +71,10 @@ Davis, CA 95616, USA
     <cluster id="0x0098" name="Device Energy Management" side="server">
       <optionalConform/>
       <features>
-        <feature code="" name="PFR">
+        <feature code="" name="PowerForecastReporting">
           <optionalConform/>
         </feature>
-        <feature code="" name="PFA">
+        <feature code="" name="ForecastAdjustment">
           <optionalConform/>
         </feature>
       </features>
@@ -85,10 +85,10 @@ Davis, CA 95616, USA
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="HEAT">
+        <feature code="" name="Heating">
           <mandatoryConform/>
         </feature>
-        <feature code="" name="SCH">
+        <feature code="" name="ScheduleConfiguration">
           <mandatoryConform/>
         </feature>
       </features>

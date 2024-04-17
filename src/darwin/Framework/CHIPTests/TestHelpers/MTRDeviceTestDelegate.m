@@ -60,4 +60,13 @@
     }
 }
 
+- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device
+{
+    return self.skipExpectedValuesForWrite;
+}
+
+- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device
+{
+    return self.forceAttributeReportsIfMatchingCache;
+}
 @end

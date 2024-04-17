@@ -470,7 +470,7 @@ gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 > **Note:** Some platforms that can be built as part of the unified build
 > require downloading additional tools. To add these to the build, the location
 > must be provided as a build argument. For example, to add the Simplelink
-> cc13x2_26x2 examples to the unified build, install
+> cc13xx_26xx examples to the unified build, install
 > [SysConfig](https://www.ti.com/tool/SYSCONFIG) and add the following build
 > arguments:
 >

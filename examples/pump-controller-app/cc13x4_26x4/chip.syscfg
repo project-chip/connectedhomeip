@@ -175,6 +175,7 @@ LED2.$hardware                  = system.deviceData.board.components.LED_GREEN;
 LED2.gpioPin.$name              = "CONFIG_GPIO_GLED";
 LED2.gpioPin.mode               = "Output";
 
+
 /* Debug UART  */
 UART2.$hardware     = system.deviceData.board.components.XDS110UART;
 UART2.$name         = "CONFIG_UART2_DEBUG";

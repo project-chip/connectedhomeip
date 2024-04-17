@@ -48,9 +48,9 @@ tests:
 
           On the TH(Chip-tool) Log, Verify featureMap value is 0 and below is the sample log provided for the raspi platform:
 
-          [1705923720.577354][23553:23555] CHIP:DMG: }
-          [1705923720.577393][23553:23555] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_009F Attribute 0x0000_FFFC DataVersion: 2217281174
-          [1705923720.577412][23553:23555] CHIP:TOO:   FeatureMap: 1
+          [1707803263.396282][12695:12697] CHIP:DMG: }
+          [1707803263.396447][12695:12697] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_009F Attribute 0x0000_FFFC DataVersion: 3404644350
+          [1707803263.396492][12695:12697] CHIP:TOO:   FeatureMap: 0
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP

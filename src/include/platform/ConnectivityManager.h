@@ -24,7 +24,6 @@
 #pragma once
 #include <memory>
 
-#include <app/AttributeAccessInterface.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
@@ -139,8 +138,9 @@ public:
 
     enum BLEAdvertisingMode
     {
-        kFastAdvertising = 0,
-        kSlowAdvertising = 1,
+        kFastAdvertising     = 0,
+        kSlowAdvertising     = 1,
+        kExtendedAdvertising = 2,
     };
 
     enum class SEDIntervalMode
