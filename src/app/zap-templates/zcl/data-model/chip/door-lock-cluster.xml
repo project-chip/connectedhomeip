@@ -65,10 +65,10 @@ limitations under the License.
         </globalAttribute>
 
         <features>
-            <feature bit="0" code="PIN" name="PINCredential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
+            <feature bit="0" code="PIN" name="PIN Credential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
             <optionalConform/>
             </feature>
-            <feature bit="1" code="RID" name="RFIDCredential" summary="Lock supports RFID credentials">
+            <feature bit="1" code="RID" name="RFID Credential" summary="Lock supports RFID credentials">
             <optionalConform/>
             </feature>
             <feature bit="2" code="FGP" name="FingerCredentials" summary="Lock supports finger related credentials (fingerprint, finger vein)">

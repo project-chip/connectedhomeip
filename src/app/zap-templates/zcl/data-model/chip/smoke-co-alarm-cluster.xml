@@ -40,7 +40,7 @@ limitations under the License.
       <feature bit="0" code="SMOKE" name="SmokeAlarm" summary="Supports Smoke alarm">
         <optionalConform choice="a" more="true"/>
       </feature>
-      <feature bit="1" code="CO" name="COAlarm" summary="Supports CO alarm">
+      <feature bit="1" code="CO" name="CO Alarm" summary="Supports CO alarm">
         <optionalConform choice="a" more="true"/>
       </feature>
     </features>
