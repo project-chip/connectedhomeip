@@ -46,18 +46,13 @@ public:
         mTriedDecode = true;
         // The WriteRequest comes with no fabric index, this will happen when receiving a write request on a PASE session before
         // AddNOC.
-        VerifyOrReturnError(AccessingFabricIndex() != kUndefinedFabricIndex, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
+        VerifyOrReturnError(GetSubjectDescriptor().fabricIndex != kUndefinedFabricIndex, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
         ReturnErrorOnFailure(DataModel::Decode(mReader, aArg));
-        aArg.SetFabricIndex(AccessingFabricIndex());
+        aArg.SetFabricIndex(GetSubjectDescriptor().fabricIndex);
         return CHIP_NO_ERROR;
     }
 
     bool TriedDecode() const { return mTriedDecode; }
-
-    /**
-     * The accessing fabric index for this write interaction.
-     */
-    FabricIndex AccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
 
     /**
      * The accessing subject descriptor for this write interaction.

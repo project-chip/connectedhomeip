@@ -200,7 +200,7 @@ void BindingTableAccess::OnListWriteEnd(const app::ConcreteAttributePath & aPath
 
 CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
 {
-    mAccessingFabricIndex = decoder.AccessingFabricIndex();
+    mAccessingFabricIndex = decoder.GetSubjectDescriptor().fabricIndex;
     if (!path.IsListOperation() || path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
         DecodableBindingListType newBindingList;

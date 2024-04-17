@@ -230,7 +230,7 @@ CHIP_ERROR AccessControlAttribute::WriteImpl(const ConcreteDataAttributePath & a
 
 CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
+    FabricIndex accessingFabricIndex = aDecoder.GetSubjectDescriptor().fabricIndex;
 
     size_t oldCount;
     ReturnErrorOnFailure(GetAccessControl().GetEntryCount(accessingFabricIndex, oldCount));
@@ -293,7 +293,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 {
     auto & storage = Server::GetInstance().GetPersistentStorage();
 
-    FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
+    FabricIndex accessingFabricIndex = aDecoder.GetSubjectDescriptor().fabricIndex;
 
     uint8_t buffer[kExtensionDataMaxLength] = { 0 };
     uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));

@@ -425,7 +425,7 @@ CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & 
 // Helper function for trying to read an attribute value via an
 // AttributeAccessInterface.  On failure, the read has failed.  On success, the
 // aTriedEncode outparam is set to whether the AttributeAccessInterface tried to encode a value.
-CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFabricFiltered,
+CHIP_ERROR ReadViaAccessInterface(SubjectDescriptor subjectDescriptor, bool aIsFabricFiltered,
                                   const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                   AttributeValueEncoder::AttributeEncodeState * aEncoderState,
                                   AttributeAccessInterface * aAccessInterface, bool * aTriedEncode)
@@ -434,7 +434,7 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFab
         (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
     DataVersion version = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath, version));
-    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
+    AttributeValueEncoder valueEncoder(aAttributeReports, subjectDescriptor, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
     if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead) && aPath.mExpanded)
@@ -569,7 +569,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         if (attributeOverride)
         {
             bool triedEncode = false;
-            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aIsFabricFiltered, aPath, aAttributeReports,
+            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReports,
                                                         apEncoderState, attributeOverride, &triedEncode));
             ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);
         }

@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <access/SubjectDescriptor.h>
 #include <app/AttributeReportBuilder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -51,9 +52,10 @@ public:
             // If we are encoding for a fabric filtered attribute read and the fabric index does not match that present in the
             // request, skip encoding this list item.
             VerifyOrReturnError(!mAttributeValueEncoder.mIsFabricFiltered ||
-                                    aArg.GetFabricIndex() == mAttributeValueEncoder.mAccessingFabricIndex,
+                                    aArg.GetFabricIndex() == mAttributeValueEncoder.GetSubjectDescriptor().fabricIndex,
                                 CHIP_NO_ERROR);
-            return mAttributeValueEncoder.EncodeListItem(mAttributeValueEncoder.mAccessingFabricIndex, std::forward<T>(aArg));
+            return mAttributeValueEncoder.EncodeListItem(mAttributeValueEncoder.GetSubjectDescriptor().fabricIndex,
+                                                         std::forward<T>(aArg));
         }
 
         template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
@@ -97,11 +99,11 @@ public:
         ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
     };
 
-    AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, FabricIndex aAccessingFabricIndex,
+    AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, Access::SubjectDescriptor subjectDescriptor,
                           const ConcreteAttributePath & aPath, DataVersion aDataVersion, bool aIsFabricFiltered = false,
                           const AttributeEncodeState & aState = AttributeEncodeState()) :
         mAttributeReportIBsBuilder(aAttributeReportIBsBuilder),
-        mAccessingFabricIndex(aAccessingFabricIndex), mPath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+        mSubjectDescriptor(subjectDescriptor), mPath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
         mDataVersion(aDataVersion), mIsFabricFiltered(aIsFabricFiltered), mEncodeState(aState)
     {}
 
@@ -176,10 +178,7 @@ public:
 
     bool TriedEncode() const { return mTriedEncode; }
 
-    /**
-     * The accessing fabric index for this read or subscribe interaction.
-     */
-    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+    const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
     /**
      * AttributeValueEncoder is a short lived object, and the state is persisted by mEncodeState and restored by constructor.
@@ -268,7 +267,7 @@ private:
 
     bool mTriedEncode = false;
     AttributeReportIBs::Builder & mAttributeReportIBsBuilder;
-    const FabricIndex mAccessingFabricIndex;
+    const Access::SubjectDescriptor mSubjectDescriptor;
     ConcreteDataAttributePath mPath;
     DataVersion mDataVersion;
     bool mIsFabricFiltered = false;

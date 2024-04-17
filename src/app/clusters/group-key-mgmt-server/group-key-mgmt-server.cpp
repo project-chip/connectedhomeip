@@ -192,7 +192,7 @@ private:
 
     CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
     {
-        auto fabric_index = aDecoder.AccessingFabricIndex();
+        auto fabric_index = aDecoder.GetSubjectDescriptor().fabricIndex;
         auto provider     = GetGroupDataProvider();
 
         if (!aPath.IsListItemOperation())
