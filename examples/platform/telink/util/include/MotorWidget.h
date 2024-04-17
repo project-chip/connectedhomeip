@@ -45,6 +45,8 @@ public:
 private:
 
     struct gpio_callback mStalling_cb_data;
+    struct gpio_callback mLimit1_cb_data;
+    struct gpio_callback mLimit2_cb_data;
 
     bool mState;
     bool isMotorStopped = true;
@@ -55,6 +57,8 @@ private:
     static void ActionMotorStateUpdateHandler(k_timer * timer);
     static void SkipDetectStallTimerHandler(k_timer * timer);
     static void stalling_detected(const struct device * dev, struct gpio_callback * cb, uint32_t pins);
+    static void limited1_detected(const struct device * dev, struct gpio_callback * cb, uint32_t pins);
+    static void limited2_detected(const struct device * dev, struct gpio_callback * cb, uint32_t pins);
 
     void DoSet(bool state);
     void ScheduleStateChange();

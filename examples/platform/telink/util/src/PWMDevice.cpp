@@ -299,10 +299,10 @@ void PWMDevice::UpdateMotorAction(void)
         else
         {
             mLevel += mBreatheStepLevel;
-            if(mLevel <= (mMaxLevel-mMinLevel)*87/100)
+            if(mLevel <= (mMaxLevel-mMinLevel))
             {
-                if(mLevel == 104)
-                    mLevel = 103;
+                //if(mLevel == 104)
+                //    mLevel = 103;
                 mBreatheStepCntr++;
                 Set(true);
                 StartBreatheTimer(kBreatheStepTimeMS);

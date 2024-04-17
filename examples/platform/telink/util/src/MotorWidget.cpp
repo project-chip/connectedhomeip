@@ -32,6 +32,8 @@ LOG_MODULE_DECLARE(Motor, CONFIG_CHIP_APP_LOG_LEVEL);
 //const struct gpio_dt_spec sMotorIn2Dt = GPIO_DT_SPEC_GET(DT_ALIAS(motorin2), gpios);
 static const struct gpio_dt_spec sMotorSleepDt = GPIO_DT_SPEC_GET(DT_ALIAS(motorsleep), gpios);
 static const struct gpio_dt_spec sMotorStallingDt = GPIO_DT_SPEC_GET(DT_ALIAS(motordetect), gpios);
+static const struct gpio_dt_spec sMotorLimte1Dt = GPIO_DT_SPEC_GET(DT_ALIAS(motorlimited1), gpios);
+static const struct gpio_dt_spec sMotorLimte2Dt = GPIO_DT_SPEC_GET(DT_ALIAS(motorlimited2), gpios);
 //static gpio_dt_spec sMotorIn1Dt = GPIO_DT_SPEC_GET(DT_ALIAS(motorin1), gpios);
 static const struct pwm_dt_spec sMotorIn1Dt = PWM_DT_SPEC_GET(DT_ALIAS(pwmmotorin1));
 //static gpio_dt_spec sMotorIn2Dt = GPIO_DT_SPEC_GET(DT_ALIAS(motorin2), gpios);
@@ -87,6 +89,46 @@ void MotorWidget::Init(void)
         LOG_ERR("Config gpio_init_callback err: %d", ret);
         return ret;
     }
+    //Limit detected
+    ret = gpio_pin_configure_dt(&sMotorLimte1Dt, GPIO_INPUT | GPIO_PULL_UP);
+    if (ret < 0)
+    {
+        LOG_ERR("Config in pin err: %d", ret);
+        return ret;
+    }
+    ret = gpio_pin_interrupt_configure_dt(&sMotorLimte1Dt, GPIO_INT_EDGE_TO_ACTIVE);
+    if (ret < 0)
+    {
+        LOG_ERR("Config irq pin err: %d", ret);
+        return ret;
+    }
+    gpio_init_callback(&mLimit1_cb_data, &MotorWidget::stalling_detected, BIT(sMotorLimte1Dt.pin));
+    ret = gpio_add_callback(sMotorLimte1Dt.port, &mLimit1_cb_data);
+    if (ret < 0)
+    {
+        LOG_ERR("Config gpio_init_callback err: %d", ret);
+        return ret;
+    }
+
+    ret = gpio_pin_configure_dt(&sMotorLimte2Dt, GPIO_INPUT | GPIO_PULL_UP);
+    if (ret < 0)
+    {
+        LOG_ERR("Config in pin err: %d", ret);
+        return ret;
+    }
+    ret = gpio_pin_interrupt_configure_dt(&sMotorLimte2Dt, GPIO_INT_EDGE_TO_ACTIVE);
+    if (ret < 0)
+    {
+        LOG_ERR("Config irq pin err: %d", ret);
+        return ret;
+    }
+    gpio_init_callback(&mLimit2_cb_data, &MotorWidget::stalling_detected, BIT(sMotorLimte2Dt.pin));
+    ret = gpio_add_callback(sMotorLimte2Dt.port, &mLimit2_cb_data);
+    if (ret < 0)
+    {
+        LOG_ERR("Config gpio_init_callback err: %d", ret);
+        return ret;
+    }
 
     CHIP_ERROR err;
     err = mPwmMotorIn1.Init(&sMotorIn1Dt, 80, 200, 80);
@@ -116,10 +158,40 @@ void MotorWidget::Init(void)
 
 void MotorWidget::stalling_detected(const struct device * dev, struct gpio_callback * cb, uint32_t pins)
 {
-    //if(skipDetectStalling == false)
+    if ((BIT(sMotorLimte1Dt.pin) & pins) && (dev == sMotorLimte1Dt.port))
     {
-        MotorWidget & sInstance = MotorWidgetInst();
-        sInstance.MotorStop();
+        //MotorWidget & sInstance = MotorWidgetInst();
+        //sInstance.MotorStop();
+        LOG_INF("Motor limited Up detected!");
+        if (sStopCallback)
+            sStopCallback(&sInstance);
+
+        int ret = gpio_pin_configure_dt(&sMotorLimte1Dt, GPIO_INPUT | GPIO_PULL_DOWN);
+        if (ret < 0)
+        {
+            LOG_ERR("Config in pin err: %d", ret);
+            return ret;
+        }
+    }
+    else if ((BIT(sMotorLimte2Dt.pin) & pins) && (dev == sMotorLimte2Dt.port))
+    {
+        //MotorWidget & sInstance = MotorWidgetInst();
+        //sInstance.MotorStop();
+        LOG_INF("Motor limited Down detected!");
+        if (sStopCallback)
+            sStopCallback(&sInstance);
+
+        int ret = gpio_pin_configure_dt(&sMotorLimte2Dt, GPIO_INPUT | GPIO_PULL_DOWN);
+        if (ret < 0)
+        {
+            LOG_ERR("Config in pin err: %d", ret);
+            return ret;
+        }
+    }
+    else if ((BIT(sMotorStallingDt.pin) & pins) && (dev == sMotorStallingDt.port))
+    {
+        //MotorWidget & sInstance = MotorWidgetInst();
+        //sInstance.MotorStop();
         LOG_INF("Stalling_detected!");
         if (sStopCallback)
             sStopCallback(&sInstance);
@@ -166,34 +238,73 @@ void MotorWidget::Break(void)
 
 void MotorWidget::Forward(void)
 {
-    //skipDetectStalling = true;
-    //k_timer_stop(&mSkipDetectStallTimer);
-    //k_timer_start(&mSkipDetectStallTimer, K_MSEC(20), K_NO_WAIT);
-    Sleep(true);
-    mPwmMotorIn2.StopAction();
-    mPwmMotorIn1.InitiateMotorAction(800);
-    motorState = false;
+    int ret = gpio_pin_configure_dt(&sMotorLimte2Dt, GPIO_INPUT | GPIO_PULL_UP);
+    if (ret < 0)
+    {
+        LOG_ERR("Config in pin err: %d", ret);
+        return ret;
+    }
+    if(gpio_pin_get_dt(&sMotorLimte2Dt) == 0)
+    {
+        //skipDetectStalling = true;
+        //k_timer_stop(&mSkipDetectStallTimer);
+        //k_timer_start(&mSkipDetectStallTimer, K_MSEC(20), K_NO_WAIT);
+        Sleep(true);
+        mPwmMotorIn2.StopAction();
+        mPwmMotorIn1.InitiateMotorAction(800);
+    }
+    else
+    {
+        ret = gpio_pin_configure_dt(&sMotorLimte2Dt, GPIO_INPUT | GPIO_PULL_DOWN);
+        if (ret < 0)
+        {
+            LOG_ERR("Config in pin err: %d", ret);
+            return ret;
+        }
+    }
 }
 
 void MotorWidget::Reverse(void)
 {
-    //skipDetectStalling = true;
-    //k_timer_stop(&mSkipDetectStallTimer);
-    //k_timer_start(&mSkipDetectStallTimer, K_MSEC(20), K_NO_WAIT);
-    Sleep(true);
-    mPwmMotorIn1.StopAction();
-    mPwmMotorIn2.InitiateMotorAction(800);
-    motorState = true;
+    int ret = gpio_pin_configure_dt(&sMotorLimte1Dt, GPIO_INPUT | GPIO_PULL_UP);
+    if (ret < 0)
+    {
+        LOG_ERR("Config in pin err: %d", ret);
+        return ret;
+    }
+    if(gpio_pin_get_dt(&sMotorLimte1Dt) == 0)
+    {
+        //skipDetectStalling = true;
+        //k_timer_stop(&mSkipDetectStallTimer);
+        //k_timer_start(&mSkipDetectStallTimer, K_MSEC(20), K_NO_WAIT);
+        Sleep(true);
+        mPwmMotorIn1.StopAction();
+        mPwmMotorIn2.InitiateMotorAction(800);
+    }
+    else
+    {
+        ret = gpio_pin_configure_dt(&sMotorLimte1Dt, GPIO_INPUT | GPIO_PULL_DOWN);
+        if (ret < 0)
+        {
+            LOG_ERR("Config in pin err: %d", ret);
+            return ret;
+        }
+    }
 }
 
 void MotorWidget::Start(bool direction)
 {
+    if(motorState == direction)
+    {
+        return;
+    }
+    motorState = direction;
     if (isMotorStopped)
     {
         pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
         pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
     }
-
+    
     isMotorStopped = false;
     LOG_INF("Motor start: %d\n", direction);
     k_timer_stop(&mMotorTimer);

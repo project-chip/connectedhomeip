@@ -7,6 +7,8 @@
 		sw1 = &key_switch;
 		motorsleep = &motor_sleep;
 		motordetect = &motor_detect;
+		motorlimited1 = &motor_limited_1;
+		motorlimited2 = &motor_limited_2;
 		pwmmotorin1 = &pwm_motor_1;
 		pwmmotorin2 = &pwm_motor_2;
 	};
@@ -23,6 +25,14 @@
 		motor_detect: motor_switch {
 			label = "MOTOR SWITCH";
 			gpios = <&gpioc 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		};
+		motor_limited_1: motor_stop_1 {
+			label = "MOTOR LIMIT 1";
+			gpios = <&gpioc 6 (GPIO_ACTIVE_LOW)>;
+		};
+		motor_limited_2: motor_stop_2 {
+			label = "MOTOR LIMIT 2";
+			gpios = <&gpioc 7 (GPIO_ACTIVE_LOW)>;
 		};
 	};
 
@@ -78,5 +88,3 @@
 &gpiof {
 	status = "disabled";
 };
-
-
