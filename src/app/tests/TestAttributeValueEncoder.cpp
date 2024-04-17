@@ -55,7 +55,7 @@ template <size_t N>
 struct LimitedTestSetup
 {
     LimitedTestSetup(nlTestSuite * aSuite, const FabricIndex aFabricIndex = kUndefinedFabricIndex,
-                     const AttributeValueEncoder::AttributeEncodeState & aState = AttributeValueEncoder::AttributeEncodeState()) :
+                     const AttributeEncodeState & aState = AttributeEncodeState()) :
         encoder(builder, aFabricIndex, ConcreteAttributePath(kRandomEndpointId, kRandomClusterId, kRandomAttributeId),
                 kRandomDataVersion, aFabricIndex != kUndefinedFabricIndex, aState)
     {
@@ -275,7 +275,7 @@ void TestEncodeFabricScoped(nlTestSuite * aSuite, void * aContext)
 
 void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
 {
-    AttributeValueEncoder::AttributeEncodeState state;
+    AttributeEncodeState state;
 
     bool list[]      = { true, false, false, true, true, false };
     auto listEncoder = [&list](const auto & encoder) -> CHIP_ERROR {
@@ -400,7 +400,7 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
 
 void TestEncodeListChunking2(nlTestSuite * aSuite, void * aContext)
 {
-    AttributeValueEncoder::AttributeEncodeState state;
+    AttributeEncodeState state;
 
     bool list[]      = { true, false, false, true, true, false };
     auto listEncoder = [&list](const auto & encoder) -> CHIP_ERROR {

@@ -321,8 +321,7 @@ DataVersion GetVersion()
 }
 
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
-                                     AttributeReportIBs::Builder & aAttributeReports,
-                                     AttributeValueEncoder::AttributeEncodeState * apEncoderState)
+                                     AttributeReportIBs::Builder & aAttributeReports, AttributeEncodeState * apEncoderState)
 {
     bool dataExists =
         (emberAfGetServerAttributeIndexByAttributeId(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId) != UINT16_MAX);
@@ -351,8 +350,7 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     // Attribute 4 acts as a large attribute to trigger chunking.
     if (aPath.mAttributeId == MockAttributeId(4))
     {
-        AttributeValueEncoder::AttributeEncodeState state =
-            (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
+        AttributeEncodeState state = (apEncoderState == nullptr ? AttributeEncodeState() : *apEncoderState);
         AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, dataVersion, false, state);
 
         CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {

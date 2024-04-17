@@ -29,6 +29,60 @@ namespace chip {
 namespace app {
 
 /**
+ * Maintains the internal state of list encoding
+ */
+class AttributeEncodeState
+{
+public:
+    AttributeEncodeState() = default;
+
+    bool AllowPartialData() const { return mAllowPartialData; }
+    ListIndex CurrentEncodingListIndex() const { return mCurrentEncodingListIndex; }
+
+    AttributeEncodeState & SetAllowPartialData(bool allow)
+    {
+        mAllowPartialData = allow;
+        return *this;
+    }
+
+    AttributeEncodeState & SetCurrentEncodingListIndex(ListIndex idx)
+    {
+        mCurrentEncodingListIndex = idx;
+        return *this;
+    }
+
+    void Reset()
+    {
+        mCurrentEncodingListIndex = kInvalidListIndex;
+        mAllowPartialData         = false;
+    }
+
+private:
+    /**
+     * If set to kInvalidListIndex, indicates that we have not encoded any data for the list yet and
+     * need to start by encoding an empty list before we start encoding any list items.
+     *
+     * When set to a valid ListIndex value, indicates the index of the next list item that needs to be
+     * encoded (i.e. the count of items encoded so far).
+     */
+    ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
+
+    /**
+     * When an attempt to encode an attribute returns an error, the buffer may contain tailing dirty data
+     * (since the put was aborted).  The report engine normally rolls back the buffer to right before encoding
+     * of the attribute started on errors.
+     *
+     * When chunking a list, EncodeListItem will atomically encode list items, ensuring that the
+     * state of the buffer is valid to send (i.e. contains no trailing garbage), and return an error
+     * if the list doesn't entirely fit.  In this situation, mAllowPartialData is set to communicate to the
+     * report engine that it should not roll back the list items.
+     *
+     * TODO: There might be a better name for this variable.
+     */
+    bool mAllowPartialData = false;
+};
+
+/**
  * The AttributeValueEncoder is a helper class for filling report payloads into AttributeReportIBs.
  * The attribute value encoder can be initialized with a AttributeEncodeState for saving and recovering its state between encode
  * sessions (chunkings).
@@ -66,37 +120,6 @@ public:
 
     private:
         AttributeValueEncoder & mAttributeValueEncoder;
-    };
-
-    class AttributeEncodeState
-    {
-    public:
-        AttributeEncodeState() : mAllowPartialData(false), mCurrentEncodingListIndex(kInvalidListIndex) {}
-        bool AllowPartialData() const { return mAllowPartialData; }
-
-    private:
-        friend class AttributeValueEncoder;
-        /**
-         * When an attempt to encode an attribute returns an error, the buffer may contain tailing dirty data
-         * (since the put was aborted).  The report engine normally rolls back the buffer to right before encoding
-         * of the attribute started on errors.
-         *
-         * When chunking a list, EncodeListItem will atomically encode list items, ensuring that the
-         * state of the buffer is valid to send (i.e. contains no trailing garbage), and return an error
-         * if the list doesn't entirely fit.  In this situation, mAllowPartialData is set to communicate to the
-         * report engine that it should not roll back the list items.
-         *
-         * TODO: There might be a better name for this variable.
-         */
-        bool mAllowPartialData = false;
-        /**
-         * If set to kInvalidListIndex, indicates that we have not encoded any data for the list yet and
-         * need to start by encoding an empty list before we start encoding any list items.
-         *
-         * When set to a valid ListIndex value, indicates the index of the next list item that needs to be
-         * encoded (i.e. the count of items encoded so far).
-         */
-        ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
     };
 
     AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, Access::SubjectDescriptor subjectDescriptor,
@@ -194,7 +217,7 @@ private:
     {
         // EncodeListItem must be called after EnsureListStarted(), thus mCurrentEncodingListIndex and
         // mEncodeState.mCurrentEncodingListIndex are not invalid values.
-        if (mCurrentEncodingListIndex < mEncodeState.mCurrentEncodingListIndex)
+        if (mCurrentEncodingListIndex < mEncodeState.CurrentEncodingListIndex())
         {
             // We have encoded this element in previous chunks, skip it.
             mCurrentEncodingListIndex++;
@@ -225,7 +248,7 @@ private:
         }
 
         mCurrentEncodingListIndex++;
-        mEncodeState.mCurrentEncodingListIndex++;
+        mEncodeState.SetCurrentEncodingListIndex(mCurrentEncodingListIndex);
         mEncodedAtLeastOneListItem = true;
         return CHIP_NO_ERROR;
     }

@@ -427,12 +427,11 @@ CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & 
 // aTriedEncode outparam is set to whether the AttributeAccessInterface tried to encode a value.
 CHIP_ERROR ReadViaAccessInterface(SubjectDescriptor subjectDescriptor, bool aIsFabricFiltered,
                                   const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                  AttributeValueEncoder::AttributeEncodeState * aEncoderState,
-                                  AttributeAccessInterface * aAccessInterface, bool * aTriedEncode)
+                                  AttributeEncodeState * aEncoderState, AttributeAccessInterface * aAccessInterface,
+                                  bool * aTriedEncode)
 {
-    AttributeValueEncoder::AttributeEncodeState state =
-        (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
-    DataVersion version = 0;
+    AttributeEncodeState state = (aEncoderState == nullptr ? AttributeEncodeState() : *aEncoderState);
+    DataVersion version        = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath, version));
     AttributeValueEncoder valueEncoder(aAttributeReports, subjectDescriptor, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
@@ -523,7 +522,7 @@ bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
 
 CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
+                                 AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
