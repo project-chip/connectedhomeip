@@ -114,8 +114,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             {
                 state = *apEncoderState;
             }
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, path, kDataVersion /* data version */,
-                                               aIsFabricFiltered, state);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, path, kDataVersion, aIsFabricFiltered, state);
             ReturnErrorOnFailure(valueEncoder.Encode(true));
         }
 
@@ -132,8 +131,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             {
                 state = *apEncoderState;
             }
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion /* data version */,
-                                               aIsFabricFiltered, state);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
+                                               state);
 
             return valueEncoder.EncodeList([aSubjectDescriptor](const auto & encoder) -> CHIP_ERROR {
                 app::Clusters::UnitTesting::Structs::TestFabricScoped::Type val;
@@ -152,8 +151,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             {
                 state = *apEncoderState;
             }
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion /* data version */,
-                                               aIsFabricFiltered, state);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
+                                               state);
 
             return valueEncoder.Encode(++totalReadCount);
         }
@@ -161,8 +160,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             (aPath.mClusterId == app::Clusters::UnitTesting::Id && aPath.mAttributeId == kPerpetualAttributeid))
         {
             AttributeEncodeState state;
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion /* data version */,
-                                               aIsFabricFiltered, state);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
+                                               state);
 
             CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
                 encoder.Encode(static_cast<uint8_t>(1));
@@ -188,8 +187,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             {
                 state = *apEncoderState;
             }
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion /* data version */,
-                                               aIsFabricFiltered, state);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
+                                               state);
 
             return valueEncoder.Encode(isLitIcd ? Clusters::IcdManagement::OperatingModeEnum::kLit
                                                 : Clusters::IcdManagement::OperatingModeEnum::kSit);
