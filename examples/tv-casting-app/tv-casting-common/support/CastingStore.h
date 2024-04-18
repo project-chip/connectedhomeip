@@ -83,6 +83,7 @@ private:
         kCastingPlayerPortTag,
         kCastingPlayerInstanceNameTag,
         kCastingPlayerDeviceNameTag,
+        kCastingCommissionerPasscodeTag,
         kCastingPlayerHostNameTag,
 
         kCastingPlayerEndpointsContainerTag,

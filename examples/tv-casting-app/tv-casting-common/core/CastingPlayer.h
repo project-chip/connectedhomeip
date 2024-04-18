@@ -115,11 +115,6 @@ public:
     bool IsConnected() const { return mConnectionState == CASTING_PLAYER_CONNECTED; }
 
     /**
-     * @return true if this CastingPlayer supports the Commissioner-Generated Passcode feature.
-     */
-    bool IsCommissionerPasscodeSupported() const { return mAttributes.commissionerPasscode != 0; }
-
-    /**
      * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new session
      * request. If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk,
      * this will execute the user directed commissioning process.
