@@ -131,7 +131,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-      - label:
+    - label:
           "Step 8: TH sends ArmFailSafe command to the DUT with the
           ExpiryLengthSeconds field set to 900"
       verification: |
