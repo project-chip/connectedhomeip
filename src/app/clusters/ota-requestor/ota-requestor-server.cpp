@@ -120,7 +120,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const 
         DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        ReturnErrorOnFailure(requestor->ClearDefaultOtaProviderList(aDecoder.GetSubjectDescriptor().fabricIndex));
+        ReturnErrorOnFailure(requestor->ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex()));
 
         auto iter = list.begin();
         while (iter.Next())

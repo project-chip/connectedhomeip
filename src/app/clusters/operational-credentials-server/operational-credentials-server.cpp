@@ -117,7 +117,7 @@ private:
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadNOCs(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    auto accessingFabricIndex = aEncoder.GetSubjectDescriptor().fabricIndex;
+    auto accessingFabricIndex = aEncoder.AccessingFabricIndex();
 
     return aEncoder.EncodeList([accessingFabricIndex](const auto & encoder) -> CHIP_ERROR {
         const auto & fabricTable = Server::GetInstance().GetFabricTable();
@@ -252,7 +252,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::Read(const ConcreteReadAttributePat
         return ReadRootCertificates(aPath.mEndpointId, aEncoder);
     }
     case Attributes::CurrentFabricIndex::Id: {
-        return aEncoder.Encode(aEncoder.GetSubjectDescriptor().fabricIndex);
+        return aEncoder.Encode(aEncoder.AccessingFabricIndex());
     }
     default:
         break;

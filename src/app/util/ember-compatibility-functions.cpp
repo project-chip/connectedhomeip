@@ -425,7 +425,7 @@ CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & 
 // Helper function for trying to read an attribute value via an
 // AttributeAccessInterface.  On failure, the read has failed.  On success, the
 // aTriedEncode outparam is set to whether the AttributeAccessInterface tried to encode a value.
-CHIP_ERROR ReadViaAccessInterface(const SubjectDescriptor &subjectDescriptor, bool aIsFabricFiltered,
+CHIP_ERROR ReadViaAccessInterface(const SubjectDescriptor & subjectDescriptor, bool aIsFabricFiltered,
                                   const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                   AttributeEncodeState * aEncoderState, AttributeAccessInterface * aAccessInterface,
                                   bool * aTriedEncode)

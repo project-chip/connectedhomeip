@@ -53,10 +53,9 @@ public:
             // If we are encoding for a fabric filtered attribute read and the fabric index does not match that present in the
             // request, skip encoding this list item.
             VerifyOrReturnError(!mAttributeValueEncoder.mIsFabricFiltered ||
-                                    aArg.GetFabricIndex() == mAttributeValueEncoder.GetSubjectDescriptor().fabricIndex,
+                                    aArg.GetFabricIndex() == mAttributeValueEncoder.AccessingFabricIndex(),
                                 CHIP_NO_ERROR);
-            return mAttributeValueEncoder.EncodeListItem(mAttributeValueEncoder.GetSubjectDescriptor().fabricIndex,
-                                                         std::forward<T>(aArg));
+            return mAttributeValueEncoder.EncodeListItem(mAttributeValueEncoder.AccessingFabricIndex(), std::forward<T>(aArg));
         }
 
         template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
@@ -149,6 +148,8 @@ public:
     bool TriedEncode() const { return mTriedEncode; }
 
     const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
+
+    FabricIndex AccessingFabricIndex() const { return GetSubjectDescriptor().fabricIndex; }
 
     /**
      * AttributeValueEncoder is a short lived object, and the state is persisted by mEncodeState and restored by constructor.

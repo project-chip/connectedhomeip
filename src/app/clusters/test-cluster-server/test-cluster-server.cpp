@@ -661,7 +661,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
         size_t srcIndex = 0, dstIndex = 0;
         while (srcIndex < gListFabricScopedAttributeLen)
         {
-            if (gListFabricScopedAttributeValue[srcIndex].fabricIndex != aDecoder.GetSubjectDescriptor().fabricIndex)
+            if (gListFabricScopedAttributeValue[srcIndex].fabricIndex != aDecoder.AccessingFabricIndex())
             {
                 auto & dstEntry = gListFabricScopedAttributeValue[dstIndex];
                 auto & srcEntry = gListFabricScopedAttributeValue[srcIndex];
