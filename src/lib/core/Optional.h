@@ -214,10 +214,7 @@ public:
 
     std::optional<T> std_optional() const
     {
-        if (!HasValue())
-        {
-            return std::optional<T>();
-        }
+        VerifyOrReturnValue(HasValue(), std::nullopt);
         return std::make_optional(Value());
     }
 
