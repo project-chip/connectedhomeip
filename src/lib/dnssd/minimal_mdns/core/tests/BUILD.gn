@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -27,15 +28,29 @@ source_set("support") {
   ]
 }
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libMinimalMdnsCoreTests"
 
   test_sources = [
     "TestFlatAllocatedQName.cpp",
-    "TestHeapQName.cpp",
     "TestQName.cpp",
     "TestRecordWriter.cpp",
   ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":support",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd/minimal_mdns/core",
+  ]
+}
+
+#nl tests will not be compiled
+chip_test_suite_using_nltest("tests_nltest") {
+  output_name = "libMinimalMdnsCoreTestsNL"
+
+  test_sources = [ "TestHeapQName.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
