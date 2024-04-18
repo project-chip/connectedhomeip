@@ -55,7 +55,7 @@ public:
         CHIP_ERROR error = chip::Platform::MemoryInit();
         EXPECT_EQ(error, CHIP_NO_ERROR);
 
-        // Setup a fake commissionable data provider since required by internals of several
+        // Set up a fake commissionable data provider since required by internals of several
         // Device/SystemLayer components.
         static chip::DeviceLayer::TestOnlyCommissionableDataProvider commissionable_data_provider;
         chip::DeviceLayer::SetCommissionableDataProvider(&commissionable_data_provider);
