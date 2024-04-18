@@ -177,7 +177,7 @@ TEST_F(TestPersistentStorageOpKeyStore, TestBasicLifeCycle)
     err = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
-    EXPECT_TRUE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     P256PublicKey csrPublicKey1;
     err = VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), csrPublicKey1);
@@ -216,21 +216,21 @@ TEST_F(TestPersistentStorageOpKeyStore, TestBasicLifeCycle)
     EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     // Even after error, the previous valid pending keypair stays valid.
-    EXPECT_FALSE(opKeystore.HasPendingOpKeypair());
+    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
 
     // Activating with mismatching fabricIndex and matching public key fails
     err = opKeystore.ActivateOpKeypairForFabric(kBadFabricIndex, csrPublicKey2);
     EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
     EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
     EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
-    EXPECT_TRUE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     // Activating with matching fabricIndex and mismatching public key fails
     err = opKeystore.ActivateOpKeypairForFabric(kFabricIndex, csrPublicKey1);
     EXPECT_EQ(err, CHIP_ERROR_INVALID_PUBLIC_KEY);
     EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
     EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
-    EXPECT_TRUE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     uint8_t message[] = { 1, 2, 3, 4 };
     P256ECDSASignature sig1;
@@ -276,7 +276,7 @@ TEST_F(TestPersistentStorageOpKeyStore, TestBasicLifeCycle)
     std::string opKeyStorageKey = DefaultStorageKeyAllocator::FabricOpKey(kFabricIndex).KeyName();
     err                         = opKeystore.CommitOpKeypairForFabric(kFabricIndex);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
+    EXPECT_FALSE(opKeystore.HasPendingOpKeypair());
     EXPECT_EQ(storageDelegate.GetNumKeys(), 1u);
     EXPECT_TRUE(storageDelegate.HasKey(opKeyStorageKey));
 
@@ -300,10 +300,10 @@ TEST_F(TestPersistentStorageOpKeyStore, TestBasicLifeCycle)
     // Let's remove the opkey for a fabric, it disappears
     err = opKeystore.RemoveOpKeypairForFabric(kFabricIndex);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
-    EXPECT_TRUE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_FALSE(opKeystore.HasPendingOpKeypair());
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
     EXPECT_EQ(storageDelegate.GetNumKeys(), 0u);
-    EXPECT_TRUE(storageDelegate.HasKey(opKeyStorageKey));
+    EXPECT_FALSE(storageDelegate.HasKey(opKeyStorageKey));
 
     opKeystore.Finish();
 }
@@ -348,8 +348,8 @@ TEST_F(TestPersistentStorageOpKeyStore, TestMigrationKeys)
               CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // The key does not exists in the any of the Operational Keystores
-    EXPECT_TRUE(storageDelegate.HasKey(opKeyStorageKey));
-    EXPECT_TRUE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_FALSE(storageDelegate.HasKey(opKeyStorageKey));
+    EXPECT_FALSE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
     EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore),
               CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
@@ -362,7 +362,7 @@ TEST_F(TestPersistentStorageOpKeyStore, TestMigrationKeys)
     EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore), CHIP_NO_ERROR);
     EXPECT_EQ(storageDelegate.GetNumKeys(), 1u);
     EXPECT_TRUE(storageDelegate.HasKey(opKeyStorageKey));
-    EXPECT_TRUE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_FALSE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     // Verify the migration
     P256SerializedKeypair serializedKeypair;
@@ -379,7 +379,7 @@ TEST_F(TestPersistentStorageOpKeyStore, TestMigrationKeys)
     EXPECT_EQ(testOperationalKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan2), CHIP_NO_ERROR);
     EXPECT_TRUE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
     EXPECT_EQ(opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore), CHIP_NO_ERROR);
-    EXPECT_TRUE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_FALSE(testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     opKeyStore.Finish();
 }

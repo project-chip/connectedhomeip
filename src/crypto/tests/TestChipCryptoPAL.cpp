@@ -1829,10 +1829,10 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointIsValid)
 
         err = spake2p.PointLoad(vector->point, vector->point_len, spake2p.L);
         // The underlying implementation may (i.e. should) check for validity when loading a point. Let's catch this case.
-        EXPECT_FALSE(err == CHIP_NO_ERROR || vector->valid);
+        EXPECT_TRUE(err == CHIP_NO_ERROR || vector->valid == 0);
 
         err = spake2p.PointIsValid(spake2p.L);
-        EXPECT_FALSE(err == CHIP_NO_ERROR || vector->valid);
+        EXPECT_TRUE(err == CHIP_NO_ERROR || vector->valid == 0);
 
         numOfTestsRan += 1;
     }
