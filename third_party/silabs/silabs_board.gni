@@ -57,6 +57,10 @@ declare_args() {
   # Enabling BLE on 9116/917 NCP by default
   chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
 }
+if(use_rs9116 || use_SiWx917)
+{
+  use_external_flash = false
+}
 
 if (silabs_board == "") {
   silabs_board = getenv("SILABS_BOARD")
