@@ -162,7 +162,7 @@ public:
         assertChipStackLockedByCurrentThread();
 
         if (!nodeData.Is<CommissionNodeData>()) {
-            // not commissionable/commissioners node 
+            // not commissionable/commissioners node
             return;
         }
 
