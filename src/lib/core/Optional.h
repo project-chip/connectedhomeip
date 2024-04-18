@@ -24,6 +24,7 @@
 #pragma once
 
 #include <new>
+#include <optional>
 #include <type_traits>
 #include <utility>
 
@@ -210,6 +211,15 @@ public:
     bool operator!=(const Optional & other) const { return !(*this == other); }
     bool operator==(const T & other) const { return HasValue() && Value() == other; }
     bool operator!=(const T & other) const { return !(*this == other); }
+
+    std::optional<T> std_optional() const
+    {
+        if (!HasValue())
+        {
+            return std::optional<T>();
+        }
+        return std::make_optional(Value());
+    }
 
     /** Convenience method to create an optional without a valid value. */
     static Optional<T> Missing() { return Optional<T>(); }

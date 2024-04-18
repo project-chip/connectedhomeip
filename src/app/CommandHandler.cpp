@@ -158,7 +158,7 @@ CHIP_ERROR CommandHandler::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRe
 
         // Grab the CommandRef if there is one, and validate that it's there when it
         // has to be.
-        Optional<uint16_t> commandRef;
+        std::optional<uint16_t> commandRef;
         uint16_t ref;
         err = commandData.GetRef(&ref);
         VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, err);
@@ -168,7 +168,7 @@ CHIP_ERROR CommandHandler::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRe
         }
         if (err == CHIP_NO_ERROR)
         {
-            commandRef.SetValue(ref);
+            commandRef.emplace(ref);
         }
 
         // Adding can fail if concretePath is not unique, or if commandRef is a value
@@ -590,9 +590,9 @@ CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const ConcreteCommandPat
                                                         const CommandHandler::InvokeResponseParameters & aPrepareParameters)
 {
     auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aPrepareParameters.mRequestCommandPath);
-    VerifyOrReturnValue(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnValue(commandPathRegistryEntry.has_value(), CHIP_ERROR_INCORRECT_STATE);
 
-    return PrepareInvokeResponseCommand(commandPathRegistryEntry.Value(), aResponseCommandPath,
+    return PrepareInvokeResponseCommand(commandPathRegistryEntry.value(), aResponseCommandPath,
                                         aPrepareParameters.mStartOrEndDataStruct);
 }
 
@@ -610,9 +610,9 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aResponseC
                        "Seemingly device supports batch commands, but is calling the deprecated PrepareCommand API");
 
     auto commandPathRegistryEntry = GetCommandPathRegistry().GetFirstEntry();
-    VerifyOrReturnValue(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnValue(commandPathRegistryEntry.has_value(), CHIP_ERROR_INCORRECT_STATE);
 
-    return PrepareInvokeResponseCommand(commandPathRegistryEntry.Value(), aResponseCommandPath, aStartDataStruct);
+    return PrepareInvokeResponseCommand(commandPathRegistryEntry.value(), aResponseCommandPath, aStartDataStruct);
 }
 
 CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
@@ -675,9 +675,9 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
 
-    if (mRefForResponse.HasValue())
+    if (mRefForResponse.has_value())
     {
-        ReturnErrorOnFailure(commandData.Ref(mRefForResponse.Value()));
+        ReturnErrorOnFailure(commandData.Ref(mRefForResponse.value()));
     }
 
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
@@ -699,8 +699,8 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     }
 
     auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aCommandPath);
-    VerifyOrReturnError(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-    mRefForResponse = commandPathRegistryEntry.Value().ref;
+    VerifyOrReturnError(commandPathRegistryEntry.has_value(), CHIP_ERROR_INCORRECT_STATE);
+    mRefForResponse = commandPathRegistryEntry.value().ref;
 
     MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
@@ -720,9 +720,9 @@ CHIP_ERROR CommandHandler::FinishStatus()
     VerifyOrReturnError(mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
 
     CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
-    if (mRefForResponse.HasValue())
+    if (mRefForResponse.has_value())
     {
-        ReturnErrorOnFailure(commandStatus.Ref(mRefForResponse.Value()));
+        ReturnErrorOnFailure(commandStatus.Ref(mRefForResponse.value()));
     }
 
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus().EndOfCommandStatusIB());
