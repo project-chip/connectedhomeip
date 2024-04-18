@@ -1719,7 +1719,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // Should be able to add this one, though; it's unrelated to any existing endpoints.
     XCTAssertTrue([controllerClient addServerEndpoint:endpoint5]);
 
-    __auto_type * device = [MTRBaseDevice deviceWithNodeID:nodeIDServer controller:controllerClient];
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:nodeIDServer controller:controllerClient];
 
     __auto_type * requestPath = attribute1RequestPath;
     __block __auto_type * responsePath = attribute1ResponsePath;
@@ -1762,14 +1762,14 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     // First try a basic read.
     XCTestExpectation * readExpectation1 = [self expectationWithDescription:@"Read 1 of attribute complete"];
-    [device readAttributePaths:@[ requestPath ]
-                    eventPaths:nil
-                        params:nil
-                         queue:queue
-                    completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                        checkSingleValue(values, error, unsignedIntValue1);
-                        [readExpectation1 fulfill];
-                    }];
+    [baseDevice readAttributePaths:@[ requestPath ]
+                        eventPaths:nil
+                            params:nil
+                             queue:queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            checkSingleValue(values, error, unsignedIntValue1);
+                            [readExpectation1 fulfill];
+                        }];
     [self waitForExpectations:@[ readExpectation1 ] timeout:kTimeoutInSeconds];
 
     // Now try a basic subscribe.
@@ -1783,7 +1783,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     XCTestExpectation * subscriptionEstablishedExpectation = [self expectationWithDescription:@"Basic subscription established"];
     __auto_type * subscribeParams = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
-    [device subscribeToAttributesWithEndpointID:requestPath.endpoint clusterID:requestPath.cluster attributeID:requestPath.attribute
+    [baseDevice subscribeToAttributesWithEndpointID:requestPath.endpoint clusterID:requestPath.cluster attributeID:requestPath.attribute
         params:subscribeParams
         queue:queue
         reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -1809,14 +1809,14 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     requestPath = attribute2RequestPath;
     responsePath = attribute2ResponsePath;
     XCTestExpectation * readNoPermissionsExpectation1 = [self expectationWithDescription:@"Read 1 of attribute with no permissions complete"];
-    [device readAttributePaths:@[ requestPath ]
-                    eventPaths:nil
-                        params:nil
-                         queue:queue
-                    completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                        checkSinglePathError(values, error, MTRInteractionErrorCodeUnsupportedAccess);
-                        [readNoPermissionsExpectation1 fulfill];
-                    }];
+    [baseDevice readAttributePaths:@[ requestPath ]
+                        eventPaths:nil
+                            params:nil
+                             queue:queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            checkSinglePathError(values, error, MTRInteractionErrorCodeUnsupportedAccess);
+                            [readNoPermissionsExpectation1 fulfill];
+                        }];
     [self waitForExpectations:@[ readNoPermissionsExpectation1 ] timeout:kTimeoutInSeconds];
 
     // Change the permissions to give Manage access on the cluster to some
@@ -1826,14 +1826,14 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [cluster2 addAccessGrant:unrelatedGrant];
 
     XCTestExpectation * readNoPermissionsExpectation2 = [self expectationWithDescription:@"Read 2 of attribute with no permissions complete"];
-    [device readAttributePaths:@[ requestPath ]
-                    eventPaths:nil
-                        params:nil
-                         queue:queue
-                    completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                        checkSinglePathError(values, error, MTRInteractionErrorCodeUnsupportedAccess);
-                        [readNoPermissionsExpectation2 fulfill];
-                    }];
+    [baseDevice readAttributePaths:@[ requestPath ]
+                        eventPaths:nil
+                            params:nil
+                             queue:queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            checkSinglePathError(values, error, MTRInteractionErrorCodeUnsupportedAccess);
+                            [readNoPermissionsExpectation2 fulfill];
+                        }];
     [self waitForExpectations:@[ readNoPermissionsExpectation2 ] timeout:kTimeoutInSeconds];
 
     // Change the permissions to give Manage access on the cluster to our client
@@ -1843,14 +1843,14 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [cluster2 addAccessGrant:clientManageGrant];
 
     XCTestExpectation * readExpectation2 = [self expectationWithDescription:@"Read 2 of attribute complete"];
-    [device readAttributePaths:@[ requestPath ]
-                    eventPaths:nil
-                        params:nil
-                         queue:queue
-                    completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                        checkSingleValue(values, error, listOfStructsValue1);
-                        [readExpectation2 fulfill];
-                    }];
+    [baseDevice readAttributePaths:@[ requestPath ]
+                        eventPaths:nil
+                            params:nil
+                             queue:queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            checkSingleValue(values, error, listOfStructsValue1);
+                            [readExpectation2 fulfill];
+                        }];
     [self waitForExpectations:@[ readExpectation2 ] timeout:kTimeoutInSeconds];
 
     // Adding Manage permissions to one cluster should not affect another one.
@@ -1858,14 +1858,14 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     responsePath = attribute3ResponsePath;
 
     XCTestExpectation * readNoPermissionsExpectation3 = [self expectationWithDescription:@"Read 3 of attribute with no permissions complete"];
-    [device readAttributePaths:@[ requestPath ]
-                    eventPaths:nil
-                        params:nil
-                         queue:queue
-                    completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                        checkSinglePathError(values, error, MTRInteractionErrorCodeUnsupportedAccess);
-                        [readNoPermissionsExpectation3 fulfill];
-                    }];
+    [baseDevice readAttributePaths:@[ requestPath ]
+                        eventPaths:nil
+                            params:nil
+                             queue:queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            checkSinglePathError(values, error, MTRInteractionErrorCodeUnsupportedAccess);
+                            [readNoPermissionsExpectation3 fulfill];
+                        }];
     [self waitForExpectations:@[ readNoPermissionsExpectation3 ] timeout:kTimeoutInSeconds];
 
     // But adding Manage permissions on the endpoint should grant Operate on
@@ -1873,28 +1873,28 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [endpoint1 addAccessGrant:clientManageGrant];
 
     XCTestExpectation * readExpectation3 = [self expectationWithDescription:@"Read 3 of attribute complete"];
-    [device readAttributePaths:@[ requestPath ]
-                    eventPaths:nil
-                        params:nil
-                         queue:queue
-                    completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                        checkSingleValue(values, error, unsignedIntValue1);
-                        [readExpectation3 fulfill];
-                    }];
+    [baseDevice readAttributePaths:@[ requestPath ]
+                        eventPaths:nil
+                            params:nil
+                             queue:queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            checkSingleValue(values, error, unsignedIntValue1);
+                            [readExpectation3 fulfill];
+                        }];
     [self waitForExpectations:@[ readExpectation3 ] timeout:kTimeoutInSeconds];
 
     // And removing that grant should remove the permissions again.
     [endpoint1 removeAccessGrant:clientManageGrant];
 
     XCTestExpectation * readNoPermissionsExpectation4 = [self expectationWithDescription:@"Read 4 of attribute with no permissions complete"];
-    [device readAttributePaths:@[ requestPath ]
-                    eventPaths:nil
-                        params:nil
-                         queue:queue
-                    completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                        checkSinglePathError(values, error, MTRInteractionErrorCodeUnsupportedAccess);
-                        [readNoPermissionsExpectation4 fulfill];
-                    }];
+    [baseDevice readAttributePaths:@[ requestPath ]
+                        eventPaths:nil
+                            params:nil
+                             queue:queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            checkSinglePathError(values, error, MTRInteractionErrorCodeUnsupportedAccess);
+                            [readNoPermissionsExpectation4 fulfill];
+                        }];
     [self waitForExpectations:@[ readNoPermissionsExpectation4 ] timeout:kTimeoutInSeconds];
 
     // Now do a wildcard read on the endpoint and check that this does the right
@@ -1926,23 +1926,23 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     };
 #endif
     XCTestExpectation * wildcardReadExpectation = [self expectationWithDescription:@"Wildcard read of our endpoint"];
-    [device readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:endpointId1 clusterID:nil attributeID:nil] ]
-                    eventPaths:nil
-                        params:nil
-                         queue:queue
-                    completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                        XCTAssertNil(error);
-                        XCTAssertNotNil(values);
+    [baseDevice readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:endpointId1 clusterID:nil attributeID:nil] ]
+                        eventPaths:nil
+                            params:nil
+                             queue:queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            XCTAssertNil(error);
+                            XCTAssertNotNil(values);
 
-                        // TODO: Figure out how to test that values is correct that's not
-                        // too fragile if things get returned in different valid order.
-                        // For now just check that every path we got has a value, not an
-                        // error.
-                        for (NSDictionary<NSString *, id> * value in values) {
-                            XCTAssertNotNil(value[MTRAttributePathKey]);
-                            XCTAssertNil(value[MTRErrorKey]);
-                            XCTAssertNotNil(value[MTRDataKey]);
-                        }
+                            // TODO: Figure out how to test that values is correct that's not
+                            // too fragile if things get returned in different valid order.
+                            // For now just check that every path we got has a value, not an
+                            // error.
+                            for (NSDictionary<NSString *, id> * value in values) {
+                                XCTAssertNotNil(value[MTRAttributePathKey]);
+                                XCTAssertNil(value[MTRErrorKey]);
+                                XCTAssertNotNil(value[MTRDataKey]);
+                            }
 #if 0
             XCTAssertEqualObjects(values, @[
                                             // cluster1
@@ -1960,9 +1960,70 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
                                             ]);
 #endif
-                        [wildcardReadExpectation fulfill];
-                    }];
+                            [wildcardReadExpectation fulfill];
+                        }];
     [self waitForExpectations:@[ wildcardReadExpectation ] timeout:kTimeoutInSeconds];
+
+    // Do some MTRDevice testing against this convenient server we have that has
+    // vendor-specific attributes.
+    __auto_type * device = [MTRDevice deviceWithNodeID:nodeIDServer controller:controllerClient];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.forceAttributeReportsIfMatchingCache = YES;
+
+    XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"MTRDevice subscription established"];
+    delegate.onReportEnd = ^() {
+        [gotReportsExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ gotReportsExpectation ] timeout:kTimeoutInSeconds];
+
+    delegate.onReportEnd = nil;
+
+    // Test read-through behavior of non-standard (as in, not present in Matter XML) attributes.
+    XCTestExpectation * nonStandardReadThroughExpectation = [self expectationWithDescription:@"Read-throughs of non-standard attributes complete"];
+
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReports) {
+        XCTAssertNotNil(attributeReports);
+
+        for (NSDictionary<NSString *, id> * report in attributeReports) {
+            XCTAssertNil(report[MTRErrorKey]);
+
+            XCTAssertNotNil(report[MTRDataKey]);
+            XCTAssertNotNil(report[MTRAttributePathKey]);
+
+            // We only expect to get a report for the read that opted in to be
+            // treated as "C"
+            XCTAssertEqualObjects(report[MTRAttributePathKey], attribute2ResponsePath);
+
+            // Strip out the DataVersion before comparing values, since our
+            // local value does not have that.
+            __auto_type * reportValue = [NSMutableDictionary dictionaryWithDictionary:report[MTRDataKey]];
+            reportValue[MTRDataVersionKey] = nil;
+            XCTAssertEqualObjects(reportValue, listOfStructsValue1);
+
+            [nonStandardReadThroughExpectation fulfill];
+        }
+    };
+
+    __auto_type * attrValue = [device readAttributeWithEndpointID:attribute1ResponsePath.endpoint
+                                                        clusterID:attribute1ResponsePath.cluster
+                                                      attributeID:attribute1ResponsePath.attribute
+                                                           params:nil];
+    XCTAssertNotNil(attrValue);
+    XCTAssertEqualObjects(attrValue, unsignedIntValue2);
+
+    __auto_type * params = [[MTRReadParams alloc] init];
+    params.assumeUnknownAttributesReportable = NO;
+    attrValue = [device readAttributeWithEndpointID:attribute2ResponsePath.endpoint
+                                          clusterID:attribute2ResponsePath.cluster
+                                        attributeID:attribute2ResponsePath.attribute
+                                             params:params];
+    XCTAssertNotNil(attrValue);
+    XCTAssertEqualObjects(attrValue, listOfStructsValue1);
+
+    [self waitForExpectations:@[ nonStandardReadThroughExpectation ] timeout:kTimeoutInSeconds];
 
     [controllerClient shutdown];
     [controllerServer shutdown];

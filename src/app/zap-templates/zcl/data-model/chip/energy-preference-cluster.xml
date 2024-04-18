@@ -24,6 +24,15 @@ limitations under the License.
     <!--Attributes-->
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
+    <features>
+      <feature bit="0" code="BALA" name="EnergyBalance" summary="Device can balance energy consumption vs. another priority">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="LPMS" name="LowPowerModeSensitivity" summary="Device can adjust the conditions for entering a low power mode">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+    </features>
+
     <!--Conformance feature BALA - for now optional-->
     <attribute code="0x0000" side="server" type="array" entryType="BalanceStruct" define="ENERGY_PREFERENCE_ENERGY_BALANCES" isNullable="false" min="2" max="10" writable="false" optional="true">EnergyBalances</attribute>
 
@@ -48,12 +57,6 @@ limitations under the License.
     </attribute>
 
   </cluster>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x009B"/>
-    <field name="EnergyBalance" mask="0x1"/>
-    <field name="LowPowerModeSensitivity" mask="0x2"/>
-  </bitmap>
 
   <enum name="EnergyPriorityEnum" type="enum8">
     <cluster code="0x009B"/>

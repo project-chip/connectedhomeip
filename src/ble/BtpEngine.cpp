@@ -25,15 +25,19 @@
  *
  */
 
-#include <ble/BleConfig.h>
+#define _CHIP_BLE_BLE_H
+#include "BtpEngine.h"
 
-#if CONFIG_NETWORK_LAYER_BLE
+#include <utility>
 
-#include <ble/BtpEngine.h>
-
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
+
+#include "BleError.h"
 
 // Define below to enable extremely verbose BLE-specific debug logging.
 #undef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
@@ -576,5 +580,3 @@ void BtpEngine::LogStateDebug() const
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* CONFIG_NETWORK_LAYER_BLE */
