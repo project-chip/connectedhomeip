@@ -592,8 +592,7 @@ CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const ConcreteCommandPat
     auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aPrepareParameters.mRequestCommandPath);
     VerifyOrReturnValue(commandPathRegistryEntry.has_value(), CHIP_ERROR_INCORRECT_STATE);
 
-    return PrepareInvokeResponseCommand(*commandPathRegistryEntry, aResponseCommandPath,
-                                        aPrepareParameters.mStartOrEndDataStruct);
+    return PrepareInvokeResponseCommand(*commandPathRegistryEntry, aResponseCommandPath, aPrepareParameters.mStartOrEndDataStruct);
 }
 
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aResponseCommandPath, bool aStartDataStruct)
