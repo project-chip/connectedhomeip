@@ -78,7 +78,7 @@ TEST_F(TestPSAOpKeyStore, TestBasicLifeCycle)
     P256PublicKey csrPublicKey2;
     err = VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), csrPublicKey2);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_TRUE(!csrPublicKey1.Matches(csrPublicKey2));
+    EXPECT_FALSE(csrPublicKey1.Matches(csrPublicKey2));
 
     // Cannot NewOpKeypair for a different fabric if one already pending
     uint8_t badCsrBuf[kMIN_CSR_Buffer_Size];

@@ -200,7 +200,7 @@ TEST_F(TestPersistentStorageOpKeyStore, TestBasicLifeCycle)
     P256PublicKey csrPublicKey2;
     err = VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), csrPublicKey2);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    EXPECT_TRUE(!csrPublicKey1.Matches(csrPublicKey2));
+    EXPECT_FALSE(csrPublicKey1.Matches(csrPublicKey2));
 
     // Fail to generate CSR for invalid fabrics
     csrSpan = MutableByteSpan{ csrBuf };

@@ -820,7 +820,7 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
     HeapChecker heapChecker;
     unsigned int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
     unsigned int numOfTestsExecuted = 0;
-    CHIP_ERROR error       = CHIP_NO_ERROR;
+    CHIP_ERROR error                = CHIP_NO_ERROR;
 
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
@@ -1832,10 +1832,10 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointIsValid)
 
         err = spake2p.PointLoad(vector->point, vector->point_len, spake2p.L);
         // The underlying implementation may (i.e. should) check for validity when loading a point. Let's catch this case.
-        EXPECT_EQ(err == CHIP_NO_ERROR || vector->valid, 0);
+        EXPECT_FALSE(err == CHIP_NO_ERROR || vector->valid);
 
         err = spake2p.PointIsValid(spake2p.L);
-        EXPECT_EQ(err == CHIP_NO_ERROR || vector->valid, 0);
+        EXPECT_FALSE(err == CHIP_NO_ERROR || vector->valid);
 
         numOfTestsRan += 1;
     }
@@ -2517,25 +2517,25 @@ TEST_F(TestChipCryptoPAL, TestSubject_x509Extraction)
     };
 
     ChipDN subjectDN_Root01;
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Root01.AddAttribute_MatterRCACId(0xCACACACA00000001));
+    EXPECT_EQ(subjectDN_Root01.AddAttribute_MatterRCACId(0xCACACACA00000001), CHIP_NO_ERROR);
     ChipDN subjectDN_ICA01;
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_ICA01.AddAttribute_MatterICACId(0xCACACACA00000003));
+    EXPECT_EQ(subjectDN_ICA01.AddAttribute_MatterICACId(0xCACACACA00000003), CHIP_NO_ERROR);
     ChipDN subjectDN_Node02_02;
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_02.AddAttribute_MatterNodeId(0xDEDEDEDE00020002));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_02.AddAttribute_MatterFabricId(0xFAB000000000001D));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_02.AddAttribute_CommonName("TEST CERT COMMON NAME Attr for Node02_02"_span, false));
+    EXPECT_EQ(subjectDN_Node02_02.AddAttribute_MatterNodeId(0xDEDEDEDE00020002), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_02.AddAttribute_MatterFabricId(0xFAB000000000001D), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_02.AddAttribute_CommonName("TEST CERT COMMON NAME Attr for Node02_02"_span, false), CHIP_NO_ERROR);
     ChipDN subjectDN_Node02_04;
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCE1002));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_04.AddAttribute_CommonName("TestCert02_04"_span, false));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_04.AddAttribute_MatterFabricId(0xFAB000000000001D));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCD0003));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_04.AddAttribute_MatterNodeId(0xDEDEDEDE00020004));
+    EXPECT_EQ(subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCE1002), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_04.AddAttribute_CommonName("TestCert02_04"_span, false), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_04.AddAttribute_MatterFabricId(0xFAB000000000001D), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCD0003), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_04.AddAttribute_MatterNodeId(0xDEDEDEDE00020004), CHIP_NO_ERROR);
     ChipDN subjectDN_Node02_08;
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCF00A0));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_08.AddAttribute_MatterNodeId(0xDEDEDEDE00020008));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCD0020));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_08.AddAttribute_MatterFabricId(0xFAB000000000001D));
-    EXPECT_EQ(CHIP_NO_ERROR, subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCE0100));
+    EXPECT_EQ(subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCF00A0), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_08.AddAttribute_MatterNodeId(0xDEDEDEDE00020008), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCD0020), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_08.AddAttribute_MatterFabricId(0xFAB000000000001D), CHIP_NO_ERROR);
+    EXPECT_EQ(subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCE0100), CHIP_NO_ERROR);
 
     // clang-format off
     static TestCase sTestCases[] = {
@@ -2748,12 +2748,12 @@ TEST_F(TestChipCryptoPAL, TestVIDPID_StringExtraction)
         {
             if (testCase.attrType == DNAttrType::kMatterVID || testCase.attrType == DNAttrType::kMatterPID)
             {
-                EXPECT_TRUE(!vidpidFromCN.Initialized());
+                EXPECT_FALSE(vidpidFromCN.Initialized());
                 vidpidToCheck = vidpid;
             }
             else if (testCase.attrType == DNAttrType::kCommonName)
             {
-                EXPECT_TRUE(!vidpid.Initialized());
+                EXPECT_FALSE(vidpid.Initialized());
                 vidpidToCheck = vidpidFromCN;
             }
 
