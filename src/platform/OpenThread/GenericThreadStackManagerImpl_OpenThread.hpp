@@ -122,17 +122,14 @@ NetworkCommissioning::otScanResponseIterator<NetworkCommissioning::ThreadScanRes
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChange(uint32_t flags, void * context)
 {
-    ChipDeviceEvent event
-    {
-        .Type              = DeviceEventType::kThreadStateChange;
-        .ThreadStateChange = {
-            .RoleChanged       = (flags & OT_CHANGED_THREAD_ROLE) != 0,
-            .AddressChanged    = (flags & (OT_CHANGED_IP6_ADDRESS_ADDED | OT_CHANGED_IP6_ADDRESS_REMOVED)) != 0,
-            .NetDataChanged    = (flags & OT_CHANGED_THREAD_NETDATA) != 0,
-            .ChildNodesChanged = (flags & (OT_CHANGED_THREAD_CHILD_ADDED | OT_CHANGED_THREAD_CHILD_REMOVED)) != 0,
-            .OpenThread        = { .Flags = flags }
-        }
-    };
+    ChipDeviceEvent event{ .Type              = DeviceEventType::kThreadStateChange,
+                           .ThreadStateChange = {
+                               .RoleChanged    = (flags & OT_CHANGED_THREAD_ROLE) != 0,
+                               .AddressChanged = (flags & (OT_CHANGED_IP6_ADDRESS_ADDED | OT_CHANGED_IP6_ADDRESS_REMOVED)) != 0,
+                               .NetDataChanged = (flags & OT_CHANGED_THREAD_NETDATA) != 0,
+                               .ChildNodesChanged =
+                                   (flags & (OT_CHANGED_THREAD_CHILD_ADDED | OT_CHANGED_THREAD_CHILD_REMOVED)) != 0,
+                               .OpenThread = { .Flags = flags } } };
 
     CHIP_ERROR status = PlatformMgr().PostEvent(&event);
     if (status != CHIP_NO_ERROR)
