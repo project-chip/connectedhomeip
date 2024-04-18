@@ -1,5 +1,4 @@
-#include <ble/BleUUID.h>
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/UUIDHelper.h>

@@ -57,7 +57,7 @@
 #include <glib-object.h>
 #include <glib.h>
 
-#include <ble/BleError.h>
+#include <ble/Ble.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

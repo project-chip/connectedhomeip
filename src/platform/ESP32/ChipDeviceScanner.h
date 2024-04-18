@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemLayer.h>
 
@@ -32,7 +31,7 @@
 #include "esp_gattc_api.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemLayer.h>
 #endif
