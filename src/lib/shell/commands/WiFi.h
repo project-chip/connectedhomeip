@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,27 +15,21 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      Header that defines default shell commands for CHIP examples
+ */
+
 #pragma once
 
-#include <ble/Ble.h>
+#include <lib/shell/Engine.h>
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
-namespace DeviceLayer {
-namespace Internal {
+namespace Shell {
 
-class BleConnectionDelegateImpl : public Ble::BleConnectionDelegate
-{
-public:
-    void StartScan(BleScannerDelegate * delegate = nullptr);
-    void StopScan();
-    virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator);
-    virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj);
-    virtual CHIP_ERROR CancelConnection();
+void SetWiFiDriver(DeviceLayer::NetworkCommissioning::WiFiDriver * driver);
+DeviceLayer::NetworkCommissioning::WiFiDriver * GetWiFiDriver();
 
-private:
-    CHIP_ERROR DoCancel();
-};
-
-} // namespace Internal
-} // namespace DeviceLayer
+} // namespace Shell
 } // namespace chip
