@@ -557,8 +557,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
-    ChipDeviceEvent event{ .Type              = conId->IsNotifyAcquired() ? DeviceEventType::kCHIPoBLESubscribe
-                                                                          : DeviceEventType::kCHIPoBLEUnsubscribe,
+    ChipDeviceEvent event{ .Type = conId->IsNotifyAcquired() ? static_cast<uint16_t>(DeviceEventType::kCHIPoBLESubscribe)
+                                                             : static_cast<uint16_t>(DeviceEventType::kCHIPoBLEUnsubscribe),
                            .CHIPoBLESubscribe = { .ConId = conId } };
     PlatformMgr().PostEventOrDie(&event);
 
