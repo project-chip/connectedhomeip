@@ -291,10 +291,7 @@ struct TestChipCryptoPAL : public ::testing::Test
         psa_crypto_init();
 #endif
     }
-    static void TearDownTestSuite()
-    {
-        chip::Platform::MemoryShutdown();
-    }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestChipCryptoPAL, TestAES_CTR_128CryptTestVectors)

@@ -111,10 +111,7 @@ struct TestSessionKeystore : public ::testing::Test
 #endif
     }
 
-    static void TearDownTestSuite()
-    {
-        Platform::MemoryShutdown();
-    }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestSessionKeystore, TestBasicImport)

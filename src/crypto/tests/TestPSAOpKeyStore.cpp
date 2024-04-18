@@ -44,10 +44,7 @@ struct TestPSAOpKeyStore : public ::testing::Test
         psa_crypto_init();
 #endif
     }
-    static void TearDownTestSuite()
-    {
-        chip::Platform::MemoryShutdown();
-    }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestPSAOpKeyStore, TestBasicLifeCycle)
@@ -187,10 +184,10 @@ TEST_F(TestPSAOpKeyStore, TestEphemeralKeys)
 
     Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
     EXPECT_NE(ephemeralKeypair, nullptr);
-    EXPECT_EQ( ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+    EXPECT_EQ(ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
 
-    EXPECT_EQ( ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig), CHIP_NO_ERROR);
-    EXPECT_EQ( ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig), CHIP_NO_ERROR);
+    EXPECT_EQ(ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig), CHIP_NO_ERROR);
+    EXPECT_EQ(ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig), CHIP_NO_ERROR);
 
     opKeyStore.ReleaseEphemeralKeypair(ephemeralKeypair);
 }

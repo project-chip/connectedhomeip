@@ -313,17 +313,17 @@ TEST_F(TestPersistentStorageOpKeyStore, TestEphemeralKeys)
     chip::TestPersistentStorageDelegate storage;
 
     PersistentStorageOperationalKeystore opKeyStore;
-    EXPECT_EQ( opKeyStore.Init(&storage), CHIP_NO_ERROR);
+    EXPECT_EQ(opKeyStore.Init(&storage), CHIP_NO_ERROR);
 
     Crypto::P256ECDSASignature sig;
     uint8_t message[] = { 'm', 's', 'g' };
 
     Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
     EXPECT_NE(ephemeralKeypair, nullptr);
-    EXPECT_EQ( ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
+    EXPECT_EQ(ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
 
-    EXPECT_EQ( ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig), CHIP_NO_ERROR);
-    EXPECT_EQ( ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig), CHIP_NO_ERROR);
+    EXPECT_EQ(ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig), CHIP_NO_ERROR);
+    EXPECT_EQ(ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig), CHIP_NO_ERROR);
 
     opKeyStore.ReleaseEphemeralKeypair(ephemeralKeypair);
 
@@ -383,6 +383,5 @@ TEST_F(TestPersistentStorageOpKeyStore, TestMigrationKeys)
 
     opKeyStore.Finish();
 }
-
 
 } // namespace
