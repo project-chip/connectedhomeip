@@ -55,8 +55,7 @@ CHIP_ERROR DeviceScanner::Stop()
 
 void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
 {
-    VerifyOrReturn(nodeData.Is<CommissionNodeData>())
-    auto & commissionData = nodeData.Get<CommissionNodeData>();
+    VerifyOrReturn(nodeData.Is<CommissionNodeData>()) auto & commissionData = nodeData.Get<CommissionNodeData>();
 
     auto discriminator = commissionData.longDiscriminator;
     auto vendorId      = static_cast<VendorId>(commissionData.vendorId);
