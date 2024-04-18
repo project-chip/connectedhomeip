@@ -182,7 +182,7 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                 continue;
             }
 
-            if (castingPlayerContainerTagNum == kCastingCommissionerPasscodeTag)
+            if (castingPlayerContainerTagNum == kCastingPlayerCommissionerPasscodeTag)
             {
                 err = reader.Get(attributes.commissionerPasscode);
                 VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
@@ -481,7 +481,7 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerProductIdTag), castingPlayer.GetProductId()));
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerDeviceTypeIdTag), castingPlayer.GetDeviceType()));
         ReturnErrorOnFailure(
-            tlvWriter.Put(chip::TLV::ContextTag(kCastingCommissionerPasscodeTag), castingPlayer.GetCommissionerPasscode()));
+            tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerCommissionerPasscodeTag), castingPlayer.GetCommissionerPasscode()));
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerPortTag), castingPlayer.GetPort()));
         ReturnErrorOnFailure(tlvWriter.PutBytes(chip::TLV::ContextTag(kCastingPlayerInstanceNameTag),
                                                 (const uint8_t *) castingPlayer.GetInstanceName(),
