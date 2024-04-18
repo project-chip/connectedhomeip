@@ -79,18 +79,12 @@ public:
     /**
      * Return the expiration time.
      */
-    Clock::Timestamp AwakenTime() const
-    {
-        return mAwakenTime;
-    }
+    Clock::Timestamp AwakenTime() const { return mAwakenTime; }
 
     /**
      * Return callback information.
      */
-    const Callback & GetCallback() const
-    {
-        return mCallback;
-    }
+    const Callback & GetCallback() const { return mCallback; }
 
 private:
     Clock::Timestamp mAwakenTime;
