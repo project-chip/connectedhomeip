@@ -336,6 +336,7 @@ static NSString * const sAttributesKey = @"attributes";
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
+- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 @end
 #endif
 
@@ -745,7 +746,7 @@ static NSString * const sAttributesKey = @"attributes";
 
     // Unfortunately, we currently have no subscriptions over our hacked-up XPC
     // setup.  Try to detect that situation.
-    if ([_deviceController.class respondsToSelector:@selector(sharedControllerWithID:xpcConnectBlock:)]) {
+    if ([_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class]) {
         return NO;
     }
 
@@ -1603,24 +1604,33 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
                                                               clusterID:(NSNumber *)clusterID
                                                             attributeID:(NSNumber *)attributeID
-                                                                 params:(MTRReadParams *)params
+                                                                 params:(MTRReadParams * _Nullable)params
 {
     MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
                                                                            clusterID:clusterID
                                                                          attributeID:attributeID];
 
     BOOL attributeIsSpecified = MTRAttributeIsSpecified(clusterID.unsignedIntValue, attributeID.unsignedIntValue);
-    BOOL hasChangesOmittedQuality = AttributeHasChangesOmittedQuality(attributePath);
+    BOOL hasChangesOmittedQuality;
+    if (attributeIsSpecified) {
+        hasChangesOmittedQuality = AttributeHasChangesOmittedQuality(attributePath);
+    } else {
+        if (params == nil) {
+            hasChangesOmittedQuality = NO;
+        } else {
+            hasChangesOmittedQuality = !params.assumeUnknownAttributesReportable;
+        }
+    }
 
     // Return current known / expected value right away
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
 
     // Send read request to device if any of the following are true:
-    // 1. The attribute is not in the specification (so we don't know whether hasChangesOmittedQuality can be trusted).
-    // 2. Subscription not in a state we can expect reports
-    // 3. There is subscription but attribute has Changes Omitted quality
-    // TODO: add option for BaseSubscriptionCallback to report during priming, to reduce when case 4 is hit
-    if (!attributeIsSpecified || ![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
+    // 1. Subscription not in a state we can expect reports
+    // 2. The attribute has the Changes Omitted quality, so we won't get reports for it.
+    // 3. The attribute is not in the spec, and the read params asks to assume
+    //    an unknown attribute has the Changes Omitted quality.
+    if (![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
         // Read requests container will be a mutable array of items, each being an array containing:
         //   [attribute request path, params]
         // Batching handler should only coalesce when params are equal.
@@ -2343,6 +2353,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 #endif
             }
             NSArray * expectedValue = _expectedValueCache[attributePath];
+
+            // Unit test only code.
+#ifdef DEBUG
+            if (!readCacheValueChanged) {
+                id delegate = _weakDelegate.strongObject;
+                if (delegate) {
+                    if ([delegate respondsToSelector:@selector(unitTestForceAttributeReportsIfMatchingCache:)]) {
+                        readCacheValueChanged = [delegate unitTestForceAttributeReportsIfMatchingCache:self];
+                    }
+                }
+            }
+#endif // DEBUG
 
             // Report the attribute if a read would get a changed value.  This happens
             // when our cached value changes and no expected value exists.

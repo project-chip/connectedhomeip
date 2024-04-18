@@ -25,7 +25,7 @@
 #include <memory>
 #include <string>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemLayer.h>
 
