@@ -11,7 +11,6 @@ MessagingLayerTests
 MinimalMdnsCoreTests
 MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
-PlatformTests
 RawTransportTests
 RetransmitTests
 SecureChannelTests

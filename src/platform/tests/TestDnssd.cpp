@@ -234,7 +234,7 @@ TEST_F(TestDnssd, TestDnssdBrowse)
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     ChipLogProgress(DeviceLayer, "End EventLoop");
 
-    EXPECT_GT(mResolvedServicesCount, 0);
+    EXPECT_GT(mResolvedServicesCount, 0u);
     EXPECT_FALSE(mTimeoutExpired);
 
     // Stop browsing so we can safely shutdown DNS-SD
@@ -289,7 +289,7 @@ TEST_F(TestDnssd, TestDnssdPublishService)
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     ChipLogProgress(DeviceLayer, "End EventLoop");
 
-    EXPECT_GT(mResolvedServicesCount, 0);
+    EXPECT_GT(mResolvedServicesCount, 0u);
     EXPECT_FALSE(mTimeoutExpired);
 
     // Stop browsing so we can safely shutdown DNS-SD
