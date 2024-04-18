@@ -89,7 +89,7 @@ J-Link > erase 0x8000000, 0x88a0000
 -   Using MCUXPresso, import the `mcuboot_opensource` demo example from the SDK
     previously downloaded. The example can be found under the `ota_examples`
     folder.
-    ![mcuboot_demo](../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_demo.PNG)
+    ![mcuboot_demo](../../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_demo.PNG)
 -   Before building the demo example, it should be specified that the
     application to be run by the bootloader is monolithic. As a result, only one
     image will be upgraded by the bootloader. This can be done by defining
@@ -99,7 +99,7 @@ J-Link > erase 0x8000000, 0x88a0000
 Right click on the Project -> Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU C Compiler -> Preprocessor -> Add "MONOLITHIC_APP=1" in the Defined Symbols
 ```
 
-![rw610_mcuboot_monolithic](../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_monolithic_app.PNG)
+![rw610_mcuboot_monolithic](../../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_monolithic_app.PNG)
 
 -   Build the demo example project.
 
@@ -149,7 +149,7 @@ The image must have the following format :
     signature, the upgrade type, the swap status...
 
 The all-clusters application can be generated using the instructions from the
-[README.md 'Building'](../../examples/all-clusters-app/nxp/rt/rw61x/README.md#building)
+[README.md 'Building'](../../../examples/all-clusters-app/nxp/rt/rw61x/README.md#building)
 section. The application is automatically linked to be executed from the primary
 image partition, taking into consideration the offset imposed by mcuboot.
 
@@ -242,7 +242,7 @@ instructions below describe the procedure step-by-step.
 
 Setup example :
 
--   [Chip-tool](../../examples/chip-tool/README.md) application running on the
+-   [Chip-tool](../../../examples/chip-tool/README.md) application running on the
     RPi.
 -   OTA Provider application built on the same RPi (as explained below).
 -   RW61x board programmed with the example application (with the instructions
