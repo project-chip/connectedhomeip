@@ -61,14 +61,14 @@ static app::Clusters::NetworkCommissioning::Instance
     sEthernetNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
 #endif
 
-#if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
+#if CONFIG_TEST_EVENT_TRIGGER_ENABLED
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
 #endif
 } // namespace
 
-#if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
+#if CONFIG_TEST_EVENT_TRIGGER_ENABLED
 static int hex_digit_to_int(char hex)
 {
     if ('A' <= hex && hex <= 'F')
@@ -107,7 +107,7 @@ static size_t hex_string_to_binary(const char * hex_string, uint8_t * buf, size_
 
     return buf_size;
 }
-#endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
+#endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED
 
 void Esp32AppServer::DeInitBLEIfCommissioned(void)
 {
@@ -158,7 +158,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-#if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
+#if CONFIG_TEST_EVENT_TRIGGER_ENABLED
     if (hex_string_to_binary(CONFIG_TEST_EVENT_TRIGGER_ENABLE_KEY, sTestEventTriggerEnableKey,
                              sizeof(sTestEventTriggerEnableKey)) == 0)
     {
@@ -166,9 +166,11 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
     }
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
-    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+#endif
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     (void) initParams.InitializeStaticResourcesBeforeServerInit();

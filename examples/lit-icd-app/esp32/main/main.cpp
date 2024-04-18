@@ -24,6 +24,8 @@
 #include "nvs_flash.h"
 
 #include <DeviceCallbacks.h>
+#include <IcdUatButton.h>
+#include <app/icd/server/ICDManager.h>
 #include <app/server/Server.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
@@ -31,6 +33,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <platform/PlatformManager.h>
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
@@ -58,6 +61,18 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #error "Currently this example only support Thread chips"
 #endif
 
+#ifdef CONFIG_IDF_TARGET_ESP32H2
+// GPIO9-GPIO14 could be used to wake up ESP32-H2.
+// For ESP32-H2 DevKitM, the boot button is GPIO9.
+#define UAT_GPIO GPIO_NUM_9
+#elif defined(CONFIG_IDF_TARGET_ESP32C6)
+// GPIO0-GPIO7 could be used to wake up ESP32-C6.
+// For ESP32-C6 DevKitC, the boot button is GPIO9, we cannot use it to wake up the chip.
+#define UAT_GPIO GPIO_NUM_7
+#else
+#error "Unsupport IDF target"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Credentials;
@@ -65,6 +80,13 @@ using namespace ::chip::Credentials;
 extern const char TAG[] = "lit-icd-app";
 
 static AppDeviceCallbacks EchoCallbacks;
+
+static void UatButtonHandler(UatButton *button)
+{
+    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
+        Server::GetInstance().GetICDManager().UpdateOperationState(app::ICDManager::OperationalState::ActiveMode);
+    });
+}
 
 static void InitServer(intptr_t context)
 {
@@ -110,6 +132,9 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
     ESPOpenThreadInit();
+    static UatButton sButton;
+    sButton.Init(UAT_GPIO, ESP_EXT1_WAKEUP_ANY_LOW);
+    sButton.SetUatButtonPressCallback(UatButtonHandler);
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
