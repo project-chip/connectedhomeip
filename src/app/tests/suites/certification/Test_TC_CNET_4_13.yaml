@@ -131,8 +131,19 @@ tests:
           ( Pre-Condition)
       disabled: true
 
+      - label:
+          "Step 8: TH sends ArmFailSafe command to the DUT with the
+          ExpiryLengthSeconds field set to 900"
+      verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
+
+
+          The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
+          ( Pre-Condition)
+      disabled: true
+
     - label:
-          "Step 8: TH sends ReorderNetwork Command to the DUT with the following
+          "Step 9: TH sends ReorderNetwork Command to the DUT with the following
           fields: 1. NetworkID is PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID 2.
           NetworkIndex is 'MaxNetworksValue' 3. Breadcrumb is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
@@ -144,7 +155,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 9: TH reads Breadcumb attribute from the General Commissioning
+          "Step 10: TH reads Breadcumb attribute from the General Commissioning
           Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
@@ -154,7 +165,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 10: TH sends ReorderNetwork Command to the DUT with the
+          "Step 11: TH sends ReorderNetwork Command to the DUT with the
           following fields: 1. NetworkID is a NetworkID value NOT present in
           'OriginalNetworkList' 2.NetworkIndex is'Midpoint' 3.Breadcrumb is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
@@ -164,7 +175,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 11: TH reads Breadcumb attribute from the General Commissioning
+          "Step 12: TH reads Breadcumb attribute from the General Commissioning
           Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
@@ -174,7 +185,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 12: TH sends ReorderNetwork Command to the DUT with the
+          "Step 13: TH sends ReorderNetwork Command to the DUT with the
           following fields: 1. NetworkID is PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
           2. NetworkIndex is 'Midpoint' 3. Breadcrumb is 2"
       PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
@@ -186,7 +197,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 13: TH reads Breadcrumb attribute from the GeneralCommissioning
+          "Step 14: TH reads Breadcrumb attribute from the GeneralCommissioning
           Cluster"
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
@@ -195,7 +206,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "Step 14: TH reads Networks attribute list from the DUT"
+    - label: "Step 15: TH reads Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
@@ -205,7 +216,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 15: TH sends ArmFailSafe command to the DUT with
+          "Step 16: TH sends ArmFailSafe command to the DUT with
           ExpiryLengthSeconds set to 0"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
@@ -214,7 +225,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "Step 16: TH reads Networks attribute list from the DUT"
+    - label: "Step 17: TH reads Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
@@ -224,7 +235,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 17: TH sends ArmFailSafe command to the DUT with
+          "Step 18: TH sends ArmFailSafe command to the DUT with
           ExpiryLengthSeconds set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
@@ -235,7 +246,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 18: TH sends AddOrUpdateWiFiNetwork command to the DUT. This
+          "Step 19: TH sends AddOrUpdateWiFiNetwork command to the DUT. This
           step should be repeated 'RemainingNetworkSlots' times using DIFFERENT
           SSID and credential values and Breadcrumb field set to 1. Note that
           these credentials are NOT required to be connectable."
@@ -246,7 +257,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 19: TH sends ReorderNetwork Command to the DUT with the
+          "Step 20: TH sends ReorderNetwork Command to the DUT with the
           following fields: 1. NetworkID is
           PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID2.NetworkIndex is
           'Midpoint'3.Breadcrumb is 2"
@@ -256,7 +267,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "Step 20: TH sends the CommissioningComplete command to the DUT"
+    - label: "Step 21: TH sends the CommissioningComplete command to the DUT"
       verification: |
           ./chip-tool generalcommissioning CommissioningComplete 1 0
 
@@ -265,7 +276,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 21: TH sends ArmFailSafe command to the DUT with
+          "Step 22: TH sends ArmFailSafe command to the DUT with
           ExpiryLengthSeconds set to 0"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
@@ -274,7 +285,7 @@ tests:
           ( Pre-Condition)
       disabled: true
 
-    - label: "Step 22: TH reads Networks attribute list from the DUT"
+    - label: "Step 23: TH reads Networks attribute list from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
