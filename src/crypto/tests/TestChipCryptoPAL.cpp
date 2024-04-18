@@ -91,9 +91,8 @@ using TestHMAC_sha                      = HMAC_sha;
 class HeapChecker
 {
 public:
-    explicit HeapChecker(nlTestSuite * testSuite) : mTestSuite(testSuite)
+    explicit HeapChecker()
     {
-
         size_t numBlocks;
         mbedtls_memory_buffer_alloc_cur_get(&mHeapBytesUsed, &numBlocks);
     }
@@ -112,7 +111,6 @@ public:
     }
 
 private:
-    nlTestSuite * mTestSuite;
     size_t mHeapBytesUsed;
 };
 #else
