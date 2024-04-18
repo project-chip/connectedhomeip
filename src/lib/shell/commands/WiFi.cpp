@@ -119,7 +119,7 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
     /* Command accepts running with SSID and password as parameters */
     VerifyOrReturnError((argc == 2), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ByteSpan ssidSpan = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
+    ByteSpan ssidSpan     = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
     ByteSpan passwordSpan = ByteSpan(Uint8::from_const_char(argv[1]), strlen(argv[1]));
 
     VerifyOrReturnError(IsSpanUsable(ssidSpan) && IsSpanUsable(passwordSpan), CHIP_ERROR_INVALID_ARGUMENT);

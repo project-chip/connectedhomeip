@@ -148,31 +148,31 @@ Status NXPWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDeb
     outNetworkIndex = 0;
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
-    err_code = wlan_remove_network((char *)networkId.data());
+    err_code = wlan_remove_network((char *) networkId.data());
 
     switch (err_code)
     {
-        case -WM_E_INVAL:
-            ChipLogError(DeviceLayer, "Error: Network not found");
-            break;
+    case -WM_E_INVAL:
+        ChipLogError(DeviceLayer, "Error: Network not found");
+        break;
 
-        case WM_SUCCESS:
-            /* Use empty ssid for representing invalid network */
-            mStagingNetwork.ssidLen = 0;
-            memset(mStagingNetwork.ssid, 0, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-            memset(mStagingNetwork.credentials, 0, DeviceLayer::Internal::kMaxWiFiKeyLength);
-            /* Save to persistent memory */
-            CommitConfiguration();
-            ChipLogProgress(DeviceLayer, "Successfully removed network");
-            break;
+    case WM_SUCCESS:
+        /* Use empty ssid for representing invalid network */
+        mStagingNetwork.ssidLen = 0;
+        memset(mStagingNetwork.ssid, 0, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        memset(mStagingNetwork.credentials, 0, DeviceLayer::Internal::kMaxWiFiKeyLength);
+        /* Save to persistent memory */
+        CommitConfiguration();
+        ChipLogProgress(DeviceLayer, "Successfully removed network");
+        break;
 
-        case WLAN_ERROR_STATE:
-            ChipLogError(DeviceLayer, "Error: Can't remove network in this state");
-            break;
+    case WLAN_ERROR_STATE:
+        ChipLogError(DeviceLayer, "Error: Can't remove network in this state");
+        break;
 
-        default:
-            ChipLogError(DeviceLayer, "Error: Unable to remove network");
-            break;
+    default:
+        ChipLogError(DeviceLayer, "Error: Unable to remove network");
+        break;
     }
 
     return Status::kSuccess;
