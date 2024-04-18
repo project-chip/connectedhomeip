@@ -17,12 +17,10 @@
 #
 
 import sys
-import typing
 from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from chip.clusters.Types import NullValue
 from MockTestRunner import MockTestRunner
 
 
