@@ -252,18 +252,39 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     Encoding::LittleEndian::Put16(serviceData.uuid, UUID16_CHIPoBLEService.val);
     ReturnErrorOnFailure(ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo));
 
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    if (mFlags.Has(Flags::kExtendedAdvertisingEnabled))
+    {
+        serviceData.deviceIdInfo.SetVendorId(DEVICE_HANDLE_NULL);
+        serviceData.deviceIdInfo.SetProductId(DEVICE_HANDLE_NULL);
+        serviceData.deviceIdInfo.SetExtendedAnnouncementFlag(true);
+    }
+#endif
+
     advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
     advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
     scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
 
-    mAdvertisingRequest.priority         = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
-    mAdvertisingRequest.options          = kAdvertisingOptions;
-    mAdvertisingRequest.minInterval      = mFlags.Has(Flags::kFastAdvertisingEnabled)
-             ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
-             : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-    mAdvertisingRequest.maxInterval      = mFlags.Has(Flags::kFastAdvertisingEnabled)
-             ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
-             : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+    mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
+    mAdvertisingRequest.options  = kAdvertisingOptions;
+
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        mAdvertisingRequest.minInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        mAdvertisingRequest.maxInterval = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+    }
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    else if (mFlags.Has(Flags::kExtendedAdvertisingEnabled))
+    {
+        mAdvertisingRequest.minInterval = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN;
+        mAdvertisingRequest.maxInterval = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX;
+    }
+#endif
+    else
+    {
+        mAdvertisingRequest.minInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        mAdvertisingRequest.maxInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+    }
     mAdvertisingRequest.advertisingData  = Span<bt_data>(advertisingData);
     mAdvertisingRequest.scanResponseData = nameSize ? Span<bt_data>(scanResponseData) : Span<bt_data>{};
 
@@ -322,10 +343,17 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
 
         if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         {
-            // Start timer to change advertising interval.
+            // Start timer to change advertising interval from fast to slow.
             DeviceLayer::SystemLayer().StartTimer(
                 System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME),
-                HandleBLEAdvertisementIntervalChange, this);
+                HandleSlowBLEAdvertisementInterval, this);
+
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+            // Start timer to schedule start of the extended advertising
+            DeviceLayer::SystemLayer().StartTimer(
+                System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS),
+                HandleExtendedBLEAdvertisementInterval, this);
+#endif
         }
     }
 
@@ -342,6 +370,10 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising()
         mFlags.Clear(Flags::kAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+        mFlags.Clear(Flags::kExtendedAdvertisingEnabled);
+#endif
+
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
 
         // Post a CHIPoBLEAdvertisingChange(Stopped) event.
@@ -353,7 +385,8 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising()
         }
 
         // Cancel timer event changing CHIPoBLE advertisement interval
-        DeviceLayer::SystemLayer().CancelTimer(HandleBLEAdvertisementIntervalChange, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleSlowBLEAdvertisementInterval, this);
+        DeviceLayer::SystemLayer().CancelTimer(HandleExtendedBLEAdvertisementInterval, this);
     }
 
     return CHIP_NO_ERROR;
@@ -366,6 +399,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
         ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
 
         mFlags.Set(Flags::kAdvertisingEnabled, val);
+        // Ensure that each enabling/disabling of the standard advertising clears
+        // the extended mode flag.
+        mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
@@ -378,8 +414,14 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
     {
     case BLEAdvertisingMode::kFastAdvertising:
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
         break;
     case BLEAdvertisingMode::kSlowAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
+        break;
+    case BLEAdvertisingMode::kExtendedAdvertising:
+        mFlags.Set(Flags::kExtendedAdvertisingEnabled, true);
         mFlags.Set(Flags::kFastAdvertisingEnabled, false);
         break;
     default:
@@ -570,10 +612,16 @@ exit:
 }
 #endif
 
-void BLEManagerImpl::HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param)
+void BLEManagerImpl::HandleSlowBLEAdvertisementInterval(System::Layer * layer, void * param)
 {
     BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising mode changed to slow");
+}
+
+void BLEManagerImpl::HandleExtendedBLEAdvertisementInterval(System::Layer * layer, void * param)
+{
+    BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kExtendedAdvertising);
+    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising mode changed to extended");
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)

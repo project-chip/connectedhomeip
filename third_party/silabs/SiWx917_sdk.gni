@@ -166,7 +166,6 @@ template("siwx917_sdk") {
       "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
-      "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
       "CCP_SI917_BRINGUP=1",
@@ -223,6 +222,12 @@ template("siwx917_sdk") {
       "RADIO_CONFIG_DMP_SUPPORT=1",
       "configUSE_POSIX_ERRNO=1",
     ]
+
+    if (silabs_log_enabled && chip_logging) {
+      defines += [ "SILABS_LOG_ENABLED=1" ]
+    } else {
+      defines += [ "SILABS_LOG_ENABLED=0" ]
+    }
 
     if (chip_build_libshell) {
       defines += [ "ENABLE_CHIP_SHELL" ]
