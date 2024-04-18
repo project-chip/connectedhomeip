@@ -81,7 +81,7 @@ extern const char TAG[] = "lit-icd-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 
-static void UatButtonHandler(UatButton *button)
+static void UatButtonHandler(UatButton * button)
 {
     DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
         Server::GetInstance().GetICDManager().UpdateOperationState(app::ICDManager::OperationalState::ActiveMode);
