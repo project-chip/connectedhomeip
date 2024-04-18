@@ -592,7 +592,7 @@ CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const ConcreteCommandPat
     auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aPrepareParameters.mRequestCommandPath);
     VerifyOrReturnValue(commandPathRegistryEntry.has_value(), CHIP_ERROR_INCORRECT_STATE);
 
-    return PrepareInvokeResponseCommand(commandPathRegistryEntry.value(), aResponseCommandPath,
+    return PrepareInvokeResponseCommand(*commandPathRegistryEntry, aResponseCommandPath,
                                         aPrepareParameters.mStartOrEndDataStruct);
 }
 
@@ -612,7 +612,7 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aResponseC
     auto commandPathRegistryEntry = GetCommandPathRegistry().GetFirstEntry();
     VerifyOrReturnValue(commandPathRegistryEntry.has_value(), CHIP_ERROR_INCORRECT_STATE);
 
-    return PrepareInvokeResponseCommand(commandPathRegistryEntry.value(), aResponseCommandPath, aStartDataStruct);
+    return PrepareInvokeResponseCommand(*commandPathRegistryEntry, aResponseCommandPath, aStartDataStruct);
 }
 
 CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
@@ -677,7 +677,7 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
 
     if (mRefForResponse.has_value())
     {
-        ReturnErrorOnFailure(commandData.Ref(mRefForResponse.value()));
+        ReturnErrorOnFailure(commandData.Ref(*mRefForResponse));
     }
 
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
@@ -700,7 +700,7 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
 
     auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aCommandPath);
     VerifyOrReturnError(commandPathRegistryEntry.has_value(), CHIP_ERROR_INCORRECT_STATE);
-    mRefForResponse = commandPathRegistryEntry.value().ref;
+    mRefForResponse = commandPathRegistryEntry->ref;
 
     MoveToState(State::Preparing);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
@@ -722,7 +722,7 @@ CHIP_ERROR CommandHandler::FinishStatus()
     CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
     if (mRefForResponse.has_value())
     {
-        ReturnErrorOnFailure(commandStatus.Ref(mRefForResponse.value()));
+        ReturnErrorOnFailure(commandStatus.Ref(*mRefForResponse));
     }
 
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus().EndOfCommandStatusIB());

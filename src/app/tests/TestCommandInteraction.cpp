@@ -540,7 +540,7 @@ void TestCommandInteraction::GenerateInvokeResponse(nlTestSuite * apSuite, void 
 
     if (aCommandRef.has_value())
     {
-        NL_TEST_ASSERT(apSuite, commandDataIBBuilder.Ref(aCommandRef.value()) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, commandDataIBBuilder.Ref(*aCommandRef) == CHIP_NO_ERROR);
     }
 
     commandDataIBBuilder.EndOfCommandDataIB();
