@@ -51,34 +51,6 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_der_private_key
 from default import Base64Argument, FileArgument, IntArgument, StrArgument
 
-
-class Verifier(Base64Argument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 1
-
-
-class Salt(Base64Argument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 2
-
-
-class IterationCount(IntArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 3
-
-
 class DacPKey(FileArgument):
 
     def __init__(self, arg):
@@ -86,7 +58,7 @@ class DacPKey(FileArgument):
         self.private_key = None
 
     def key(self):
-        return 4
+        return 1
 
     def length(self):
         assert (self.private_key is not None)
@@ -112,7 +84,7 @@ class DacCert(FileArgument):
         super().__init__(arg)
 
     def key(self):
-        return 5
+        return 2
 
 
 class PaiCert(FileArgument):
@@ -121,49 +93,7 @@ class PaiCert(FileArgument):
         super().__init__(arg)
 
     def key(self):
-        return 6
-
-
-class Discriminator(IntArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 7
-
-
-class SetupPasscode(IntArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 8
-
-
-class VendorId(IntArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 9
-
-    def length(self):
-        return 2
-
-
-class ProductId(IntArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 10
-
-    def length(self):
-        return 2
+        return 3
 
 
 class CertDeclaration(FileArgument):
@@ -172,109 +102,4 @@ class CertDeclaration(FileArgument):
         super().__init__(arg)
 
     def key(self):
-        return 11
-
-
-class VendorName(StrArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 12
-
-
-class ProductName(StrArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 13
-
-
-class SerialNum(StrArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 14
-
-
-class ManufacturingDate(StrArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 15
-
-    def max_length(self):
-        return 16
-
-
-class HardwareVersion(IntArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 16
-
-    def length(self):
-        return 2
-
-
-class HardwareVersionStr(StrArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 17
-
-    def max_length(self):
-        return 64
-
-
-class UniqueId(StrArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 18
-
-
-class PartNumber(StrArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 19
-
-
-class ProductURL(StrArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 20
-
-    def max_length(self):
-        return 256
-
-
-class ProductLabel(StrArgument):
-
-    def __init__(self, arg):
-        super().__init__(arg)
-
-    def key(self):
-        return 21
-
-    def max_length(self):
-        return 64
+        return 4
