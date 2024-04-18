@@ -72,6 +72,7 @@ if (chip_build_tests) {
     if (current_os != "mbed") {
       tests += [
         "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/core/tests:tests_nltest",
         "${chip_root}/src/lib/dnssd/minimal_mdns/responders/tests",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests",
         "${chip_root}/src/lib/dnssd/tests",
