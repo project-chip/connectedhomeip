@@ -350,7 +350,8 @@ CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
     outputData.Set<CommissionNodeData>();
     CommissionNodeData & nodeData     = outputData.Get<CommissionNodeData>();
     nodeData                          = mSpecificResolutionData.Get<CommissionNodeData>();
-    (CommonResolutionData &) nodeData = mCommonResolutionData;
+    CommonResolutionData & resolutionData = nodeData;
+    resolutionData = mCommonResolutionData;
 
     ResetToInactive();
 

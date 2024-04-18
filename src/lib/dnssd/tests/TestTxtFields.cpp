@@ -455,18 +455,19 @@ void DiscoveredTxtFieldSessionIdleInterval()
     char val[16];
     DiscoveredNodeData nodeData;
     nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
 
     // Minimum
     strcpy(key, "SII");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().HasValue());
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().Value() == 1_ms32);
 
     // Maximum
     strcpy(key, "SII");
     strcpy(val, "3600000");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().HasValue());
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().Value() == 3600000_ms32);
 
@@ -477,37 +478,37 @@ void DiscoveredTxtFieldSessionIdleInterval()
     // Invalid SII - negative value
     strcpy(key, "SII");
     strcpy(val, "-1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - greater than maximum
     strcpy(key, "SII");
     strcpy(val, "3600001");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - much greater than maximum
     strcpy(key, "SII");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - hexadecimal value
     strcpy(key, "SII");
     strcpy(val, "0x20");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - leading zeros
     strcpy(key, "SII");
     strcpy(val, "0700");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - text at the end
     strcpy(key, "SII");
     strcpy(val, "123abc");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalIdle().HasValue());
 }
 
@@ -519,18 +520,19 @@ void DiscoveredTxtFieldSessionActiveInterval()
     char val[16];
     DiscoveredNodeData nodeData;
     nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
 
     // Minimum
     strcpy(key, "SAI");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryIntervalActive().HasValue());
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryIntervalActive().Value() == 1_ms32);
 
     // Maximum
     strcpy(key, "SAI");
     strcpy(val, "3600000");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryIntervalActive().HasValue());
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryIntervalActive().Value() == 3600000_ms32);
 
@@ -541,37 +543,37 @@ void DiscoveredTxtFieldSessionActiveInterval()
     // Invalid SAI - negative value
     strcpy(key, "SAI");
     strcpy(val, "-1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - greater than maximum
     strcpy(key, "SAI");
     strcpy(val, "3600001");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - much greater than maximum
     strcpy(key, "SAI");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - hexadecimal value
     strcpy(key, "SAI");
     strcpy(val, "0x20");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - leading zeros
     strcpy(key, "SAI");
     strcpy(val, "0700");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - text at the end
     strcpy(key, "SAI");
     strcpy(val, "123abc");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryIntervalActive().HasValue());
 }
 
@@ -583,18 +585,19 @@ void DiscoveredTxtFieldSessionActiveThreshold()
     char val[16];
     DiscoveredNodeData nodeData;
     nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
 
     // Minimum
     strcpy(key, "SAT");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().HasValue());
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().Value() == 1_ms16);
 
     // Maximum
     strcpy(key, "SAT");
     strcpy(val, "65535");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().HasValue());
     EXPECT_TRUE( nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().Value() == 65535_ms16);
 
@@ -605,37 +608,37 @@ void DiscoveredTxtFieldSessionActiveThreshold()
     // Invalid SAI - negative value
     strcpy(key, "SAT");
     strcpy(val, "-1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().HasValue());
 
     // Invalid SAI - greater than maximum
     strcpy(key, "SAT");
     strcpy(val, "65536");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().HasValue());
 
     // Invalid SAT - much greater than maximum
     strcpy(key, "SAT");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().HasValue());
 
     // Invalid SAT - hexadecimal value
     strcpy(key, "SAT");
     strcpy(val, "0x20");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().HasValue());
 
     // Invalid SAT - leading zeros
     strcpy(key, "SAT");
     strcpy(val, "0700");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().HasValue());
 
     // Invalid SAT - text at the end
     strcpy(key, "SAT");
     strcpy(val, "123abc");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().GetMrpRetryActiveThreshold().HasValue());
 }
 
@@ -647,11 +650,12 @@ void DiscoveredTxtFieldTcpSupport()
     char val[8];
     DiscoveredNodeData nodeData;
     nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
 
     // True
     strcpy(key, "T");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().supportsTcp);
 
     // Test no other fields were populated
@@ -661,13 +665,13 @@ void DiscoveredTxtFieldTcpSupport()
     // False
     strcpy(key, "T");
     strcpy(val, "0");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().supportsTcp == false);
 
     // Invalid value, stil false
     strcpy(key, "T");
     strcpy(val, "asdf");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().supportsTcp == false);
 }
 
@@ -679,11 +683,12 @@ void DiscoveredTxtFieldICDoperatesAsLIT()
     char val[16];
     DiscoveredNodeData nodeData;
     nodeData.Set<NodeData>();
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
 
     // ICD is operating as a LIT device
     strcpy(key, "ICD");
     strcpy(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().isICDOperatingAsLIT.HasValue());
     EXPECT_TRUE( nodeData.Get<NodeData>().isICDOperatingAsLIT.Value());
 
@@ -694,7 +699,7 @@ void DiscoveredTxtFieldICDoperatesAsLIT()
     // ICD is operating as a SIT device
     strcpy(key, "ICD");
     strcpy(val, "0");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().isICDOperatingAsLIT.HasValue());
     EXPECT_TRUE( nodeData.Get<NodeData>().isICDOperatingAsLIT.Value() == false);
 
@@ -703,7 +708,7 @@ void DiscoveredTxtFieldICDoperatesAsLIT()
     // Invalid value, No key set
     strcpy(key, "ICD");
     strcpy(val, "asdf");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().isICDOperatingAsLIT.HasValue() == false);
 }
 
@@ -717,6 +722,7 @@ void DiscoveredTestIsDeviceSessionIdle()
     nodeData.Set<NodeData>();
     const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL,
                                                          CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
 
     // No key/val set, so the device can't be sleepy
     EXPECT_TRUE( !nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
@@ -724,13 +730,13 @@ void DiscoveredTestIsDeviceSessionIdle()
     // If the interval is the default value, the device is not sleepy
     strcpy(key, "SII");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL.count()));
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     sprintf(key, "SII");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL.count() + 1));
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
 
@@ -744,6 +750,7 @@ void DiscoveredTestIsDeviceSessionActive()
     nodeData.Set<NodeData>();
     const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL,
                                                          CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
+    CommonResolutionData & resolutionData = nodeData.Get<NodeData>();
 
     // No key/val set, so the device can't be sleepy
     EXPECT_TRUE( !nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
@@ -751,13 +758,13 @@ void DiscoveredTestIsDeviceSessionActive()
     // If the interval is the default value, the device is not sleepy
     sprintf(key, "SAI");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL.count()));
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( !nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     strcpy(key, "SAI");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL.count() + 1));
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), (CommonResolutionData &)nodeData.Get<NodeData>());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), resolutionData);
     EXPECT_TRUE( nodeData.Get<NodeData>().IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
 

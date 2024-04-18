@@ -161,6 +161,11 @@ public:
     {
         assertChipStackLockedByCurrentThread();
 
+        if (!nodeData.Is<CommissionNodeData>()) {
+            // not commissionable/commissioners node 
+            return;
+        }
+
         auto & commissionData = nodeData.Get<CommissionNodeData>();
         auto key = [NSString stringWithUTF8String:commissionData.instanceName];
         if ([mDiscoveredResults objectForKey:key] == nil) {

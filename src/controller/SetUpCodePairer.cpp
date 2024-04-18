@@ -337,7 +337,7 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
         return false;
     }
 
-    Dnssd::CommissionNodeData nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+    const Dnssd::CommissionNodeData & nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
     if (nodeData.commissioningMode == 0)
     {
         ChipLogProgress(Controller, "Discovered device does not have an open commissioning window.");

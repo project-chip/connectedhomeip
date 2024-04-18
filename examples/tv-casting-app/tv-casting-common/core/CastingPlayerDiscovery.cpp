@@ -73,13 +73,12 @@ CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
     return CHIP_NO_ERROR;
 }
 
-void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & discNodeData)
+void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
 {
     ChipLogProgress(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice() called");
     VerifyOrReturn(mClientDelegate != nullptr,
                    ChipLogError(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice mClientDelegate is a nullptr"));
 
-    auto & nodeData = discNodeData;
     // convert nodeData to CastingPlayer
     CastingPlayerAttributes attributes;
     snprintf(attributes.id, kIdMaxLength + 1, "%s%u", nodeData.hostName, nodeData.port);

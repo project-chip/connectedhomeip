@@ -235,6 +235,7 @@ struct CommissionNodeData : public CommonResolutionData
 
     void LogDetail() const
     {
+        ChipLogDetail(Discovery, "Discovered commissionable/commissioners node:");
         CommonResolutionData::LogDetail();
 
         if (rotatingIdLen > 0)
@@ -298,30 +299,6 @@ struct ResolvedNodeData
 };
 
 using DiscoveredNodeData = Variant<CommissionNodeData>;
-
-#if 0
-struct DiscoveredNodeData
-{
-    CommonResolutionData resolutionData;
-    CommissionNodeData nodeData;
-    DiscoveryType nodeType;
-
-    void Reset()
-    {
-        resolutionData.Reset();
-        nodeData.Reset();
-        nodeType = DiscoveryType::kUnknown;
-    }
-    DiscoveredNodeData() { Reset(); }
-
-    void LogDetail() const
-    {
-        ChipLogDetail(Discovery, "Discovered node:");
-        resolutionData.LogDetail();
-        nodeData.LogDetail();
-    }
-};
-#endif
 
 /// Callbacks for discovering nodes advertising non-operational status:
 ///   - Commissioners

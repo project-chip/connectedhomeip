@@ -153,6 +153,7 @@ public:
             {
                 return false;
             }
+            auto & nodeData = data.Get<chip::Dnssd::CommissionNodeData>();
 
             switch (browse.filter.type)
             {
@@ -160,17 +161,17 @@ public:
                 return true;
             case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
                 return browse.filter.code ==
-                    static_cast<uint64_t>((data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator >> 8) & 0x0F);
+                    static_cast<uint64_t>((nodeData.longDiscriminator >> 8) & 0x0F);
             case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
-                return browse.filter.code == data.Get<chip::Dnssd::CommissionNodeData>().longDiscriminator;
+                return browse.filter.code == nodeData.longDiscriminator;
             case chip::Dnssd::DiscoveryFilterType::kVendorId:
-                return browse.filter.code == data.Get<chip::Dnssd::CommissionNodeData>().vendorId;
+                return browse.filter.code == nodeData.vendorId;
             case chip::Dnssd::DiscoveryFilterType::kDeviceType:
-                return browse.filter.code == data.Get<chip::Dnssd::CommissionNodeData>().deviceType;
+                return browse.filter.code == nodeData.deviceType;
             case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
-                return browse.filter.code == data.Get<chip::Dnssd::CommissionNodeData>().commissioningMode;
+                return browse.filter.code == nodeData.commissioningMode;
             case chip::Dnssd::DiscoveryFilterType::kInstanceName:
-                return strncmp(browse.filter.instanceName, data.Get<chip::Dnssd::CommissionNodeData>().instanceName,
+                return strncmp(browse.filter.instanceName, nodeData.instanceName,
                                chip::Dnssd::Commission::kInstanceNameMaxLength + 1) == 0;
             case chip::Dnssd::DiscoveryFilterType::kCommissioner:
             case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
