@@ -47,7 +47,6 @@
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
-#include <lib/dnssd/ServiceNaming.h>
 #include <platform/LockTracker.h>
 #include <platform/PlatformManager.h>
 
@@ -672,8 +671,7 @@ static NSString * const sAttributesKey = @"attributes";
     // subscription.  In that case, _internalDeviceState will update when the
     // subscription is actually terminated.
 
-    [_connectivityMonitor stopMonitoring];
-    _connectivityMonitor = nil;
+    [self _stopConnectivityMonitoring];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -868,8 +866,7 @@ static NSString * const sAttributesKey = @"attributes";
     [self _changeState:MTRDeviceStateReachable];
 
     // No need to monitor connectivity after subscription establishment
-    [_connectivityMonitor stopMonitoring];
-    _connectivityMonitor = nil;
+    [self _stopConnectivityMonitoring];
 
     os_unfair_lock_unlock(&self->_lock);
 
@@ -1256,35 +1253,40 @@ static NSString * const sAttributesKey = @"attributes";
 
 - (void)_setupConnectivityMonitoring
 {
-    std::lock_guard lock(_lock);
+    // Dispatch to own queue first to avoid deadlock with syncGetCompressedFabricID
+    dispatch_async(self.queue, ^{
+        // Get the required info before setting up the connectivity monitor
+        NSNumber * compressedFabricID = [self->_deviceController syncGetCompressedFabricID];
+        if (!compressedFabricID) {
+            MTR_LOG_INFO("%@ could not get compressed fabricID", self);
+            return;
+        }
+
+        // Now lock for _connectivityMonitor
+        std::lock_guard lock(self->_lock);
+        if (self->_connectivityMonitor) {
+            // already monitoring
+            return;
+        }
+
+        self->_connectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:compressedFabricID nodeID:self.nodeID];
+        [self->_connectivityMonitor startMonitoringWithHandler:^{
+            [self->_deviceController asyncDispatchToMatterQueue:^{
+                [self _triggerResubscribeWithReason:"read-through skipped while not subscribed" nodeLikelyReachable:YES];
+            }
+                                                   errorHandler:nil];
+        } queue:self.queue];
+    });
+}
+
+- (void)_stopConnectivityMonitoring
+{
+    os_unfair_lock_assert_owner(&_lock);
 
     if (_connectivityMonitor) {
-        // already monitoring
-        return;
+        [_connectivityMonitor stopMonitoring];
+        _connectivityMonitor = nil;
     }
-
-    // Get the required info before setting up the connectivity monitor
-    NSNumber * compressedFabricID = [_deviceController syncGetCompressedFabricID];
-    if (!compressedFabricID) {
-        MTR_LOG_INFO("%@ could not get compressed fabricID", self);
-        return;
-    }
-
-    char instanceName[chip::Dnssd::kMaxOperationalServiceNameSize];
-    chip::PeerId peerId(static_cast<chip::CompressedFabricId>(compressedFabricID.unsignedLongLongValue), static_cast<chip::NodeId>(_nodeID.unsignedLongLongValue));
-    CHIP_ERROR err = chip::Dnssd::MakeInstanceName(instanceName, sizeof(instanceName), peerId);
-    if (err != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("%@ could not make instance name", self);
-        return;
-    }
-
-    _connectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:[NSString stringWithUTF8String:instanceName]];
-    [_connectivityMonitor startMonitoringWithHandler:^{
-        [self->_deviceController asyncDispatchToMatterQueue:^{
-            [self _triggerResubscribeWithReason:"read-through skipped while not subscribed" nodeLikelyReachable:YES];
-        }
-                                               errorHandler:nil];
-    } queue:_queue];
 }
 
 // assume lock is held

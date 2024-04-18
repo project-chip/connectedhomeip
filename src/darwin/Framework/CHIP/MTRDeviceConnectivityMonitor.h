@@ -16,13 +16,27 @@
 
 #import <Foundation/Foundation.h>
 
+#import "MTRDefines_Internal.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^MTRDeviceConnectivityMonitorHandler)(void);
 
+/**
+ * Class that a matter dns-sd instance name, and monitors connectivity to the device.
+ */
+MTR_TESTABLE
 @interface MTRDeviceConnectivityMonitor : NSObject
-- (instancetype)initWithInstanceName:(NSString *)instanceName;
+- (instancetype)initWithCompressedFabricID:(NSNumber *)compressedFabricID nodeID:(NSNumber *)nodeID;
+
+/**
+ * Any time a path becomes satisfied or route becomes viable, the registered handler will be called.
+ */
 - (void)startMonitoringWithHandler:(MTRDeviceConnectivityMonitorHandler)handler queue:(dispatch_queue_t)queue;
+
+/**
+ * Stops the monitoring. After this method returns no more calls to the handler will be made.
+ */
 - (void)stopMonitoring;
 @end
 

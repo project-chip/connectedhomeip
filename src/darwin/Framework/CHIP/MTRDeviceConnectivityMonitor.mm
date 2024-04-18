@@ -22,9 +22,7 @@
 #import <dns_sd.h>
 #import <os/lock.h>
 
-@interface MTRDeviceConnectivityMonitor ()
-- (void)handleResolvedHostname:(const char *)hostName port:(uint16_t)port error:(DNSServiceErrorType)error;
-@end
+#include <lib/dnssd/ServiceNaming.h>
 
 @implementation MTRDeviceConnectivityMonitor {
     NSString * _instanceName;
@@ -38,10 +36,10 @@
 namespace {
 constexpr char kLocalDot[] = "local.";
 constexpr char kOperationalType[] = "_matter._tcp";
+constexpr int64_t kSharedConnectionLingerIntervalSeconds = (10);
 }
 
-static dispatch_once_t sConnecitivityMonitorOnceToken;
-static os_unfair_lock sConnectivityMonitorLock;
+static os_unfair_lock sConnectivityMonitorLock = OS_UNFAIR_LOCK_INIT;
 static NSUInteger sConnectivityMonitorCount;
 static DNSServiceRef sSharedResolverConnection;
 static dispatch_queue_t sSharedResolverQueue;
@@ -49,13 +47,23 @@ static dispatch_queue_t sSharedResolverQueue;
 - (instancetype)initWithInstanceName:(NSString *)instanceName
 {
     if (self = [super init]) {
-        dispatch_once(&sConnecitivityMonitorOnceToken, ^{
-            sConnectivityMonitorLock = OS_UNFAIR_LOCK_INIT;
-        });
         _instanceName = [instanceName copy];
         _connections = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (instancetype)initWithCompressedFabricID:(NSNumber *)compressedFabricID nodeID:(NSNumber *)nodeID
+{
+    char instanceName[chip::Dnssd::kMaxOperationalServiceNameSize];
+    chip::PeerId peerId(static_cast<chip::CompressedFabricId>(compressedFabricID.unsignedLongLongValue), static_cast<chip::NodeId>(nodeID.unsignedLongLongValue));
+    CHIP_ERROR err = chip::Dnssd::MakeInstanceName(instanceName, sizeof(instanceName), peerId);
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("%@ could not make instance name", self);
+        return nil;
+    }
+
+    return [self initWithInstanceName:[NSString stringWithUTF8String:instanceName]];
 }
 
 - (void)dealloc
@@ -76,7 +84,7 @@ static dispatch_queue_t sSharedResolverQueue;
 
     if (!sSharedResolverConnection) {
         DNSServiceErrorType dnsError = DNSServiceCreateConnection(&sSharedResolverConnection);
-        if (dnsError) {
+        if (dnsError != kDNSServiceErr_NoError) {
             MTR_LOG_ERROR("MTRDeviceConnectivityMonitor: DNSServiceCreateConnection failed %d", dnsError);
             return NULL;
         }
@@ -99,7 +107,7 @@ static dispatch_queue_t sSharedResolverQueue;
     os_unfair_lock_assert_owner(&sConnectivityMonitorLock);
     MTRDeviceConnectivityMonitorHandler handlerToCall = self->_monitorHandler;
     if (handlerToCall) {
-        dispatch_async(self->_handlerQueue, ^{ handlerToCall(); });
+        dispatch_async(self->_handlerQueue, handlerToCall);
     }
 }
 
@@ -151,36 +159,37 @@ static dispatch_queue_t sSharedResolverQueue;
             }
         });
         nw_connection_start(connection);
+
+        _connections[hostNameString] = connection;
     }
 }
 
-static void _resolveReplyCallback(
+static void ResolveCallback(
     DNSServiceRef sdRef,
     DNSServiceFlags flags,
     uint32_t interfaceIndex,
     DNSServiceErrorType errorCode,
-    const char * fullname,
-    const char * hosttarget,
+    const char * fullName,
+    const char * hostName,
     uint16_t port, /* In network byte order */
     uint16_t txtLen,
     const unsigned char * txtRecord,
     void * context)
 {
     auto * connectivityMonitor = (__bridge MTRDeviceConnectivityMonitor *) context;
-    [connectivityMonitor handleResolvedHostname:hosttarget port:port error:errorCode];
+    [connectivityMonitor handleResolvedHostname:hostName port:port error:errorCode];
 }
 
 - (void)startMonitoringWithHandler:(MTRDeviceConnectivityMonitorHandler)handler queue:(dispatch_queue_t)queue
 {
     std::lock_guard lock(sConnectivityMonitorLock);
 
-    MTRDeviceConnectivityMonitorHandler handlerCopy = [handler copy];
-    _monitorHandler = handlerCopy;
+    _monitorHandler = handler;
     _handlerQueue = queue;
 
     // If there's already a resolver running, just return
     if (_resolver) {
-        MTR_LOG_INFO("%@ connectivity monitor updated handler", self);
+        MTR_LOG_INFO("%@ connectivity monitor already running", self);
         return;
     }
 
@@ -197,7 +206,7 @@ static void _resolveReplyCallback(
         _instanceName.UTF8String,
         kOperationalType,
         kLocalDot,
-        _resolveReplyCallback,
+        ResolveCallback,
         (__bridge void *) self);
     if (dnsError != kDNSServiceErr_NoError) {
         MTR_LOG_ERROR("%@ failed to create resolver", self);
@@ -207,8 +216,6 @@ static void _resolveReplyCallback(
     sConnectivityMonitorCount++;
 }
 
-#define MTRDEVICECONNECTIVITYMONITOR_SHARED_CONNECTION_LINGER_INTERVAL (10)
-
 - (void)_stopMonitoring
 {
     os_unfair_lock_assert_owner(&sConnectivityMonitorLock);
@@ -217,6 +224,9 @@ static void _resolveReplyCallback(
     }
     [_connections removeAllObjects];
 
+    _monitorHandler = nil;
+    _handlerQueue = nil;
+
     if (_resolver) {
         DNSServiceRefDeallocate(_resolver);
         _resolver = NULL;
@@ -224,11 +234,11 @@ static void _resolveReplyCallback(
         // If no monitor objects exist, schedule to deallocate shared connection and queue
         sConnectivityMonitorCount--;
         if (!sConnectivityMonitorCount) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (MTRDEVICECONNECTIVITYMONITOR_SHARED_CONNECTION_LINGER_INTERVAL * NSEC_PER_SEC)), sSharedResolverQueue, ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kSharedConnectionLingerIntervalSeconds * NSEC_PER_SEC), sSharedResolverQueue, ^{
                 std::lock_guard lock(sConnectivityMonitorLock);
 
                 if (!sConnectivityMonitorCount) {
-                    MTR_LOG_INFO("%@ Closing shared resolver connection", self);
+                    MTR_LOG_INFO("MTRDeviceConnectivityMonitor: Closing shared resolver connection");
                     DNSServiceRefDeallocate(sSharedResolverConnection);
                     sSharedResolverConnection = NULL;
                     sSharedResolverQueue = nil;
