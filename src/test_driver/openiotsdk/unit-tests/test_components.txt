@@ -1,6 +1,7 @@
 accesstest
 ASN1Tests
 MinimalMdnsCoreTests
+ChipCryptoTests
 MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
 CoreTests

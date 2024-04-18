@@ -84,7 +84,7 @@ TEST_F(TestPSAOpKeyStore, TestBasicLifeCycle)
     EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
     EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
 
-    EXPECT_EQ Fail to generate CSR for invalid fabrics
+    // Fail to generate CSR for invalid fabrics
     csrSpan = MutableByteSpan{ csrBuf };
     err     = opKeystore.NewOpKeypairForFabric(kUndefinedFabricIndex, csrSpan);
     EXPECT_EQ(err, CHIP_ERROR_INVALID_FABRIC_INDEX);
