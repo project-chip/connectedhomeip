@@ -24,4 +24,3 @@ uint16_t getUserDefaultDnssdSRPTimeout();
 } // namespace Utils
 } // namespace DeviceLayer
 } // namespace chip
-
