@@ -45,7 +45,8 @@ def test_spec_to_attribute_cache(test_spec: TestSpec) -> Attribute.AsyncReadTran
     gd = Clusters.GeneralDiagnostics
     gd_attr = gd.Attributes
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
-    resp.attributes = {0: {bi: {bi_attr.MaxPathsPerInvoke: test_spec.max_paths}, gd: {gd_attr.FeatureMap: test_spec.dmtest_feature_map}}}
+    resp.attributes = {0: {bi: {bi_attr.MaxPathsPerInvoke: test_spec.max_paths},
+                           gd: {gd_attr.FeatureMap: test_spec.dmtest_feature_map}}}
     return resp
 
 

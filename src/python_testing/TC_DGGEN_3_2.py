@@ -40,7 +40,8 @@ class TC_DGGEN_3_2(MatterBaseTest):
         self.step(2)
         feature_map = await self.read_single_attribute_check_success(cluster=Clusters.GeneralDiagnostics, attribute=Clusters.GeneralDiagnostics.Attributes.FeatureMap)
         if max_paths_per_invoke > 1:
-            asserts.assert_true(feature_map & Clusters.GeneralDiagnostics.Bitmaps.Feature.kDataModelTest, "DMTEST feature must be set if MaxPathsPerInvoke > 1")
+            asserts.assert_true(feature_map & Clusters.GeneralDiagnostics.Bitmaps.Feature.kDataModelTest,
+                                "DMTEST feature must be set if MaxPathsPerInvoke > 1")
 
 
 if __name__ == "__main__":
