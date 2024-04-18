@@ -1280,18 +1280,6 @@ TEST_F(TestChipCryptoPAL, TestAddEntropySources)
 }
 #endif
 
-#if CHIP_CRYPTO_PSA
-TEST_F(TestChipCryptoPAL, TestAddEntropySources)
-#endif
-
-#if CHIP_CRYPTO_BORINGSSL
-TEST_F(TestChipCryptoPAL, TestAddEntropySources)
-#endif
-
-#if CHIP_CRYPTO_PLATFORM
-TEST_F(TestChipCryptoPAL, TestAddEntropySources)
-#endif
-
 TEST_F(TestChipCryptoPAL, TestPBKDF2_SHA256_TestVectors)
 {
     HeapChecker heapChecker;
