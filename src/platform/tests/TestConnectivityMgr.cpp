@@ -52,6 +52,7 @@ struct TestConnectivityMgr : public ::testing::Test
     {
         auto err = chip::Platform::MemoryInit();
         EXPECT_EQ(err, CHIP_NO_ERROR);
+        // TODO: Move initialization of the platform manager from Init test to here
     }
 
     static void TearDownTestSuite()
@@ -60,6 +61,7 @@ struct TestConnectivityMgr : public ::testing::Test
         chip::DeviceLayer::PlatformMgr().Shutdown();
     }
 };
+
 TEST_F(TestConnectivityMgr, Init)
 {
     // ConfigurationManager is initialized from PlatformManager indirectly

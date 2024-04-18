@@ -119,8 +119,8 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     }
 
     EXPECT_EQ(result->mTextEntrySize, 1u);
-    EXPECT_EQ(strcmp(result->mTextEntries[0].mKey, "key"), 0);
-    EXPECT_EQ(strcmp(reinterpret_cast<const char *>(result->mTextEntries[0].mData), "val"), 0);
+    EXPECT_STREQ(result->mTextEntries[0].mKey, "key");
+    EXPECT_STREQ(reinterpret_cast<const char *>(result->mTextEntries[0].mData), "val");
 
     if (ctx->mBrowsedServicesCount == ++ctx->mResolvedServicesCount)
     {
@@ -143,7 +143,7 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
     auto * ctx = static_cast<TestDnssd *>(context);
 
     // Make sure that we will not be called again after end-of-input is set
-    EXPECT_EQ(ctx->mEndOfInput, false);
+    EXPECT_FALSE(ctx->mEndOfInput);
     // Cancelled error is expected when the browse is stopped with
     // ChipDnssdStopBrowse(), so we will not assert on it.
     EXPECT_TRUE(error == CHIP_NO_ERROR || error == CHIP_ERROR_CANCELLED);

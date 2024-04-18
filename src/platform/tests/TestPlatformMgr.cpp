@@ -146,7 +146,7 @@ TEST_F(TestPlatformMgr, BasicRunEventLoop)
 
     PlatformMgr().ScheduleWork(StopTheLoop);
 
-    EXPECT_TRUE(!stopRan);
+    EXPECT_FALSE(stopRan);
     PlatformMgr().RunEventLoop();
     EXPECT_TRUE(stopRan);
     EXPECT_EQ(stopResult, CHIP_NO_ERROR);
@@ -172,8 +172,8 @@ TEST_F(TestPlatformMgr, RunEventLoopTwoTasks)
     PlatformMgr().ScheduleWork(SleepSome);
     PlatformMgr().ScheduleWork(StopTheLoop);
 
-    EXPECT_TRUE(!stopRan);
-    EXPECT_TRUE(!sleepRan);
+    EXPECT_FALSE(stopRan);
+    EXPECT_FALSE(sleepRan);
     PlatformMgr().RunEventLoop();
     EXPECT_TRUE(stopRan);
     EXPECT_TRUE(sleepRan);
