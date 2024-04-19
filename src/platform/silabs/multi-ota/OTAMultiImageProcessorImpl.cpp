@@ -64,7 +64,6 @@ void OTAMultiImageProcessorImpl::Clear()
     mParams.totalFileBytes  = 0;
     mParams.downloadedBytes = 0;
     mCurrentProcessor       = nullptr;
-
     ReleaseBlock();
 }
 
