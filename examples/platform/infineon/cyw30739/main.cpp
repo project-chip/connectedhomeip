@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <matter_config.h>
+#include <sparcommon.h>
+#include <stdio.h>
 
-#pragma once
+APPLICATION_START()
+{
+    printf("\nApp starting\n");
 
-void RegisterAppShellCommands();
+    if (CYW30739MatterConfig::InitMatter() != CHIP_NO_ERROR)
+        printf("\nERROR InitMatter\n");
+}

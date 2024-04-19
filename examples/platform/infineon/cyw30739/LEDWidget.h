@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-void RegisterAppShellCommands();
+#include <wiced_led_manager.h>
+
+class LEDWidget
+{
+public:
+    void Init(wiced_led_config_t * config, size_t count);
+    void Set(bool state, wiced_led_t pin);
+    void Blink(wiced_led_t led_pin, uint32_t on_period_ms, uint32_t off_period_ms);
+    bool IsLEDOn();
+
+private:
+    void DoSetLEDOnOff(bool state, wiced_led_t pin);
+    friend LEDWidget & LEDWid(void);
+    bool usr_LED1_OnOffStatus;
+    static LEDWidget sLEDWidget;
+};
+
+inline LEDWidget & LEDWid(void)
+{
+    return LEDWidget::sLEDWidget;
+}
