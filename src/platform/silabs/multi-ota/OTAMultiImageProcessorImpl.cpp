@@ -42,7 +42,7 @@ extern "C" {
 #ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
 #include "spi_multiplex.h"
 #include "btl_interface.h"
-#endif // SL_WIFI
+#endif // SLI_SI91X_MCU_INTERFACE
 #ifdef CHIP_9117
 #include "spi_multiplex.h"
 #endif // CHIP_9117
