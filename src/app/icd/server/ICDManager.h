@@ -76,6 +76,23 @@ public:
     /**
      * @brief This enum class represents to all ICDStateObserver callbacks available from the
      *        mStateObserverPool for the ICDManager.
+     *
+     *        EnterActiveMode, TransitionToIdle and EnterIdleMode will always be called as a trio in the same order.
+     *        Each event will only be called once per cycle.
+     *        EnterActiveMode will always be called first, when the ICD has transitioned to ActiveMode.
+     *        TransitionToIdle will always be second. This event will only be called the first time there is
+     *        `ICD_ACTIVE_TIME_JITTER_MS` remaining to the ActiveMode timer.
+     *         When this event is called, the ICD is still in ActiveMode.
+     *        If the ActiveMode timer is increased due to the TransitionToIdle event, the event will not be called a second time in
+     *        a given cycle.
+     *        OnEnterIdleMode will always the third when the ICD has transitioned to IdleMode.
+     *
+     *        The ICDModeChange event can occur independently from the EnterActiveMode, TransitionToIdle and EnterIdleMode.
+     *        It will typpically hapen at the ICDManager init when a client is already registered with the ICD before the
+     *        OnEnterIdleMode event or when a client send a register command after the OnEnterActiveMode event. Nothing prevents the
+     *        ICDModeChange event to happen multiple times per cycle or while the ICD is in IdleMode.
+     *
+     *        See src/app/icd/server/ICDStateObserver.h for more information on the APIs each event triggers
      */
     enum class ObserverEventType : uint8_t
     {
@@ -184,10 +201,12 @@ public:
 private:
     friend class TestICDManager;
     /**
-     * @brief UpdateICDMode checks in which ICDMode (SIT or LIT) the ICD can go to and updates the mode if necessary.
-     *        For a SIT ICD, the function does nothing.
-     *        For a LIT ICD, the function checks if the ICD has a registration in the ICDMonitoringTable to determine which
-     *        ICDMode the ICD must be in.
+     * @brief UpdateICDMode evaluates in which mode the ICD can be in; SIT or LIT mode.
+     *        If the current operating mode does not match the evaluated operating mode, function updates the ICDMode and triggers
+     *        all necessary operations.
+     *        For a SIT ICD, this function does nothing.
+     *        For a LIT ICD, the function checks if the ICD has a registration in the ICDMonitoringTable to determine which ICDMode
+     *        the ICD must be in.
      */
     void UpdateICDMode();
 
