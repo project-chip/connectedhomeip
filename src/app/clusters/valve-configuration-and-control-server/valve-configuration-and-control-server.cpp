@@ -277,7 +277,7 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
 
 CHIP_ERROR CloseValve(EndpointId ep)
 {
-    Delegate * delegate = GetDelegate(ep);
+    Delegate * delegate        = GetDelegate(ep);
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     VerifyOrReturnError(Status::Success == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
