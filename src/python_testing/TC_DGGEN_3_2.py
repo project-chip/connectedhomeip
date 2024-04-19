@@ -23,9 +23,9 @@ from mobly import asserts
 class TC_DGGEN_3_2(MatterBaseTest):
     def steps_TC_DGGEN_3_2(self):
         return [TestStep(0, "Commission DUT (already done)", is_commissioning=True),
-                TestStep(1, "TH reads the MaxPathsPerInvoke attribute form the Basic Information Cluster from DUT. Save the value as `max_paths_per_invoke",
+                TestStep(1, "TH reads the MaxPathsPerInvoke attribute from the Basic Information Cluster from DUT. Save the value as `max_paths_per_invoke",
                          "Read is successful"),
-                TestStep(2, "TH reads FeatureMap attribute form the General Diagnostics Cluster from DUT",
+                TestStep(2, "TH reads FeatureMap attribute from the General Diagnostics Cluster from DUT",
                          "Verify that the FeatureMap value has the DMTEST feature bit (0) set to 1 if `max_path_per_invoke` > 1")
                 ]
 
