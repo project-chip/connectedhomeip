@@ -21,15 +21,13 @@
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 #include <src/lib/core/CHIPError.h>
 
+#include <platform/nxp/k32w/common/FactoryDataDriver.h>
+
 #include <vector>
 
 #include "CHIPPlatformConfig.h"
 
 #include <vector>
-
-/* Grab symbol for the base address from the linker file. */
-extern uint32_t __MATTER_FACTORY_DATA_START[];
-extern uint32_t __MATTER_FACTORY_DATA_SIZE[];
 
 namespace chip {
 namespace DeviceLayer {
@@ -66,6 +64,13 @@ public:
         uint8_t hash[4];
     };
 
+    struct FactoryDataConfig
+    {
+        uint32_t start;
+        uint32_t size;
+        uint32_t payload;
+    };
+
     // Default factory data IDs
     enum FactoryDataId
     {
@@ -95,9 +100,7 @@ public:
         kMaxId
     };
 
-    static uint32_t kFactoryDataStart;
-    static uint32_t kFactoryDataSize;
-    static uint32_t kFactoryDataPayloadStart;
+    static uint32_t kFactoryDataMaxSize;
     static constexpr uint32_t kLengthOffset = 1;
     static constexpr uint32_t kValueOffset  = 3;
     static constexpr uint32_t kHashLen      = 4;
@@ -105,11 +108,22 @@ public:
 
     virtual ~FactoryDataProvider();
 
-    virtual CHIP_ERROR Init()                                                                          = 0;
-    virtual CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) = 0;
-    CHIP_ERROR Validate();
+    virtual CHIP_ERROR Init() = 0;
+    virtual CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer);
+    virtual CHIP_ERROR Validate();
 
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
+    virtual CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
+                                   uint32_t * offset = nullptr);
+
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+    using RestoreMechanism = CHIP_ERROR (*)(void);
+
+    CHIP_ERROR ValidateWithRestore();
+    void RegisterRestoreMechanism(RestoreMechanism mechanism);
+
+    virtual CHIP_ERROR PreResetCheck()  = 0;
+    virtual CHIP_ERROR PostResetCheck() = 0;
+#endif
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
@@ -145,6 +159,11 @@ public:
 
 protected:
     Header mHeader;
+    FactoryDataConfig mConfig;
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+    std::vector<RestoreMechanism> mRestoreMechanisms;
+    FactoryDataDriver * mFactoryDataDriver = nullptr;
+#endif
 };
 
 } // namespace DeviceLayer

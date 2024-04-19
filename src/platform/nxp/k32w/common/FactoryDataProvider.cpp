@@ -44,20 +44,94 @@ static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Cry
  */
 static constexpr size_t kDacPrivateKey_MaxLen = Crypto::kP256_PrivateKey_Length + 24;
 
-uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __MATTER_FACTORY_DATA_START;
-uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __MATTER_FACTORY_DATA_SIZE;
-uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
-
 FactoryDataProvider::~FactoryDataProvider() {}
+
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+
+CHIP_ERROR FactoryDataProvider::ValidateWithRestore()
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(mRestoreMechanisms.size() > 0, CHIP_FACTORY_DATA_RESTORE_MECHANISM);
+
+    for (auto & restore : mRestoreMechanisms)
+    {
+        error = restore();
+        if (error != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+
+        error = Validate();
+        if (error != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+
+        break;
+    }
+
+    if (error == CHIP_NO_ERROR)
+    {
+        error = mFactoryDataDriver->DeleteBackup();
+    }
+
+    return error;
+}
+
+void FactoryDataProvider::RegisterRestoreMechanism(RestoreMechanism restore)
+{
+    mRestoreMechanisms.insert(mRestoreMechanisms.end(), restore);
+}
+
+#endif
+
+CHIP_ERROR FactoryDataProvider::SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    Crypto::P256ECDSASignature signature;
+    Crypto::P256Keypair keypair;
+    Crypto::P256SerializedKeypair serializedKeypair;
+    uint8_t keyBuf[Crypto::kP256_PrivateKey_Length];
+    MutableByteSpan dacPrivateKeySpan(keyBuf);
+    uint16_t keySize = 0;
+
+    VerifyOrExit(!outSignBuffer.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!messageToSign.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(outSignBuffer.size() >= signature.Capacity(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    /* Get private key of DAC certificate from reserved section */
+    error = SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize);
+    SuccessOrExit(error);
+    dacPrivateKeySpan.reduce_size(keySize);
+
+    /* Only the private key is used when signing */
+    error = serializedKeypair.SetLength(Crypto::kP256_PublicKey_Length + dacPrivateKeySpan.size());
+    SuccessOrExit(error);
+    memcpy(serializedKeypair.Bytes() + Crypto::kP256_PublicKey_Length, dacPrivateKeySpan.data(), dacPrivateKeySpan.size());
+
+    error = keypair.Deserialize(serializedKeypair);
+    SuccessOrExit(error);
+
+    error = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);
+    SuccessOrExit(error);
+
+    error = CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
+
+exit:
+    /* Sanitize temporary buffer */
+    memset(keyBuf, 0, Crypto::kP256_PrivateKey_Length);
+    return error;
+}
 
 CHIP_ERROR FactoryDataProvider::Validate()
 {
     uint8_t output[Crypto::kSHA256_Hash_Length] = { 0 };
 
-    memcpy(&mHeader, (void *) kFactoryDataStart, sizeof(Header));
+    memcpy(&mHeader, (void *) mConfig.start, sizeof(Header));
     ReturnErrorCodeIf(mHeader.hashId != kHashId, CHIP_FACTORY_DATA_HASH_ID);
 
-    ReturnErrorOnFailure(Crypto::Hash_SHA256((uint8_t *) kFactoryDataPayloadStart, mHeader.size, output));
+    ReturnErrorOnFailure(Crypto::Hash_SHA256((uint8_t *) mConfig.payload, mHeader.size, output));
     ReturnErrorCodeIf(memcmp(output, mHeader.hash, kHashLen) != 0, CHIP_FACTORY_DATA_SHA_CHECK);
 
     return CHIP_NO_ERROR;
@@ -66,10 +140,10 @@ CHIP_ERROR FactoryDataProvider::Validate()
 CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                                             uint32_t * offset)
 {
-    uint32_t addr = kFactoryDataPayloadStart;
+    uint32_t addr = mConfig.payload;
     uint8_t type  = 0;
 
-    while (addr < (kFactoryDataPayloadStart + mHeader.size))
+    while (addr < (mConfig.payload + mHeader.size))
     {
         memcpy(&type, (void *) addr, sizeof(type));
         memcpy(&length, (void *) (addr + 1), sizeof(length));
@@ -80,7 +154,7 @@ CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf
             memcpy(pBuf, (void *) (addr + kValueOffset), length);
 
             if (offset)
-                *offset = (addr - kFactoryDataPayloadStart);
+                *offset = (addr - mConfig.payload);
 
             return CHIP_NO_ERROR;
         }
