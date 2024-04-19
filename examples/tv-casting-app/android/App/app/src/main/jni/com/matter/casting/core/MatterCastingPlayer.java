@@ -47,7 +47,12 @@ public class MatterCastingPlayer implements CastingPlayer {
   private int productId;
   private int vendorId;
   private long deviceType;
-  private short commissionerPasscode;
+  /**
+   * The CommissionerPasscode field indicates whether a CastingPlayer supports the
+   * Commissioner-Generated Passcode feature.
+   */
+  private boolean commissionerPasscode;
+
   protected long _cppCastingPlayer;
 
   public MatterCastingPlayer(
@@ -61,7 +66,7 @@ public class MatterCastingPlayer implements CastingPlayer {
       int productId,
       int vendorId,
       long deviceType,
-      short commissionerPasscode) {
+      boolean commissionerPasscode) {
     this.connected = connected;
     this.deviceId = deviceId;
     this.hostName = hostName;
@@ -135,7 +140,7 @@ public class MatterCastingPlayer implements CastingPlayer {
   }
 
   @Override
-  public short getCommissionerPasscode() {
+  public boolean isCommissionerPasscodeSupported() {
     return this.commissionerPasscode;
   }
 

@@ -83,7 +83,6 @@ private:
         kCastingPlayerPortTag,
         kCastingPlayerInstanceNameTag,
         kCastingPlayerDeviceNameTag,
-        kCastingPlayerCommissionerPasscodeTag,
         kCastingPlayerHostNameTag,
 
         kCastingPlayerEndpointsContainerTag,
@@ -97,6 +96,8 @@ private:
 
         kCastingPlayerEndpointServerListContainerTag,
         kCastingPlayerEndpointServerClusterIdTag,
+
+        kCastingPlayerCommissionerPasscodeTag,
 
         kContextTagMaxNum = UINT8_MAX
     };

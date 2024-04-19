@@ -185,7 +185,7 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
 
 uint8_t GetCommissionerPasscode(const ByteSpan & value)
 {
-    return MakeU8FromAsciiDecimal(value);
+    return MakeBoolFromAsciiDecimal(value);
 }
 
 Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
