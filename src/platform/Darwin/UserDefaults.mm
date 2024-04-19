@@ -23,12 +23,12 @@ static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOv
 namespace chip {
 namespace DeviceLayer {
 
-uint16_t getUserDefaultDnssdSRPTimeoutInMSecs()
-{
-    NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultDomain];
-    NSInteger srpTimeoutValue = [defaults integerForKey:kSRPTimeoutInMsecsUserDefaultKey];
-    return (srpTimeoutValue < UINT16_MAX) ? static_cast<uint16_t>(srpTimeoutValue) : 0;
-}
+    uint16_t getUserDefaultDnssdSRPTimeoutInMSecs()
+    {
+        NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultDomain];
+        NSInteger srpTimeoutValue = [defaults integerForKey:kSRPTimeoutInMsecsUserDefaultKey];
+        return (srpTimeoutValue < UINT16_MAX) ? static_cast<uint16_t>(srpTimeoutValue) : 0;
+    }
 
 } // namespace DeviceLayer
 } // namespace chip
