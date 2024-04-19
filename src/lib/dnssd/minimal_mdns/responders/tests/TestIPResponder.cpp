@@ -63,7 +63,7 @@ public:
     static void SetUpTestSuite()
     {
         mdns::Minimal::SetDefaultAddressPolicy();
-        VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
