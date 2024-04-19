@@ -45,6 +45,7 @@ struct CtorDtorCounter
     CtorDtorCounter & operator=(CtorDtorCounter &&) = default;
 
     bool operator==(const CtorDtorCounter & o) const { return m == o.m; }
+    bool operator!=(const CtorDtorCounter & o) const { return m != o.m; }
 
     int m;
 
@@ -68,6 +69,9 @@ public:
 
     MovableCtorDtorCounter(MovableCtorDtorCounter && o)           = default;
     MovableCtorDtorCounter & operator=(MovableCtorDtorCounter &&) = default;
+
+    using CtorDtorCounter::operator==;
+    using CtorDtorCounter::operator!=;
 };
 
 int CtorDtorCounter::created   = 0;

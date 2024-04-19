@@ -19,9 +19,9 @@
 #pragma once
 
 #include <app/util/attribute-storage-null-handling.h>
-#include <lib/core/Optional.h>
-
+#include <optional>
 #include <type_traits>
+#include <utility>
 
 namespace chip {
 namespace app {
@@ -37,29 +37,36 @@ inline constexpr auto NullNullable = NullOptional;
  * things.
  */
 template <typename T>
-struct Nullable : protected Optional<T>
+struct Nullable : protected std::optional<T>
 {
+
     //
     // The following 'using' statement is needed to make visible
     // all constructors of the base class within this derived class.
     //
-    using Optional<T>::Optional;
+    using std::optional<T>::optional;
+    using std::optional<T>::value_or;
+    using std::optional<T>::value;
+    using std::optional<T>::has_value;
+    using std::optional<T>::operator*;
+    using std::optional<T>::operator->;
 
-    // Pull in APIs that make sense on Nullable with the same names as on
-    // Optional.
-    using Optional<T>::Value;
-    using Optional<T>::ValueOr;
+    // backwards compatibiltiyt with old chip::Optional functionality
+    // NOTE: as we transition to std::optional, these should be removed
+    T & Value() & { return value(); }
+    const T & Value() const & { return value(); }
+    Nullable(NullOptionalType) : std::optional<T>(std::nullopt) {}
 
     // Some consumers need an easy way to determine our underlying type.
     using UnderlyingType = T;
 
-    constexpr void SetNull() { Optional<T>::ClearValue(); }
-    constexpr bool IsNull() const { return !Optional<T>::HasValue(); }
+    constexpr void SetNull() { std::optional<T>::reset(); }
+    constexpr bool IsNull() const { return !std::optional<T>::has_value(); }
 
     template <class... Args>
     constexpr T & SetNonNull(Args &&... args)
     {
-        return Optional<T>::Emplace(std::forward<Args>(args)...);
+        return std::optional<T>::emplace(std::forward<Args>(args)...);
     }
 
     // For integer types, being nullable involves a range restriction.
@@ -96,22 +103,29 @@ struct Nullable : protected Optional<T>
     // The only fabric-scoped objects in the spec are commands, events and structs inside lists, and none of those can be nullable.
     static constexpr bool kIsFabricScoped = false;
 
-    bool operator==(const Nullable & other) const { return Optional<T>::operator==(other); }
-    bool operator!=(const Nullable & other) const { return Optional<T>::operator!=(other); }
-    bool operator==(const T & other) const { return Optional<T>::operator==(other); }
-    bool operator!=(const T & other) const { return Optional<T>::operator!=(other); }
+    bool operator==(const Nullable<T> & other) const
+    {
+        if (!has_value())
+        {
+            return !other.has_value();
+        }
+        return other.has_value() && (*other == **this);
+    }
+    bool operator!=(const Nullable<T> & other) const { return !(*this == other); }
+    bool operator==(const T & other) const { return has_value() && (*this == other); }
+    bool operator!=(const T & other) const { return !has_value() || (*this != other); }
 };
 
 template <class T>
 constexpr Nullable<std::decay_t<T>> MakeNullable(T && value)
 {
-    return Nullable<std::decay_t<T>>(InPlace, std::forward<T>(value));
+    return Nullable<std::decay_t<T>>(std::in_place, std::forward<T>(value));
 }
 
 template <class T, class... Args>
 constexpr Nullable<T> MakeNullable(Args &&... args)
 {
-    return Nullable<T>(InPlace, std::forward<Args>(args)...);
+    return Nullable<T>(std::in_place, std::forward<Args>(args)...);
 }
 
 } // namespace DataModel
