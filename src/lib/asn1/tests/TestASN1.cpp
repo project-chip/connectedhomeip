@@ -34,7 +34,6 @@
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/TLV.h>
 
-
 using namespace chip;
 using namespace chip::ASN1;
 using namespace chip::TLV;
@@ -371,8 +370,8 @@ TEST(TestASN1, ASN1UniversalTime)
 
         EXPECT_EQ(result.ImportFrom_ASN1_TIME_string(testStr), CHIP_NO_ERROR);
         EXPECT_TRUE(result.Year == testCase.asn1Time.Year && result.Month == testCase.asn1Time.Month &&
-                           result.Day == testCase.asn1Time.Day && result.Hour == testCase.asn1Time.Hour &&
-                           result.Minute == testCase.asn1Time.Minute && result.Second == testCase.asn1Time.Second);
+                    result.Day == testCase.asn1Time.Day && result.Hour == testCase.asn1Time.Hour &&
+                    result.Minute == testCase.asn1Time.Minute && result.Second == testCase.asn1Time.Second);
 
         char buf[ASN1UniversalTime::kASN1TimeStringMaxLength];
         MutableCharSpan resultTimeStr(buf);
@@ -432,7 +431,8 @@ TEST(TestASN1, ObjectID)
 
         ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_ObjectId);
         EXPECT_EQ(reader.GetValueLen(), sizeof(sOID_Extension_AuthorityKeyIdentifier));
-        EXPECT_EQ(memcmp(reader.GetValue(), sOID_Extension_AuthorityKeyIdentifier, sizeof(sOID_Extension_AuthorityKeyIdentifier)), 0);
+        EXPECT_EQ(memcmp(reader.GetValue(), sOID_Extension_AuthorityKeyIdentifier, sizeof(sOID_Extension_AuthorityKeyIdentifier)),
+                  0);
 
         ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_ObjectId);
         EXPECT_EQ(reader.GetValueLen(), sizeof(sOID_Extension_BasicConstraints));
