@@ -1,2 +1,3 @@
 accesstest
 PlatformTests
+TestShell
