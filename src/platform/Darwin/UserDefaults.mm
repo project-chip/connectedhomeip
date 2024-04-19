@@ -20,6 +20,8 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "UserDefaults.h"
+
 static NSString * const kUserDefaultDomain = @"org.csa-iot.matter.darwin";
 static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
 
