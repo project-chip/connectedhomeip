@@ -37,8 +37,7 @@ struct TestPSAOpKeyStore : public ::testing::Test
 {
     static void SetUpTestSuite()
     {
-        CHIP_ERROR error = chip::Platform::MemoryInit();
-        EXPECT_EQ(error, CHIP_NO_ERROR);
+        ASSERT_EQ(CHIP_NO_ERROR, chip::Platform::MemoryInit());
 
 #if CHIP_CRYPTO_PSA
         psa_crypto_init();
@@ -183,7 +182,7 @@ TEST_F(TestPSAOpKeyStore, TestEphemeralKeys)
     uint8_t message[] = { 'm', 's', 'g' };
 
     Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
-    EXPECT_NE(ephemeralKeypair, nullptr);
+    EXPECT_NE(nullptr, ephemeralKeypair);
     EXPECT_EQ(ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
 
     EXPECT_EQ(ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig), CHIP_NO_ERROR);

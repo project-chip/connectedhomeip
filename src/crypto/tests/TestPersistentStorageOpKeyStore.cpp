@@ -319,7 +319,7 @@ TEST_F(TestPersistentStorageOpKeyStore, TestEphemeralKeys)
     uint8_t message[] = { 'm', 's', 'g' };
 
     Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
-    EXPECT_NE(ephemeralKeypair, nullptr);
+    ASSERT_NE(ephemeralKeypair, nullptr);
     EXPECT_EQ(ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
 
     EXPECT_EQ(ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig), CHIP_NO_ERROR);

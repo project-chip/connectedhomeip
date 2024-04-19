@@ -81,11 +81,7 @@ struct GroupKeySetTestEntry theGroupKeySetTestVector[] = {
 
 struct TestGroupOperationalCredentials : public ::testing::Test
 {
-    static void SetUpTestSuite()
-    {
-        CHIP_ERROR error = chip::Platform::MemoryInit();
-        EXPECT_EQ(error, CHIP_NO_ERROR);
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 

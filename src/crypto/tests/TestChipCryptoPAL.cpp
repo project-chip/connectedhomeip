@@ -282,9 +282,7 @@ struct TestChipCryptoPAL : public ::testing::Test
 {
     static void SetUpTestSuite()
     {
-        CHIP_ERROR error = chip::Platform::MemoryInit();
-        EXPECT_EQ(error, CHIP_NO_ERROR);
-
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
 #if CHIP_CRYPTO_PSA
         psa_crypto_init();
 #endif

@@ -103,8 +103,7 @@ struct TestSessionKeystore : public ::testing::Test
 {
     static void SetUpTestSuite()
     {
-        CHIP_ERROR error = Platform::MemoryInit();
-        EXPECT_EQ(error, CHIP_NO_ERROR);
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
 
 #if CHIP_CRYPTO_PSA
         psa_crypto_init();
