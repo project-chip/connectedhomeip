@@ -22,8 +22,8 @@
 
 #include <inet/IPPacketInfo.h>
 
-#include <optional>
 #include <cstdint>
+#include <optional>
 
 namespace mdns {
 namespace Minimal {

@@ -125,7 +125,8 @@ CHIP_ERROR CreateBindingEntry(const TargetStructType & entry, EndpointId localEn
 
     if (entry.group.HasValue())
     {
-        bindingEntry = EmberBindingTableEntry::ForGroup(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster.std_optional());
+        bindingEntry =
+            EmberBindingTableEntry::ForGroup(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster.std_optional());
     }
     else
     {

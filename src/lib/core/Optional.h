@@ -257,7 +257,7 @@ constexpr Optional<std::decay_t<T>> MakeOptional(T && value)
 }
 
 template <class T>
-constexpr Optional<T> FromStdOptional(const std::optional<T> &value)
+constexpr Optional<T> FromStdOptional(const std::optional<T> & value)
 {
     VerifyOrReturnValue(value.has_value(), NullOptional);
     return MakeOptional(*value);
