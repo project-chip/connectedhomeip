@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 namespace chip {
 namespace DeviceLayer {
-namespace Utils {
 
-uint16_t getUserDefaultDnssdSRPTimeout();
+uint16_t getUserDefaultDnssdSRPTimeoutInMSecs();
 
-} // namespace Utils
 } // namespace DeviceLayer
 } // namespace chip

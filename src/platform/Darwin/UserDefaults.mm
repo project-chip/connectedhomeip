@@ -15,26 +15,20 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Implementation for an utility to set configurable parametes via user defaults.
- */
-#import "UserDefaultUtils.h"
 #import <Foundation/Foundation.h>
 
-static NSString * const kUserDefaultDomain = @"org.csa-iot.matter.darwindefaults";
-static NSString * const kSRPTimeoutUserDefaultKey = @"SRPTimeoutOverride";
+static NSString * const kUserDefaultDomain = @"org.csa-iot.matter.darwin";
+static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
 
 namespace chip {
 namespace DeviceLayer {
-    namespace Utils {
 
-        uint16_t getUserDefaultDnssdSRPTimeout()
-        {
-            NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultDomain];
-            return static_cast<uint16_t>([defaults integerForKey:kSRPTimeoutUserDefaultKey]);
-        }
+uint16_t getUserDefaultDnssdSRPTimeoutInMSecs()
+{
+    NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultDomain];
+    NSInteger srpTimeoutValue = [defaults integerForKey:kSRPTimeoutInMsecsUserDefaultKey];
+    return (srpTimeoutValue < UINT16_MAX) ? static_cast<uint16_t>(srpTimeoutValue) : 0;
+}
 
-    } // namespace Utils
 } // namespace DeviceLayer
 } // namespace chip
