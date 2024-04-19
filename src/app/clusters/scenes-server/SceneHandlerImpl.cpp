@@ -40,12 +40,10 @@ Type ConvertDefaultValueToWorkingValue(const EmberAfDefaultAttributeValue & defa
     {
         return static_cast<Type>(defaultValue.defaultValue);
     }
-    else
-    {
-        Type sValue = 0;
-        memcpy(&sValue, defaultValue.ptrToDefaultValue, sizeof(Type));
-        return app::NumericAttributeTraits<Type>::StorageToWorking(sValue);
-    }
+
+    Type sValue = 0;
+    memcpy(&sValue, defaultValue.ptrToDefaultValue, sizeof(Type));
+    return app::NumericAttributeTraits<Type>::StorageToWorking(sValue);
 }
 
 /// CapAttributeID
