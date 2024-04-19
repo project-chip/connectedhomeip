@@ -55,6 +55,7 @@ struct Nullable : protected std::optional<T>
     // NOTE: as we transition to std::optional, these should be removed
     T & Value() & { return value(); }
     const T & Value() const & { return value(); }
+    const T & ValueOr(const T & defaultValue) const { return value_or(defaultValue); }
     Nullable(NullOptionalType) : std::optional<T>(std::nullopt) {}
 
     // Some consumers need an easy way to determine our underlying type.

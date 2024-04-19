@@ -311,8 +311,6 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
 {
     Delegate * delegate     = GetDelegate(ep);
     Optional<Status> status = Optional<Status>::Missing();
-    DataModel::Nullable<Percent> openLevel;
-    DataModel::Nullable<uint64_t> autoCloseTime;
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))
@@ -328,6 +326,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
             VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
 
             uint64_t time = openDuration.Value() * chip::kMicrosecondsPerSecond;
+            DataModel::Nullable<uint64_t> autoCloseTime;
             autoCloseTime.SetNonNull(chipEpochTime + time);
             VerifyOrReturnError(Status::Success == AutoCloseTime::Set(ep, autoCloseTime), attribute_error);
         }
