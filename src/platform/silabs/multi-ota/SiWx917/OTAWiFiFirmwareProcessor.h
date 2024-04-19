@@ -39,8 +39,10 @@ public:
     CHIP_ERROR FinalizeAction() override;
     static bool mReset;
     static constexpr size_t kAlignmentBytes = 64;
-    // Bootloader storage API requires the buffer size to be a multiple of 4.
+    // Store the header of the OTA file
     static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4)));
+    // Used to tranfer other block to processor 
+    static uint8_t writeDataBuffer[1024] __attribute__((aligned(4)));
     // Offset indicates how far the write buffer has been filled
     static uint16_t writeBufOffset;
 private:

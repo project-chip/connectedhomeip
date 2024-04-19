@@ -40,12 +40,16 @@ extern "C" {
 #define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_NO_AP_FOUND
 uint8_t flag = RPS_HEADER;
 
+// TODO: more descriptive error codes
+#define SL_OTA_ERROR 1L
+
 namespace chip {
 
 // Define static memebers
 bool OTAWiFiFirmwareProcessor::mReset                                                      = false;
 uint16_t OTAWiFiFirmwareProcessor::writeBufOffset                                          = 0;
 uint8_t OTAWiFiFirmwareProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
+uint8_t OTAWiFiFirmwareProcessor::writeDataBuffer[1024] __attribute__((aligned(4))) = { 0 };
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::Init()
 {
@@ -78,45 +82,36 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
         ReturnErrorOnFailure(ProcessDescriptor(block));
     }
 
-    uint32_t blockReadOffset = 0;
-
-    while (blockReadOffset < block.size())
+    if (flag == RPS_HEADER)
+    {   
+        memcpy(&writeBuffer, block.data(), kAlignmentBytes);
+        // Send RPS header which is received as first chunk
+        status = sl_si91x_fwup_start(writeBuffer);
+        status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
+        flag   = RPS_DATA;
+        memcpy(&writeDataBuffer, block.data() + kAlignmentBytes, (block.size() - kAlignmentBytes));
+        status = sl_si91x_fwup_load(writeDataBuffer, (block.size() - kAlignmentBytes));
+    } 
+    else if (flag == RPS_DATA)
     {
-        writeBuffer[writeBufOffset] = *((block.data()) + blockReadOffset);
-        writeBufOffset++;
-        blockReadOffset++;
-        if (writeBufOffset == kAlignmentBytes)
+        memcpy(&writeDataBuffer, block.data(), block.size());
+        // Send RPS content
+        status = sl_si91x_fwup_load(writeDataBuffer, block.size());
+        if (status != SL_STATUS_OK)
         {
-            writeBufOffset = 0;
-            
-            if (flag == RPS_HEADER)
+            // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value
+            // should be set to true in HandleProcessBlock
+            if (status == SL_STATUS_FW_UPDATE_DONE)
             {
-                // Send RPS header which is received as first chunk
-                status = sl_si91x_fwup_start(writeBuffer);
-                status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
-                flag   = RPS_DATA;
+                mReset = true;
             }
-            else if (flag == RPS_DATA)
+            else
             {
-                // Send RPS content
-                status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
-                if (status != SL_STATUS_OK)
-                {
-                    // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value
-                    // should be set to true in HandleProcessBlock
-                    if (status == SL_STATUS_FW_UPDATE_DONE)
-                    {
-                        mReset = true;
-                    }
-                    else
-                    {
-                        ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error %ld", status);
-                        // TODO: add this somewhere
-                        // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                        // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
-                        return CHIP_ERROR_CANCELLED;
-                    }
-                }
+                ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error %ld", status);
+                // TODO: add this somewhere
+                // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+                // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
+                return CHIP_ERROR_CANCELLED;
             }
         }
     }
