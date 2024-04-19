@@ -8,7 +8,7 @@ DataModelTests
 InetLayerTests
 MdnsTests
 MessagingLayerTests
-MinimalMdnsCoreTests
+MinimalMdnsCoreTestsNL
 MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
 PlatformTests
