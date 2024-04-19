@@ -360,12 +360,12 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     filled.nodeData.commissioningMode = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
-    // Commissioning mode
+    // CommissionerPasscode
     strcpy(key, "CP");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
-    NL_TEST_ASSERT(inSuite, filled.nodeData.commissionerPasscode == 1);
-    filled.nodeData.commissionerPasscode = 0;
+    NL_TEST_ASSERT(inSuite, filled.nodeData.commissionerPasscode == true);
+    filled.nodeData.commissionerPasscode = false;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Device type
