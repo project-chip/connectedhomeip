@@ -15,12 +15,11 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
+#include "UserDefaults.h"
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "UserDefaults.h"
+#import <Foundation/Foundation.h>
 
 static NSString * const kUserDefaultDomain = @"org.csa-iot.matter.darwin";
 static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
