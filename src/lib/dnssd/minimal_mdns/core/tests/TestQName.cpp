@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <lib/dnssd/minimal_mdns/core/QName.h>
 #include <gtest/gtest.h>
+#include <lib/dnssd/minimal_mdns/core/QName.h>
 
 namespace {
 
@@ -38,8 +38,7 @@ static SerializedQNameIterator AsSerializedQName(const uint8_t (&v)[N])
     return SerializedQNameIterator(BytesRange(v, v + N - 1), v);
 }
 
-
-TEST (TestQName, IteratorTest)
+TEST(TestQName, IteratorTest)
 {
     {
         static const uint8_t kOneItem[] = "\04test\00";
@@ -91,8 +90,7 @@ TEST (TestQName, IteratorTest)
     }
 }
 
-
-TEST (TestQName, ErrorTest)
+TEST(TestQName, ErrorTest)
 {
     {
         // Truncated before the end
@@ -122,8 +120,7 @@ TEST (TestQName, ErrorTest)
     }
 }
 
-
-TEST (TestQName, InvalidReferencing)
+TEST(TestQName, InvalidReferencing)
 {
     {
         // Truncated before the end (but seemingly valid in case of error)
@@ -175,8 +172,7 @@ TEST (TestQName, InvalidReferencing)
     }
 }
 
-
-TEST (TestQName, Comparison)
+TEST(TestQName, Comparison)
 {
     static const uint8_t kManyItems[] = "\04this\02is\01a\04test\00";
 
@@ -211,27 +207,30 @@ TEST (TestQName, Comparison)
     }
 }
 
-TEST (TestQName, CaseInsensitiveSerializedCompare)
+TEST(TestQName, CaseInsensitiveSerializedCompare)
 {
     static const uint8_t kManyItems[] = "\04thIs\02iS\01a\04tEst\00";
 
     {
         const QNamePart kTestName[] = { "this", "is", "a", "test" };
-        EXPECT_EQ(SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems), FullQName(kTestName));
+        EXPECT_EQ(SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems),
+                  FullQName(kTestName));
     }
 
     {
         const QNamePart kTestName[] = { "THIS", "IS", "A", "test" };
-        EXPECT_EQ(SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems), FullQName(kTestName));
+        EXPECT_EQ(SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems),
+                  FullQName(kTestName));
     }
 
     {
         const QNamePart kTestName[] = { "THIS", "IS", "A", "TEST" };
-        EXPECT_EQ(SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems), FullQName(kTestName));
+        EXPECT_EQ(SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems),
+                  FullQName(kTestName));
     }
 }
 
-TEST (TestQName, CaseInsensitiveFullQNameCompare)
+TEST(TestQName, CaseInsensitiveFullQNameCompare)
 {
     {
         const QNamePart kName1[] = { "this", "is", "a", "test" };
@@ -270,7 +269,7 @@ TEST (TestQName, CaseInsensitiveFullQNameCompare)
     }
 }
 
-TEST (TestQName, SerializedCompare)
+TEST(TestQName, SerializedCompare)
 {
     static const uint8_t kThisIsATest1[]    = "\04this\02is\01a\04test\00";
     static const uint8_t kThisIsATest2[]    = "\04ThIs\02is\01A\04tESt\00";

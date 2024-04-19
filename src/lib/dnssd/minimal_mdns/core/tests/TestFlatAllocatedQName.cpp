@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 #include <gtest/gtest.h>
+#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 
 namespace {
 
@@ -36,8 +36,7 @@ private:
     void * mBuffer;
 };
 
-
-TEST (TestFlatAllocatedQName, TestFlatAllocatedQName)
+TEST(TestFlatAllocatedQName, TestFlatAllocatedQName)
 {
     AutoFreeBuffer buffer(128);
 
@@ -58,8 +57,7 @@ TEST (TestFlatAllocatedQName, TestFlatAllocatedQName)
     }
 }
 
-
-TEST (TestFlatAllocatedQName, SizeCompare)
+TEST(TestFlatAllocatedQName, SizeCompare)
 {
     static const char kThis[]    = "this";
     static const char kIs[]      = "is";
@@ -90,11 +88,11 @@ TEST (TestFlatAllocatedQName, SizeCompare)
     EXPECT_LT(kTestStorageSize, FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArrayExtraWord, 5));
 
     EXPECT_GT(kTestStorageSize, FlatAllocatedQName::RequiredStorageSizeFromArray(kShorterArray, 3));
-    EXPECT_EQ(FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArraySameSize, 3), FlatAllocatedQName::RequiredStorageSizeFromArray(kShorterArray, 3));
+    EXPECT_EQ(FlatAllocatedQName::RequiredStorageSizeFromArray(kSameArraySameSize, 3),
+              FlatAllocatedQName::RequiredStorageSizeFromArray(kShorterArray, 3));
 }
 
-
-TEST (TestFlatAllocatedQName, BuildCompare)
+TEST(TestFlatAllocatedQName, BuildCompare)
 {
     static const char kThis[]  = "this";
     static const char kIs[]    = "is";
@@ -118,7 +116,8 @@ TEST (TestFlatAllocatedQName, BuildCompare)
     EXPECT_NE(kTestQName, FlatAllocatedQName::BuildFromArray(storage, kSameArrayExtraWord, 5));
 
     EXPECT_NE(kTestQName, FlatAllocatedQName::BuildFromArray(storage, kShorterArray, 3));
-    EXPECT_EQ(FlatAllocatedQName::BuildFromArray(storage, kSameArraySameSize, 3), FlatAllocatedQName::BuildFromArray(storage, kShorterArray, 3));
+    EXPECT_EQ(FlatAllocatedQName::BuildFromArray(storage, kSameArraySameSize, 3),
+              FlatAllocatedQName::BuildFromArray(storage, kShorterArray, 3));
 }
 
 } // namespace

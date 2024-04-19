@@ -25,8 +25,7 @@ namespace {
 using namespace mdns::Minimal;
 using namespace chip::Encoding::BigEndian;
 
-
-TEST (TestRecordWriter, BasicWriteTest)
+TEST(TestRecordWriter, BasicWriteTest)
 {
     const QNamePart kName1[] = { "some", "name" };
     const QNamePart kName2[] = { "abc", "xyz", "here" };
@@ -52,11 +51,11 @@ TEST (TestRecordWriter, BasicWriteTest)
     };
     // clang-format on
 
-    EXPECT_EQ(output.Needed(),sizeof(expectedOutput));
+    EXPECT_EQ(output.Needed(), sizeof(expectedOutput));
     EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
 
-TEST (TestRecordWriter, SimpleDedup)
+TEST(TestRecordWriter, SimpleDedup)
 {
     const QNamePart kName1[] = { "some", "name" };
     const QNamePart kName2[] = { "other", "name" };
@@ -84,7 +83,7 @@ TEST (TestRecordWriter, SimpleDedup)
     EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
 
-TEST (TestRecordWriter, ComplexDedup)
+TEST(TestRecordWriter, ComplexDedup)
 {
     const QNamePart kName1[] = { "some", "name" };
     const QNamePart kName2[] = { "other", "name" };
@@ -129,7 +128,7 @@ TEST (TestRecordWriter, ComplexDedup)
     EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
 
-TEST (TestRecordWriter, TonsOfReferences)
+TEST(TestRecordWriter, TonsOfReferences)
 {
     const QNamePart kName1[] = { "some", "name" };
     const QNamePart kName2[] = { "different", "name" };
