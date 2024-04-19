@@ -282,33 +282,31 @@ void ClusterStateCacheT<CanEnableDataCaching>::OnReportEnd()
     mCallback.OnReportEnd();
 }
 
-template <bool CanEnableDataCaching>
-CHIP_ERROR ClusterStateCacheT<CanEnableDataCaching>::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader) const
+template <>
+CHIP_ERROR ClusterStateCacheT<true>::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader) const
 {
-    if constexpr (CanEnableDataCaching)
+    CHIP_ERROR err;
+    auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
+    ReturnErrorOnFailure(err);
+
+    if (attributeState->template Is<StatusIB>())
     {
-        CHIP_ERROR err;
-        auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
-        ReturnErrorOnFailure(err);
-
-        if (attributeState->template Is<StatusIB>())
-        {
-            return CHIP_ERROR_IM_STATUS_CODE_RECEIVED;
-        }
-
-        if (!attributeState->template Is<AttributeData>())
-        {
-            return CHIP_ERROR_KEY_NOT_FOUND;
-        }
-
-        reader.Init(attributeState->template Get<AttributeData>().Get(),
-                    attributeState->template Get<AttributeData>().AllocatedSize());
-        return reader.Next();
+        return CHIP_ERROR_IM_STATUS_CODE_RECEIVED;
     }
-    else
+
+    if (!attributeState->template Is<AttributeData>())
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
+
+    reader.Init(attributeState->template Get<AttributeData>().Get(), attributeState->template Get<AttributeData>().AllocatedSize());
+    return reader.Next();
+}
+
+template <>
+CHIP_ERROR ClusterStateCacheT<false>::Get(const ConcreteAttributePath & path, TLV::TLVReader & reader) const
+{
+    return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
 template <bool CanEnableDataCaching>
