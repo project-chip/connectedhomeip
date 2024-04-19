@@ -112,7 +112,7 @@ struct Nullable : protected std::optional<T>
         return other.has_value() && (*other == **this);
     }
     bool operator!=(const Nullable<T> & other) const { return !(*this == other); }
-    bool operator==(const T & other) const { return has_value() && (*this == other); }
+    bool operator==(const T & other) const { return has_value() && (**this == other); }
     bool operator!=(const T & other) const { return !has_value() || (*this != other); }
 };
 
