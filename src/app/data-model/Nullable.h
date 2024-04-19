@@ -115,9 +115,29 @@ struct Nullable : protected std::optional<T>
     // NOTE: as we transition to std::optional, these should be removed
     // We expect only `value` and `value_or` to remain as standard names
     // for both nullable and optional.
-    T & Value() & { return value(); }
-    const T & Value() const & { return value(); }
-    const T & ValueOr(const T & defaultValue) const { return value_or(defaultValue); }
+    template <typename... Args>
+    auto Value(Args &&... args) -> decltype(std::optional<T>::value(std::forward<Args>(args)...))
+    {
+        return std::optional<T>::value(std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    auto Value(Args &&... args) const -> decltype(std::optional<T>::value(std::forward<Args>(args)...))
+    {
+        return std::optional<T>::value(std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    auto ValueOr(Args &&... args) -> decltype(std::optional<T>::value_or(std::forward<Args>(args)...))
+    {
+        return std::optional<T>::value_or(std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    auto ValueOr(Args &&... args) const -> decltype(std::optional<T>::value_or(std::forward<Args>(args)...))
+    {
+        return std::optional<T>::value_or(std::forward<Args>(args)...);
+    }
 
 };
 
