@@ -24,7 +24,6 @@
 #include "freertos/queue.h"
 #include "freertos/task.h"
 #include "hal/gpio_types.h"
-#include "soc/gpio_num.h"
 #include <cstdint>
 
 #define ESP_INTR_FLAG_DEFAULT 0

@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/icd/server/ICDNotifier.h"
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_system.h"
@@ -84,7 +85,7 @@ static AppDeviceCallbacks EchoCallbacks;
 static void UatButtonHandler(UatButton * button)
 {
     DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
-        Server::GetInstance().GetICDManager().UpdateOperationState(app::ICDManager::OperationalState::ActiveMode);
+        app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
     });
 }
 
