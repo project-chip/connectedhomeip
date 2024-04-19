@@ -29,7 +29,6 @@
 #include <gtest/gtest.h>
 #include <lib/support/Span.h>
 
-
 using namespace chip;
 using namespace std;
 

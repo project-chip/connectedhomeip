@@ -131,8 +131,8 @@ TEST(TestManualCode, TestDecimalRepresentation_FullPayloadWithoutZeros)
     EXPECT_TRUE(CheckGenerator(payload, expectedResult));
 }
 
-void assertPayloadValues(CHIP_ERROR actualError, CHIP_ERROR expectedError, const PayloadContents & payload,
-                         uint32_t pinCode, const SetupDiscriminator & discriminator, uint16_t vendorID, uint16_t productID)
+void assertPayloadValues(CHIP_ERROR actualError, CHIP_ERROR expectedError, const PayloadContents & payload, uint32_t pinCode,
+                         const SetupDiscriminator & discriminator, uint16_t vendorID, uint16_t productID)
 {
     EXPECT_EQ(actualError, expectedError);
     EXPECT_EQ(payload.setUpPINCode, pinCode);
@@ -274,8 +274,7 @@ TEST(TestManualCode, TestGenerateAndParser_FullPayload)
 
     SetupDiscriminator discriminator;
     discriminator.SetShortValue(payload.discriminator.GetShortValue());
-    assertPayloadValues(err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, discriminator, payload.vendorID,
-                        payload.productID);
+    assertPayloadValues(err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, discriminator, payload.vendorID, payload.productID);
 }
 
 TEST(TestManualCode, TestGenerateAndParser_PartialPayload)
@@ -292,8 +291,7 @@ TEST(TestManualCode, TestGenerateAndParser_PartialPayload)
 
     SetupDiscriminator discriminator;
     discriminator.SetShortValue(payload.discriminator.GetShortValue());
-    assertPayloadValues(err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, discriminator, payload.vendorID,
-                        payload.productID);
+    assertPayloadValues(err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, discriminator, payload.vendorID, payload.productID);
 }
 
 TEST(TestManualCode, TestPayloadParser_PartialPayload)
@@ -399,11 +397,11 @@ TEST(TestManualCode, TestLongCodeReadWrite)
     EXPECT_TRUE(inPayload == outPayload);
 }
 
-void assertEmptyPayloadWithError(CHIP_ERROR actualError, CHIP_ERROR expectedError,
-                                 const SetupPayload & payload)
+void assertEmptyPayloadWithError(CHIP_ERROR actualError, CHIP_ERROR expectedError, const SetupPayload & payload)
 {
     EXPECT_EQ(actualError, expectedError);
-    EXPECT_TRUE(payload.setUpPINCode == 0 && payload.discriminator.GetLongValue() == 0 && payload.productID == 0 && payload.vendorID == 0);
+    EXPECT_TRUE(payload.setUpPINCode == 0 && payload.discriminator.GetLongValue() == 0 && payload.productID == 0 &&
+                payload.vendorID == 0);
 }
 
 TEST(TestManualCode, TestPayloadParser_InvalidEntry)
@@ -414,47 +412,47 @@ TEST(TestManualCode, TestPayloadParser_InvalidEntry)
     // Empty input
     decimalString = "";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
-    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload),
-                                CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
+                                payload);
 
     // Invalid character
     decimalString = "24184.2196";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
-    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload),
-                                CHIP_ERROR_INVALID_INTEGER_VALUE, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_INTEGER_VALUE,
+                                payload);
 
     // too short
     decimalString = "2456";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
-    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload),
-                                CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
+                                payload);
 
     // too long for long code
     decimalString = "123456789123456785671";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
-    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload),
-                                CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
+                                payload);
 
     // too long for short code
     decimalString = "12749875380";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
-    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload),
-                                CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
+                                payload);
 
     // bit to indicate short code but long code length
     decimalString = "23456789123456785610";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
-    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload),
-                                CHIP_ERROR_INVALID_STRING_LENGTH, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_STRING_LENGTH,
+                                payload);
     // no pin code (= 0)
     decimalString = "2327680000";
     decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
-    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload),
-                                CHIP_ERROR_INVALID_ARGUMENT, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INVALID_ARGUMENT,
+                                payload);
     // wrong check digit
     decimalString = "02684354589";
-    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload),
-                                CHIP_ERROR_INTEGRITY_CHECK_FAILED, payload);
+    assertEmptyPayloadWithError(ManualSetupPayloadParser(decimalString).populatePayload(payload), CHIP_ERROR_INTEGRITY_CHECK_FAILED,
+                                payload);
 }
 
 TEST(TestManualCode, TestCheckDecimalStringValidity)
@@ -465,10 +463,12 @@ TEST(TestManualCode, TestCheckDecimalStringValidity)
     std::string decimalString;
 
     representationWithoutCheckDigit = "";
-    EXPECT_EQ(ManualSetupPayloadParser::CheckDecimalStringValidity(representationWithoutCheckDigit, outReprensation), CHIP_ERROR_INVALID_STRING_LENGTH);
+    EXPECT_EQ(ManualSetupPayloadParser::CheckDecimalStringValidity(representationWithoutCheckDigit, outReprensation),
+              CHIP_ERROR_INVALID_STRING_LENGTH);
 
     representationWithoutCheckDigit = "1";
-    EXPECT_EQ(ManualSetupPayloadParser::CheckDecimalStringValidity(representationWithoutCheckDigit, outReprensation), CHIP_ERROR_INVALID_STRING_LENGTH);
+    EXPECT_EQ(ManualSetupPayloadParser::CheckDecimalStringValidity(representationWithoutCheckDigit, outReprensation),
+              CHIP_ERROR_INVALID_STRING_LENGTH);
 
     representationWithoutCheckDigit = "10109";
     checkDigit                      = Verhoeff10::ComputeCheckChar(representationWithoutCheckDigit.c_str());
@@ -544,7 +544,8 @@ TEST(TestManualCode, TestReadCharsFromDecimalString)
     EXPECT_EQ(ManualSetupPayloadParser::ReadDigitsFromDecimalString("12", index, number, 5), CHIP_ERROR_INVALID_STRING_LENGTH);
 
     index = 200;
-    EXPECT_EQ(ManualSetupPayloadParser::ReadDigitsFromDecimalString("6256276377282", index, number, 1), CHIP_ERROR_INVALID_STRING_LENGTH);
+    EXPECT_EQ(ManualSetupPayloadParser::ReadDigitsFromDecimalString("6256276377282", index, number, 1),
+              CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
 TEST(TestManualCode, TestShortCodeCharLengths)
