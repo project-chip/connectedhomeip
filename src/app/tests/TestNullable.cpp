@@ -169,7 +169,7 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
     CtorDtorCounter::ResetCounter();
 
     {
-        auto testSrc = MakeNullable<MovableCtorDtorCounter>(400);     // contstruct
+        auto testSrc = MakeNullable<MovableCtorDtorCounter>(400);     // construct
         Nullable<MovableCtorDtorCounter> testDst(std::move(testSrc)); // move construct
         NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
         NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 400);
