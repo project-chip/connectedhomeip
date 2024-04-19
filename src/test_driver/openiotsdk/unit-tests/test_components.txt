@@ -1,2 +1,5 @@
 accesstest
 SystemLayerTests
+ASN1Tests
+PlatformTests
+TestShell

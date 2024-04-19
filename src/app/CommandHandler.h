@@ -686,7 +686,7 @@ private:
     // TODO Allow flexibility in registration.
     BasicCommandPathRegistry<CHIP_CONFIG_MAX_PATHS_PER_INVOKE> mBasicCommandPathRegistry;
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
-    Optional<uint16_t> mRefForResponse;
+    std::optional<uint16_t> mRefForResponse;
 
     CommandHandlerExchangeInterface * mpResponder = nullptr;
 

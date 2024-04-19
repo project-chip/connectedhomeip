@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,19 +15,21 @@
  *    limitations under the License.
  */
 
-#include "TestCHIPoBLEStackMgr.h"
-#include <gtest/gtest.h>
-#include <platform/CHIPDeviceConfig.h>
-#include <stdlib.h>
+/**
+ *    @file
+ *      Header that defines default shell commands for CHIP examples
+ */
 
-int main(int argc, char * argv[])
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    if (argc == 2 && atoi(argv[1]) == 1)
-    {
-        testing::InitGoogleTest(nullptr, nullptr);
-        return RUN_ALL_TESTS();
-    }
-    return 0;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-}
+#pragma once
+
+#include <lib/shell/Engine.h>
+#include <platform/NetworkCommissioning.h>
+
+namespace chip {
+namespace Shell {
+
+void SetWiFiDriver(DeviceLayer::NetworkCommissioning::WiFiDriver * driver);
+DeviceLayer::NetworkCommissioning::WiFiDriver * GetWiFiDriver();
+
+} // namespace Shell
+} // namespace chip
