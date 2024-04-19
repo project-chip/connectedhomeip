@@ -1,2 +1,6 @@
 accesstest
 MinimalMdnsCoreTests
+ASN1Tests
+PlatformTests
+TestShell
+

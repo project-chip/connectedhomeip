@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <string>
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #include "bluez/BluezAdvertisement.h"

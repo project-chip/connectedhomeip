@@ -27,7 +27,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 
 namespace chip {
 namespace DeviceLayer {

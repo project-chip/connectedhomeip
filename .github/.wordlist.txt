@@ -369,6 +369,7 @@ DelayedActionTime
 delayedApplyActionTimeSec
 delayedQueryActionTimeSec
 delayQuery
+deliverables
 demangle
 deployable
 depottools
@@ -729,6 +730,7 @@ JLink
 JLinkExe
 JLinkRTTClient
 JN
+jni
 jpg
 jre
 js

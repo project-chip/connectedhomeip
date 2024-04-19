@@ -22,7 +22,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <ble/BleConfig.h>
+#include <ble/Ble.h>
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/CryptoContext.h>

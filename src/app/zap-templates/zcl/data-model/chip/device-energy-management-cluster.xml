@@ -16,16 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="Energy Management"/>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0098"/>
-    <field name="PowerAdjustment" mask="0x01"/>
-    <field name="PowerForecastReporting" mask="0x02"/>
-    <field name="StateForecastReporting" mask="0x04"/>
-    <field name="StartTimeAdjustment" mask="0x08"/>
-    <field name="Pausable" mask="0x10"/>
-    <field name="ForecastAdjustment" mask="0x20"/>
-    <field name="ConstraintBasedAdjustment" mask="0x40"/>
-  </bitmap>
+
 
   <cluster apiMaturity="provisional">
     <name>Device Energy Management</name>
@@ -36,6 +27,73 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA).</description>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
+
+    <features>
+      <feature bit="0" code="PA" name="PowerAdjustment" summary="Allows an EMS to make a temporary power
+                                                                              adjustment (within the limits offered by the ESA).">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="1" code="PFR" name="PowerForecastReporting" summary="Allows an ESA to advertise its indicative
+                                                                              future power consumption vs time.">
+        <otherwiseConform>
+          <mandatoryConform>
+            <andTerm>
+              <orTerm>
+                <feature name="STA"/>
+                <feature name="PAU"/>
+                <feature name="FA"/>
+                <feature name="CON"/>
+              </orTerm>
+              <notTerm>
+                <feature name="SFR"/>
+              </notTerm>
+            </andTerm>
+          </mandatoryConform>
+          <optionalConform choice="a" more="true"/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="2" code="SFR" name="StateForecastReporting" summary="Allows an ESA to advertise its indicative
+                                                                              future state vs time.">
+        <otherwiseConform>
+          <mandatoryConform>
+            <andTerm>
+              <orTerm>
+                <feature name="STA"/>
+                <feature name="PAU"/>
+                <feature name="FA"/>
+                <feature name="CON"/>
+              </orTerm>
+              <notTerm>
+                <feature name="PFR"/>
+              </notTerm>
+            </andTerm>
+          </mandatoryConform>
+          <optionalConform choice="a" more="true"/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="3" code="STA" name="StartTimeAdjustment" summary="Allows an EMS to delay an ESA's
+                                                                              planned operation.">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="4" code="PAU" name="Pausable" summary="Allows an EMS to pause an ESA's
+                                                                              planned operation.">
+        <optionalConform choice="a" more="true"/>
+      </feature>
+      <feature bit="5" code="FA" name="ForecastAdjustment" summary="Allows an EMS to adjust an ESA's
+                                                                              planned operation.">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform choice="a" more="true"/>
+        </otherwiseConform>
+      </feature>
+      <feature bit="6" code="CON" name="ConstraintBasedAdjustment" summary="Allows an EMS to request constraints to an ESA's
+                                                                              planned operation.">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform choice="a" more="true"/>
+        </otherwiseConform>
+      </feature>
+    </features>
 
     <!--Attributes-->
     <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" writable="false" optional="false" min="0x00" max="0xFF" default="0xFF">ESAType</attribute>

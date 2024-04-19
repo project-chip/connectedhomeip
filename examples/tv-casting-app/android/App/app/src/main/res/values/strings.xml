@@ -41,4 +41,12 @@
     <string name="matter_action_selector_text">Select an action</string>
     <string name="matter_select_content_launcher_launch_url_button_text">Content Launcher Launch URL</string>
     <string name="matter_disconnect_text">Disconnect from Casting Player</string>
+    <string name="matter_application_basic_fragment_title">Application Basic</string>
+    <string name="vendor_id_attribute_title">VendorID attribute</string>
+    <string name="read_vendor_id_button_text">Read</string>
+    <string name="matter_media_playback_fragment_title">Media Playback</string>
+    <string name="current_state_attribute_title">Current State</string>
+    <string name="matter_select_application_basic_read_vendor_id_button_text">Application Basic Read Vendor ID</string>
+    <string name="matter_select_media_playback_subscribe_to_current_state_button_text">Media Playback Subscribe to Current State</string>
+    <string name="matter_shutdown_subscriptions_text">Shutdown subscriptions</string>
 </resources>

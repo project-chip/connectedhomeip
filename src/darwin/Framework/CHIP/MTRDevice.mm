@@ -28,6 +28,7 @@
 #import "MTRCommandTimedCheck.h"
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
@@ -336,6 +337,7 @@ static NSString * const sAttributesKey = @"attributes";
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
+- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 @end
 #endif
 
@@ -354,6 +356,7 @@ static NSString * const sAttributesKey = @"attributes";
     // _setupSubscription or via the auto-resubscribe behavior of the
     // ReadClient).  Nil if we have had no such failures.
     NSDate * _Nullable _lastSubscriptionFailureTime;
+    MTRDeviceConnectivityMonitor * _connectivityMonitor;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -668,6 +671,8 @@ static NSString * const sAttributesKey = @"attributes";
     // subscription.  In that case, _internalDeviceState will update when the
     // subscription is actually terminated.
 
+    [self _stopConnectivityMonitoring];
+
     os_unfair_lock_unlock(&self->_lock);
 }
 
@@ -745,7 +750,7 @@ static NSString * const sAttributesKey = @"attributes";
 
     // Unfortunately, we currently have no subscriptions over our hacked-up XPC
     // setup.  Try to detect that situation.
-    if ([_deviceController.class respondsToSelector:@selector(sharedControllerWithID:xpcConnectBlock:)]) {
+    if ([_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class]) {
         return NO;
     }
 
@@ -860,6 +865,9 @@ static NSString * const sAttributesKey = @"attributes";
 
     [self _changeState:MTRDeviceStateReachable];
 
+    // No need to monitor connectivity after subscription establishment
+    [self _stopConnectivityMonitoring];
+
     os_unfair_lock_unlock(&self->_lock);
 
     os_unfair_lock_lock(&self->_timeSyncLock);
@@ -893,6 +901,9 @@ static NSString * const sAttributesKey = @"attributes";
     // former case we recently had a subscription and do not want to be forcing
     // retries immediately.
     _lastSubscriptionFailureTime = [NSDate now];
+
+    // Set up connectivity monitoring in case network routability changes for the positive, to accellerate resubscription
+    [self _setupConnectivityMonitoring];
 }
 
 - (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay
@@ -1240,6 +1251,44 @@ static NSString * const sAttributesKey = @"attributes";
     *count = maxDataVersionFilterSize;
 }
 
+- (void)_setupConnectivityMonitoring
+{
+    // Dispatch to own queue first to avoid deadlock with syncGetCompressedFabricID
+    dispatch_async(self.queue, ^{
+        // Get the required info before setting up the connectivity monitor
+        NSNumber * compressedFabricID = [self->_deviceController syncGetCompressedFabricID];
+        if (!compressedFabricID) {
+            MTR_LOG_INFO("%@ could not get compressed fabricID", self);
+            return;
+        }
+
+        // Now lock for _connectivityMonitor
+        std::lock_guard lock(self->_lock);
+        if (self->_connectivityMonitor) {
+            // already monitoring
+            return;
+        }
+
+        self->_connectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:compressedFabricID nodeID:self.nodeID];
+        [self->_connectivityMonitor startMonitoringWithHandler:^{
+            [self->_deviceController asyncDispatchToMatterQueue:^{
+                [self _triggerResubscribeWithReason:"read-through skipped while not subscribed" nodeLikelyReachable:YES];
+            }
+                                                   errorHandler:nil];
+        } queue:self.queue];
+    });
+}
+
+- (void)_stopConnectivityMonitoring
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    if (_connectivityMonitor) {
+        [_connectivityMonitor stopMonitoring];
+        _connectivityMonitor = nil;
+    }
+}
+
 // assume lock is held
 - (void)_setupSubscription
 {
@@ -1461,6 +1510,9 @@ static NSString * const sAttributesKey = @"attributes";
                    callback->AdoptClusterStateCache(std::move(clusterStateCache));
                    callback.release();
                }];
+
+    // Set up connectivity monitoring in case network becomes routable after any part of the subscription process goes into backoff retries.
+    [self _setupConnectivityMonitoring];
 }
 
 #ifdef DEBUG
@@ -1603,24 +1655,33 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
                                                               clusterID:(NSNumber *)clusterID
                                                             attributeID:(NSNumber *)attributeID
-                                                                 params:(MTRReadParams *)params
+                                                                 params:(MTRReadParams * _Nullable)params
 {
     MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
                                                                            clusterID:clusterID
                                                                          attributeID:attributeID];
 
     BOOL attributeIsSpecified = MTRAttributeIsSpecified(clusterID.unsignedIntValue, attributeID.unsignedIntValue);
-    BOOL hasChangesOmittedQuality = AttributeHasChangesOmittedQuality(attributePath);
+    BOOL hasChangesOmittedQuality;
+    if (attributeIsSpecified) {
+        hasChangesOmittedQuality = AttributeHasChangesOmittedQuality(attributePath);
+    } else {
+        if (params == nil) {
+            hasChangesOmittedQuality = NO;
+        } else {
+            hasChangesOmittedQuality = !params.assumeUnknownAttributesReportable;
+        }
+    }
 
     // Return current known / expected value right away
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
 
     // Send read request to device if any of the following are true:
-    // 1. The attribute is not in the specification (so we don't know whether hasChangesOmittedQuality can be trusted).
-    // 2. Subscription not in a state we can expect reports
-    // 3. There is subscription but attribute has Changes Omitted quality
-    // TODO: add option for BaseSubscriptionCallback to report during priming, to reduce when case 4 is hit
-    if (!attributeIsSpecified || ![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
+    // 1. Subscription not in a state we can expect reports
+    // 2. The attribute has the Changes Omitted quality, so we won't get reports for it.
+    // 3. The attribute is not in the spec, and the read params asks to assume
+    //    an unknown attribute has the Changes Omitted quality.
+    if (![self _subscriptionAbleToReport] || hasChangesOmittedQuality) {
         // Read requests container will be a mutable array of items, each being an array containing:
         //   [attribute request path, params]
         // Batching handler should only coalesce when params are equal.
@@ -2342,25 +2403,38 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [attributesToPersist addObject:attributeResponseValueToPersist];
 #endif
             }
-
-            // if expected values exists, purge and update read cache
             NSArray * expectedValue = _expectedValueCache[attributePath];
-            if (expectedValue) {
-                previousValue = expectedValue[MTRDeviceExpectedValueFieldValueIndex];
-                _readCache[attributePath] = attributeDataValue;
-                shouldReportAttribute = NO;
-            } else if (readCacheValueChanged) {
-                // otherwise compare and update read cache
+
+            // Unit test only code.
+#ifdef DEBUG
+            if (!readCacheValueChanged) {
+                id delegate = _weakDelegate.strongObject;
+                if (delegate) {
+                    if ([delegate respondsToSelector:@selector(unitTestForceAttributeReportsIfMatchingCache:)]) {
+                        readCacheValueChanged = [delegate unitTestForceAttributeReportsIfMatchingCache:self];
+                    }
+                }
+            }
+#endif // DEBUG
+
+            // Report the attribute if a read would get a changed value.  This happens
+            // when our cached value changes and no expected value exists.
+            if (readCacheValueChanged && !expectedValue) {
                 previousValue = _readCache[attributePath];
-                _readCache[attributePath] = attributeDataValue;
                 shouldReportAttribute = YES;
             }
 
+            // Now that we have grabbed previousValue, update the readCache with the attribute value.
+            _readCache[attributePath] = attributeDataValue;
+
             if (!shouldReportAttribute) {
+                // If an expected value exists, the attribute will not be reported at this time.
+                // When the expected value interval expires, the correct value will be reported,
+                // if needed.
                 if (expectedValue) {
-                    MTR_LOG_INFO("%@ report %@ value filtered - same as expected values", self, attributePath);
+                    MTR_LOG_INFO("%@ report %@ value filtered - expected value still present", self, attributePath);
                 } else {
-                    MTR_LOG_INFO("%@ report %@ value filtered - same values as cache", self, attributePath);
+                    MTR_LOG_INFO("%@ report %@ value filtered - same as read cache", self, attributePath);
                 }
             }
 

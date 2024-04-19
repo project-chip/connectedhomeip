@@ -413,10 +413,6 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
-        if (_cppCommissioner == nullptr) {
-            [self checkForStartError:CHIP_ERROR_NO_MEMORY logMsg:kErrorCommissionerInit];
-            return;
-        }
 
         // nocBuffer might not be used, but if it is it needs to live
         // long enough (until after we are done using
@@ -1370,6 +1366,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     return @(_cppCommissioner->GetCompressedFabricId());
+}
+
+- (NSNumber * _Nullable)syncGetCompressedFabricID
+{
+    return [self syncRunOnWorkQueueWithReturnValue:^NSNumber * {
+        return [self compressedFabricID];
+    } error:nil];
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
