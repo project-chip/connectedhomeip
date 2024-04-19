@@ -19,7 +19,6 @@
 
 #include <lib/support/CodeUtils.h>
 
-
 // Include entire C++ file to have access to functions-under-test
 // such as TokenizeLine despite them being declared within an anonymous namespace.
 #include "../MainLoopDefault.cpp"

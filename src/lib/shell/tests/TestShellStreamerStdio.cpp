@@ -20,7 +20,6 @@
 #include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
 
-
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
