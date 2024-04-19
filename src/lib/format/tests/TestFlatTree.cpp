@@ -17,13 +17,13 @@
 #include <lib/format/FlatTree.h>
 
 #include <lib/core/TLVTags.h>
-#include <lib/support/UnitTestRegistration.h>
+
 
 #include <array>
 
 #include <string.h>
 
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
 namespace {
 
@@ -82,43 +82,28 @@ private:
     const char * mName;
 };
 
-void TestFlatTreeFind(nlTestSuite * inSuite, void * inContext)
+TEST(TestFlatTree, TestFlatTreeFind)
 {
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 0, ByTag(ContextTag(1)))->data.name, "hello") == 0);
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 0, ByTag(ContextTag(2)))->data.name, "world") == 0);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ByTag(ContextTag(3))) == nullptr);
+    EXPECT_EQ(strcmp(FindEntry(tree, 0, ByTag(ContextTag(1)))->data.name, "hello"), 0);
+    EXPECT_EQ(strcmp(FindEntry(tree, 0, ByTag(ContextTag(2)))->data.name, "world"), 0);
+    EXPECT_EQ(FindEntry(tree, 0, ByTag(ContextTag(3))), nullptr);
 
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ByName("hello"))->data.tag == ContextTag(1));
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ByName("world"))->data.tag == ContextTag(2));
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ByName("foo")) == nullptr);
+    EXPECT_EQ(FindEntry(tree, 0, ByName("hello"))->data.tag, ContextTag(1));
+    EXPECT_EQ(FindEntry(tree, 0, ByName("world"))->data.tag, ContextTag(2));
+    EXPECT_EQ(FindEntry(tree, 0, ByName("foo")), nullptr);
 
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 1, ByTag(ContextTag(1))) == nullptr);
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 1, ByTag(ProfileTag(234, 2)))->data.name, "b") == 0);
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 1, ByTag(ProfileTag(345, 3)))->data.name, "c") == 0);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 1, ByTag(AnonymousTag())) == nullptr);
+    EXPECT_EQ(FindEntry(tree, 1, ByTag(ContextTag(1))), nullptr);
+    EXPECT_EQ(strcmp(FindEntry(tree, 1, ByTag(ProfileTag(234, 2)))->data.name, "b"), 0);
+    EXPECT_EQ(strcmp(FindEntry(tree, 1, ByTag(ProfileTag(345, 3)))->data.name, "c"), 0);
+    EXPECT_EQ(FindEntry(tree, 1, ByTag(AnonymousTag())), nullptr);
 
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 2, ByTag(ContextTag(1))) == nullptr);
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 2, ByTag(AnonymousTag()))->data.name, "foo") == 0);
+    EXPECT_EQ(FindEntry(tree, 2, ByTag(ContextTag(1))), nullptr);
+    EXPECT_EQ(strcmp(FindEntry(tree, 2, ByTag(AnonymousTag()))->data.name, "foo"), 0);
 
     // out of array
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 3, ByTag(AnonymousTag())) == nullptr);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 100, ByTag(AnonymousTag())) == nullptr);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 1000, ByTag(AnonymousTag())) == nullptr);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 9999999, ByTag(AnonymousTag())) == nullptr);
+    EXPECT_EQ(FindEntry(tree, 3, ByTag(AnonymousTag())), nullptr);
+    EXPECT_EQ(FindEntry(tree, 100, ByTag(AnonymousTag())), nullptr);
+    EXPECT_EQ(FindEntry(tree, 1000, ByTag(AnonymousTag())), nullptr);
+    EXPECT_EQ(FindEntry(tree, 9999999, ByTag(AnonymousTag())), nullptr);
 }
-
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestFlatTreeFind", TestFlatTreeFind), //
-    NL_TEST_SENTINEL()                                 //
-};
-
 } // namespace
-
-int TestFlatTree()
-{
-    nlTestSuite theSuite = { "FlatTree", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestFlatTree)
