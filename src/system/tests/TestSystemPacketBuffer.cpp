@@ -162,7 +162,44 @@ public:
 
     std::vector<BufferConfiguration> configurations;
     std::vector<PacketBufferHandle> handles;
+
+    void CheckAddRef();
+    void CheckAddToEnd();
+    void CheckCompactHead();
+    void CheckConsume();
+    void CheckConsumeHead();
+    void CheckDataLength();
+    void CheckEnsureReservedSize();
+    void CheckFree();
+    void CheckFreeHead();
+    void CheckHandleAdopt();
+    void CheckHandleAdvance();
+    void CheckHandleCloneData();
+    void CheckHandleConstruct();
+    void CheckHandleFree();
+    void CheckHandleHold();
+    void CheckHandleMove();
+    void CheckHandleRelease();
+    void CheckHandleRetain();
+    void CheckHandleRightSize();
+    void CheckLast();
+    void CheckNew();
+    void CheckNext();
+    void CheckPopHead();
+    void CheckRead();
+    void CheckSetDataLength();
+    void CheckSetStart();
 };
+
+/*
+ * Run fixture's class function as a test.
+ */
+#define TEST_F_FROM_FIXTURE(test_fixture, test_name)                                                                               \
+    TEST_F(test_fixture, test_name)                                                                                                \
+    {                                                                                                                              \
+        test_name();                                                                                                               \
+    }                                                                                                                              \
+    void test_fixture::test_name()
 
 /**
  *  Allocate memory for a test buffer and configure according to test buffer configuration.
@@ -189,11 +226,11 @@ void TestSystemPacketBuffer::PrepareTestBuffer(BufferConfiguration * config, int
         exit(EXIT_FAILURE);
     }
 
-    const size_t lInitialSize = PacketBuffer::kStructureSize + config->reserved_size;
+    const size_t lInitialSize = kStructureSize + config->reserved_size;
     const size_t lAllocSize   = kBlockSize;
 
     uint8_t * const raw = reinterpret_cast<uint8_t *>(config->handle.Get());
-    memset(raw + PacketBuffer::kStructureSize, 0, lAllocSize - PacketBuffer::kStructureSize);
+    memset(raw + kStructureSize, 0, lAllocSize - kStructureSize);
 
     config->start_buffer = raw;
     config->end_buffer   = raw + lAllocSize;
@@ -262,7 +299,7 @@ bool TestSystemPacketBuffer::ResetHandles()
  *               the method returns nullptr. Otherwise, check for correctness of initializing
  *               the new buffer's internal state.
  */
-TEST_F(TestSystemPacketBuffer, CheckNew)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNew)
 {
     for (const auto & config : configurations)
     {
@@ -331,7 +368,7 @@ TEST_F(TestSystemPacketBuffer, CheckStart)
  *               adjusted according to the offset value passed into the
  *               SetStart() method.
  */
-TEST_F(TestSystemPacketBuffer, CheckSetStart)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetStart)
 {
     static constexpr ptrdiff_t sSizePacketBuffer = kBlockSize;
 
@@ -390,7 +427,7 @@ TEST_F(TestSystemPacketBuffer, CheckSetStart)
 /**
  *  Test PacketBuffer::DataLength() function.
  */
-TEST_F(TestSystemPacketBuffer, CheckDataLength)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckDataLength)
 {
     for (auto & config : configurations)
     {
@@ -412,7 +449,7 @@ TEST_F(TestSystemPacketBuffer, CheckDataLength)
  *               other one being passed as the head of the chain. After calling
  *               the method verify that data lengths were correctly adjusted.
  */
-TEST_F(TestSystemPacketBuffer, CheckSetDataLength)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetDataLength)
 {
     for (auto & config_1 : configurations)
     {
@@ -569,7 +606,7 @@ TEST_F(TestSystemPacketBuffer, CheckHasChainedBuffer)
  *               This test function tests linking any combination of three
  *               buffer-configurations passed within inContext.
  */
-TEST_F(TestSystemPacketBuffer, CheckAddToEnd)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckAddToEnd)
 {
     for (auto & config_1 : configurations)
     {
@@ -627,7 +664,7 @@ TEST_F(TestSystemPacketBuffer, CheckAddToEnd)
  *               on the first buffer to unlink the second buffer. After the call,
  *               verify correct internal state of the first buffer.
  */
-TEST_F(TestSystemPacketBuffer, CheckPopHead)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckPopHead)
 {
     // Single buffer test.
     for (auto & config_1 : configurations)
@@ -683,7 +720,7 @@ TEST_F(TestSystemPacketBuffer, CheckPopHead)
  *               the chain. After calling the method, verify correctly adjusted
  *               state of the first buffer.
  */
-TEST_F(TestSystemPacketBuffer, CheckCompactHead)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckCompactHead)
 {
     // Single buffer test.
     for (auto & config : configurations)
@@ -696,7 +733,7 @@ TEST_F(TestSystemPacketBuffer, CheckCompactHead)
 
             config.handle->CompactHead();
 
-            EXPECT_EQ(config.handle->payload, (config.start_buffer + PacketBuffer::kStructureSize));
+            EXPECT_EQ(config.handle->payload, (config.start_buffer + kStructureSize));
             EXPECT_EQ(config.handle->tot_len, data_length);
         }
 
@@ -743,7 +780,7 @@ TEST_F(TestSystemPacketBuffer, CheckCompactHead)
 
                     config_1.handle->CompactHead();
 
-                    EXPECT_EQ(config_1.handle->payload, (config_1.start_buffer + PacketBuffer::kStructureSize));
+                    EXPECT_EQ(config_1.handle->payload, (config_1.start_buffer + kStructureSize));
 
                     if (config_1.handle->tot_len > config_1.handle->MaxDataLength())
                     {
@@ -791,7 +828,7 @@ TEST_F(TestSystemPacketBuffer, CheckCompactHead)
  *               the internal state of the buffer has been correctly
  *               adjusted according to the value passed into the method.
  */
-TEST_F(TestSystemPacketBuffer, CheckConsumeHead)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckConsumeHead)
 {
     for (auto & config : configurations)
     {
@@ -829,7 +866,7 @@ TEST_F(TestSystemPacketBuffer, CheckConsumeHead)
  *               method, verify correctly adjusted the state of the first
  *               buffer and appropriate return pointer from the method's call.
  */
-TEST_F(TestSystemPacketBuffer, CheckConsume)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckConsume)
 {
     for (auto & config_1 : configurations)
     {
@@ -919,7 +956,7 @@ TEST_F(TestSystemPacketBuffer, CheckConsume)
  *               Then, verify that EnsureReservedSize() method correctly
  *               retrieves the amount of the reserved space.
  */
-TEST_F(TestSystemPacketBuffer, CheckEnsureReservedSize)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckEnsureReservedSize)
 {
     for (auto & config : configurations)
     {
@@ -929,9 +966,9 @@ TEST_F(TestSystemPacketBuffer, CheckEnsureReservedSize)
             const uint16_t kAllocSize = config.handle->AllocSize();
             uint16_t reserved_size    = config.reserved_size;
 
-            if (PacketBuffer::kStructureSize + config.reserved_size > kAllocSize)
+            if (kStructureSize + config.reserved_size > kAllocSize)
             {
-                reserved_size = static_cast<uint16_t>(kAllocSize - PacketBuffer::kStructureSize);
+                reserved_size = static_cast<uint16_t>(kAllocSize - kStructureSize);
             }
 
             if (length <= reserved_size)
@@ -940,7 +977,7 @@ TEST_F(TestSystemPacketBuffer, CheckEnsureReservedSize)
                 continue;
             }
 
-            if ((length + config.init_len) > (kAllocSize - PacketBuffer::kStructureSize))
+            if ((length + config.init_len) > (kAllocSize - kStructureSize))
             {
                 EXPECT_FALSE(config.handle->EnsureReservedSize(length));
                 continue;
@@ -1003,7 +1040,7 @@ TEST_F(TestSystemPacketBuffer, CheckAlignPayload)
 /**
  *  Test PacketBuffer::Next() function.
  */
-TEST_F(TestSystemPacketBuffer, CheckNext)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNext)
 {
     for (auto & config_1 : configurations)
     {
@@ -1034,7 +1071,7 @@ TEST_F(TestSystemPacketBuffer, CheckNext)
 /**
  *  Test PacketBuffer::Last() function.
  */
-TEST_F(TestSystemPacketBuffer, CheckLast)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckLast)
 {
     for (auto & config_1 : configurations)
     {
@@ -1078,7 +1115,7 @@ TEST_F(TestSystemPacketBuffer, CheckLast)
 /**
  *  Test PacketBuffer::Read() function.
  */
-TEST_F(TestSystemPacketBuffer, CheckRead)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckRead)
 {
     uint8_t payloads[2 * kBlockSize] = { 1 };
     uint8_t result[2 * kBlockSize];
@@ -1156,7 +1193,7 @@ TEST_F(TestSystemPacketBuffer, CheckRead)
 /**
  *  Test PacketBuffer::AddRef() function.
  */
-TEST_F(TestSystemPacketBuffer, CheckAddRef)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckAddRef)
 {
     for (auto & config : configurations)
     {
@@ -1179,7 +1216,7 @@ TEST_F(TestSystemPacketBuffer, CheckAddRef)
  *               the chain and verify correctly adjusted states of the two
  *               buffers.
  */
-TEST_F(TestSystemPacketBuffer, CheckFree)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckFree)
 {
     const decltype(PacketBuffer::ref) init_ref_count[] = { 1, 2, 3 };
     constexpr size_t kRefs                             = sizeof(init_ref_count) / sizeof(init_ref_count[0]);
@@ -1271,7 +1308,7 @@ TEST_F(TestSystemPacketBuffer, CheckFree)
  *               FreeHead() on the first buffer in the chain and verify that
  *               the method returned pointer to the second buffer.
  */
-TEST_F(TestSystemPacketBuffer, CheckFreeHead)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckFreeHead)
 {
     for (auto & config_1 : configurations)
     {
@@ -1332,7 +1369,7 @@ TEST_F(TestSystemPacketBuffer, CheckFreeHead)
     }
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleConstruct)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleConstruct)
 {
     PacketBufferHandle handle_1;
     EXPECT_TRUE(handle_1.IsNull());
@@ -1349,7 +1386,7 @@ TEST_F(TestSystemPacketBuffer, CheckHandleConstruct)
     EXPECT_EQ(handle_4.Get(), buffer_3);
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleMove)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleMove)
 {
     for (auto & config_1 : configurations)
     {
@@ -1382,7 +1419,7 @@ TEST_F(TestSystemPacketBuffer, CheckHandleMove)
     }
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleRelease)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleRelease)
 {
     for (auto & config_1 : configurations)
     {
@@ -1398,7 +1435,7 @@ TEST_F(TestSystemPacketBuffer, CheckHandleRelease)
     }
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleFree)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleFree)
 {
     for (auto & config_1 : configurations)
     {
@@ -1414,7 +1451,7 @@ TEST_F(TestSystemPacketBuffer, CheckHandleFree)
     }
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleRetain)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleRetain)
 {
     for (auto & config_1 : configurations)
     {
@@ -1429,7 +1466,7 @@ TEST_F(TestSystemPacketBuffer, CheckHandleRetain)
     }
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleAdopt)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleAdopt)
 {
     for (auto & config_1 : configurations)
     {
@@ -1449,7 +1486,7 @@ TEST_F(TestSystemPacketBuffer, CheckHandleAdopt)
     }
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleHold)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleHold)
 {
     for (auto & config_1 : configurations)
     {
@@ -1471,7 +1508,7 @@ TEST_F(TestSystemPacketBuffer, CheckHandleHold)
     }
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleAdvance)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleAdvance)
 {
     for (auto & config_1 : configurations)
     {
@@ -1524,7 +1561,7 @@ TEST_F(TestSystemPacketBuffer, CheckHandleAdvance)
     }
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleRightSize)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleRightSize)
 {
     static const char kPayload[] = "Joy!";
     PacketBufferHandle handle    = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -1557,7 +1594,7 @@ TEST_F(TestSystemPacketBuffer, CheckHandleRightSize)
 #endif // CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHTSIZE
 }
 
-TEST_F(TestSystemPacketBuffer, CheckHandleCloneData)
+TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckHandleCloneData)
 {
     uint8_t lPayload[2 * PacketBuffer::kMaxSizeWithoutReserve];
     for (uint8_t & payload : lPayload)
@@ -1639,12 +1676,11 @@ TEST_F(TestSystemPacketBuffer, CheckHandleCloneData)
     // construct an oversize buffer.
 
     constexpr uint16_t kOversizeDataSize = PacketBuffer::kMaxSizeWithoutReserve + 99;
-    PacketBuffer * p =
-        reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(PacketBuffer::kStructureSize + kOversizeDataSize));
+    PacketBuffer * p = reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(kStructureSize + kOversizeDataSize));
     ASSERT_NE(p, nullptr);
 
     p->next       = nullptr;
-    p->payload    = reinterpret_cast<uint8_t *>(p) + PacketBuffer::kStructureSize;
+    p->payload    = reinterpret_cast<uint8_t *>(p) + kStructureSize;
     p->tot_len    = 0;
     p->len        = 0;
     p->ref        = 1;

@@ -391,30 +391,6 @@ private:
 
     friend class PacketBufferHandle;
     friend class TestSystemPacketBuffer;
-    friend class TestSystemPacketBuffer_CheckNew_Test;
-    friend class TestSystemPacketBuffer_CheckSetStart_Test;
-    friend class TestSystemPacketBuffer_CheckDataLength_Test;
-    friend class TestSystemPacketBuffer_CheckSetDataLength_Test;
-    friend class TestSystemPacketBuffer_CheckAddToEnd_Test;
-    friend class TestSystemPacketBuffer_CheckPopHead_Test;
-    friend class TestSystemPacketBuffer_CheckCompactHead_Test;
-    friend class TestSystemPacketBuffer_CheckConsumeHead_Test;
-    friend class TestSystemPacketBuffer_CheckConsume_Test;
-    friend class TestSystemPacketBuffer_CheckEnsureReservedSize_Test;
-    friend class TestSystemPacketBuffer_CheckNext_Test;
-    friend class TestSystemPacketBuffer_CheckRead_Test;
-    friend class TestSystemPacketBuffer_CheckAddRef_Test;
-    friend class TestSystemPacketBuffer_CheckFree_Test;
-    friend class TestSystemPacketBuffer_CheckFreeHead_Test;
-    friend class TestSystemPacketBuffer_CheckHandleMove_Test;
-    friend class TestSystemPacketBuffer_CheckHandleRelease_Test;
-    friend class TestSystemPacketBuffer_CheckHandleFree_Test;
-    friend class TestSystemPacketBuffer_CheckHandleRetain_Test;
-    friend class TestSystemPacketBuffer_CheckHandleAdopt_Test;
-    friend class TestSystemPacketBuffer_CheckHandleHold_Test;
-    friend class TestSystemPacketBuffer_CheckHandleAdvance_Test;
-    friend class TestSystemPacketBuffer_CheckHandleRightSize_Test;
-    friend class TestSystemPacketBuffer_CheckHandleCloneData_Test;
 };
 
 static_assert(sizeof(pbuf) == sizeof(PacketBuffer), "PacketBuffer must not have additional members");
@@ -719,24 +695,6 @@ private:
 
     friend class PacketBuffer;
     friend class TestSystemPacketBuffer;
-    friend class TestSystemPacketBuffer_CheckNew_Test;
-    friend class TestSystemPacketBuffer_CheckAddToEnd_Test;
-    friend class TestSystemPacketBuffer_CheckPopHead_Test;
-    friend class TestSystemPacketBuffer_CheckConsume_Test;
-    friend class TestSystemPacketBuffer_CheckNext_Test;
-    friend class TestSystemPacketBuffer_CheckLast_Test;
-    friend class TestSystemPacketBuffer_CheckFree_Test;
-    friend class TestSystemPacketBuffer_CheckFreeHead_Test;
-    friend class TestSystemPacketBuffer_CheckHandleConstruct_Test;
-    friend class TestSystemPacketBuffer_CheckHandleMove_Test;
-    friend class TestSystemPacketBuffer_CheckHandleRelease_Test;
-    friend class TestSystemPacketBuffer_CheckHandleFree_Test;
-    friend class TestSystemPacketBuffer_CheckHandleRetain_Test;
-    friend class TestSystemPacketBuffer_CheckHandleAdopt_Test;
-    friend class TestSystemPacketBuffer_CheckHandleHold_Test;
-    friend class TestSystemPacketBuffer_CheckHandleAdvance_Test;
-    friend class TestSystemPacketBuffer_CheckHandleRightSize_Test;
-    friend class TestSystemPacketBuffer_CheckHandleCloneData_Test;
 };
 
 inline void PacketBuffer::SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead)
