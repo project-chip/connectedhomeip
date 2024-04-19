@@ -84,9 +84,7 @@ static AppDeviceCallbacks EchoCallbacks;
 
 static void UatButtonHandler(UatButton * button)
 {
-    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
-        app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
-    });
+    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 }
 
 static void InitServer(intptr_t context)
