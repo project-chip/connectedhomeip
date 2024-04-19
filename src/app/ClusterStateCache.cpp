@@ -462,28 +462,27 @@ void ClusterStateCacheT<CanEnableDataCaching>::OnEventData(const EventHeader & a
     mCallback.OnEventData(aEventHeader, apData ? &dataSnapshot : nullptr, apStatus);
 }
 
-template <bool CanEnableDataCaching>
-CHIP_ERROR ClusterStateCacheT<CanEnableDataCaching>::GetStatus(const ConcreteAttributePath & path, StatusIB & status) const
+template <>
+CHIP_ERROR ClusterStateCacheT<true>::GetStatus(const ConcreteAttributePath & path, StatusIB & status) const
 {
-    if constexpr (CanEnableDataCaching)
-    {
-        CHIP_ERROR err;
+    CHIP_ERROR err;
 
-        auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
-        ReturnErrorOnFailure(err);
+    auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
+    ReturnErrorOnFailure(err);
 
-        if (!attributeState->template Is<StatusIB>())
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
-        status = attributeState->template Get<StatusIB>();
-        return CHIP_NO_ERROR;
-    }
-    else
+    if (!attributeState->template Is<StatusIB>())
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    status = attributeState->template Get<StatusIB>();
+    return CHIP_NO_ERROR;
+}
+
+template <>
+CHIP_ERROR ClusterStateCacheT<false>::GetStatus(const ConcreteAttributePath & path, StatusIB & status) const
+{
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 template <bool CanEnableDataCaching>
