@@ -1,5 +1,6 @@
 accesstest
 MinimalMdnsCoreTests
 ASN1Tests
+MinimalMdnsRecordsTests
 PlatformTests
 TestShell
