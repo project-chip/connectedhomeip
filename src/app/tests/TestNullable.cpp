@@ -179,12 +179,12 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
 
     CtorDtorCounter::ResetCounter();
     {
-        Nullable<MovableCtorDtorCounter> testDst;  // no object construction
+        Nullable<MovableCtorDtorCounter> testDst; // no object construction
         NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 0 && CtorDtorCounter::destroyed == 0);
         NL_TEST_ASSERT(inSuite, !!testDst.IsNull());
 
         auto testSrc = MakeNullable<MovableCtorDtorCounter>(401); // construct object
-        testDst      = std::move(testSrc);  // construct a copy
+        testDst      = std::move(testSrc);                        // construct a copy
         NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
         NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 401);
     }
