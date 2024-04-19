@@ -23,7 +23,7 @@
 
 #include <glib-object.h>
 
-#include <ble/BleError.h>
+#include <ble/Ble.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/GLibTypeDeleter.h>

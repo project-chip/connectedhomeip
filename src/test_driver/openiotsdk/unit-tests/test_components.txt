@@ -1,1 +1,5 @@
 accesstest
+ASN1Tests
+PlatformTests
+TestShell
+SetupPayloadTests

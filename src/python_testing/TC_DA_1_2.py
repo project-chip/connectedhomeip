@@ -57,6 +57,7 @@ def parse_single_vidpid_from_common_name(commonName: str, tag_str: str) -> str:
 
     s = sp[1][:4]
     if not s.isupper() or len(s) != 4:
+        asserts.fail(f"Improperly encoded PID or VID when using fallback encoding {tag_str}:{s}")
         return None
 
     return s
@@ -132,6 +133,8 @@ class TC_DA_1_2(MatterBaseTest):
                 TestStep("6.7", "Verify CD security_information", "security_information = 0"),
                 TestStep("6.8", "Verify CD version_number", "version_number is an integer in range 0..65535"),
                 TestStep("6.9", "Verify CD certification_type", "certification_type has a value between 1..2"),
+                TestStep("7.0", "Extract the Vendor ID (VID) and Product ID (PID) from the DAC. Extract the VID from the PAI. Extract the PID from the PAI, if present",
+                         "VID and PID are present and properly encoded in the DAC. VID is present and properly encoded in the PAI. If the PID is present in the PAI, it is properly encoded"),
                 TestStep("7.1", "", "If the dac_origin_vendor_id is present in the CD, confirm the dac_origin_product_id is also present. If the dac_origin_vendor_id is not present in the CD, confirm the dac_origin_product_id is also not present."),
                 TestStep("7.2", "If the Certification Declaration has both the dac_origin_vendor_id and the dac_origin_product_id fields, verify dac_origin fields",
                          ("* The Vendor ID (VID) in the DAC subject and PAI subject are the same as the dac_origin_vendor_id field in the Certification Declaration.\n"
@@ -309,9 +312,10 @@ class TC_DA_1_2(MatterBaseTest):
         else:
             asserts.assert_in(certification_type, [1, 2], "Certification type is out of range")
 
-        self.step("7.1")
+        self.step("7.0")
         dac_vid, dac_pid, pai_vid, pai_pid = parse_ids_from_certs(parsed_dac, parsed_pai)
 
+        self.step("7.1")
         has_origin_vid = 9 in cd.keys()
         has_origin_pid = 10 in cd.keys()
         if has_origin_pid != has_origin_vid:

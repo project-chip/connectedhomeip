@@ -1840,11 +1840,7 @@ OpenCommissioningWindowHelper::OpenCommissioningWindowHelper(Controller::DeviceC
 CHIP_ERROR OpenCommissioningWindowHelper::OpenCommissioningWindow(Controller::DeviceController * controller, NodeId nodeID,
     System::Clock::Seconds16 timeout, uint16_t discriminator, const Optional<uint32_t> & setupPIN, ResultCallback callback)
 {
-    auto * self = new (std::nothrow) OpenCommissioningWindowHelper(controller, callback);
-    if (self == nullptr) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
+    auto * self = new OpenCommissioningWindowHelper(controller, callback);
     SetupPayload unused;
     CHIP_ERROR err = self->mOpener.OpenCommissioningWindow(nodeID, timeout, Crypto::kSpake2p_Min_PBKDF_Iterations, discriminator,
         setupPIN, NullOptional, &self->mOnOpenCommissioningWindowCallback, unused);
