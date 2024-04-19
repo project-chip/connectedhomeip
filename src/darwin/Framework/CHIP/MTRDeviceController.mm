@@ -1368,6 +1368,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return @(_cppCommissioner->GetCompressedFabricId());
 }
 
+- (NSNumber * _Nullable)syncGetCompressedFabricID
+{
+    return [self syncRunOnWorkQueueWithReturnValue:^NSNumber * {
+        return [self compressedFabricID];
+    } error:nil];
+}
+
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
                     fabricIndex:(chip::FabricIndex)fabricIndex
                       isRunning:(BOOL *)isRunning
