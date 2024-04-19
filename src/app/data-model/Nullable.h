@@ -110,9 +110,11 @@ struct Nullable : protected std::optional<T>
     bool operator==(const T & other) const { return std::optional<T>::has_value() && (**this == other); }
     bool operator!=(const T & other) const { return !(*this == other); }
 
-    // backwards compatibiltiyt with old chip::Optional functionality
+    // backwards compatibility with old chip::Nullable method names
+    //
     // NOTE: as we transition to std::optional, these should be removed
-    // We expect only `value` and `value_or` to remain.
+    // We expect only `value` and `value_or` to remain as standard names
+    // for both nullable and optional.
     T & Value() & { return value(); }
     const T & Value() const & { return value(); }
     const T & ValueOr(const T & defaultValue) const { return value_or(defaultValue); }
