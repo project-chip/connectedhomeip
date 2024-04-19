@@ -250,10 +250,7 @@ void TestDupString(TLVReader & reader, Tag tag, const char * expectedVal)
     CHIP_ERROR err = reader.DupString(val);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     ASSERT_NE(val, nullptr);
-    if (val != nullptr)
-    {
-        EXPECT_EQ(memcmp(val, expectedVal, expectedLen + 1), 0);
-    }
+    EXPECT_EQ(memcmp(val, expectedVal, expectedLen + 1), 0);
     chip::Platform::MemoryFree(val);
 }
 
@@ -268,10 +265,7 @@ void TestDupBytes(TLVReader & reader, Tag tag, const uint8_t * expectedVal, uint
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     ASSERT_NE(val, nullptr);
-    if (val != nullptr)
-    {
-        EXPECT_EQ(memcmp(val, expectedVal, expectedLen), 0);
-    }
+    EXPECT_EQ(memcmp(val, expectedVal, expectedLen), 0);
     chip::Platform::MemoryFree(val);
 }
 
