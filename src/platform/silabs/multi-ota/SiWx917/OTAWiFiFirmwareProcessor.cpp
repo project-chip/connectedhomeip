@@ -40,16 +40,10 @@ extern "C" {
 #define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_NO_AP_FOUND
 uint8_t flag = RPS_HEADER;
 
-// TODO: more descriptive error codes
-#define SL_OTA_ERROR 1L
-
 namespace chip {
 
 // Define static memebers
 bool OTAWiFiFirmwareProcessor::mReset                                                      = false;
-uint16_t OTAWiFiFirmwareProcessor::writeBufOffset                                          = 0;
-uint8_t OTAWiFiFirmwareProcessor::writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
-uint8_t OTAWiFiFirmwareProcessor::writeDataBuffer[1024] __attribute__((aligned(4))) = { 0 };
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::Init()
 {
@@ -77,6 +71,11 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::Clear()
 CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
     int32_t status        = SL_STATUS_OK;
+    // Store the header of the OTA file
+    static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4))) = { 0 };
+    // Used to tranfer other block to processor
+    static uint8_t writeDataBuffer[1024] __attribute__((aligned(4))) = { 0 };
+
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
@@ -99,8 +98,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
         status = sl_si91x_fwup_load(writeDataBuffer, block.size());
         if (status != SL_STATUS_OK)
         {
-            // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value
-            // should be set to true in HandleProcessBlock
+            // When TA recived all the blocks it will return SL_STATUS_FW_UPDATE_DONE status
             if (status == SL_STATUS_FW_UPDATE_DONE)
             {
                 mReset = true;
@@ -108,9 +106,6 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
             else
             {
                 ChipLogError(SoftwareUpdate, "ERROR: In HandleProcessBlock sl_si91x_fwup_load() error %ld", status);
-                // TODO: add this somewhere
-                // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
                 return CHIP_ERROR_CANCELLED;
             }
         }
@@ -132,62 +127,24 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::ApplyAction()
 {
-    ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Apply Action started");
     // This reboots the device
     if (mReset)
     {
-        ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
+        ChipLogProgress(SoftwareUpdate, "WiFi Device OTA update complete");
+#ifdef SLI_SI91X_MCU_INTERFACE //only for SoC
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
-#ifdef SLI_SI91X_MCU_INTERFACE //only for SoC
         // Reboots the device
         sl_si91x_soc_soft_reset();
 #endif
     }
-    ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Apply Action completed");
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAWiFiFirmwareProcessor::FinalizeAction()
 {
-    int32_t status        = SL_STATUS_OK;
-    ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Finalize Action started");
-
-
-    if (writeBufOffset != 0)
-    {
-
-        status = sl_si91x_fwup_load(writeBuffer, writeBufOffset);
-
-        // Pad the remainder of the write buffer with zeros and write it to bootloader storage
-        while (writeBufOffset != kAlignmentBytes)
-        {
-            writeBuffer[writeBufOffset] = 0;
-            writeBufOffset++;
-        }
-        ChipLogProgress(SoftwareUpdate, "status: 0x%lX", status);
-
-        if (status != SL_STATUS_OK)
-        {
-            if (status == SL_STATUS_FW_UPDATE_DONE)
-            {
-                mReset = true;
-            }
-            else
-            {
-                ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk sl_si91x_fwup_load() error %ld", status);
-
-                // TODO: add this somewhere
-                // imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-                // TODO: Replace CHIP_ERROR_CANCELLED with new error statement
-                return CHIP_ERROR_CANCELLED;
-            }
-        }
-
-    }
-
-    ChipLogProgress(SoftwareUpdate, "OTA WiFi Firmware Finalize Action completed");
-    return status ? CHIP_ERROR_CANCELLED : CHIP_NO_ERROR;
+    // TODO: Not requied by 917 OTA updated keeping this function to execute any other command before soft reset of the TA
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

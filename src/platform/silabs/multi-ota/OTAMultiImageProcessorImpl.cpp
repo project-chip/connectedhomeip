@@ -41,7 +41,11 @@ extern "C" {
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
 #ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
 #include "spi_multiplex.h"
+#include "btl_interface.h"
 #endif // SL_WIFI
+#ifdef CHIP_9117
+#include "spi_multiplex.h"
+#endif // CHIP_9117
 }
 
 namespace chip {
@@ -430,10 +434,13 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     // This reboots the device
 =======
     // TODO: check where to put this
     // ConfigurationManagerImpl().StoreSoftwareUpdateCompleted();
+=======
+>>>>>>> 306094209f (Cleanup of the code)
 #ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
 >>>>>>> ac92393594 (Added changes for the build errores)
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
