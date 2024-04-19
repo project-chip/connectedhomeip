@@ -306,7 +306,7 @@ void BindingHandler::PrintBindingTable()
             \t+ ClusterId %d \n \
             \t+ RemoteEndpointId %d \n \
             \t+ NodeId %d \n",
-                   (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.value_or(-1), (int) entry.remote,
+                   (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.value_or(kInvalidClusterId), (int) entry.remote,
                    (int) entry.nodeId);
             break;
         case MATTER_MULTICAST_BINDING:
