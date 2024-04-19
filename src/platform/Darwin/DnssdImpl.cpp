@@ -78,10 +78,10 @@ void LogOnFailure(const char * name, DNSServiceErrorType err)
  */
 CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
 {
-    // Check to see if an user default value exists for the SRP timeout. If it does, override the timeoutInMSecs with user default
+    // Check to see if a user default value exists for the SRP timeout. If it does, override the timeoutInMSecs with user default
     // value. To override the timeout value, use ` defaults write org.csa-iot.matter.darwin SRPTimeoutInMSecsOverride
-    // <timeoutinMsecs>` See UserDefaults.mm for details
-    uint16_t userDefaultSRPTimeoutInMsecs = static_cast<uint16_t>(getUserDefaultDnssdSRPTimeoutInMSecs());
+    // <timeoutinMsecs>` See UserDefaults.mm for details.
+    uint16_t userDefaultSRPTimeoutInMsecs = getUserDefaultDnssdSRPTimeoutInMSecs();
     if (userDefaultSRPTimeoutInMsecs)
     {
         timeoutInMSecs = userDefaultSRPTimeoutInMsecs;
