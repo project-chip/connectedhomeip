@@ -17,8 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <optional>
 
 static NSString * const kUserDefaultDomain = @"org.csa-iot.matter.darwin";
@@ -31,8 +31,7 @@ namespace Platform {
     {
         NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultDomain];
         NSInteger srpTimeoutValue = [defaults integerForKey:kSRPTimeoutInMsecsUserDefaultKey];
-        if (CanCastTo<uint16_t>(srpTimeoutValue))
-        {
+        if (CanCastTo<uint16_t>(srpTimeoutValue)) {
             uint16_t timeoutinMsecs = static_cast<uint16_t>(srpTimeoutValue);
             ChipLogProgress(Discovery, "Got a user default value for Dnssd SRP timeout - %d msecs", timeoutinMsecs);
             return std::make_optional(timeoutinMsecs);
