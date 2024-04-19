@@ -47,15 +47,9 @@ struct Nullable : protected std::optional<T>
     using std::optional<T>::optional;
     using std::optional<T>::value_or;
     using std::optional<T>::value;
-    using std::optional<T>::has_value;
     using std::optional<T>::operator*;
     using std::optional<T>::operator->;
 
-    // backwards compatibiltiyt with old chip::Optional functionality
-    // NOTE: as we transition to std::optional, these should be removed
-    T & Value() & { return value(); }
-    const T & Value() const & { return value(); }
-    const T & ValueOr(const T & defaultValue) const { return value_or(defaultValue); }
     Nullable(NullOptionalType) : std::optional<T>(std::nullopt) {}
 
     // Some consumers need an easy way to determine our underlying type.
@@ -106,15 +100,23 @@ struct Nullable : protected std::optional<T>
 
     bool operator==(const Nullable<T> & other) const
     {
-        if (!has_value())
+        if (!std::optional<T>::has_value())
         {
             return !other.has_value();
         }
         return other.has_value() && (*other == **this);
     }
     bool operator!=(const Nullable<T> & other) const { return !(*this == other); }
-    bool operator==(const T & other) const { return has_value() && (**this == other); }
-    bool operator!=(const T & other) const { return !has_value() || (**this != other); }
+    bool operator==(const T & other) const { return std::optional<T>::has_value() && (**this == other); }
+    bool operator!=(const T & other) const { return !(*this == other); }
+
+    // backwards compatibiltiyt with old chip::Optional functionality
+    // NOTE: as we transition to std::optional, these should be removed
+    // We expect only `value` and `value_or` to remain.
+    T & Value() & { return value(); }
+    const T & Value() const & { return value(); }
+    const T & ValueOr(const T & defaultValue) const { return value_or(defaultValue); }
+
 };
 
 template <class T>
