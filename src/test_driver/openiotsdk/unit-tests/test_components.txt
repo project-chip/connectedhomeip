@@ -3,5 +3,6 @@ SystemLayerTests
 ASN1Tests
 MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
+CoreTests
 PlatformTests
 TestShell
