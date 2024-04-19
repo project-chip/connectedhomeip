@@ -67,6 +67,14 @@ class TAG:
     WIFI_917_SOC_COMBINED = 5
     WIFI_917_NCP_COMBINED = 6
 
+def set_logger():
+    stdout_handler = logging.StreamHandler(stream=sys.stdout)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='[%(levelname)s] %(message)s',
+        handlers=[stdout_handler]
+    )
+
 def write_to_temp(path: str, payload: bytearray):
     with open(path, "wb") as _handle:
         _handle.write(payload)
