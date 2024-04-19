@@ -113,7 +113,7 @@ struct Nullable : protected std::optional<T>
     }
     bool operator!=(const Nullable<T> & other) const { return !(*this == other); }
     bool operator==(const T & other) const { return has_value() && (**this == other); }
-    bool operator!=(const T & other) const { return !has_value() || (*this != other); }
+    bool operator!=(const T & other) const { return !has_value() || (**this != other); }
 };
 
 template <class T>
