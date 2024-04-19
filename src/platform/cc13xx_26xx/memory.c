@@ -69,6 +69,7 @@
 #include <reent.h>
 
 #endif
+
 extern void * pvPortRealloc(void * pv, size_t size);
 
 /*
@@ -180,7 +181,7 @@ void ATTRIBUTE * calloc(size_t nmemb, size_t size)
 
     return (retval);
 }
-
+#ifndef DeviceFamily_CC3220
 /*
  *  ======== realloc ========
  */
@@ -233,6 +234,46 @@ void ATTRIBUTE * realloc(void * ptr, size_t size)
     return (packet);
 #endif
 }
+
+#else
+/*
+ *  ======== realloc ========
+ */
+void ATTRIBUTE * realloc(void * ptr, size_t size)
+{
+#if defined(TI_POSIX_FREERTOS_MEMORY_ENABLEADV)
+    void * retval;
+    Header * packet;
+    size_t oldSize;
+
+    if (ptr == NULL)
+    {
+        retval = malloc(size);
+    }
+    else if (size == 0)
+    {
+        errno  = EINVAL;
+        retval = NULL;
+    }
+    else
+    {
+        packet = (Header *) ptr - 1;
+        retval = malloc(size);
+        if (retval != NULL)
+        {
+            oldSize = packet->header.size - sizeof(Header);
+            (void) memcpy(retval, ptr, (size < oldSize) ? size : oldSize);
+            free(ptr);
+        }
+    }
+
+    return (retval);
+#else
+    /* Unsupported implementation */
+    return (NULL);
+#endif
+}
+#endif
 
 /*
  *  ======== free ========
