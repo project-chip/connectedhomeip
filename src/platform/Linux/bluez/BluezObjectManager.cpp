@@ -19,13 +19,14 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <string_view>
 
 #include <gio/gio.h>
 #include <glib-object.h>
 #include <glib.h>
 
-#include <ble/BleError.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>

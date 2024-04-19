@@ -23,10 +23,10 @@ CHIP_ERROR ConvertToDiscoveredNodeData(TargetVideoPlayerInfo * inPlayer, chip::D
     if (inPlayer == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    outNodeData.commissionData.vendorId   = inPlayer->GetVendorId();
-    outNodeData.commissionData.productId  = static_cast<uint16_t>(inPlayer->GetProductId());
-    outNodeData.commissionData.deviceType = inPlayer->GetDeviceType();
-    outNodeData.resolutionData.numIPs     = inPlayer->GetNumIPs();
+    outNodeData.nodeData.vendorId     = inPlayer->GetVendorId();
+    outNodeData.nodeData.productId    = static_cast<uint16_t>(inPlayer->GetProductId());
+    outNodeData.nodeData.deviceType   = inPlayer->GetDeviceType();
+    outNodeData.resolutionData.numIPs = inPlayer->GetNumIPs();
 
     const chip::Inet::IPAddress * ipAddresses = inPlayer->GetIpAddresses();
     if (ipAddresses != nullptr)
@@ -37,8 +37,7 @@ CHIP_ERROR ConvertToDiscoveredNodeData(TargetVideoPlayerInfo * inPlayer, chip::D
         }
     }
 
-    chip::Platform::CopyString(outNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
-                               inPlayer->GetDeviceName());
+    chip::Platform::CopyString(outNodeData.nodeData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1, inPlayer->GetDeviceName());
     chip::Platform::CopyString(outNodeData.resolutionData.hostName, chip::Dnssd::kHostNameMaxLength + 1, inPlayer->GetHostName());
 
     return CHIP_NO_ERROR;

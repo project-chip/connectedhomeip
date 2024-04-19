@@ -139,10 +139,10 @@ private:
     NodeId mNodeId                                       = kUndefinedNodeId;
     System::Clock::Seconds16 mCommissioningWindowTimeout = System::Clock::kZero;
     CommissioningWindowOption mCommissioningWindowOption = CommissioningWindowOption::kOriginalSetupCode;
-    Spake2pVerifier mVerifier; // Used for non-basic commissioning.
+    Crypto::Spake2pVerifier mVerifier; // Used for non-basic commissioning.
     // Parameters needed for non-basic commissioning.
     uint32_t mPBKDFIterations = 0;
-    uint8_t mPBKDFSaltBuffer[kSpake2p_Max_PBKDF_Salt_Length];
+    uint8_t mPBKDFSaltBuffer[Crypto::kSpake2p_Max_PBKDF_Salt_Length];
     ByteSpan mPBKDFSalt;
 
     Callback::Callback<OnDeviceConnected> mDeviceConnected;

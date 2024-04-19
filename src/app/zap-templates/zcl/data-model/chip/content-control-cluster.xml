@@ -24,6 +24,25 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster is used for managing the content control (including "parental control") settings on a media device such as a TV, or Set-top Box.</description>
+
+    <features>
+      <feature bit="0" code="ST" name="ScreenTime" summary="Supports managing screen time limits.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="PM" name="PINManagement" summary="Supports managing a PIN code which is used for restricting access to configuration of this feature.">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="BU" name="BlockUnrated" summary="Supports managing content controls for unrated content.">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="OCR" name="OnDemandContentRating" summary="Supports managing content controls based upon rating threshold for on demand content.">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="SCR" name="ScheduledContentRating" summary="Supports managing content controls based upon rating threshold for scheduled content.">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="ENABLED" type="boolean" writable="false" optional="false">Enabled</attribute>
     <attribute side="server" code="0x0001" define="ON_DEMAND_RATINGS" type="ARRAY" entryType="RatingNameStruct" writable="false" optional="true">OnDemandRatings</attribute>
     <attribute side="server" code="0x0002" define="ON_DEMAND_THRESHOLD" type="char_string" length="8" writable="false" optional="true">OnDemandRatingThreshold</attribute>
@@ -95,14 +114,5 @@ limitations under the License.
     <item name="RatingName" type="char_string" optional="false"/>
     <item name="RatingNameDesc" type="char_string" optional="true"/>
   </struct>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x050F"/>
-    <field name="ScreenTime" mask="0x1"/>
-    <field name="PINManagement"  mask="0x2"/>
-    <field name="BlockUnrated" mask="0x4"/>
-    <field name="OnDemandContentRating"  mask="0x8"/>
-    <field name="ScheduledContentRating"  mask="0x10"/>
-  </bitmap>
 
 </configurator>

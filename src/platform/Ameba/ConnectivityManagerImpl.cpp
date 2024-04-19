@@ -55,7 +55,6 @@
 
 using namespace ::chip;
 using namespace ::chip::Inet;
-using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
@@ -499,6 +498,10 @@ void ConnectivityManagerImpl::DriveStationState()
             ChipLogProgress(DeviceLayer, "WiFi station interface connected");
             mLastStationConnectFailTime = System::Clock::kZero;
             OnStationConnected();
+        }
+        else
+        {
+            ChangeWiFiStationState(kWiFiStationState_Connecting);
         }
     }
 

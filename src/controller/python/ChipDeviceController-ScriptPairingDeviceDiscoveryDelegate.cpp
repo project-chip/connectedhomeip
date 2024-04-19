@@ -24,7 +24,7 @@ namespace Controller {
 void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeData)
 {
     // Ignore nodes with closed comissioning window
-    VerifyOrReturn(nodeData.commissionData.commissioningMode != 0);
+    VerifyOrReturn(nodeData.nodeData.commissioningMode != 0);
     VerifyOrReturn(mActiveDeviceCommissioner != nullptr);
 
     const uint16_t port = nodeData.resolutionData.port;
@@ -40,7 +40,7 @@ void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::Disco
 
     Inet::InterfaceId interfaceId =
         nodeData.resolutionData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.resolutionData.interfaceId : Inet::InterfaceId::Null();
-    PeerAddress peerAddress = PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], port, interfaceId);
+    auto peerAddress = Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], port, interfaceId);
 
     RendezvousParameters keyExchangeParams = RendezvousParameters().SetSetupPINCode(mSetupPasscode).SetPeerAddress(peerAddress);
 

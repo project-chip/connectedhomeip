@@ -648,9 +648,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!allocator->AddResponder<SrvResponder>(SrvResourceRecord(instanceName, hostName, params.GetPort()))
-             .SetReportAdditional(hostName)
-             .IsValid())
+    SrvResourceRecord srvRecord(instanceName, hostName, params.GetPort());
+    srvRecord.SetCacheFlush(true);
+    if (!allocator->AddResponder<SrvResponder>(srvRecord).SetReportAdditional(hostName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
@@ -759,9 +759,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
     }
 
-    if (!allocator->AddResponder<TxtResponder>(TxtResourceRecord(instanceName, GetCommissioningTxtEntries(params)))
-             .SetReportAdditional(hostName)
-             .IsValid())
+    TxtResourceRecord txtRecord(instanceName, GetCommissioningTxtEntries(params));
+    txtRecord.SetCacheFlush(true);
+    if (!allocator->AddResponder<TxtResponder>(txtRecord).SetReportAdditional(hostName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add TXT record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
@@ -975,10 +975,14 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 AdvertiserMinMdns gAdvertiser;
 } // namespace
 
-ServiceAdvertiser & ServiceAdvertiser::Instance()
+#if CHIP_DNSSD_DEFAULT_MINIMAL
+
+ServiceAdvertiser & GetDefaultAdvertiser()
 {
     return gAdvertiser;
 }
+
+#endif // CHIP_DNSSD_DEFAULT_MINIMAL
 
 } // namespace Dnssd
 } // namespace chip

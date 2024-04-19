@@ -30,7 +30,7 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 
 #include "stdio.h"
 #include "timers.h"

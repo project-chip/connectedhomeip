@@ -23,7 +23,7 @@
 
 #include <glib-object.h>
 
-#include <ble/BleError.h>
+#include <ble/Ble.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/GLibTypeDeleter.h>
@@ -65,14 +65,14 @@ CHIP_ERROR ChipDeviceScanner::Init(BluezAdapter1 * adapter, ChipDeviceScannerDel
     mAdapter.reset(reinterpret_cast<BluezAdapter1 *>(g_object_ref(adapter)));
     mDelegate = delegate;
 
-    mScannerState = ChipDeviceScannerState::SCANNER_INITIALIZED;
+    mScannerState = ChipDeviceScannerState::INITIALIZED;
 
     return CHIP_NO_ERROR;
 }
 
 void ChipDeviceScanner::Shutdown()
 {
-    VerifyOrReturn(mScannerState != ChipDeviceScannerState::SCANNER_UNINITIALIZED);
+    VerifyOrReturn(mScannerState != ChipDeviceScannerState::UNINITIALIZED);
 
     StopScan();
 
@@ -86,14 +86,13 @@ void ChipDeviceScanner::Shutdown()
         },
         this);
 
-    mScannerState = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
+    mScannerState = ChipDeviceScannerState::UNINITIALIZED;
 }
 
-CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
+CHIP_ERROR ChipDeviceScanner::StartScan()
 {
     assertChipStackLockedByCurrentThread();
-    VerifyOrReturnError(mScannerState != ChipDeviceScannerState::SCANNER_SCANNING, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mTimerState == ScannerTimerState::TIMER_CANCELED, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mScannerState != ChipDeviceScannerState::SCANNING, CHIP_ERROR_INCORRECT_STATE);
 
     mCancellable.reset(g_cancellable_new());
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
@@ -105,38 +104,16 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         return err;
     }
 
-    // Here need to set the Bluetooth scanning status immediately.
-    // So that if the timer fails to start in the next step,
-    // calling StopScan will be effective.
-    mScannerState = ChipDeviceScannerState::SCANNER_SCANNING;
-
-    err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "Failed to schedule scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
-        StopScan();
-        return err;
-    }
-
-    mTimerState = ScannerTimerState::TIMER_STARTED;
-
+    mScannerState = ChipDeviceScannerState::SCANNING;
     ChipLogDetail(Ble, "ChipDeviceScanner has started scanning!");
 
     return CHIP_NO_ERROR;
 }
 
-void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState)
-{
-    ChipDeviceScanner * chipDeviceScanner = static_cast<ChipDeviceScanner *>(appState);
-    chipDeviceScanner->mTimerState        = ScannerTimerState::TIMER_EXPIRED;
-    chipDeviceScanner->mDelegate->OnScanError(CHIP_ERROR_TIMEOUT);
-    chipDeviceScanner->StopScan();
-}
-
 CHIP_ERROR ChipDeviceScanner::StopScan()
 {
     assertChipStackLockedByCurrentThread();
-    VerifyOrReturnError(mScannerState == ChipDeviceScannerState::SCANNER_SCANNING, CHIP_NO_ERROR);
+    VerifyOrReturnError(mScannerState == ChipDeviceScannerState::SCANNING, CHIP_NO_ERROR);
 
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) { return self->StopScanImpl(); }, this);
@@ -147,17 +124,9 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     }
 
     // Stop scanning and return to initialization state
-    mScannerState = ChipDeviceScannerState::SCANNER_INITIALIZED;
+    mScannerState = ChipDeviceScannerState::INITIALIZED;
 
     ChipLogDetail(Ble, "ChipDeviceScanner has stopped scanning!");
-
-    if (mTimerState == ScannerTimerState::TIMER_STARTED)
-    {
-        chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
-    }
-
-    // Reset timer status
-    mTimerState = ScannerTimerState::TIMER_CANCELED;
 
     mDelegate->OnScanComplete();
 

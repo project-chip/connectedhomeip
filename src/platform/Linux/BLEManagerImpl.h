@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <string>
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #include "bluez/BluezAdvertisement.h"
@@ -187,6 +187,7 @@ private:
     BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
     void InitiateScan(BleScanState scanType);
+    static void HandleScannerTimer(chip::System::Layer *, void * appState);
     void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;

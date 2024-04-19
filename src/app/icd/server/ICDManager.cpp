@@ -26,7 +26,14 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/LockTracker.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <stdlib.h>
+
+namespace {
+enum class ICDTestEventTriggerEvent : uint64_t
+{
+    kAddActiveModeReq    = 0x0046'0000'00000001,
+    kRemoveActiveModeReq = 0x0046'0000'00000002,
+};
+} // namespace
 
 namespace chip {
 namespace app {
@@ -105,6 +112,10 @@ void ICDManager::Shutdown()
     mFabricTable     = nullptr;
     mSubInfoProvider = nullptr;
     mICDSenderPool.ReleaseAll();
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    mIsBootUpResumeSubscriptionExecuted = false;
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 }
 
@@ -152,6 +163,7 @@ void ICDManager::SendCheckInMsgs()
 
         ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
                                  mSymmetricKeystore);
+
         if (table.IsEmpty())
         {
             continue;
@@ -173,8 +185,7 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            bool active = mSubInfoProvider->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
-            if (active)
+            if (!ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
             }
@@ -204,8 +215,10 @@ void ICDManager::SendCheckInMsgs()
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
-bool ICDManager::CheckInMessagesWouldBeSent()
+bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsgsBeSentFunction> & shouldCheckInMsgsBeSentFunction)
 {
+    VerifyOrReturnValue(shouldCheckInMsgsBeSentFunction, false);
+
     for (const auto & fabricInfo : *mFabricTable)
     {
         uint16_t supported_clients = ICDConfigurationData::GetInstance().GetClientsSupportedPerFabric();
@@ -234,7 +247,7 @@ bool ICDManager::CheckInMessagesWouldBeSent()
             }
 
             // At least one registration would require a Check-In message
-            VerifyOrReturnValue(mSubInfoProvider->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject), true);
+            VerifyOrReturnValue(!shouldCheckInMsgsBeSentFunction(entry.fabricIndex, entry.monitoredSubject), true);
         }
     }
 
@@ -242,7 +255,87 @@ bool ICDManager::CheckInMessagesWouldBeSent()
     return false;
 }
 
-void ICDManager::TriggerCheckInMessages()
+/**
+ * ShouldCheckInMsgsBeSentAtActiveModeFunction is used to determine if a Check-In message is required for a given registration.
+ * Due to how the ICD Check-In use-case interacts with the persistent subscription and subscription timeout resumption features,
+ * having a single implementation of the function renders the implementation very difficult to understand and maintain.
+ * Because of this, each valid feature combination has its own implementation of the function.
+ */
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+/**
+ * @brief Implementation for when the persistent subscription and subscription timeout resumption feature are present.
+ *        Function checks that there are no active or persisted subscriptions for a given fabricIndex or subjectID.
+ *
+ * @note When the persistent subscription and subscription timeout resumption feature are present, we need to check for
+ *       persisted subscription at each transition to ActiveMode since there will be persisted subscriptions during normal
+ *       operation for the subscription timeout resumption feature. Once we have finished all our subscription resumption attempts
+ *       for a given subscription, the entry is deleted from persisted storage which will enable us to send Check-In messages for
+ *       the client registration. This logic avoids the device sending a Check-In message while trying to resume subscriptions.
+ *
+ * @param aFabricIndex
+ * @param subjectID subjectID to check. Can be an operational node id or a CAT
+ *
+ * @return true Returns true if the fabricIndex and subjectId combination does not have an active or a persisted subscription.
+ * @return false Returns false if the fabricIndex and subjectId combination has an active or persisted subscription.
+ */
+bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID)
+{
+    return !(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID) ||
+             mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID));
+}
+#else
+/**
+ * @brief Implementation for when the persistent subscription feature is present without the subscription timeout resumption
+ * feature. Function checks that there are no active subscriptions. If the boot up subscription resumption has not been completed,
+ *        function also checks if there are persisted subscriptions.
+ *
+ * @note The persistent subscriptions feature tries to resume subscriptions at the highest min interval
+ *       of all the persisted subscriptions. As such, it is possible for the ICD to return to Idle Mode
+ *       until the timer elaspses. We do not want to send Check-In messages to clients with persisted subscriptions
+ *       until we have tried to resubscribe.
+ *
+ * @param aFabricIndex
+ * @param subjectID subjectID to check. Can be an opperationnal node id or a CAT
+ *
+ * @return true Returns true if the fabricIndex and subjectId combination does not have an active subscription.
+ *              If the boot up subscription resumption has not been completed, there must not be a persisted subscription either.
+ * @return false Returns false if the fabricIndex and subjectId combination has an active subscription.
+ *               If the boot up subscription resumption has not been completed,
+ *               returns false if the fabricIndex and subjectId combination has a persisted subscription.
+ */
+bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID)
+{
+    bool mightHaveSubscription = mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID);
+    if (!mightHaveSubscription && !mIsBootUpResumeSubscriptionExecuted)
+    {
+        mightHaveSubscription = mSubInfoProvider->SubjectHasPersistedSubscription(aFabricIndex, subjectID);
+    }
+
+    return !mightHaveSubscription;
+}
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+#else
+/**
+ * @brief Implementation for when neither the persistent subscription nor the subscription timeout resumption features are present.
+ *        Function checks that there no active sbuscriptions for a given fabricIndex and subjectId combination.
+ *
+ * @note When neither the persistent subscription nor the subscription timeout resumption features are present, we only need to
+ *       check for active subscription since we will never have any persisted subscription.
+ *
+ * @param aFabricIndex
+ * @param subjectID subjectID to check. Can be an opperationnal node id or a CAT
+ *
+ * @return true Returns true if the fabricIndex and subjectId combination does not have an active subscription.
+ * @return false Returns false if the fabricIndex and subjectId combination has an active subscription.
+ */
+bool ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID)
+{
+    return !(mSubInfoProvider->SubjectHasActiveSubscription(aFabricIndex, subjectID));
+}
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+void ICDManager::TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & verifier)
 {
     VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
 
@@ -251,8 +344,7 @@ void ICDManager::TriggerCheckInMessages()
     VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
 
     // If we don't have any Check-In messages to send, do nothing
-    VerifyOrReturn(CheckInMessagesWouldBeSent());
-
+    VerifyOrReturn(CheckInMessagesWouldBeSent(verifier));
     UpdateOperationState(OperationalState::ActiveMode);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
@@ -313,12 +405,16 @@ void ICDManager::UpdateOperationState(OperationalState state)
     {
         mOperationalState = OperationalState::IdleMode;
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        std::function<ShouldCheckInMsgsBeSentFunction> sendCheckInMessagesOnActiveMode =
+            std::bind(&ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction, this, std::placeholders::_1, std::placeholders::_2);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
         // unless the device would need to send Check-In messages
-        // TODO(#30281) : Verify how persistent subscriptions affects this at ICDManager::Init
         if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-            || CheckInMessagesWouldBeSent()
+            || CheckInMessagesWouldBeSent(sendCheckInMessagesOnActiveMode)
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
         )
         {
@@ -552,6 +648,27 @@ void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
     {
         DeviceLayer::SystemLayer().ExtendTimerTo(activeModeJitterThreshold, OnTransitionToIdle, this);
     }
+}
+
+CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
+{
+    ICDTestEventTriggerEvent trigger = static_cast<ICDTestEventTriggerEvent>(eventTrigger);
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+
+    switch (trigger)
+    {
+    case ICDTestEventTriggerEvent::kAddActiveModeReq:
+        SetKeepActiveModeRequirements(KeepActiveFlag::kTestEventTriggerActiveMode, true);
+        break;
+    case ICDTestEventTriggerEvent::kRemoveActiveModeReq:
+        SetKeepActiveModeRequirements(KeepActiveFlag::kTestEventTriggerActiveMode, false);
+        break;
+    default:
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
+
+    return err;
 }
 
 ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)

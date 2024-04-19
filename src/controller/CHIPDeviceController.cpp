@@ -61,7 +61,7 @@
 #include <tracing/macros.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <transport/raw/BLE.h>
 #endif
 
@@ -70,6 +70,7 @@
 #include <memory>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string>
 #include <time.h>
 
 using namespace chip::Inet;
@@ -77,6 +78,7 @@ using namespace chip::System;
 using namespace chip::Transport;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters;
+using namespace chip::Crypto;
 
 namespace chip {
 namespace Controller {
@@ -108,22 +110,33 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->UDPEndPointManager()));
-    mDNSResolver.SetCommissioningDelegate(this);
+    mDNSResolver.SetDiscoveryDelegate(this);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
-
-    VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
     mVendorId = params.controllerVendorId;
     if (params.operationalKeypair != nullptr || !params.controllerNOC.empty() || !params.controllerRCAC.empty())
     {
         ReturnErrorOnFailure(InitControllerNOCChain(params));
     }
+    else if (params.fabricIndex.HasValue())
+    {
+        VerifyOrReturnError(params.systemState->Fabrics()->FabricCount() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+        if (params.systemState->Fabrics()->FindFabricWithIndex(params.fabricIndex.Value()) != nullptr)
+        {
+            mFabricIndex = params.fabricIndex.Value();
+        }
+        else
+        {
+            ChipLogError(Controller, "There is no fabric corresponding to the given fabricIndex");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
 
     mSystemState = params.systemState->Retain();
     mState       = State::Initialized;
 
     mRemoveFromFabricTableOnShutdown = params.removeFromFabricTableOnShutdown;
+    mDeleteFromFabricTableOnShutdown = params.deleteFromFabricTableOnShutdown;
 
     if (GetFabricIndex() != kUndefinedFabricIndex)
     {
@@ -305,8 +318,62 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     ReturnErrorOnFailure(err);
     VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
 
-    mFabricIndex = fabricIndex;
+    mFabricIndex       = fabricIndex;
+    mAdvertiseIdentity = advertiseOperational;
+    return CHIP_NO_ERROR;
+}
 
+CHIP_ERROR DeviceController::UpdateControllerNOCChain(const ByteSpan & noc, const ByteSpan & icac,
+                                                      Crypto::P256Keypair * operationalKeypair,
+                                                      bool operationalKeypairExternalOwned)
+{
+    VerifyOrReturnError(mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INTERNAL);
+    FabricTable * fabricTable = mSystemState->Fabrics();
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    FabricId fabricId;
+    NodeId nodeId;
+    CATValues oldCats;
+    CATValues newCats;
+    ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(noc, &nodeId, &fabricId));
+    ReturnErrorOnFailure(fabricTable->FetchCATs(mFabricIndex, oldCats));
+    ReturnErrorOnFailure(ExtractCATsFromOpCert(noc, newCats));
+
+    bool needCloseSession = true;
+    if (GetFabricInfo()->GetNodeId() == nodeId && oldCats == newCats)
+    {
+        needCloseSession = false;
+    }
+
+    if (operationalKeypair != nullptr)
+    {
+        err = fabricTable->UpdatePendingFabricWithProvidedOpKey(mFabricIndex, noc, icac, operationalKeypair,
+                                                                operationalKeypairExternalOwned, mAdvertiseIdentity);
+    }
+    else
+    {
+        VerifyOrReturnError(fabricTable->HasOperationalKeyForFabric(mFabricIndex), CHIP_ERROR_KEY_NOT_FOUND);
+        err = fabricTable->UpdatePendingFabricWithOperationalKeystore(mFabricIndex, noc, icac, mAdvertiseIdentity);
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        err = fabricTable->CommitPendingFabricData();
+    }
+    else
+    {
+        fabricTable->RevertPendingFabricData();
+    }
+
+    ReturnErrorOnFailure(err);
+    if (needCloseSession)
+    {
+        // If the node id or CATs have changed, our existing CASE sessions are no longer valid,
+        // because the other side will think anything coming over those sessions comes from our
+        // old node ID, and the new CATs might not satisfy the ACL requirements of the other side.
+        mSystemState->SessionMgr()->ExpireAllSessionsForFabric(mFabricIndex);
+    }
+    ChipLogProgress(Controller, "Controller NOC chain has updated");
     return CHIP_NO_ERROR;
 }
 
@@ -316,8 +383,9 @@ void DeviceController::Shutdown()
 
     VerifyOrReturn(mState != State::NotInitialized);
 
+    // If our state is initialialized it means mSystemState is valid,
+    // and we can use it below before we release our reference to it.
     ChipLogDetail(Controller, "Shutting down the controller");
-
     mState = State::NotInitialized;
 
     if (mFabricIndex != kUndefinedFabricIndex)
@@ -335,13 +403,13 @@ void DeviceController::Shutdown()
         // existing sessions too?
         mSystemState->SessionMgr()->ExpireAllSessionsForFabric(mFabricIndex);
 
-        if (mRemoveFromFabricTableOnShutdown)
+        if (mDeleteFromFabricTableOnShutdown)
         {
-            FabricTable * fabricTable = mSystemState->Fabrics();
-            if (fabricTable != nullptr)
-            {
-                fabricTable->Forget(mFabricIndex);
-            }
+            mSystemState->Fabrics()->Delete(mFabricIndex);
+        }
+        else if (mRemoveFromFabricTableOnShutdown)
+        {
+            mSystemState->Fabrics()->Forget(mFabricIndex);
         }
     }
 
@@ -397,6 +465,8 @@ DeviceCommissioner::DeviceCommissioner() :
 
 CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
+    VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
     ReturnErrorOnFailure(DeviceController::Init(params));
 
     mPairingDelegate = params.pairingDelegate;
@@ -1160,31 +1230,41 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(
 }
 
 void DeviceCommissioner::OnArmFailSafeExtendedForDeviceAttestation(
-    void * context, const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
+    void * context, const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &)
 {
-    // If this function starts using "data", need to fix ExtendArmFailSafeForDeviceAttestation accordingly.
+    ChipLogProgress(Controller, "Successfully extended fail-safe timer to handle DA failure");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
-    if (!commissioner->mDeviceBeingCommissioned)
+    // We have completed our command invoke, but we're not going to finish the
+    // commissioning step until our client examines the attestation
+    // information.  Clear out mInvokeCancelFn (which points at the
+    // CommandSender we just finished using) now, so it's not dangling.
+    commissioner->mInvokeCancelFn = nullptr;
+
+    commissioner->HandleDeviceAttestationCompleted();
+}
+
+void DeviceCommissioner::HandleDeviceAttestationCompleted()
+{
+    if (!mDeviceBeingCommissioned)
     {
         return;
     }
 
-    auto & params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
+    auto & params                                                      = mDefaultCommissioner->GetCommissioningParameters();
     Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
     if (deviceAttestationDelegate)
     {
         ChipLogProgress(Controller, "Device attestation completed, delegating continuation to client");
-        deviceAttestationDelegate->OnDeviceAttestationCompleted(commissioner, commissioner->mDeviceBeingCommissioned,
-                                                                *commissioner->mAttestationDeviceInfo,
-                                                                commissioner->mAttestationResult);
+        deviceAttestationDelegate->OnDeviceAttestationCompleted(this, mDeviceBeingCommissioned, *mAttestationDeviceInfo,
+                                                                mAttestationResult);
     }
     else
     {
         ChipLogProgress(Controller, "Device attestation failed and no delegate set, failing commissioning");
         CommissioningDelegate::CommissioningReport report;
-        report.Set<AttestationErrorInfo>(commissioner->mAttestationResult);
-        commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
+        report.Set<AttestationErrorInfo>(mAttestationResult);
+        CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
     }
 }
 
@@ -1301,9 +1381,7 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
 
     if (!waitForFailsafeExtension)
     {
-        // Callee does not use data argument.
-        const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType data;
-        OnArmFailSafeExtendedForDeviceAttestation(this, data);
+        HandleDeviceAttestationCompleted();
     }
 }
 
