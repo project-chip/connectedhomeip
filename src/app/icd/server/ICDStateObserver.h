@@ -28,8 +28,8 @@ namespace chip {
 namespace app {
 
 /**
- * @brief Public API used my the ICDManager to expose when different events occurs.
- *        ICDManager::RegisterObserver can be used to register as an Observer to be notified when these events occurs.
+ * @brief Public API used by the ICDManager to expose when different events occur.
+ *        ICDManager::RegisterObserver can be used to register as an Observer to be notified when these events occur.
  *        These functions are called synchronously.
  */
 class ICDStateObserver

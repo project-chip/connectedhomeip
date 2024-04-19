@@ -108,7 +108,7 @@ public:
      * @param[in] feature FeatureMap bit to verify
      *
      * @return true: if the FeatureMap bit is enabled in the ICDM cluster attribute.
-     *         false: ff the FeatureMap bit is not enabled in the ICDM cluster attribute.
+     *         false: if the FeatureMap bit is not enabled in the ICDM cluster attribute.
      *                if we failed to read the FeatureMap attribute.
      */
     bool SupportsFeature(Clusters::IcdManagement::Feature feature);
@@ -186,7 +186,7 @@ private:
     /**
      * @brief UpdateICDMode checks in which ICDMode (SIT or LIT) the ICD can go to and updates the mode if necessary.
      *        For a SIT ICD, the function does nothing.
-     *        For a LIT ICD, the function checks if the ICD has a registration in the ICDMonitoringTable to determine in which
+     *        For a LIT ICD, the function checks if the ICD has a registration in the ICDMonitoringTable to determine which
      *        ICDMode the ICD must be in.
      */
     void UpdateICDMode();
@@ -194,13 +194,13 @@ private:
     /**
      * @brief UpdateOperationState updates the OperationState of the ICD to the requested one.
      *        IdleMode -> IdleMode     : No actions are necessary, do nothing.
-     *        IdleMode -> ActiveMode   : Transition the device to ActiveMode, start the  ActiveMode timer and triggers all necessary
+     *        IdleMode -> ActiveMode   : Transition the device to ActiveMode, start the  ActiveMode timer and trigger all necessary
      *                                   operations. These operations could be : Send Check-In messages
      *                                                                           Send subscription reports
      *                                                                           Process user actions
      *        ActiveMode -> ActiveMode : Increase remaining ActiveMode timer to one ActiveModeThreshold.
      *                                   If ActiveModeThreshold is 0, do nothing.
-     *        ActiveMode -> IdleMode   : Transition ICD to IdleMode and starts the IdleMode timer.
+     *        ActiveMode -> IdleMode   : Transition ICD to IdleMode and start the IdleMode timer.
      *
      * @param state requested OperationalState for the ICD to transition to
      */
@@ -209,7 +209,7 @@ private:
     /**
      * @brief Set or Remove a keep ActiveMode requirement for the given flag
      *        If state is true and the ICD is in IdleMode, transition the ICD to ActiveMode
-     *        If state is false and the ICD is in ActiveMode, verifies if we can transition the ICD to IdleMode.
+     *        If state is false and the ICD is in ActiveMode, check whether we can transition the ICD to IdleMode.
      *        If we can, transition the ICD to IdleMode.
      *
      * @param flag KeepActiveFlag to remove or add

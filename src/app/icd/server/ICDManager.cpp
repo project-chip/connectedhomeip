@@ -458,7 +458,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().StartTimer(activeModeDuration, OnActiveModeDone, this);
 
             Milliseconds32 activeModeJitterInterval = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
-            // TODO(#33074): Edge case when we transition to IdleMode with this conditio being true
+            // TODO(#33074): Edge case when we transition to IdleMode with this condition being true
             // (activeModeDuration == kZero && !mKeepActiveFlags.HasAny())
             activeModeJitterInterval =
                 (activeModeDuration >= activeModeJitterInterval) ? activeModeDuration - activeModeJitterInterval : kZero;
