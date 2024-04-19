@@ -27,7 +27,7 @@ namespace DeviceLayer {
     {
         NSUserDefaults * defaults = [[NSUserDefaults alloc] initWithSuiteName:kUserDefaultDomain];
         NSInteger srpTimeoutValue = [defaults integerForKey:kSRPTimeoutInMsecsUserDefaultKey];
-        return (srpTimeoutValue < UINT16_MAX) ? static_cast<uint16_t>(srpTimeoutValue) : 0;
+        return (srpTimeoutValue > 0 && srpTimeoutValue < UINT16_MAX) ? static_cast<uint16_t>(srpTimeoutValue) : 0;
     }
 
 } // namespace DeviceLayer
