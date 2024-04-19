@@ -256,6 +256,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
 - (void)removeDevice:(MTRDevice *)device;
 
+- (NSNumber * _Nullable)syncGetCompressedFabricID;
+
 @end
 
 NS_ASSUME_NONNULL_END

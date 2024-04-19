@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

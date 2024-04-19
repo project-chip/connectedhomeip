@@ -27,13 +27,14 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <string.h>
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
 
-#include <ble/BleConfig.h>
+#include <cstdint>
+#include <cstring>
 
-#include <ble/BleError.h>
-#include <lib/support/BitFlags.h>
+#include <lib/core/CHIPError.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

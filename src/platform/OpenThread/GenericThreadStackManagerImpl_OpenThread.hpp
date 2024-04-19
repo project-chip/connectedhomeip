@@ -52,6 +52,7 @@
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
@@ -222,6 +223,22 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
             else
             {
                 ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+            }
+
+            ThreadDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetThreadDiagnosticsDelegate();
+
+            if (mIsAttached)
+            {
+                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
+            }
+            else
+            {
+                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
+
+                GeneralFaults<kMaxNetworkFaults> current;
+                current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
+                delegate->OnNetworkFaultChanged(mNetworkFaults, current);
+                mNetworkFaults = current;
             }
         }
 

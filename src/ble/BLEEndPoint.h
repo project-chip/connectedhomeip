@@ -27,10 +27,23 @@
 
 #pragma once
 
-#include <system/SystemLayer.h>
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
 
-#include <ble/BleRole.h>
-#include <ble/BtpEngine.h>
+#include <cstdint>
+
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/DLLUtil.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
+
+#include "BleConnectionDelegate.h"
+#include "BleLayerDelegate.h"
+#include "BlePlatformDelegate.h"
+#include "BleRole.h"
+#include "BtpEngine.h"
 
 namespace chip {
 namespace Ble {
@@ -46,8 +59,6 @@ enum
 // Forward declarations
 class BleLayer;
 class BleEndPointPool;
-// BLEEndPoint holds a pointer to BleLayerDelegate for messages, while BleLayerDelegate functions also accepts BLEEndPoint.
-class BleLayerDelegate;
 
 class DLL_EXPORT BLEEndPoint
 {

@@ -216,7 +216,6 @@ public class DiscoveryExampleFragment extends Fragment {
   public void onPause() {
     super.onPause();
     Log.i(TAG, "onPause() called");
-    stopDiscovery();
   }
 
   /** Interface for notifying the host. */
