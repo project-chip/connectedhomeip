@@ -29,7 +29,6 @@
 
 #include <lib/core/ReferenceCounted.h>
 
-
 #include <gtest/gtest.h>
 
 using namespace chip;

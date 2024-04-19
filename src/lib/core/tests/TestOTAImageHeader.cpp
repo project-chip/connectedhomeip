@@ -18,7 +18,6 @@
 
 #include <lib/core/OTAImageHeader.h>
 
-
 #include <gtest/gtest.h>
 
 using namespace chip;

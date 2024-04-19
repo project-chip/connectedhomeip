@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include <gtest/gtest.h>
 
 #include <lib/core/CASEAuthTag.h>

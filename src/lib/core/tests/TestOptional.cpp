@@ -31,7 +31,6 @@
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
 
-
 #include <gtest/gtest.h>
 
 using namespace chip;

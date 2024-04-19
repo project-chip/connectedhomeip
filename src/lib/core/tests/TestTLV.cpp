@@ -23,8 +23,8 @@
  *
  */
 
-#include <nlbyteorder.h>
 #include <gtest/gtest.h>
+#include <nlbyteorder.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
@@ -143,26 +143,25 @@ void TestEndAndExitContainer(T & t, TLVType outerContainerType)
     EXPECT_EQ(t.GetContainerType(), outerContainerType);
 }
 
-#define TEST_GET(s, type, tag, expectedVal, expectedErr)                                                                  \
+#define TEST_GET(s, type, tag, expectedVal, expectedErr)                                                                           \
     do                                                                                                                             \
     {                                                                                                                              \
-        EXPECT_EQ(s.GetType(), type);                                                                              \
-        EXPECT_EQ(s.GetTag(), tag);                                                                                \
-        EXPECT_EQ(s.GetLength(), 0u);                                                                               \
+        EXPECT_EQ(s.GetType(), type);                                                                                              \
+        EXPECT_EQ(s.GetTag(), tag);                                                                                                \
+        EXPECT_EQ(s.GetLength(), 0u);                                                                                              \
                                                                                                                                    \
         decltype(expectedVal) __val;                                                                                               \
         CHIP_ERROR __err = s.Get(__val);                                                                                           \
-        EXPECT_EQ(__err, expectedErr);                                                                             \
+        EXPECT_EQ(__err, expectedErr);                                                                                             \
         if (__err == CHIP_NO_ERROR)                                                                                                \
         {                                                                                                                          \
-            EXPECT_EQ(__val, expectedVal);                                                                         \
+            EXPECT_EQ(__val, expectedVal);                                                                                         \
         }                                                                                                                          \
     } while (false)
 
 #define TEST_GET_NOERROR(s, type, tag, expectedVal) TEST_GET(s, type, tag, expectedVal, CHIP_NO_ERROR)
 
-void ForEachElement(TLVReader & reader, void * context,
-                    void (*cb)(TLVReader & reader, void * context))
+void ForEachElement(TLVReader & reader, void * context, void (*cb)(TLVReader & reader, void * context))
 {
     CHIP_ERROR err;
 
@@ -276,8 +275,7 @@ void TestDupBytes(TLVReader & reader, Tag tag, const uint8_t * expectedVal, uint
     chip::Platform::MemoryFree(val);
 }
 
-void TestBufferContents(const System::PacketBufferHandle & buffer, const uint8_t * expectedVal,
-                        uint32_t expectedLen)
+void TestBufferContents(const System::PacketBufferHandle & buffer, const uint8_t * expectedVal, uint32_t expectedLen)
 {
     System::PacketBufferHandle buf = buffer.Retain();
     while (!buf.IsNull())
@@ -727,12 +725,9 @@ void ReadEncoding1(TLVReader & reader)
             TEST_GET_NOERROR(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<int32_t>(42));
             TEST_GET_NOERROR(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<int64_t>(42));
             TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint8_t>(42), CHIP_ERROR_WRONG_TLV_TYPE);
-            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint16_t>(42),
-                     CHIP_ERROR_WRONG_TLV_TYPE);
-            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint32_t>(42),
-                     CHIP_ERROR_WRONG_TLV_TYPE);
-            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint64_t>(42),
-                     CHIP_ERROR_WRONG_TLV_TYPE);
+            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint16_t>(42), CHIP_ERROR_WRONG_TLV_TYPE);
+            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint32_t>(42), CHIP_ERROR_WRONG_TLV_TYPE);
+            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint64_t>(42), CHIP_ERROR_WRONG_TLV_TYPE);
 
             TestNext<TLVReader>(reader3);
 
@@ -740,8 +735,7 @@ void ReadEncoding1(TLVReader & reader)
             TEST_GET_NOERROR(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<int16_t>(-17));
             TEST_GET_NOERROR(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<int32_t>(-17));
             TEST_GET_NOERROR(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<int64_t>(-17));
-            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint64_t>(-17),
-                     CHIP_ERROR_WRONG_TLV_TYPE);
+            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint64_t>(-17), CHIP_ERROR_WRONG_TLV_TYPE);
 
             TestNext<TLVReader>(reader3);
 
@@ -811,8 +805,7 @@ void ReadEncoding1(TLVReader & reader)
         TestNext<TLVReader>(reader2);
 
         TEST_GET_NOERROR(reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), 17.9f);
-        TEST_GET_NOERROR(reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535),
-                         static_cast<double>(17.9f));
+        TEST_GET_NOERROR(reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), static_cast<double>(17.9f));
 
         TestNext<TLVReader>(reader2);
 
@@ -1131,8 +1124,7 @@ void AppendEncoding2(uint8_t * buf, uint32_t dataLen, uint32_t maxLen, uint32_t 
  * <TestProfile_1, 1, kTLVType_Structure, <TestProfile_1, 2, true> <TestProfile_2, 2, false> >,
  * <TestProfile_2, 1, kTLVType_Structure, <TestProfile_2, 2, false> <TestProfile_1, 2, true> >
  */
-void FindAppendEncoding2(uint8_t * buf, uint32_t dataLen, uint32_t maxLen, uint32_t & updatedLen,
-                         bool findContainer)
+void FindAppendEncoding2(uint8_t * buf, uint32_t dataLen, uint32_t maxLen, uint32_t & updatedLen, bool findContainer)
 {
     CHIP_ERROR err;
 
@@ -2443,7 +2435,8 @@ TEST_F(TestTLV, CheckCircularTLVBufferEvictStraddlingEvent)
 
     WriteEncoding3(writer);
 
-    EXPECT_EQ(writer.GetLengthWritten(), (8u * 11 + 7)); // 8 writes of Encoding3 (11 bytes each) and 7 bytes for the initial boolean.
+    EXPECT_EQ(writer.GetLengthWritten(),
+              (8u * 11 + 7)); // 8 writes of Encoding3 (11 bytes each) and 7 bytes for the initial boolean.
     EXPECT_EQ(buffer.DataLength(), 22u);
     EXPECT_EQ((buffer.DataLength() + context->mEvictedBytes), writer.GetLengthWritten());
     EXPECT_EQ(context->mEvictionCount, 7);
@@ -3471,10 +3464,8 @@ void TestTLVReaderDup()
             TEST_GET_NOERROR(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<int16_t>(42));
             TEST_GET_NOERROR(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<int32_t>(42));
             TEST_GET_NOERROR(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<int64_t>(42));
-            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint32_t>(42),
-                     CHIP_ERROR_WRONG_TLV_TYPE);
-            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint64_t>(42),
-                     CHIP_ERROR_WRONG_TLV_TYPE);
+            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint32_t>(42), CHIP_ERROR_WRONG_TLV_TYPE);
+            TEST_GET(reader3, kTLVType_SignedInteger, AnonymousTag(), static_cast<uint64_t>(42), CHIP_ERROR_WRONG_TLV_TYPE);
 
             TestNext<TLVReader>(reader3);
 
@@ -3551,8 +3542,7 @@ void TestTLVReaderDup()
         TestNext<TLVReader>(reader2);
 
         TEST_GET_NOERROR(reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), 17.9f);
-        TEST_GET_NOERROR(reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535),
-                         static_cast<double>(17.9f));
+        TEST_GET_NOERROR(reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), static_cast<double>(17.9f));
 
         TestNext<TLVReader>(reader2);
 
@@ -3739,13 +3729,11 @@ void TestTLVReaderInPractice()
 
     TestNext<TLVReader>(reader);
 
-    TEST_GET_NOERROR(reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL),
-                     static_cast<int64_t>(12345));
+    TEST_GET_NOERROR(reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL), static_cast<int64_t>(12345));
 
     TestNext<TLVReader>(reader);
 
-    TEST_GET_NOERROR(reader, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_1, 4000000000ULL),
-                     static_cast<float>(1.0));
+    TEST_GET_NOERROR(reader, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_1, 4000000000ULL), static_cast<float>(1.0));
 }
 
 void TestTLVReader_NextOverContainer_ProcessElement(TLVReader & reader, void * context)
@@ -4879,7 +4867,8 @@ TEST_F(TestTLV, TestUninitializedWriter)
         TLVWriter writer;
         TLVType outerContainerType;
 
-        EXPECT_EQ(writer.StartContainer(ContextTag(1), TLVType::kTLVType_Structure, outerContainerType), CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(writer.StartContainer(ContextTag(1), TLVType::kTLVType_Structure, outerContainerType),
+                  CHIP_ERROR_INCORRECT_STATE);
     }
 
     {
@@ -4911,8 +4900,9 @@ TEST_F(TestTLV, TestUninitializedWriter)
     {
         uint8_t buf[]{ 0, 0, 0 };
         TLVWriter writer;
-        EXPECT_EQ(writer.PutPreEncodedContainer(ContextTag(1), TLVType::kTLVType_Structure, buf,
-                                                     static_cast<uint32_t>(sizeof(buf))), CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(
+            writer.PutPreEncodedContainer(ContextTag(1), TLVType::kTLVType_Structure, buf, static_cast<uint32_t>(sizeof(buf))),
+            CHIP_ERROR_INCORRECT_STATE);
     }
 
     {
