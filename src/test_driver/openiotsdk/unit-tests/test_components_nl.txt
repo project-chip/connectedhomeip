@@ -1,5 +1,4 @@
 AppTests
-ASN1Tests
 BDXTests
 ChipCryptoTests
 CoreTests
