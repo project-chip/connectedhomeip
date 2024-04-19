@@ -4,6 +4,7 @@ ASN1Tests
 MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
 CoreTests
+MdnsTests
 PlatformTests
 TestShell
 SetupPayloadTests
