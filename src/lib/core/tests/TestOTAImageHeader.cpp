@@ -72,7 +72,7 @@ const uint8_t kMinOtaImageWithoutVendor[] = { 0x1e, 0xf1, 0xee, 0x1b, 0x44, 0x00
 class TestOTAImageHeader : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite() { VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR); }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
