@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <optional>
+
 namespace chip {
 namespace Platform {
 
