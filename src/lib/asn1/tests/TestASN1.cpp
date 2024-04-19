@@ -369,9 +369,13 @@ TEST(TestASN1, ASN1UniversalTime)
         ASN1UniversalTime result;
 
         EXPECT_EQ(result.ImportFrom_ASN1_TIME_string(testStr), CHIP_NO_ERROR);
-        EXPECT_TRUE(result.Year == testCase.asn1Time.Year && result.Month == testCase.asn1Time.Month &&
-                    result.Day == testCase.asn1Time.Day && result.Hour == testCase.asn1Time.Hour &&
-                    result.Minute == testCase.asn1Time.Minute && result.Second == testCase.asn1Time.Second);
+
+        EXPECT_EQ(result.Year, testCase.asn1Time.Year);
+        EXPECT_EQ(result.Month, testCase.asn1Time.Month);
+        EXPECT_EQ(result.Day, testCase.asn1Time.Day);
+        EXPECT_EQ(result.Hour, testCase.asn1Time.Hour);
+        EXPECT_EQ(result.Minute, testCase.asn1Time.Minute);
+        EXPECT_EQ(result.Second, testCase.asn1Time.Second);
 
         char buf[ASN1UniversalTime::kASN1TimeStringMaxLength];
         MutableCharSpan resultTimeStr(buf);
