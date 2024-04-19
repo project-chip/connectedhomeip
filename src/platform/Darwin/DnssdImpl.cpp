@@ -30,7 +30,7 @@
 
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
-using namespace chip::DeviceLayer;
+using namespace chip::Platform;
 
 namespace {
 
@@ -39,7 +39,7 @@ constexpr char kLocalDot[] = "local.";
 constexpr char kSRPDot[] = "default.service.arpa.";
 
 // The extra time in milliseconds that we will wait for the resolution on the SRP domain to complete.
-constexpr uint16_t kSRPTimeoutInMsec = 3000;
+constexpr uint16_t kSRPTimeoutInMsec = 250;
 
 constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
 constexpr DNSServiceFlags kBrowseFlags          = kDNSServiceFlagsShareConnection;
@@ -81,11 +81,8 @@ CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
     // Check to see if a user default value exists for the SRP timeout. If it does, override the timeoutInMSecs with user default
     // value. To override the timeout value, use ` defaults write org.csa-iot.matter.darwin SRPTimeoutInMSecsOverride
     // <timeoutinMsecs>` See UserDefaults.mm for details.
-    uint16_t userDefaultSRPTimeoutInMsecs = getUserDefaultDnssdSRPTimeoutInMSecs();
-    if (userDefaultSRPTimeoutInMsecs)
-    {
-        timeoutInMSecs = userDefaultSRPTimeoutInMsecs;
-    }
+    timeoutInMSecs =  GetUserDefaultDnssdSRPTimeoutInMSecs().value_or(timeoutInMSecs);
+
     VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(Discovery, "Starting timer to wait for %d milliseconds for possible SRP resolve results for %s", timeoutInMSecs,
                     ctx->instanceName.c_str());

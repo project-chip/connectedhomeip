@@ -17,9 +17,9 @@
 #pragma once
 
 namespace chip {
-namespace DeviceLayer {
+namespace Platform {
 
-uint16_t GetUserDefaultDnssdSRPTimeoutInMSecs();
+std::optional<uint16_t> GetUserDefaultDnssdSRPTimeoutInMSecs();
 
-} // namespace DeviceLayer
+} // namespace Platform
 } // namespace chip
