@@ -18,7 +18,6 @@
 #include <lib/format/protocol_decoder.h>
 #include <lib/support/StringBuilder.h>
 
-
 #include <tlv/meta/clusters_meta.h>
 #include <tlv/meta/protocols_meta.h>
 
@@ -57,8 +56,7 @@ const std::array<const Node<ItemInfo>, 53 + 2> fake_protocols_meta = { {
     { 2, _FakeProtocolData },
 } };
 
-void TestSampleData(const PayloadDecoderInitParams & params, const SamplePayload & data,
-                    const char * expectation)
+void TestSampleData(const PayloadDecoderInitParams & params, const SamplePayload & data, const char * expectation)
 {
     chip::Decoders::PayloadDecoder<64, 128> decoder(
         PayloadDecoderInitParams(params).SetProtocol(data.protocolId).SetMessageType(data.messageType));

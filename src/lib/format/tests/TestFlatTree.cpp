@@ -18,7 +18,6 @@
 
 #include <lib/core/TLVTags.h>
 
-
 #include <array>
 
 #include <string.h>

@@ -19,7 +19,6 @@
 
 #include <lib/core/TLVTags.h>
 
-
 #include <array>
 #include <vector>
 
@@ -94,15 +93,15 @@ private:
 };
 
 #define ASSERT_HAS_NAME(p, n)                                                                                                      \
-    EXPECT_NE(p.Get(), nullptr);                                                                                   \
+    EXPECT_NE(p.Get(), nullptr);                                                                                                   \
     EXPECT_EQ(strcmp(p.Get()->name, n), 0)
 
 #define ASSERT_HAS_CONTEXT_TAG(p, t)                                                                                               \
-    EXPECT_NE(p.Get(), nullptr);                                                                                   \
+    EXPECT_NE(p.Get(), nullptr);                                                                                                   \
     EXPECT_EQ(p.Get()->tag, ContextTag(t))
 
 #define ASSERT_HAS_PROFILE_TAG(p, a, b)                                                                                            \
-    EXPECT_NE(p.Get(), nullptr);                                                                                   \
+    EXPECT_NE(p.Get(), nullptr);                                                                                                   \
     EXPECT_EQ(p.Get()->tag, ProfileTag(a, b))
 
 template <size_t N>
