@@ -46,7 +46,7 @@ TEST (TestQName, IteratorTest)
         SerializedQNameIterator it      = AsSerializedQName(kOneItem);
 
         EXPECT_TRUE(it.Next());
-        EXPECT_FALSE(strcmp(it.Value(), "test"));
+        EXPECT_STREQ(it.Value(), "test");
         EXPECT_FALSE(it.Next());
         EXPECT_TRUE(it.IsValid());
     }
@@ -56,16 +56,16 @@ TEST (TestQName, IteratorTest)
         SerializedQNameIterator it        = AsSerializedQName(kManyItems);
 
         EXPECT_TRUE(it.Next());
-        EXPECT_FALSE(strcmp(it.Value(), "this"));
+        EXPECT_STREQ(it.Value(), "this");
 
         EXPECT_TRUE(it.Next());
-        EXPECT_FALSE(strcmp(it.Value(), "is"));
+        EXPECT_STREQ(it.Value(), "is");
 
         EXPECT_TRUE(it.Next());
-        EXPECT_FALSE(strcmp(it.Value(), "a"));
+        EXPECT_STREQ(it.Value(), "a");
 
         EXPECT_TRUE(it.Next());
-        EXPECT_FALSE(strcmp(it.Value(), "test"));
+        EXPECT_STREQ(it.Value(), "test");
 
         EXPECT_FALSE(it.Next());
         EXPECT_TRUE(it.IsValid());
@@ -75,16 +75,16 @@ TEST (TestQName, IteratorTest)
         SerializedQNameIterator it(BytesRange(kPtrItems, kPtrItems + sizeof(kPtrItems)), kPtrItems + 14);
 
         EXPECT_TRUE(it.Next());
-        EXPECT_FALSE(strcmp(it.Value(), "this"));
+        EXPECT_STREQ(it.Value(), "this");
 
         EXPECT_TRUE(it.Next());
-        EXPECT_FALSE(strcmp(it.Value(), "is"));
+        EXPECT_STREQ(it.Value(), "is");
 
         EXPECT_TRUE(it.Next());
-        EXPECT_FALSE(strcmp(it.Value(), "a"));
+        EXPECT_STREQ(it.Value(), "a");
 
         EXPECT_TRUE(it.Next());
-        EXPECT_FALSE(strcmp(it.Value(), "test"));
+        EXPECT_STREQ(it.Value(), "test");
 
         EXPECT_FALSE(it.Next());
         EXPECT_TRUE(it.IsValid());

@@ -17,9 +17,7 @@
  */
 
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
-//#include <lib/support/UnitTestRegistration.h>
 
-//#include <nlunit-test.h>
 #include <gtest/gtest.h>
 
 namespace {
@@ -28,7 +26,6 @@ using namespace mdns::Minimal;
 using namespace chip::Encoding::BigEndian;
 
 
-//void BasicWriteTest(nlTestSuite * inSuite, void * inContext)
 TEST (TestRecordWriter, BasicWriteTest)
 {
     const QNamePart kName1[] = { "some", "name" };
@@ -59,7 +56,6 @@ TEST (TestRecordWriter, BasicWriteTest)
     EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
 
-//void SimpleDedup(nlTestSuite * inSuite, void * inContext)
 TEST (TestRecordWriter, SimpleDedup)
 {
     const QNamePart kName1[] = { "some", "name" };
@@ -88,7 +84,6 @@ TEST (TestRecordWriter, SimpleDedup)
     EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
 
-//void ComplexDedup(nlTestSuite * inSuite, void * inContext)
 TEST (TestRecordWriter, ComplexDedup)
 {
     const QNamePart kName1[] = { "some", "name" };
@@ -134,7 +129,6 @@ TEST (TestRecordWriter, ComplexDedup)
     EXPECT_EQ(memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)), 0);
 }
 
-//void TonsOfReferences(nlTestSuite * inSuite, void * inContext)
 TEST (TestRecordWriter, TonsOfReferences)
 {
     const QNamePart kName1[] = { "some", "name" };
@@ -170,37 +164,3 @@ TEST (TestRecordWriter, TonsOfReferences)
 }
 
 } // namespace
-
-// clang-format off
-
-/* static const nlTest sTests[] =
-{
-    NL_TEST_DEF("BasicWriteTest", BasicWriteTest),
-    NL_TEST_DEF("SimpleDedup", SimpleDedup),
-    NL_TEST_DEF("ComplexDedup", ComplexDedup),
-    NL_TEST_DEF("TonsOfReferences", TonsOfReferences),
-
-    NL_TEST_SENTINEL()
-}; */
-
-// clang-format on
-/*
-int TestRecordWriter()
-{
-    // clang-format off
-    nlTestSuite theSuite =
-    {
-        "RecordWriter",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
-}*/
-/*
-CHIP_REGISTER_TEST_SUITE(TestRecordWriter)
-*/
