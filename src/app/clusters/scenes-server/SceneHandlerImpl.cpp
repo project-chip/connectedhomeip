@@ -17,25 +17,26 @@
 
 #include <app/clusters/scenes-server/SceneHandlerImpl.h>
 #include <app/util/endpoint-config-api.h>
+#include <app/util/odd-sized-integers.h>
 
 namespace chip {
 namespace scenes {
 
 namespace {
 
+template <int ByteSize, bool IsSigned>
+using OddSizedInteger        = app::OddSizedInteger<ByteSize, IsSigned>;
 using ConcreteAttributePath  = app::ConcreteAttributePath;
 using AttributeValuePairType = app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type;
 
-/// ConvertByteArrayToUInt64
-/// @brief Helper function to convert a byte array to a uint64_t value
+/// ConvertDefaultValueToWorkingValue
+/// @brief Helper function to convert a byte array to a value of the given type.
 /// @param EmberAfDefaultAttributeValue & defaultValue
-/// @param len Length of the byte array
-/// @return uint64_t or int64_t Value
-/// @note The attribute table supports 8 bytes only for unsigned integers, 4 bytes is the maximum for signed integers
+/// @return Value converted to the given working type
 template <typename Type>
-Type ConvertByteArrayToType(const EmberAfDefaultAttributeValue & defaultValue, uint16_t len)
+Type ConvertDefaultValueToWorkingValue(const EmberAfDefaultAttributeValue & defaultValue)
 {
-    if (len <= 2)
+    if (sizeof(Type) <= 2)
     {
         return static_cast<Type>(defaultValue.defaultValue);
     }
@@ -56,32 +57,38 @@ Type ConvertByteArrayToType(const EmberAfDefaultAttributeValue & defaultValue, u
 template <typename Type>
 void CapAttributeID(AttributeValuePairType & aVPair, const EmberAfAttributeMetadata * metadata)
 {
-    // Calculate the maximum value that can be represented with the given number of bytes
-    Type maxValue = 0;
+    using IntType     = app::NumericAttributeTraits<Type, CHIP_CONFIG_BIG_ENDIAN_TARGET>;
+    using WorkingType = typename IntType::WorkingType;
+
+    WorkingType maxValue;
+
+    if (metadata->IsBoolean())
+    {
+        aVPair.attributeValue = aVPair.attributeValue ? 1 : 0;
+        return;
+    }
 
     // Check if the attribute type is signed
     if (metadata->IsSignedIntegerAttribute())
     {
-        maxValue = static_cast<Type>((1ULL << (emberAfAttributeSize(metadata) * 8 - 1)) - 1);
+        maxValue = static_cast<WorkingType>((1ULL << (emberAfAttributeSize(metadata) * 8 - 1)) - 1);
     }
     else
     {
-        maxValue = static_cast<Type>((1ULL << (emberAfAttributeSize(metadata) * 8)) - 1);
+        maxValue = static_cast<WorkingType>((1ULL << (emberAfAttributeSize(metadata) * 8)) - 1);
     }
 
     // Check metadata for min and max values
     if (metadata->HasMinMax())
     {
         const EmberAfAttributeMinMaxValue * minMaxValue = metadata->defaultValue.ptrToMinMaxValue;
-        Type minVal = ConvertByteArrayToType<Type>(minMaxValue->minValue, emberAfAttributeSize(metadata));
-        Type maxVal = ConvertByteArrayToType<Type>(minMaxValue->maxValue, emberAfAttributeSize(metadata));
+        WorkingType minVal                              = ConvertDefaultValueToWorkingValue<WorkingType>(minMaxValue->minValue);
+        WorkingType maxVal                              = ConvertDefaultValueToWorkingValue<WorkingType>(minMaxValue->maxValue);
 
         // Cap based on minimum value
-        if (minVal > static_cast<Type>(aVPair.attributeValue))
+        if (minVal > static_cast<WorkingType>(aVPair.attributeValue))
         {
-            uint64_t sValue = 0;
-            memcpy(&sValue, &minVal, sizeof(Type));
-            aVPair.attributeValue = app::NumericAttributeTraits<uint64_t>::StorageToWorking(sValue);
+            aVPair.attributeValue = static_cast<std::make_unsigned_t<WorkingType>>(minVal);
             // We assume the max is >= min therefore we can return
             return;
         }
@@ -98,18 +105,14 @@ void CapAttributeID(AttributeValuePairType & aVPair, const EmberAfAttributeMetad
     {
         if (static_cast<int64_t>(aVPair.attributeValue) > static_cast<int64_t>(maxValue))
         {
-            uint64_t sValue = 0;
-            memcpy(&sValue, &maxValue, sizeof(Type));
-            aVPair.attributeValue = app::NumericAttributeTraits<uint64_t>::StorageToWorking(sValue);
+            aVPair.attributeValue = static_cast<std::make_unsigned_t<WorkingType>>(maxValue);
         }
     }
     else
     {
-        if (static_cast<uint64_t>(aVPair.attributeValue) > static_cast<uint64_t>(maxValue))
+        if (aVPair.attributeValue > static_cast<uint64_t>(maxValue))
         {
-            uint64_t sValue = 0;
-            memcpy(&sValue, &maxValue, sizeof(Type));
-            aVPair.attributeValue = app::NumericAttributeTraits<uint64_t>::StorageToWorking(sValue);
+            aVPair.attributeValue = static_cast<std::make_unsigned_t<WorkingType>>(maxValue);
         }
     }
 }
@@ -134,15 +137,32 @@ CHIP_ERROR ValidateAttributePath(EndpointId endpoint, ClusterId cluster, Attribu
 
     switch (metadata->attributeType)
     {
+    case ZCL_BOOLEAN_ATTRIBUTE_TYPE:
+    case ZCL_BITMAP8_ATTRIBUTE_TYPE:
     case ZCL_INT8U_ATTRIBUTE_TYPE:
         CapAttributeID<uint8_t>(aVPair, metadata);
         break;
+    case ZCL_BITMAP16_ATTRIBUTE_TYPE:
     case ZCL_INT16U_ATTRIBUTE_TYPE:
         CapAttributeID<uint16_t>(aVPair, metadata);
         break;
+    case ZCL_INT24U_ATTRIBUTE_TYPE:
+        CapAttributeID<OddSizedInteger<3, false>>(aVPair, metadata);
+        break;
+    case ZCL_BITMAP32_ATTRIBUTE_TYPE:
     case ZCL_INT32U_ATTRIBUTE_TYPE:
         CapAttributeID<uint32_t>(aVPair, metadata);
         break;
+    case ZCL_INT40U_ATTRIBUTE_TYPE:
+        CapAttributeID<OddSizedInteger<5, false>>(aVPair, metadata);
+        break;
+    case ZCL_INT48U_ATTRIBUTE_TYPE:
+        CapAttributeID<OddSizedInteger<6, false>>(aVPair, metadata);
+        break;
+    case ZCL_INT56U_ATTRIBUTE_TYPE:
+        CapAttributeID<OddSizedInteger<7, false>>(aVPair, metadata);
+        break;
+    case ZCL_BITMAP64_ATTRIBUTE_TYPE:
     case ZCL_INT64U_ATTRIBUTE_TYPE:
         CapAttributeID<uint64_t>(aVPair, metadata);
         break;
@@ -152,8 +172,20 @@ CHIP_ERROR ValidateAttributePath(EndpointId endpoint, ClusterId cluster, Attribu
     case ZCL_INT16S_ATTRIBUTE_TYPE: // fallthrough
         CapAttributeID<int16_t>(aVPair, metadata);
         break;
+    case ZCL_INT24S_ATTRIBUTE_TYPE:
+        CapAttributeID<OddSizedInteger<3, true>>(aVPair, metadata);
+        break;
     case ZCL_INT32S_ATTRIBUTE_TYPE:
         CapAttributeID<int32_t>(aVPair, metadata);
+        break;
+    case ZCL_INT40S_ATTRIBUTE_TYPE:
+        CapAttributeID<OddSizedInteger<5, true>>(aVPair, metadata);
+        break;
+    case ZCL_INT48S_ATTRIBUTE_TYPE:
+        CapAttributeID<OddSizedInteger<6, true>>(aVPair, metadata);
+        break;
+    case ZCL_INT56S_ATTRIBUTE_TYPE:
+        CapAttributeID<OddSizedInteger<7, true>>(aVPair, metadata);
         break;
     case ZCL_INT64S_ATTRIBUTE_TYPE:
         CapAttributeID<int64_t>(aVPair, metadata);

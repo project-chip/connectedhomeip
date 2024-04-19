@@ -755,7 +755,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
                    CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint1, kOnOffClusterId, buff_span, extensionFieldValueCapOut));
 
     // Verify that the output value is capped
-    NL_TEST_ASSERT(aSuite, extensionFieldValueCapOut.attributeValueList[0].attributeValue == 0x00FFFFFF);
+    NL_TEST_ASSERT(aSuite, extensionFieldValueCapOut.attributeValueList[0].attributeValue == 0x007FFFFF);
 
     // Clear buffer
     memset(buffer, 0, buff_span.size());
