@@ -1,7 +1,5 @@
 /*
- *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,9 +14,15 @@
  *    limitations under the License.
  */
 
-#include "Globals.h"
+#pragma once
 
-#if (LED_ENABLE == 1)
-LED_Handle sAppRedHandle;
-LED_Handle sAppGreenHandle;
-#endif
+#include <cstdint>
+#include <optional>
+
+namespace chip {
+namespace Platform {
+
+std::optional<uint16_t> GetUserDefaultDnssdSRPTimeoutInMSecs();
+
+} // namespace Platform
+} // namespace chip

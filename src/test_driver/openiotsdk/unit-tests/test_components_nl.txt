@@ -14,6 +14,5 @@ RetransmitTests
 SecureChannelTests
 SetupPayloadTests
 SupportTests
-SystemLayerTests
 TransportLayerTests
 UserDirectedCommissioningTests
