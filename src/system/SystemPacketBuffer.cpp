@@ -515,6 +515,21 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     // Setting a static upper bound on the maximum buffer size allocation for regular sized messages (not large).
     static_assert(PacketBuffer::kMaxSizeWithoutReserve <= UINT16_MAX, "kMaxSizeWithoutReserve should not exceed UINT16_MAX.");
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Setting a static upper bound on the maximum buffer size allocation for
+    // large messages.
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // LwIP based systems are internally limited to using a u16_t type as the size of a buffer.
+    static_assert(PacketBuffer::kLargeBufMaxSizeWithoutReserve <= UINT16_MAX,
+                  "In LwIP, max size for Large payload buffers cannot exceed UINT16_MAX!");
+#else
+    // Messages over TCP are framed using a length field that is 32 bits in
+    // length.
+    static_assert(PacketBuffer::kLargeBufMaxSizeWithoutReserve <= UINT32_MAX,
+                  "Max size for Large payload buffers cannot exceed UINT32_MAX");
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     // Ensure that aAvailableSize is bound within a max and is not big enough to cause overflow during
     // subsequent addition of all the sizes.
     if (aAvailableSize > UINT32_MAX)
@@ -547,7 +562,14 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // LwIP based APIs have a maximum buffer size of UINT16_MAX. Ensure that
     // limit is met during allocation.
-    VerifyOrDieWithMsg(sumOfAvailAndReserved < UINT16_MAX, chipSystemLayer, "LwIP based systems can handle only up to UINT16_MAX!");
+    if (sumOfAvailAndReserved > UINT16_MAX)
+    {
+        ChipLogError(chipSystemLayer,
+                     "LwIP based systems require total buffer size to be less than UINT16_MAX!."
+                     "Attempted allocation size = " ChipLogFormatX64,
+                     ChipLogValueX64(sumOfAvailAndReserved));
+        return PacketBufferHandle();
+    }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // sumOfAvailAndReserved is no larger than sumOfSizes, which we checked can be cast to
@@ -557,7 +579,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return PacketBufferHandle());
 
-    if (lAllocSize > PacketBuffer::kMaxSizeWithoutReserve)
+    if (lAllocSize > PacketBuffer::kMaxAllocSize)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: allocation exceeding buffer capacity limits.");
         return PacketBufferHandle();
@@ -621,11 +643,6 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aDataSize, size_t aAdditionalSize,
                                                    uint16_t aReservedSize)
 {
-    if (aDataSize > UINT16_MAX)
-    {
-        ChipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
-        return PacketBufferHandle();
-    }
     // Since `aDataSize` fits in uint16_t, the sum `aDataSize + aAdditionalSize` will not overflow.
     // `New()` will only return a non-null buffer if the total allocation size does not overflow.
     PacketBufferHandle buffer = New(aDataSize + aAdditionalSize, aReservedSize);
@@ -633,6 +650,8 @@ PacketBufferHandle PacketBufferHandle::NewWithData(const void * aData, size_t aD
     {
         memcpy(buffer.mBuffer->payload, aData, aDataSize);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+        // Checks in the New() call catch buffer allocations greater
+        // than UINT16_MAX for LwIP based platforms.
         buffer.mBuffer->len = buffer.mBuffer->tot_len = static_cast<uint16_t>(aDataSize);
 #else
         buffer.mBuffer->len = buffer.mBuffer->tot_len = aDataSize;
@@ -755,18 +774,18 @@ PacketBufferHandle PacketBufferHandle::CloneData() const
         size_t originalDataSize       = original->MaxDataLength();
         uint16_t originalReservedSize = original->ReservedSize();
 
-        if (originalDataSize + originalReservedSize > PacketBuffer::kMaxSizeWithoutReserve)
+        if (originalDataSize + originalReservedSize > PacketBuffer::kMaxAllocSize)
         {
             // The original memory allocation may have provided a larger block than requested (e.g. when using a shared pool),
             // and in particular may have provided a larger block than we are able to request from PackBufferHandle::New().
             // It is a genuine error if that extra space has been used.
-            if (originalReservedSize + original->DataLength() > PacketBuffer::kMaxSizeWithoutReserve)
+            if (originalReservedSize + original->DataLength() > PacketBuffer::kMaxAllocSize)
             {
                 return PacketBufferHandle();
             }
             // Otherwise, reduce the requested data size. This subtraction can not underflow because the above test
-            // guarantees originalReservedSize <= PacketBuffer::kMaxSizeWithoutReserve.
-            originalDataSize = PacketBuffer::kMaxSizeWithoutReserve - originalReservedSize;
+            // guarantees originalReservedSize <= PacketBuffer::kMaxAllocSize.
+            originalDataSize = PacketBuffer::kMaxAllocSize - originalReservedSize;
         }
 
         PacketBufferHandle clone = PacketBufferHandle::New(originalDataSize, originalReservedSize);
