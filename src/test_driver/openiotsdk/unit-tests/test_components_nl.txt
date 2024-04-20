@@ -8,13 +8,10 @@ InetLayerTests
 MdnsTests
 MessagingLayerTests
 MinimalMdnsCoreTests
-MinimalMdnsRecordsTests
-MinimalMdnsRespondersTests
 RawTransportTests
 RetransmitTests
 SecureChannelTests
 SetupPayloadTestsNL
 SupportTests
-SystemLayerTests
 TransportLayerTests
 UserDirectedCommissioningTests
