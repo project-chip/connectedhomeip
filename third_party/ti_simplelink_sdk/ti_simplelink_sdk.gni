@@ -305,8 +305,8 @@ template("ti_simplelink_sdk") {
     configs -= [ "${build_root}/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
+      "${chip_root}/src/platform/cc13xx_26xx/memory.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/memory.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/mqueue.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_barrier.c",
@@ -521,8 +521,8 @@ template("ti_simplelink_sdk") {
       ]
 
       sources = [
+        "${chip_root}/src/platform/cc13xx_26xx/TI_heap_wrapper.c",
         "${chip_root}/src/platform/cc13xx_26xx/chipOBleProfile.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/TI_heap_wrapper.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/bget.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/ble_remote_display/stack/osal_icall_ble.c",
