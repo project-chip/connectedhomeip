@@ -1,5 +1,4 @@
 AppTests
-ASN1Tests
 BDXTests
 ChipCryptoTests
 CoreTests
@@ -9,14 +8,10 @@ InetLayerTests
 MdnsTests
 MessagingLayerTests
 MinimalMdnsCoreTests
-MinimalMdnsRecordsTests
-MinimalMdnsRespondersTests
 RawTransportTests
 RetransmitTests
 SecureChannelTests
 SetupPayloadTests
 SupportTests
-SystemLayerTests
-TestShell
 TransportLayerTests
 UserDirectedCommissioningTests

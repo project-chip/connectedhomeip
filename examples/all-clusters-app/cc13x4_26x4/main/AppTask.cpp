@@ -54,12 +54,6 @@
 #define APP_TASK_STACK_SIZE (5000)
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
-
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
-#define LED_ENABLE 0
-#else
-#define LED_ENABLE 1
-#endif
 #define BUTTON_ENABLE 1
 
 using namespace ::chip;
@@ -68,7 +62,6 @@ using namespace ::chip::DeviceLayer;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
-
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
