@@ -29,6 +29,7 @@ CHIP_ERROR ChipToolCheckInDelegate::Init(ICDClientStorage * storage, Interaction
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(engine != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mpStorage  = storage;
     mpImEngine = engine;
     return CHIP_NO_ERROR;
@@ -39,9 +40,9 @@ void ChipToolCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo
     ChipLogProgress(
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
-    for (auto handler : mCheckInCompleteCallbacks)
+    if (mpCheckInCompleteCallbacks != nullptr)
     {
-        handler->OnCheckInComplete(clientInfo);
+        mpCheckInCompleteCallbacks->OnCheckInComplete(clientInfo);
     }
 }
 
@@ -83,12 +84,12 @@ void ChipToolCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySend
     }
 }
 
-void ChipToolCheckInDelegate::RegisterOnCheckInCompleteCallback(CheckInCompleteCallback * handler)
+void ChipToolCheckInDelegate::SetOnCheckInCompleteCallback(CheckInCompleteCallback * handler)
 {
-    chip::DeviceLayer::SystemLayer().ScheduleLambda([this, handler]() { mCheckInCompleteCallbacks.insert(handler); });
+    mpCheckInCompleteCallbacks = handler;
 }
 
-void ChipToolCheckInDelegate::UnregisterOnCheckInCompleteCallback(CheckInCompleteCallback * handler)
+void ChipToolCheckInDelegate::UnsetOnCheckInCompleteCallback()
 {
-    chip::DeviceLayer::SystemLayer().ScheduleLambda([this, handler]() { mCheckInCompleteCallbacks.insert(handler); });
+    mpCheckInCompleteCallbacks = nullptr;
 }

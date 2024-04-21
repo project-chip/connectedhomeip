@@ -32,7 +32,7 @@ public:
     /**
      * @brief Callback used to let the application know that a check-in message was received and validated.
      *
-     * The callback will be executed in CHIP main loop. Implementations avoid blocking in this callback.
+     * The callback will be executed in CHIP main loop. Implementations should avoid blocking operations in this callback.
      *
      * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
      *                         node that sent the check-in message.
@@ -51,26 +51,24 @@ public:
     void OnKeyRefreshDone(chip::app::RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
     /**
-     * @brief Reigsters a callback when the check-in completes.
+     * @brief Sets a callback for when the Check-In processing completes.
      *
-     * The registeration will be processed inside CHIP main loop.
+     * This method does not consider the race condition that the callback is changed during OnCheckInComplete.
      *
-     * @param[in] handler - A pointer to CheckInCompleteCallback to register.
+     * @param[in] handler - A pointer to the CheckInCompleteCallback to register.
      */
-    void RegisterOnCheckInCompleteCallback(CheckInCompleteCallback * handler);
+    void SetOnCheckInCompleteCallback(CheckInCompleteCallback * handler);
 
     /**
-     * @brief Unreigsters a callback when the check-in completes.
+     * @brief Unsets the callback for when the Check-In processing completes.
      *
-     * The unregisteration will be processed inside CHIP main loop.
-     *
-     * @param[in] handler - A pointer to CheckInCompleteCallback to unregister.
+     * This method does not consider the race condition that the callback is changed during OnCheckInComplete.
      */
-    void UnregisterOnCheckInCompleteCallback(CheckInCompleteCallback * handler);
+    void UnsetOnCheckInCompleteCallback();
 
 private:
     chip::app::ICDClientStorage * mpStorage        = nullptr;
     chip::app::InteractionModelEngine * mpImEngine = nullptr;
 
-    std::set<CheckInCompleteCallback *> mCheckInCompleteCallbacks;
+    CheckInCompleteCallback * mpCheckInCompleteCallbacks;
 };
