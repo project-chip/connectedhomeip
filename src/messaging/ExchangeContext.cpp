@@ -20,13 +20,6 @@
  *      This file implements the ExchangeContext class.
  *
  */
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
 
 #include <inttypes.h>
 #include <stdint.h>

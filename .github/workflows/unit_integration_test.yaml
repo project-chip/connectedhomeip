@@ -16,6 +16,8 @@ name: Unit / Integration Tests
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
@@ -37,8 +39,9 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:35
+            image: ghcr.io/project-chip/chip-build:47
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -49,6 +52,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
+                bootstrap-log-name: bootstrap-logs-unittest-${{ matrix.type }}
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1

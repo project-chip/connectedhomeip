@@ -38,21 +38,24 @@ shared_library("jni") {
   sources += [
     "App/app/src/main/jni/cpp/core/CastingApp-JNI.cpp",
     "App/app/src/main/jni/cpp/core/CastingApp-JNI.h",
-    "App/app/src/main/jni/cpp/core/CastingPlayer-JNI.cpp",
-    "App/app/src/main/jni/cpp/core/CastingPlayer-JNI.h",
     "App/app/src/main/jni/cpp/core/CastingPlayerDiscovery-JNI.cpp",
     "App/app/src/main/jni/cpp/core/CastingPlayerDiscovery-JNI.h",
-    "App/app/src/main/jni/cpp/support/CastingPlayerConverter-JNI.cpp",
-    "App/app/src/main/jni/cpp/support/CastingPlayerConverter-JNI.h",
-    "App/app/src/main/jni/cpp/support/ErrorConverter-JNI.cpp",
-    "App/app/src/main/jni/cpp/support/ErrorConverter-JNI.h",
+    "App/app/src/main/jni/cpp/core/MatterCastingPlayer-JNI.cpp",
+    "App/app/src/main/jni/cpp/core/MatterCastingPlayer-JNI.h",
+    "App/app/src/main/jni/cpp/core/MatterEndpoint-JNI.cpp",
+    "App/app/src/main/jni/cpp/core/MatterEndpoint-JNI.h",
+    "App/app/src/main/jni/cpp/support/Converters-JNI.cpp",
+    "App/app/src/main/jni/cpp/support/Converters-JNI.h",
+    "App/app/src/main/jni/cpp/support/MatterCallback-JNI.h",
     "App/app/src/main/jni/cpp/support/RotatingDeviceIdUniqueIdProvider-JNI.cpp",
     "App/app/src/main/jni/cpp/support/RotatingDeviceIdUniqueIdProvider-JNI.h",
   ]
 
   deps = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common",
+    "${chip_root}/src/app/data-model:heap",
     "${chip_root}/src/app/server/java:jni",
+    "${chip_root}/src/controller/java:android_chip_im_jni",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
   ]
@@ -70,6 +73,7 @@ android_library("java") {
   deps = [
     ":android",
     "${chip_root}/src/app/server/java",
+    "${chip_root}/src/controller/java:android_chip_im",
     "${chip_root}/src/platform/android:java",
     "${chip_root}/third_party/android_deps:annotation",
   ]
@@ -105,6 +109,7 @@ android_library("java") {
     "App/app/src/main/jni/com/matter/casting/core/CastingAppState.java",
     "App/app/src/main/jni/com/matter/casting/core/CastingPlayer.java",
     "App/app/src/main/jni/com/matter/casting/core/CastingPlayerDiscovery.java",
+    "App/app/src/main/jni/com/matter/casting/core/Endpoint.java",
     "App/app/src/main/jni/com/matter/casting/core/MatterCastingPlayer.java",
     "App/app/src/main/jni/com/matter/casting/core/MatterCastingPlayerDiscovery.java",
     "App/app/src/main/jni/com/matter/casting/support/AppParameters.java",
@@ -113,6 +118,7 @@ android_library("java") {
     "App/app/src/main/jni/com/matter/casting/support/DataProvider.java",
     "App/app/src/main/jni/com/matter/casting/support/DeviceTypeStruct.java",
     "App/app/src/main/jni/com/matter/casting/support/EndpointFilter.java",
+    "App/app/src/main/jni/com/matter/casting/support/MatterCallback.java",
     "App/app/src/main/jni/com/matter/casting/support/MatterError.java",
   ]
 
@@ -132,6 +138,7 @@ group("default") {
     ":java",
     ":jni",
     "${chip_root}/src/app/server/java",
+    "${chip_root}/src/controller/java:android_chip_im",
     "${chip_root}/src/platform/android:java",
   ]
 }

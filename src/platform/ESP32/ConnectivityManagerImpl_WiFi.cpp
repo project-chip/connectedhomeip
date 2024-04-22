@@ -46,7 +46,6 @@
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 using chip::DeviceLayer::Internal::ESP32Utils;
 
 namespace chip {
@@ -1119,8 +1118,8 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
         {
             uint8_t dig1               = (station_mac[i] & 0xF0) >> 4;
             uint8_t dig2               = station_mac[i] & 0x0F;
-            station_mac_str[2 * i]     = dig1 > 9 ? ('A' + dig1 - 0xA) : ('0' + dig1);
-            station_mac_str[2 * i + 1] = dig2 > 9 ? ('A' + dig2 - 0xA) : ('0' + dig2);
+            station_mac_str[2 * i]     = static_cast<char>(dig1 > 9 ? ('A' + dig1 - 0xA) : ('0' + dig1));
+            station_mac_str[2 * i + 1] = static_cast<char>(dig2 > 9 ? ('A' + dig2 - 0xA) : ('0' + dig2));
         }
         if (sEndpointQueueFilter.SetMdnsHostName(chip::CharSpan(station_mac_str)) == CHIP_NO_ERROR)
         {

@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app/InteractionModelEngine.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/icd/client/RefreshKeySender.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -25,11 +24,12 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage)
+CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage, InteractionModelEngine * engine)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mpStorage = storage;
+    mpStorage  = storage;
+    mpImEngine = engine;
     return CHIP_NO_ERROR;
 }
 
@@ -38,9 +38,6 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
     ChipLogProgress(
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-    InteractionModelEngine::GetInstance()->OnActiveModeNotification(clientInfo.peer_node);
-#endif
 }
 
 RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
@@ -55,7 +52,7 @@ RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
         return nullptr;
     }
 
-    auto refreshKeySender = Platform::New<RefreshKeySender>(this, clientInfo, clientStorage, newKey);
+    auto refreshKeySender = Platform::New<RefreshKeySender>(this, clientInfo, clientStorage, mpImEngine, newKey);
     if (refreshKeySender == nullptr)
     {
         return nullptr;

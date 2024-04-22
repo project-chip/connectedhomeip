@@ -139,6 +139,7 @@ action("build-darwin-framework") {
 config("config") {
   include_dirs = [
     ".",
+    "include",
     "${chip_root}/examples/common",
     "${chip_root}/examples/darwin-framework-tool/commands/common",
     "${chip_root}/zzz_generated/darwin-framework-tool",
@@ -192,6 +193,11 @@ executable("darwin-framework-tool") {
     "commands/common/MTRLogging.h",
     "commands/common/RemoteDataModelLogger.h",
     "commands/common/RemoteDataModelLogger.mm",
+    "commands/configuration/Commands.h",
+    "commands/configuration/ResetMRPParametersCommand.h",
+    "commands/configuration/ResetMRPParametersCommand.mm",
+    "commands/configuration/SetMRPParametersCommand.h",
+    "commands/configuration/SetMRPParametersCommand.mm",
     "commands/delay/Commands.h",
     "commands/delay/SleepCommand.h",
     "commands/delay/SleepCommand.mm",

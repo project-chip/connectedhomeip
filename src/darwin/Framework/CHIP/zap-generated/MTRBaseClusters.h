@@ -4491,9 +4491,7 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * Request the end device to stay in Active Mode for an additional ActiveModeThreshold
  */
-- (void)stayActiveRequestWithParams:(MTRICDManagementClusterStayActiveRequestParams * _Nullable)params completion:(void (^)(MTRICDManagementClusterStayActiveResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)stayActiveRequestWithCompletion:(void (^)(MTRICDManagementClusterStayActiveResponseParams * _Nullable data, NSError * _Nullable error))completion
-    MTR_PROVISIONALLY_AVAILABLE;
+- (void)stayActiveRequestWithParams:(MTRICDManagementClusterStayActiveRequestParams *)params completion:(void (^)(MTRICDManagementClusterStayActiveResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeIdleModeDurationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeIdleModeDurationWithParams:(MTRSubscribeParams *)params
@@ -10204,7 +10202,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * The Step command speeds up or slows down the fan, in steps.
  */
-- (void)stepWithParams:(MTRFanControlClusterStepParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)stepWithParams:(MTRFanControlClusterStepParams *)params completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeFanModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeFanModeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -10284,13 +10282,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeWindSettingWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
-- (void)readAttributeAirflowDirectionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeAirflowDirectionWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeAirflowDirectionWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeAirflowDirectionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeAirflowDirectionWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeAirflowDirectionWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeAirflowDirectionWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeAirflowDirectionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)readAttributeAirflowDirectionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -18937,9 +18935,9 @@ typedef NS_OPTIONS(uint8_t, MTRThermostatTemperatureSetpointHoldPolicyBitmap) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRFanControlAirflowDirection) {
-    MTRFanControlAirflowDirectionForward MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRFanControlAirflowDirectionReverse MTR_PROVISIONALLY_AVAILABLE = 0x01,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRFanControlAirflowDirectionForward MTR_NEWLY_AVAILABLE = 0x00,
+    MTRFanControlAirflowDirectionReverse MTR_NEWLY_AVAILABLE = 0x01,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRFanControlFanMode) {
     MTRFanControlFanModeOff MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x00,
@@ -18982,17 +18980,17 @@ typedef NS_ENUM(uint8_t, MTRFanControlFanModeSequenceType) {
 } MTR_DEPRECATED("Please use MTRFanControlFanModeSequence", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
 
 typedef NS_ENUM(uint8_t, MTRFanControlStepDirection) {
-    MTRFanControlStepDirectionIncrease MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRFanControlStepDirectionDecrease MTR_PROVISIONALLY_AVAILABLE = 0x01,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRFanControlStepDirectionIncrease MTR_NEWLY_AVAILABLE = 0x00,
+    MTRFanControlStepDirectionDecrease MTR_NEWLY_AVAILABLE = 0x01,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRFanControlFeature) {
     MTRFanControlFeatureMultiSpeed MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
     MTRFanControlFeatureAuto MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
     MTRFanControlFeatureRocking MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
     MTRFanControlFeatureWind MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
-    MTRFanControlFeatureStep MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRFanControlFeatureAirflowDirection MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRFanControlFeatureStep MTR_NEWLY_AVAILABLE = 0x10,
+    MTRFanControlFeatureAirflowDirection MTR_NEWLY_AVAILABLE = 0x20,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRFanControlRockBitmap) {

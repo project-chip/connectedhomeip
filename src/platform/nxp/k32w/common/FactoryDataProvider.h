@@ -25,6 +25,8 @@
 
 #include "CHIPPlatformConfig.h"
 
+#include <vector>
+
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __MATTER_FACTORY_DATA_START[];
 extern uint32_t __MATTER_FACTORY_DATA_SIZE[];

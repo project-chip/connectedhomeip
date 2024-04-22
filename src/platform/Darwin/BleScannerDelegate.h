@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/DLLUtil.h>
 
 namespace chip {

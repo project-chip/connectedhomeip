@@ -56,21 +56,25 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
     MTRErrorCodeIntegrityCheckFailed = 8,
     MTRErrorCodeTimeout              = 9,
     MTRErrorCodeBufferTooSmall       = 10,
+
     /**
      * MTRErrorCodeFabricExists is returned when trying to commission a device
      * into a fabric when it's already part of that fabric.
      */
     MTRErrorCodeFabricExists         = 11,
+
     /**
      * MTRErrorCodeUnknownSchema means the schema for the given cluster/attribute,
      * cluster/event, or cluster/command combination is not known.
      */
     MTRErrorCodeUnknownSchema MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 12,
+
     /**
      * MTRErrorCodeSchemaMismatch means that provided data did not match the
      * expected schema.
      */
     MTRErrorCodeSchemaMismatch MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 13,
+
     /**
      * MTRErrorCodeTLVDecodeFailed means that the TLV being decoded was malformed in
      * some way.  This can include things like lengths running past the end of
@@ -87,6 +91,11 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * application's Info.plist.
      */
     MTRErrorCodeDNSSDUnauthorized MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 15,
+
+    /**
+     * The operation was cancelled.
+     */
+    MTRErrorCodeCancelled MTR_NEWLY_AVAILABLE = 16,
 };
 // clang-format on
 
@@ -129,8 +138,8 @@ typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     MTRInteractionErrorCodePathsExhausted                            = 0xc8,
     MTRInteractionErrorCodeTimedRequestMismatch                      = 0xc9,
     MTRInteractionErrorCodeFailsafeRequired                          = 0xca,
-    MTRInteractionErrorInvalidInState            MTR_NEWLY_AVAILABLE = 0xcb,
-    MTRInteractionErrorNoCommandResponse         MTR_NEWLY_AVAILABLE = 0xcc,
+    MTRInteractionErrorCodeInvalidInState        MTR_NEWLY_AVAILABLE = 0xcb,
+    MTRInteractionErrorCodeNoCommandResponse     MTR_NEWLY_AVAILABLE = 0xcc,
 };
 // clang-format on
 

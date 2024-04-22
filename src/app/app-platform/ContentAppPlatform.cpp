@@ -23,7 +23,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <app/util/endpoint-config-api.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
@@ -33,6 +35,8 @@
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <string>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -237,13 +241,12 @@ EndpointId ContentAppPlatform::RemoveContentApp(ContentApp * app)
         if (mContentApps[index] == app)
         {
             EndpointId curEndpoint = app->GetEndpointId();
-            EndpointId ep          = emberAfClearDynamicEndpoint(index);
-            mContentApps[index]    = nullptr;
-            ChipLogProgress(DeviceLayer, "Removed device %d from dynamic endpoint %d (index=%d)",
-                            app->GetApplicationBasicDelegate()->HandleGetVendorId(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
-            UNUSED_VAR(ep);
+            /*[[maybe_unused]]*/ EndpointId ep = emberAfClearDynamicEndpoint(index);
+            mContentApps[index]                = nullptr;
+            ChipLogProgress(DeviceLayer, "Removed device %d from dynamic endpoint %d (index=%d)",
+                            app->GetApplicationBasicDelegate()->HandleGetVendorId(), ep, index);
             if (curEndpoint == mCurrentAppEndpointId)
             {
                 mCurrentAppEndpointId = kNoCurrentEndpointId;
@@ -717,6 +720,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                 continue;
             }
 
+            bool accessAllowed = false;
             for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
             {
                 if (allowedVendor == targetVendorId)
@@ -733,6 +737,12 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                         .fabricIndex = kUndefinedFabricIndex,
                     });
                 }
+                accessAllowed = true;
+            }
+            if (accessAllowed)
+            {
+                // notify content app about this nodeId
+                app->AddClientNode(subjectNodeId);
             }
         }
     }

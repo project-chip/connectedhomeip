@@ -22,12 +22,13 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/util.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -48,6 +49,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <string>
 #include <vector>
 
 using namespace chip;
@@ -300,12 +302,11 @@ int RemoveDeviceEndpoint(Device * dev)
         {
             // Todo: Update this to schedule the work rather than use this lock
             DeviceLayer::StackLock lock;
-            EndpointId ep   = emberAfClearDynamicEndpoint(index);
-            gDevices[index] = nullptr;
-            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
-            UNUSED_VAR(ep);
+            [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
+            gDevices[index]                = nullptr;
+            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             return index;
         }
         index++;

@@ -117,7 +117,8 @@ public:
      */
     CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex);
 
-    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, CounterType & counter) override;
+    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
+                                     Protocols::SecureChannel::CounterType & counter) override;
 
 protected:
     enum class ClientInfoTag : uint8_t
@@ -155,8 +156,10 @@ protected:
     static constexpr size_t MaxICDClientInfoSize()
     {
         // All the fields added together
-        return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
-                                           sizeof(uint64_t), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t) /*start_icd_counter*/,
+                                           sizeof(uint32_t) /*offset*/, sizeof(uint64_t) /*monitored_subject*/,
+                                           sizeof(Crypto::Symmetric128BitsKeyByteArray) /*aes_key_handle*/,
+                                           sizeof(Crypto::Symmetric128BitsKeyByteArray) /*hmac_key_handle*/);
     }
 
     static constexpr size_t MaxICDCounterSize()

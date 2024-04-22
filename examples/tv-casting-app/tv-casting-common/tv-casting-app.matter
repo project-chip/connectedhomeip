@@ -1545,7 +1545,7 @@ provisional cluster Messages = 151 {
     MessagePriorityEnum priority = 1;
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
-    nullable int16u duration = 4;
+    nullable int64u duration = 4;
     char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }
@@ -1579,7 +1579,7 @@ provisional cluster Messages = 151 {
     MessagePriorityEnum priority = 1;
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
-    nullable int16u duration = 4;
+    nullable int64u duration = 4;
     char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }

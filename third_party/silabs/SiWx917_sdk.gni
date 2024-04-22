@@ -43,6 +43,7 @@ template("siwx917_sdk") {
   config("${sdk_target_name}_config") {
     include_dirs = []
     libs = []
+    defines = []
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
@@ -143,16 +144,28 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/inc",
     ]
 
+    if (use_system_view) {
+      _include_dirs += [
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/init/",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
+      ]
+
+      defines += [
+        "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT",
+        "SEGGER_SYSVIEW_RTT_BUFFER_SIZE=8192",
+      ]
+    }
+
     # Note that we're setting the mbedTLS and PSA configuration files through a
     # define. This means the build system by default does not pick up changes in
     # the content of these, only when changing the filename itself.
     # To fix this, these files are also manually depended upon in the source set
     # declared in siwx917_mbedtls_config further down this file.
-    defines = [
+    defines += [
       "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
-      "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
       "CCP_SI917_BRINGUP=1",
@@ -160,7 +173,8 @@ template("siwx917_sdk") {
       "RS911X_WIFI=1",
       "RSI_WLAN_ENABLE",
       "SLI_SI91X_ENABLE_OS=1",
-      "SLI_SI91X_MCU_INTERFACE=1",  #Enable CCP bus Interface
+      "SLI_SI91X_MCU_INTERFACE=1",  #Enable CCP bus Interface, Differentiation:
+                                    # 1->SOC and 0->NCP
       "RSI_WLAN_API_ENABLE",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
@@ -171,8 +185,6 @@ template("siwx917_sdk") {
       "__HEAP_SIZE=0",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
-      "SIWX_917=1",
-      "CHIP_9117=1",
       "SLI_SI91X_ENABLE_BLE=1",
       "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
       "TINYCRYPT_PRIMITIVES",
@@ -183,7 +195,6 @@ template("siwx917_sdk") {
       "SLI_SI91X_MCU_ENABLE_FLASH_BASED_EXECUTION=1",
       "SL_WIFI_COMPONENT_INCLUDED=1",
       "SLI_SI917=1",
-      "SI917=1",
       "ROMDRIVER_PRESENT=1",
       "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
       "SLI_SI91X_MCU_CONFIG_RADIO_BOARD_BASE_VER=1",
@@ -203,7 +214,6 @@ template("siwx917_sdk") {
       "ENABLE_DEBUG_MODULE=1",
       "SI91X_SYSRTC_PRESENT=1",
       "TA_DEEP_SLEEP_COMMON_FLASH=1",
-      "SI917_SOC=1",
       "SI91X_PLATFORM=1",
       "SL_NET_COMPONENT_INCLUDED=1",
       "SRAM_BASE=0x0cUL",
@@ -212,6 +222,12 @@ template("siwx917_sdk") {
       "RADIO_CONFIG_DMP_SUPPORT=1",
       "configUSE_POSIX_ERRNO=1",
     ]
+
+    if (silabs_log_enabled && chip_logging) {
+      defines += [ "SILABS_LOG_ENABLED=1" ]
+    } else {
+      defines += [ "SILABS_LOG_ENABLED=0" ]
+    }
 
     if (chip_build_libshell) {
       defines += [ "ENABLE_CHIP_SHELL" ]
@@ -280,6 +296,13 @@ template("siwx917_sdk") {
           "ALARM_PERIODIC_TIME=${si91x_alarm_periodic_time}",
         ]
       }
+    }
+
+    if (sl_uart_log_output) {
+      defines += [
+        "SILABS_LOG_OUT_UART=1",
+        "SILABS_LOG_OUT_RTT=0",
+      ]
     }
 
     if (chip_build_libshell) {  # matter shell
@@ -470,6 +493,17 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/src/sl_si91x_hal_soc_soft_reset.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c",
     ]
+
+    if (use_system_view) {
+      sources += [
+        "${chip_root}/examples/platform/silabs/sl_systemview_config.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/Global.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/SEGGER_RTT_Conf.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_SYSVIEW.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/init/SEGGER_SYSVIEW_Init.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/SEGGER_SYSVIEW_FreeRTOS.c",
+      ]
+    }
 
     if (!disable_lcd) {
       sources += [

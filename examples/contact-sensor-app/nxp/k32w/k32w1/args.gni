@@ -24,5 +24,15 @@ chip_stack_lock_tracking = "fatal"
 chip_enable_ble = true
 
 chip_enable_icd_server = true
+chip_enable_icd_lit = false
+icd_enforce_sit_slow_poll_limit = true
 chip_persist_subscriptions = true
 chip_subscription_timeout_resumption = true
+
+is_debug = false
+
+chip_crypto = "platform"
+chip_openthread_ftd = false
+chip_with_ot_cli = 0
+
+chip_with_diag_logs_demo = true

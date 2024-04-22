@@ -27,6 +27,7 @@
 #include "KeypadInput.h"
 #include "LevelControl.h"
 #include "MediaPlayback.h"
+#include "Messages.h"
 #include "OnOff.h"
 #include "PersistenceManager.h"
 #include "TargetEndpointInfo.h"
@@ -49,6 +50,10 @@ inline constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = ch
  *  as a singleton and is to be used across Linux, Android and iOS.
  */
 class CastingServer : public AppDelegate
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    ,
+                      chip::Protocols::UserDirectedCommissioning::CommissionerDeclarationHandler
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 {
 public:
     CastingServer(CastingServer & other)  = delete;
@@ -59,6 +64,13 @@ public:
     CHIP_ERROR Init(AppParams * AppParams = nullptr);
     CHIP_ERROR InitBindingHandlers();
     void InitAppDelegation();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    void SetCommissionerPasscodeEnabled(bool enabled) { mUdcCommissionerPasscodeEnabled = enabled; };
+    void SetCommissionerPasscodeReady() { mUdcCommissionerPasscodeReady = true; };
+    void OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
+                                          chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     CHIP_ERROR DiscoverCommissioners(chip::Controller::DeviceDiscoveryDelegate * deviceDiscoveryDelegate = nullptr);
     const chip::Dnssd::DiscoveredNodeData *
@@ -185,6 +197,12 @@ public:
     CHIP_ERROR OnOff_On(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR OnOff_Off(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR OnOff_Toggle(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+
+    /**
+     * @brief Messages cluster
+     */
+    CHIP_ERROR Messages_PresentMessagesRequest(TargetEndpointInfo * endpoint, const char * messageText,
+                                               std::function<void(CHIP_ERROR)> responseCallback);
 
     /**
      * @brief Media Playback cluster
@@ -463,6 +481,12 @@ private:
     PersistenceManager mPersistenceManager;
     bool mInited        = false;
     bool mUdcInProgress = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    bool mUdcCommissionerPasscodeEnabled                                                           = false;
+    bool mUdcCommissionerPasscodeReady                                                             = false;
+    char mUdcCommissionerPasscodeInstanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1] = "";
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
     chip::Dnssd::DiscoveredNodeData mStrNodeDataList[kMaxCachedVideoPlayers];
     TargetVideoPlayerInfo mActiveTargetVideoPlayerInfo;
     TargetVideoPlayerInfo mCachedTargetVideoPlayerInfo[kMaxCachedVideoPlayers];
@@ -509,6 +533,11 @@ private:
     OnCommand mOnCommand;
     OffCommand mOffCommand;
     ToggleCommand mToggleCommand;
+
+    /**
+     * @brief OnOff cluster
+     */
+    PresentMessagesRequestCommand mPresentMessagesRequestCommand;
 
     /**
      * @brief Media Playback cluster

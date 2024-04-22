@@ -295,7 +295,8 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-rvc-app chip-rvc
 # Stage 3.1: Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_env python_env
-COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing/scripts/sdk
+COPY --from=chip-build-cert-bins /root/connectedhomeip/data_model python_testing/data_model
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/scripts/tests/requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt

@@ -135,6 +135,7 @@ function(chip_configure_data_model APP_TARGET)
     target_sources(${APP_TARGET} ${SCOPE}
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
+        ${CHIP_APP_BASE_DIR}/reporting/reporting.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
@@ -144,7 +145,6 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
         ${CHIP_APP_BASE_DIR}/util/generic-callback-stubs.cpp
-        ${CHIP_APP_BASE_DIR}/util/message.cpp
         ${CHIP_APP_BASE_DIR}/util/privilege-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/util.cpp
         ${APP_GEN_FILES}

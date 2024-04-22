@@ -47,7 +47,6 @@
 #include <glib.h>
 
 #include <ble/Ble.h>
-#include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/ErrorStr.h>
@@ -208,11 +207,11 @@ void BLEManagerImpl::ReadValueRequestedCb(const char * remoteAddress, int reques
     GAutoPtr<char> uuid;
     GAutoPtr<char> value;
 
-    VerifyOrReturn(__GetAttInfo(gattHandle, &MakeUniquePointerReceiver(uuid).Get(), &type) == BT_ERROR_NONE,
+    VerifyOrReturn(__GetAttInfo(gattHandle, &uuid.GetReceiver(), &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
     ChipLogProgress(DeviceLayer, "Gatt read requested on %s: uuid=%s", __ConvertAttTypeToStr(type), StringOrNullMarker(uuid.get()));
 
-    ret = bt_gatt_get_value(gattHandle, &MakeUniquePointerReceiver(value).Get(), &len);
+    ret = bt_gatt_get_value(gattHandle, &value.GetReceiver(), &len);
     VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_get_value() failed: %s", get_error_message(ret)));
 
     ChipLogByteSpan(DeviceLayer, ByteSpan(Uint8::from_const_char(value.get()), len));
@@ -233,7 +232,7 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
     conn = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, remoteAddress));
     VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
-    VerifyOrReturn(__GetAttInfo(gattHandle, &MakeUniquePointerReceiver(uuid).Get(), &type) == BT_ERROR_NONE,
+    VerifyOrReturn(__GetAttInfo(gattHandle, &uuid.GetReceiver(), &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
     ChipLogProgress(DeviceLayer, "Gatt write requested on %s: uuid=%s len=%d", __ConvertAttTypeToStr(type),
                     StringOrNullMarker(uuid.get()), len);
@@ -268,7 +267,7 @@ void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h se
 
     VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
-    int ret = __GetAttInfo(charHandle, &MakeUniquePointerReceiver(uuid).Get(), &type);
+    int ret = __GetAttInfo(charHandle, &uuid.GetReceiver(), &type);
     VerifyOrReturn(ret == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from CHAR handle: %s", get_error_message(ret)));
 
@@ -776,7 +775,7 @@ static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle
     GAutoPtr<char> uuid;
     auto conn = static_cast<BLEConnection *>(data);
 
-    int ret = __GetAttInfo(charHandle, &MakeUniquePointerReceiver(uuid).Get(), &type);
+    int ret = __GetAttInfo(charHandle, &uuid.GetReceiver(), &type);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from CHAR handle: %s", get_error_message(ret)));
 
@@ -803,7 +802,7 @@ static bool __GattClientForeachServiceCb(int total, int index, bt_gatt_h svcHand
     auto conn = static_cast<BLEConnection *>(data);
     ChipLogProgress(DeviceLayer, "__GattClientForeachServiceCb");
 
-    int ret = __GetAttInfo(svcHandle, &MakeUniquePointerReceiver(uuid).Get(), &type);
+    int ret = __GetAttInfo(svcHandle, &uuid.GetReceiver(), &type);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from SVC handle: %s", get_error_message(ret)));
 

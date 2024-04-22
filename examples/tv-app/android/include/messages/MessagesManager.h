@@ -18,7 +18,9 @@
 #pragma once
 
 #include <app/clusters/messages-server/messages-server.h>
+
 #include <list>
+#include <string>
 
 class MessagesManager : public chip::app::Clusters::Messages::Delegate
 {
@@ -27,7 +29,7 @@ public:
     void HandlePresentMessagesRequest(
         const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
         const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
-        const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint16_t> & duration,
+        const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint64_t> & duration,
         const chip::CharSpan & messageText,
         const chip::Optional<chip::app::DataModel::DecodableList<
             chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::DecodableType>> & responses) override;

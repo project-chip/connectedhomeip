@@ -301,10 +301,11 @@ class ClusterAttributeDescriptor:
         """Register a subclass."""
         super().__init_subclass__(*args, **kwargs)
         try:
-            if cls.standard_attribute and cls.cluster_id not in ALL_ATTRIBUTES:
-                ALL_ATTRIBUTES[cls.cluster_id] = {}
-            # register this clusterattribute in the ALL_ATTRIBUTES dict for quick lookups
-            ALL_ATTRIBUTES[cls.cluster_id][cls.attribute_id] = cls
+            if cls.standard_attribute:
+                if cls.cluster_id not in ALL_ATTRIBUTES:
+                    ALL_ATTRIBUTES[cls.cluster_id] = {}
+                # register this clusterattribute in the ALL_ATTRIBUTES dict for quick lookups
+                ALL_ATTRIBUTES[cls.cluster_id][cls.attribute_id] = cls
         except NotImplementedError:
             # handle case where the ClusterAttribute class is not (fully) subclassed
             # and accessing the id property throws a NotImplementedError.

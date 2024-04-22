@@ -20,7 +20,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -214,6 +214,7 @@ public:
               ScenesManagement::ScenesServer::Instance().IsHandlerRegistered(endpoint, LevelControlServer::GetSceneHandler())))
 #endif
         {
+            VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);
         }
 
@@ -221,7 +222,7 @@ public:
     }
 
 private:
-    OnOffTransitionTimeInterface mTransitionTimeInterface = OnOffTransitionTimeInterface(Attributes::OnOff::Id, sceneOnOffCallback);
+    OnOffTransitionTimeInterface mTransitionTimeInterface = OnOffTransitionTimeInterface(OnOff::Id, sceneOnOffCallback);
 };
 static DefaultOnOffSceneHandler sOnOffSceneHandler;
 

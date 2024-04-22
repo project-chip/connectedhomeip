@@ -37,8 +37,10 @@
 #include <openthread/dns_client.h>
 #endif
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <platform/GeneralFaults.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
@@ -144,8 +146,6 @@ protected:
     bool IsThreadAttachedNoLock(void);
     bool IsThreadInterfaceUpNoLock(void);
 
-    CHIP_ERROR _JoinerStart(void);
-
 private:
     // ===== Private members for use by this class only.
 
@@ -230,6 +230,7 @@ private:
 
     DnsBrowseCallback mDnsBrowseCallback;
     DnsResolveCallback mDnsResolveCallback;
+    GeneralFaults<kMaxNetworkFaults> mNetworkFaults;
 
     struct DnsServiceTxtEntries
     {
@@ -262,9 +263,6 @@ private:
                                                   otError error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-
-    static void OnJoinerComplete(otError aError, void * aContext);
-    void OnJoinerComplete(otError aError);
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };

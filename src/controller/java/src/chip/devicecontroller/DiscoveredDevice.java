@@ -17,8 +17,66 @@
  */
 package chip.devicecontroller;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class DiscoveredDevice {
   public long discriminator;
   public String ipAddress;
   public int port;
+  public long deviceType;
+  public int vendorId;
+  public int productId;
+  public Set<PairingHintBitmap> pairingHint;
+  public CommissioningWindowStatus commissioningMode;
+  public byte[] rotatingId;
+  public String instanceName;
+  public String deviceName;
+  public String pairingInstruction;
+
+  // For use in JNI.
+  private void setCommissioningMode(int value) {
+    this.commissioningMode = CommissioningWindowStatus.value(value);
+  }
+
+  private void setPairingHint(int value) {
+    this.pairingHint = new HashSet<>();
+    for (PairingHintBitmap mode : PairingHintBitmap.values()) {
+      int bitmask = 1 << mode.getBitIndex();
+      if ((value & bitmask) != 0) {
+        pairingHint.add(mode);
+      }
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "DiscoveredDevice : {"
+        + "\n\tdiscriminator : "
+        + discriminator
+        + "\n\tipAddress : "
+        + ipAddress
+        + "\n\tport : "
+        + port
+        + "\n\tdeviceType : "
+        + deviceType
+        + "\n\tvendorId : "
+        + vendorId
+        + "\n\tproductId : "
+        + productId
+        + "\n\tpairingHint : "
+        + pairingHint
+        + "\n\tcommissioningMode : "
+        + commissioningMode
+        + "\n\trotatingId : "
+        + (rotatingId != null ? Arrays.toString(rotatingId) : "null")
+        + "\n\tinstanceName : "
+        + instanceName
+        + "\n\tdeviceName : "
+        + deviceName
+        + "\n\tpairingInstruction : "
+        + pairingInstruction
+        + "\n}";
+  }
 }

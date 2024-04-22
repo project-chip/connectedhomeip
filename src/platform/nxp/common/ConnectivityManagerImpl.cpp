@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
- *    Copyright 2023 NXP
+ *    Copyright 2023-2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,18 +51,22 @@ extern "C" {
 
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
-#include <app/server/Dnssd.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#include <openthread/mdns_server.h>
+
+#include "br_rtos_manager.h"
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
-#endif
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::DeviceLayer::DeviceEventType;
 
@@ -85,6 +89,10 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    StartWiFiManagement();
 #endif
 
     SuccessOrExit(err);
@@ -110,11 +118,35 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
     else if (event->Type == kPlatformNxpStartWlanConnectEvent)
     {
-        if (wlan_add_network(event->Platform.pNetworkDataEvent) == WM_SUCCESS)
+        bool is_wlan_added                  = false;
+        struct wlan_network searchedNetwork = { 0 };
+
+        /* If network was added before on a previous connection call or other API, do not add it again */
+        if (wlan_get_network_byname(event->Platform.pNetworkDataEvent->name, &searchedNetwork) != WM_SUCCESS)
+        {
+            if (wlan_add_network(event->Platform.pNetworkDataEvent) == WM_SUCCESS)
+            {
+                ChipLogProgress(DeviceLayer, "Added WLAN \"%s\"", event->Platform.pNetworkDataEvent->name);
+                is_wlan_added = true;
+            }
+        }
+        else
+        {
+            /* In case network was added before, signal that it is added and that connection can start */
+            is_wlan_added = true;
+        }
+
+        /* At this point, the network details should be registered in the wlan driver */
+        if (is_wlan_added == true)
         {
             _SetWiFiStationState(kWiFiStationState_Connecting);
             ChipLogProgress(DeviceLayer, "WLAN connecting to network.name = \"%s\"", event->Platform.pNetworkDataEvent->name);
+#if WIFI_DFS_OPTIMIZATION
+            /* Skip DFS (Dynamic Frequency Selection) channels during scan, DFS is used to avoid interferences */
+            wlan_connect_opt(event->Platform.pNetworkDataEvent->name, true);
+#else
             wlan_connect(event->Platform.pNetworkDataEvent->name);
+#endif
         }
         if (event->Platform.pNetworkDataEvent != NULL)
         {
@@ -314,6 +346,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
     const ip6_addr_t * addr6;
     CHIP_ERROR err;
     ChipDeviceEvent event;
+#if CHIP_ENABLE_OPENTHREAD
+    otIp6Address newIpAddress;
+#endif
 
     // If the WiFi station is currently in the connected state...
     if (_IsWiFiStationConnected())
@@ -350,6 +385,11 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
                 {
                     haveIPv6Conn = true;
                     addr6        = netif_ip6_addr(netif, i);
+#if CHIP_ENABLE_OPENTHREAD
+                    // We are using ot mDNS sever and need to add IP address to server list
+                    memcpy(&newIpAddress.mFields.m32, addr6->addr, sizeof(Inet::IPAddress));
+                    otMdnsServerAddAddress(ThreadStackMgrImpl().OTInstance(), &newIpAddress);
+#endif
                     break;
                 }
             }
@@ -369,8 +409,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         if (haveIPv4Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
-            /* (Re-)start the DNSSD server */
-            chip::app::DnssdServer::Instance().StartServer();
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
@@ -386,8 +424,11 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         if (haveIPv6Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr6);
-            /* (Re-)start the DNSSD server */
-            chip::app::DnssdServer::Instance().StartServer();
+
+#if CHIP_ENABLE_OPENTHREAD
+            // Start the Border Router services including MDNS Server
+            StartBrServices();
+#endif
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
@@ -435,6 +476,48 @@ void ConnectivityManagerImpl::StartWiFiManagement()
         chipDie();
     }
 }
+#if CHIP_ENABLE_OPENTHREAD
+void ConnectivityManagerImpl::StartBrServices()
+{
+    if (mBorderRouterInit == false)
+    {
+        struct netif * extNetIfPtr = static_cast<struct netif *>(net_get_mlan_handle());
+        struct netif * thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
+        otInstance * thrInstancePtr;
+
+        // Initalize internal interface variables, these can be used by other modules like the DNSSD Impl to
+        // get the underlying IP interface
+        Inet::InterfaceId tmpExtIf(extNetIfPtr);
+        Inet::InterfaceId tmpThrIf(thrNetIfPtr);
+        mExternalNetIf = tmpExtIf;
+        mThreadNetIf   = tmpThrIf;
+
+        // Need to wait for the wifi to be connected because the mlan netif can be !=null but not initialized
+        // properly. If the thread netif is !=null it means that it was fully initialized
+
+        // Lock OT task
+        if ((thrNetIfPtr) && (mWiFiStationState == kWiFiStationState_Connected))
+        {
+            mBorderRouterInit = true;
+            // Check if OT instance is init
+            thrInstancePtr = ThreadStackMgrImpl().OTInstance();
+
+            BrInitServices(thrInstancePtr, extNetIfPtr, thrNetIfPtr);
+            otMdnsServerStart(thrInstancePtr);
+        }
+    }
+}
+
+Inet::InterfaceId ConnectivityManagerImpl::GetThreadInterface()
+{
+    return sInstance.mThreadNetIf;
+}
+
+Inet::InterfaceId ConnectivityManagerImpl::GetExternalInterface()
+{
+    return sInstance.mExternalNetIf;
+}
+#endif // CHIP_ENABLE_OPENTHREAD
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
@@ -506,6 +589,34 @@ void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer *
                                               ConnectNetworkTimerHandler, context);
         PlatformMgr().UnlockChipStack();
     }
+}
+
+/* Can be used to disconnect from WiFi network.
+ */
+CHIP_ERROR ConnectivityManagerImpl::_DisconnectNetwork(void)
+{
+    int ret        = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (ConnectivityMgrImpl().IsWiFiStationConnected())
+    {
+        ChipLogProgress(NetworkProvisioning, "Disconnecting from WiFi network.");
+
+        ret = wlan_disconnect();
+
+        if (ret != WM_SUCCESS)
+        {
+            ChipLogError(NetworkProvisioning, "Failed to disconnect from network with error: %u", (uint8_t) ret);
+            err = CHIP_ERROR_UNEXPECTED_EVENT;
+        }
+    }
+    else
+    {
+        ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return err;
 }
 #endif
 

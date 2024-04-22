@@ -193,11 +193,17 @@ class IcdManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun stayActiveRequest(timedInvokeTimeout: Duration? = null): StayActiveResponse {
+  suspend fun stayActiveRequest(
+    stayActiveDuration: UInt,
+    timedInvokeTimeout: Duration? = null
+  ): StayActiveResponse {
     val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_STAY_ACTIVE_DURATION_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_STAY_ACTIVE_DURATION_REQ), stayActiveDuration)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

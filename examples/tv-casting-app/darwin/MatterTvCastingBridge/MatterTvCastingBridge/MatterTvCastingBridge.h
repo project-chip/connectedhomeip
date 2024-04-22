@@ -27,14 +27,11 @@ FOUNDATION_EXPORT const unsigned char MatterTvCastingBridgeVersionString[];
 
 // Add simplified casting API headers here
 #import "MCAttribute.h"
-#import "MCAttributeObjects.h"
 #import "MCCastingApp.h"
 #import "MCCastingPlayer.h"
 #import "MCCastingPlayerDiscovery.h"
 #import "MCCluster.h"
-#import "MCClusterObjects.h"
 #import "MCCommand.h"
-#import "MCCommandObjects.h"
 #import "MCCommissionableData.h"
 #import "MCCryptoUtils.h"
 #import "MCDataSource.h"
@@ -42,3 +39,6 @@ FOUNDATION_EXPORT const unsigned char MatterTvCastingBridgeVersionString[];
 #import "MCEndpointClusterType.h"
 #import "MCEndpointFilter.h"
 #import "MCObserver.h"
+#import "zap-generated/MCAttributeObjects.h"
+#import "zap-generated/MCClusterObjects.h"
+#import "zap-generated/MCCommandObjects.h"

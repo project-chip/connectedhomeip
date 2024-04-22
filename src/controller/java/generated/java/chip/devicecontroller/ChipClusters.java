@@ -121,7 +121,7 @@ public class ChipClusters {
         boolean isFabricFiltered) {
       ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
-      ChipDeviceController.read(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, isFabricFiltered, timeoutMillis.orElse(0L).intValue(), null);
+      ChipInteractionClient.read(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, isFabricFiltered, timeoutMillis.orElse(0L).intValue(), null);
     }
 
     protected void writeAttribute(
@@ -132,7 +132,7 @@ public class ChipClusters {
       WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
       byte[] tlv = encodeToTlv(value);
       AttributeWriteRequest writeRequest = AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, tlv);
-      ChipDeviceController.write(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(writeRequest), timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
+      ChipInteractionClient.write(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(writeRequest), timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
     }
 
     protected void subscribeAttribute(
@@ -142,7 +142,7 @@ public class ChipClusters {
         int maxInterval) {
       ReportCallbackJni jniCallback = new ReportCallbackJni(callback, callback, null);
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
-      ChipDeviceController.subscribe(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L).intValue(), null);
+      ChipInteractionClient.subscribe(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L).intValue(), null);
     }
 
     protected void invoke(
@@ -153,7 +153,7 @@ public class ChipClusters {
       InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
       byte[] tlv = encodeToTlv(value);
       InvokeElement element = InvokeElement.newInstance(endpointId, clusterId, commandId, tlv, null);
-      ChipDeviceController.invoke(0, jniCallback.getCallbackHandle(), devicePtr, element, timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
+      ChipInteractionClient.invoke(0, jniCallback.getCallbackHandle(), devicePtr, element, timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
     }
 
     private static native byte[] encodeToTlv(BaseTLVType value);
@@ -18170,14 +18170,18 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void stayActiveRequest(StayActiveResponseCallback callback) {
-      stayActiveRequest(callback, 0);
+    public void stayActiveRequest(StayActiveResponseCallback callback, Long stayActiveDuration) {
+      stayActiveRequest(callback, stayActiveDuration, 0);
     }
 
-    public void stayActiveRequest(StayActiveResponseCallback callback, int timedInvokeTimeoutMs) {
+    public void stayActiveRequest(StayActiveResponseCallback callback, Long stayActiveDuration, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
+      final long stayActiveDurationFieldID = 0L;
+      BaseTLVType stayActiveDurationtlvValue = new UIntType(stayActiveDuration);
+      elements.add(new StructElement(stayActiveDurationFieldID, stayActiveDurationtlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -29906,11 +29910,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Integer duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses) {
+    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Long duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses) {
       presentMessagesRequest(callback, messageID, priority, messageControl, startTime, duration, messageText, responses, 0);
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Integer duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses, int timedInvokeTimeoutMs) {
+    public void presentMessagesRequest(DefaultClusterCallback callback, byte[] messageID, Integer priority, Integer messageControl, @Nullable Long startTime, @Nullable Long duration, String messageText, Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();

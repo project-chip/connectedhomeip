@@ -24,7 +24,10 @@ NS_ASSUME_NONNULL_BEGIN
  * A representation of an attribute implemented on a server cluster by an
  * MTRDeviceController.  An attribute has an identifier and a value, and may or
  * may not be writable.
+ *
+ * MTRServerAttribute's API can be accessed from any thread.
  */
+NS_SWIFT_SENDABLE
 MTR_NEWLY_AVAILABLE
 @interface MTRServerAttribute : NSObject
 
@@ -50,13 +53,13 @@ MTR_NEWLY_AVAILABLE
  */
 - (BOOL)setValue:(NSDictionary<NSString *, id> *)value;
 
-@property (nonatomic, copy, readonly) NSNumber * attributeID;
-@property (nonatomic, copy, readonly) NSDictionary<NSString *, id> * value;
+@property (atomic, copy, readonly) NSNumber * attributeID;
+@property (atomic, copy, readonly) NSDictionary<NSString *, id> * value;
 /**
  * The privilege level necessary to read this attribute.
  */
-@property (nonatomic, assign, readonly) MTRAccessControlEntryPrivilege requiredReadPrivilege;
-@property (nonatomic, assign, readonly, getter=isWritable) BOOL writable;
+@property (atomic, assign, readonly) MTRAccessControlEntryPrivilege requiredReadPrivilege;
+@property (atomic, assign, readonly, getter=isWritable) BOOL writable;
 
 @end
 

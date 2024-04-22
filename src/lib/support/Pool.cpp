@@ -127,6 +127,46 @@ Loop StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, Lambda lamb
     return Loop::Finish;
 }
 
+size_t StaticAllocatorBitmap::FirstActiveIndex()
+{
+    size_t idx = 0;
+    for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
+    {
+        auto & usage = mUsage[word];
+        auto value   = usage.load(std::memory_order_relaxed);
+        for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < Capacity(); ++offset)
+        {
+            if ((value & (kBit1 << offset)) != 0)
+            {
+                return idx;
+            }
+            idx++;
+        }
+    }
+    VerifyOrDie(idx == mCapacity);
+    return mCapacity;
+}
+
+size_t StaticAllocatorBitmap::NextActiveIndexAfter(size_t start)
+{
+    size_t idx = 0;
+    for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
+    {
+        auto & usage = mUsage[word];
+        auto value   = usage.load(std::memory_order_relaxed);
+        for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < Capacity(); ++offset)
+        {
+            if (((value & (kBit1 << offset)) != 0) && (start < idx))
+            {
+                return idx;
+            }
+            idx++;
+        }
+    }
+    VerifyOrDie(idx == mCapacity);
+    return mCapacity;
+}
+
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 HeapObjectListNode * HeapObjectList::FindNode(void * object) const
@@ -159,24 +199,30 @@ Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
         p = p->mNext;
     }
     --mIterationDepth;
-    if (mIterationDepth == 0 && mHaveDeferredNodeRemovals)
-    {
-        // Remove nodes for released objects.
-        p = mNext;
-        while (p != this)
-        {
-            HeapObjectListNode * next = p->mNext;
-            if (p->mObject == nullptr)
-            {
-                p->Remove();
-                Platform::Delete(p);
-            }
-            p = next;
-        }
-
-        mHaveDeferredNodeRemovals = false;
-    }
+    CleanupDeferredReleases();
     return result;
+}
+
+void HeapObjectList::CleanupDeferredReleases()
+{
+    if (mIterationDepth != 0 || !mHaveDeferredNodeRemovals)
+    {
+        return;
+    }
+    // Remove nodes for released objects.
+    HeapObjectListNode * p = mNext;
+    while (p != this)
+    {
+        HeapObjectListNode * next = p->mNext;
+        if (p->mObject == nullptr)
+        {
+            p->Remove();
+            Platform::Delete(p);
+        }
+        p = next;
+    }
+
+    mHaveDeferredNodeRemovals = false;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP

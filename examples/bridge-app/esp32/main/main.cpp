@@ -26,6 +26,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -201,12 +202,11 @@ CHIP_ERROR RemoveDeviceEndpoint(Device * dev)
     {
         if (gDevices[index] == dev)
         {
-            EndpointId ep   = emberAfClearDynamicEndpoint(index);
-            gDevices[index] = NULL;
-            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
-            UNUSED_VAR(ep);
+            [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
+            gDevices[index]                = NULL;
+            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             return CHIP_NO_ERROR;
         }
     }

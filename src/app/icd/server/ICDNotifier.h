@@ -39,17 +39,17 @@ class ICDListener
 public:
     enum class KeepActiveFlagsValues : uint8_t
     {
-        kCommissioningWindowOpen = 0x01,
-        kFailSafeArmed           = 0x02,
-        kExchangeContextOpen     = 0x04,
-        kCheckInInProgress       = 0x08,
-        kInvalidFlag             = 0x10, // Move up when adding more flags
+        kCommissioningWindowOpen    = 0x01,
+        kFailSafeArmed              = 0x02,
+        kExchangeContextOpen        = 0x04,
+        kCheckInInProgress          = 0x08,
+        kTestEventTriggerActiveMode = 0x10,
+        kInvalidFlag                = 0x20, // Move up when adding more flags
     };
 
     enum class ICDManagementEvents : uint8_t
     {
-        kTableUpdated              = 0x01,
-        kStayActiveRequestReceived = 0x02,
+        kTableUpdated = 0x01,
     };
 
     using KeepActiveFlags = BitFlags<KeepActiveFlagsValues>;

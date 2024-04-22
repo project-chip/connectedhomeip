@@ -23,7 +23,7 @@
  */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/Global.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/BleApplicationDelegate.h>

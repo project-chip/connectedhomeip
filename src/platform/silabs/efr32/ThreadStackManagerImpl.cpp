@@ -35,6 +35,9 @@
 
 #include <lib/support/CHIPPlatformMemory.h>
 
+// Forward declaration
+extern "C" otInstance * otGetInstance(void);
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -130,6 +133,11 @@ extern "C" otError otPlatUartEnable(void)
     // Uart Init is handled in init_efrPlatform.cpp
     return OT_ERROR_NONE;
 #endif
+}
+
+extern "C" otInstance * otGetInstance(void)
+{
+    return ThreadStackMgrImpl().OTInstance();
 }
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI

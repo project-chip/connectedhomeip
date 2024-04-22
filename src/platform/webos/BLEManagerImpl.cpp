@@ -23,7 +23,7 @@
  */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <new>
@@ -32,6 +32,7 @@
 
 #include <cassert>
 #include <iomanip>
+#include <string>
 #include <type_traits>
 #include <utility>
 

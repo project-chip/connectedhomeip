@@ -73,6 +73,9 @@ public:
         NodeId mNodeId;
         FabricIndex mFabricIndex;
         SubscriptionId mSubscriptionId;
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+        uint32_t mResumptionRetries;
+#endif
         uint16_t mMinInterval;
         uint16_t mMaxInterval;
         bool mFabricFiltered;

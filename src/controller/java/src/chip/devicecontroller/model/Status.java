@@ -124,4 +124,8 @@ public final class Status {
   public static Status newInstance(int status, Integer clusterStatus) {
     return new Status(status, Optional.ofNullable(clusterStatus));
   }
+
+  public static Status newInstance(int status, Optional<Integer> clusterStatus) {
+    return new Status(status, clusterStatus);
+  }
 }

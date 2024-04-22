@@ -20,10 +20,11 @@
 #import "MTRServerAttribute_Internal.h"
 #import "MTRServerCluster_Internal.h"
 #import "MTRServerEndpoint_Internal.h"
+#import "MTRUnfairLock.h"
+#import "NSDataSpanConversion.h"
+
 #import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRServerCluster.h>
-
-#import "NSDataSpanConversion.h"
 
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/descriptor/descriptor.h>
@@ -34,7 +35,8 @@
 #include <lib/support/SafeInt.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-// TODO: These attribute-*.h bits are a hack that should eventually go away.
+// TODO: These attribute-*.h and AttributeAccessInterfaceRegistry.h bits are a hack that should eventually go away.
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 
@@ -71,11 +73,26 @@ MTR_DIRECT_MEMBERS
     std::unique_ptr<MTRServerAttributeAccessInterface> _attributeAccessInterface;
     // We can't use something like std::unique_ptr<EmberAfAttributeMetadata[]>
     // because EmberAfAttributeMetadata does not have a default constructor, so
-    // we can't alloc and then initializer later.
+    // we can't alloc and then initialize later.
     std::vector<EmberAfAttributeMetadata> _matterAttributeMetadata;
 
     std::unique_ptr<CommandId[]> _matterAcceptedCommandList;
     std::unique_ptr<CommandId[]> _matterGeneratedCommandList;
+
+    NSSet<MTRAccessGrant *> * _matterAccessGrants;
+
+    chip::EndpointId _parentEndpoint;
+
+    // _acceptedCommands and _generatedCommands are touched directly by our API
+    // consumer.
+    NSArray<NSNumber *> * _acceptedCommands;
+    NSArray<NSNumber *> * _generatedCommands;
+
+    /**
+     * _lock always protects access to all our mutable ivars (the ones that are
+     * modified after init).
+     */
+    os_unfair_lock _lock;
 }
 
 - (nullable instancetype)initWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision
@@ -117,6 +134,7 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
+    _lock = OS_UNFAIR_LOCK_INIT;
     _clusterID = [clusterID copy];
     _clusterRevision = [revision copy];
     _accessGrants = [[NSMutableSet alloc] init];
@@ -141,6 +159,8 @@ MTR_DIRECT_MEMBERS
 
 - (void)updateMatterAccessGrants
 {
+    os_unfair_lock_assert_owner(&_lock);
+
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController == nil) {
         // _matterAccessGrants will be updated when we get bound to a controller.
@@ -149,6 +169,7 @@ MTR_DIRECT_MEMBERS
 
     NSSet * grants = [_accessGrants copy];
     [deviceController asyncDispatchToMatterQueue:^{
+        std::lock_guard lock(self->_lock);
         self->_matterAccessGrants = grants;
     }
                                     errorHandler:nil];
@@ -156,6 +177,8 @@ MTR_DIRECT_MEMBERS
 
 - (void)addAccessGrant:(MTRAccessGrant *)accessGrant
 {
+    std::lock_guard lock(self->_lock);
+
     [_accessGrants addObject:accessGrant];
 
     [self updateMatterAccessGrants];
@@ -163,13 +186,24 @@ MTR_DIRECT_MEMBERS
 
 - (void)removeAccessGrant:(MTRAccessGrant *)accessGrant;
 {
+    std::lock_guard lock(self->_lock);
+
     [_accessGrants removeObject:accessGrant];
 
     [self updateMatterAccessGrants];
 }
 
+- (NSArray<MTRAccessGrant *> *)matterAccessGrants
+{
+    std::lock_guard lock(self->_lock);
+
+    return [_matterAccessGrants allObjects];
+}
+
 - (BOOL)addAttribute:(MTRServerAttribute *)attribute
 {
+    std::lock_guard lock(self->_lock);
+
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController != nil) {
         MTR_LOG_ERROR("Cannot add attribute on cluster %llx which is already in use", _clusterID.unsignedLongLongValue);
@@ -213,14 +247,12 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
 - (BOOL)associateWithController:(nullable MTRDeviceController *)controller
 {
+    std::lock_guard lock(self->_lock);
+
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
         MTR_LOG_ERROR("Cannot associate MTRServerCluster with controller %@; already associated with controller %@",
             controller.uniqueIdentifier, existingController.uniqueIdentifier);
-#else
-        MTR_LOG_ERROR("Cannot associate MTRServerCluster with controller; already associated with a different controller");
-#endif
         return NO;
     }
 
@@ -313,7 +345,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     _deviceController = controller;
 
-    MTR_LOG_DEFAULT("Associated %@, attribute count %llu, with controller", self,
+    MTR_LOG_DEFAULT("Associated %@, attribute count %llu, with controller", [self _descriptionWhileLocked],
         static_cast<unsigned long long>(attributeCount));
 
     return YES;
@@ -321,6 +353,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
 - (void)invalidate
 {
+    std::lock_guard lock(_lock);
+
     // Undo any work associateWithController did.
     for (MTRServerAttribute * attr in _attributes) {
         [attr invalidate];
@@ -342,6 +376,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 {
     assertChipStackLockedByCurrentThread();
 
+    std::lock_guard lock(_lock);
+
     if (!registerAttributeAccessOverride(_attributeAccessInterface.get())) {
         // This should only happen if we somehow managed to register an
         // AttributeAccessInterface for the same (endpoint, cluster) pair.
@@ -354,6 +390,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 {
     assertChipStackLockedByCurrentThread();
 
+    std::lock_guard lock(_lock);
+
     if (_attributeAccessInterface != nullptr) {
         unregisterAttributeAccessOverride(_attributeAccessInterface.get());
     }
@@ -361,38 +399,84 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
 - (NSArray<MTRAccessGrant *> *)accessGrants
 {
+    std::lock_guard lock(_lock);
+
     return [_accessGrants allObjects];
 }
 
 - (NSArray<MTRServerAttribute *> *)attributes
 {
+    std::lock_guard lock(_lock);
+
     return [_attributes copy];
 }
 
-- (void)setParentEndpoint:(EndpointId)endpoint
+- (BOOL)addToEndpoint:(chip::EndpointId)endpoint
 {
+    std::lock_guard lock(_lock);
+
+    if (_parentEndpoint != kInvalidEndpointId) {
+        MTR_LOG_ERROR("Cannot add cluster " ChipLogFormatMEI " to endpoint %" PRIu32 "; already added to endpoint %" PRIu32,
+            ChipLogValueMEI(_clusterID.unsignedLongLongValue), endpoint, _parentEndpoint);
+        return NO;
+    }
+
     _parentEndpoint = endpoint;
     // Update it on all the attributes, in case the attributes were added to us
     // before we were added to the endpoint.
     for (MTRServerAttribute * attr in _attributes) {
         [attr updateParentCluster:ConcreteClusterPath(endpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue))];
     }
+    return YES;
+}
+
+- (chip::EndpointId)parentEndpoint
+{
+    std::lock_guard lock(_lock);
+    return _parentEndpoint;
 }
 
 - (Span<const EmberAfAttributeMetadata>)matterAttributeMetadata
 {
     // This is always called after our _matterAttributeMetadata has been set up
     // by associateWithController.
+    std::lock_guard lock(_lock);
     return Span<const EmberAfAttributeMetadata>(_matterAttributeMetadata.data(), _matterAttributeMetadata.size());
+}
+
+- (void)setAcceptedCommands:(NSArray<NSNumber *> *)acceptedCommands
+{
+    std::lock_guard lock(_lock);
+    _acceptedCommands = [acceptedCommands copy];
+}
+
+- (NSArray<NSNumber *> *)acceptedCommands
+{
+    std::lock_guard lock(_lock);
+    return [_acceptedCommands copy];
+}
+
+- (void)setGeneratedCommands:(NSArray<NSNumber *> *)generatedCommands
+{
+    std::lock_guard lock(_lock);
+    _generatedCommands = [generatedCommands copy];
+}
+
+- (NSArray<NSNumber *> *)generatedCommands
+{
+    std::lock_guard lock(_lock);
+    return [_generatedCommands copy];
 }
 
 - (CommandId *)matterAcceptedCommands
 {
+    std::lock_guard lock(_lock);
     return _matterAcceptedCommandList.get();
 }
 
 - (CommandId *)matterGeneratedCommands
 {
+    std::lock_guard lock(_lock);
     return _matterGeneratedCommandList.get();
 }
 
@@ -413,6 +497,13 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
 - (NSString *)description
 {
+    std::lock_guard lock(_lock);
+    return [self _descriptionWhileLocked];
+}
+
+- (NSString *)_descriptionWhileLocked
+{
+    os_unfair_lock_assert_owner(&_lock);
     return [NSString stringWithFormat:@"<MTRServerCluster endpoint %u, id " ChipLogFormatMEI ">",
                      _parentEndpoint, ChipLogValueMEI(_clusterID.unsignedLongLongValue)];
 }

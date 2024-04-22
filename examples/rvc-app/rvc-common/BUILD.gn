@@ -21,7 +21,5 @@ config("config") {
 
 chip_data_model("rvc-common") {
   zap_file = "rvc-app.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/rvc-app/zap-generated"
   is_server = true
 }

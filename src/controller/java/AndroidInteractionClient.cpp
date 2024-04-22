@@ -24,9 +24,10 @@
 #include "AndroidInteractionClient.h"
 
 #include "AndroidCallbacks.h"
-#include "AndroidDeviceControllerWrapper.h"
 
 #include <lib/support/jsontlv/JsonToTlv.h>
+
+#include <string>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -431,7 +432,7 @@ exit:
 
 CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::CommandPathParams & path, const ByteSpan & data)
 {
-    // PrepareCommand does nott create the struct container with kFields and copycontainer below sets the
+    // PrepareCommand does not create the struct container with kFields and copycontainer below sets the
     // kFields container already
     ReturnErrorOnFailure(commandSender.PrepareCommand(path, false /* aStartDataStruct */));
     TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
@@ -440,6 +441,230 @@ CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::C
     reader.Init(data);
     ReturnErrorOnFailure(reader.Next());
     return writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader);
+}
+
+CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::CommandPathParams & path, const ByteSpan & data,
+                                      app::CommandSender::PrepareCommandParameters & prepareCommandParams)
+{
+    // PrepareCommand does not create the struct container with kFields and copycontainer below sets the
+    // kFields container already
+    ReturnErrorOnFailure(commandSender.PrepareCommand(path, prepareCommandParams));
+    TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    TLV::TLVReader reader;
+    reader.Init(data);
+    ReturnErrorOnFailure(reader.Next());
+    return writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader);
+}
+
+CHIP_ERROR extendableInvoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElementList,
+                            jint timedRequestTimeoutMs, jint imTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    auto callback                           = reinterpret_cast<ExtendableInvokeCallback *>(callbackHandle);
+    app::CommandSender * commandSender      = nullptr;
+    uint16_t groupId                        = 0;
+    bool isEndpointIdValid                  = false;
+    bool isGroupIdValid                     = false;
+    jint listSize                           = 0;
+    uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
+    app::CommandSender::ConfigParameters config;
+
+    ChipLogDetail(Controller, "IM extendableInvoke() called");
+
+    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
+    VerifyOrExit(device != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
+
+    VerifyOrExit(invokeElementList != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    SuccessOrExit(err = JniReferences::GetInstance().GetListSize(invokeElementList, listSize));
+
+    if ((listSize > 1) && (device->GetSecureSession().Value()->IsGroupSession()))
+    {
+        ChipLogError(Controller, "Not allow group session for InvokeRequests that has more than 1 CommandDataIB)");
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        goto exit;
+    }
+
+    commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
+    config.SetRemoteMaxPathsPerInvoke(device->GetSecureSession().Value()->GetRemoteSessionParameters().GetMaxPathsPerInvoke());
+    SuccessOrExit(err = commandSender->SetCommandSenderConfig(config));
+
+    for (uint8_t i = 0; i < listSize; i++)
+    {
+        jmethodID getEndpointIdMethod     = nullptr;
+        jmethodID getClusterIdMethod      = nullptr;
+        jmethodID getCommandIdMethod      = nullptr;
+        jmethodID getGroupIdMethod        = nullptr;
+        jmethodID getTlvByteArrayMethod   = nullptr;
+        jmethodID getJsonStringMethod     = nullptr;
+        jmethodID isEndpointIdValidMethod = nullptr;
+        jmethodID isGroupIdValidMethod    = nullptr;
+        jlong endpointIdObj               = 0;
+        jlong clusterIdObj                = 0;
+        jlong commandIdObj                = 0;
+        jobject groupIdObj                = nullptr;
+        jbyteArray tlvBytesObj            = nullptr;
+        jobject invokeElement             = nullptr;
+        SuccessOrExit(err = JniReferences::GetInstance().GetListItem(invokeElementList, i, invokeElement));
+        SuccessOrExit(
+            err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getEndpointId", "(J)J", &getEndpointIdMethod));
+        SuccessOrExit(err =
+                          JniReferences::GetInstance().FindMethod(env, invokeElement, "getClusterId", "(J)J", &getClusterIdMethod));
+        SuccessOrExit(err =
+                          JniReferences::GetInstance().FindMethod(env, invokeElement, "getCommandId", "(J)J", &getCommandIdMethod));
+        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getGroupId", "()Ljava/util/Optional;",
+                                                                    &getGroupIdMethod));
+        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "isEndpointIdValid", "()Z",
+                                                                    &isEndpointIdValidMethod));
+        SuccessOrExit(
+            err = JniReferences::GetInstance().FindMethod(env, invokeElement, "isGroupIdValid", "()Z", &isGroupIdValidMethod));
+        SuccessOrExit(
+            err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getTlvByteArray", "()[B", &getTlvByteArrayMethod));
+
+        isEndpointIdValid = (env->CallBooleanMethod(invokeElement, isEndpointIdValidMethod) == JNI_TRUE);
+        isGroupIdValid    = (env->CallBooleanMethod(invokeElement, isGroupIdValidMethod) == JNI_TRUE);
+
+        if (isEndpointIdValid)
+        {
+            endpointIdObj = env->CallLongMethod(invokeElement, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        }
+
+        if (isGroupIdValid)
+        {
+            VerifyOrExit(device->GetSecureSession().Value()->IsGroupSession(), err = CHIP_ERROR_INVALID_ARGUMENT);
+            groupIdObj = env->CallObjectMethod(invokeElement, getGroupIdMethod);
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            VerifyOrExit(groupIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            jobject boxedGroupId = nullptr;
+
+            SuccessOrExit(err = JniReferences::GetInstance().GetOptionalValue(groupIdObj, boxedGroupId));
+            VerifyOrExit(boxedGroupId != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+            groupId = static_cast<uint16_t>(JniReferences::GetInstance().IntegerToPrimitive(boxedGroupId));
+        }
+
+        clusterIdObj = env->CallLongMethod(invokeElement, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        commandIdObj = env->CallLongMethod(invokeElement, getCommandIdMethod, static_cast<jlong>(kInvalidCommandId));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(invokeElement, getTlvByteArrayMethod));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        app::CommandSender::PrepareCommandParameters prepareCommandParams;
+        prepareCommandParams.commandRef.SetValue(static_cast<uint16_t>(i));
+
+        {
+            uint16_t id = isEndpointIdValid ? static_cast<uint16_t>(endpointIdObj) : groupId;
+            app::CommandPathFlags flag =
+                isEndpointIdValid ? app::CommandPathFlags::kEndpointIdValid : app::CommandPathFlags::kGroupIdValid;
+            app::CommandPathParams path(id, static_cast<ClusterId>(clusterIdObj), static_cast<CommandId>(commandIdObj), flag);
+
+            if (tlvBytesObj != nullptr)
+            {
+                JniByteArray tlvBytesObjBytes(env, tlvBytesObj);
+                SuccessOrExit(
+                    err = PutPreencodedInvokeRequest(*commandSender, path, tlvBytesObjBytes.byteSpan(), prepareCommandParams));
+            }
+            else
+            {
+                SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getJsonString",
+                                                                            "()Ljava/lang/String;", &getJsonStringMethod));
+                jstring jsonJniString = static_cast<jstring>(env->CallObjectMethod(invokeElement, getJsonStringMethod));
+                VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+                VerifyOrExit(jsonJniString != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+                JniUtfString jsonUtfJniString(env, jsonJniString);
+                // The invoke does not support chunk, kMaxSecureSduLengthBytes should be enough for command json blob
+                uint8_t tlvBytes[chip::app::kMaxSecureSduLengthBytes] = { 0 };
+                MutableByteSpan tlvEncodingLocal{ tlvBytes };
+                SuccessOrExit(err = JsonToTlv(std::string(jsonUtfJniString.c_str(), static_cast<size_t>(jsonUtfJniString.size())),
+                                              tlvEncodingLocal));
+                SuccessOrExit(err = PutPreencodedInvokeRequest(*commandSender, path, tlvEncodingLocal, prepareCommandParams));
+            }
+        }
+
+        app::CommandSender::FinishCommandParameters finishCommandParams(convertedTimedRequestTimeoutMs != 0
+                                                                            ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
+                                                                            : Optional<uint16_t>::Missing());
+
+        finishCommandParams.commandRef = prepareCommandParams.commandRef;
+        SuccessOrExit(err = commandSender->FinishCommand(finishCommandParams));
+    }
+    SuccessOrExit(err = device->GetSecureSession().Value()->IsGroupSession()
+                      ? commandSender->SendGroupCommandRequest(device->GetSecureSession().Value())
+                      : commandSender->SendCommandRequest(device->GetSecureSession().Value(),
+                                                          imTimeoutMs != 0
+                                                              ? MakeOptional(System::Clock::Milliseconds32(imTimeoutMs))
+                                                              : Optional<System::Clock::Timeout>::Missing()));
+
+    callback->mCommandSender = commandSender;
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "JNI IM Invoke Error: %s", err.AsString());
+        if (err == CHIP_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        app::CommandSender::ErrorData errorData;
+        errorData.error = err;
+        callback->OnError(nullptr, errorData);
+        if (commandSender != nullptr)
+        {
+            Platform::Delete(commandSender);
+            commandSender = nullptr;
+        }
+        if (callback != nullptr)
+        {
+            Platform::Delete(callback);
+            callback = nullptr;
+        }
+    }
+    return err;
+}
+
+CHIP_ERROR shutdownSubscriptions(JNIEnv * env, jlong handle, jobject fabricIndex, jobject peerNodeId, jobject subscriptionId)
+{
+    chip::DeviceLayer::StackLock lock;
+    if (fabricIndex == nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
+    {
+        app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+        return CHIP_NO_ERROR;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId == nullptr)
+    {
+        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        jlong jPeerNodeId = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex),
+                                                                          static_cast<chip::NodeId>(jPeerNodeId));
+        return CHIP_NO_ERROR;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
+    {
+        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex));
+        return CHIP_NO_ERROR;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId != nullptr)
+    {
+        jint jFabricIndex     = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        jlong jPeerNodeId     = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
+        jlong jSubscriptionId = chip::JniReferences::GetInstance().LongToPrimitive(subscriptionId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
+            chip::ScopedNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex)),
+            static_cast<chip::SubscriptionId>(jSubscriptionId));
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement,

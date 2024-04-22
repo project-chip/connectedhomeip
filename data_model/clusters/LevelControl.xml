@@ -79,8 +79,8 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="2" code="FQ" name="Frequency" default="0" summary="Supports frequency attributes and behavior.
-                                      The Pulse Width Modulation cluster was created
-                                      for frequency control.">
+                                                    The Pulse Width Modulation cluster was created
+                                                    for frequency control.">
       <provisionalConform/>
     </feature>
   </features>

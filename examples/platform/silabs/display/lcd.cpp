@@ -25,7 +25,7 @@
 #include "dmd.h"
 #include "glib.h"
 
-#if (SIWX_917)
+#if (SLI_SI91X_MCU_INTERFACE)
 #include "rsi_chip.h"
 #endif
 
@@ -66,7 +66,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     }
 
     /* Enable the memory lcd */
-#if (SIWX_917)
+#if (SLI_SI91X_MCU_INTERFACE)
     RSI_NPSSGPIO_InputBufferEn(SL_BOARD_ENABLE_DISPLAY_PIN, 1U);
     RSI_NPSSGPIO_SetPinMux(SL_BOARD_ENABLE_DISPLAY_PIN, 0);
     RSI_NPSSGPIO_SetDir(SL_BOARD_ENABLE_DISPLAY_PIN, 0);

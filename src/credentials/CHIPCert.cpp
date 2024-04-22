@@ -25,10 +25,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <stddef.h>
 
 #include <credentials/CHIPCert_Internal.h>

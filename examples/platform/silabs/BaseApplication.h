@@ -27,11 +27,11 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/server/AppDelegate.h>
 #include <app/util/config.h>
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -62,6 +62,17 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+class BaseApplicationDelegate : public AppDelegate
+{
+private:
+    bool isComissioningStarted;
+    void OnCommissioningSessionStarted() override;
+    void OnCommissioningSessionStopped() override;
+    void OnCommissioningWindowClosed() override;
+};
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+
 /**********************************************************
  * BaseApplication Declaration
  *********************************************************/
@@ -75,6 +86,9 @@ public:
     static bool sIsProvisioned;
     static bool sIsFactoryResetTriggered;
     static LEDWidget * sAppActionLed;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
+    static BaseApplicationDelegate sAppDelegate;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SLI_SI917
 
     /**
      * @brief Create AppTask task and Event Queue
@@ -82,7 +96,7 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR if no errors
      */
-    CHIP_ERROR StartAppTask(TaskFunction_t taskFunction);
+    CHIP_ERROR StartAppTask(osThreadFunc_t taskFunction);
 
     /**
      * @brief Links the application specific led to the baseApplication context
@@ -168,9 +182,9 @@ protected:
      * @brief Function Timer finished callback function
      *        Post an FunctionEventHandler event
      *
-     * @param xTimer timer that finished
+     * @param timerCbArg argument to the timer callback function assigned at timer creation
      */
-    static void FunctionTimerEventHandler(TimerHandle_t xTimer);
+    static void FunctionTimerEventHandler(void * timerCbArg);
 
     /**
      * @brief Timer Event processing function
@@ -193,9 +207,9 @@ protected:
      * @brief Light Timer finished callback function
      *        Calls LED processing function
      *
-     * @param xTimer timer that finished
+     * @param timerCbArg argument to the timer callback function assigned at timer creation
      */
-    static void LightTimerEventHandler(TimerHandle_t xTimer);
+    static void LightTimerEventHandler(void * timerCbArg);
 
     /**
      * @brief Updates device LEDs

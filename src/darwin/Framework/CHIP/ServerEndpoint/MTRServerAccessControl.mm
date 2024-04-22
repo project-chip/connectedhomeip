@@ -32,6 +32,7 @@
 #include <lib/core/Global.h>
 #include <lib/core/NodeId.h>
 
+#include <app/util/ember-compatibility-functions.h>
 #include <app/util/privilege-storage.h>
 
 using namespace chip;
@@ -134,36 +135,36 @@ Global<ControllerAccessControl> gControllerAccessControl;
 
 } // anonymous namespace
 
-int MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
+chip::Access::Privilege MatterGetAccessPrivilegeForReadEvent(ClusterId cluster, EventId event)
 {
     // We don't support any event bits yet.
-    return kMatterAccessPrivilegeAdminister;
+    return chip::Access::Privilege::kAdminister;
 }
 
-int MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId command)
+chip::Access::Privilege MatterGetAccessPrivilegeForInvokeCommand(ClusterId cluster, CommandId command)
 {
     // For now we only have OTA, which uses Operate.
-    return kMatterAccessPrivilegeOperate;
+    return chip::Access::Privilege::kOperate;
 }
 
-int MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attribute)
+chip::Access::Privilege MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attribute)
 {
     NSNumber * _Nullable neededPrivilege = [[MTRDeviceControllerFactory sharedInstance] neededReadPrivilegeForClusterID:@(cluster) attributeID:@(attribute)];
     if (neededPrivilege == nil) {
         // No privileges declared for this attribute on this cluster.  Treat as
         // "needs admin privileges", so we fail closed.
-        return kMatterAccessPrivilegeAdminister;
+        return chip::Access::Privilege::kAdminister;
     }
 
     switch (neededPrivilege.unsignedLongLongValue) {
     case MTRAccessControlEntryPrivilegeView:
-        return kMatterAccessPrivilegeView;
+        return chip::Access::Privilege::kView;
     case MTRAccessControlEntryPrivilegeOperate:
-        return kMatterAccessPrivilegeOperate;
+        return chip::Access::Privilege::kOperate;
     case MTRAccessControlEntryPrivilegeManage:
-        return kMatterAccessPrivilegeManage;
+        return chip::Access::Privilege::kManage;
     case MTRAccessControlEntryPrivilegeAdminister:
-        return kMatterAccessPrivilegeAdminister;
+        return chip::Access::Privilege::kAdminister;
     case MTRAccessControlEntryPrivilegeProxyView:
         // Just treat this as an unknown value; there is no value for this in privilege-storage.
         FALLTHROUGH;
@@ -174,13 +175,13 @@ int MatterGetAccessPrivilegeForReadAttribute(ClusterId cluster, AttributeId attr
     // To be safe, treat unknown values as "needs admin privileges".  That way the failure case
     // disallows access that maybe should be allowed, instead of allowing access that maybe
     // should be disallowed.
-    return kMatterAccessPrivilegeAdminister;
+    return chip::Access::Privilege::kAdminister;
 }
 
-int MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId attribute)
+chip::Access::Privilege MatterGetAccessPrivilegeForWriteAttribute(ClusterId cluster, AttributeId attribute)
 {
     // We don't have any writable attributes yet, but default to Operate.
-    return kMatterAccessPrivilegeOperate;
+    return chip::Access::Privilege::kOperate;
 }
 
 void InitializeServerAccessControl()

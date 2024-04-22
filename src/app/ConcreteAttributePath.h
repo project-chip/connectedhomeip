@@ -142,11 +142,20 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
                         ChipLogValueMEI(mClusterId), ChipLogValueMEI(mAttributeId));
     }
 
-    bool MatchesConcreteAttributePath(const ConcreteAttributePath & aOther) { return ConcreteAttributePath::operator==(aOther); }
+    bool MatchesConcreteAttributePath(const ConcreteAttributePath & aOther) const
+    {
+        return ConcreteAttributePath::operator==(aOther);
+    }
 
-    bool operator==(const ConcreteDataAttributePath & aOther) const = delete;
-    bool operator!=(const ConcreteDataAttributePath & aOther) const = delete;
-    bool operator<(const ConcreteDataAttributePath & aOther) const  = delete;
+    bool operator==(const ConcreteDataAttributePath & aOther) const
+    {
+        return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex) && (mListOp == aOther.mListOp) &&
+            (mDataVersion == aOther.mDataVersion);
+    }
+
+    bool operator!=(const ConcreteDataAttributePath & aOther) const { return !(*this == aOther); }
+
+    bool operator<(const ConcreteDataAttributePath & aOther) const = delete;
 
     //
     // This index is only valid if `mListOp` is set to a list item operation, i.e

@@ -31,6 +31,7 @@
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
+#include <string>
 #include <type_traits>
 
 namespace chip {
@@ -40,6 +41,8 @@ static const int MILLIS_SINCE_BOOT  = 0;
 static const int MILLIS_SINCE_EPOCH = 1;
 // Add the bytes for attribute tag(1:control + 8:tag + 8:length) and structure(1:struct + 1:close container)
 static const int EXTRA_SPACE_FOR_ATTRIBUTE_TAG = 19;
+
+jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR & err);
 
 GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback,
                                                        const char * callbackClassSignature) :
@@ -314,20 +317,24 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     readerForJavaTLV.Init(*apData);
 
     jobject value = nullptr;
-#ifdef USE_JAVA_TLV_ENCODE_DECODE
     TLV::TLVReader readerForJavaObject;
     readerForJavaObject.Init(*apData);
-
+#ifdef USE_JAVA_TLV_ENCODE_DECODE
     value = DecodeAttributeValue(aPath, readerForJavaObject, &err);
     // If we don't know this attribute, suppress it.
     if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB)
     {
-        err = CHIP_NO_ERROR;
+        TLV::TLVReader readerForGeneralValueObject;
+        readerForGeneralValueObject.Init(*apData);
+        value = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
+        err   = CHIP_NO_ERROR;
     }
 
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode attribute with error %s", ErrorStr(err));
                    aPath.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+#else
+    value = DecodeGeneralTLVValue(env, readerForJavaObject, err);
 #endif
     // Create TLV byte array to pass to Java layer
     size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
@@ -468,18 +475,23 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     }
 
     jobject value = nullptr;
-#ifdef USE_JAVA_TLV_ENCODE_DECODE
     TLV::TLVReader readerForJavaObject;
     readerForJavaObject.Init(*apData);
+#ifdef USE_JAVA_TLV_ENCODE_DECODE
     value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
     // If we don't know this event, just skip it.
     if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB)
     {
-        err = CHIP_NO_ERROR;
+        TLV::TLVReader readerForGeneralValueObject;
+        readerForGeneralValueObject.Init(*apData);
+        value = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
+        err   = CHIP_NO_ERROR;
     }
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode event with error %s", ErrorStr(err));
                    aEventHeader.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+#else
+    value = DecodeGeneralTLVValue(env, readerForJavaObject, err);
 #endif
 
     // Create TLV byte array to pass to Java layer
@@ -780,6 +792,7 @@ InvokeCallback::~InvokeCallback()
     if (mCommandSender != nullptr)
     {
         Platform::Delete(mCommandSender);
+        mCommandSender = nullptr;
     }
 }
 
@@ -791,7 +804,6 @@ void InvokeCallback::OnResponse(app::CommandSender * apCommandSender, const app:
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     jmethodID onResponseMethod;
     JniLocalReferenceScope scope(env);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java InvokeElement: %s", ErrorStr(err)));
     VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
                    ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s", __func__));
     jobject wrapperCallbackRef = mWrapperCallbackRef.ObjectRef();
@@ -907,6 +919,275 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
+jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGeneralValueObject, CHIP_ERROR & err)
+{
+    jobject retValue = nullptr;
+
+    switch (readerForGeneralValueObject.GetType())
+    {
+    case TLV::kTLVType_SignedInteger: {
+        int64_t signedValue = 0;
+        VerifyOrReturnValue(readerForGeneralValueObject.Get(signedValue) == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "Get TLV Value fail!"));
+        err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(signedValue),
+                                                                    retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+        return retValue;
+    }
+    case TLV::kTLVType_UnsignedInteger: {
+        uint64_t unsignedValue = 0;
+        VerifyOrReturnValue(readerForGeneralValueObject.Get(unsignedValue) == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "Get TLV Value fail!"));
+        err = JniReferences::GetInstance().CreateBoxedObject<jlong>("java/lang/Long", "(J)V", static_cast<jlong>(unsignedValue),
+                                                                    retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+        return retValue;
+    }
+    case TLV::kTLVType_Boolean: {
+        bool booleanValue = false;
+        VerifyOrReturnValue(readerForGeneralValueObject.Get(booleanValue) == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "Get TLV Value fail!"));
+        err = JniReferences::GetInstance().CreateBoxedObject<jboolean>("java/lang/Boolean", "(Z)V",
+                                                                       static_cast<jboolean>(booleanValue), retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+        return retValue;
+    }
+    case TLV::kTLVType_FloatingPointNumber: {
+        double doubleValue = 0.0;
+        VerifyOrReturnValue(readerForGeneralValueObject.Get(doubleValue) == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "Get TLV Value fail!"));
+        err = JniReferences::GetInstance().CreateBoxedObject<jdouble>("java/lang/Double", "(D)V", static_cast<jdouble>(doubleValue),
+                                                                      retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Create Boxed Object fail!"));
+        return retValue;
+    }
+    case TLV::kTLVType_UTF8String: {
+        uint32_t bufferLen             = readerForGeneralValueObject.GetLength();
+        std::unique_ptr<char[]> buffer = std::unique_ptr<char[]>(new char[bufferLen + 1]);
+        err                            = readerForGeneralValueObject.GetString(buffer.get(), bufferLen + 1);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+        chip::CharSpan valueSpan(buffer.get(), bufferLen);
+        chip::JniReferences::GetInstance().CharToStringUTF(valueSpan, retValue);
+        return retValue;
+    }
+    case TLV::kTLVType_ByteString: {
+        uint32_t bufferLen                = readerForGeneralValueObject.GetLength();
+        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen + 1]);
+        err                               = readerForGeneralValueObject.GetBytes(buffer.get(), bufferLen + 1);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogProgress(Controller, "Get TLV Value fail!"));
+
+        jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(bufferLen));
+        env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(bufferLen), reinterpret_cast<const jbyte *>(buffer.get()));
+
+        return static_cast<jobject>(valueByteArray);
+    }
+    case TLV::kTLVType_Array: {
+        TLV::TLVType containerType;
+        err = readerForGeneralValueObject.EnterContainer(containerType);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "EnterContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        err = chip::JniReferences::GetInstance().CreateArrayList(retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        while (readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
+        {
+            jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                                ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
+        }
+        return retValue;
+    }
+    case TLV::kTLVType_List: {
+        TLV::TLVType containerType;
+        err = readerForGeneralValueObject.EnterContainer(containerType);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "EnterContainer fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        err = chip::JniReferences::GetInstance().CreateArrayList(retValue);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogProgress(Controller, "CreateArrayList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
+        while (readerForGeneralValueObject.Next() == CHIP_NO_ERROR)
+        {
+            jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                                ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
+        }
+        return retValue;
+    }
+    case TLV::kTLVType_Null: {
+        return nullptr;
+    }
+    default:
+        err = CHIP_ERROR_WRONG_TLV_TYPE;
+        return nullptr;
+    }
+}
+
+ExtendableInvokeCallback::ExtendableInvokeCallback(jobject wrapperCallback)
+{
+    VerifyOrReturn(mWrapperCallbackRef.Init(wrapperCallback) == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Could not init mWrapperCallbackRef for ExtendableInvokeCallback"));
+}
+
+ExtendableInvokeCallback::~ExtendableInvokeCallback()
+{
+    if (mCommandSender != nullptr)
+    {
+        Platform::Delete(mCommandSender);
+        mCommandSender = nullptr;
+    }
+}
+
+void ExtendableInvokeCallback::OnResponse(app::CommandSender * apCommandSender,
+                                          const app::CommandSender::ResponseData & aResponseData)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    jmethodID onResponseMethod;
+    JniLocalReferenceScope scope(env);
+    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
+                   ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s", __func__));
+    jobject wrapperCallbackRef = mWrapperCallbackRef.ObjectRef();
+    DeviceLayer::StackUnlock unlock;
+
+    jobject jCommandRef = nullptr;
+    if (aResponseData.commandRef.HasValue())
+    {
+        err = JniReferences::GetInstance().CreateBoxedObject<jint>(
+            "java/lang/Integer", "(I)V", static_cast<jint>(aResponseData.commandRef.Value()), jCommandRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Controller, "Could not CreateBoxedObject with error %" CHIP_ERROR_FORMAT, err.Format()));
+    }
+
+    if (aResponseData.data != nullptr)
+    {
+        TLV::TLVReader readerForJavaTLV;
+        TLV::TLVReader readerForJson;
+        readerForJavaTLV.Init(*(aResponseData.data));
+
+        // Create TLV byte array to pass to Java layer
+        size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
+        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
+        uint32_t size                     = 0;
+
+        TLV::TLVWriter writer;
+        writer.Init(buffer.get(), bufferLen);
+        err = writer.CopyElement(TLV::AnonymousTag(), readerForJavaTLV);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed CopyElement: %" CHIP_ERROR_FORMAT, err.Format()));
+        size = writer.GetLengthWritten();
+
+        chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), static_cast<jint>(size));
+
+        // Convert TLV to JSON
+        std::string json;
+        readerForJson.Init(buffer.get(), size);
+        err = readerForJson.Next();
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(Controller, "Failed readerForJson next: %" CHIP_ERROR_FORMAT, err.Format()));
+        err = TlvToJson(readerForJson, json);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed TlvToJson: %" CHIP_ERROR_FORMAT, err.Format()));
+        UtfString jsonString(env, json.c_str());
+
+        err = JniReferences::GetInstance().FindMethod(env, wrapperCallbackRef, "onResponse",
+                                                      "(IJJLjava/lang/Integer;[BLjava/lang/String;)V", &onResponseMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onResponse method: %s", ErrorStr(err)));
+
+        env->CallVoidMethod(wrapperCallbackRef, onResponseMethod, static_cast<jint>(aResponseData.path.mEndpointId),
+                            static_cast<jlong>(aResponseData.path.mClusterId), static_cast<jlong>(aResponseData.path.mCommandId),
+                            jCommandRef, jniByteArray.jniValue(), jsonString.jniValue());
+    }
+    else
+    {
+        err = JniReferences::GetInstance().FindMethod(env, wrapperCallbackRef, "onResponse",
+                                                      "(IJJLjava/lang/Integer;ILjava/lang/Integer;)V", &onResponseMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onResponse method: %s", ErrorStr(err)));
+
+        jobject jClusterState = nullptr;
+        if (aResponseData.statusIB.mClusterStatus.HasValue())
+        {
+            err = JniReferences::GetInstance().CreateBoxedObject<jint>(
+                "java/lang/Integer", "(I)V", static_cast<jint>(aResponseData.statusIB.mClusterStatus.Value()), jClusterState);
+            VerifyOrReturn(err == CHIP_NO_ERROR,
+                           ChipLogError(Controller, "Could not CreateBoxedObject with error %" CHIP_ERROR_FORMAT, err.Format()));
+        }
+
+        env->CallVoidMethod(wrapperCallbackRef, onResponseMethod, static_cast<jint>(aResponseData.path.mEndpointId),
+                            static_cast<jlong>(aResponseData.path.mClusterId), static_cast<jlong>(aResponseData.path.mCommandId),
+                            jCommandRef, aResponseData.statusIB.mStatus, jClusterState);
+    }
+
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+}
+
+void ExtendableInvokeCallback::OnNoResponse(app::CommandSender * commandSender,
+                                            const app::CommandSender::NoResponseData & aNoResponseData)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    jmethodID onNoResponseMethod;
+    JniLocalReferenceScope scope(env);
+    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
+                   ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s", __func__));
+    jobject wrapperCallbackRef = mWrapperCallbackRef.ObjectRef();
+    DeviceLayer::StackUnlock unlock;
+
+    err = JniReferences::GetInstance().FindMethod(env, wrapperCallbackRef, "onNoResponse", "(I)V", &onNoResponseMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Unable to find onNoResponse method: %" CHIP_ERROR_FORMAT, err.Format()));
+    env->CallVoidMethod(wrapperCallbackRef, onNoResponseMethod, static_cast<jint>(aNoResponseData.commandRef));
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+}
+
+void ExtendableInvokeCallback::OnError(const app::CommandSender * apCommandSender, const app::CommandSender::ErrorData & aErrorData)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
+    ChipLogError(Controller, "ExtendableInvokeCallback::OnError is called with %u", aErrorData.error.AsInteger());
+    jthrowable exception;
+    err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, ErrorStr(aErrorData.error),
+                                                                                      aErrorData.error.AsInteger(), exception);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Controller, "Unable to create AndroidControllerException with error: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    jmethodID onErrorMethod;
+    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
+                   ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s", __func__));
+    jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
+    err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "onError", "(Ljava/lang/Exception;)V", &onErrorMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Unable to find onError method:  %" CHIP_ERROR_FORMAT, err.Format()));
+
+    DeviceLayer::StackUnlock unlock;
+    env->CallVoidMethod(wrapperCallback, onErrorMethod, exception);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+}
+
+void ExtendableInvokeCallback::OnDone(app::CommandSender * apCommandSender)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
+    jmethodID onDoneMethod;
+    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(),
+                   ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s", __func__));
+    jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
+    JniGlobalReference globalRef(std::move(mWrapperCallbackRef));
+
+    err = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "onDone", "()V", &onDoneMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
+
+    DeviceLayer::StackUnlock unlock;
+    env->CallVoidMethod(wrapperCallback, onDoneMethod);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+}
+
 jlong newConnectedDeviceCallback(JNIEnv * env, jobject self, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
@@ -969,5 +1250,19 @@ void deleteInvokeCallback(JNIEnv * env, jobject self, jlong callbackHandle)
     chip::Platform::Delete(invokeCallback);
 }
 
+jlong newExtendableInvokeCallback(JNIEnv * env, jobject self)
+{
+    chip::DeviceLayer::StackLock lock;
+    ExtendableInvokeCallback * invokeCallback = chip::Platform::New<ExtendableInvokeCallback>(self);
+    return reinterpret_cast<jlong>(invokeCallback);
+}
+
+void deleteExtendableInvokeCallback(JNIEnv * env, jobject self, jlong callbackHandle)
+{
+    chip::DeviceLayer::StackLock lock;
+    ExtendableInvokeCallback * invokeCallback = reinterpret_cast<ExtendableInvokeCallback *>(callbackHandle);
+    VerifyOrReturn(invokeCallback != nullptr, ChipLogError(Controller, "ExtendableInvokeCallback handle is nullptr"));
+    chip::Platform::Delete(invokeCallback);
+}
 } // namespace Controller
 } // namespace chip

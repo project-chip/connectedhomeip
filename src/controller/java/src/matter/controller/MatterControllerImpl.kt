@@ -543,6 +543,7 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
         .setUdpListenPort(params.udpListenPort)
         .setControllerVendorId(params.vendorId)
         .setCountryCode(params.countryCode)
+        .setEnableServerInteractions(params.enableServerInteractions)
 
     if (config != null) {
       val intermediateCertificate = config.certificateData.intermediateCertificate

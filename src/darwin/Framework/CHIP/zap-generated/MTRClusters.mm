@@ -6080,11 +6080,7 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)stayActiveRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRICDManagementClusterStayActiveResponseParams * _Nullable data, NSError * _Nullable error))completion
-{
-    [self stayActiveRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
-}
-- (void)stayActiveRequestWithParams:(MTRICDManagementClusterStayActiveRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRICDManagementClusterStayActiveResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)stayActiveRequestWithParams:(MTRICDManagementClusterStayActiveRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRICDManagementClusterStayActiveResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
         params = [[MTRICDManagementClusterStayActiveRequestParams

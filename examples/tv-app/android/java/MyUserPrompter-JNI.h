@@ -41,6 +41,9 @@ private:
     chip::JniGlobalReference mJNIMyUserPrompterObject;
     jmethodID mPromptForCommissionOKPermissionMethod = nullptr;
     jmethodID mPromptForCommissionPincodeMethod      = nullptr;
+    jmethodID mHidePromptsOnCancelMethod             = nullptr;
+    jmethodID mPromptWithCommissionerPasscodeMethod  = nullptr;
+    jmethodID mPromptCommissioningStartedMethod      = nullptr;
     jmethodID mPromptCommissioningSucceededMethod    = nullptr;
     jmethodID mPromptCommissioningFailedMethod       = nullptr;
 };

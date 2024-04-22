@@ -1,0 +1,17 @@
+AppTests
+BDXTests
+ChipCryptoTests
+CoreTests
+CredentialsTest
+DataModelTests
+InetLayerTests
+MdnsTests
+MessagingLayerTests
+MinimalMdnsCoreTests
+RawTransportTests
+RetransmitTests
+SecureChannelTests
+SetupPayloadTests
+SupportTests
+TransportLayerTests
+UserDirectedCommissioningTests

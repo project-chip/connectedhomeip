@@ -21,6 +21,7 @@
  *      one) for a fabric.
  */
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>

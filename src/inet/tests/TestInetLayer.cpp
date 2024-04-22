@@ -25,10 +25,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include <signal.h>
 #include <stdint.h>
 #include <string.h>

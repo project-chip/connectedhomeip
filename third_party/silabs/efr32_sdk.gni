@@ -46,6 +46,9 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
+  # Enable the BLE extended advertisement
+  sl_matter_ble_extended_adv = false
+
   # ICD Openthread Configuration flags
   sl_ot_idle_interval_ms = 15000  # 15s Idle Intervals
   sl_ot_active_interval_ms = 200  # 200ms Active Intervals
@@ -74,6 +77,9 @@ declare_args() {
 
   # Use SLC generated files
   slc_reuse_files = false
+
+  # Multi-chip OTA
+  chip_enable_multi_ota_requestor = false
 }
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 silabs_plat_efr32_wifi_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
@@ -277,7 +283,6 @@ template("efr32_sdk") {
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
-      "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -297,9 +302,16 @@ template("efr32_sdk") {
       "SL_RAIL_LIB_MULTIPROTOCOL_SUPPORT=1",
       "SL_RAIL_UTIL_PA_CONFIG_HEADER=<sl_rail_util_pa_config.h>",
       "RADIO_CONFIG_DMP_SUPPORT=1",
+      "SL_MATTER_BLE_EXTENDED_ADV=${sl_matter_ble_extended_adv}",
 
       #"__STACK_SIZE=0",
     ]
+
+    if (silabs_log_enabled && chip_logging) {
+      defines += [ "SILABS_LOG_ENABLED=1" ]
+    } else {
+      defines += [ "SILABS_LOG_ENABLED=0" ]
+    }
 
     # Temporary configuration to enable COAP specific configurations
     if (use_thread_coap_lib) {
@@ -396,12 +408,14 @@ template("efr32_sdk") {
     if (use_system_view) {
       _include_dirs += [
         "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/",
         "${efr32_sdk_root}/util/third_party/segger/systemview/init/",
         "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
       ]
 
-      defines += [ "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT=1" ]
+      defines += [
+        "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT",
+        "SEGGER_SYSVIEW_RTT_BUFFER_SIZE=8192",
+      ]
     }
 
     defines += board_defines
@@ -824,6 +838,9 @@ template("efr32_sdk") {
 
     if (use_system_view) {
       sources += [
+        "${chip_root}/examples/platform/silabs/sl_systemview_config.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/Global.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/SEGGER_RTT_Conf.h",
         "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_SYSVIEW.c",
         "${efr32_sdk_root}/util/third_party/segger/systemview/init/SEGGER_SYSVIEW_Init.c",
         "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/SEGGER_SYSVIEW_FreeRTOS.c",

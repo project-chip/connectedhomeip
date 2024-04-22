@@ -24,9 +24,7 @@
 
 #include "AppEvent.h"
 
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
-
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
 struct WeekDaysScheduleInfo
@@ -203,10 +201,11 @@ private:
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 
-    static void TimerEventHandler(TimerHandle_t xTimer);
+    static void TimerEventHandler(void * timerCbArg);
     static void AutoLockTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
+    osTimerId_t mLockTimer;
     EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
     EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentials];
     WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];

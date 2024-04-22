@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <list>
+#include <string>
 #include <vector>
 
 struct CachedMessageOption
@@ -64,7 +65,7 @@ struct CachedMessage
     CachedMessage(const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
                   const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
                   const chip::app::DataModel::Nullable<uint32_t> & startTime,
-                  const chip::app::DataModel::Nullable<uint16_t> & duration, std::string messageText) :
+                  const chip::app::DataModel::Nullable<uint64_t> & duration, std::string messageText) :
         mPriority(priority),
         mMessageControl(messageControl), mStartTime(startTime), mDuration(duration), mMessageText(messageText)
     {
@@ -110,7 +111,7 @@ protected:
     const chip::app::Clusters::Messages::MessagePriorityEnum mPriority;
     const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> mMessageControl;
     const chip::app::DataModel::Nullable<uint32_t> mStartTime;
-    const chip::app::DataModel::Nullable<uint16_t> mDuration;
+    const chip::app::DataModel::Nullable<uint64_t> mDuration;
 
     std::string mMessageText;
     uint8_t mMessageIdBuffer[chip::app::Clusters::Messages::kMessageIdLength];
@@ -126,7 +127,7 @@ public:
     CHIP_ERROR HandlePresentMessagesRequest(
         const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
         const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
-        const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint16_t> & duration,
+        const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint64_t> & duration,
         const chip::CharSpan & messageText,
         const chip::Optional<
             chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &

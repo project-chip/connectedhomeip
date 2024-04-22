@@ -283,9 +283,6 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         }
         SuccessOrExit(err = sender->TestOnlyFinishCommand(finishCommandParams));
 
-        // CommandSender provides us with the CommandReference for this associated command. In order to match responses
-        // we have to add CommandRef to index lookup.
-        VerifyOrExit(finishCommandParams.commandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
         if (testOnlyCommandRefsOverride != nullptr)
         {
             // Making sure the value we used to override CommandRef was actually used.

@@ -37,8 +37,9 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:35
+            image: ghcr.io/project-chip/chip-build-android:47
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:

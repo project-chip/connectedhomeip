@@ -23068,12 +23068,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
                 else
                 {
-                    std::string newElement_0_durationClassName     = "java/lang/Integer";
-                    std::string newElement_0_durationCtorSignature = "(I)V";
-                    jint jninewElement_0_duration                  = static_cast<jint>(entry_0.duration.Value());
-                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_durationClassName.c_str(),
-                                                                               newElement_0_durationCtorSignature.c_str(),
-                                                                               jninewElement_0_duration, newElement_0_duration);
+                    std::string newElement_0_durationClassName     = "java/lang/Long";
+                    std::string newElement_0_durationCtorSignature = "(J)V";
+                    jlong jninewElement_0_duration                 = static_cast<jlong>(entry_0.duration.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_durationClassName.c_str(),
+                                                                                newElement_0_durationCtorSignature.c_str(),
+                                                                                jninewElement_0_duration, newElement_0_duration);
                 }
                 jobject newElement_0_messageText;
                 LogErrorOnFailure(
@@ -23163,11 +23163,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jmethodID messageStructStructCtor_1;
-                err =
-                    chip::JniReferences::GetInstance().FindMethod(env, messageStructStructClass_1, "<init>",
-                                                                  "([BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/"
-                                                                  "lang/Integer;Ljava/lang/String;Ljava/util/Optional;)V",
-                                                                  &messageStructStructCtor_1);
+                err = chip::JniReferences::GetInstance().FindMethod(env, messageStructStructClass_1, "<init>",
+                                                                    "([BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
+                                                                    "Long;Ljava/lang/Long;Ljava/lang/String;Ljava/util/Optional;)V",
+                                                                    &messageStructStructCtor_1);
                 if (err != CHIP_NO_ERROR || messageStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$MessagesClusterMessageStruct constructor");

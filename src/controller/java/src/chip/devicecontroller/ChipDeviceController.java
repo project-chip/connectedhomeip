@@ -151,6 +151,11 @@ public class ChipDeviceController {
     finishOTAProvider(deviceControllerPtr);
   }
 
+  /** Set the delegate of ICD check in */
+  public void setICDCheckInDelegate(ICDCheckInDelegate delegate) {
+    setICDCheckInDelegate(deviceControllerPtr, new ICDCheckInDelegateWrapper(delegate));
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -414,7 +419,7 @@ public class ChipDeviceController {
    * @param params
    * @return CHIP_ERROR error code (0 is no error)
    */
-  public int onNOCChainGeneration(ControllerParams params) {
+  public long onNOCChainGeneration(ControllerParams params) {
     return onNOCChainGeneration(deviceControllerPtr, params);
   }
 
@@ -451,6 +456,15 @@ public class ChipDeviceController {
 
   public void unpairDeviceCallback(long deviceId, UnpairDeviceCallback callback) {
     unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
+  }
+
+  /**
+   * This function stops a pairing or commissioning process that is in progress.
+   *
+   * @param deviceId The remote device Id.
+   */
+  public void stopDevicePairing(long deviceId) {
+    stopDevicePairing(deviceControllerPtr, deviceId);
   }
 
   /**
@@ -541,19 +555,19 @@ public class ChipDeviceController {
     }
   }
 
-  public void onPairingComplete(int errorCode) {
+  public void onPairingComplete(long errorCode) {
     if (completionListener != null) {
       completionListener.onPairingComplete(errorCode);
     }
   }
 
-  public void onCommissioningComplete(long nodeId, int errorCode) {
+  public void onCommissioningComplete(long nodeId, long errorCode) {
     if (completionListener != null) {
       completionListener.onCommissioningComplete(nodeId, errorCode);
     }
   }
 
-  public void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode) {
+  public void onCommissioningStatusUpdate(long nodeId, String stage, long errorCode) {
     if (completionListener != null) {
       completionListener.onCommissioningStatusUpdate(nodeId, stage, errorCode);
     }
@@ -567,7 +581,7 @@ public class ChipDeviceController {
     }
   }
 
-  public void onScanNetworksFailure(int errorCode) {
+  public void onScanNetworksFailure(long errorCode) {
     if (scanNetworksListener != null) {
       scanNetworksListener.onScanNetworksFailure(errorCode);
     }
@@ -590,7 +604,7 @@ public class ChipDeviceController {
     }
   }
 
-  public void onPairingDeleted(int errorCode) {
+  public void onPairingDeleted(long errorCode) {
     if (completionListener != null) {
       completionListener.onPairingDeleted(errorCode);
     }
@@ -622,7 +636,7 @@ public class ChipDeviceController {
     }
   }
 
-  public void onICDRegistrationComplete(int errorCode, ICDDeviceInfo icdDeviceInfo) {
+  public void onICDRegistrationComplete(long errorCode, ICDDeviceInfo icdDeviceInfo) {
     if (completionListener != null) {
       completionListener.onICDRegistrationComplete(errorCode, icdDeviceInfo);
     }
@@ -743,12 +757,13 @@ public class ChipDeviceController {
 
   /* Shuts down all active subscriptions. */
   public void shutdownSubscriptions() {
-    shutdownSubscriptions(deviceControllerPtr, null, null, null);
+    ChipInteractionClient.shutdownSubscriptions(deviceControllerPtr, null, null, null);
   }
 
   /* Shuts down all active subscriptions for the fabric at the given fabricIndex */
   public void shutdownSubscriptions(int fabricIndex) {
-    shutdownSubscriptions(deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
+    ChipInteractionClient.shutdownSubscriptions(
+        deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
   }
 
   /**
@@ -758,7 +773,7 @@ public class ChipDeviceController {
    * @param peerNodeId the node ID of the device for which subscriptions should be canceled
    */
   public void shutdownSubscriptions(int fabricIndex, long peerNodeId) {
-    shutdownSubscriptions(
+    ChipInteractionClient.shutdownSubscriptions(
         deviceControllerPtr, Integer.valueOf(fabricIndex), Long.valueOf(peerNodeId), null);
   }
 
@@ -770,7 +785,7 @@ public class ChipDeviceController {
    * @param subscriptionId the ID of the subscription on the node which should be canceled
    */
   public void shutdownSubscriptions(int fabricIndex, long peerNodeId, long subscriptionId) {
-    shutdownSubscriptions(
+    ChipInteractionClient.shutdownSubscriptions(
         deviceControllerPtr,
         Integer.valueOf(fabricIndex),
         Long.valueOf(peerNodeId),
@@ -811,7 +826,7 @@ public class ChipDeviceController {
       int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -849,7 +864,7 @@ public class ChipDeviceController {
       int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -875,7 +890,7 @@ public class ChipDeviceController {
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -909,7 +924,7 @@ public class ChipDeviceController {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(
             subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -961,7 +976,7 @@ public class ChipDeviceController {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(
             subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -992,7 +1007,7 @@ public class ChipDeviceController {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(
             subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1022,7 +1037,7 @@ public class ChipDeviceController {
       List<ChipAttributePath> attributePaths,
       int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1046,7 +1061,7 @@ public class ChipDeviceController {
   public void readEventPath(
       ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths, int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1066,7 +1081,7 @@ public class ChipDeviceController {
       int imTimeoutMs,
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1087,7 +1102,7 @@ public class ChipDeviceController {
       boolean isFabricFiltered,
       int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1119,7 +1134,7 @@ public class ChipDeviceController {
       boolean isFabricFiltered,
       int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1141,7 +1156,7 @@ public class ChipDeviceController {
       int imTimeoutMs,
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1170,7 +1185,7 @@ public class ChipDeviceController {
       int timedRequestTimeoutMs,
       int imTimeoutMs) {
     WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
-    write(
+    ChipInteractionClient.write(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1196,11 +1211,37 @@ public class ChipDeviceController {
       int timedRequestTimeoutMs,
       int imTimeoutMs) {
     InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
-    invoke(
+    ChipInteractionClient.invoke(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
         invokeElement,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
+  }
+
+  /**
+   * @brief ExtendableInvoke command to target device
+   * @param ExtendableInvokeCallback Callback when invoke responses have been received and processed
+   *     for the given batched invoke commands.
+   * @param devicePtr connected device pointer
+   * @param invokeElementList invoke element list
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void extendableInvoke(
+      ExtendableInvokeCallback callback,
+      long devicePtr,
+      List<InvokeElement> invokeElementList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    ExtendableInvokeCallbackJni jniCallback = new ExtendableInvokeCallbackJni(callback);
+    ChipInteractionClient.extendableInvoke(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        invokeElementList,
         timedRequestTimeoutMs,
         imTimeoutMs);
   }
@@ -1309,10 +1350,12 @@ public class ChipDeviceController {
   /**
    * Extract skid from paa cert.
    *
-   * @param paaCert The product attestation authority (PAA) cert
-   * @return The subject key identifier (SKID)
+   * <p>This method was deprecated. Please use {@link DeviceAttestation.extractSkidFromPaaCert}.
    */
-  public native byte[] extractSkidFromPaaCert(byte[] paaCert);
+  @Deprecated
+  public byte[] extractSkidFromPaaCert(byte[] paaCert) {
+    return DeviceAttestation.extractSkidFromPaaCert(paaCert);
+  }
 
   /**
    * Generates a new PASE verifier for the given setup PIN code.
@@ -1336,47 +1379,6 @@ public class ChipDeviceController {
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
 
-  static native void subscribe(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      List<ChipAttributePath> attributePaths,
-      List<ChipEventPath> eventPaths,
-      List<DataVersionFilter> dataVersionFilters,
-      int minInterval,
-      int maxInterval,
-      boolean keepSubscriptions,
-      boolean isFabricFiltered,
-      int imTimeoutMs,
-      @Nullable Long eventMin);
-
-  static native void read(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      List<ChipAttributePath> attributePaths,
-      List<ChipEventPath> eventPaths,
-      List<DataVersionFilter> dataVersionFilters,
-      boolean isFabricFiltered,
-      int imTimeoutMs,
-      @Nullable Long eventMin);
-
-  static native void write(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      List<AttributeWriteRequest> attributeList,
-      int timedRequestTimeoutMs,
-      int imTimeoutMs);
-
-  static native void invoke(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      InvokeElement invokeElement,
-      int timedRequestTimeoutMs,
-      int imTimeoutMs);
-
   private native long newDeviceController(ControllerParams params);
 
   private native void setDeviceAttestationDelegate(
@@ -1390,6 +1392,9 @@ public class ChipDeviceController {
   private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
 
   private native void finishOTAProvider(long deviceControllerPtr);
+
+  private native void setICDCheckInDelegate(
+      long deviceControllerPtr, ICDCheckInDelegateWrapper delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,
@@ -1439,6 +1444,8 @@ public class ChipDeviceController {
 
   private native void unpairDeviceCallback(
       long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
+
+  private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
@@ -1521,15 +1528,9 @@ public class ChipDeviceController {
 
   private native List<ICDClientInfo> getICDClientInfo(long deviceControllerPtr, long fabricIndex);
 
-  private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
+  private native long onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
   private native int getFabricIndex(long deviceControllerPtr);
-
-  private native void shutdownSubscriptions(
-      long deviceControllerPtr,
-      @Nullable Integer fabricIndex,
-      @Nullable Long peerNodeId,
-      @Nullable Long subscriptionId);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
 
@@ -1587,7 +1588,7 @@ public class ChipDeviceController {
    */
   public interface ScanNetworksListener {
     /** Notifies when scan networks call fails. */
-    void onScanNetworksFailure(int errorCode);
+    void onScanNetworksFailure(long errorCode);
 
     void onScanNetworksSuccess(
         Integer networkingStatus,
@@ -1606,20 +1607,20 @@ public class ChipDeviceController {
     void onStatusUpdate(int status);
 
     /** Notifies the completion of pairing. */
-    void onPairingComplete(int errorCode);
+    void onPairingComplete(long errorCode);
 
     /** Notifies the deletion of pairing session. */
-    void onPairingDeleted(int errorCode);
+    void onPairingDeleted(long errorCode);
 
     /** Notifies the completion of commissioning. */
-    void onCommissioningComplete(long nodeId, int errorCode);
+    void onCommissioningComplete(long nodeId, long errorCode);
 
     /** Notifies the completion of each stage of commissioning. */
     void onReadCommissioningInfo(
         int vendorId, int productId, int wifiEndpointId, int threadEndpointId);
 
     /** Notifies the completion of each stage of commissioning. */
-    void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode);
+    void onCommissioningStatusUpdate(long nodeId, String stage, long errorCode);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();
@@ -1640,6 +1641,6 @@ public class ChipDeviceController {
     void onICDRegistrationInfoRequired();
 
     /** Notifies when the registration flow for the ICD completes. */
-    void onICDRegistrationComplete(int errorCode, ICDDeviceInfo icdDeviceInfo);
+    void onICDRegistrationComplete(long errorCode, ICDDeviceInfo icdDeviceInfo);
   }
 }

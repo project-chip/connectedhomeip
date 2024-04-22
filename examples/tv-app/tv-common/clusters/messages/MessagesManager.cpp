@@ -18,6 +18,7 @@
 #include "MessagesManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <string>
 #include <vector>
 
 using namespace std;
@@ -30,7 +31,7 @@ using MessageResponseOption = chip::app::Clusters::Messages::Structs::MessageRes
 // Commands
 CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
-    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
+    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
     const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     ChipLogProgress(Zcl, "HandlePresentMessagesRequest message:%s", std::string(messageText.data(), messageText.size()).c_str());

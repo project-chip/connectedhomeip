@@ -35,6 +35,11 @@
 
 #include <inet/arpa-inet-compatibility.h>
 
+#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#include <inet/arpa-inet-compatibility.h>
+#include <openthread/icmp6.h>
+#include <openthread/ip6.h>
+
 #else
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -718,12 +723,6 @@ void CheckAddress(nlTestSuite * inSuite, const IPAddressContext & inContext, con
 
     CheckAddressQuartets(inSuite, inContext, inAddress);
 
-    // Convert the address to a string and compare it to the control string.
-
-    inAddress.ToString(lAddressBuffer);
-
-    CheckAddressString(inSuite, lAddressBuffer, inContext.mAddrString);
-
     // Convert the control string to an address and compare the parsed address to the created address.
 
     lResult = IPAddress::FromString(inContext.mAddrString, lParsedAddress);
@@ -735,6 +734,21 @@ void CheckAddress(nlTestSuite * inSuite, const IPAddressContext & inContext, con
     {
         fprintf(stdout, "Address parse mismatch for %s\n", inContext.mAddrString);
     }
+
+    // Convert the address to a string and compare it to the control string.
+
+    inAddress.ToString(lAddressBuffer);
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+    // Embedded openthread stack otIp6AddressFromString format the string as a uncompressed IPV6
+    // example ff01::1 is formatted has ff01:0:0:0:0:0:0:1
+    // But the IPV6 address From string API (otIp6AddressFromString) handle both compressed and uncompressed format.
+    char uncompressedAddrStr[INET6_ADDRSTRLEN];
+    // Reconvert the previously parsed control string to an uncompressed string format
+    lParsedAddress.ToString(uncompressedAddrStr);
+    CheckAddressString(inSuite, lAddressBuffer, uncompressedAddrStr);
+#else
+    CheckAddressString(inSuite, lAddressBuffer, inContext.mAddrString);
+#endif
 }
 
 // Test functions invoked from the suite.
@@ -786,9 +800,22 @@ void CheckToString(nlTestSuite * inSuite, void * inContext)
         SetupIPAddress(lAddress, lCurrent);
 
         lAddress.ToString(lAddressBuffer);
-
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+        // Embedded openthread stack otIp6AddressFromString format the string as a uncompressed IPV6
+        // So ff01::1 is formatted has ff01:0:0:0:0:0:0:1
+        // But the IPV6 address From string API (otIp6AddressFromString) handle both compressed and uncompressed format.
+        // For this test, pass the expected, compressed, string throught the opentread stack address format API
+        // so the final check evaluates uncompressed IPV6 strings.
+        char uncompressedAddrStr[INET6_ADDRSTRLEN];
+        IPAddress tempIpAddr;
+        // Set Expected compressed IPV6 String as otIpv6 Address
+        IPAddress::FromString(lCurrent->mAddr.mAddrString, strlen(lCurrent->mAddr.mAddrString), tempIpAddr);
+        // Reconvert the expected IPV6 String to an uncompressed string format
+        tempIpAddr.ToString(uncompressedAddrStr);
+        CheckAddressString(inSuite, lAddressBuffer, uncompressedAddrStr);
+#else
         CheckAddressString(inSuite, lAddressBuffer, lCurrent->mAddr.mAddrString);
-
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
         ++lCurrent;
     }
 }
@@ -1015,6 +1042,9 @@ void CheckToIPv6(nlTestSuite * inSuite, void * inContext)
 #if LWIP_IPV6_SCOPES
         ip_addr_1.zone = 0;
 #endif
+#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+        otIp6Address ip_addr_1 = { 0 }, ip_addr_2 = { 0 };
+        memcpy(ip_addr_1.mFields.m32, addr, sizeof(addr));
 #else
         struct in6_addr ip_addr_1, ip_addr_2;
         ip_addr_1 = *reinterpret_cast<struct in6_addr *>(addr);
@@ -1052,6 +1082,9 @@ void CheckFromIPv6(nlTestSuite * inSuite, void * inContext)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip6_addr_t ip_addr;
         memcpy(ip_addr.addr, addr, sizeof(addr));
+#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+        otIp6Address ip_addr;
+        memcpy(ip_addr.mFields.m32, addr, sizeof(addr));
 #else
         struct in6_addr ip_addr;
         ip_addr = *reinterpret_cast<struct in6_addr *>(addr);
@@ -1203,9 +1236,9 @@ void CheckFromIPv4(nlTestSuite * inSuite, void * inContext)
  */
 void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     (void) inSuite;
-    // This test is only supported for non LWIP stack.
+    // This test is not supported LWIP or OPEN_THREAD_ENDPOINT stacks.
 #else // CHIP_SYSTEM_CONFIG_USE_LWIP
     const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
     IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
@@ -1261,7 +1294,7 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
 
         ++lCurrent;
     }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 }
 
 /**

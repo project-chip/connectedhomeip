@@ -35,6 +35,7 @@ Checks: >
   -clang-analyzer-cplusplus.Move,
   -clang-analyzer-deadcode.DeadStores,
   -clang-analyzer-nullability.NullablePassedToNonnull,
+  -clang-analyzer-optin.core.EnumCastOutOfRange,
   -clang-analyzer-optin.cplusplus.UninitializedObject,
   -clang-analyzer-optin.cplusplus.VirtualCall,
   -clang-analyzer-optin.osx.cocoa.localizability.EmptyLocalizationContextChecker,

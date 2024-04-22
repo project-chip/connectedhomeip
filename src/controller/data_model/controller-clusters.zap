@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 99,
+  "featureLevel": 100,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1117,10 +1117,10 @@
               "side": "client",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1224,7 +1224,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -2032,6 +2032,7 @@
           "define": "LAUNDRY_DRYER_CONTROLS_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -2840,22 +2841,6 @@
               "isEnabled": 1
             },
             {
-              "name": "Stop",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "Start",
-              "code": 2,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
               "name": "Resume",
               "code": 3,
               "mfgCode": null,
@@ -3140,10 +3125,10 @@
               "side": "client",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3183,10 +3168,10 @@
               "side": "client",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3321,6 +3306,7 @@
           "define": "POWER_TOPOLOGY_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -3332,7 +3318,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3943,8 +3929,7 @@
           "mfgCode": null,
           "define": "FAN_CONTROL_CLUSTER",
           "side": "client",
-          "enabled": 1,
-          "apiMaturity": "provisional"
+          "enabled": 1
         },
         {
           "name": "Thermostat User Interface Configuration",
@@ -4343,7 +4328,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -5748,7 +5733,8 @@
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "parentEndpointIdentifier": null
     }
   ]
 }

@@ -22,6 +22,9 @@
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
+#if CONFIG_ENABLE_SNTP_TIME_SYNC
+#include <time/TimeSync.h>
+#endif
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
 #else
@@ -126,7 +129,8 @@ static void InitServer(intptr_t context)
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
-    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND
+                            // Initialize device attestation config
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
     esp_insights_config_t config = {
         .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
@@ -144,8 +148,15 @@ static void InitServer(intptr_t context)
     Tracing::Register(backend);
 #endif
 
-    // Application code should always be initialised after the initialisation of server.
+    // Application code should always be initialised after the initialisation of
+    // server.
     ApplicationInit();
+
+#if CONFIG_ENABLE_SNTP_TIME_SYNC
+    const char kNtpServerUrl[]             = "pool.ntp.org";
+    const uint16_t kSyncNtpTimeIntervalDay = 1;
+    chip::Esp32TimeSync::Init(kNtpServerUrl, kSyncNtpTimeIntervalDay);
+#endif
 }
 
 extern "C" void app_main()

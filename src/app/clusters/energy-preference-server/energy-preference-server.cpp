@@ -17,6 +17,7 @@
 
 #include "energy-preference-server.h"
 
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h> // Needed for registerAttributeAccessOverride
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -78,9 +79,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
                     Optional<MutableCharSpan> label{ MutableCharSpan(buffer) };
                     if ((err = gsDelegate->GetEnergyBalanceAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
                     {
-                        BalanceStruct::Type balance = { step,
-                                                        label.HasValue() ? Optional<CharSpan>(label.Value())
-                                                                         : Optional<CharSpan>() };
+                        BalanceStruct::Type balance = { step, Optional<CharSpan>(label) };
                         ReturnErrorOnFailure(encoder.Encode(balance));
                         index++;
                     }
@@ -137,9 +136,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
                     Optional<MutableCharSpan> label{ MutableCharSpan(buffer) };
                     if ((err = gsDelegate->GetLowPowerModeSensitivityAtIndex(endpoint, index, step, label)) == CHIP_NO_ERROR)
                     {
-                        BalanceStruct::Type balance = { step,
-                                                        label.HasValue() ? Optional<CharSpan>(label.Value())
-                                                                         : Optional<CharSpan>() };
+                        BalanceStruct::Type balance = { step, Optional<CharSpan>(label) };
                         ReturnErrorOnFailure(encoder.Encode(balance));
                         index++;
                     }

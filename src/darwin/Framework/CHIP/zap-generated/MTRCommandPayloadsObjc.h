@@ -3697,6 +3697,8 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRICDManagementClusterStayActiveRequestParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull stayActiveDuration MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -7757,14 +7759,14 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRFanControlClusterStepParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull direction MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull direction MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable wrap MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable wrap MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable lowestOff MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable lowestOff MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

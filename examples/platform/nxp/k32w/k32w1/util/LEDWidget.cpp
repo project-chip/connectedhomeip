@@ -23,6 +23,10 @@
 
 #include "app.h"
 
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+#include "LED_Dimmer.h"
+#endif
+
 #if (defined(gAppLedCnt_c) && (gAppLedCnt_c > 0))
 
 void LEDWidget::Init(uint8_t led, bool inverted)
@@ -48,6 +52,13 @@ void LEDWidget::Set(bool state)
     DoSet(state);
 }
 
+void LEDWidget::SetLevel(uint8_t level)
+{
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+    move_to_level(level);
+#endif
+}
+
 void LEDWidget::Blink(uint32_t changeRateMS)
 {
     Blink(changeRateMS, changeRateMS);
@@ -70,7 +81,12 @@ void LEDWidget::Animate()
 
         if (nextChangeTimeMS < nowMS)
         {
+#if CHIP_CONFIG_ENABLE_DIMMABLE_LED
+            SetLevel(!mState * 254);
+            mState = !mState;
+#else
             DoSet(!mState);
+#endif
             mLastChangeTimeMS = nowMS;
         }
     }

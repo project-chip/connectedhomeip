@@ -53,4 +53,20 @@
     return @(2); // seconds
 }
 
+- (void)deviceCachePrimed:(MTRDevice *)device
+{
+    if (self.onDeviceCachePrimed != nil) {
+        self.onDeviceCachePrimed();
+    }
+}
+
+- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device
+{
+    return self.skipExpectedValuesForWrite;
+}
+
+- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device
+{
+    return self.forceAttributeReportsIfMatchingCache;
+}
 @end

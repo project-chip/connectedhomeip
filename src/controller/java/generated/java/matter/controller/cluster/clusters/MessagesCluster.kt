@@ -106,7 +106,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
     priority: UByte,
     messageControl: UByte,
     startTime: UInt?,
-    duration: UShort?,
+    duration: ULong?,
     messageText: String,
     responses: List<MessagesClusterMessageResponseOptionStruct>?,
     timedInvokeTimeout: Duration? = null

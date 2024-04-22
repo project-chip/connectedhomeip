@@ -3510,7 +3510,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterFanControlAttributeRockSettingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000008,
     MTRAttributeIDTypeClusterFanControlAttributeWindSupportID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000009,
     MTRAttributeIDTypeClusterFanControlAttributeWindSettingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000A,
-    MTRAttributeIDTypeClusterFanControlAttributeAirflowDirectionID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterFanControlAttributeAirflowDirectionID MTR_NEWLY_AVAILABLE = 0x0000000B,
     MTRAttributeIDTypeClusterFanControlAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterFanControlAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterFanControlAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -6493,7 +6493,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster FanControl deprecated command id names
 
     // Cluster FanControl commands
-    MTRCommandIDTypeClusterFanControlCommandStepID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterFanControlCommandStepID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster ColorControl deprecated command id names
     MTRClusterColorControlCommandMoveToHueID

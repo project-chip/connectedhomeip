@@ -21,9 +21,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
-#include <app/att-storage.h>
 #include <app/reporting/reporting.h>
-#include <app/util/af.h>
+#include <app/util/att-storage.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 #include <inttypes.h>
@@ -39,6 +38,18 @@ using namespace app::Clusters;
 using namespace app::Clusters::Groups;
 using namespace chip::Credentials;
 using Protocols::InteractionModel::Status;
+
+// Is the device identifying?
+static bool emberAfIsDeviceIdentifying(EndpointId endpoint)
+{
+#ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
+    uint16_t identifyTime;
+    Status status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
+    return (status == Status::Success && 0 < identifyTime);
+#else
+    return false;
+#endif
+}
 
 /**
  * @brief Checks if group-endpoint association exist for the given fabric

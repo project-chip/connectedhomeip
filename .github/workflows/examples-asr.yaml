@@ -16,6 +16,8 @@ name: Build example - ASR
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
@@ -34,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-asr:35
+            image: ghcr.io/project-chip/chip-build-asr:47
             options: --user root
 
         steps:

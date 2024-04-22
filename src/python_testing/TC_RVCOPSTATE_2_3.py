@@ -234,7 +234,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
         await self.send_resume_cmd_with_check(13, op_errors.kNoError)
 
-        if self.check_pics("OPSTATE.S.M.RESUME_AFTER_ERR"):
+        if self.check_pics("RVCOPSTATE.S.M.RESUME_AFTER_ERR"):
             self.print_instruction(16, "Manually put the device in the Running state")
 
             await self.read_operational_state_with_check(17, op_states.kRunning)

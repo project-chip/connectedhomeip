@@ -372,3 +372,82 @@ tests:
                 value: 102
       response:
           error: NOT_FOUND
+
+    - label:
+          "Wait for a little bit less than the active mode duration (10000ms)"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 9000
+
+    - label:
+          "StayActive Scenario 1: Confirm the promised active duration is
+          increased to a specific if a value less than 30000ms is requested and
+          the device does not intend to stay active longer"
+      command: "StayActiveRequest"
+      arguments:
+          values:
+              - name: "StayActiveDuration"
+                value: 20000
+      response:
+          values:
+              - name: "PromisedActiveDuration"
+                constraints:
+                    type: int32u
+                    minValue: 19500
+                    maxValue: 20500
+
+    - label:
+          "Wait for a little bit less than the new promied active mode duration
+          (20000ms)"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 19000
+
+    - label:
+          "StayActive Scenario 2: Confirm the promised active duration is
+          reduced to 30000ms if a value greater than 30000ms is requested"
+      command: "StayActiveRequest"
+      arguments:
+          values:
+              - name: "StayActiveDuration"
+                value: 35000
+      response:
+          values:
+              - name: "PromisedActiveDuration"
+                constraints:
+                    type: int32u
+                    minValue: 29500
+                    maxValue: 30500
+
+    - label:
+          "Wait for a 20000 less than the new promied active mode duration
+          (30000ms)"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "StayActive Scenario 3: confirm that the device ignores the request if
+          the device intends to stay active longer than the requested duration
+          we should have about 20000ms left here"
+      command: "StayActiveRequest"
+      arguments:
+          values:
+              - name: "StayActiveDuration"
+                value: 10000
+      response:
+          values:
+              - name: "PromisedActiveDuration"
+                constraints:
+                    type: int32u
+                    minValue: 19500
+                    maxValue: 20500

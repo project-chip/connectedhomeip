@@ -24,11 +24,12 @@
 
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/basic-types.h>

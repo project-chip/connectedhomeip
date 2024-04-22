@@ -271,6 +271,12 @@ menu "CHIP Core"
                 Opens the commissioning window automatically at application boot time if
                 the node is not yet commissioned.
 
+        config ENABLE_SNTP_TIME_SYNC
+            bool "Enable SNTP time synchronization"
+            default n
+            help
+                Enable this option to enable SNTP time synchronization
+
     endmenu # "System Options"
 
     menu "Security Options"
@@ -340,12 +346,26 @@ menu "CHIP Device Layer"
             help
                 Enables or Disables the support for Commissionable Device Type.
 
-        config ENABLE_ICD_SERVER
+        menuconfig ENABLE_ICD_SERVER
             bool "Enable ICD server"
             depends on OPENTHREAD_MTD
             default n
             help
                 Enables or Disables ICD server
+
+        config ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
+            bool "Enforce SIT Slow Polling Max value to 15 seconds"
+            depends on ENABLE_ICD_SERVER
+            default n
+            help
+                Set to true to enforce SIT Slow Polling Max value to 15seconds
+
+        config ICD_REPORT_ON_ACTIVE_MODE
+            bool "Emit a report on entering active mode"
+            depends on ENABLE_ICD_SERVER
+            default n
+            help
+                Make the ICD manager emit a report on entering active mode
 
         config ICD_SLOW_POLL_INTERVAL_MS
             int "ICD Slow Polling Interval(ms)"
@@ -389,13 +409,47 @@ menu "CHIP Device Layer"
                 This value indicates the minimum amount of time in milliseconds the server typically
                 will stay active after network activity when in active mode.
 
+        config ENABLE_ICD_LIT
+            bool "Enable Long Idle Time ICD"
+            depends on ENABLE_ICD_SERVER
+            default n
+            help
+                Enables or Disables LIT ICD
+
+        config ENABLE_ICD_CIP
+            bool "Enable Check-in protocol"
+            depends on ENABLE_ICD_LIT
+            default y
+            help
+                Enables or Disables ICD Check-in protocol
+
         config ICD_CLIENTS_SUPPORTED_PER_FABRIC
             int "ICD Clients Number Supported Per Fabric"
-            depends on ENABLE_ICD_SERVER
+            depends on ENABLE_ICD_CIP
             default 1
             help
                 This value indicates the maximum number of entries that the ICD server is able to store
                 for each fabric in the RegisteredClients attribute.
+
+        config ICD_MAX_NOTIFICATION_SUBSCRIBERS
+            int "Max ICD notification subscribers"
+            depends on ENABLE_ICD_SERVER
+            default 1
+            help
+                The ICDManager implements the ICDListener functions and is always subscribed to the ICDNotifier
+                This allows other Matter modules to inform the ICDManager that it needs to go and may have to stay in Active Mode,
+                outside of its standard ActiveModeDuration and IdleModeDuration, without being tightly coupled the  application
+                data model
+
+                This implementation also allows other modules to implement an ICDListener and subscribe to ICDNotifier
+                to couple behaviours with the ICD cycles. In such cases, ICD_MAX_NOTIFICATION_SUBSCRIBERS need to be adjusted
+
+        config ENABLE_ICD_USER_ACTIVE_MODE_TRIGGER
+            bool "Enable User Active Mode Trigger feature"
+            depends on ENABLE_ICD_LIT
+            default y
+            help
+                Enables or Disables ICD User Active Mode Trigger feature
 
         config ENABLE_BG_EVENT_PROCESSING
             bool "Enable Background event processing"
@@ -912,6 +966,16 @@ menu "CHIP Device Layer"
            default n
            help
                This option enables the system statistics to be sent to the insights cloud.
+
+      config MAX_PERMIT_LIST_SIZE
+           int "Set permit list size for Insights traces"
+           range 5 30
+           depends on ESP_INSIGHTS_ENABLED
+           default 20
+           help
+               Maximum number of group entries that can be included in the permit list for reporting
+               the traces to insights.
+
     endmenu
 
 
@@ -1128,8 +1192,11 @@ menu "CHIP Device Layer"
     menu "Commissioning Window Options"
         config CHIP_DISCOVERY_TIMEOUT_SECS
             int "Commissioning Window Timeout in seconds"
-            range 180 900 
-            default 900 
+            range 180 900 if !ENABLE_BLE_EXT_ANNOUNCEMENT
+            range 901 172800 if ENABLE_BLE_EXT_ANNOUNCEMENT
+            default 900 if !ENABLE_BLE_EXT_ANNOUNCEMENT
+            default 172800 if ENABLE_BLE_EXT_ANNOUNCEMENT
+
             help
                 The amount of time (in seconds) after which the CHIP platform will close the Commissioning Window
     endmenu
@@ -1149,6 +1216,15 @@ menu "CHIP Device Layer"
             default n
             help
                 Enable Matter support Event List attribute.
+
+    endmenu
+
+    menu "Enable BLE Extended Announcement"
+        config ENABLE_BLE_EXT_ANNOUNCEMENT
+            bool "Enable BLE Extended Announcement"
+            default n
+            help
+                Enable BLE Extended Announcement.To be used with CHIP_DISCOVERY_TIMEOUT_SECS for extended announcement duration.
 
     endmenu
 

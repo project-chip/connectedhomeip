@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * A representation of an endpoint implemented by an MTRDeviceController.
  */
+NS_SWIFT_SENDABLE
 MTR_NEWLY_AVAILABLE
 @interface MTRServerEndpoint : NSObject
 

@@ -865,6 +865,36 @@ exit:
     return (err == CHIP_NO_ERROR);
 }
 
+JNI_METHOD(jboolean, messages_1presentMessages)
+(JNIEnv * env, jobject, jobject contentApp, jstring messageText, jobject jResponseHandler)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(AppServer, "JNI_METHOD messages_presentMessages called");
+    const char * nativeMessageText = env->GetStringUTFChars(messageText, 0);
+
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(Messages_PresentMessagesRequest).SetUp(env, jResponseHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = CastingServer::GetInstance()->Messages_PresentMessagesRequest(&endpoint, nativeMessageText, [](CHIP_ERROR err) {
+        TvCastingAppJNIMgr().getMediaCommandResponseHandler(Messages_PresentMessagesRequest).Handle(err);
+    });
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "CastingServer.Messages_PresentMessagesRequest failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    env->ReleaseStringUTFChars(messageText, nativeMessageText);
+
+exit:
+    return (err == CHIP_NO_ERROR);
+}
+
 JNI_METHOD(jboolean, mediaPlayback_1play)
 (JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
 {

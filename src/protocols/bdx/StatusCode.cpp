@@ -33,6 +33,14 @@ StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR error)
     {
         status = StatusCode::kBadMessageContents;
     }
+    else if (error == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        status = StatusCode::kTransferMethodNotSupported;
+    }
+    else if (error == CHIP_ERROR_UNKNOWN_RESOURCE_ID)
+    {
+        status = StatusCode::kFileDesignatorUnknown;
+    }
 
     return status;
 }

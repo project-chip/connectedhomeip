@@ -27,6 +27,8 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Messages;
@@ -74,7 +76,7 @@ void MessagesManager::InitializeWithObjects(jobject managerObject)
     }
 
     mPresentMessagesMethod =
-        env->GetMethodID(managerClass, "presentMessages", "(Ljava/lang/String;IIJILjava/lang/String;Ljava/util/HashMap;)Z");
+        env->GetMethodID(managerClass, "presentMessages", "(Ljava/lang/String;IIJJLjava/lang/String;Ljava/util/HashMap;)Z");
     if (mPresentMessagesMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MessagesManager 'presentMessages' method");
@@ -182,11 +184,11 @@ CHIP_ERROR MessagesManager::HandleGetMessages(AttributeValueEncoder & aEncoder)
                 message.startTime = DataModel::Nullable<uint32_t>(static_cast<uint32_t>(jstartTime));
             }
 
-            jfieldID durationField = env->GetFieldID(messageClass, "duration", "I");
-            jint jduration         = env->GetIntField(messageObject, durationField);
+            jfieldID durationField = env->GetFieldID(messageClass, "duration", "J");
+            jlong jduration        = env->GetLongField(messageObject, durationField);
             if (jduration >= 0)
             {
-                message.duration = DataModel::Nullable<uint16_t>(static_cast<uint16_t>(jduration));
+                message.duration = DataModel::Nullable<uint64_t>(static_cast<uint64_t>(jduration));
             }
 
             jfieldID getResponseOptionsField =
@@ -301,7 +303,7 @@ exit:
 
 CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
     const ByteSpan & messageId, const MessagePriorityEnum & priority, const BitMask<MessageControlBitmap> & messageControl,
-    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint16_t> & duration, const CharSpan & messageText,
+    const DataModel::Nullable<uint32_t> & startTime, const DataModel::Nullable<uint64_t> & duration, const CharSpan & messageText,
     const Optional<DataModel::DecodableList<MessageResponseOption>> & responses)
 {
     DeviceLayer::StackUnlock unlock;
@@ -336,11 +338,11 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
             return CHIP_ERROR_INTERNAL;
         }
 
-        jint jcontrol  = static_cast<jint>(messageControl.Raw());
-        jint jduration = -1;
+        jint jcontrol   = static_cast<jint>(messageControl.Raw());
+        jlong jduration = -1;
         if (!duration.IsNull())
         {
-            jduration = static_cast<jint>(duration.Value());
+            jduration = static_cast<jlong>(duration.Value());
         }
         jlong jstartTime = -1;
         if (!startTime.IsNull())
@@ -382,11 +384,11 @@ CHIP_ERROR MessagesManager::HandlePresentMessagesRequest(
                     return CHIP_ERROR_INTERNAL;
                 }
 
-                jobject jlong = env->NewObject(longClass, longCtor, response.messageResponseID.Value());
-                VerifyOrReturnError(jlong != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not create Long"));
+                jobject jlongobj = env->NewObject(longClass, longCtor, static_cast<uint64_t>(response.messageResponseID.Value()));
+                VerifyOrReturnError(jlongobj != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Could not create Long"));
 
                 // add to HashMap
-                env->CallObjectMethod(joptions, hashMapPut, jlong, jlabel);
+                env->CallObjectMethod(joptions, hashMapPut, jlongobj, jlabel);
                 if (env->ExceptionCheck())
                 {
                     ChipLogError(DeviceLayer, "Java exception in MessagesManager::HandlePresentMessagesRequest");

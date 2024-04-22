@@ -16,6 +16,8 @@ name: Full builds - Android
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     workflow_dispatch:
 
 concurrency:
@@ -36,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:35
+            image: ghcr.io/project-chip/chip-build-android:47
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -107,7 +109,9 @@ jobs:
                     "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
             - name: Clean out build output
               run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/* examples/android/CHIPTool/app/libs/*.jar
-            # - name: Build Android Studio build (arm64 only)
-            #   run: |
-            #     ./scripts/run_in_build_env.sh \
-            #       "./scripts/build/build_examples.py --target android-androidstudio-arm64-chip-tool  build"
+            - name: Build Android arm64-chip-test
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm64-chip-test build"
+            - name: Clean out build output
+              run: rm -rf ./out examples/android/CHIPTest/app/libs/jniLibs/* examples/android/CHIPTest/app/libs/*.jar

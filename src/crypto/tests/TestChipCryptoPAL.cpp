@@ -77,6 +77,7 @@
 
 using namespace chip;
 using namespace chip::Crypto;
+using namespace chip::Credentials;
 using namespace chip::TLV;
 
 namespace {
@@ -639,7 +640,7 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
         { .input = bad_buffer_empty, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT }
     };
 
-    int case_idx = 0;
+    [[maybe_unused]] int case_idx = 0;
     for (const ErrorCase & v : error_cases)
     {
         CHIP_ERROR status = ConvertIntegerRawToDerWithoutTag(v.input, v.output);
@@ -703,7 +704,7 @@ static void TestReadDerLengthValidCases(nlTestSuite * inSuite, void * inContext)
         { .input_buf = max_byte_length_large_buf, .expected_length = SIZE_MAX },
     };
 
-    int case_idx = 0;
+    [[maybe_unused]] int case_idx = 0;
     for (const SuccessCase & v : cases)
     {
         size_t output_length = SIZE_MAX - 1;
@@ -767,7 +768,7 @@ static void TestReadDerLengthInvalidCases(nlTestSuite * inSuite, void * inContex
         { .input_buf = max_byte_length_large_insufficient_bytes_buf, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
     };
 
-    int case_idx = 0;
+    [[maybe_unused]] int case_idx = 0;
     for (const ErrorCase & v : error_cases)
     {
         size_t output_length = SIZE_MAX;
@@ -2134,7 +2135,7 @@ static void TestX509_VerifyAttestationCertificateFormat(nlTestSuite * inSuite, v
     };
     // clang-format on
 
-    int case_idx = 0;
+    [[maybe_unused]] int case_idx = 0;
     for (auto & testCase : sValidationTestCases)
     {
         ByteSpan cert  = testCase.cert;
@@ -2715,7 +2716,7 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
     };
     // clang-format on
 
-    int caseIdx = 0;
+    [[maybe_unused]] int caseIdx = 0;
     for (const auto & testCase : kTestCases)
     {
         AttestationCertVidPid vidpid;

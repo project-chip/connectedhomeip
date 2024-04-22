@@ -57,14 +57,14 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Network Identity Management" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0450" name="Network Identity Management" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId name="Network Identity Management"/>
+    <clusterId id="0x0450" name="Network Identity Management"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="TODO" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="NETIM" scope="Endpoint"/>
   <dataTypes>
     <number name="Client Table" type=""/>
     <enum name="NetworkIdentityStatus">

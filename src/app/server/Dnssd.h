@@ -146,6 +146,11 @@ private:
     /// Set MDNS commissionable node advertisement
     CHIP_ERROR AdvertiseCommissionableNode(chip::Dnssd::CommissioningMode mode);
 
+    // Our randomly-generated fallback "MAC address", in case we don't have a real one.
+    uint8_t mFallbackMAC[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength] = { 0 };
+
+    void GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac);
+
     //
     // Check if we have any valid operational credentials present in the fabric table and return true
     // if we do.

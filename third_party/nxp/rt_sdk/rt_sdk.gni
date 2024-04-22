@@ -24,7 +24,7 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")  # declares some sdk args such as
 
 declare_args() {
   # Location of the rt SDK.
-  rt_sdk_root = "${chip_root}/third_party/nxp/rt_sdk/repo"
+  rt_sdk_root = "${chip_root}/third_party/nxp/rt_sdk/repo/sdk-2.15"
 
   # Enables Matter over Ethernet support
   chip_enable_ethernet = false
@@ -41,6 +41,10 @@ declare_args() {
   # Could be used only if k32w0_transceiver is enabled
   hci_spinel_single_uart = false
 
+  # Enables spinel communication over spi
+  # Could be used only if iwx12_transceiver is enabled
+  spinel_over_spi = false
+
   # Allows to enable OTW logs to see
   # firmware download logs for K32W0 transceiver
   otw_logs_enabled = false
@@ -48,7 +52,10 @@ declare_args() {
   # Defines the RT NVM component supported
   rt_nvm_component = "littlefs"
 
+  # KeyStorage enable only for RW61x
+  #if(nxp_platform == "rt/rw61x"){
   #rt_nvm_component = "key_storage"
+  #}
 
   # Enable wifi PTA support
   wifi_enable_pta = false
@@ -67,6 +74,12 @@ declare_args() {
 
   # Enables Watchdog support
   use_watchdog = 0
+
+  # SDK 2.15 support
+  is_sdk_2_15 = false
+
+  # Describe the transceiver detail flags
+  nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_USD"
 }
 
 declare_args() {
@@ -84,6 +97,19 @@ if (!defined(rt_fwk_platform)) {
 
 assert(rt_sdk_root != "", "rt_sdk_root must be specified")
 
+# Assuming 2.15 SDK support for RT1170
+if (rt_platform == "rt1060" || rt_platform == "rt1170") {
+  is_sdk_2_15 = true
+}
+
+if (rt_platform == "rt1060") {
+  nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_M2"
+}
+
+if (iwx12_transceiver && chip_enable_openthread) {
+  spinel_over_spi = true
+}
+
 rt_sdk_freertos_kernel = "${rt_sdk_root}/rtos/freertos/freertos-kernel"
 
 template("rt_transceiver") {
@@ -98,8 +124,8 @@ template("rt_transceiver") {
     if (iw416_transceiver || w8801_transceiver || iwx12_transceiver) {
       _transceiver_include_dirs += [
         # Transceiver files
-        "${rt_sdk_root}/middleware/wifi_nxp/wifi_bt_firmware",
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver",
+        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/incl",
         "${rt_sdk_root}/middleware/sdmmc/common",
         "${rt_sdk_root}/middleware/sdmmc/sdio",
         "${rt_sdk_root}/middleware/sdmmc/host/usdhc",
@@ -110,7 +136,21 @@ template("rt_transceiver") {
         "${rt_sdk_root}/middleware/wifi_nxp/incl/port/os",
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver",
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/incl",
+        "${rt_sdk_root}/middleware/wifi_nxp/fwdnld_intf_abs",
+        "${rt_sdk_root}/middleware/wifi_nxp/sdio_nxp_abs/incl",
+        "${rt_sdk_root}/middleware/wifi_nxp/firmware_dnld",
       ]
+      if (is_sdk_2_15) {
+        _transceiver_include_dirs += [
+          "${rt_sdk_root}/middleware/wifi_nxp/wifi_bt_firmware/nw61x",
+          "${rt_sdk_root}/middleware/wifi_nxp/fwdnld_intf_abs",
+          "${rt_sdk_root}/middleware/wifi_nxp/sdio_nxp_abs/incl",
+          "${rt_sdk_root}/middleware/wifi_nxp/firmware_dnld",
+        ]
+      } else {
+        _transceiver_include_dirs +=
+            [ "${rt_sdk_root}/middleware/wifi_nxp/wifi_bt_firmware" ]
+      }
     }
 
     libs = []
@@ -145,10 +185,21 @@ template("rt_transceiver") {
         "${rt_sdk_root}/middleware/sdmmc/host/usdhc/non_blocking/fsl_sdmmc_host.c",
         "${rt_sdk_root}/middleware/sdmmc/osa/fsl_sdmmc_osa.c",
         "${rt_sdk_root}/middleware/sdmmc/sdio/fsl_sdio.c",
-        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/firmware_dnld.c",
-        "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_sdio.c",
         "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/sdio.c",
       ]
+      if (is_sdk_2_15) {
+        sources += [
+          "${rt_sdk_root}/middleware/wifi_nxp/firmware_dnld/firmware_dnld.c",
+          "${rt_sdk_root}/middleware/wifi_nxp/fwdnld_intf_abs/fwdnld_intf_abs.c",
+          "${rt_sdk_root}/middleware/wifi_nxp/sdio_nxp_abs/fwdnld_sdio.c",
+          "${rt_sdk_root}/middleware/wifi_nxp/sdio_nxp_abs/mlan_sdio.c",
+        ]
+      } else {
+        sources += [
+          "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/firmware_dnld.c",
+          "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_sdio.c",
+        ]
+      }
     }
 
     if (!defined(public_configs)) {
@@ -191,7 +242,6 @@ template("rt_wifi") {
     defines += [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA",
       "CONFIG_IPV6=1",  # missing in wifi_config.h
-      "CONFIG_MAX_IPV6_ADDRESSES=5",  # missing in wifi_config.h
     ]
 
     if (wifi_enable_pta) {
@@ -223,8 +273,6 @@ template("rt_wifi") {
       "${rt_sdk_root}/middleware/wifi_nxp/dhcpd/dhcp-server-main.c",
       "${rt_sdk_root}/middleware/wifi_nxp/dhcpd/dhcp-server.c",
       "${rt_sdk_root}/middleware/wifi_nxp/dhcpd/dns-server.c",
-      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/net.c",
-      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/wifi_netif.c",
       "${rt_sdk_root}/middleware/wifi_nxp/port/os/os.c",
       "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11ac.c",
       "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11d.c",
@@ -305,6 +353,7 @@ template("rt_sdk") {
       "${rt_core_sdk_root}/components/wifi_bt_module/AzureWave/tx_pwr_limits",
       "${rt_core_sdk_root}/components/wifi_bt_module/Murata/tx_pwr_limits",
       "${rt_core_sdk_root}/components/wifi_bt_module/template",
+      "${rt_core_sdk_root}/components/wifi_bt_module/incl",
       "${rt_core_sdk_root}/components/messaging",
       "${rt_core_sdk_root}/components/mem_manager",
       "${rt_core_sdk_root}/components/flash/mflash",
@@ -319,6 +368,8 @@ template("rt_sdk") {
       "${rt_sdk_root}/middleware/wireless/framework/FileCache",
       "${rt_sdk_root}/middleware/wireless/framework/FSAbstraction",
       "${rt_sdk_root}/middleware/wireless/framework/KeyStorage",
+
+      #"${rt_sdk_root}/middleware/wireless/framework/DBG",
 
       #littlefs
       "${rt_sdk_root}/middleware/littlefs",
@@ -382,11 +433,6 @@ template("rt_sdk") {
       "PRINTF_ADVANCED_ENABLE=1",
     ]
 
-    if (rt_platform != "rw61x") {
-      # This adds a temporary workakound to fix mbdetls concurrent access to crypto hardware
-      defines += [ "RT_MATTER_SUPPORT" ]
-    }
-
     if (use_watchdog != 0) {
       defines += [ "WATCHDOG_ALLOWED" ]
     }
@@ -423,6 +469,11 @@ template("rt_sdk") {
         # No OSA main task
         "FSL_OSA_MAIN_FUNC_ENABLE=0",
       ]
+      if (chip_enable_openthread) {
+        defines += [ "CONFIG_MAX_IPV6_ADDRESSES=8" ]
+      } else {
+        defines += [ "CONFIG_MAX_IPV6_ADDRESSES=5" ]
+      }
     }
 
     if (chip_enable_ethernet) {
@@ -451,7 +502,7 @@ template("rt_sdk") {
 
     if (iwx12_transceiver) {
       defines += [
-        "WIFI_IW61x_BOARD_RD_USD",
+        nxp_transceiver_interface_detail,
         "SDIO_ENABLED",
       ]
     }
@@ -511,16 +562,16 @@ template("rt_sdk") {
     }
 
     if (chip_enable_wifi) {
-      if (!w8801_transceiver) {
-        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION=1" ]
-      } else {
-        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION=0" ]
-      }
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION=1" ]
     }
 
     # Now add our "system-header" include dirs
     foreach(include_dir, _sdk_include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
+
+    if (is_sdk_2_15) {
+      defines += [ "NXP_SDK_2_15_SUPPORT" ]
     }
 
     #Adding pre-include files
@@ -588,6 +639,11 @@ template("rt_sdk") {
         "${rt_sdk_root}/middleware/wireless/framework/FSAbstraction/fwk_lfs_mflash.c",
         "${rt_sdk_root}/middleware/wireless/framework/FileCache/fwk_file_cache.c",
         "${rt_sdk_root}/middleware/wireless/framework/KeyStorage/fwk_key_storage.c",
+      ]
+      sources += [
+        #littlefs
+        "${rt_sdk_root}/middleware/littlefs/lfs.c",
+        "${rt_sdk_root}/middleware/littlefs/lfs_util.c",
       ]
     }
 

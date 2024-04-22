@@ -30,8 +30,8 @@
 // TODO: These af-types.h and att-storage.h and attribute-storage.h and
 // endpoint-config-api.h and probably CodeUtils.h bits are a hack that should
 // eventually go away.
-#include <app/att-storage.h>
 #include <app/util/af-types.h>
+#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
@@ -154,20 +154,18 @@ MTR_DIRECT_MEMBERS
         return NO;
     }
 
-    if (serverCluster.parentEndpoint != kInvalidEndpointId) {
-        MTR_LOG_ERROR("Cannot add cluster to endpoint %llu; already added to endpoint %" PRIu32, _endpointID.unsignedLongLongValue, serverCluster.parentEndpoint);
-        return NO;
-    }
-
     for (MTRServerCluster * existingCluster in _serverClusters) {
         if ([existingCluster.clusterID isEqual:serverCluster.clusterID]) {
-            MTR_LOG_ERROR("Cannot add second cluster with ID %llx on endpoint %llu", serverCluster.clusterID.unsignedLongLongValue, _endpointID.unsignedLongLongValue);
+            MTR_LOG_ERROR("Cannot add second cluster with ID " ChipLogFormatMEI " on endpoint %llu", ChipLogValueMEI(serverCluster.clusterID.unsignedLongLongValue), _endpointID.unsignedLongLongValue);
             return NO;
         }
     }
 
+    if (![serverCluster addToEndpoint:static_cast<EndpointId>(_endpointID.unsignedLongLongValue)]) {
+        return NO;
+    }
     [_serverClusters addObject:serverCluster];
-    serverCluster.parentEndpoint = static_cast<EndpointId>(_endpointID.unsignedLongLongValue);
+
     return YES;
 }
 
@@ -189,12 +187,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 {
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
         MTR_LOG_ERROR("Cannot associate MTRServerEndpoint with controller %@; already associated with controller %@",
             controller.uniqueIdentifier, existingController.uniqueIdentifier);
-#else
-        MTR_LOG_ERROR("Cannot associate MTRServerEndpoint with controller; already associated with a different controller");
-#endif
         return NO;
     }
 
@@ -401,7 +395,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     NSMutableArray<MTRAccessGrant *> * grants = [[_matterAccessGrants allObjects] mutableCopy];
     for (MTRServerCluster * cluster in _serverClusters) {
         if ([cluster.clusterID isEqual:clusterID]) {
-            [grants addObjectsFromArray:[cluster.matterAccessGrants allObjects]];
+            [grants addObjectsFromArray:cluster.matterAccessGrants];
         }
     }
 

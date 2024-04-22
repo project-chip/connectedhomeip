@@ -1273,7 +1273,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -1801,6 +1801,10 @@ cluster IcdManagement = 70 {
     optional octet_string<16> verificationKey = 1;
   }
 
+  request struct StayActiveRequestRequest {
+    int32u stayActiveDuration = 0;
+  }
+
   response struct StayActiveResponse = 4 {
     int32u promisedActiveDuration = 0;
   }
@@ -1810,7 +1814,7 @@ cluster IcdManagement = 70 {
   /** Unregister a client from an end device */
   fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
   /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayActiveRequest(): StayActiveResponse = 3;
+  command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
 /** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
@@ -2143,7 +2147,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ResetCounts;
   }

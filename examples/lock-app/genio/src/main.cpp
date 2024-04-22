@@ -51,8 +51,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
-#define UNUSED_PARAMETER(a) (a = a)
-
 volatile int apperror_cnt;
 
 /***************************************************************************

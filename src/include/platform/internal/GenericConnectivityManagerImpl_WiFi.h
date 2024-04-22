@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>

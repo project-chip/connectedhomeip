@@ -1323,7 +1323,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -2067,7 +2067,7 @@ provisional cluster Messages = 151 {
     MessagePriorityEnum priority = 1;
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
-    nullable int16u duration = 4;
+    nullable int64u duration = 4;
     char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }
@@ -2101,7 +2101,7 @@ provisional cluster Messages = 151 {
     MessagePriorityEnum priority = 1;
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
-    nullable int16u duration = 4;
+    nullable int64u duration = 4;
     char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }
@@ -3406,7 +3406,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster WiFiNetworkDiagnostics {

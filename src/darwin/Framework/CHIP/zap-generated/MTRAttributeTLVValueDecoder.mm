@@ -8750,7 +8750,7 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
                 if (entry_0.duration.IsNull()) {
                     newElement_0.duration = nil;
                 } else {
-                    newElement_0.duration = [NSNumber numberWithUnsignedShort:entry_0.duration.Value()];
+                    newElement_0.duration = [NSNumber numberWithUnsignedLongLong:entry_0.duration.Value()];
                 }
                 newElement_0.messageText = AsString(entry_0.messageText);
                 if (newElement_0.messageText == nil) {
