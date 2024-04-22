@@ -28,7 +28,7 @@ app.
 
 ### Starting point
 
-The program starts in [the main() function](src/main.cpp). However, the
+The program starts in [the main() function](../../examples/platform/silabs/main.cpp). However, the
 application's behaviour is mainly defined in the function
 [AppTaskMain()](src/AppTask.cpp). AppTaskMain() listens to incoming _events_ and
 sends them to the corresponding _handler_.
@@ -78,7 +78,7 @@ template application, the template.zap file is located in
 
 Once the modifications are saved, the "file.zap" can be fed to the ZAP tool to
 _generate_ a C implementation of these clusters. The C files generated must be
-stored in the [zzz-generated folder](../../../zzz_generated).
+stored in the [zzz-generated folder](../../zzz_generated).
 
 ### The GN Build system
 
@@ -97,7 +97,7 @@ app. Refer to its [README file][4] for more information.
 
 ###### Last modified August 5th, 2022.
 
-[1]: ../../../examples/lighting-app/efr32/README.md
-[2]: ../../../src/app/clusters
-[3]: ../template_DataModel_config
-[4]: ../../sl-newLight/efr32/README.md
+[1]: ../../examples/lighting-app/silabs/README.md
+[2]: ../../src/app/clusters
+[3]: template_DataModel_config/sl_template.zap
+[4]: ../sl-newLight/efr32/README.md

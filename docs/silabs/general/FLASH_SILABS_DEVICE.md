@@ -12,6 +12,8 @@ Links to download Simplicity Commander's standalone versions are included below.
 
 To Flash the bootloader and Binaries, refer [Flashing using Commander](./FLASHING_USING_COMMANDER.md)
 
+>**Note**: Flashing the bootloader binaries is only required for NCP devices (MG12 and MG24). It is not applicable to the SiWx917 SoC.
+
 ## (Optional) J-Link RTT for Logging:
 
 Multi-platform Logging software for device logs. Links to download J-Link RTT for logging are included below

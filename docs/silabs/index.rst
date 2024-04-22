@@ -20,3 +20,7 @@ Welcome to Silicon Labs' Matter documentation!
    ./unify/index
    ./nav_3_general
    ./nav_6_faq
+
+Note: Silicon Labs Matter GitHub is being phased out in favor of using the Matter GSDK Extension that is available through Studio and standalone via SLC-CLI.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Documentation on the Matter GSDK extension can be found here: https://docs.silabs.com/matter/latest/matter-start/

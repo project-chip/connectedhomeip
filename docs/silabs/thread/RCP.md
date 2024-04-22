@@ -31,7 +31,7 @@ image file, you can skip to [Step #2: Flash the RCP](#step-2-flash-the-rcp).
 
 <br>
 
-### **Building the Image File from the Repository**
+### **Building the Image File from the ot-efr32 Repository**
 
 **1. Clone the ot-efr32 repository**
 
@@ -83,7 +83,7 @@ location: '<git>/ot-efr32/build/<efr32xgxx>'
 ## Step 2: Flash the RCP
 
 Once you get the RCP image, either by downloading a prebuilt image or building
-the image file from the repo, you can flash it onto your device. This is done
+the image file, you can flash it onto your device. This is done
 directly from your laptop and not through the Raspberry Pi, so make sure that
 the device is connected directly over USB to your laptop. See
 [How to Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md) for more information.
@@ -93,3 +93,32 @@ you laptop and connect it via USB to the Raspberry Pi.
 
 The Raspberry Pi's Open Thread Border Router can then use the RCP to communicate
 with the Thread network.
+
+## Troubleshooting
+
+To run the Mattertool, you need the OTBR to be running. To check the OTBR status, *enter sudo systemctl status otbr-agent* on the Raspberry Pi console.
+
+A successfully running OTBR will show the output below:
+
+```shell
+pi@raspberrypi:~ $ sudo systemctl status otbr-agent
+● otbr-agent.service - OpenThread Border Router Agent
+     Loaded: loaded (/lib/systemd/system/otbr-agent.service; enabled; vendor preset: enabled)
+     Active: active (running) since Mon 2024-03-04 09:09:44 EST; 1 weeks 2 days ago
+```
+
+You can restart the OTBR agent by entering *sudo systemctl restart otbr-agent*.
+
+If the OTBR agent is restarting continuously, it's likely because it cannot connect to the RCP. There are multiple reasons that can contribute to this:
+
+Ensure that RCP has been configured correctly:
+
+- The RCP has a default UART baudrate of 115200.
+- If using a Wireless Gecko Starter Kit (WSTK), make sure the WSTK baud is configured correctly:
+
+   1. Open the WSTK console in Simplicity Studio by right clicking on the device under **Debug Adapters**.
+   2. Select the **Admin** tab in the console.
+   3. Configure the RCP with `serial vcom config <'baud rate'>`.
+
+- Make sure the RCP has been flashed with a bootloader image.
+- Make sure the RCP GSDK version matches the OTBR GSDK version.

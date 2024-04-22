@@ -393,7 +393,7 @@ chip-tool doorlock subscribe-event lock-operation <min-interval> <max-interval> 
 ```
 
 For more information on how to use the `chip-tool` see
-[chip-tool manual](../../docs/guides/chip_tool_guide.md) on the Matter website.
+[chip-tool manual](https://github.com/SiliconLabs/matter/blob/latest/docs/guides/chip_tool_guide.md) on the Matter website.
 
 ## Troubleshooting
 

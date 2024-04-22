@@ -2,13 +2,14 @@
 - Amazon Web Services offers reliable, scalable, and inexpensive cloud computing services. Refer to [AWS Documentation](https://aws.amazon.com/what-is-aws/) for more details.
 ## AWS CA Certitifcate Registration
 
-1. Create a CA certificate, a client certificate and a client key using the [Openssl Certificate Creation](./OPENSSL_CERTIFICATE_CREATION.md) documentation.
+1. Create a CA certificate, a CA verification certificate, a client certificate and a client key using the  [Openssl Certificate Creation](./OPENSSL_CERTIFICATE_CREATION.md) documentation.
 2. Open [AWS](https://aws.amazon.com/)
 3. Login using your AWS credentials
 4. Register the CA Certificate in AWS:
-    - Go to `Security -> Certificate Authorities` and `Register CA Certificate`
-    - Select `Register CA` in the Multi-account mode
-    - Choose the CA certificate that you previously created in the Openssl Certificate Creation (CA.crt) step in the CA certificate registration, and set the CA status to `Active` and the `Automatic certificate registration` option to `ON`
+    - Go to `Security -> Certificate Authorities` and `Register CA Certificate`.
+    - Select `Register CA` in the Single account mode.
+    - Choose the CA certificate (CA.crt) that you previously created above.
+    - Choose the CA verification certificate (verification_cert.pem) that you previously created above.
     - Register the CA.
 5. Go to `Security -> Policies` and select `Create Policy`. Enter the policy name (ex: `DIC_POLICY`) and in the policy statements select `JSON` and replace the contents with the JSON provided below:
 ```

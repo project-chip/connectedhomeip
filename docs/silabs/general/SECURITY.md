@@ -96,7 +96,7 @@ The Onboarding Payload is the information used by the Commissioner to ensure int
 | Version | Provides versioning of the payload. |
 | Vendor ID | Assigned by CSA. Allows a way to identify the maker of the device. |
 | Product ID | Vendor specified. Unique for each certified product within a Vendor ID. |
-| Custom Flow | :para[Indicates to the Commissioner the steps needed before commissioning can take place.] :list[Standard commissioning flow: A device, when uncommissioned, always enters commissioning mode upon power-up. \n User-intent commissioning flow: Device requires user action (pressing a button, for example) to enter commissioning mode. \n Custom commissioning flow: Interaction with a service provided by the manufacturer is required for initial device setup.] {type=unordered} |
+| Commissioning Flow | :para[Indicates to the Commissioner the steps needed before commissioning can take place.] :list[Standard commissioning flow: A device, when uncommissioned, always enters commissioning mode upon power-up. \n User-intent commissioning flow: Device requires user action (pressing a button, for example) to enter commissioning mode. \n Custom commissioning flow: Interaction with a service provided by the manufacturer is required for initial device setup.] {type=unordered} |
 | Discovery Capabilities Bitmask | :para[Indicate device’s available technologies for device discovery:] :list[Soft-AP \n BLE \n On IP Network (device is already on the IP network)] {type=unordered} |
 | Discriminator | Helps to further identify potential devices during the setup process. |
 | Passcode | Establishes proof of possession and is also used as the shared secret for the initial secure channel before further onboarding steps. |

@@ -23,15 +23,14 @@ while the Attestation Credentials includes the Certificate Declaration (CD), the
 and the DAC (Device Attestation Certificate).
 
 During commissioning, Matter devices perform a Password Authenticated Key Exchange using the SPAKE2+ protocol.
-Calculating the SPAKE2+ verifier is computationally costly. For large iteration counts it may take several minutes to
-compute by the targe device. For this reason, the SPAKE2+ verifier is calculated on the host side by the script iself.
+Calculating the SPAKE2+ verifier is computationally costly. For large iteration counts, the target device may require several minutes to compute. For this reason, the SPAKE2+ verifier is calculated on the host side by the script itself.
 
 The passcode is used to derive a QR code, typically printed on the label, or displayed by the device itself.
 The QR code contains the pre-computed setup payload, which allows the commissioner to establish a session with the device.
 The parameters required to generate and validate the session keys are static and stored in NVM3.
 
 To protect the attestation private-key (used to generate the DAC), the asymmetric key-pair may be generated on-device, using PSA,
-and the most secure storage location available to the specific part. However, the private-key may be generated externally,
+and in the most secure storage location available to the specific part. However, the private-key may be generated externally,
 and imported using the --dac_key option.
 
 The DAC is generated and signed by a Certification Authority (CA), which may reside on a separate host. The `modules/signing_server.py`
@@ -43,7 +42,7 @@ this script is replaced by an actual CA.
 The Generator Firmware (GFW) is a FreeRTOS application that runs on the targeted device, and assists with the provisioning of the device.
 The GFW performs the following tasks:
 * When key-generation is used:
-  - Generates the key-pair on device on the most secure location available.
+  - Generates the key-pair on device in the most secure location available.
   - Generates and returns a CSR (Certificate Signing Request). The CSR contains the device public-key, Vendor Id, Product Id, and Serial Number.
 * When key-import is used:
   - Imports the key into the most secure location available.
@@ -84,9 +83,9 @@ The Provisioner Script executes the following steps:
 4. If a PKCS#12 file is provided, extracts the PAI, DAC, and DAC key files in DER format.
 4. Generates default values for the SPAKE2+ arguments, if necessary.
 5. Saves the input parameters as a JSON file (`latest.json` in the local folder, or the file indicated by `--output`).
-5. Flashes the Generator Firmware (GFW) into the device, if required.
+5. Flashes the Generator Firmware (GFW) onto the device, if required.
 6. Sends the provisioned data to the targed device using the selected channel and protocol.
-7. Flashed the Production Firmware (PFW), if provided by the inputs.
+7. Flashes the Production Firmware (PFW), if provided the inputs.
 
 ## Provision Protocol
 
@@ -100,7 +99,7 @@ Verion 1 defines the following commands:
 * Init: Used for initialization. Sends the flash size and location to the firmware.
 * CSR: Used for on-device key and CSR generation.
 * Import: Used to transmit files to the device (DAC, DAC key, PAI, and CD). Each file is sent whole in a single exchange.
-* Setup: Used to transmit all other factory device to the device. The transmitted data is send in a single package,
+* Setup: Used to transmit all other factory device to the device. The transmitted data is sent in a single package,
 in precise order, with fixed data types and sizes.
 Users of version 1.0 do not execute any of these commands manually. The script simply execute these commands sequentially as needed.
 There are no extension capabilities on this protocol, nor any provision to read-back the provisioned data.
@@ -122,11 +121,11 @@ Custom arguments must have IDs range 0x00 to 0xff (255).
 ## Channels
 
 The Provision Tool can transfer the arguments to the device in two ways:
-* J-Link RTT: When the device is phisically connected to the host, the GFW can communicate throught the serial port using J-Link RTT.
+* J-Link RTT: When the device is physically connected to the host, the GFW can communicate through the serial port using J-Link RTT.
 This method can be used both in development and factory environments. This methods works with the legacy Protocol version 1.0 or
 the new protocol version 2.0.
 * Bluetooth: The provision script can transmit the data directly to applications running in provision-mode. While in this mode,
-Silicon Labs' example applications use the bluetooth communication to receive provisionning data. The Bluetooh channel requires
+Silicon Labs' example applications use Bluetooth communication to receive provisioning data. The Bluetooh channel requires
 Provision Protocol v2.0.
 
 ### Parameters
@@ -188,19 +187,19 @@ file defines the well-known (default) parameters used by the automatic provision
 | -dn, --common_name        | optional<sup>4</sup> | string             | Common Name to use in the Device Certificate (DAC) .                |
 
 <sup>1</sup> Use xxxxxxxxx for serial, xxx.xxx.xxx.xxx[:yyyy] for TCP, or bt:XXXXXXXXXXXXXXXX for bluetooth
-<sup>2</sup> If not provided (or zero), the `discriminator `is generated at random
-<sup>3</sup> If the DAC is provided, its corresponding private-key also must be provided
+<sup>2</sup> If not provided (or zero), the `discriminator` is generated at random
+<sup>3</sup> If the DAC is provided, its corresponding private-key must also be provided
 <sup>4</sup> Required if the DAC is not provided
 <sup>5</sup> If not provided, the `unique_id` is randomly generated
 <sup>6</sup> Salt and verifier must be provided as base64 string
 
-WARNING:
-    With the release of version 2.0, many shortcuts have been modified. Single-characters are now reserved for tool options.
-    Most long versions have been preserved, with the exception of --config and --att_certs.
+>WARNING:
+    With the release of version 2.0, many shortcuts have been modified. Single characters are now reserved for tool options.
+    Most long versions have been preserved, with the exception of `--config` and `--att_certs`.
 
 ### Custom Parameters
 
-Custom parameters may be defined in a YAML file formatted as the following example:
+Custom parameters may be defined in a YAML file, with the following format as an example:
 ```
 custom:
   - id: 1
@@ -225,9 +224,9 @@ If a parameters file named `parameters.yaml` exists in the local directory, the 
 Otherwise, the path to the parameters file may be provided with the `--params` option.
 
 Supported types are int8u, int16u, int32u, string, binary, and path. The `path` parameters must point to an existing file in the filesystem.
-If such file exits, its contents are read and sent to the firmware as a binary value.
+If such file exists, its contents are read and sent to the firmware as a binary value.
 
-Given the previous configuration, the actual argument may be provided as command-line:
+Given the previous configuration, the actual argument may be provided via command-line:
 ```
 python3 provision.py -x1 99 --example2 "ABC123"
 ```
@@ -252,12 +251,13 @@ Or, as part of an input file:
 ```
 
 On the firmware side, custom parameters are routed to the [Custom Provision Storage](examples/platform/silabs/provision/ProvisionStorageCustom.cpp).
-A sample implementation is provided, but it must be replaced with a class that matches with the parameters defined in the YAML descriptor.
+A sample implementation is provided, but it must be replaced with a class that matches the parameters defined in the YAML descriptor.
 
 
 ## Actions
 
-When using version 1.x, there is only one action available, which performs the device provisioning as automatically as possible.
+When using version 1.x, there is only one action available. This action performs the device provisioning as automatically as possible.
+
 In contrast, version 2.x defines the following actions:
 * `auto`: This is the default action, and emulates the automatic provisioning performed in version 1.
    This action sends: `version`, `serial_number`, `vendor_id`, `vendor_name`, `product_id`, `product_name`, `product_label`, `product_url`, `part_number`, `hw_version`, `hw_version_str`, `manufacturing_date`, `unique_id`, `discriminator`, `spake2p_passcode`, `spake2p_iterations`, `spake2p_salt`, `spake2p_verifier`, `setup_payload`, `commissioning_flow`, `rendezvous_flags`, `firmware_info`, `dac_cert`, `pai_cert`, `certification`, `dac_key`
@@ -286,7 +286,7 @@ Any or all of these arguments may be overwritten though the command line.
 
 ### Argument Files
 
-The -i/--inputs argument allows to read all the required arguments from a JSON file. The same validation rules apply
+The -i/--inputs argument reads all the required arguments from a provided JSON file. The same validation rules apply
 both for command line or configuration file, but JSON does not support hexadecimal numbers. Command line arguments
 override arguments read from a configuration file. For instance, with the configuration `example.json`:
 ```
@@ -315,7 +315,9 @@ You may run:
 ```
 python3 ./provision.py --inputs example.json
 ```
-Which will set the connected device with discriminator 3840, product ID 32773, and use 15000 SPAKE2+ iterations. However, if you run instead:
+Which will set the connected device with discriminator 3840, product ID 32773, and use 15000 SPAKE2+ iterations. 
+
+However, if you run instead:
 ```
 python3 ./provision.py --inputs example.json --discriminator 2748 --product_id 0x8006 --spake2p_iterations 10000
 ```
@@ -325,15 +327,15 @@ and use 10000 SPAKE2+ iterations (instead of 15000).
 For each run, `provision.py` will generate a local file `./latest.json`, containing the arguments compiled from the different sources.
 Example input files may be found under `./inputs/`:
 ```
-python ./provision.py --inputs inputs/develop.json
+python3 ./provision.py --inputs inputs/develop.json
 ```
 
 ### Default Arguments
 
 To ease development and testing, either `provision.py` or the firmware provide defaults for all arguments. The only
 arguments that are truly mandatory are `vendor_id`, and `product_id`, and these are included in `defaults.json`.
-Test certificates may be auto-generated using the `--generate flag`, provided the `chip-cert` can be found, either
-in the default location, or through the `--cert-tool` argument.
+Test certificates may be auto-generated using the `--generate` flag (provided the `chip-cert` can be found either
+in the default location or through the `--cert-tool` argument).
 For instance, you may run:
 ```
 python3 ./provision.py --vendor_id 0x1049 --product_id 0x8005 --generate
@@ -441,7 +443,7 @@ the last page is located at 0x0817E000. These addresses can be found in
 the memory map of the board's datasheet. For instance, for a MG24 board:
 
 ```shell
-commander readmem --range 0x0817E000:+1536 --serialno 440266330`
+commander readmem --range 0x0817E000:+1536 --serialno 440266330
 ```
 
 The output should look something like:
@@ -485,63 +487,68 @@ stored by the setup script as ./temp/dac.der :
 
 ```shell
 $ xxd ./temp/dac.der
-```
+
 00000000: 3082 01d8 3082 017f a003 0201 0202 0407  0...0...........
 00000010: 5bcd 1530 0a06 082a 8648 ce3d 0403 0230  [..0...*.H.=...0
 ...
 000001c0: 2bba 1532 2f4c 69f2 3848 d2bc 622a 47fb  +..2/Li.8H..b*G.
 000001d0: 3ff7 288a 7c90 7572 5884 96e7            ?.(.|.urX...
-
+```
 
 The PAI certificate is located at address 0x0817e200 (offset 512), and
 has 460 octets:
+```
 0817e200: 30 82 01 C8 30 82 01 6E A0 03 02 01 02 02 08 79
 0817e210: 6E 32 5A FA 5B D1 F8 30 0A 06 08 2A 86 48 CE 3D
 ...
 0817e3b0: FD 92 D1 EB 59 95 D8 38 DE 5D 80 E3 05 65 24 4A
 0817e3c0: 62 FD 9F E9 D8 00 FA CD 0F 32 7C C9 00 00 00 00
+```
 
 This should match the contents of the DER-formatted PAI certificate, which is
 stored by the setup script as ./temp/pai_cert.der :
 
 ```shell
 $ xxd ./temp/pai_cert.der
-```
+
 00000000: 3082 01c8 3082 016e a003 0201 0202 0879  0...0..n.......y
 00000010: 6e32 5afa 5bd1 f830 0a06 082a 8648 ce3d  n2Z.[..0...*.H.=
 ...
 000001b0: fd92 d1eb 5995 d838 de5d 80e3 0565 244a  ....Y..8.]...e$J
 000001c0: 62fd 9fe9 d800 facd 0f32 7cc9            b........2|.
-
+```
 
 Finally, on this example the CD is located at address 0817e400
 (offset 1024), and contains 541 octets:
+```
 0817e400: 30 81 EF 06 09 2A 86 48 86 F7 0D 01 07 02 A0 81
 0817e410: E1 30 81 DE 02 01 03 31 0D 30 0B 06 09 60 86 48
 ...
 0817e4d0: 02 20 38 B9 9C 73 B2 30 92 D7 A2 92 47 30 14 F7
 0817e4e0: 28 41 FD B8 28 CD 19 F2 BB DB A0 0F 33 B2 21 D3
 0817e4f0: 33 CE 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+```
 
 The CD is a binary file, and is neither modified, nor validated by the setup
 script. It is simply stored in flash after the DAC:
 
 ```shell
 $ xxd cd.der
-```
+
 00000000: 3081 ef06 092a 8648 86f7 0d01 0702 a081  0....*.H........
 00000010: e130 81de 0201 0331 0d30 0b06 0960 8648  .0.....1.0...`.H
 ...
 000000e0: 2841 fdb8 28cd 19f2 bbdb a00f 33b2 21d3  (A..(.......3.!.
 000000f0: 33ce                                     3.
+```
 
 The 0xff octets between the files and at the end of the flash are unmodified
 sections of the flash storage.
 
 ### Device Terminal
 
-Logs have beed added to the SilabsDeviceAttestationCreds, to help verifying if the Attestation
-files are loaded correctly. The size and first eight bytes of CD, PAI, and DAC are printed, and
+Logs have beed added to the SilabsDeviceAttestationCreds, to help verify if the attestation
+files are loaded correctly. The size and first eight bytes of CD, PAI, and DAC are printed and
 must match the contents of `cd.der`, `pai_cert.der`, and `dac.der`, respectively:
 ```
 ...

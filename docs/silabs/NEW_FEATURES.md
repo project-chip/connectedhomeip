@@ -1,5 +1,17 @@
 # Silicon Labs Matter New Features
 
+## New Features for v2.3.0-1.3
+
+- Matter 1.3 solution for Thread (MG12, MG24), Wi-Fi NCP platforms (MG24/RS9116, MG24/WF200, MG24/SiWx917) and Wi-Fi SoC platform (SiWx917).
+  - Long Idle Time ICDs are ready for integration.
+  - Provides Multi-chip OTA functionality support (EFR32-Thread only).
+  - Adds Provisioning 2.0 Support for EFR32 and SiWx917 SoC.
+- Works using [Gecko SDK (GSDK) v4.4.2](https://docs.silabs.com/gecko-platform/4.4.2/platform-overview/) and [WiSeConnect SDK v3.1.3.4](https://github.com/SiliconLabs/wiseconnect/tree/v3.1.3-matter-hotfix.4).
+- Provides targeted improvements for Wi-Fi platforms.
+  - Stability and sleep improvements for SiWx917 SoC have been added for both the TA and M4.
+  - Enables LCD and OTA support (M4 image only) for MG24+SiWx917 NCP.
+- Miscellaneous bug fixes and improvements
+
 ## New Features for v2.3.0-1.3-alpha.2
 
 - Update to use [Gecko SDK (GSDK) v4.4.1](https://docs.silabs.com/gecko-platform/4.4.1/platform-overview/)

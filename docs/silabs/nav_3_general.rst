@@ -6,6 +6,7 @@ Developer Reference
 
     Code Savings Guide <./general/CODE_SIZE_SAVINGS.md>
     Commit Hash Reference <./general/COMMIT_HASHES.md>
+    Versioning and Release Maintenance <./general/VERSIONING_AND_MAINTENANCE.md>
     Custom Matter Device <./general/CUSTOM_MATTER_DEVICE.md>
     Find Your Raspberry Pi <./general/FIND_RASPI.md>
     Flashing Using Simplicity Commander <./general/FLASHING_USING_COMMANDER.md>
@@ -16,5 +17,6 @@ Developer Reference
     Using Energy Profiler <./general/EP.md>
     BLE GATT Configuration <./general/GATT.md>
     Hardware Pin Configuration <./general/PINTOOL.md>
+    SMG to Matter Extension Project Migration Guide <./general/SMG_TO_SLC_GUIDE.md>
     ./dev/vscode/index
    

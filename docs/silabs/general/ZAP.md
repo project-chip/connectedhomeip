@@ -162,5 +162,38 @@ store these differently.
 
 Once you have chosen the cluster options, save the current ZAP configuration using the application menu in the upper left corner. 
 
-Before v1.1.0-1.1 you needed to click the Generate button to generate code. Now, code is generated automatically in the save function. You will be prompted to choose a save location for the generated ZAP code. In the Silicon Labs Matter repository, the lock-app generated files belong in 
-matter/zzz_generated/lock-app/zap-generated.
+Before v1.1.0-1.1, you needed to click the **Generate** button for the code to be generated. Now, the code is generated automatically in the save function. You will be prompted to choose a save location for the generated ZAP code. In the Silicon Labs Matter repository, the lock-app generated files belong in matter/zzz_generated/lock-app/zap-generated.
+
+## New Tutorial Button
+
+This new feature helps you understand all the steps needed to create a new endpoint.
+
+Click the **Tutorial** button at the top-right side, between the **Preview** and the **Settings** buttons.
+
+A pop-up displays with instructions for next steps.
+
+![Tutorial start page](images/tutorial1.png)
+
+These steps guide you on the components of this tool, the effects of each component, and the points you need to consider carefully when creating a new endpoint.
+
+![Tutorial end page](images/tutorial2.png)
+
+At the final step, a notification asks if you want to keep the endpoint you just created. Select what you want to finish the tutorial.
+
+## Multiple ZCL Device Types per Endpoint
+
+This is a new Matter-only feature where you can select more than one ZCL device type per endpoint. The addition of multiple device types will add the cluster configurations within the device types to the endpoint configuration.
+
+You can select multiple ZCL device types per endpoint, but there is only one **Primary Device** as in the below image.
+
+![Edit endpoint](images/edit-endpoint.png)
+
+The image above shows that endpoint 2 has more than one device type selected. The **Primary Device** denotes the primary device type that the endpoint will be associated with. The primary device type is always present at index 0 of the list of device types selected so selecting a different primary device type will change the ordering of the device types selected. The device type selections also have constraints based on the Data Model specification. ZAP protects you from choosing invalid combinations of device types on an endpoint using these constraints.
+
+![Multiple endpoints](images/multiple-endpoints.png)
+
+The image above is what the multiple device type endpoints looks like after configured. On the left-hand side, it shows the list of all clusters sequentially in order, and on the other side are clusters that are ready to be configured.
+
+## Defining a Custom Cluster
+
+Create an XML file with custom cluster definitions, for an example see [Sample MEI Cluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml). In ZAP click **Extensions** and add the XML file. The newly defined cluster can then be enabled in any endpoint under the domain for which it was defined (for example General), its Commands and Attributes can be managed like those of any other cluster. 

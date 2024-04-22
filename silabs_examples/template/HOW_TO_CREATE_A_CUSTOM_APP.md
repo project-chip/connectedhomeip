@@ -208,16 +208,16 @@ to rename certain variables. Simply renaming any instance of "sl_template" or
 
 Color Light app's [README][9] contains useful information about building,
 flashing and running a Matter EFR32 app. A more complete guide can be found in
-Lighting-app's [README](../../../examples/lighting-app/efr32/README.md).
+Lighting-app's [README](../../examples/lighting-app/silabs/README.md).
 
 ###### Last modified August 5th, 2022.
 
-[1]: ../../template/
-[2]: ../../../silabs_examples/
-[3]: ../../../zzz_generated/
-[4]: ../../../third_party/zap/repo/README.md
-[5]: ../../../
+[1]: ../template/
+[2]: ../../silabs_examples/
+[3]: ../../zzz_generated/
+[4]: ../../third_party/zap/repo/README.md
+[5]: ../../
 [6]: #Modifying-the-GN-Build-files
 [7]: src/ZclCallbacks.cpp
-[8]: ../../sl-newLight/efr32/src/
-[9]: ../../sl-newLight/efr32/README.md
+[8]: ../sl-newLight/efr32/src/
+[9]: ../sl-newLight/efr32/README.md

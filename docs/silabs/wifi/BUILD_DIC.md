@@ -46,14 +46,14 @@
 
    - Two devices should not use the same Client ID. To use a different Client ID for your second connection do the following:
    - If using AWS, Change the following file `examples/platform/silabs/DIC/matter_abs_interface/src/dic_nvm_cert.cpp` under `#if USE_AWS`
-        * provide device_certificate and device_key with your device cert and device key. (There is no need to change the CA certificate.), Refer [Openssl Certificate Creation](./OPENSSL_CERTIFICATE_CREATION.md)
-        * provide `DIC_SERVER_HOST` with your hostname
-        * provide `DIC_CLIENT_ID`  macro value with your Client ID in `examples/platform/silabs/DIC/matter_abs_interface/include/dic_config.h` file
-   - The preferred certificate type to use in the application is ECDSA.
-   - If using mosquitto, change the following files `matter/examples/platform/silabs/DIC/matter_abs_interface/src/dic_nvm_cert.cpp`  and `examples/platform/silabs/DIC/matter_abs_interface/include/dic_config.h` enable `USE_MOSQUITTO` and disable `USE_AWS`.
-   - Under `#if USE_MOSQUITTO`
-        * provide DIC_CLIENT_ID macro value with your Client ID
-        * provide `DIC_SERVER_HOST` with your hostname
-        * provide ca_certificate, device_certificate and device_key with your ca_certificate, device cert and device key. Refer [Openssl Certificate Creation](./OPENSSL_CERTIFICATE_CREATION.md)
-        * provide mosquitto client user in `DIC_CLIENT_USER` and password im `DIC_CLIENT_PASS` in `examples/platform/silabs/DIC/matter_abs_interface/include/dic_config.h` file.
-   - The preferred certificate type to use in the application is ECDSA.
+      - Use `DIC_SERVER_HOST` name with your Server host name.
+         - For Example: a2m21kovu9tcsh-ats.iot.ap-southeast-1.amazonaws.com 
+      - Use AWS CA certificate as ca_certificate, device_certificate and device_key with your device cert and device key.
+      - Use `DIC_CLIENT_ID` macro value with your Client ID in `examples/platform/silabs/DIC/matter_abs_interface/include/dic_config.h`
+      - The preferred certificate type to use in the application is ECDSA.
+   - If using mosquitto, change the following files `matter/examples/platform/silabs/DIC/matter_abs_interface/src/dic_nvm_cert.cpp`, `examples/platform/silabs/DIC/matter_abs_interface/include/dic_config.h` and enable `USE_MOSQUITTO` and disable `USE_AWS`.
+      - Under `#if USE_MOSQUITTO`
+      - Use `DIC_SERVER_HOST` name with your Server host name where Mosquitto Broker is running.
+      - Use OpenSSL CA certificate as ca_certificate, device_certificate and device_key.
+      - `DIC_CLIENT_ID` is not required here but `DIC_CLIENT_USER` and `DIC_CLIENT_PASS` in `examples/platform/silabs/DIC/matter_abs_interface/include/dic_config.h` needs to be updated as per your Mosquitto password file.
+      - The preferred certificate type to use in the application is ECDSA.

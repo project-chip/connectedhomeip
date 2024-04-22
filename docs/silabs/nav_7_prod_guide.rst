@@ -8,3 +8,5 @@ Matter Production Guide
     Using Custom Part Manufacturing Services (CPMS) <./production/USING_CPMS.md>
     Matter Device Attestation <./production/CPMS_ATTESTATION.md>
     Matter, CPMS, and Kudelski <./production/KUDELSKI.md>
+    Matter Distributed Compliance Ledger <./production/DCL.md>
+    Matter Certification <./production/CERTIFICATION.md>
