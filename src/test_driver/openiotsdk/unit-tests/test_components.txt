@@ -7,3 +7,4 @@ CoreTests
 PlatformTests
 TestShell
 SetupPayloadTests
+SupportTests
