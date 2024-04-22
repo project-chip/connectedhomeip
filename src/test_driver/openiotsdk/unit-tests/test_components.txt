@@ -5,3 +5,4 @@ MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
 PlatformTests
 TestShell
+SupportTests
