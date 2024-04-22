@@ -17,8 +17,6 @@
 
 #include "Resolver.h"
 
-#include <limits>
-
 #include <lib/core/CHIPConfig.h>
 #include <lib/dnssd/ActiveResolveAttempts.h>
 #include <lib/dnssd/IncrementalResolve.h>
@@ -29,7 +27,6 @@
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
-#include <lib/dnssd/minimal_mdns/core/QNameString.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
