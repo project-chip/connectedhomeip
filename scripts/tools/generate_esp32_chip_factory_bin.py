@@ -18,7 +18,6 @@
 
 import argparse
 import base64
-import enum
 import logging
 import os
 import sys
@@ -27,6 +26,7 @@ from types import SimpleNamespace
 import cryptography.x509
 from bitarray import bitarray
 from bitarray.util import ba2int
+from esp_secure_cert.tlv_format import generate_partition_ds, generate_partition_no_ds, tlv_priv_key_t, tlv_priv_key_type_t
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
@@ -148,50 +148,7 @@ FACTORY_DATA = {
         'encoding': 'hex2bin',
         'value': None,
     },
-    # DeviceInfoProvider
-    'cal-types': {
-        'type': 'data',
-        'encoding': 'u32',
-        'value': None,
-    },
-    'locale-sz': {
-        'type': 'data',
-        'encoding': 'u32',
-        'value': None,
-    },
-
-    # Other device info provider keys are dynamically generated
-    # in the respective functions.
 }
-
-
-class CalendarTypes(enum.Enum):
-    Buddhist = 0
-    Chinese = 1
-    Coptic = 2
-    Ethiopian = 3
-    Gregorian = 4
-    Hebrew = 5
-    Indian = 6
-    Islamic = 7
-    Japanese = 8
-    Korean = 9
-    Persian = 10
-    Taiwanese = 11
-
-
-# Supported Calendar types is stored as a bit array in one uint32_t.
-def calendar_types_to_uint32(calendar_types):
-    result = bitarray(32, endian='little')
-    result.setall(0)
-    for calendar_type in calendar_types:
-        try:
-            result[CalendarTypes[calendar_type].value] = 1
-        except KeyError:
-            logging.error('Unknown calendar type: %s', calendar_type)
-            logging.error('Supported calendar types: %s', ', '.join(CalendarTypes.__members__))
-            sys.exit(1)
-    return ba2int(result)
 
 
 def ishex(s):
@@ -200,31 +157,6 @@ def ishex(s):
         return True
     except ValueError:
         return False
-
-# get_fixed_label_dict() converts the list of strings to per endpoint dictionaries.
-# example input  : ['0/orientation/up', '1/orientation/down', '2/orientation/down']
-# example output : {'0': [{'orientation': 'up'}], '1': [{'orientation': 'down'}], '2': [{'orientation': 'down'}]}
-
-
-def get_fixed_label_dict(fixed_labels):
-    fl_dict = {}
-    for fl in fixed_labels:
-        _l = fl.split('/')
-
-        if len(_l) != 3:
-            logging.error('Invalid fixed label: %s', fl)
-            sys.exit(1)
-
-        if not (ishex(_l[0]) and (len(_l[1]) > 0 and len(_l[1]) < 16) and (len(_l[2]) > 0 and len(_l[2]) < 16)):
-            logging.error('Invalid fixed label: %s', fl)
-            sys.exit(1)
-
-        if _l[0] not in fl_dict.keys():
-            fl_dict[_l[0]] = list()
-
-        fl_dict[_l[0]].append({_l[1]: _l[2]})
-
-    return fl_dict
 
 # get_supported_modes_dict() converts the list of strings to per endpoint dictionaries.
 # example with semantic tags
@@ -344,52 +276,6 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['hardware-ver']['value'] = args.hw_ver
     if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
-
-    if args.calendar_types:
-        FACTORY_DATA['cal-types']['value'] = calendar_types_to_uint32(args.calendar_types)
-
-    # Supported locale is stored as multiple entries, key format: "locale/<index>, example key: "locale/0"
-    if args.locales:
-        FACTORY_DATA['locale-sz']['value'] = len(args.locales)
-
-        for i in range(len(args.locales)):
-            _locale = {
-                'type': 'data',
-                'encoding': 'string',
-                'value': args.locales[i]
-            }
-            FACTORY_DATA.update({'locale/{:x}'.format(i): _locale})
-
-    # Each endpoint can contains the fixed lables
-    #  - fl-sz/<index>     : number of fixed labels for the endpoint
-    #  - fl-k/<ep>/<index> : fixed label key for the endpoint and index
-    #  - fl-v/<ep>/<index> : fixed label value for the endpoint and index
-    if args.fixed_labels:
-        dict = get_fixed_label_dict(args.fixed_labels)
-        for key in dict.keys():
-            _sz = {
-                'type': 'data',
-                'encoding': 'u32',
-                'value': len(dict[key])
-            }
-            FACTORY_DATA.update({'fl-sz/{:x}'.format(int(key)): _sz})
-
-            for i in range(len(dict[key])):
-                entry = dict[key][i]
-
-                _label_key = {
-                    'type': 'data',
-                    'encoding': 'string',
-                    'value': list(entry.keys())[0]
-                }
-                _label_value = {
-                    'type': 'data',
-                    'encoding': 'string',
-                    'value': list(entry.values())[0]
-                }
-
-                FACTORY_DATA.update({'fl-k/{:x}/{:x}'.format(int(key), i): _label_key})
-                FACTORY_DATA.update({'fl-v/{:x}/{:x}'.format(int(key), i): _label_value})
 
     # SupportedModes are stored as multiple entries
     #  - sm-sz/<ep>                 : number of supported modes for the endpoint
@@ -547,13 +433,6 @@ def main():
                         help=('128-bit unique identifier for generating rotating device identifier, '
                               'provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"'))
 
-    # These will be used by DeviceInfoProvider
-    parser.add_argument('--calendar-types', nargs='+',
-                        help=('List of supported calendar types.\nSupported Calendar Types: Buddhist, Chinese, Coptic, Ethiopian, '
-                              'Gregorian, Hebrew, Indian, Islamic, Japanese, Korean, Persian, Taiwanese'))
-    parser.add_argument('--locales', nargs='+', help='List of supported locales, Language Tag as defined by BCP47, eg. en-US en-GB')
-    parser.add_argument('--fixed-labels', nargs='+',
-                        help='List of fixed labels, eg: "0/orientation/up" "1/orientation/down" "2/orientation/down"')
     parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
                         help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
 
