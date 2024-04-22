@@ -177,18 +177,21 @@ System::PacketBufferHandle BuildSrvTestPacket()
 
     mdns::Minimal::ResponseBuilder builder(std::move(packet));
 
-    constexpr uint16_t kSrvPort                          = 4400;
+    constexpr uint16_t kSrvPort                          = 5540;
+    constexpr const char * kNodeName                     = "ABCD1234ABCD1234";
+    constexpr const char * kNodeFabricName               = "ABCD1234ABCD1234-0000000000000001";
     constexpr mdns::Minimal::QNamePart kServiceName[]    = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
                                                              Dnssd::kLocalDomain };
-    constexpr mdns::Minimal::QNamePart kServerName[]     = { "fake-server", Dnssd::kLocalDomain };
-    constexpr mdns::Minimal::QNamePart kServerFullName[] = { "fake-server", Dnssd::kOperationalServiceName,
+    constexpr mdns::Minimal::QNamePart kServerFullName[] = { kNodeFabricName, Dnssd::kOperationalServiceName,
                                                              Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
+    constexpr mdns::Minimal::QNamePart kServerName[]     = { kNodeFabricName, Dnssd::kLocalDomain };
 
     mdns::Minimal::PtrResourceRecord ptrRecord(kServiceName, kServerFullName);
     mdns::Minimal::SrvResourceRecord srvRecord(kServerFullName, kServerName, kSrvPort);
+    srvRecord.SetCacheFlush(true);
 
     builder.AddRecord(mdns::Minimal::ResourceType::kAnswer, ptrRecord);
-    builder.AddRecord(mdns::Minimal::ResourceType::kAdditional, srvRecord);
+    builder.AddRecord(mdns::Minimal::ResourceType::kAnswer, srvRecord);
 
     if (!builder.Ok())
     {
