@@ -19,8 +19,6 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <algorithm>
-
 using namespace chip;
 
 namespace mdns {
