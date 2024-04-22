@@ -1,7 +1,6 @@
 AppTests
 BDXTests
 ChipCryptoTests
-CoreTests
 CredentialsTest
 DataModelTests
 InetLayerTests
