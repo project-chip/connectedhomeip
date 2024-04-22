@@ -1715,8 +1715,7 @@ TEST_F(TestTLV, CheckOctetStringPrettyPrinter)
 
     chip::TLV::Debug::Dump(reader, StringDumpWriter);
 
-    EXPECT_EQ(strlen(expectedPrint), strlen(gStringDumpWriterBuf));
-    EXPECT_EQ(strcmp(expectedPrint, gStringDumpWriterBuf), 0);
+    EXPECT_STREQ(expectedPrint, gStringDumpWriterBuf);
 }
 
 /**
