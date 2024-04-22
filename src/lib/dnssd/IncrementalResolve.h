@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include "Types.h"
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
