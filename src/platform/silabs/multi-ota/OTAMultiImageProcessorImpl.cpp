@@ -444,8 +444,6 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 #ifndef SLI_SI91X_MCU_INTERFACE // required for 917 NCP
 >>>>>>> ac92393594 (Added changes for the build errores)
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
-#else
-    
 #endif
 }
 

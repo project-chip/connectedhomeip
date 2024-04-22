@@ -551,12 +551,14 @@ template("efr32_sdk") {
       ]
     }
 
-    if (chip_enable_multi_ota_encryption && chip_enable_multi_ota_requestor) {
-      defines += [ "SL_MATTER_ENABLE_OTA_ENCRYPTION=1" ]
-    }
+    if (chip_enable_multi_ota_requestor) {
+      if (chip_enable_multi_ota_encryption) {
+        defines += [ "OTA_ENCRYPTION_ENABLE=1" ]
+      }
 
-    if (chip_enable_ota_custom_tlv_testing && chip_enable_multi_ota_requestor) {
-      defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
+      if (chip_enable_ota_custom_tlv_testing) {
+        defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
+      }
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
@@ -864,10 +866,10 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
     ]
 
-    if (chip_enable_multi_ota_requestor && use_SiWx917) {
-      sources += [
-       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c",
-      ]
+    if (chip_enable_multi_ota_requestor) {
+      if (use_SiWx917) {
+        sources += [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c" ]
+      }
     }
 
     if (enable_dic) {
