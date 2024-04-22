@@ -288,11 +288,11 @@ public:
     /// IP resolution.
     bool IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const;
 
-    /// Determines if for the given host name a IP address is required.
+    /// Determines if address resolution for the given peer ID is required
     ///
-    /// IP Addresses are required for specific hosts we are looking for as well
-    /// as during browse operations where we want ip data for any seen server.
-    bool ShouldResolveIpAddress(SerializedQNameIterator targetHostName) const;
+    /// IP Addresses are required for active operational discovery of specific peers
+    /// or if an active browse is being performed.
+    bool ShouldResolveIpAddress(chip::PeerId peerId) const;
 
     /// Check if a browse operation is active for the given discovery type
     bool HasBrowseFor(chip::Dnssd::DiscoveryType type) const;

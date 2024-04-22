@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "Types.h"
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
@@ -103,6 +104,12 @@ public:
     bool IsActiveOperationalParse() const { return mSpecificResolutionData.Is<OperationalNodeData>(); }
 
     ServiceNameType GetCurrentType() const { return mServiceNameType; }
+
+    PeerId OperationalParsePeerId() const
+    {
+        VerifyOrReturnValue(IsActiveOperationalParse(), PeerId());
+        return mSpecificResolutionData.Get<OperationalNodeData>().peerId;
+    }
 
     /// Start parsing a new record. SRV records are the records we are mainly
     /// interested on, after which TXT and A/AAAA are looked for.

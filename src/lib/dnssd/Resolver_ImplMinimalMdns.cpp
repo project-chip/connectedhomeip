@@ -29,6 +29,7 @@
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
+#include <lib/dnssd/minimal_mdns/core/QNameString.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <tracing/macros.h>
@@ -370,13 +371,25 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
         IncrementalResolver::RequiredInformationFlags missing = resolver->GetMissingRequiredInformation();
 
-        // Keep searching for IP addresses if an active resolve needs these IP addresses
-        // otherwise ignore the data (received a SRV record without IP address, however we do not
-        // seem interested in it. Probably just a device that came online).
-        if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress) &&
-            mActiveResolves.ShouldResolveIpAddress(resolver->GetTargetHostName()))
+        if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
         {
-            ScheduleIpAddressResolve(resolver->GetTargetHostName());
+            if (resolver->IsActiveBrowseParse())
+            {
+                // Browse wants IP addresses
+                ScheduleIpAddressResolve(resolver->GetTargetHostName());
+            }
+            else if (mActiveResolves.ShouldResolveIpAddress(resolver->OperationalParsePeerId()))
+            {
+                // Keep searching for IP addresses if an active resolve needs these IP addresses
+                // otherwise ignore the data (received a SRV record without IP address, however we do not
+                // seem interested in it. Probably just a device that came online).
+                ScheduleIpAddressResolve(resolver->GetTargetHostName());
+            }
+            else
+            {
+                // This IP address is not interesting enough to run another discovery
+                resolver->ResetToInactive();
+            }
             continue;
         }
 

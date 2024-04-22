@@ -284,7 +284,7 @@ Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextSch
     return Optional<ScheduledAttempt>::Missing();
 }
 
-bool ActiveResolveAttempts::ShouldResolveIpAddress(SerializedQNameIterator targetHostName) const
+bool ActiveResolveAttempts::ShouldResolveIpAddress(PeerId peerId) const
 {
     for (auto & item : mRetryQueue)
     {
@@ -297,9 +297,14 @@ bool ActiveResolveAttempts::ShouldResolveIpAddress(SerializedQNameIterator targe
             return true;
         }
 
-        if (item.attempt.MatchesIpResolve(targetHostName))
+        if (item.attempt.IsResolve())
         {
-            return true;
+            // attempting to resolve a server
+            auto & data = item.attempt.ResolveData();
+            if (data.peerId == peerId)
+            {
+                return true;
+            }
         }
     }
 

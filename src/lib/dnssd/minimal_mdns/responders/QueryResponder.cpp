@@ -96,6 +96,13 @@ size_t QueryResponderBase::MarkAdditional(const FullQName & qname)
             continue; // already marked
         }
 
+        // DO NOT SUBMIT: no addresses as additional data
+        if ((mResponderInfos[i].responder->GetQType() == QType::AAAA)
+      || (mResponderInfos[i].responder->GetQType() == QType::A))
+        {
+            continue;
+        }
+
         if (mResponderInfos[i].responder->GetQName() == qname)
         {
             mResponderInfos[i].reportNowAsAdditional = true;
