@@ -297,7 +297,6 @@ bool ActiveResolveAttempts::ShouldResolveIpAddress(PeerId peerId) const
 
         if (item.attempt.IsResolve())
         {
-            // attempting to resolve a server
             auto & data = item.attempt.ResolveData();
             if (data.peerId == peerId)
             {
