@@ -27,14 +27,13 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestContext.h>  //++++
 #include <lib/support/UnitTestUtils.h>
 #include <system/SystemLayer.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/TCP.h>
 
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
 #include <errno.h>
 #include <stdlib.h>

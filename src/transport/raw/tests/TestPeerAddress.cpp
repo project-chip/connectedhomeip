@@ -55,7 +55,7 @@ TEST(TestPeerAddress, TestPeerAddressMulticast)
     uint8_t result[NL_INET_IPV6_ADDR_LEN_IN_BYTES];
     uint8_t * p = result;
     ip.WriteAddress(p);
-    EXPECT_EQ(0, memcmp(expected, result, NL_INET_IPV6_ADDR_LEN_IN_BYTES));
+    EXPECT_EQ(0, memcmp(expected, result, NL_INET_IPV6_ADDR_LEN_IN_BYTES));  //++++
 }
 
 TEST(TestPeerAddress, TestToString)
