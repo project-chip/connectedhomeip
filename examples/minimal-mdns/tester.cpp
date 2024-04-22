@@ -184,7 +184,7 @@ System::PacketBufferHandle BuildSrvTestPacket()
                                                              Dnssd::kLocalDomain };
     constexpr mdns::Minimal::QNamePart kServerFullName[] = { kNodeFabricName, Dnssd::kOperationalServiceName,
                                                              Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
-    constexpr mdns::Minimal::QNamePart kServerName[]     = { kNodeFabricName, Dnssd::kLocalDomain };
+    constexpr mdns::Minimal::QNamePart kServerName[]     = { kNodeName, Dnssd::kLocalDomain };
 
     mdns::Minimal::PtrResourceRecord ptrRecord(kServiceName, kServerFullName);
     mdns::Minimal::SrvResourceRecord srvRecord(kServerFullName, kServerName, kSrvPort);

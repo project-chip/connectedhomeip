@@ -370,7 +370,11 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
         IncrementalResolver::RequiredInformationFlags missing = resolver->GetMissingRequiredInformation();
 
-        if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
+        // Keep searching for IP addresses if an active resolve needs these IP addresses
+        // otherwise ignore the data (received a SRV record without IP address, however we do not
+        // seem interested in it. Probably just a device that came online).
+        if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress) &&
+            mActiveResolves.ShouldResolveIpAddress(resolver->GetTargetHostName()))
         {
             ScheduleIpAddressResolve(resolver->GetTargetHostName());
             continue;

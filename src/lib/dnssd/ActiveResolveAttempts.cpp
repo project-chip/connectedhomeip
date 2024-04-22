@@ -284,6 +284,28 @@ Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextSch
     return Optional<ScheduledAttempt>::Missing();
 }
 
+bool ActiveResolveAttempts::ShouldResolveIpAddress(SerializedQNameIterator targetHostName) const
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (item.attempt.IsEmpty())
+        {
+            continue;
+        }
+        if (item.attempt.IsBrowse())
+        {
+            return true;
+        }
+
+        if (item.attempt.MatchesIpResolve(targetHostName))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool ActiveResolveAttempts::IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const
 {
     for (auto & entry : mRetryQueue)

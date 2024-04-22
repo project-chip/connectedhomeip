@@ -288,6 +288,12 @@ public:
     /// IP resolution.
     bool IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const;
 
+    /// Determines if for the given host name a IP address is required.
+    ///
+    /// IP Addresses are required for specific hosts we are looking for as well
+    /// as during browse operations where we want ip data for any seen server.
+    bool ShouldResolveIpAddress(SerializedQNameIterator targetHostName) const;
+
     /// Check if a browse operation is active for the given discovery type
     bool HasBrowseFor(chip::Dnssd::DiscoveryType type) const;
 
