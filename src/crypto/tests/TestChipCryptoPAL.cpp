@@ -152,6 +152,9 @@ void AssertKeysEqual(SessionKeystore & keystore, HkdfKeyHandle & left, const Hkd
 }
 
 } // namespace
+  //
+
+#if CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_MBEDTLS
 
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
@@ -160,6 +163,8 @@ static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t
     gs_test_entropy_source_called++;
     return 0;
 }
+
+#endif // CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_MBEDTLS
 
 constexpr size_t KEY_LENGTH   = Crypto::kAES_CCM128_Key_Length;
 constexpr size_t NONCE_LENGTH = Crypto::kAES_CCM128_Nonce_Length;
