@@ -69,7 +69,7 @@ constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
-using TestContext = chip::Test::IOContext;
+using TestContext = chip::Test::IOContext;  //++++
 
 const char PAYLOAD[] = "Hello!";
 
@@ -106,7 +106,7 @@ public:
 
     void InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
-        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));  //++++
 
         // retry a few times in case the port is somehow in use.
         // this is a WORKAROUND for flaky testing if we run tests very fast after each other.
@@ -125,7 +125,7 @@ public:
         {
             ChipLogProgress(NotSpecified, "RETRYING tcp initialization");
             chip::test_utils::SleepMillis(100);
-            err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+            err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));  //++++
         }
 
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
@@ -154,7 +154,7 @@ public:
         err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
-        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });  //++++
         NL_TEST_ASSERT(mSuite, mReceiveHandlerCallCount == 1);
 
         SetCallback(nullptr);
@@ -164,7 +164,7 @@ public:
     {
         // Disconnect and wait for seeing peer close
         tcp.Disconnect(Transport::PeerAddress::TCP(addr));
-        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });  //++++
     }
 
     int mReceiveHandlerCallCount = 0;
