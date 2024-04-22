@@ -94,7 +94,7 @@ private:
 
 #define ASSERT_HAS_NAME(p, n)                                                                                                      \
     EXPECT_NE(p.Get(), nullptr);                                                                                                   \
-    EXPECT_EQ(strcmp(p.Get()->name, n), 0)
+    EXPECT_STREQ(p.Get()->name, n);
 
 #define ASSERT_HAS_CONTEXT_TAG(p, t)                                                                                               \
     EXPECT_NE(p.Get(), nullptr);                                                                                                   \

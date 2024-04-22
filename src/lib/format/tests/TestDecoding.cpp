@@ -128,7 +128,7 @@ void TestSampleData(const PayloadDecoderInitParams & params, const SamplePayload
         printf("ACTUAL: '%s'\n", partial.Reset().Add(output_builder.c_str() + idx).AddMarkerIfOverflow().c_str());
     }
 
-    EXPECT_EQ(strcmp(output_builder.c_str(), expectation), 0);
+    EXPECT_STREQ(output_builder.c_str(), expectation);
 }
 
 TEST(TestDecoding, TestFullDataDecoding)

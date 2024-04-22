@@ -83,8 +83,8 @@ private:
 
 TEST(TestFlatTree, TestFlatTreeFind)
 {
-    EXPECT_EQ(strcmp(FindEntry(tree, 0, ByTag(ContextTag(1)))->data.name, "hello"), 0);
-    EXPECT_EQ(strcmp(FindEntry(tree, 0, ByTag(ContextTag(2)))->data.name, "world"), 0);
+    EXPECT_STREQ(FindEntry(tree, 0, ByTag(ContextTag(1)))->data.name, "hello");
+    EXPECT_STREQ(FindEntry(tree, 0, ByTag(ContextTag(2)))->data.name, "world");
     EXPECT_EQ(FindEntry(tree, 0, ByTag(ContextTag(3))), nullptr);
 
     EXPECT_EQ(FindEntry(tree, 0, ByName("hello"))->data.tag, ContextTag(1));
@@ -92,12 +92,12 @@ TEST(TestFlatTree, TestFlatTreeFind)
     EXPECT_EQ(FindEntry(tree, 0, ByName("foo")), nullptr);
 
     EXPECT_EQ(FindEntry(tree, 1, ByTag(ContextTag(1))), nullptr);
-    EXPECT_EQ(strcmp(FindEntry(tree, 1, ByTag(ProfileTag(234, 2)))->data.name, "b"), 0);
-    EXPECT_EQ(strcmp(FindEntry(tree, 1, ByTag(ProfileTag(345, 3)))->data.name, "c"), 0);
+    EXPECT_STREQ(FindEntry(tree, 1, ByTag(ProfileTag(234, 2)))->data.name, "b");
+    EXPECT_STREQ(FindEntry(tree, 1, ByTag(ProfileTag(345, 3)))->data.name, "c");
     EXPECT_EQ(FindEntry(tree, 1, ByTag(AnonymousTag())), nullptr);
 
     EXPECT_EQ(FindEntry(tree, 2, ByTag(ContextTag(1))), nullptr);
-    EXPECT_EQ(strcmp(FindEntry(tree, 2, ByTag(AnonymousTag()))->data.name, "foo"), 0);
+    EXPECT_STREQ(FindEntry(tree, 2, ByTag(AnonymousTag()))->data.name, "foo");
 
     // out of array
     EXPECT_EQ(FindEntry(tree, 3, ByTag(AnonymousTag())), nullptr);
