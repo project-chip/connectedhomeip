@@ -280,6 +280,20 @@ Host will initiate OTA download to receive combined image (TA+M4) and store M4 a
     ```
 - The application device will connect to the Provider and start the image download. Once the image is downloaded the device will reboot into the downloaded image.
 
+## Multi-Chip OTA Images
+Multi-Chip OTA is implemented only for EFR32 devices. Multi-chip OTA uses an enhanced ota_image_tool.py script which creates .ota files that contain additional TLV headers. These TLV headers describe the binaries to be sent over the air. The enhanced script is located at scripts/tool/silabs/ota/ota_image_tool.py which is a wrapper to the original src/app/ota_image_tool.py. Multiple binaries can be packaged in the .ota file. Some Tags are reserved for specific Silicon Labs binaries, and other Tags are available to be used for arbitrary TLVs. The payloads can be encrypted. 
+
+For more information on creating a Multi-Chip .ota file see the 
+[README.md](https://github.com/SiliconLabs/matter/blob/latest/scripts/tools/silabs/ota/README.md)
+
+OTA-A applications must be built with an additional gn argument to enable them to process the TLVs. 
+
+    ```shell
+    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting-app BRD41xx chip_enable_multi_ota_requestor=true
+    ```
+
+chip_enable_multi_ota_encryption=true should be added to the build command if the requestor is meant to process encrypted payloads.
+
 ## Additional Info
 
 Developers can find more resources on
