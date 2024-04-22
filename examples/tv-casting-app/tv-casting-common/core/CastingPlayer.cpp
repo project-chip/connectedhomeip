@@ -282,7 +282,8 @@ void CastingPlayer::LogDetail() const
     {
         ChipLogDetail(AppServer, "\tDevice Type: %" PRIu32, mAttributes.deviceType);
     }
-    ChipLogDetail(AppServer, "\tCommissionerPasscode: %s", mAttributes.commissionerPasscode ? "true" : "false");
+    ChipLogDetail(AppServer, "\tSupports Commissioner Generated Passcode: %s",
+                  mAttributes.supportsCommissionerGeneratedPasscode ? "true" : "false");
     if (mAttributes.nodeId > 0)
     {
         ChipLogDetail(AppServer, "\tNode ID: 0x" ChipLogFormatX64, ChipLogValueX64(mAttributes.nodeId));

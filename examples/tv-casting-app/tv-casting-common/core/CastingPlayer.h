@@ -63,10 +63,7 @@ public:
     uint16_t productId;
     uint16_t vendorId;
     uint32_t deviceType;
-    /**
-     * The CommissionerPasscode field indicates whether a CastingPlayer supports the Commissioner-Generated Passcode feature.
-     */
-    bool commissionerPasscode;
+    bool supportsCommissionerGeneratedPasscode;
 
     chip::NodeId nodeId           = 0;
     chip::FabricIndex fabricIndex = 0;
@@ -186,7 +183,7 @@ public:
 
     uint32_t GetDeviceType() const { return mAttributes.deviceType; }
 
-    bool isCommissionerPasscodeSupported() const { return mAttributes.commissionerPasscode; }
+    bool GetSupportsCommissionerGeneratedPasscode() const { return mAttributes.supportsCommissionerGeneratedPasscode; }
 
     chip::NodeId GetNodeId() const { return mAttributes.nodeId; }
 

@@ -49,7 +49,7 @@ public interface CastingPlayer {
 
   long getDeviceType();
 
-  boolean isCommissionerPasscodeSupported();
+  boolean getSupportsCommissionerGeneratedPasscode();
 
   List<Endpoint> getEndpoints();
 

@@ -256,7 +256,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DnssdNodeDa
         nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
     case TxtFieldKey::kCommissionerPasscode:
-        nodeData.commissionerPasscode = Internal::GetCommissionerPasscode(val);
+        nodeData.supportsCommissionerGeneratedPasscode = Internal::GetCommissionerPasscode(val);
         break;
     default:
         break;

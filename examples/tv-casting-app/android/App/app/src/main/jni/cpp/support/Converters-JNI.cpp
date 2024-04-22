@@ -182,12 +182,12 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
 
     // Create a new instance of the MatterCastingPlayer Java class
     jobject jMatterCastingPlayer = nullptr;
-    jMatterCastingPlayer =
-        env->NewObject(matterCastingPlayerJavaClass, constructor, static_cast<jboolean>(player->IsConnected()),
-                       env->NewStringUTF(player->GetId()), env->NewStringUTF(player->GetHostName()),
-                       env->NewStringUTF(player->GetDeviceName()), env->NewStringUTF(player->GetInstanceName()), jIpAddressList,
-                       (jint) (player->GetPort()), (jint) (player->GetProductId()), (jint) (player->GetVendorId()),
-                       (jlong) (player->GetDeviceType()), static_cast<jboolean>(player->isCommissionerPasscodeSupported()));
+    jMatterCastingPlayer = env->NewObject(matterCastingPlayerJavaClass, constructor, static_cast<jboolean>(player->IsConnected()),
+                                          env->NewStringUTF(player->GetId()), env->NewStringUTF(player->GetHostName()),
+                                          env->NewStringUTF(player->GetDeviceName()), env->NewStringUTF(player->GetInstanceName()),
+                                          jIpAddressList, (jint) (player->GetPort()), (jint) (player->GetProductId()),
+                                          (jint) (player->GetVendorId()), (jlong) (player->GetDeviceType()),
+                                          static_cast<jboolean>(player->GetSupportsCommissionerGeneratedPasscode()));
     if (jMatterCastingPlayer == nullptr)
     {
         ChipLogError(AppServer, "convertCastingPlayerFromCppToJava(): Could not create MatterCastingPlayer Java object");

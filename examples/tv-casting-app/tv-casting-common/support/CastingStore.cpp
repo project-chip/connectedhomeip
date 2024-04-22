@@ -182,9 +182,9 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                 continue;
             }
 
-            if (castingPlayerContainerTagNum == kCastingPlayerCommissionerPasscodeTag)
+            if (castingPlayerContainerTagNum == kCastingPlayerSupportsCommissionerGeneratedPasscodeTag)
             {
-                err = reader.Get(attributes.commissionerPasscode);
+                err = reader.Get(attributes.supportsCommissionerGeneratedPasscode);
                 VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                                     ChipLogError(AppServer, "TLVReader.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
                 continue;
@@ -480,8 +480,8 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerVendorIdTag), castingPlayer.GetVendorId()));
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerProductIdTag), castingPlayer.GetProductId()));
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerDeviceTypeIdTag), castingPlayer.GetDeviceType()));
-        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerCommissionerPasscodeTag),
-                                           castingPlayer.isCommissionerPasscodeSupported()));
+        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerSupportsCommissionerGeneratedPasscodeTag),
+                                           castingPlayer.GetSupportsCommissionerGeneratedPasscode()));
         ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerPortTag), castingPlayer.GetPort()));
         ReturnErrorOnFailure(tlvWriter.PutBytes(chip::TLV::ContextTag(kCastingPlayerInstanceNameTag),
                                                 (const uint8_t *) castingPlayer.GetInstanceName(),

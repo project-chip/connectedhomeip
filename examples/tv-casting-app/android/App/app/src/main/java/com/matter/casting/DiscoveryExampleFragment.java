@@ -352,8 +352,8 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
     aux += (aux.isEmpty() ? "" : ", ") + "Resolved IP?: " + (player.getIpAddresses().size() > 0);
     aux +=
         (aux.isEmpty() ? "" : ", ")
-            + "CommissionerPasscode: "
-            + (player.isCommissionerPasscodeSupported());
+            + "Supports Commissioner Generated Passcode: "
+            + (player.getSupportsCommissionerGeneratedPasscode());
 
     aux = aux.isEmpty() ? aux : "\n" + aux;
     return main + aux;

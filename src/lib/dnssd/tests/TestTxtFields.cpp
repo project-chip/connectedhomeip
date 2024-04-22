@@ -309,7 +309,7 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
         node.nodeData.pairingHint != 0 || node.resolutionData.mrpRetryIntervalIdle.HasValue() ||
         node.resolutionData.mrpRetryIntervalActive.HasValue() || node.resolutionData.mrpRetryActiveThreshold.HasValue() ||
         node.resolutionData.isICDOperatingAsLIT.HasValue() || node.resolutionData.supportsTcp ||
-        node.nodeData.commissionerPasscode != 0)
+        node.nodeData.supportsCommissionerGeneratedPasscode != 0)
     {
         return false;
     }
@@ -360,12 +360,12 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     filled.nodeData.commissioningMode = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
-    // CommissionerPasscode
+    // Supports Commissioner Generated Passcode
     strcpy(key, "CP");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.nodeData);
-    NL_TEST_ASSERT(inSuite, filled.nodeData.commissionerPasscode == true);
-    filled.nodeData.commissionerPasscode = false;
+    NL_TEST_ASSERT(inSuite, filled.nodeData.supportsCommissionerGeneratedPasscode == true);
+    filled.nodeData.supportsCommissionerGeneratedPasscode = false;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Device type
