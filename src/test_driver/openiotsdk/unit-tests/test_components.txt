@@ -6,3 +6,4 @@ MinimalMdnsRespondersTests
 CoreTests
 PlatformTests
 TestShell
+SetupPayloadTests

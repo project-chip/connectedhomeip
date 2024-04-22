@@ -10,7 +10,7 @@ MinimalMdnsCoreTests
 RawTransportTests
 RetransmitTests
 SecureChannelTests
-SetupPayloadTests
+SetupPayloadTestsNL
 SupportTests
 TransportLayerTests
 UserDirectedCommissioningTests
