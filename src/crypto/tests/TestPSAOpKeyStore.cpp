@@ -59,7 +59,7 @@ TEST_F(TestPSAOpKeyStore, TestBasicLifeCycle)
     CHIP_ERROR err = opKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(opKeystore.HasPendingOpKeypair());
-    EXPECT_TRUE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
+    EXPECT_FALSE(opKeystore.HasOpKeypairForFabric(kFabricIndex));
 
     P256PublicKey csrPublicKey1;
     err = VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), csrPublicKey1);
