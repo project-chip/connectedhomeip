@@ -44,7 +44,7 @@ struct Nullable : protected std::optional<T>
     // The following 'using' statement is needed to make visible
     // all constructors of the base class within this derived class.
     //
-    using std::optional<T>::value;
+    using std::optional<T>::optional;
     using std::optional<T>::operator*;
     using std::optional<T>::operator->;
 
@@ -68,11 +68,8 @@ struct Nullable : protected std::optional<T>
         return std::optional<T>::value_or(std::forward<Args>(args)...);
     }
 
-    template <typename... Args>
-    constexpr auto Value(Args &&... args) const
-    {
-        return std::optional<T>::value(std::forward<Args>(args)...);
-    }
+    constexpr const T & Value() const { return **this; }
+    T & Value() { return **this; }
 
     // For integer types, being nullable involves a range restriction.
     template <
