@@ -28,6 +28,7 @@
 #import "MTRCommandTimedCheck.h"
 #import "MTRConversion.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDeviceConnectivityMonitor.h"
 #import "MTRDeviceControllerOverXPC.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
@@ -355,6 +356,7 @@ static NSString * const sAttributesKey = @"attributes";
     // _setupSubscription or via the auto-resubscribe behavior of the
     // ReadClient).  Nil if we have had no such failures.
     NSDate * _Nullable _lastSubscriptionFailureTime;
+    MTRDeviceConnectivityMonitor * _connectivityMonitor;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -669,6 +671,8 @@ static NSString * const sAttributesKey = @"attributes";
     // subscription.  In that case, _internalDeviceState will update when the
     // subscription is actually terminated.
 
+    [self _stopConnectivityMonitoring];
+
     os_unfair_lock_unlock(&self->_lock);
 }
 
@@ -861,6 +865,9 @@ static NSString * const sAttributesKey = @"attributes";
 
     [self _changeState:MTRDeviceStateReachable];
 
+    // No need to monitor connectivity after subscription establishment
+    [self _stopConnectivityMonitoring];
+
     os_unfair_lock_unlock(&self->_lock);
 
     os_unfair_lock_lock(&self->_timeSyncLock);
@@ -894,6 +901,9 @@ static NSString * const sAttributesKey = @"attributes";
     // former case we recently had a subscription and do not want to be forcing
     // retries immediately.
     _lastSubscriptionFailureTime = [NSDate now];
+
+    // Set up connectivity monitoring in case network routability changes for the positive, to accellerate resubscription
+    [self _setupConnectivityMonitoring];
 }
 
 - (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay
@@ -1030,9 +1040,7 @@ static NSString * const sAttributesKey = @"attributes";
     for (MTRClusterPath * clusterPath in clusterPaths) {
         NSNumber * dataVersion = _clusterData[clusterPath].dataVersion;
         NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes = nil;
-#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
         attributes = [self _attributesForCluster:clusterPath];
-#endif
         if (dataVersion || attributes) {
             MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:attributes];
             clusterDataToReturn[clusterPath] = clusterData;
@@ -1239,6 +1247,44 @@ static NSString * const sAttributesKey = @"attributes";
 
     *dataVersionFilterList = dataVersionFilterArray;
     *count = maxDataVersionFilterSize;
+}
+
+- (void)_setupConnectivityMonitoring
+{
+    // Dispatch to own queue first to avoid deadlock with syncGetCompressedFabricID
+    dispatch_async(self.queue, ^{
+        // Get the required info before setting up the connectivity monitor
+        NSNumber * compressedFabricID = [self->_deviceController syncGetCompressedFabricID];
+        if (!compressedFabricID) {
+            MTR_LOG_INFO("%@ could not get compressed fabricID", self);
+            return;
+        }
+
+        // Now lock for _connectivityMonitor
+        std::lock_guard lock(self->_lock);
+        if (self->_connectivityMonitor) {
+            // already monitoring
+            return;
+        }
+
+        self->_connectivityMonitor = [[MTRDeviceConnectivityMonitor alloc] initWithCompressedFabricID:compressedFabricID nodeID:self.nodeID];
+        [self->_connectivityMonitor startMonitoringWithHandler:^{
+            [self->_deviceController asyncDispatchToMatterQueue:^{
+                [self _triggerResubscribeWithReason:"read-through skipped while not subscribed" nodeLikelyReachable:YES];
+            }
+                                                   errorHandler:nil];
+        } queue:self.queue];
+    });
+}
+
+- (void)_stopConnectivityMonitoring
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    if (_connectivityMonitor) {
+        [_connectivityMonitor stopMonitoring];
+        _connectivityMonitor = nil;
+    }
 }
 
 // assume lock is held
@@ -1462,6 +1508,9 @@ static NSString * const sAttributesKey = @"attributes";
                    callback->AdoptClusterStateCache(std::move(clusterStateCache));
                    callback.release();
                }];
+
+    // Set up connectivity monitoring in case network becomes routable after any part of the subscription process goes into backoff retries.
+    [self _setupConnectivityMonitoring];
 }
 
 #ifdef DEBUG
@@ -2289,12 +2338,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     NSMutableArray * attributesToReport = [NSMutableArray array];
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
     BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
-#if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
-    NSMutableArray * attributesToPersist;
-    if (dataStoreExists) {
-        attributesToPersist = [NSMutableArray array];
-    }
-#endif
     for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
         NSDictionary * attributeDataValue = attributeResponseValue[MTRDataKey];
@@ -2337,20 +2380,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:_readCache[attributePath]];
             // Check if attribute needs to be persisted - compare only to read cache and disregard expected values
             if (dataStoreExists && readCacheValueChanged) {
-#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
                 [self _noteChangeForClusterPath:clusterPath];
-#else
-                NSDictionary * attributeResponseValueToPersist;
-                if (dataVersion) {
-                    // Remove data version from what we cache in memory and storage
-                    NSMutableDictionary * attributeResponseValueCopy = [attributeResponseValue mutableCopy];
-                    attributeResponseValueCopy[MTRDataKey] = attributeDataValue;
-                    attributeResponseValueToPersist = attributeResponseValueCopy;
-                } else {
-                    attributeResponseValueToPersist = attributeResponseValue;
-                }
-                [attributesToPersist addObject:attributeResponseValueToPersist];
-#endif
             }
             NSArray * expectedValue = _expectedValueCache[attributePath];
 
@@ -2422,12 +2452,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     MTR_LOG_INFO("%@ report from reported values %@", self, attributePathsToReport);
 
-#if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
-    if (dataStoreExists && attributesToPersist.count) {
-        [_deviceController.controllerDataStore storeAttributeValues:attributesToPersist forNodeID:_nodeID];
-    }
-#endif
-
     return attributesToReport;
 }
 
@@ -2479,7 +2503,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     std::lock_guard lock(_lock);
 
-#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
     // For each cluster, extract and create the attribute response-value for the read cache
     // TODO: consider some optimization in how the read cache is structured so there's fewer conversions from this format to what's in the cache
     for (MTRClusterPath * clusterPath in clusterData) {
@@ -2497,7 +2520,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
         }
     }
-#endif
 
     [_clusterData addEntriesFromDictionary:clusterData];
 }

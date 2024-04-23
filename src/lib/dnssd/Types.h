@@ -214,7 +214,7 @@ struct DnssdNodeData
     uint16_t productId                                        = 0;
     uint16_t pairingHint                                      = 0;
     uint8_t commissioningMode                                 = 0;
-    uint8_t commissionerPasscode                              = 0;
+    bool supportsCommissionerGeneratedPasscode                = false;
     uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
     char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
     char deviceName[kMaxDeviceNameLen + 1]                    = {};
@@ -272,10 +272,8 @@ struct DnssdNodeData
             ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
         }
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
-        if (commissionerPasscode > 0)
-        {
-            ChipLogDetail(Discovery, "\tCommissioner Passcode: %u", commissionerPasscode);
-        }
+        ChipLogDetail(Discovery, "\tSupports Commissioner Generated Passcode: %s",
+                      supportsCommissionerGeneratedPasscode ? "true" : "false");
     }
 };
 

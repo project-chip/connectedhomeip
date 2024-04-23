@@ -19,6 +19,7 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+#import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
@@ -181,6 +182,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 @implementation MTRPerControllerStorageTests {
     dispatch_queue_t _storageQueue;
+    BOOL _localTestStorageEnabledBeforeUnitTest;
 }
 
 - (void)setUp
@@ -188,6 +190,12 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    // Make sure local test storage is off, because we assume that the storage
+    // delegate we provide is in fact used for local storage as part of our
+    // tests.
+    _localTestStorageEnabledBeforeUnitTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = NO;
 
     _storageQueue = dispatch_queue_create("test.storage.queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
 }
@@ -197,6 +205,10 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // Per-test teardown, runs after each test.
     [self stopFactory];
     _storageQueue = nil;
+
+    // Restore local test storage setting to previous state.
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = _localTestStorageEnabledBeforeUnitTest;
+
     [super tearDown];
 }
 
@@ -1081,132 +1093,137 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
 
-    NSArray * testAttributes = @[
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(1)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(111) } },
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(2)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(112) } },
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(3)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(113) } },
-
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(1)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(121) } },
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(2)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(122) } },
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(3)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(123) } },
-
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(1) attributeID:@(1)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(211) } },
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(1) attributeID:@(2)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(212) } },
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(1) attributeID:@(3)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(213) } },
-    ];
-    [controller.controllerDataStore storeAttributeValues:testAttributes forNodeID:@(1001)];
-    [controller.controllerDataStore storeAttributeValues:testAttributes forNodeID:@(1002)];
-    [controller.controllerDataStore storeAttributeValues:testAttributes forNodeID:@(1003)];
-
     MTRDeviceClusterData * testClusterData1 = [[MTRDeviceClusterData alloc] init];
     testClusterData1.dataVersion = @(1);
+    testClusterData1.attributes = @{
+        @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(111) },
+        @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(112) },
+        @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(113) },
+    };
     MTRDeviceClusterData * testClusterData2 = [[MTRDeviceClusterData alloc] init];
     testClusterData2.dataVersion = @(2);
+    testClusterData2.attributes = @{
+        @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(121) },
+        @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(122) },
+        @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(123) },
+    };
     MTRDeviceClusterData * testClusterData3 = [[MTRDeviceClusterData alloc] init];
     testClusterData3.dataVersion = @(3);
+    testClusterData3.attributes = @{
+        @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(211) },
+        @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(212) },
+        @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(213) },
+    };
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * testClusterData = @{
         [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(1)] : testClusterData1,
         [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)] : testClusterData2,
-        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(3)] : testClusterData3,
+        [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(3)] : testClusterData3,
     };
     [controller.controllerDataStore storeClusterData:testClusterData forNodeID:@(1001)];
+    [controller.controllerDataStore storeClusterData:testClusterData forNodeID:@(1002)];
+    [controller.controllerDataStore storeClusterData:testClusterData forNodeID:@(1003)];
 
-    // Check values are written and can be fetched
-    NSArray * dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1001)];
-    XCTAssertEqual(dataStoreValues.count, 9);
-    dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1002)];
-    XCTAssertEqual(dataStoreValues.count, 9);
-    dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1003)];
-    XCTAssertEqual(dataStoreValues.count, 9);
-
-    // Check values
-    NSUInteger unexpectedValues = 0;
-    for (NSDictionary * responseValue in dataStoreValues) {
-        MTRAttributePath * path = responseValue[MTRAttributePathKey];
-        XCTAssertNotNil(path);
-        NSDictionary * dataValue = responseValue[MTRDataKey];
-        XCTAssertNotNil(dataValue);
-        NSString * type = dataValue[MTRTypeKey];
-        XCTAssertNotNil(type);
-        XCTAssertEqualObjects(type, MTRUnsignedIntegerValueType);
-        NSNumber * value = dataValue[MTRValueKey];
-        XCTAssertNotNil(value);
-
-        if ([path.endpoint isEqualToNumber:@(1)] && [path.cluster isEqualToNumber:@(1)] && [path.attribute isEqualToNumber:@(1)]) {
-            XCTAssertEqualObjects(value, @(111));
-        } else if ([path.endpoint isEqualToNumber:@(1)] && [path.cluster isEqualToNumber:@(1)] && [path.attribute isEqualToNumber:@(2)]) {
-            XCTAssertEqualObjects(value, @(112));
-        } else if ([path.endpoint isEqualToNumber:@(1)] && [path.cluster isEqualToNumber:@(1)] && [path.attribute isEqualToNumber:@(3)]) {
-            XCTAssertEqualObjects(value, @(113));
-        } else if ([path.endpoint isEqualToNumber:@(1)] && [path.cluster isEqualToNumber:@(2)] && [path.attribute isEqualToNumber:@(1)]) {
-            XCTAssertEqualObjects(value, @(121));
-        } else if ([path.endpoint isEqualToNumber:@(1)] && [path.cluster isEqualToNumber:@(2)] && [path.attribute isEqualToNumber:@(2)]) {
-            XCTAssertEqualObjects(value, @(122));
-        } else if ([path.endpoint isEqualToNumber:@(1)] && [path.cluster isEqualToNumber:@(2)] && [path.attribute isEqualToNumber:@(3)]) {
-            XCTAssertEqualObjects(value, @(123));
-        } else if ([path.endpoint isEqualToNumber:@(2)] && [path.cluster isEqualToNumber:@(1)] && [path.attribute isEqualToNumber:@(1)]) {
-            XCTAssertEqualObjects(value, @(211));
-        } else if ([path.endpoint isEqualToNumber:@(2)] && [path.cluster isEqualToNumber:@(1)] && [path.attribute isEqualToNumber:@(2)]) {
-            XCTAssertEqualObjects(value, @(212));
-        } else if ([path.endpoint isEqualToNumber:@(2)] && [path.cluster isEqualToNumber:@(1)] && [path.attribute isEqualToNumber:@(3)]) {
-            XCTAssertEqualObjects(value, @(213));
-        } else {
-            unexpectedValues++;
+    for (NSNumber * nodeID in @[ @(1001), @(1002), @(1003) ]) {
+        NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:nodeID];
+        for (MTRClusterPath * path in testClusterData) {
+            XCTAssertEqualObjects(testClusterData[path], dataStoreClusterData[path]);
         }
     }
-    XCTAssertEqual(unexpectedValues, 0);
 
-    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(1001)];
-    for (MTRClusterPath * path in testClusterData) {
-        XCTAssertEqualObjects(testClusterData[path].dataVersion, dataStoreClusterData[path].dataVersion);
+    [controller.controllerDataStore clearStoredClusterDataForNodeID:@(1001)];
+    XCTAssertNil([controller.controllerDataStore getStoredClusterDataForNodeID:@(1001)]);
+    for (NSNumber * nodeID in @[ @(1002), @(1003) ]) {
+        NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:nodeID];
+        for (MTRClusterPath * path in testClusterData) {
+            XCTAssertEqualObjects(testClusterData[path], dataStoreClusterData[path]);
+        }
     }
 
-    [controller.controllerDataStore clearStoredAttributesForNodeID:@(1001)];
-    dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1001)];
-    XCTAssertEqual(dataStoreValues.count, 0);
-    dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1002)];
-    XCTAssertEqual(dataStoreValues.count, 9);
-    dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1003)];
-    XCTAssertEqual(dataStoreValues.count, 9);
-
-    [controller.controllerDataStore clearAllStoredAttributes];
-    dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1001)];
-    XCTAssertEqual(dataStoreValues.count, 0);
-    dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1002)];
-    XCTAssertEqual(dataStoreValues.count, 0);
-    dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:@(1003)];
-    XCTAssertEqual(dataStoreValues.count, 0);
+    [controller.controllerDataStore clearAllStoredClusterData];
+    for (NSNumber * nodeID in @[ @(1001), @(1002), @(1003) ]) {
+        XCTAssertNil([controller.controllerDataStore getStoredClusterDataForNodeID:nodeID]);
+    }
 
     // Test MTRDeviceControllerDataStore _pruneEmptyStoredAttributesBranches
     //  - Clear cache
-    //  - Store an attribute
-    //  - Manually delete it from the test storage delegate
+    //  - Store some cluster data
+    //  - Manually delete parts of the data from the test storage delegate
     //  - Call _pruneEmptyStoredAttributesBranches
-    [controller.controllerDataStore clearAllStoredAttributes];
+    [controller.controllerDataStore storeClusterData:testClusterData forNodeID:@(2001)];
+    [controller.controllerDataStore storeClusterData:testClusterData forNodeID:@(2002)];
 
-    NSArray * testAttribute = @[
-        @{ MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(1)], MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(111) } },
-    ];
-    [controller.controllerDataStore storeAttributeValues:testAttribute forNodeID:@(2001)];
+    NSString * testClusterIndexKey1 = [controller.controllerDataStore _clusterIndexKeyForNodeID:@(2001) endpointID:@(1)];
+    NSString * testClusterIndexKey2 = [controller.controllerDataStore _clusterIndexKeyForNodeID:@(2001) endpointID:@(2)];
+    NSString * testClusterIndexKey3 = [controller.controllerDataStore _clusterIndexKeyForNodeID:@(2002) endpointID:@(1)];
+    NSString * testClusterIndexKey4 = [controller.controllerDataStore _clusterIndexKeyForNodeID:@(2002) endpointID:@(2)];
+    NSString * testEndpointIndexKey1 = [controller.controllerDataStore _endpointIndexKeyForNodeID:@(2001)];
+    NSString * testEndpointIndexKey2 = [controller.controllerDataStore _endpointIndexKeyForNodeID:@(2002)];
+    NSString * testNodeIndexKey = @"attrCacheNodeIndex";
 
     // store is async, so remove on the same queue to ensure order
     dispatch_sync(_storageQueue, ^{
-        NSString * testAttributeValueKey = [controller.controllerDataStore _attributeValueKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1) attributeID:@(1)];
-        [storageDelegate controller:controller removeValueForKey:testAttributeValueKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
-    });
-    [controller.controllerDataStore unitTestPruneEmptyStoredAttributesBranches];
+        // Ensure that the indices we expect are populated.
+        XCTAssertNotNil([storageDelegate controller:controller valueForKey:testClusterIndexKey1 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared]);
+        XCTAssertNotNil([storageDelegate controller:controller valueForKey:testClusterIndexKey2 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared]);
+        XCTAssertNotNil([storageDelegate controller:controller valueForKey:testClusterIndexKey3 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared]);
+        XCTAssertNotNil([storageDelegate controller:controller valueForKey:testClusterIndexKey4 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared]);
+        XCTAssertNotNil([storageDelegate controller:controller valueForKey:testEndpointIndexKey1 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared]);
+        XCTAssertNotNil([storageDelegate controller:controller valueForKey:testEndpointIndexKey2 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared]);
+        XCTAssertNotNil([storageDelegate controller:controller valueForKey:testNodeIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared]);
 
-    // Now check the indexes are pruned
-    NSString * testAttributeIndexKey = [controller.controllerDataStore _attributeIndexKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1)];
-    id testAttributeIndex = [storageDelegate controller:controller valueForKey:testAttributeIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
-    XCTAssertNil(testAttributeIndex);
-    NSString * testClusterIndexKey = [controller.controllerDataStore _clusterIndexKeyForNodeID:@(2001) endpointID:@(1)];
-    id testClusterIndex = [storageDelegate controller:controller valueForKey:testClusterIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
-    XCTAssertNil(testClusterIndex);
-    NSString * testEndpointIndexKey = [controller.controllerDataStore _endpointIndexKeyForNodeID:@(2001)];
-    id testEndpointIndex = [storageDelegate controller:controller valueForKey:testEndpointIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
-    XCTAssertNil(testEndpointIndex);
-    id testNodeIndex = [storageDelegate controller:controller valueForKey:@"attrCacheNodeIndex" securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+        // Remove all three MTRDeviceClusterData for node 2001
+        NSString * testClusterDataKey = [controller.controllerDataStore _clusterDataKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(1)];
+        [storageDelegate controller:controller removeValueForKey:testClusterDataKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+        testClusterDataKey = [controller.controllerDataStore _clusterDataKeyForNodeID:@(2001) endpointID:@(1) clusterID:@(2)];
+        [storageDelegate controller:controller removeValueForKey:testClusterDataKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+        testClusterDataKey = [controller.controllerDataStore _clusterDataKeyForNodeID:@(2001) endpointID:@(2) clusterID:@(3)];
+        [storageDelegate controller:controller removeValueForKey:testClusterDataKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+
+        // Remove the two MTRDeviceClusterData under endpoint 1 for node 2002
+        testClusterDataKey = [controller.controllerDataStore _clusterDataKeyForNodeID:@(2002) endpointID:@(1) clusterID:@(1)];
+        [storageDelegate controller:controller removeValueForKey:testClusterDataKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+        testClusterDataKey = [controller.controllerDataStore _clusterDataKeyForNodeID:@(2002) endpointID:@(1) clusterID:@(2)];
+        [storageDelegate controller:controller removeValueForKey:testClusterDataKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
+
+    [controller.controllerDataStore unitTestPruneEmptyStoredClusterDataBranches];
+
+    // Now check the indexes are pruned.  There should be no more cluster
+    // indices or endpoint indices for node 2001.
+    id testClusterIndex1 = [storageDelegate controller:controller valueForKey:testClusterIndexKey1 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testClusterIndex1);
+    id testClusterIndex2 = [storageDelegate controller:controller valueForKey:testClusterIndexKey2 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testClusterIndex2);
+    id testEndpointIndex1 = [storageDelegate controller:controller valueForKey:testEndpointIndexKey1 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testEndpointIndex1);
+
+    // There should be no more cluster index for endpoint 1 for node 2, but
+    // we should still have a cluster index for endpoint 2, and an endpoint index.
+    id testClusterIndex3 = [storageDelegate controller:controller valueForKey:testClusterIndexKey3 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testClusterIndex3);
+    id testClusterIndex4 = [storageDelegate controller:controller valueForKey:testClusterIndexKey4 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNotNil(testClusterIndex4);
+    id testEndpointIndex2 = [storageDelegate controller:controller valueForKey:testEndpointIndexKey2 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNotNil(testClusterIndex4);
+
+    // We should still have a node index.
+    id testNodeIndex = [storageDelegate controller:controller valueForKey:testNodeIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNotNil(testNodeIndex);
+
+    // Again, remove on the storage queue to ensure order.
+    dispatch_sync(_storageQueue, ^{
+        NSString * testClusterDataKey = [controller.controllerDataStore _clusterDataKeyForNodeID:@(2002) endpointID:@(2) clusterID:@(3)];
+        [storageDelegate controller:controller removeValueForKey:testClusterDataKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
+
+    [controller.controllerDataStore unitTestPruneEmptyStoredClusterDataBranches];
+
+    // All the indices should be pruned now.
+    testClusterIndex4 = [storageDelegate controller:controller valueForKey:testClusterIndexKey4 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testClusterIndex4);
+    testEndpointIndex2 = [storageDelegate controller:controller valueForKey:testEndpointIndexKey2 securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    XCTAssertNil(testClusterIndex4);
+    testNodeIndex = [storageDelegate controller:controller valueForKey:testNodeIndexKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
     XCTAssertNil(testNodeIndex);
 
     // Now test bulk write
@@ -1275,11 +1292,11 @@ static const uint16_t kTestVendorId = 0xFFF1u;
         [storageDelegate controller:controller storeValues:testBulkValues securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
     });
     // Verify that the store resulted in the correct values
-    dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:@(3001)];
     XCTAssertEqualObjects(dataStoreClusterData, bulkTestClusterDataDictionary);
 
     // clear information before the next test
-    [controller.controllerDataStore clearStoredAttributesForNodeID:@(3001)];
+    [controller.controllerDataStore clearStoredClusterDataForNodeID:@(3001)];
 
     // Now test bulk store through data store
     [controller.controllerDataStore storeClusterData:bulkTestClusterDataDictionary forNodeID:@(3001)];
@@ -1356,7 +1373,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
     NSUInteger dataStoreValuesCount = 0;
-#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * dataStoreClusterData = [controller.controllerDataStore getStoredClusterDataForNodeID:deviceID];
     for (MTRClusterPath * path in dataStoreClusterData) {
         MTRDeviceClusterData * data = dataStoreClusterData[path];
@@ -1367,21 +1383,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
             XCTAssertTrue([device _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
         }
     }
-#else
-    NSArray * dataStoreValues = [controller.controllerDataStore getStoredAttributesForNodeID:deviceID];
-    dataStoreValuesCount = dataStoreValues.count;
-
-    // Verify all values are stored into storage
-    for (NSDictionary * responseValue in dataStoreValues) {
-        MTRAttributePath * path = responseValue[MTRAttributePathKey];
-        XCTAssertNotNil(path);
-        NSDictionary * dataValue = responseValue[MTRDataKey];
-        XCTAssertNotNil(dataValue);
-
-        NSDictionary * dataValueFromMTRDevice = [device readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute params:nil];
-        XCTAssertTrue([device _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]);
-    }
-#endif
 
     // Now force the removal of the object from controller to test reloading read cache from storage
     [controller removeDevice:device];
@@ -1389,7 +1390,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
     // Verify the new device is initialized with the same values
     __auto_type * newDevice = [MTRDevice deviceWithNodeID:deviceID controller:controller];
     NSUInteger storedAttributeDifferFromMTRDeviceCount = 0;
-#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
     for (MTRClusterPath * path in dataStoreClusterData) {
         MTRDeviceClusterData * data = dataStoreClusterData[path];
         for (NSNumber * attributeID in data.attributes) {
@@ -1400,19 +1400,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
             }
         }
     }
-#else
-    for (NSDictionary * responseValue in dataStoreValues) {
-        MTRAttributePath * path = responseValue[MTRAttributePathKey];
-        XCTAssertNotNil(path);
-        NSDictionary * dataValue = responseValue[MTRDataKey];
-        XCTAssertNotNil(dataValue);
-
-        NSDictionary * dataValueFromMTRDevice = [newDevice readAttributeWithEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute params:nil];
-        if (![newDevice _attributeDataValue:dataValue isEqualToDataValue:dataValueFromMTRDevice]) {
-            storedAttributeDifferFromMTRDeviceCount++;
-        }
-    }
-#endif
 
     // Only test that 90% of attributes are the same because there are some changing attributes each time (UTC time, for example)
     //   * With all-clusters-app as of 2024-02-10, about 1.476% of attributes change.

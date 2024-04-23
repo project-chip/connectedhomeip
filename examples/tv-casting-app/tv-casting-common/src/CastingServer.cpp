@@ -312,7 +312,7 @@ void CastingServer::ReadServerClustersForNode(NodeId nodeId)
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                        binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
         if (binding.type == MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
         {
             if (!mActiveTargetVideoPlayerInfo.HasEndpoint(binding.remote))
@@ -584,7 +584,7 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
                     "CastingServer::DeviceEventCallback Read cached binding type=%d fabrixIndex=%d nodeId=0x" ChipLogFormatX64
                     " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                     binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                    binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                    binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
                 if (binding.type == MATTER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
                 {
                     ChipLogProgress(
@@ -675,7 +675,7 @@ NodeId CastingServer::GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                        binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
         if (binding.type == MATTER_UNICAST_BINDING && fabricIndex == binding.fabricIndex)
         {
             ChipLogProgress(NotSpecified, "GetVideoPlayerNodeForFabricIndex nodeId=0x" ChipLogFormatX64,
@@ -701,7 +701,7 @@ FabricIndex CastingServer::GetVideoPlayerFabricIndexForNode(NodeId nodeId)
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                        binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
         if (binding.type == MATTER_UNICAST_BINDING && nodeId == binding.nodeId)
         {
             ChipLogProgress(NotSpecified, "GetVideoPlayerFabricIndexForNode fabricIndex=%d nodeId=0x" ChipLogFormatX64,

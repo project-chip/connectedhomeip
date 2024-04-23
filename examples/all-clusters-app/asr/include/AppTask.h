@@ -19,7 +19,7 @@
 #pragma once
 
 #include "AppEvent.h"
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
 #include <lega_rtos_api.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <stdbool.h>

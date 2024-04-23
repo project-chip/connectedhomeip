@@ -47,21 +47,26 @@
 
 #pragma once
 
-#include <stdint.h>
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
 
-#include <ble/BleConfig.h>
+#include <cstddef>
+#include <cstdint>
 
+#include <lib/core/CHIPError.h>
+#include <lib/support/DLLUtil.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include <ble/BleApplicationDelegate.h>
-#include <ble/BleConnectionDelegate.h>
-#include <ble/BleError.h>
-#include <ble/BleLayerDelegate.h>
-#include <ble/BlePlatformDelegate.h>
-#include <ble/BleRole.h>
-#include <ble/BleUUID.h>
+#include "BleApplicationDelegate.h"
+#include "BleConfig.h"
+#include "BleConnectionDelegate.h"
+#include "BleLayerDelegate.h"
+#include "BlePlatformDelegate.h"
+#include "BleRole.h"
+#include "BleUUID.h"
 
 namespace chip {
 namespace Ble {
@@ -77,10 +82,6 @@ namespace Ble {
 /// Version(s) of the CHIP BLE Transport Protocol that this stack supports.
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
-
-/// Forward declarations.
-class BleLayer;
-class BLEEndPoint;
 
 /// Enum defining versions of CHIP over BLE transport protocol.
 typedef enum
@@ -344,5 +345,3 @@ private:
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#include "BLEEndPoint.h"

@@ -93,11 +93,12 @@ void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::Discover
     {
         attributes.ipAddresses[j] = nodeData.resolutionData.ipAddress[j];
     }
-    attributes.interfaceId = nodeData.resolutionData.interfaceId;
-    attributes.port        = nodeData.resolutionData.port;
-    attributes.productId   = nodeData.nodeData.productId;
-    attributes.vendorId    = nodeData.nodeData.vendorId;
-    attributes.deviceType  = nodeData.nodeData.deviceType;
+    attributes.interfaceId                           = nodeData.resolutionData.interfaceId;
+    attributes.port                                  = nodeData.resolutionData.port;
+    attributes.productId                             = nodeData.nodeData.productId;
+    attributes.vendorId                              = nodeData.nodeData.vendorId;
+    attributes.deviceType                            = nodeData.nodeData.deviceType;
+    attributes.supportsCommissionerGeneratedPasscode = nodeData.nodeData.supportsCommissionerGeneratedPasscode;
 
     memory::Strong<CastingPlayer> player = std::make_shared<CastingPlayer>(attributes);
 

@@ -369,7 +369,7 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include CHIPDEVICEPLATFORMEVENT_HEADER
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
-#include <ble/BleConfig.h>
+#include <ble/Ble.h>
 #include <inet/InetInterface.h>
 #include <lib/support/LambdaBridge.h>
 #include <system/SystemEvent.h>

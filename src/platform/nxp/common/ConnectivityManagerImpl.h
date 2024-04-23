@@ -115,6 +115,7 @@ private:
     bool _IsWiFiStationEnabled();
     bool _IsWiFiStationConnected();
     bool _IsWiFiStationApplicationControlled();
+    CHIP_ERROR _DisconnectNetwork(void);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
     // ===== Members for internal use by the following friends.

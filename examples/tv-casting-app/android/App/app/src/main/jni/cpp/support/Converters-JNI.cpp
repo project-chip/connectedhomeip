@@ -151,7 +151,7 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
     // Get the constructor for the com/matter/casting/core/MatterCastingPlayer Java class
     jmethodID constructor =
         env->GetMethodID(matterCastingPlayerJavaClass, "<init>",
-                         "(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;IIIJ)V");
+                         "(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;IIIJZ)V");
     if (constructor == nullptr)
     {
         ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() could not locate MatterCastingPlayer Java class constructor");
@@ -186,7 +186,8 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
                                           env->NewStringUTF(player->GetId()), env->NewStringUTF(player->GetHostName()),
                                           env->NewStringUTF(player->GetDeviceName()), env->NewStringUTF(player->GetInstanceName()),
                                           jIpAddressList, (jint) (player->GetPort()), (jint) (player->GetProductId()),
-                                          (jint) (player->GetVendorId()), (jlong) (player->GetDeviceType()));
+                                          (jint) (player->GetVendorId()), (jlong) (player->GetDeviceType()),
+                                          static_cast<jboolean>(player->GetSupportsCommissionerGeneratedPasscode()));
     if (jMatterCastingPlayer == nullptr)
     {
         ChipLogError(AppServer, "convertCastingPlayerFromCppToJava(): Could not create MatterCastingPlayer Java object");

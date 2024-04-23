@@ -40,6 +40,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <optional>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
@@ -392,7 +393,7 @@ private:
                                              const Optional<uint16_t> & aRef) :
             CommandHandler(apCallback)
         {
-            GetCommandPathRegistry().Add(aRequestCommandPath, aRef);
+            GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional());
             SetExchangeInterface(&mMockCommandResponder);
         }
         MockCommandResponder mMockCommandResponder;
@@ -407,7 +408,8 @@ private:
     // payload will be included.  Otherwise no payload will be included.
     static void GenerateInvokeResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
                                        CommandId aCommandId, ClusterId aClusterId = kTestClusterId,
-                                       EndpointId aEndpointId = kTestEndpointId, Optional<uint16_t> aCommandRef = NullOptional);
+                                       EndpointId aEndpointId              = kTestEndpointId,
+                                       std::optional<uint16_t> aCommandRef = std::nullopt);
     static void AddInvokeRequestData(nlTestSuite * apSuite, void * apContext, CommandSender * apCommandSender,
                                      CommandId aCommandId = kTestCommandIdWithData);
     static void AddInvalidInvokeRequestData(nlTestSuite * apSuite, void * apContext, CommandSender * apCommandSender,
@@ -494,7 +496,7 @@ void TestCommandInteraction::GenerateInvokeRequest(nlTestSuite * apSuite, void *
 
 void TestCommandInteraction::GenerateInvokeResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
                                                     CommandId aCommandId, ClusterId aClusterId, EndpointId aEndpointId,
-                                                    Optional<uint16_t> aCommandRef)
+                                                    std::optional<uint16_t> aCommandRef)
 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -536,9 +538,9 @@ void TestCommandInteraction::GenerateInvokeResponse(nlTestSuite * apSuite, void 
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
-    if (aCommandRef.HasValue())
+    if (aCommandRef.has_value())
     {
-        NL_TEST_ASSERT(apSuite, commandDataIBBuilder.Ref(aCommandRef.Value()) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, commandDataIBBuilder.Ref(*aCommandRef) == CHIP_NO_ERROR);
     }
 
     commandDataIBBuilder.EndOfCommandDataIB();
@@ -633,9 +635,9 @@ uint32_t TestCommandInteraction::GetAddResponseDataOverheadSizeForPath(nlTestSui
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
 
-    CHIP_ERROR err = basicCommandPathRegistry.Add(requestCommandPath1, MakeOptional<uint16_t>(static_cast<uint16_t>(1)));
+    CHIP_ERROR err = basicCommandPathRegistry.Add(requestCommandPath1, std::make_optional<uint16_t>(static_cast<uint16_t>(1)));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = basicCommandPathRegistry.Add(requestCommandPath2, MakeOptional<uint16_t>(static_cast<uint16_t>(2)));
+    err = basicCommandPathRegistry.Add(requestCommandPath2, std::make_optional<uint16_t>(static_cast<uint16_t>(2)));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = commandHandler.AllocateBuffer();
@@ -823,7 +825,7 @@ void TestCommandInteraction::TestCommandSenderExtendableApiWithProcessReceivedMs
 
     uint16_t invalidResponseCommandRef = 2;
     GenerateInvokeResponse(apSuite, apContext, buf, kTestCommandIdWithData, kTestClusterId, kTestEndpointId,
-                           MakeOptional(invalidResponseCommandRef));
+                           std::make_optional(invalidResponseCommandRef));
     bool moreChunkedMessages = false;
     err                      = commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_KEY_NOT_FOUND);
@@ -1948,9 +1950,9 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
 
-    CHIP_ERROR err = basicCommandPathRegistry.Add(requestCommandPath1, MakeOptional<uint16_t>(static_cast<uint16_t>(1)));
+    CHIP_ERROR err = basicCommandPathRegistry.Add(requestCommandPath1, std::make_optional<uint16_t>(static_cast<uint16_t>(1)));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = basicCommandPathRegistry.Add(requestCommandPath2, MakeOptional<uint16_t>(static_cast<uint16_t>(2)));
+    err = basicCommandPathRegistry.Add(requestCommandPath2, std::make_optional<uint16_t>(static_cast<uint16_t>(2)));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t sizeToLeave = 0;
@@ -1977,9 +1979,9 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
 
-    CHIP_ERROR err = basicCommandPathRegistry.Add(requestCommandPath1, MakeOptional<uint16_t>(static_cast<uint16_t>(1)));
+    CHIP_ERROR err = basicCommandPathRegistry.Add(requestCommandPath1, std::make_optional<uint16_t>(static_cast<uint16_t>(1)));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = basicCommandPathRegistry.Add(requestCommandPath2, MakeOptional<uint16_t>(static_cast<uint16_t>(2)));
+    err = basicCommandPathRegistry.Add(requestCommandPath2, std::make_optional<uint16_t>(static_cast<uint16_t>(2)));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t sizeToLeave = 0;
@@ -2005,9 +2007,9 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
     ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
     ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
 
-    CHIP_ERROR err = basicCommandPathRegistry.Add(requestCommandPath1, MakeOptional<uint16_t>(static_cast<uint16_t>(1)));
+    CHIP_ERROR err = basicCommandPathRegistry.Add(requestCommandPath1, std::make_optional<uint16_t>(static_cast<uint16_t>(1)));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = basicCommandPathRegistry.Add(requestCommandPath2, MakeOptional<uint16_t>(static_cast<uint16_t>(2)));
+    err = basicCommandPathRegistry.Add(requestCommandPath2, std::make_optional<uint16_t>(static_cast<uint16_t>(2)));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t sizeToLeave = 0;

@@ -17,6 +17,7 @@
 #include "DnssdImpl.h"
 #include "DnssdType.h"
 #include "MdnsError.h"
+#include "UserDefaults.h"
 
 #include <cstdio>
 
@@ -29,6 +30,7 @@
 
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
+using namespace chip::Platform;
 
 namespace {
 
@@ -76,8 +78,14 @@ void LogOnFailure(const char * name, DNSServiceErrorType err)
  */
 CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
 {
+    // Check to see if a user default value exists for the SRP timeout. If it does, override the timeoutInMSecs with user default
+    // value. To override the timeout value, use ` defaults write org.csa-iot.matter.darwin SRPTimeoutInMSecsOverride
+    // <timeoutinMsecs>` See UserDefaults.mm for details.
+    timeoutInMSecs = GetUserDefaultDnssdSRPTimeoutInMSecs().value_or(timeoutInMSecs);
+
     VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ChipLogProgress(Discovery, "Starting timer to wait for possible SRP resolve results for %s", ctx->instanceName.c_str());
+    ChipLogProgress(Discovery, "Starting timer to wait for %d milliseconds for possible SRP resolve results for %s", timeoutInMSecs,
+                    ctx->instanceName.c_str());
     return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs),
                                                        ResolveContext::SRPTimerExpiredCallback, static_cast<void *>(ctx));
 }

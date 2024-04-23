@@ -76,6 +76,8 @@ static_library("Darwin") {
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
+    "UserDefaults.h",
+    "UserDefaults.mm",
   ]
 
   if (chip_enable_wifi) {
