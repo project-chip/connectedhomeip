@@ -31,6 +31,12 @@ namespace chip {
 #if OTA_ENCRYPTION_ENABLE
 constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
 #endif
+
+CHIP_ERROR OTATlvProcessor::ApplyAction()
+{
+    return mShouldNotApply ? CHIP_OTA_PROCESSOR_SHOULD_NOT_APPLY : CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 {
     CHIP_ERROR status     = CHIP_NO_ERROR;
@@ -63,6 +69,7 @@ void OTATlvProcessor::ClearInternal()
     mLength          = 0;
     mProcessedLength = 0;
     mWasSelected     = false;
+    mShouldNotApply  = false;
 #if OTA_ENCRYPTION_ENABLE
     mIVOffset = 0;
 #endif

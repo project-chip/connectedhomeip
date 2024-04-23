@@ -41,6 +41,7 @@ namespace chip {
 #define CHIP_OTA_PROCESSOR_EEPROM_OFFSET CHIP_ERROR_TLV_PROCESSOR(0x0C)
 #define CHIP_OTA_PROCESSOR_EXTERNAL_STORAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
 #define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
+#define CHIP_OTA_PROCESSOR_SHOULD_NOT_APPLY CHIP_ERROR_TLV_PROCESSOR(0x0F)
 
 // Descriptor constants
 constexpr size_t kVersionStringSize = 64;
@@ -81,9 +82,9 @@ public:
 
     virtual CHIP_ERROR Init()        = 0;
     virtual CHIP_ERROR Clear()       = 0;
-    virtual CHIP_ERROR ApplyAction() = 0;
     virtual CHIP_ERROR AbortAction() = 0;
     virtual CHIP_ERROR ExitAction() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR ApplyAction();
 
     CHIP_ERROR Process(ByteSpan & block);
     void RegisterDescriptorCallback(ProcessDescriptor callback) { mCallbackProcessDescriptor = callback; }
@@ -130,9 +131,23 @@ protected:
     /* Expected byte size of the OTAEncryptionKeyLength */
     static constexpr size_t kOTAEncryptionKeyLength = 16;
 #endif
-    uint32_t mLength                             = 0;
-    uint32_t mProcessedLength                    = 0;
-    bool mWasSelected                            = false;
+    uint32_t mLength          = 0;
+    uint32_t mProcessedLength = 0;
+    bool mWasSelected         = false;
+
+    /**
+     * @brief A flag to account for corner cases during OTA apply
+     *
+     * Used by the default ApplyAction implementation.
+     *
+     * If something goes wrong during ExitAction of the TLV processor,
+     * then mShouldNotApply should be set to true and the image processor
+     * should abort. In this case, the BDX transfer was already finished
+     * and calling CancelImageUpdate will not abort the transfer, hence
+     * the device will reboot even though it should not have. If ApplyAction
+     * fails during HandleApply, then the process will be aborted.
+     */
+    bool mShouldNotApply                         = false;
     ProcessDescriptor mCallbackProcessDescriptor = nullptr;
 };
 
