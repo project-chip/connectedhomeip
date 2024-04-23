@@ -266,6 +266,40 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
     return kEmberInvalidEndpointIndex;
 }
 
+const EmberAfCluster * getClusterTypeDefinition(EndpointId endpointId, ClusterId clusterId, EmberAfClusterMask mask)
+{
+    uint16_t index = emberAfIndexFromEndpointIncludingDisabledEndpoints(endpointId);
+    if (index != kEmberInvalidEndpointIndex)
+    {
+        return emberAfFindClusterInType(emAfEndpoints[index].endpointType, clusterId, mask, nullptr);
+    }
+    // not found
+    return nullptr;
+}
+
+CHIP_ERROR setupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, EndpointId templateEndpointId,
+                                           const Span<const ClusterId> & templateClusterIds)
+{
+    // allocate cluster list
+    endpointType.clusterCount = static_cast<uint8_t>(templateClusterIds.size());
+    endpointType.cluster      = new EmberAfCluster[endpointType.clusterCount];
+    endpointType.endpointSize = 0;
+    // get the actual cluster pointers and sum up memory size
+    for (size_t i = 0; i < templateClusterIds.size(); i++)
+    {
+        auto cluster = getClusterTypeDefinition(templateEndpointId, templateClusterIds.data()[i], 0);
+        VerifyOrDieWithMsg(cluster, Support, "cluster 0x%04x template in endpoint %u does not exist",
+                           (unsigned int) templateClusterIds.data()[i], (unsigned int) templateEndpointId);
+        // for now, we need to copy the cluster definition, unfortunately.
+        // TODO: make endpointType use a pointer to a list of EmberAfCluster* instead, so we can re-use cluster definitions
+        //   instead of duplicating them here once for every instance.
+        memcpy((void *) &endpointType.cluster[i], cluster, sizeof(EmberAfCluster));
+        // sum up the needed storage
+        endpointType.endpointSize = (uint16_t) (endpointType.endpointSize + cluster->clusterSize);
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
                                      const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
                                      EndpointId parentEndpointId, uint8_t * dynamicAttributeStorage)
