@@ -182,6 +182,18 @@ CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const 
 CHIP_ERROR SetTagList(chip::EndpointId endpoint,
                       chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
 
+// setup a dynamic endpoint's EmberAfEndpointType from a list of template clusters.
+//
+// This is a alternative to declaring dynamic endpoint metadata using DECLARE_DYNAMIC_* macros.
+//
+// As clusters to be used in dynamic endpoint setup need to be defined in ZAP anyway
+// (usually on a special endpoint which remains always disabled), the cluster's
+// metadata including all attributes already exists and can be re-used this way,
+// without error prone manual duplicating with DECLARE_DYNAMIC_*
+//
+CHIP_ERROR setupDynamicEndpointDeclaration(EmberAfEndpointType & endpointType, chip::EndpointId templateEndpointId,
+                                           const chip::Span<const chip::ClusterId> & templateClusterIds);
+
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
 // storage for data versions.

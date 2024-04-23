@@ -225,7 +225,8 @@ struct EmberAfDefinedEndpoint
     /**
      * Pointer to the memory block to be used for automatic attribute storage if
      * this is a dynamic endpoint. If set, the memory block pointed at
-     * must have the sum of all endpointType->clusters[*].clustersize.
+     * must have a size equal to endpointType->endpointSize (which is
+     * the sum of all endpointType->clusters[*].clustersize).
      */
     uint8_t * dynamicAttributeStorage = nullptr;
 #endif
