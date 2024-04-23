@@ -46,10 +46,7 @@ struct TestBdxMessages : public ::testing::Test
         EXPECT_EQ(error, CHIP_NO_ERROR);
     }
 
-    static void TearDownTestSuite()
-    {
-        chip::Platform::MemoryShutdown();
-    }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestBdxMessages, TestTransferInitMessage)

@@ -47,8 +47,7 @@ CHIP_ERROR WriteTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uin
 }
 
 // Helper method: read a TLV structure with a single tag and string and verify it matches expected string.
-CHIP_ERROR ReadAndVerifyTLVString(const uint8_t * dataStart, uint32_t len,
-                                  const char * expected, size_t expectedLen)
+CHIP_ERROR ReadAndVerifyTLVString(const uint8_t * dataStart, uint32_t len, const char * expected, size_t expectedLen)
 {
     TLV::TLVReader reader;
     char tmp[64]      = { 0 };
@@ -90,8 +89,7 @@ CHIP_ERROR AttachHeaderAndSend(TransferSession::MessageTypeData typeData, chip::
 }
 
 // Helper method for verifying that a PacketBufferHandle contains a valid BDX header and message type matches expected.
-void VerifyBdxMessageToSend(const TransferSession::OutputEvent & outEvent,
-                            MessageType expected)
+void VerifyBdxMessageToSend(const TransferSession::OutputEvent & outEvent, MessageType expected)
 {
     static_assert(std::is_same<std::underlying_type_t<decltype(expected)>, uint8_t>::value, "Cast is not safe");
     EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
@@ -136,9 +134,8 @@ void VerifyNoMoreOutput(TransferSession & transferSession)
 
 // Helper method for initializing two TransferSession objects, generating a TransferInit message, and passing it to a responding
 // TransferSession.
-void SendAndVerifyTransferInit(TransferSession::OutputEvent & outEvent,
-                               System::Clock::Timeout timeout, TransferSession & initiator, TransferRole initiatorRole,
-                               TransferSession::TransferInitData initData, TransferSession & responder,
+void SendAndVerifyTransferInit(TransferSession::OutputEvent & outEvent, System::Clock::Timeout timeout, TransferSession & initiator,
+                               TransferRole initiatorRole, TransferSession::TransferInitData initData, TransferSession & responder,
                                BitFlags<TransferControlFlags> & responderControlOpts, uint16_t responderMaxBlock)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -173,7 +170,8 @@ void SendAndVerifyTransferInit(TransferSession::OutputEvent & outEvent,
     if (outEvent.EventType == TransferSession::OutputEventType::kInitReceived &&
         outEvent.transferInitData.FileDesignator != nullptr)
     {
-        EXPECT_EQ(0, memcmp(initData.FileDesignator, outEvent.transferInitData.FileDesignator, outEvent.transferInitData.FileDesLength));
+        EXPECT_EQ(
+            0, memcmp(initData.FileDesignator, outEvent.transferInitData.FileDesignator, outEvent.transferInitData.FileDesLength));
     }
     if (outEvent.transferInitData.Metadata != nullptr)
     {
@@ -186,7 +184,8 @@ void SendAndVerifyTransferInit(TransferSession::OutputEvent & outEvent,
             {
                 // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to
                 // parse the metadata and verify that it matches.
-                EXPECT_EQ(0, memcmp(initData.Metadata, outEvent.transferInitData.Metadata, outEvent.transferInitData.MetadataLength));
+                EXPECT_EQ(0,
+                          memcmp(initData.Metadata, outEvent.transferInitData.Metadata, outEvent.transferInitData.MetadataLength));
             }
         }
         else
@@ -202,8 +201,7 @@ void SendAndVerifyTransferInit(TransferSession::OutputEvent & outEvent,
 // receiver should emit a StatusCode event instead.
 //
 // The acceptSender is the node that is sending the Accept message (not necessarily the same node that will send Blocks).
-void SendAndVerifyAcceptMsg(TransferSession::OutputEvent & outEvent,
-                            TransferSession & acceptSender, TransferRole acceptSenderRole,
+void SendAndVerifyAcceptMsg(TransferSession::OutputEvent & outEvent, TransferSession & acceptSender, TransferRole acceptSenderRole,
                             TransferSession::TransferAcceptData acceptData, TransferSession & acceptReceiver,
                             TransferSession::TransferInitData initData)
 {
@@ -246,7 +244,9 @@ void SendAndVerifyAcceptMsg(TransferSession::OutputEvent & outEvent,
             {
                 // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to
                 // parse the metadata and verify that it matches.
-                EXPECT_EQ(0, memcmp(acceptData.Metadata, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength));
+                EXPECT_EQ(
+                    0,
+                    memcmp(acceptData.Metadata, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength));
             }
         }
         else
@@ -260,8 +260,7 @@ void SendAndVerifyAcceptMsg(TransferSession::OutputEvent & outEvent,
 }
 
 // Helper method for preparing a sending a BlockQuery message between two TransferSession objects.
-void SendAndVerifyQuery(TransferSession & queryReceiver, TransferSession & querySender,
-                        TransferSession::OutputEvent & outEvent)
+void SendAndVerifyQuery(TransferSession & queryReceiver, TransferSession & querySender, TransferSession::OutputEvent & outEvent)
 {
     // Verify that querySender emits BlockQuery message
     CHIP_ERROR err = querySender.PrepareBlockQuery();
@@ -281,8 +280,8 @@ void SendAndVerifyQuery(TransferSession & queryReceiver, TransferSession & query
 
 // Helper method for preparing a sending a Block message between two TransferSession objects. The sender refers to the node that is
 // sending Blocks. Uses a static counter incremented with each call. Also verifies that block data received matches what was sent.
-void SendAndVerifyArbitraryBlock(TransferSession & sender, TransferSession & receiver,
-                                 TransferSession::OutputEvent & outEvent, bool isEof, uint32_t inBlockCounter)
+void SendAndVerifyArbitraryBlock(TransferSession & sender, TransferSession & receiver, TransferSession::OutputEvent & outEvent,
+                                 bool isEof, uint32_t inBlockCounter)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     static uint8_t dataCount = 0;
@@ -329,8 +328,8 @@ void SendAndVerifyArbitraryBlock(TransferSession & sender, TransferSession & rec
 }
 
 // Helper method for sending a BlockAck or BlockAckEOF, depending on the state of the receiver.
-void SendAndVerifyBlockAck(TransferSession & ackReceiver, TransferSession & ackSender,
-                           TransferSession::OutputEvent & outEvent, bool expectEOF)
+void SendAndVerifyBlockAck(TransferSession & ackReceiver, TransferSession & ackSender, TransferSession::OutputEvent & outEvent,
+                           bool expectEOF)
 {
     TransferSession::OutputEventType expectedEventType =
         expectEOF ? TransferSession::OutputEventType::kAckEOFReceived : TransferSession::OutputEventType::kAckReceived;
@@ -360,10 +359,7 @@ struct TestBdxTransferSession : public ::testing::Test
         EXPECT_EQ(error, CHIP_NO_ERROR);
     }
 
-    static void TearDownTestSuite()
-    {
-        chip::Platform::MemoryShutdown();
-    }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 // Test a full transfer using a responding receiver and an initiating sender, receiver drive.
@@ -398,8 +394,8 @@ TEST_F(TestBdxTransferSession, TestInitiatingReceiverReceiverDrive)
     BitFlags<TransferControlFlags> senderOpts;
     senderOpts.Set(driveMode);
 
-    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions,
-                              respondingSender, senderOpts, proposedBlockSize);
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              senderOpts, proposedBlockSize);
 
     // Test metadata for Accept message
     uint8_t tlvBuf[64]    = { 0 };
@@ -418,8 +414,7 @@ TEST_F(TestBdxTransferSession, TestInitiatingReceiverReceiverDrive)
     acceptData.Metadata       = tlvBuf;
     acceptData.MetadataLength = metadataSize;
 
-    SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver,
-                           initOptions);
+    SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver, initOptions);
 
     // Verify that MaxBlockSize was chosen correctly
     EXPECT_EQ(respondingSender.GetTransferBlockSize(), testSmallerBlockSize);
@@ -506,13 +501,13 @@ TEST_F(TestBdxTransferSession, TestInitiatingSenderSenderDrive)
     initOptions.Metadata         = tlvBuf;
     initOptions.MetadataLength   = metadataSize;
 
-    SendAndVerifyTransferInit(outEvent, timeout, initiatingSender, TransferRole::kSender, initOptions,
-                              respondingReceiver, receiverOpts, transferBlockSize);
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingSender, TransferRole::kSender, initOptions, respondingReceiver,
+                              receiverOpts, transferBlockSize);
 
     // Verify parsed TLV metadata matches the original
-    err = ReadAndVerifyTLVString(outEvent.transferInitData.Metadata,
-                                 static_cast<uint32_t>(outEvent.transferInitData.MetadataLength), metadataStr,
-                                 static_cast<uint16_t>(strlen(metadataStr)));
+    err =
+        ReadAndVerifyTLVString(outEvent.transferInitData.Metadata, static_cast<uint32_t>(outEvent.transferInitData.MetadataLength),
+                               metadataStr, static_cast<uint16_t>(strlen(metadataStr)));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Compose SendAccept parameters struct and give to respondingSender
@@ -525,8 +520,7 @@ TEST_F(TestBdxTransferSession, TestInitiatingSenderSenderDrive)
     acceptData.Metadata       = nullptr;
     acceptData.MetadataLength = 0;
 
-    SendAndVerifyAcceptMsg(outEvent, respondingReceiver, TransferRole::kReceiver, acceptData, initiatingSender,
-                           initOptions);
+    SendAndVerifyAcceptMsg(outEvent, respondingReceiver, TransferRole::kReceiver, acceptData, initiatingSender, initOptions);
 
     uint32_t numBlocksSent = 0;
     // Test multiple Block -> BlockAck -> Block
@@ -571,8 +565,8 @@ TEST_F(TestBdxTransferSession, TestBadAcceptMessageFields)
     BitFlags<TransferControlFlags> responderControl;
     responderControl.Set(driveMode);
 
-    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions,
-                              respondingSender, responderControl, maxBlockSize);
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              responderControl, maxBlockSize);
 
     // Verify AcceptTransfer() returns error for choosing larger max block size
     TransferSession::TransferAcceptData acceptData;
@@ -668,8 +662,8 @@ TEST_F(TestBdxTransferSession, TestDuplicateBlockError)
     BitFlags<TransferControlFlags> senderOpts;
     senderOpts.Set(driveMode);
 
-    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions,
-                              respondingSender, senderOpts, blockSize);
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              senderOpts, blockSize);
 
     // Compose ReceiveAccept parameters struct and give to respondingSender
     TransferSession::TransferAcceptData acceptData;
@@ -680,8 +674,7 @@ TEST_F(TestBdxTransferSession, TestDuplicateBlockError)
     acceptData.Metadata       = nullptr;
     acceptData.MetadataLength = 0;
 
-    SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver,
-                           initOptions);
+    SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver, initOptions);
 
     SendAndVerifyQuery(respondingSender, initiatingReceiver, outEvent);
 
