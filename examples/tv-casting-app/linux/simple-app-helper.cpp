@@ -45,6 +45,7 @@ DiscoveryDelegateImpl * DiscoveryDelegateImpl::GetInstance()
 
 void DiscoveryDelegateImpl::HandleOnAdded(matter::casting::memory::Strong<matter::casting::core::CastingPlayer> player)
 {
+    ChipLogProgress(AppServer, "DiscoveryDelegateImpl::HandleOnAdded() called");
     if (commissionersCount == 0)
     {
         ChipLogProgress(AppServer, "Select discovered Casting Player (start index = 0) to request commissioning");
@@ -58,7 +59,7 @@ void DiscoveryDelegateImpl::HandleOnAdded(matter::casting::memory::Strong<matter
 
 void DiscoveryDelegateImpl::HandleOnUpdated(matter::casting::memory::Strong<matter::casting::core::CastingPlayer> player)
 {
-    ChipLogProgress(AppServer, "Updated CastingPlayer with ID: %s", player->GetId());
+    ChipLogProgress(AppServer, "DiscoveryDelegateImpl::HandleOnUpdated() Updated CastingPlayer with ID: %s", player->GetId());
 }
 
 void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)

@@ -185,7 +185,7 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
 
 uint8_t GetCommissionerPasscode(const ByteSpan & value)
 {
-    return MakeU8FromAsciiDecimal(value);
+    return MakeBoolFromAsciiDecimal(value);
 }
 
 Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
@@ -256,7 +256,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DnssdNodeDa
         nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
     case TxtFieldKey::kCommissionerPasscode:
-        nodeData.commissionerPasscode = Internal::GetCommissionerPasscode(val);
+        nodeData.supportsCommissionerGeneratedPasscode = Internal::GetCommissionerPasscode(val);
         break;
     default:
         break;
