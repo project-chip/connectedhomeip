@@ -105,17 +105,16 @@ struct Nullable : protected std::optional<T>
     // The only fabric-scoped objects in the spec are commands, events and structs inside lists, and none of those can be nullable.
     static constexpr bool kIsFabricScoped = false;
 
-    bool operator==(const Nullable<T> & other) const
-    {
-        if (!std::optional<T>::has_value())
-        {
-            return !other.has_value();
-        }
-        return other.has_value() && (*other == **this);
-    }
-    bool operator!=(const Nullable<T> & other) const { return !(*this == other); }
     bool operator==(const T & other) const { return std::optional<T>::has_value() && (**this == other); }
     bool operator!=(const T & other) const { return !(*this == other); }
+
+    inline bool operator==(const Nullable<T> & other) const
+    {
+        return static_cast<const std::optional<T>&>(*this) ==
+               static_cast<const std::optional<T>&>(other);
+    }
+    bool operator!=(const Nullable<T> & other) const { return !(*this == other); }
+
 };
 
 template <class T>
