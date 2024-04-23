@@ -1,8 +1,8 @@
 # Commissioning NXP K32W using Android CHIPTool
 
 This article describes how to use
-[CHIPTool](../../../examples/android/CHIPTool/README.md) for Android smartphones to
-commission an NXP K32W061 DK6 running
+[CHIPTool](../../../examples/android/CHIPTool/README.md) for Android smartphones
+to commission an NXP K32W061 DK6 running
 [NXP K32W Light Example Application](#building-and-programming-nxp-k32w-light-example-application)
 onto a CHIP-enabled Thread network.
 

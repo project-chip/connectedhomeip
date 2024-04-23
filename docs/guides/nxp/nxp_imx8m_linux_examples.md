@@ -234,8 +234,8 @@ Thermostat-app is used as an example below.
 
     In order to test the CHIP protocol functions, another device on the same
     network is needed to run the
-    [ChipDeviceController](../../../src/controller/python) tool to communicate with
-    the **i.MX 8M Mini EVK**.
+    [ChipDeviceController](../../../src/controller/python) tool to communicate
+    with the **i.MX 8M Mini EVK**.
 
     The ChipDeviceController can be a laptop / workstation. Bluetooth
     functionality is mandatory on this device.

@@ -178,8 +178,8 @@ Update. The instructions below describes the procedure step-by-step.
 
 Setup example :
 
--   [Chip-tool](../../../examples/chip-tool/README.md) application running on the
-    RPi.
+-   [Chip-tool](../../../examples/chip-tool/README.md) application running on
+    the RPi.
 -   OTA Provider application built on the same RPi (as explained below).
 -   Board programmed with the example application (with the instructions above).
 
