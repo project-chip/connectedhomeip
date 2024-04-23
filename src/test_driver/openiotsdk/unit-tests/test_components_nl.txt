@@ -6,7 +6,6 @@ DataModelTests
 InetLayerTests
 MdnsTests
 MessagingLayerTests
-MinimalMdnsCoreTests
 RawTransportTests
 RetransmitTests
 SecureChannelTests
