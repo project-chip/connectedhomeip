@@ -1093,27 +1093,21 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     XCTAssertEqualObjects(controller.controllerNodeID, nodeID);
 
-    MTRDeviceClusterData * testClusterData1 = [[MTRDeviceClusterData alloc] init];
-    testClusterData1.dataVersion = @(1);
-    testClusterData1.attributes = @{
+    MTRDeviceClusterData * testClusterData1 = [[MTRDeviceClusterData alloc] initWithDataVersion:@(1) attributes:@{
         @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(111) },
         @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(112) },
         @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(113) },
-    };
-    MTRDeviceClusterData * testClusterData2 = [[MTRDeviceClusterData alloc] init];
-    testClusterData2.dataVersion = @(2);
-    testClusterData2.attributes = @{
+    }];
+    MTRDeviceClusterData * testClusterData2 = [[MTRDeviceClusterData alloc] initWithDataVersion:@(2) attributes:@{
         @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(121) },
         @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(122) },
         @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(123) },
-    };
-    MTRDeviceClusterData * testClusterData3 = [[MTRDeviceClusterData alloc] init];
-    testClusterData3.dataVersion = @(3);
-    testClusterData3.attributes = @{
+    }];
+    MTRDeviceClusterData * testClusterData3 = [[MTRDeviceClusterData alloc] initWithDataVersion:@(3) attributes:@{
         @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(211) },
         @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(212) },
         @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(213) },
-    };
+    }];
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * testClusterData = @{
         [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(1)] : testClusterData1,
         [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)] : testClusterData2,
@@ -1228,45 +1222,35 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
     // Now test bulk write
     MTRClusterPath * bulkTestClusterPath11 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(1)];
-    MTRDeviceClusterData * bulkTestClusterData11 = [[MTRDeviceClusterData alloc] init];
-    bulkTestClusterData11.dataVersion = @(11);
-    bulkTestClusterData11.attributes = @{
+    MTRDeviceClusterData * bulkTestClusterData11 = [[MTRDeviceClusterData alloc] initWithDataVersion:@(11) attributes:@{
         @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(111) },
         @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(112) },
         @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(113) },
-    };
+    }];
     MTRClusterPath * bulkTestClusterPath12 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
-    MTRDeviceClusterData * bulkTestClusterData12 = [[MTRDeviceClusterData alloc] init];
-    bulkTestClusterData12.dataVersion = @(12);
-    bulkTestClusterData12.attributes = @{
+    MTRDeviceClusterData * bulkTestClusterData12 = [[MTRDeviceClusterData alloc] initWithDataVersion:@(12) attributes:@{
         @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(121) },
         @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(122) },
         @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(123) },
-    };
+    }];
     MTRClusterPath * bulkTestClusterPath13 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(3)];
-    MTRDeviceClusterData * bulkTestClusterData13 = [[MTRDeviceClusterData alloc] init];
-    bulkTestClusterData13.dataVersion = @(13);
-    bulkTestClusterData13.attributes = @{
+    MTRDeviceClusterData * bulkTestClusterData13 = [[MTRDeviceClusterData alloc] initWithDataVersion:@(13) attributes:@{
         @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(131) },
         @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(132) },
         @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(133) },
-    };
+    }];
     MTRClusterPath * bulkTestClusterPath21 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(1)];
-    MTRDeviceClusterData * bulkTestClusterData21 = [[MTRDeviceClusterData alloc] init];
-    bulkTestClusterData21.dataVersion = @(21);
-    bulkTestClusterData21.attributes = @{
+    MTRDeviceClusterData * bulkTestClusterData21 = [[MTRDeviceClusterData alloc] initWithDataVersion:@(21) attributes:@{
         @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(211) },
         @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(212) },
         @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(213) },
-    };
+    }];
     MTRClusterPath * bulkTestClusterPath22 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(2)];
-    MTRDeviceClusterData * bulkTestClusterData22 = [[MTRDeviceClusterData alloc] init];
-    bulkTestClusterData22.dataVersion = @(22);
-    bulkTestClusterData22.attributes = @{
+    MTRDeviceClusterData * bulkTestClusterData22 = [[MTRDeviceClusterData alloc] initWithDataVersion:@(22) attributes:@{
         @(1) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(221) },
         @(2) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(222) },
         @(3) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(223) },
-    };
+    }];
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * bulkTestClusterDataDictionary = @{
         bulkTestClusterPath11 : bulkTestClusterData11,
         bulkTestClusterPath12 : bulkTestClusterData12,
