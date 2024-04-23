@@ -27,6 +27,8 @@
 
 #include "sl_status.h"
 #include <cmsis_os2.h>
+// TODO Fix include order issue #33120
+#include "wfx_host_events.h"
 
 #include "rsi_bootup_config.h"
 #include "rsi_common_apis.h"
@@ -41,7 +43,6 @@
 #include "rsi_wlan_config.h"
 #include "rsi_wlan_non_rom.h"
 #include "silabs_utils.h"
-#include "wfx_host_events.h"
 
 #include "dhcp_client.h"
 #include "lwip/nd6.h"
