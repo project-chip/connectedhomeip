@@ -301,7 +301,7 @@ void USART_IRQHandler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcess();
-#elif !defined(PW_RPC_ENABLED)
+#elif !defined(PW_RPC_ENABLED) && !defined(SL_WIFI)
     otSysEventSignalPending();
 #endif
 

@@ -83,13 +83,13 @@ CHIP_ERROR CmdSilabsDispatch(int argc, char ** argv)
         size_t arg_len = strlen(argv[i]);
 
         /* Make sure that the next argument won't overflow the buffer */
-        VerifyOrExit(buff_ptr + arg_len < buff + kMaxLineLength, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrExit(buff_ptr + arg_len < buff + SL_CLI_INPUT_BUFFER_SIZE, error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
         strncpy(buff_ptr, argv[i], arg_len);
         buff_ptr += arg_len;
 
         /* Make sure that there is enough buffer for a space char */
-        if (buff_ptr + sizeof(char) < buff + kMaxLineLength)
+        if (buff_ptr + sizeof(char) < buff + SL_CLI_INPUT_BUFFER_SIZE)
         {
             strncpy(buff_ptr, " ", sizeof(char));
             buff_ptr++;
