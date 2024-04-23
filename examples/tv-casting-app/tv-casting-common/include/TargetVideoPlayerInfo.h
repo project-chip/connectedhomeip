@@ -72,7 +72,7 @@ class TargetVideoPlayerInfo
 public:
     TargetVideoPlayerInfo() {}
 
-    bool operator==(const TargetVideoPlayerInfo & other) { return this->mNodeId == other.mNodeId; }
+    bool operator==(const TargetVideoPlayerInfo & other) const { return this->mNodeId == other.mNodeId; }
 
     bool IsInitialized() { return mInitialized; }
     void Reset();

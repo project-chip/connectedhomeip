@@ -51,7 +51,7 @@ if (chip_project_config_include_dirs == [] &&
   chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 }
 
-if (chip_device_platform == "cc13x2_26x2") {
+if (chip_device_platform == "cc13x4_26x4") {
   import("//build_overrides/ti_simplelink_sdk.gni")
 } else if (chip_device_platform == "efr32") {
   import("//build_overrides/efr32_sdk.gni")

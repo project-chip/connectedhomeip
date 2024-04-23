@@ -16,12 +16,17 @@ name: Darwin
 
 on:
     push:
+        branches-ignore:
+            - "dependabot/**"
     pull_request:
     merge_group:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+        'pull_request' && github.event.number) || (github.event_name ==
+        'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
@@ -49,16 +54,17 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: darwin
-                bootstrap-log-name: bootstrap-logs-framework-${{ matrix.options.flavor }}
+                  platform: darwin
+                  bootstrap-log-name:
+                      bootstrap-logs-framework-${{ matrix.options.flavor }}
             - name: Block zap-cli from being used
               env:
-                PW_ENVSETUP_NO_BANNER: 1
+                  PW_ENVSETUP_NO_BANNER: 1
               run: |
-                # Framework builds are NOT expected to require zap-cli
-                scripts/run_in_build_env.sh 'rm -- "$(which zap-cli)"'
-                # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
-                scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
+                  # Framework builds are NOT expected to require zap-cli
+                  scripts/run_in_build_env.sh 'rm -- "$(which zap-cli)"'
+                  # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
+                  scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
             - name: Build
               working-directory: src/darwin/Framework
               run: xcodebuild -target "Matter" ${{ matrix.options.arguments }}
@@ -66,16 +72,15 @@ jobs:
     tests:
         name: Run framework tests
         if: github.actor != 'restyled-io[bot]'
-        needs: [ framework ] # serialize to avoid running to many parallel macos runners
+        needs: [framework] # serialize to avoid running to many parallel macos runners
         runs-on: macos-13
         strategy:
             matrix:
                 options: # We don't need a full matrix
                     - flavor: asan
-                      arguments: -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES
-                    - flavor: asan-global-storage
-                      arguments: -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES
-                      defines: MTR_PER_CONTROLLER_STORAGE_ENABLED=0
+                      arguments:
+                          -enableAddressSanitizer YES
+                          -enableUndefinedBehaviorSanitizer YES
                     - flavor: tsan
                       arguments: -enableThreadSanitizer YES
         steps:
@@ -84,8 +89,9 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: darwin
-                bootstrap-log-name: bootstrap-logs-framework-${{ matrix.options.flavor }}
+                  platform: darwin
+                  bootstrap-log-name:
+                      bootstrap-logs-framework-${{ matrix.options.flavor }}
             - name: Build example All Clusters Server
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
@@ -125,19 +131,3 @@ jobs:
                   name: darwin-framework-test-logs-${{ matrix.options.flavor }}
                   path: /tmp/darwin/framework-tests
                   retention-days: 5
-
-    tv-casting-bridge:
-        name: Build TV Casting Bridge example
-        if: github.actor != 'restyled-io[bot]'
-        needs: [ framework ] # serialize to avoid running to many parallel macos runners
-        runs-on: macos-13
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: darwin
-            - name: Build
-              working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
-              run: xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos

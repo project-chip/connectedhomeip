@@ -20,7 +20,6 @@
 #include <memory>
 #include <vector>
 
-#include <app/AttributeAccessInterface.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>

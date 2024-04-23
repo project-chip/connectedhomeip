@@ -30,7 +30,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/AppDelegate.h>
 #include <app/util/config.h>
-#include <ble/BLEEndPoint.h>
+#include <ble/Ble.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>

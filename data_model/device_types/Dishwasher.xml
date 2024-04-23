@@ -68,7 +68,7 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <optionalConform/>
       <features>
-        <feature code="" name="DF">
+        <feature code="" name="DeadFrontBehavior">
           <mandatoryConform/>
         </feature>
       </features>

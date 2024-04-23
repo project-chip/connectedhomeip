@@ -20,6 +20,7 @@
 
 #include "concentration-measurement-cluster-objects.h"
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>

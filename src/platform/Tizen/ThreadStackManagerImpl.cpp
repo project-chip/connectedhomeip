@@ -39,7 +39,6 @@
 #include <thread.h>
 #include <tizen_error.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>

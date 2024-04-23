@@ -40,7 +40,7 @@ Shell::Engine sShellDnsBrowseSubcommands;
 Shell::Engine sShellDnsSubcommands;
 Dnssd::ResolverProxy sResolverProxy;
 
-class DnsShellResolverDelegate : public Dnssd::CommissioningResolveDelegate, public AddressResolve::NodeListener
+class DnsShellResolverDelegate : public Dnssd::DiscoverNodeDelegate, public AddressResolve::NodeListener
 {
 public:
     DnsShellResolverDelegate() { mSelfHandle.SetListener(this); }
@@ -92,20 +92,20 @@ public:
         }
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1];
-        Encoding::BytesToUppercaseHexString(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen, rotatingId,
+        Encoding::BytesToUppercaseHexString(nodeData.nodeData.rotatingId, nodeData.nodeData.rotatingIdLen, rotatingId,
                                             sizeof(rotatingId));
 
         streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
+        streamer_printf(streamer_get(), "   Node Type: %u\r\n", nodeData.nodeType);
         streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.resolutionData.hostName);
-        streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.commissionData.vendorId);
-        streamer_printf(streamer_get(), "   Product ID: %u\r\n", nodeData.commissionData.productId);
-        streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.commissionData.longDiscriminator);
-        streamer_printf(streamer_get(), "   Device type: %u\r\n", nodeData.commissionData.deviceType);
-        streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.commissionData.deviceName);
-        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n",
-                        static_cast<int>(nodeData.commissionData.commissioningMode));
-        streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.commissionData.pairingHint);
-        streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.commissionData.pairingInstruction);
+        streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.nodeData.vendorId);
+        streamer_printf(streamer_get(), "   Product ID: %u\r\n", nodeData.nodeData.productId);
+        streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.nodeData.longDiscriminator);
+        streamer_printf(streamer_get(), "   Device type: %u\r\n", nodeData.nodeData.deviceType);
+        streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.nodeData.deviceName);
+        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n", static_cast<int>(nodeData.nodeData.commissioningMode));
+        streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.nodeData.pairingHint);
+        streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.nodeData.pairingInstruction);
         streamer_printf(streamer_get(), "   Rotating ID %s\r\n", rotatingId);
 
         auto retryInterval = nodeData.resolutionData.GetMrpRetryIntervalIdle();
@@ -134,6 +134,10 @@ public:
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {
             streamer_printf(streamer_get(), "      %s\r\n", nodeData.resolutionData.ipAddress[i].ToString(ipAddressBuf));
+        }
+        if (nodeData.resolutionData.port > 0)
+        {
+            streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.resolutionData.port);
         }
     }
 
@@ -237,7 +241,7 @@ CHIP_ERROR BrowseHandler(int argc, char ** argv)
     }
 
     sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
-    sResolverProxy.SetCommissioningDelegate(&sDnsShellResolverDelegate);
+    sResolverProxy.SetDiscoveryDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsBrowseSubcommands.ExecCommand(argc, argv);
 }

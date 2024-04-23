@@ -39,7 +39,7 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
@@ -258,13 +258,14 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpointId, ClusterId
     return cluster->emberCluster();
 }
 
+DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
+{
+    // shared data version storage
+    return &dataVersion;
+}
+
 namespace chip {
 namespace app {
-
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
-{
-    return nullptr;
-}
 
 EndpointId EnabledEndpointsWithServerCluster::operator*() const
 {
@@ -301,7 +302,13 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 }
 
 } // namespace app
+
 namespace Test {
+
+void ResetVersion()
+{
+    dataVersion = 0;
+}
 
 void BumpVersion()
 {
@@ -399,6 +406,16 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
     ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
     return attributeReport.EndOfAttributeReportIB();
+}
+
+void SetMockNodeConfig(const MockNodeConfig & config)
+{
+    mockConfig = &config;
+}
+
+void ResetMockNodeConfig()
+{
+    mockConfig = nullptr;
 }
 
 } // namespace Test

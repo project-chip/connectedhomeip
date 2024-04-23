@@ -3,7 +3,6 @@ asr-{asr582x,asr595x,asr550x}-{all-clusters,all-clusters-minimal,lighting,light-
 android-{arm,arm64,x86,x64,androidstudio-arm,androidstudio-arm64,androidstudio-x86,androidstudio-x64}-{chip-tool,chip-test,tv-server,tv-casting-app,java-matter-controller,kotlin-matter-controller,virtual-device-app}[-no-debug]
 bouffalolab-{bl602-iot-matter-v1,bl602-night-light,xt-zb6-devkit,bl706-night-light,bl706dk,bl704ldk}-light[-shell][-115200][-rpc][-cdc][-resetcnt][-rotating_device_id][-mfd][-mfdtest][-ethernet][-wifi][-thread][-fp][-memmonitor][-mot]
 cc32xx-{lock,air-purifier}
-ti-cc13x2x7_26x2x7-{lighting,lock,pump,pump-controller}[-mtd]
 ti-cc13x4_26x4-{all-clusters,lighting,lock,pump,pump-controller}[-mtd][-ftd]
 cyw30739-cyw930739m2evb_01-{light,lock,ota-requestor,switch}
 efr32-{brd4161a,brd4187c,brd4186c,brd4163a,brd4164a,brd4166a,brd4170a,brd4186a,brd4187a,brd4304a,brd4338a}-{window-covering,switch,unit-test,light,lock,thermostat,pump}[-rpc][-with-ota-requestor][-icd][-low-power][-shell][-no-logging][-openthread-mtd][-heap-monitoring][-no-openthread-cli][-show-qr-code][-wifi][-rs9116][-wf200][-siwx917][-ipv4][-additional-data-advertising][-use-ot-lib][-use-ot-coap-lib][-no-version][-skip-rps-generation]

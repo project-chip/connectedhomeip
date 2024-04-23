@@ -72,9 +72,10 @@ using namespace ::chip::app::Clusters::DoorLock;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
-
+#if (LED_ENABLE == 1)
 static LED_Handle sAppRedHandle;
 static LED_Handle sAppGreenHandle;
+#endif
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 
@@ -267,7 +268,7 @@ int AppTask::Init()
 
         Attributes::LockState::Get(endpointId, state);
         ret = LockMgr().Init(state,
-                             CC13X2_26X2DoorLock::LockInitParams::ParamBuilder()
+                             CC13X4_26X4DoorLock::LockInitParams::ParamBuilder()
                                  .SetNumberOfUsers(numberOfUsers)
                                  .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
                                  .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)

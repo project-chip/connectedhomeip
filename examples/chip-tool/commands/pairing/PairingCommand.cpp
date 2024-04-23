@@ -482,7 +482,7 @@ void PairingCommand::OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedA
 void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     // Ignore nodes with closed commissioning window
-    VerifyOrReturn(nodeData.commissionData.commissioningMode != 0);
+    VerifyOrReturn(nodeData.nodeData.commissioningMode != 0);
 
     auto & resolutionData = nodeData.resolutionData;
 

@@ -15,9 +15,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <stdint.h>
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
+
+#include <cstdint>
 
 namespace chip {
 namespace Ble {

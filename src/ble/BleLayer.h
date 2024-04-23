@@ -22,7 +22,7 @@
  *      platform's Bluetooth Low Energy (BLE) implementation and the CHIP
  *      stack.
  *
- *      The BleLayer obect accepts BLE data and control input from the
+ *      The BleLayer object accepts BLE data and control input from the
  *      application via a functional interface. It performs the fragmentation
  *      and reassembly required to transmit CHIP message via a BLE GATT
  *      characteristic interface, and drives incoming messages up the CHIP
@@ -47,21 +47,26 @@
 
 #pragma once
 
-#include <stdint.h>
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
 
-#include <ble/BleConfig.h>
+#include <cstddef>
+#include <cstdint>
 
+#include <lib/core/CHIPError.h>
+#include <lib/support/DLLUtil.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include <ble/BleApplicationDelegate.h>
-#include <ble/BleConnectionDelegate.h>
-#include <ble/BleError.h>
-#include <ble/BleLayerDelegate.h>
-#include <ble/BlePlatformDelegate.h>
-#include <ble/BleRole.h>
-#include <ble/BleUUID.h>
+#include "BleApplicationDelegate.h"
+#include "BleConfig.h"
+#include "BleConnectionDelegate.h"
+#include "BleLayerDelegate.h"
+#include "BlePlatformDelegate.h"
+#include "BleRole.h"
+#include "BleUUID.h"
 
 namespace chip {
 namespace Ble {
@@ -77,10 +82,6 @@ namespace Ble {
 /// Version(s) of the CHIP BLE Transport Protocol that this stack supports.
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
 #define CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION kBleTransportProtocolVersion_V4
-
-/// Forward declarations.
-class BleLayer;
-class BLEEndPoint;
 
 /// Enum defining versions of CHIP over BLE transport protocol.
 typedef enum
@@ -197,7 +198,7 @@ public:
  *    and hand the platform-specific BLE_CONNECTION_OBJECT that this receipt
  *    generates to BleLayer via the corresponding platform interface function.
  *    This causes BleLayer to wrap the BLE_CONNECTION_OBJECT in a BLEEndPoint,
- *    and notify chipMessageLayer that a new BLE conneciotn has been received.
+ *    and notify chipMessageLayer that a new BLE connection has been received.
  *    The message layer then wraps the new BLEEndPoint object in a
  *    chipConnection, and hands this object to the application via the message
  *    layer's OnConnectionReceived callback.
@@ -214,9 +215,6 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    friend class BtpEngineTest;
-#endif
 
 public:
     // Public data members:
@@ -271,7 +269,7 @@ public:
      *     characteristics CHIP cares about.
 
      *     Platform must call this function when a GATT subscription has been established to any CHIP service
-     *     charateristic.
+     *     characteristic.
      *
      *     If this function returns true, CHIP has accepted the BLE connection and wrapped it
      *     in a chipConnection object. If CHIP accepts a BLE connection, the platform MUST
@@ -283,7 +281,7 @@ public:
     bool HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
     /**< Platform must call this function when a GATT unsubscribe is requested on any CHIP
-     *   service charateristic, that is, when an existing GATT subscription on a CHIP service
+     *   service characteristic, that is, when an existing GATT subscription on a CHIP service
      *   characteristic is canceled. */
     bool HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
 
@@ -319,10 +317,6 @@ public:
      *   err = BLE_ERROR_APP_CLOSED_CONNECTION to prevent the leak of this chipConnection and its end point object. */
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, CHIP_ERROR err);
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    BLEEndPoint * mTestBleEndPoint;
-#endif
-
 private:
     // Private data members:
 
@@ -351,5 +345,3 @@ private:
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#include "BLEEndPoint.h"

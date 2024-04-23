@@ -205,7 +205,12 @@ public:
     //
     // This should only be invoked if a matching call to RetainSystemState() was called prior.
     //
-    void ReleaseSystemState();
+    // Returns true if stack was shut down in response to this call, or false otherwise.
+    //
+    bool ReleaseSystemState();
+
+    // Like RetainSystemState(), but will re-initialize the system state first if necessary.
+    CHIP_ERROR EnsureAndRetainSystemState();
 
     //
     // Retrieve a read-only pointer to the system state object that contains pointers to key stack
@@ -270,7 +275,7 @@ private:
     DeviceControllerFactory() {}
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
     CHIP_ERROR InitSystemState(FactoryInitParams params);
-    CHIP_ERROR InitSystemState();
+    CHIP_ERROR ReinitSystemStateIfNecessary();
     void ControllerInitialized(const DeviceController & controller);
 
     uint16_t mListenPort;
