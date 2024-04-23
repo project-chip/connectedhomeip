@@ -190,9 +190,9 @@ def test_discovery_fn(tv_app_rel_path, tv_casting_app_rel_path):
         with LogFileManager(linux_tv_app_log_path, 'w') as linux_tv_app_log_file:
             tv_app_abs_path = os.path.abspath(tv_app_rel_path)
 
-            # Configure command options to disable stdout buffering during tests
+            # Configure command options to disable stdout buffering during tests.
             disable_stdout_buffering_cmd = []
-            # On Unix-like systems, use stdbuf to disable stdout buffering
+            # On Unix-like systems, use stdbuf to disable stdout buffering.
             if sys.platform == 'darwin' or sys.platform == 'linux':
                 disable_stdout_buffering_cmd = ['stdbuf', '-o0', '-i0']
 
