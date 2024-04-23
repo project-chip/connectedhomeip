@@ -12,3 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+name: Check for changes to data_model directory without a sha update 
+
+on:
+  pull_request:
+    branches-ignore:
+      - 'dependabot/**'
+    paths:
+      - "data_model/**"
+
+jobs:
+  check-submodule-update-label:
+    name: Check for changes to data_model directory without a sha update
+    runs-on: ubuntu-latest
+    if: "git diff --name-only HEAD^..HEAD data_model/ | grep -q spec_sha"
+    steps:
+      - name: Error Message
+        run: echo This pull request attempts to update data_model directory, but is missing updates to spec_sha file with the latest version of the sha.
+      - name: Fail Job
+        run: exit 1
