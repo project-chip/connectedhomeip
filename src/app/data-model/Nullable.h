@@ -44,8 +44,6 @@ struct Nullable : protected std::optional<T>
     // The following 'using' statement is needed to make visible
     // all constructors of the base class within this derived class.
     //
-    using std::optional<T>::optional;
-    using std::optional<T>::value_or;
     using std::optional<T>::value;
     using std::optional<T>::operator*;
     using std::optional<T>::operator->;
@@ -62,6 +60,18 @@ struct Nullable : protected std::optional<T>
     constexpr T & SetNonNull(Args &&... args)
     {
         return std::optional<T>::emplace(std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    constexpr auto ValueOr(Args &&... args) const
+    {
+        return std::optional<T>::value_or(std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    constexpr auto Value(Args &&... args) const
+    {
+        return std::optional<T>::value_or(std::forward<Args>(args)...);
     }
 
     // For integer types, being nullable involves a range restriction.
@@ -109,36 +119,6 @@ struct Nullable : protected std::optional<T>
     bool operator!=(const Nullable<T> & other) const { return !(*this == other); }
     bool operator==(const T & other) const { return std::optional<T>::has_value() && (**this == other); }
     bool operator!=(const T & other) const { return !(*this == other); }
-
-    // backwards compatibility with old chip::Nullable method names
-    //
-    // NOTE: as we transition to std::optional, these should be removed
-    // We expect only `value` and `value_or` to remain as standard names
-    // for both nullable and optional.
-    template <typename... Args>
-    auto Value(Args &&... args) -> decltype(std::optional<T>::value(std::forward<Args>(args)...))
-    {
-        return std::optional<T>::value(std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    auto Value(Args &&... args) const -> decltype(std::optional<T>::value(std::forward<Args>(args)...))
-    {
-        return std::optional<T>::value(std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    auto ValueOr(Args &&... args) -> decltype(std::optional<T>::value_or(std::forward<Args>(args)...))
-    {
-        return std::optional<T>::value_or(std::forward<Args>(args)...);
-    }
-
-    template <typename... Args>
-    auto ValueOr(Args &&... args) const -> decltype(std::optional<T>::value_or(std::forward<Args>(args)...))
-    {
-        return std::optional<T>::value_or(std::forward<Args>(args)...);
-    }
-
 };
 
 template <class T>
