@@ -117,6 +117,7 @@ CHIP_ERROR OTAFirmwareProcessor::ExitAction()
     if (OTA_CommitImage(NULL) != gOtaSuccess_c)
     {
         ChipLogError(SoftwareUpdate, "Failed to commit firmware image.");
+        mShouldNotApply = true;
         return CHIP_OTA_PROCESSOR_IMG_COMMIT;
     }
 
