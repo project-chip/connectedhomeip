@@ -40,7 +40,7 @@ TEST(TestBitMask, TestBitMaskOperations)
 {
     BitMask<TestEnum> mask;
 
-    EXPECT_FALSE(mask.Raw());
+    EXPECT_EQ(mask.Raw(), 0);
 
     mask.SetField(TestEnum::kBits_1_2, 2);
     EXPECT_EQ(mask.Raw(), 0x0004);
@@ -90,7 +90,7 @@ TEST(TestBitMask, TestBitMaskInvalid)
 
     // This generally tests for no infinite loops. Nothing to set here
     mask.SetField(TestEnum::kZero, 0x01);
-    EXPECT_FALSE(mask.Raw());
+    EXPECT_EQ(mask.Raw(), 0);
 
     mask.SetRaw(0x1234);
     mask.SetField(TestEnum::kZero, 0x01);
