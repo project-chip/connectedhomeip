@@ -42,7 +42,7 @@
 
 #ifdef CONFIG_NET_L2_OPENTHREAD
 #include <platform/ThreadStackManager.h>
-#endif 
+#endif
 
 namespace chip {
 namespace DeviceLayer {

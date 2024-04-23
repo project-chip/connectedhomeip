@@ -322,13 +322,13 @@ if PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
 config PSA_USE_CC3XX_HASH_DRIVER
     default n
 
-endif
+endif # PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
 
 # Spake2+ support
 config MBEDTLS_MD_C
     default y
 
-endif
+endif # CHIP_CRYPTO_PSA
 
 if !CHIP_CRYPTO_PSA
 
@@ -371,7 +371,7 @@ config MBEDTLS_ECP_C
 config MBEDTLS_ECP_DP_SECP256R1_ENABLED
     default y
 
-endif
+endif # !CHIP_CRYPTO_PSA
 
 config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
     default n if CHIP_WIFI
@@ -491,4 +491,4 @@ config OPENTHREAD_SHELL
 
 endif # SHELL
 
-endif
+endif # CHIP
