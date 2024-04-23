@@ -361,7 +361,7 @@ static NSString * const sAttributesKey = @"attributes";
 #endif
     BOOL _delegateDeviceCachePrimedCalled;
 
-    // _clusterData stores data that we have already persisted (when we have
+    // _persistedClusterData stores data that we have already persisted (when we have
     // cluster data persistence enabled).  Nil when we have no persistence enabled.
     NSCache<MTRClusterPath *, MTRDeviceClusterData *> * _Nullable _persistedClusterData;
     // _clusterDataToPersist stores data that needs to be persisted.  If we
