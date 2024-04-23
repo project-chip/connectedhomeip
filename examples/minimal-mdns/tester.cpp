@@ -137,7 +137,7 @@ class ReportDelegate : public mdns::Minimal::ServerDelegate
 public:
     void OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
-        char addr[32];
+        char addr[Inet::IPAddress::kMaxStringLength];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
         char ifName[64];
