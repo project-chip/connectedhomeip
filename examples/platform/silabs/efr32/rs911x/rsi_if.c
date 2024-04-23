@@ -423,7 +423,7 @@ static int32_t wfx_rsi_init(void)
 
     SILABS_LOG("%s: WLAN: MAC %02x:%02x:%02x %02x:%02x:%02x", __func__, wfx_rsi.sta_mac.octet[0], wfx_rsi.sta_mac.octet[1],
                wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4], wfx_rsi.sta_mac.octet[5]);
-    
+
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(WFX_QUEUE_SIZE, sizeof(WfxEvent_t), NULL);
     if (sWifiEventQueue == NULL)
@@ -665,7 +665,7 @@ void HandleDHCPPolling()
 /** ResetDHCPNotificationFlags
  *  @brief Reset the flags that are used to notify the application about DHCP connectivity
  *         and emits a WFX_EVT_STA_DO_DHCP event to trigger DHCP polling checks. Helper function for ProcessEvent.
- */ 
+ */
 void ResetDHCPNotificationFlags()
 {
     WfxEvent_t outEvent;
@@ -680,7 +680,7 @@ void ResetDHCPNotificationFlags()
     WfxPostEvent(&outEvent);
 }
 
-/** 
+/**
  * @brief Post the WfxEvent to tue WiFiEventQueue to be process by the wfx_rsi_task
  */
 void WfxPostEvent(WfxEvent_t * event)
