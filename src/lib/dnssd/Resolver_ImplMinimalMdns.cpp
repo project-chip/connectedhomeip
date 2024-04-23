@@ -371,7 +371,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
         if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
         {
-            if (resolver->IsActiveBrowseParse())
+            if (resolver->IsActiveCommissionParse())
             {
                 // Browse wants IP addresses
                 ScheduleIpAddressResolve(resolver->GetTargetHostName());
