@@ -122,12 +122,6 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
-{
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR OTAFirmwareProcessor::AbortAction()
 {
     OTA_CancelImage();
@@ -144,12 +138,14 @@ CHIP_ERROR OTAFirmwareProcessor::ExitAction()
     if (OTA_CommitImage(NULL) != gOtaSuccess_c)
     {
         ChipLogError(SoftwareUpdate, "Failed to commit firmware image.");
+        mShouldNotApply = true;
         return CHIP_OTA_PROCESSOR_IMG_COMMIT;
     }
 
     if (OTA_ImageAuthenticate() != gOtaImageAuthPass_c)
     {
         ChipLogError(SoftwareUpdate, "Failed to authenticate firmware image.");
+        mShouldNotApply = true;
         return CHIP_OTA_PROCESSOR_IMG_AUTH;
     }
 
