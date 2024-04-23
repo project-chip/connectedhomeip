@@ -40,6 +40,8 @@ using chip::app::DataModel::NullNullable;
 
 namespace {
 
+constexpr uint32_t kFailSafeTimeoutSeconds = 3;
+
 // As per specifications (Section 13.3), Nodes SHALL exit commissioning mode after 20 failed commission attempts.
 constexpr uint8_t kMaxFailedCommissioningAttempts = 20;
 
@@ -174,7 +176,7 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 void CommissioningWindowManager::OnSessionEstablishmentStarted()
 {
     // As per specifications, section 5.5: Commissioning Flows
-    constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
+    constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(kFailSafeTimeoutSeconds);
     DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
 
     ChipLogProgress(AppServer, "Commissioning session establishment step started");
@@ -208,7 +210,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
     else
     {
-        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60));
+        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(kFailSafeTimeoutSeconds));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");

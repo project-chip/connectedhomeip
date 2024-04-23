@@ -62,14 +62,14 @@ struct Nullable : protected std::optional<T>
         return std::optional<T>::emplace(std::forward<Args>(args)...);
     }
 
-    template <typename... Args>
-    constexpr auto ValueOr(Args &&... args) const
+    template <typename Arg>
+    constexpr auto ValueOr(Arg && arg) const
     {
-        return std::optional<T>::value_or(std::forward<Args>(args)...);
+        return std::optional<T>::value_or(std::forward<Arg>(arg));
     }
 
-    constexpr const T & Value() const { return **this; }
-    T & Value() { return **this; }
+    inline constexpr const T & Value() const { return std::optional<T>::value(); }
+    inline T & Value() { return std::optional<T>::value(); }
 
     // For integer types, being nullable involves a range restriction.
     template <
