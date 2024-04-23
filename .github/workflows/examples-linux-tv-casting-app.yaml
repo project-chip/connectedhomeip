@@ -66,7 +66,7 @@ jobs:
             - name: Test casting from Linux tv-casting-app to Linux tv-app
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "python3 ./scripts/tests/run_tv_casting_test.py test-casting"
+                    "python3 ./scripts/tests/run_tv_casting_test.py"
               timeout-minutes: 1
 
             - name: Uploading Size Reports

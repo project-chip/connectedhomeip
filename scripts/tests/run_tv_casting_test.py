@@ -36,9 +36,9 @@ LINUX_TV_CASTING_APP_LOGS = 'Linux-tv-casting-app-logs.txt'
 
 # Values that identify the Linux tv-app and are noted in the 'Device Configuration' in the Linux tv-app output
 # as well as under the 'Discovered Commissioner' details in the Linux tv-casting-app output.
-VENDOR_ID = 65521
-PRODUCT_ID = 32769
-DEVICE_TYPE = 35
+VENDOR_ID = 65521   # Test vendor id
+PRODUCT_ID = 32769  # Test product id
+DEVICE_TYPE = 35    # Casting video player
 
 
 class LogFileManager:
