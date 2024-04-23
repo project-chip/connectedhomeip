@@ -107,6 +107,7 @@ class TC_DA_1_7(MatterBaseTest):
             --script-args "--storage-path admin_storage.json --commissioning-method on-network \
                 --discriminator 12 34 --passcode 20202021 20202021 --bool-arg allow_sdk_dac:true"
     '''
+
     def expected_number_of_DUTs(self):
         # For real tests, we require more than one DUT
         # On the CI, this doesn't make sense to do since all the examples use the same DAC
@@ -132,9 +133,9 @@ class TC_DA_1_7(MatterBaseTest):
                 TestStep(f'{DUT}.4', 'TH extracts ASN.1 DER bytes for the entire issuer field of `dac_cert` and subject field of `pai_cert`.',
                          'Verify that the `dac_cert` `issuer field is byte-forbyte equivalent to the `pai_cert`subject field.'),
                 TestStep(f'{DUT}.5', 'TH extracts ASN.1 DER bytes for the entire issuer field of `pai_cert` and subject field of `paa_cert`.',
-                        'Verify that the `pai_cert` issuer field is byte-forbyte equivalent to the `paa_cert` subject field.'),
+                         'Verify that the `pai_cert` issuer field is byte-forbyte equivalent to the `paa_cert` subject field.'),
                 TestStep(f'{DUT}.6', f'TH extracts the public key from the DAC and saves as `pk_{DUT}`.')
-        ]
+                ]
 
     def steps_TC_DA_1_7(self):
         steps = [TestStep(0, "Commission DUT if not already done", is_commissioning=True)]
@@ -149,15 +150,16 @@ class TC_DA_1_7(MatterBaseTest):
     async def test_TC_DA_1_7(self):
         # post_cert_tests (or sdk) can use the qr or manual code
         # We don't currently support this in cert because the base doesn't support multiple QR/manual
-        num= 0
+        num = 0
         if self.matter_test_config.discriminators:
             num += len(self.matter_test_config.discriminators)
         if self.matter_test_config.qr_code_content:
             num += 1
         if self.matter_test_config.manual_code:
             num += 1
-        asserts.assert_equal(num, self.expected_number_of_DUTs(), "Unexpected number of devices specified - this test expects two DUTs at cert, one device for CI")
-        pk= []
+        asserts.assert_equal(num, self.expected_number_of_DUTs(),
+                             "Unexpected number of devices specified - this test expects two DUTs at cert, one device for CI")
+        pk = []
         # Commissioning - already done.
         self.step(0)
 
