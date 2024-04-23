@@ -26,7 +26,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from cryptography.x509 import AuthorityKeyIdentifier, Certificate, SubjectKeyIdentifier, load_der_x509_certificate
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, bytes_from_hex, default_matter_test_main, hex_from_bytes
+from matter_testing_support import (MatterBaseTest, TestStep, async_test_body, bytes_from_hex, default_matter_test_main,
+                                    hex_from_bytes)
 from mobly import asserts
 
 # Those are SDK samples that are known to be non-production.
