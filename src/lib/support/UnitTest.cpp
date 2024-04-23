@@ -8,7 +8,7 @@ namespace test {
 
 int RunAllTests()
 {
-    testing::InitGoogleTest(nullptr, nullptr);
+    testing::InitGoogleTest(nullptr, static_cast<char **>(nullptr));
     pw::unit_test::LoggingEventHandler handler;
     pw::unit_test::RegisterEventHandler(&handler);
     return RUN_ALL_TESTS();
