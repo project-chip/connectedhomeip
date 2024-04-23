@@ -26,6 +26,7 @@ chip_test_suite_using_nltest("tests") {
     "TestCATValues.cpp",
     "TestCHIPCallback.cpp",
     "TestCHIPErrorStr.cpp",
+    "TestCHIPError.cpp",
     "TestOTAImageHeader.cpp",
     "TestOptional.cpp",
     "TestReferenceCounted.cpp",
