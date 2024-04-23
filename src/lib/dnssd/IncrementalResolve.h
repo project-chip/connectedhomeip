@@ -104,6 +104,12 @@ public:
 
     ServiceNameType GetCurrentType() const { return mServiceNameType; }
 
+    PeerId OperationalParsePeerId() const
+    {
+        VerifyOrReturnValue(IsActiveOperationalParse(), PeerId());
+        return mSpecificResolutionData.Get<OperationalNodeData>().peerId;
+    }
+
     /// Start parsing a new record. SRV records are the records we are mainly
     /// interested on, after which TXT and A/AAAA are looked for.
     ///
