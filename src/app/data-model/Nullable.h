@@ -110,11 +110,9 @@ struct Nullable : protected std::optional<T>
 
     inline bool operator==(const Nullable<T> & other) const
     {
-        return static_cast<const std::optional<T>&>(*this) ==
-               static_cast<const std::optional<T>&>(other);
+        return static_cast<const std::optional<T> &>(*this) == static_cast<const std::optional<T> &>(other);
     }
     bool operator!=(const Nullable<T> & other) const { return !(*this == other); }
-
 };
 
 template <class T>
