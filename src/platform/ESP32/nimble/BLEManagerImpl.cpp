@@ -257,7 +257,7 @@ void BLEManagerImpl::_Shutdown()
     BleLayer::Shutdown();
     xTimerDelete(sbleAdvTimeoutTimer, portMAX_DELAY);
 
-    // selectively setting kGATTServiceStarted flag, in order to notify the state machine to stop the CHIPoBLE gatt service
+    // selectively setting kGATTServiceStarted flag, in order to notify the state machine to stop the CHIPoBLE GATT service
     mFlags.ClearAll().Set(Flags::kGATTServiceStarted);
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
 
@@ -1017,7 +1017,7 @@ void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
 
         VerifyOrReturn(err == ESP_OK, ChipLogError(DeviceLayer, "BLE deinit failed"));
         ChipLogProgress(DeviceLayer, "BLE deinit successful and memory reclaimed");
-        // TODO: PostEvent(DeviceEventType::kBLEDeinitialized);
+        // TODO: post an event when ble is deinitialized and memory is added to heap
     }
 }
 

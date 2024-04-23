@@ -111,7 +111,7 @@ static size_t hex_string_to_binary(const char * hex_string, uint8_t * buf, size_
 
 void Esp32AppServer::DeInitBLEIfCommissioned(void)
 {
-#if CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+#ifdef CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0)
     {
         chip::DeviceLayer::Internal::BLEMgr().Shutdown();
