@@ -28,13 +28,10 @@
 #include "sl_status.h"
 #include <cmsis_os2.h>
 
-#include "silabs_utils.h"
-#include "wfx_host_events.h"
-#include "rsi_driver.h"
-#include "rsi_wlan_non_rom.h"
 #include "rsi_bootup_config.h"
 #include "rsi_common_apis.h"
 #include "rsi_data_types.h"
+#include "rsi_driver.h"
 #include "rsi_error.h"
 #include "rsi_nwk.h"
 #include "rsi_socket.h"
@@ -42,6 +39,9 @@
 #include "rsi_wlan.h"
 #include "rsi_wlan_apis.h"
 #include "rsi_wlan_config.h"
+#include "rsi_wlan_non_rom.h"
+#include "silabs_utils.h"
+#include "wfx_host_events.h"
 
 #include "dhcp_client.h"
 #include "lwip/nd6.h"
@@ -317,7 +317,7 @@ static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
     wfx_rsi.join_retries += 1;
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
     is_wifi_disconnection_event = true;
-    WfxEvent.eventType = WFX_EVT_STA_START_JOIN;
+    WfxEvent.eventType          = WFX_EVT_STA_START_JOIN;
     WfxPostEvent(&WfxEvent);
 }
 /*************************************************************************************
@@ -747,8 +747,7 @@ void ProcessEvent(WfxEvent_t inEvent)
             {
                 scan = &scan_rsp.scan_info[x];
                 // is it a scan all or target scan
-                if (!wfx_rsi.scan_ssid ||
-                    (wfx_rsi.scan_ssid && strcmp(wfx_rsi.scan_ssid, (char *) scan->ssid) == CMP_SUCCESS))
+                if (!wfx_rsi.scan_ssid || (wfx_rsi.scan_ssid && strcmp(wfx_rsi.scan_ssid, (char *) scan->ssid) == CMP_SUCCESS))
                 {
                     strncpy(ap.ssid, (char *) scan->ssid, MIN(sizeof(ap.ssid), sizeof(scan->ssid)));
                     ap.security = scan->security_mode;
