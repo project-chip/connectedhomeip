@@ -22,15 +22,15 @@ void TestHelperWrittenAndParsedMatch(MsgType & testMsg)
 
     size_t msgSize = testMsg.MessageSize();
     Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(msgSize));
-    EXPECT_FALSE(bbuf.IsNull());
+    ASSERT_FALSE(bbuf.IsNull());
 
     testMsg.WriteToBuffer(bbuf);
     EXPECT_TRUE(bbuf.Fit());
 
     System::PacketBufferHandle msgBuf = bbuf.Finalize();
-    EXPECT_FALSE(msgBuf.IsNull());
+    ASSERT_FALSE(msgBuf.IsNull());
     System::PacketBufferHandle rcvBuf = System::PacketBufferHandle::NewWithData(msgBuf->Start(), msgSize);
-    EXPECT_FALSE(rcvBuf.IsNull());
+    ASSERT_FALSE(rcvBuf.IsNull());
 
     MsgType testMsgRcvd;
     err = testMsgRcvd.Parse(std::move(rcvBuf));
@@ -43,7 +43,7 @@ struct TestBdxMessages : public ::testing::Test
     static void SetUpTestSuite()
     {
         CHIP_ERROR error = chip::Platform::MemoryInit();
-        EXPECT_EQ(error, CHIP_NO_ERROR);
+        ASSERT_EQ(error, CHIP_NO_ERROR);
     }
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }

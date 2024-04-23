@@ -104,18 +104,10 @@ void VerifyStatusReport(const System::PacketBufferHandle & msg, StatusCode expec
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (msg.IsNull())
-    {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_FALSE(msg.IsNull())
 
     System::PacketBufferHandle msgCopy = msg.CloneData();
-    if (msgCopy.IsNull())
-    {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_FALSE(msgCopy.IsNull())
 
     SecureChannel::StatusReport report;
     err = report.Parse(std::move(msgCopy));
@@ -175,22 +167,14 @@ void SendAndVerifyTransferInit(TransferSession::OutputEvent & outEvent, System::
     }
     if (outEvent.transferInitData.Metadata != nullptr)
     {
-        EXPECT_EQ(outEvent.transferInitData.MetadataLength, initData.MetadataLength);
-        if (outEvent.transferInitData.MetadataLength == initData.MetadataLength)
+        ASSERT_EQ(outEvent.transferInitData.MetadataLength, initData.MetadataLength);
+        // Even if initData.MetadataLength is 0, it is still technically undefined behaviour to call memcmp with a null
+        bool isNullAndLengthZero = initData.Metadata == nullptr && initData.MetadataLength == 0;
+        if (!isNullAndLengthZero)
         {
-            // Even if initData.MetadataLength is 0, it is still technically undefined behaviour to call memcmp with a null
-            bool isNullAndLengthZero = initData.Metadata == nullptr && initData.MetadataLength == 0;
-            if (!isNullAndLengthZero)
-            {
-                // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to
-                // parse the metadata and verify that it matches.
-                EXPECT_EQ(0,
-                          memcmp(initData.Metadata, outEvent.transferInitData.Metadata, outEvent.transferInitData.MetadataLength));
-            }
-        }
-        else
-        {
-            EXPECT_TRUE(false); // Metadata length mismatch
+            // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to
+            // parse the metadata and verify that it matches.
+            EXPECT_EQ(0, memcmp(initData.Metadata, outEvent.transferInitData.Metadata, outEvent.transferInitData.MetadataLength));
         }
     }
 }
@@ -235,23 +219,15 @@ void SendAndVerifyAcceptMsg(TransferSession::OutputEvent & outEvent, TransferSes
     EXPECT_EQ(outEvent.transferAcceptData.Length, acceptData.Length);
     if (outEvent.transferAcceptData.Metadata != nullptr)
     {
-        EXPECT_EQ(outEvent.transferAcceptData.MetadataLength, acceptData.MetadataLength);
-        if (outEvent.transferAcceptData.MetadataLength == acceptData.MetadataLength)
+        ASSERT_EQ(outEvent.transferAcceptData.MetadataLength, acceptData.MetadataLength);
+        // Even if acceptData.MetadataLength is 0, it is still technically undefined behaviour to call memcmp with a null
+        bool isNullAndLengthZero = acceptData.Metadata == nullptr && acceptData.MetadataLength == 0;
+        if (!isNullAndLengthZero)
         {
-            // Even if acceptData.MetadataLength is 0, it is still technically undefined behaviour to call memcmp with a null
-            bool isNullAndLengthZero = acceptData.Metadata == nullptr && acceptData.MetadataLength == 0;
-            if (!isNullAndLengthZero)
-            {
-                // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to
-                // parse the metadata and verify that it matches.
-                EXPECT_EQ(
-                    0,
-                    memcmp(acceptData.Metadata, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength));
-            }
-        }
-        else
-        {
-            EXPECT_TRUE(false); // Metadata length mismatch
+            // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to
+            // parse the metadata and verify that it matches.
+            EXPECT_EQ(
+                0, memcmp(acceptData.Metadata, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength));
         }
     }
 
@@ -289,11 +265,7 @@ void SendAndVerifyArbitraryBlock(TransferSession & sender, TransferSession & rec
 
     EXPECT_GT(maxBlockSize, 0);
     System::PacketBufferHandle fakeDataBuf = System::PacketBufferHandle::New(maxBlockSize);
-    if (fakeDataBuf.IsNull())
-    {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_FALSE(fakeDataBuf.IsNull());
 
     uint8_t * fakeBlockData = fakeDataBuf->Start();
     fakeBlockData[0]        = dataCount++;
@@ -356,7 +328,7 @@ struct TestBdxTransferSession : public ::testing::Test
     static void SetUpTestSuite()
     {
         CHIP_ERROR error = chip::Platform::MemoryInit();
-        EXPECT_EQ(error, CHIP_NO_ERROR);
+        ASSERT_EQ(error, CHIP_NO_ERROR);
     }
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
@@ -434,11 +406,7 @@ TEST_F(TestBdxTransferSession, TestInitiatingReceiverReceiverDrive)
     // Test only one block can be prepared at a time, without receiving a response to the first
     System::PacketBufferHandle fakeBuf = System::PacketBufferHandle::New(testSmallerBlockSize);
     TransferSession::BlockData prematureBlock;
-    if (fakeBuf.IsNull())
-    {
-        EXPECT_TRUE(false);
-        return;
-    }
+    ASSERT_FALSE(fakeBuf.IsNull());
     prematureBlock.Data   = fakeBuf->Start();
     prematureBlock.Length = testSmallerBlockSize;
     prematureBlock.IsEof  = false;
