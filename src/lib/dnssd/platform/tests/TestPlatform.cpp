@@ -156,12 +156,21 @@ test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
 class TestDnssdPlatform : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite() { VerifyOrDie(chip::Platform::MemoryInit() == CHIP_NO_ERROR); }
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
+        EXPECT_EQ(mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()), CHIP_NO_ERROR);
+        EXPECT_EQ(mdnsPlatform.RemoveServices(), CHIP_NO_ERROR);
+    }
+
     static void TearDownTestSuite()
     {
         DiscoveryImplPlatform::GetInstance().Shutdown();
         chip::Platform::MemoryShutdown();
     }
+
+    void TearDown() override { test::Reset(); }
 };
 
 TEST_F(TestDnssdPlatform, TestStub)
@@ -171,8 +180,6 @@ TEST_F(TestDnssdPlatform, TestStub)
     // without an expected event.
     ChipLogError(Discovery, "Test platform returns error correctly");
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    EXPECT_EQ(mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()), CHIP_NO_ERROR);
-    EXPECT_EQ(mdnsPlatform.RemoveServices(), CHIP_NO_ERROR);
     OperationalAdvertisingParameters params;
     EXPECT_EQ(mdnsPlatform.Advertise(params), CHIP_ERROR_UNEXPECTED_EVENT);
 }
@@ -180,10 +187,7 @@ TEST_F(TestDnssdPlatform, TestStub)
 TEST_F(TestDnssdPlatform, TestOperational)
 {
     ChipLogError(Discovery, "Test operational");
-    test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    EXPECT_EQ(mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()), CHIP_NO_ERROR);
-    EXPECT_EQ(mdnsPlatform.RemoveServices(), CHIP_NO_ERROR);
 
     operationalCall1.callType = test::CallType::kStart;
     EXPECT_EQ(test::AddExpectedCall(operationalCall1), CHIP_NO_ERROR);
@@ -201,10 +205,7 @@ TEST_F(TestDnssdPlatform, TestOperational)
 TEST_F(TestDnssdPlatform, TestCommissionableNode)
 {
     ChipLogError(Discovery, "Test commissionable");
-    test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    EXPECT_EQ(mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()), CHIP_NO_ERROR);
-    EXPECT_EQ(mdnsPlatform.RemoveServices(), CHIP_NO_ERROR);
 
     commissionableSmall.callType = test::CallType::kStart;
     EXPECT_EQ(
