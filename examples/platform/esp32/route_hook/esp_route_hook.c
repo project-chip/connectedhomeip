@@ -76,6 +76,11 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
     {
         uint8_t opt_type = icmp_payload[0];
         uint8_t opt_len  = icmp_payload[1] << 3;
+        if (opt_len == 0 || opt_len > payload_len)
+        {
+            ESP_LOGE(TAG, "Invalid ND6 option length");
+            break;
+        }
 
         if (opt_type == ND6_OPTION_TYPE_ROUTE_INFO && opt_len >= sizeof(rio_header_t) && !is_self_address(netif, src_addr) &&
             payload_len >= opt_len)
