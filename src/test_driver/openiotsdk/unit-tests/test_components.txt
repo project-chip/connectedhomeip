@@ -4,5 +4,7 @@ ASN1Tests
 BDXTests
 MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
+CoreTests
 PlatformTests
 TestShell
+SetupPayloadTests

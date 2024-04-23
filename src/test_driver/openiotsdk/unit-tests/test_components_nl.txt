@@ -1,6 +1,5 @@
 AppTests
 ChipCryptoTests
-CoreTests
 CredentialsTest
 DataModelTests
 InetLayerTests
@@ -10,7 +9,7 @@ MinimalMdnsCoreTests
 RawTransportTests
 RetransmitTests
 SecureChannelTests
-SetupPayloadTests
+SetupPayloadTestsNL
 SupportTests
 TransportLayerTests
 UserDirectedCommissioningTests

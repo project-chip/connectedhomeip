@@ -126,11 +126,25 @@ public:
      */
     CHIP_ERROR SetEphemeralDiscriminator(Optional<uint16_t> discriminator);
 
-    // ICDStateObserver
-    // No action is needed by the DnssdServer on active or idle state entries
-    void OnEnterActiveMode() override{};
-    void OnTransitionToIdle() override{};
+    /**
+     * @brief When the ICD changes operating mode, the dnssd server needs to restart its DNS-SD advertising to update the TXT keys.
+     */
     void OnICDModeChange() override;
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnEnterActiveMode() override{};
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnTransitionToIdle() override{};
+
+    /**
+     * @brief dnssd server has no action to do on this ICD event. Do nothing.
+     */
+    void OnEnterIdleMode() override{};
 
 private:
     /// Overloaded utility method for commissioner and commissionable advertisement
