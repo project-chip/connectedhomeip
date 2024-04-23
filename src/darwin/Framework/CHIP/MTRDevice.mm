@@ -368,7 +368,7 @@ static NSString * const sAttributesKey = @"attributes";
     // don't have persistence enabled, this is our only data store.  Nil if we
     // currently have nothing that could need persisting.
     NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * _Nullable _clusterDataToPersist;
-    // _existingClusters stores the set of "valid" keys into _persistedClusterData.
+    // _persistedClusters stores the set of "valid" keys into _persistedClusterData.
     // These are keys that could have values in _persistedClusterData even if they don't
     // right now (because they have been evicted).
     NSMutableSet<MTRClusterPath *> * _persistedClusters;
