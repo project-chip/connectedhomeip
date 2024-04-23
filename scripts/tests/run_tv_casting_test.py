@@ -190,12 +190,14 @@ def test_discovery_fn(tv_app_rel_path, tv_casting_app_rel_path):
         with LogFileManager(linux_tv_app_log_path, 'w') as linux_tv_app_log_file:
             tv_app_abs_path = os.path.abspath(tv_app_rel_path)
 
-            if sys.platform == 'darwin':
-                # Try to avoid any stdout buffering in our tests.
-                cmd = ['stdbuf', '-o0', '-i0']
+            # Configure command options to disable stdout buffering during tests
+            disable_stdout_buffering_cmd = []
+            # On Unix-like systems, use stdbuf to disable stdout buffering
+            if sys.platform == 'darwin' or sys.platform == 'linux':
+                disable_stdout_buffering_cmd = ['stdbuf', '-o0', '-i0']
 
             # Run the Linux tv-app subprocess.
-            with ProcessManager(cmd + [tv_app_abs_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_app_process:
+            with ProcessManager(disable_stdout_buffering_cmd + [tv_app_abs_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_app_process:
                 start_wait_time = time.time()
 
                 # Loop until either the subprocess starts successfully or timeout occurs.
@@ -224,7 +226,7 @@ def test_discovery_fn(tv_app_rel_path, tv_casting_app_rel_path):
                     tv_casting_app_abs_path = os.path.abspath(tv_casting_app_rel_path)
 
                     # Run the Linux tv-casting-app subprocess.
-                    with ProcessManager(cmd + [tv_casting_app_abs_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_casting_app_process:
+                    with ProcessManager(disable_stdout_buffering_cmd + [tv_casting_app_abs_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_casting_app_process:
                         # Initialize variables.
                         continue_parsing = False
                         valid_discovered_commissioner = ''
