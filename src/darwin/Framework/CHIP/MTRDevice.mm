@@ -184,10 +184,22 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTRDeviceWorkItemDuplicateReadTypeID = 1,
 };
 
-@implementation MTRDeviceClusterData
+@implementation MTRDeviceClusterData {
+    NSMutableDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _attributes;
+}
 
 static NSString * const sDataVersionKey = @"dataVersion";
 static NSString * const sAttributesKey = @"attributes";
+
+- (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute
+{
+    _attributes[attribute] = value;
+}
+
+- (NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)attributes
+{
+    return _attributes;
+}
 
 + (BOOL)supportsSecureCoding
 {
@@ -199,6 +211,11 @@ static NSString * const sAttributesKey = @"attributes";
     return [NSString stringWithFormat:@"<MTRDeviceClusterData: dataVersion %@ attributes count %lu>", _dataVersion, static_cast<unsigned long>(_attributes.count)];
 }
 
+- (nullable instancetype)init
+{
+    return [self initWithDataVersion:nil attributes:nil];
+}
+
 // Attributes dictionary is: attributeID => data-value dictionary
 - (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes
 {
@@ -208,7 +225,8 @@ static NSString * const sAttributesKey = @"attributes";
     }
 
     _dataVersion = [dataVersion copy];
-    _attributes = [attributes copy];
+    _attributes = [NSMutableDictionary dictionaryWithCapacity:attributes.count];
+    [_attributes addEntriesFromDictionary:attributes];
 
     return self;
 }
@@ -299,10 +317,6 @@ static NSString * const sAttributesKey = @"attributes";
  */
 @property (nonatomic) BOOL reattemptingSubscription;
 
-// Read cache is attributePath => NSDictionary of value.
-// See MTRDeviceResponseHandler definition for value dictionary details.
-@property (nonatomic) NSMutableDictionary<MTRAttributePath *, NSDictionary *> * readCache;
-
 // Expected value cache is attributePath => NSArray of [NSDate of expiration time, NSDictionary of value, expected value ID]
 //   - See MTRDeviceExpectedValueFieldIndex for the definitions of indices into this array.
 // See MTRDeviceResponseHandler definition for value dictionary details.
@@ -369,7 +383,6 @@ static NSString * const sAttributesKey = @"attributes";
         _deviceController = controller;
         _queue
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        _readCache = [NSMutableDictionary dictionary];
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
         _state = MTRDeviceStateUnknown;
@@ -1021,30 +1034,12 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
-- (NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> *)_attributesForCluster:(MTRClusterPath *)clusterPath
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-    NSMutableDictionary * attributesToReturn = [NSMutableDictionary dictionary];
-    for (MTRAttributePath * attributePath in _readCache) {
-        if ([attributePath.endpoint isEqualToNumber:clusterPath.endpoint] && [attributePath.cluster isEqualToNumber:clusterPath.cluster]) {
-            attributesToReturn[attributePath.attribute] = _readCache[attributePath];
-        }
-    }
-    return attributesToReturn;
-}
-
-- (NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)_clusterDataForPaths:(NSSet<MTRClusterPath *> *)clusterPaths
+- (NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)_copiedClusterDataForPaths:(NSSet<MTRClusterPath *> *)clusterPaths
 {
     os_unfair_lock_assert_owner(&self->_lock);
     NSMutableDictionary * clusterDataToReturn = [NSMutableDictionary dictionary];
     for (MTRClusterPath * clusterPath in clusterPaths) {
-        NSNumber * dataVersion = _clusterData[clusterPath].dataVersion;
-        NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes = nil;
-        attributes = [self _attributesForCluster:clusterPath];
-        if (dataVersion || attributes) {
-            MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:attributes];
-            clusterDataToReturn[clusterPath] = clusterData;
-        }
+        clusterDataToReturn[clusterPath] = [_clusterData[clusterPath] copy];
     }
 
     return clusterDataToReturn;
@@ -1060,7 +1055,10 @@ static NSString * const sAttributesKey = @"attributes";
     BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
     if (dataStoreExists && _clustersToPersist.count) {
         MTR_LOG_DEFAULT("%@ Storing cluster information (data version) count: %lu", self, static_cast<unsigned long>(_clustersToPersist.count));
-        NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self _clusterDataForPaths:_clustersToPersist];
+        // We're going to hand out these MTRDeviceClusterData objects to our
+        // storage implementation, which will try to read them later.  Make sure
+        // we snapshot the state here instead of handing out live copies.
+        NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self _copiedClusterDataForPaths:_clustersToPersist];
         [_deviceController.controllerDataStore storeClusterData:clusterData forNodeID:_nodeID];
         _clustersToPersist = nil;
     }
@@ -1219,6 +1217,42 @@ static NSString * const sAttributesKey = @"attributes";
     MTR_LOG_INFO("%@ _getCachedDataVersions dataVersions count: %lu", self, static_cast<unsigned long>(dataVersions.count));
 
     return dataVersions;
+}
+
+- (MTRDeviceDataValueDictionary _Nullable)_cachedAttributeValueForPath:(MTRAttributePath *)path
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // We need an MTRClusterPath to do the lookup in _clusterData.
+    auto * clusterPath = [MTRClusterPath clusterPathWithEndpointID:path.endpoint clusterID:path.cluster];
+
+    MTRDeviceClusterData * clusterData = _clusterData[clusterPath];
+    if (clusterData == nil) {
+        return nil;
+    }
+
+    return clusterData.attributes[path.attribute];
+}
+
+- (void)_setCachedAttributeValue:(MTRDeviceDataValueDictionary _Nullable)value forPath:(MTRAttributePath *)path
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // We need an MTRClusterPath to do the lookup in _clusterData.
+    auto * clusterPath = [MTRClusterPath clusterPathWithEndpointID:path.endpoint clusterID:path.cluster];
+
+    MTRDeviceClusterData * clusterData = _clusterData[clusterPath];
+    if (clusterData == nil) {
+        if (value == nil) {
+            // Nothing to do.
+            return;
+        }
+
+        clusterData = [[MTRDeviceClusterData alloc] init];
+        _clusterData[clusterPath] = clusterData;
+    }
+
+    [clusterData storeValue:value forAttribute:path.attribute];
 }
 
 - (void)_createDataVersionFilterListFromDictionary:(NSDictionary<MTRClusterPath *, NSNumber *> *)dataVersions dataVersionFilterList:(DataVersionFilter **)dataVersionFilterList count:(size_t *)count sizeReduction:(size_t)sizeReduction
@@ -2192,7 +2226,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         // compare with known value and mark for report if different
         MTRAttributePath * attributePath = attributeInfo[0];
         NSDictionary * attributeDataValue = attributeInfo[1];
-        NSDictionary * cachedAttributeDataValue = _readCache[attributePath];
+        NSDictionary * cachedAttributeDataValue = [self _cachedAttributeValueForPath:attributePath];
         if (cachedAttributeDataValue
             && ![self _attributeDataValue:attributeDataValue isEqualToDataValue:cachedAttributeDataValue]) {
             [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : cachedAttributeDataValue, MTRPreviousDataKey : attributeDataValue }];
@@ -2249,7 +2283,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     // Then check read cache
-    NSDictionary<NSString *, id> * cachedAttributeValue = _readCache[attributePath];
+    NSDictionary<NSString *, id> * cachedAttributeValue = [self _cachedAttributeValueForPath:attributePath];
     if (cachedAttributeValue) {
         return cachedAttributeValue;
     } else {
@@ -2301,16 +2335,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // Update data version used for subscription filtering
     MTRDeviceClusterData * clusterData = _clusterData[clusterPath];
     if (!clusterData) {
-        clusterData = [[MTRDeviceClusterData alloc] init];
+        clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:nil];
         _clusterData[clusterPath] = clusterData;
         dataVersionChanged = YES;
     } else if (![clusterData.dataVersion isEqualToNumber:dataVersion]) {
+        clusterData.dataVersion = dataVersion;
         dataVersionChanged = YES;
     }
 
     if (dataVersionChanged) {
-        clusterData.dataVersion = dataVersion;
-
         // Mark cluster path as needing persistence if needed
         BOOL dataStoreExists = _deviceController.controllerDataStore != nil;
         if (dataStoreExists) {
@@ -2361,11 +2394,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         // if this is an error, report and purge cache
         if (attributeError) {
             shouldReportAttribute = YES;
+            previousValue = [self _cachedAttributeValueForPath:attributePath];
             MTR_LOG_INFO("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
-                _expectedValueCache[attributePath], _readCache[attributePath]);
+                _expectedValueCache[attributePath], previousValue);
             _expectedValueCache[attributePath] = nil;
-            previousValue = _readCache[attributePath];
-            _readCache[attributePath] = nil;
+            // TODO: Is this clearing business really what we want?
+            [self _setCachedAttributeValue:nil forPath:attributePath];
         } else {
             // First separate data version and restore data value to a form without data version
             NSNumber * dataVersion = attributeDataValue[MTRDataVersionKey];
@@ -2377,7 +2411,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 attributeDataValue = [self _dataValueWithoutDataVersion:attributeDataValue];
             }
 
-            BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:_readCache[attributePath]];
+            previousValue = [self _cachedAttributeValueForPath:attributePath];
+            BOOL readCacheValueChanged = ![self _attributeDataValue:attributeDataValue isEqualToDataValue:previousValue];
             // Check if attribute needs to be persisted - compare only to read cache and disregard expected values
             if (dataStoreExists && readCacheValueChanged) {
                 [self _noteChangeForClusterPath:clusterPath];
@@ -2399,12 +2434,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // Report the attribute if a read would get a changed value.  This happens
             // when our cached value changes and no expected value exists.
             if (readCacheValueChanged && !expectedValue) {
-                previousValue = _readCache[attributePath];
                 shouldReportAttribute = YES;
             }
 
-            // Now that we have grabbed previousValue, update the readCache with the attribute value.
-            _readCache[attributePath] = attributeDataValue;
+            // Now that we have grabbed previousValue, update our cache with the attribute value.
+            [self _setCachedAttributeValue:attributeDataValue forPath:attributePath];
 
             if (!shouldReportAttribute) {
                 // If an expected value exists, the attribute will not be reported at this time.
@@ -2455,42 +2489,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributesToReport;
 }
 
-- (void)_setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
-{
-    os_unfair_lock_assert_owner(&self->_lock);
-
-    if (!attributeValues.count) {
-        return;
-    }
-
-    if (reportChanges) {
-        [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeValues]];
-    } else {
-        for (NSDictionary * responseValue in attributeValues) {
-            MTRAttributePath * path = responseValue[MTRAttributePathKey];
-            NSDictionary * dataValue = responseValue[MTRDataKey];
-            _readCache[path] = dataValue;
-        }
-    }
-
-    // If cache is set from storage and is primed with initial configuration data, then assume the client had beeen informed in the past, and mark that the callback has been called
-    if ([self _isCachePrimedWithInitialConfigurationData]) {
-        _delegateDeviceCachePrimedCalled = YES;
-    }
-}
-
-- (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges
-{
-    MTR_LOG_INFO("%@ setAttributeValues count: %lu reportChanges: %d", self, static_cast<unsigned long>(attributeValues.count), reportChanges);
-    std::lock_guard lock(_lock);
-    [self _setAttributeValues:attributeValues reportChanges:reportChanges];
-}
-
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount
 {
     std::lock_guard lock(_lock);
-    return _readCache.count;
+    NSUInteger count = 0;
+    for (MTRClusterPath * path in _clusterData) {
+        count += _clusterData[path].attributes.count;
+    }
+    return count;
 }
 #endif
 
@@ -2503,25 +2510,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     std::lock_guard lock(_lock);
 
-    // For each cluster, extract and create the attribute response-value for the read cache
-    // TODO: consider some optimization in how the read cache is structured so there's fewer conversions from this format to what's in the cache
-    for (MTRClusterPath * clusterPath in clusterData) {
-        MTRDeviceClusterData * data = clusterData[clusterPath];
-        // Build and set attributes one cluster at a time to avoid creating a ton of temporary objects at a time
-        @autoreleasepool {
-            NSMutableArray * attributeValues = [NSMutableArray array];
-            for (NSNumber * attributeID in data.attributes) {
-                MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID];
-                NSDictionary * responseValue = @{ MTRAttributePathKey : attributePath, MTRDataKey : data.attributes[attributeID] };
-                [attributeValues addObject:responseValue];
-            }
-            if (attributeValues.count) {
-                [self _setAttributeValues:attributeValues reportChanges:NO];
-            }
-        }
-    }
-
     [_clusterData addEntriesFromDictionary:clusterData];
+
+    // If cache is set from storage and is primed with initial configuration data, then assume the client had beeen informed in the past, and mark that the callback has been called
+    if ([self _isCachePrimedWithInitialConfigurationData]) {
+        _delegateDeviceCachePrimedCalled = YES;
+    }
 }
 
 - (BOOL)deviceCachePrimed
@@ -2558,23 +2552,25 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // Remove previous expected value only if it's from the same setExpectedValues operation
             NSNumber * previousExpectedValueID = previousExpectedValue[MTRDeviceExpectedValueFieldIDIndex];
             if (previousExpectedValueID.unsignedLongLongValue == expectedValueID) {
+                MTRDeviceDataValueDictionary cachedValue = [self _cachedAttributeValueForPath:attributePath];
                 if (![self _attributeDataValue:previousExpectedValue[MTRDeviceExpectedValueFieldValueIndex]
-                            isEqualToDataValue:_readCache[attributePath]]) {
+                            isEqualToDataValue:cachedValue]) {
                     // Case of removing expected value that is different than read cache - report read cache value
                     *shouldReportValue = YES;
-                    *attributeValueToReport = _readCache[attributePath];
+                    *attributeValueToReport = cachedValue;
                     *previousValue = previousExpectedValue[MTRDeviceExpectedValueFieldValueIndex];
                     _expectedValueCache[attributePath] = nil;
                 }
             }
         }
     } else {
+        MTRDeviceDataValueDictionary cachedValue = [self _cachedAttributeValueForPath:attributePath];
         if (expectedAttributeValue
-            && ![self _attributeDataValue:expectedAttributeValue isEqualToDataValue:_readCache[attributePath]]) {
+            && ![self _attributeDataValue:expectedAttributeValue isEqualToDataValue:cachedValue]) {
             // Case where new expected value is different than read cache - report new expected value
             *shouldReportValue = YES;
             *attributeValueToReport = expectedAttributeValue;
-            *previousValue = _readCache[attributePath];
+            *previousValue = cachedValue;
         } else {
             *previousValue = nil;
         }
@@ -2708,7 +2704,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     os_unfair_lock_assert_owner(&self->_lock);
 
     // Check if root node descriptor exists
-    NSDictionary * rootDescriptorPartsListDataValue = _readCache[[MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)]];
+    MTRDeviceDataValueDictionary rootDescriptorPartsListDataValue = [self _cachedAttributeValueForPath:[MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)]];
     if (!rootDescriptorPartsListDataValue || ![MTRArrayValueType isEqualToString:rootDescriptorPartsListDataValue[MTRTypeKey]]) {
         return NO;
     }
@@ -2734,7 +2730,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             MTR_LOG_ERROR("%@ unexpected parts list item value class %@", self, [endpoint class]);
             continue;
         }
-        NSDictionary * descriptorDeviceTypeListDataValue = _readCache[[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)]];
+        MTRDeviceDataValueDictionary descriptorDeviceTypeListDataValue = [self _cachedAttributeValueForPath:[MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)]];
         if (![MTRArrayValueType isEqualToString:descriptorDeviceTypeListDataValue[MTRTypeKey]] || !descriptorDeviceTypeListDataValue[MTRValueKey]) {
             return NO;
         }
