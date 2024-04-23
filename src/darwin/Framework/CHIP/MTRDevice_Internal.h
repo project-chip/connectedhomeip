@@ -82,9 +82,9 @@ MTR_TESTABLE
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 
-// Method to insert cluster data
+// Method to insert persisted cluster data
 //   Contains data version information and attribute values.
-- (void)setClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
+- (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
 
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount;

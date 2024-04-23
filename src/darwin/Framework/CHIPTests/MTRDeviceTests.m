@@ -1490,16 +1490,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * onTimeWriteSuccess = [self expectationWithDescription:@"OnTime write success"];
     XCTestExpectation * onTimePreviousValue = [self expectationWithDescription:@"OnTime previous value"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
-        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
-            MTRAttributePath * path = attributeReponseValue[MTRAttributePathKey];
+        for (NSDictionary<NSString *, id> * attributeResponseValue in data) {
+            MTRAttributePath * path = attributeResponseValue[MTRAttributePathKey];
             if (path.cluster.unsignedIntValue == MTRClusterIDTypeOnOffID && path.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOnOffAttributeOnTimeID) {
-                NSDictionary * dataValue = attributeReponseValue[MTRDataKey];
+                NSDictionary * dataValue = attributeResponseValue[MTRDataKey];
                 NSNumber * onTimeValue = dataValue[MTRValueKey];
                 if (onTimeValue && (onTimeValue.unsignedIntValue == testOnTimeValue)) {
                     [onTimeWriteSuccess fulfill];
                 }
 
-                NSDictionary * previousDataValue = attributeReponseValue[MTRPreviousDataKey];
+                NSDictionary * previousDataValue = attributeResponseValue[MTRPreviousDataKey];
                 NSNumber * previousOnTimeValue = previousDataValue[MTRValueKey];
                 if (previousOnTimeValue) {
                     [onTimePreviousValue fulfill];
@@ -1517,6 +1517,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [self waitForExpectations:@[ onTimeWriteSuccess, onTimePreviousValue ] timeout:10];
 
+    __auto_type getOnOffValue = ^{
+        return [device readAttributeWithEndpointID:@(1)
+                                         clusterID:@(MTRClusterIDTypeOnOffID)
+                                       attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)
+                                            params:nil];
+    };
+    __auto_type * onOffValue = getOnOffValue();
+
+    [device unitTestClearClusterData];
+
+    // Test that we can still get the value (will get paged in from storage).
+    XCTAssertEqualObjects(getOnOffValue(), onOffValue);
+
     // Test if errors are properly received
     // TODO: We might stop reporting these altogether from MTRDevice, and then
     // this test will need updating.
@@ -1524,8 +1537,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     readThroughForUnknownAttributesParams.assumeUnknownAttributesReportable = NO;
     XCTestExpectation * attributeReportErrorExpectation = [self expectationWithDescription:@"Attribute read error"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
-        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
-            if (attributeReponseValue[MTRErrorKey]) {
+        for (NSDictionary<NSString *, id> * attributeResponseValue in data) {
+            if (attributeResponseValue[MTRErrorKey]) {
                 [attributeReportErrorExpectation fulfill];
             }
         }
@@ -2599,10 +2612,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     uint16_t testOnTimeValue = 10;
     XCTestExpectation * onTimeWriteSuccess = [self expectationWithDescription:@"OnTime write success"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
-        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
-            MTRAttributePath * path = attributeReponseValue[MTRAttributePathKey];
+        for (NSDictionary<NSString *, id> * attributeResponseValue in data) {
+            MTRAttributePath * path = attributeResponseValue[MTRAttributePathKey];
             if (path.cluster.unsignedIntValue == MTRClusterIDTypeOnOffID && path.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOnOffAttributeOnTimeID) {
-                NSDictionary * dataValue = attributeReponseValue[MTRDataKey];
+                NSDictionary * dataValue = attributeResponseValue[MTRDataKey];
                 NSNumber * onTimeValue = dataValue[MTRValueKey];
                 if ([onTimeValue isEqual:@(testOnTimeValue + 4)]) {
                     [onTimeWriteSuccess fulfill];
