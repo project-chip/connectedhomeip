@@ -16,8 +16,6 @@ name: Check for changes to data_model directory without a sha update
 
 on:
   pull_request:
-    branches-ignore:
-      - 'dependabot/**'
     paths:
       - "data_model/**"
 
