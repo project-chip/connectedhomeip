@@ -17,7 +17,6 @@
 #pragma once
 
 #include <lib/dnssd/Resolver.h>
-#include <lib/dnssd/Types.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
