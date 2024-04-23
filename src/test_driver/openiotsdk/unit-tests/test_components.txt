@@ -4,6 +4,7 @@ MinimalMdnsCoreTests
 MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
 CoreTests
+MdnsTests
 PlatformTests
 SystemLayerTests
 TestShell
