@@ -40,7 +40,7 @@ TEST(TestMessageHeader, TestPacketHeaderInitialState)
     PacketHeader header;
 
     EXPECT_FALSE(header.IsSecureSessionControlMsg());
-    EXPECT_EQ(header.GetMessageCounter(), 0);
+    EXPECT_EQ(header.GetMessageCounter(), (uint32_t) 0);
     EXPECT_EQ(header.GetSessionId(), 0);
     EXPECT_EQ(header.GetSessionType(), Header::SessionType::kUnicastSession);
     EXPECT_TRUE(header.IsSessionTypeValid());
@@ -74,7 +74,7 @@ TEST(TestMessageHeader, TestPacketHeaderEncodeDecode)
 
     EXPECT_EQ(header.Decode(buffer, &decodeLen), CHIP_NO_ERROR);
     EXPECT_EQ(encodeLen, decodeLen);
-    EXPECT_EQ(header.GetMessageCounter(), 123);
+    EXPECT_EQ(header.GetMessageCounter(), (uint32_t) 123);
     EXPECT_FALSE(header.GetDestinationNodeId().HasValue());
 
     header.SetSourceNodeId(55);
@@ -85,7 +85,7 @@ TEST(TestMessageHeader, TestPacketHeaderEncodeDecode)
 
     EXPECT_EQ(header.Decode(buffer, &decodeLen), CHIP_NO_ERROR);
     EXPECT_EQ(encodeLen, decodeLen);
-    EXPECT_EQ(header.GetMessageCounter(), 123);
+    EXPECT_EQ(header.GetMessageCounter(), (uint32_t) 123);
     EXPECT_FALSE(header.GetDestinationNodeId().HasValue());
     EXPECT_EQ(header.GetSourceNodeId(), Optional<uint64_t>::Value(55ull));
 
@@ -96,7 +96,7 @@ TEST(TestMessageHeader, TestPacketHeaderEncodeDecode)
     header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     EXPECT_EQ(header.Decode(buffer, &decodeLen), CHIP_NO_ERROR);
     EXPECT_EQ(encodeLen, decodeLen);
-    EXPECT_EQ(header.GetMessageCounter(), 123);
+    EXPECT_EQ(header.GetMessageCounter(), (uint32_t) 123);
     EXPECT_EQ(header.GetDestinationNodeId(), Optional<uint64_t>::Value(11ull));
     EXPECT_FALSE(header.GetSourceNodeId().HasValue());
 
@@ -107,7 +107,7 @@ TEST(TestMessageHeader, TestPacketHeaderEncodeDecode)
     header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     EXPECT_EQ(header.Decode(buffer, &decodeLen), CHIP_NO_ERROR);
     EXPECT_EQ(encodeLen, decodeLen);
-    EXPECT_EQ(header.GetMessageCounter(), 234);
+    EXPECT_EQ(header.GetMessageCounter(), (uint32_t) 234);
     EXPECT_EQ(header.GetDestinationNodeId(), Optional<uint64_t>::Value(88ull));
     EXPECT_EQ(header.GetSourceNodeId(), Optional<uint64_t>::Value(77ull));
 
@@ -117,7 +117,7 @@ TEST(TestMessageHeader, TestPacketHeaderEncodeDecode)
     // change it to verify decoding
     header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     EXPECT_EQ(header.Decode(buffer, &decodeLen), CHIP_NO_ERROR);
-    EXPECT_EQ(header.GetMessageCounter(), 234);
+    EXPECT_EQ(header.GetMessageCounter(), (uint32_t) 234);
     EXPECT_EQ(header.GetDestinationNodeId(), Optional<uint64_t>::Value(88ull));
     EXPECT_EQ(header.GetSourceNodeId(), Optional<uint64_t>::Value(77ull));
     EXPECT_TRUE(header.IsSecureSessionControlMsg());
@@ -128,7 +128,7 @@ TEST(TestMessageHeader, TestPacketHeaderEncodeDecode)
     // change it to verify decoding
     header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     EXPECT_EQ(header.Decode(buffer, &decodeLen), CHIP_NO_ERROR);
-    EXPECT_EQ(header.GetMessageCounter(), 234);
+    EXPECT_EQ(header.GetMessageCounter(), (uint32_t) 234);
     EXPECT_EQ(header.GetDestinationNodeId(), Optional<uint64_t>::Value(88ull));
     EXPECT_EQ(header.GetSourceNodeId(), Optional<uint64_t>::Value(77ull));
     EXPECT_TRUE(header.IsEncrypted());
@@ -140,7 +140,7 @@ TEST(TestMessageHeader, TestPacketHeaderEncodeDecode)
     // change it to verify decoding
     header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationNodeId(2);
     EXPECT_EQ(header.Decode(buffer, &decodeLen), CHIP_NO_ERROR);
-    EXPECT_EQ(header.GetMessageCounter(), 234);
+    EXPECT_EQ(header.GetMessageCounter(), (uint32_t) 234);
     EXPECT_EQ(header.GetDestinationNodeId(), Optional<uint64_t>::Value(88ull));
     EXPECT_EQ(header.GetSourceNodeId(), Optional<uint64_t>::Value(77ull));
 
@@ -157,7 +157,7 @@ TEST(TestMessageHeader, TestPacketHeaderEncodeDecode)
     // change it to verify decoding
     header.SetMessageCounter(222).SetSourceNodeId(1).SetDestinationGroupId(2);
     EXPECT_EQ(header.Decode(buffer, &decodeLen), CHIP_NO_ERROR);
-    EXPECT_EQ(header.GetMessageCounter(), 234);
+    EXPECT_EQ(header.GetMessageCounter(), (uint32_t) 234);
     EXPECT_EQ(header.GetDestinationGroupId(), Optional<uint16_t>::Value((uint16_t) 45));
     EXPECT_EQ(header.GetSourceNodeId(), Optional<uint64_t>::Value(77ull));
     EXPECT_FALSE(header.IsSecureSessionControlMsg());
