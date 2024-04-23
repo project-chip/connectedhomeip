@@ -30,9 +30,6 @@ typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
 
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
-// Whether to store attributes by cluster instead of as individual entries for each attribute
-#define MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER 1
-
 /**
  * Information about a cluster, currently is just data version
  */
