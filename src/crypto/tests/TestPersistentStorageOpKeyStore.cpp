@@ -131,12 +131,8 @@ private:
 
 struct TestPersistentStorageOpKeyStore : public ::testing::Test
 {
-    void SetUp() override
-    {
-        CHIP_ERROR error = chip::Platform::MemoryInit();
-        EXPECT_EQ(error, CHIP_NO_ERROR);
-    }
-    void TearDown() override { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestPersistentStorageOpKeyStore, TestBasicLifeCycle)
