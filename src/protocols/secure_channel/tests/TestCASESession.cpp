@@ -25,7 +25,6 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
-#include <errno.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/DataModelTypes.h>
@@ -464,6 +463,9 @@ void TestCASESession::SecurePairingStartTest(nlTestSuite * inSuite, void * inCon
     ServiceEvents(ctx);
 
     loopback.mMessageSendError = CHIP_NO_ERROR;
+
+    context->Release();
+    context1->Release();
 }
 
 void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
@@ -1123,6 +1125,8 @@ void TestCASESession::SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuit
     // Sanity check that pairing did not complete.
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
+
+    contextCommissioner->Release();
 }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
@@ -1206,6 +1210,8 @@ void TestCASESession::Sigma1BadDestinationIdTest(nlTestSuite * inSuite, void * i
 
     ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1);
     caseSession.Clear();
+
+    ctx.GetExchangeManager().CloseAllContextsForDelegate(&delegate);
 }
 
 } // namespace chip

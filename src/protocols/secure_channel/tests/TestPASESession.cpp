@@ -244,6 +244,9 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ctx.DrainAndServiceIO();
 
     loopback.mMessageSendError = CHIP_NO_ERROR;
+
+    context->Release();
+    context1->Release();
 }
 
 void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
