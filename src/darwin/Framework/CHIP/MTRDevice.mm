@@ -373,8 +373,8 @@ static NSString * const sAttributesKey = @"attributes";
     MTRDeviceConnectivityMonitor * _connectivityMonitor;
 
     // This boolean keeps track of any device configuration changes received in an attribute report
-    // and when the report ends, we notify the delegate. Device configuration changes include parts
-    // list, server list, device type list, cluster revision and feature map updates.
+    // and when the report ends, we notify the delegate. Device configuration changes include parts list,
+    // server list, device type list, accepted commands list, attribute list, cluster revision and feature map updates.
     BOOL _deviceConfigurationChanged;
 }
 
@@ -1107,8 +1107,8 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
-// When we receive an attribute report, check if there are any changes in parts list, server list, device type list, cluster revision
-// or feature map attributes of the descriptor cluster. If yes, make a note that the device configuration changed.
+// When we receive an attribute report, check if there are any changes in parts list, server list, device type list, accepted commands list,
+//  attribute list, cluster revision or feature map attributes of the descriptor cluster. If yes, make a note that the device configuration changed.
 - (void)_noteDeviceConfigurationChanged:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     for (NSDictionary<NSString *, id> * attribute in attributeReport) {
@@ -1122,6 +1122,8 @@ static NSString * const sAttributesKey = @"attributes";
         case MTRClusterDescriptorAttributePartsListID:
         case MTRClusterDescriptorAttributeServerListID:
         case MTRClusterDescriptorAttributeDeviceTypeListID:
+        case MTRClusterDescriptorAttributeAcceptedCommandListID:
+        case MTRClusterDescriptorAttributeAttributeListID:
         case MTRClusterDescriptorAttributeClusterRevisionID:
         case MTRClusterDescriptorAttributeFeatureMapID: {
             // If changes are detected, note that the device configuration has changed.
