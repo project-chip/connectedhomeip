@@ -52,6 +52,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
+using namespace chip::Crypto;
 
 namespace chip {
 namespace {

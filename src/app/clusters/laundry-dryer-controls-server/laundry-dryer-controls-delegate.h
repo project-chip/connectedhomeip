@@ -17,8 +17,8 @@
  */
 
 #pragma once
+
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {

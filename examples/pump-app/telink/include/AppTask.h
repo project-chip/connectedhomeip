@@ -21,6 +21,8 @@
 #include "AppTaskCommon.h"
 #include "PumpManager.h"
 
+class LedManager;
+
 class AppTask : public AppTaskCommon
 {
 public:
@@ -33,6 +35,7 @@ private:
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
+    void LinkLeds(LedManager & ledManager);
 
     static void ActionInitiated(PumpManager::Action_t action, int32_t actor);
     static void ActionCompleted(PumpManager::Action_t action, int32_t actor);

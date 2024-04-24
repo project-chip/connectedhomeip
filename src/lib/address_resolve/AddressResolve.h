@@ -253,13 +253,17 @@ public:
 } // namespace AddressResolve
 } // namespace chip
 
-// outside the open space, include the required platform headers for the
-// actual implementation.
+// Include the required platform header for the actual implementation, if defined.
+// Otherwise assume the default implementation is being used.
 // Expectations of this include:
 //   - define the `Impl::NodeLookupHandle` deriving from NodeLookupHandleBase
 //   - corresponding CPP file should provide a valid Resolver::Instance()
 //     implementation
+#ifdef CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER
 #include CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER
+#else
+#include <lib/address_resolve/AddressResolve_DefaultImpl.h>
+#endif
 
 namespace chip {
 namespace AddressResolve {

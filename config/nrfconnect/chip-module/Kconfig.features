@@ -75,15 +75,20 @@ endif # CHIP_SPI_NOR
 
 config CHIP_MEMORY_PROFILING
 	bool "Enable features for tracking memory usage"
+	# Matter stack
 	select CHIP_STATISTICS
+	# Heap
 	select CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT if CHIP_MALLOC_SYS_HEAP
+	select SYS_HEAP_RUNTIME_STATS if CHIP_MALLOC_SYS_HEAP	
+	# Crypto
 	select MBEDTLS_MEMORY_DEBUG if !CHIP_CRYPTO_PSA
-	select SYS_HEAP_RUNTIME_STATS if CHIP_MALLOC_SYS_HEAP
-	select KERNEL_SHELL
+	# Network
 	select NET_STATISTICS
 	select NET_SHELL
 	select NET_BUF_POOL_USAGE
 	select OPENTHREAD_SHELL if !CHIP_WIFI
+	# Zephyr
+	select KERNEL_SHELL
 	help
 	  Enables features for tracking memory usage in Matter.
 

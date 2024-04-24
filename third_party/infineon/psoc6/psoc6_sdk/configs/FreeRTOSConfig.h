@@ -72,10 +72,16 @@ extern uint32_t SystemCoreClock;
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION 1
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
-#define configTOTAL_HEAP_SIZE ((size_t)(CY_SRAM_SIZE - (64 * 1024)))
+#define configTOTAL_HEAP_SIZE ((size_t) (CY_SRAM_SIZE - (64 * 1024)))
 /* Hook function related definitions. */
 #define configUSE_IDLE_HOOK 0
+
+#ifdef ENABLE_HSM_DEVICE_ATTESTATION
+#define configUSE_TICK_HOOK 1
+#else
 #define configUSE_TICK_HOOK 0
+#endif
+
 #define configCHECK_FOR_STACK_OVERFLOW 2
 
 #define configUSE_MALLOC_FAILED_HOOK 1
@@ -96,7 +102,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TIMERS 1
 #define configTIMER_TASK_PRIORITY 2
 #define configTIMER_QUEUE_LENGTH 10
-#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 2)
+#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 6)
 
 /* Queue Creation Fix to not use static queue */
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_QUEUE 0

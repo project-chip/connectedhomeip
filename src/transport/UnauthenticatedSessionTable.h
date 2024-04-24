@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <ble/BleConfig.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/CodeUtils.h>

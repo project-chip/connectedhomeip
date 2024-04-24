@@ -23,7 +23,6 @@
 #include <nlunit-test.h>
 
 using chip::BindingTable;
-using chip::NullOptional;
 
 namespace {
 
@@ -46,9 +45,9 @@ void TestAdd(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, table.Add(unusedEntry) == CHIP_ERROR_INVALID_ARGUMENT);
     for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
-        NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, NullOptional)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, std::nullopt)) == CHIP_NO_ERROR);
     }
-    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, NullOptional)) == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt)) == CHIP_ERROR_NO_MEMORY);
     NL_TEST_ASSERT(aSuite, table.Size() == MATTER_BINDING_TABLE_SIZE);
 
     auto iter = table.begin();
@@ -67,7 +66,7 @@ void TestRemoveThenAdd(nlTestSuite * aSuite, void * aContext)
     BindingTable table;
     chip::TestPersistentStorageDelegate testStorage;
     table.SetPersistentStorage(&testStorage);
-    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, NullOptional)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt)) == CHIP_NO_ERROR);
     auto iter = table.begin();
     NL_TEST_ASSERT(aSuite, table.RemoveAt(iter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(aSuite, iter == table.end());
@@ -75,7 +74,7 @@ void TestRemoveThenAdd(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, table.begin() == table.end());
     for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
-        NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, NullOptional)) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, i, 0, 0, std::nullopt)) == CHIP_NO_ERROR);
     }
     iter = table.begin();
     ++iter;
@@ -87,7 +86,7 @@ void TestRemoveThenAdd(nlTestSuite * aSuite, void * aContext)
     ++iterCheck;
     NL_TEST_ASSERT(aSuite, iter == iterCheck);
 
-    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, 1, 0, 0, NullOptional)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(0, 1, 0, 0, std::nullopt)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(aSuite, table.Size() == MATTER_BINDING_TABLE_SIZE);
     iter = table.begin();
     for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE - 1; i++)
@@ -137,10 +136,10 @@ void TestPersistentStorage(nlTestSuite * aSuite, void * aContext)
     BindingTable table;
     chip::Optional<chip::ClusterId> cluster = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(UINT16_MAX + 6));
     std::vector<EmberBindingTableEntry> expected = {
-        EmberBindingTableEntry::ForNode(0, 0, 0, 0, NullOptional),
-        EmberBindingTableEntry::ForNode(1, 1, 0, 0, cluster),
-        EmberBindingTableEntry::ForGroup(2, 2, 0, NullOptional),
-        EmberBindingTableEntry::ForGroup(3, 3, 0, cluster),
+        EmberBindingTableEntry::ForNode(0, 0, 0, 0, std::nullopt),
+        EmberBindingTableEntry::ForNode(1, 1, 0, 0, cluster.std_optional()),
+        EmberBindingTableEntry::ForGroup(2, 2, 0, std::nullopt),
+        EmberBindingTableEntry::ForGroup(3, 3, 0, cluster.std_optional()),
     };
     table.SetPersistentStorage(&testStorage);
     NL_TEST_ASSERT(aSuite, table.Add(expected[0]) == CHIP_NO_ERROR);
@@ -151,7 +150,7 @@ void TestPersistentStorage(nlTestSuite * aSuite, void * aContext)
 
     // Verify storage untouched if add fails
     testStorage.AddPoisonKey(chip::DefaultStorageKeyAllocator::BindingTableEntry(4).KeyName());
-    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(4, 4, 0, 0, NullOptional)) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, table.Add(EmberBindingTableEntry::ForNode(4, 4, 0, 0, std::nullopt)) != CHIP_NO_ERROR);
     VerifyRestored(aSuite, testStorage, expected);
     testStorage.ClearPoisonKeys();
 

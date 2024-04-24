@@ -55,7 +55,7 @@ added.
 --paa-trust-store-path credentials/production/paa-root-certs
 ```
 
-Once a commissioning is completed for the device, is is possible to rerun the
+Once a commissioning is completed for the device, it is possible to rerun the
 tool again for an already commissioned devices, this is an example of how to do
 so:
 

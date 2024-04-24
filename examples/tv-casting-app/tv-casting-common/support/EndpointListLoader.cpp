@@ -86,7 +86,7 @@ CHIP_ERROR EndpointListLoader::Load()
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                        binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
         if (binding.type == MATTER_UNICAST_BINDING && CastingPlayer::GetTargetCastingPlayer()->GetNodeId() == binding.nodeId)
         {
             // if we discovered a new Endpoint from the bindings, read its EndpointAttributes

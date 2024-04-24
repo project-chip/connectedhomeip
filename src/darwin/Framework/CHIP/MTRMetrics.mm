@@ -76,7 +76,7 @@
 
 - (NSString *)description
 {
-    return [_metricsData description];
+    return [NSString stringWithFormat:@"<MTRMetrics: uuid = %@, data = %@>", _uniqueIdentifier, [_metricsData description]];
 }
 
 @end

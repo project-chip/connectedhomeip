@@ -47,7 +47,6 @@
 #include <glib.h>
 
 #include <ble/Ble.h>
-#include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/ErrorStr.h>

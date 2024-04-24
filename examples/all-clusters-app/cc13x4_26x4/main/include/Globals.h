@@ -31,5 +31,12 @@ void cc13xx_26xxLog(const char * aFormat, ...);
 #ifdef __cplusplus
 }
 #endif
+
+#if (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
+#define LED_ENABLE 0
+#else
+#define LED_ENABLE 1
+#endif
+
 extern LED_Handle sAppRedHandle;
 extern LED_Handle sAppGreenHandle;

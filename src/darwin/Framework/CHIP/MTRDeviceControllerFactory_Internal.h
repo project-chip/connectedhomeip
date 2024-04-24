@@ -24,15 +24,11 @@
 #import <Matter/MTRBaseDevice.h> // for MTRClusterPath
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
+#import <Matter/MTRDeviceControllerParameters.h>
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTRServerEndpoint.h>
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
-#import <Matter/MTRDeviceControllerParameters.h>
-#else
-#import "MTRDeviceControllerParameters_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
-
+#import "MTRDefines_Internal.h"
 #import "MTRDeviceControllerFactory.h"
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -49,7 +45,8 @@ namespace Credentials {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceControllerFactory (InternalMethods)
+MTR_DIRECT_MEMBERS
+@interface MTRDeviceControllerFactory ()
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller;
 
@@ -109,6 +106,25 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint;
 
+@property (readonly) chip::PersistentStorageDelegate * storageDelegate;
+@property (readonly) chip::Credentials::GroupDataProvider * groupDataProvider;
+
+@end
+
+MTR_DIRECT_MEMBERS
+@interface MTRDeviceControllerFactoryParams ()
+/*
+ * Initialize the device controller factory without storage.  In this mode,
+ * device controllers will need to have per-controller storage provided to allow
+ * storing controller-specific information.
+ */
+- (instancetype)initWithoutStorage;
+@end
+
+// Methods accessed from MTRServerAccessControl linked into darwin-framework-tool
+// TODO: https://github.com/project-chip/connectedhomeip/issues/32991
+@interface MTRDeviceControllerFactory ()
+
 /**
  * Get the access grants that apply for the given fabric index and cluster path.
  *
@@ -128,18 +144,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
 
-@property (readonly) chip::PersistentStorageDelegate * storageDelegate;
-@property (readonly) chip::Credentials::GroupDataProvider * groupData;
-
-@end
-
-@interface MTRDeviceControllerFactoryParams ()
-/*
- * Initialize the device controller factory without storage.  In this mode,
- * device controllers will need to have per-controller storage provided to allow
- * storing controller-specific information.
- */
-- (instancetype)initWithoutStorage;
 @end
 
 NS_ASSUME_NONNULL_END

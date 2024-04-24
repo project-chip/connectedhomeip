@@ -1192,8 +1192,11 @@ menu "CHIP Device Layer"
     menu "Commissioning Window Options"
         config CHIP_DISCOVERY_TIMEOUT_SECS
             int "Commissioning Window Timeout in seconds"
-            range 180 900 
-            default 900 
+            range 180 900 if !ENABLE_BLE_EXT_ANNOUNCEMENT
+            range 901 172800 if ENABLE_BLE_EXT_ANNOUNCEMENT
+            default 900 if !ENABLE_BLE_EXT_ANNOUNCEMENT
+            default 172800 if ENABLE_BLE_EXT_ANNOUNCEMENT
+
             help
                 The amount of time (in seconds) after which the CHIP platform will close the Commissioning Window
     endmenu
@@ -1213,6 +1216,15 @@ menu "CHIP Device Layer"
             default n
             help
                 Enable Matter support Event List attribute.
+
+    endmenu
+
+    menu "Enable BLE Extended Announcement"
+        config ENABLE_BLE_EXT_ANNOUNCEMENT
+            bool "Enable BLE Extended Announcement"
+            default n
+            help
+                Enable BLE Extended Announcement.To be used with CHIP_DISCOVERY_TIMEOUT_SECS for extended announcement duration.
 
     endmenu
 

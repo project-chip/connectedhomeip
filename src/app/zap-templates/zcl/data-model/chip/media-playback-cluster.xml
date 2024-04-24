@@ -27,6 +27,25 @@ limitations under the License.
     <description>This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.</description>
 
     <globalAttribute side="server" code="0xFFFC" value="0" />
+
+    <features>
+      <feature bit="0" code="AS" name="AdvancedSeek" summary="Advanced media seeking">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="VS" name="VariableSpeed" summary="Variable speed playback">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="TT" name="TextTracks" summary="Text Tracks">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="AT" name="AudioTracks" summary="Audio Tracks">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="AA" name="AudioAdvance" summary="Can play audio during fast and slow playback speeds">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE"                     type="PlaybackStateEnum" min="0x00" max="0x03" default="0x00" writable="false"                    optional="false">CurrentState</attribute>
     <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME"                type="epoch_us"          min="0x00"            default="0x00" writable="false" isNullable="true"  optional="true">StartTime</attribute>
     <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION"                  type="int64u"            min="0x00"            default="0"    writable="false" isNullable="true"  optional="true">Duration</attribute>
@@ -161,14 +180,6 @@ limitations under the License.
     <item name="SeekOutOfRange"         value="0x05"/>
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0506"/>
-    <field name="AdvancedSeek" mask="0x1"/>
-    <field name="VariableSpeed" mask="0x2"/>
-    <field name="TextTracks" mask="0x4"/>
-    <field name="AudioTracks" mask="0x8"/>
-    <field name="AudioAdvance" mask="0x10"/>
-  </bitmap>
 
   <enum name="CharacteristicEnum" type="enum8">
     <cluster code="0x0506"/>

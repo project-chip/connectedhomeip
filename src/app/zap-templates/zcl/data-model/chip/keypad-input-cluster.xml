@@ -25,6 +25,18 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT.</description>
 
+    <features>
+      <feature bit="0" code="NV" name="NavigationKeyCodes" summary="Supports UP, DOWN, LEFT, RIGHT, SELECT, BACK, EXIT, MENU">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="LK" name="LocationKeys" summary="Supports CEC keys 0x0A (Settings) and 0x09 (Home)">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="NK" name="NumberKeys" summary="Supports numeric input 0..9">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <command source="client" code="0x00" name="SendKey" response="SendKeyResponse" optional="false">
       <description>Upon receipt, this SHALL process a keycode as input to the media device.</description>
       <arg name="KeyCode" type="CECKeyCodeEnum"/>
@@ -140,11 +152,5 @@ limitations under the License.
     <item name="Data" value="0x76"/>
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0509"/>
-    <field name="NavigationKeyCodes" mask="0x1"/>
-    <field name="LocationKeys" mask="0x2"/>
-    <field name="NumberKeys" mask="0x4"/>
-  </bitmap>
 
 </configurator>

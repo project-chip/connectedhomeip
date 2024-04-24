@@ -92,7 +92,7 @@ Davis, CA 95616, USA
       <item value="2" name="SecondsGranularity" summary="This indicates the node is synchronized to an upstream source using a low resolution protocol. UTC Time is accurate to ± 5 seconds.">
         <mandatoryConform/>
       </item>
-      <item value="3" name="MillisecondsGranularity" summary="This indicates the node is synchronized to an upstream source using high resolution time-synchronization protocol such as NTP, or has built-in GNSS with some amount of jitter applying its GNSS timestamp. UTC Time is accurate to ± 50ms.">
+      <item value="3" name="MillisecondsGranularity" summary="This indicates the node is synchronized to an upstream source using high resolution time-synchronization protocol such as NTP, or has built-in GNSS with some amount of jitter applying its GNSS timestamp. UTC Time is accurate to ± 50 ms.">
         <mandatoryConform/>
       </item>
       <item value="4" name="MicrosecondsGranularity" summary="This indicates the node is synchronized to an upstream source using a highly precise time-synchronization protocol such as PTP, or has built-in GNSS. UTC time is accurate to ± 10 μs.">

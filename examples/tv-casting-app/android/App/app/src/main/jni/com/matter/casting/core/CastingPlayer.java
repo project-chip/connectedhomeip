@@ -49,6 +49,8 @@ public interface CastingPlayer {
 
   long getDeviceType();
 
+  boolean getSupportsCommissionerGeneratedPasscode();
+
   List<Endpoint> getEndpoints();
 
   @Override

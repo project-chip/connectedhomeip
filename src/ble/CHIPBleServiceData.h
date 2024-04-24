@@ -23,6 +23,12 @@
 
 #pragma once
 
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
+
+#include <cstdint>
+
 #include <lib/core/CHIPEncoding.h>
 
 namespace chip {

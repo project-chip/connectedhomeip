@@ -72,10 +72,6 @@ public:
     Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
-    /* Can be used to disconnect from WiFi network.
-     */
-    int DisconnectNetwork();
-
     /* Returns the network SSID. User needs to allocate a buffer of size >= DeviceLayer::Internal::kMaxWiFiSSIDLength.
      * ssid - pointer to the returned SSID
      */

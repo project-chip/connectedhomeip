@@ -28,6 +28,24 @@
             android:layout_below="@id/action_selector_heading" />
 
         <Button
+            android:id="@+id/selectApplicationBasicReadVendorIDButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/matter_select_application_basic_read_vendor_id_button_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:layout_marginRight="10sp"
+            android:layout_below="@id/selectContentLauncherLaunchURLButton" />
+
+        <Button
+            android:id="@+id/selectMediaPlaybackSubscribeToCurrentStateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/matter_select_media_playback_subscribe_to_current_state_button_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:layout_marginRight="10sp"
+            android:layout_below="@id/selectApplicationBasicReadVendorIDButton" />
+
+        <Button
             android:id="@+id/disconnectButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -21,7 +21,7 @@
 
 #include <glib.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
@@ -53,7 +53,7 @@ public:
 /// Allows scanning for CHIP devices
 ///
 /// Will perform scan operations and call back whenever a device is discovered.
-class ChipDeviceScanner
+class ChipDeviceScanner : public BluezObjectManagerAdapterNotificationsDelegate
 {
 public:
     ChipDeviceScanner(BluezObjectManager & aObjectManager) : mObjectManager(aObjectManager) {}
@@ -73,33 +73,29 @@ public:
     ///
     /// This method must be called while in the Matter context (from the Matter event
     /// loop, or while holding the Matter stack lock).
-    CHIP_ERROR StartScan(System::Clock::Timeout timeout);
+    CHIP_ERROR StartScan();
 
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
 
-private:
-    enum ChipDeviceScannerState
-    {
-        SCANNER_UNINITIALIZED,
-        SCANNER_INITIALIZED,
-        SCANNER_SCANNING
-    };
+    /// Check if the scanner is active
+    bool IsScanning() const { return mScannerState == ChipDeviceScannerState::SCANNING; }
 
-    enum ScannerTimerState
+    /// Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
+    void OnDeviceAdded(BluezDevice1 & device) override;
+    void OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps, const char * const * invalidatedProps) override;
+    void OnDeviceRemoved(BluezDevice1 & device) override {}
+
+private:
+    enum class ChipDeviceScannerState
     {
-        TIMER_CANCELED,
-        TIMER_STARTED,
-        TIMER_EXPIRED
+        UNINITIALIZED,
+        INITIALIZED,
+        SCANNING
     };
 
     CHIP_ERROR StartScanImpl();
     CHIP_ERROR StopScanImpl();
-    static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
-
-    void SignalObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject);
-    void SignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject, GDBusProxy * aInterface,
-                                          GVariant * aChangedProperties, const char * const * aInvalidatedProps);
 
     /// Check if a given device is a CHIP device and if yes, report it as discovered
     void ReportDevice(BluezDevice1 & device);
@@ -111,12 +107,8 @@ private:
     BluezObjectManager & mObjectManager;
     GAutoPtr<BluezAdapter1> mAdapter;
 
-    ChipDeviceScannerDelegate * mDelegate  = nullptr;
-    unsigned long mObjectAddedSignal       = 0;
-    unsigned long mPropertiesChangedSignal = 0;
-    ChipDeviceScannerState mScannerState   = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
-    /// Used to track if timer has already expired and doesn't need to be canceled.
-    ScannerTimerState mTimerState = ScannerTimerState::TIMER_CANCELED;
+    ChipDeviceScannerDelegate * mDelegate = nullptr;
+    ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::UNINITIALIZED;
     GAutoPtr<GCancellable> mCancellable;
 };
 

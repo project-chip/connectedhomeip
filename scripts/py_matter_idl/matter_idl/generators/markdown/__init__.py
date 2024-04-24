@@ -28,7 +28,7 @@ class SummaryMarkdownGenerator(CodeGenerator):
     def internal_render_all(self):
         self.internal_render_one_output(
             template_path="clusters_markdown.jinja",
-            output_file_name="clusters.md",
+            output_file_name="zap_clusters.md",
             vars={
                 'idl': self.idl,
             }

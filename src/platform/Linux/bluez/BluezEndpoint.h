@@ -52,7 +52,7 @@
 #include <gio/gio.h>
 #include <glib.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
@@ -65,7 +65,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BluezEndpoint
+class BluezEndpoint : public BluezObjectManagerAdapterNotificationsDelegate
 {
 public:
     BluezEndpoint(BluezObjectManager & aObjectManager) : mObjectManager(aObjectManager) {}
@@ -80,6 +80,11 @@ public:
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
 
+    // Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
+    void OnDeviceAdded(BluezDevice1 & device) override;
+    void OnDevicePropertyChanged(BluezDevice1 & device, GVariant * changedProps, const char * const * invalidatedProps) override;
+    void OnDeviceRemoved(BluezDevice1 & device) override;
+
 private:
     CHIP_ERROR SetupEndpointBindings();
     void SetupGattServer(GDBusConnection * aConn);
@@ -89,21 +94,17 @@ private:
     BluezGattCharacteristic1 * CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName, const char * aUUID,
                                                         const char * const * aFlags);
 
-    void HandleNewDevice(BluezDevice1 * aDevice);
-    void UpdateConnectionTable(BluezDevice1 * aDevice);
+    void HandleNewDevice(BluezDevice1 & aDevice);
+    void UpdateConnectionTable(BluezDevice1 & aDevice);
     BluezConnection * GetBluezConnection(const char * aPath);
     BluezConnection * GetBluezConnectionViaDevice();
 
     gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
-    gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
-    gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
+    gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList,
+                                             GVariant * aOptions);
+    gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GUnixFDList * aFDList,
+                                              GVariant * aOptions);
     gboolean BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv);
-
-    void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject);
-    void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject);
-    void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
-                                               GDBusProxy * aInterface, GVariant * aChangedProperties,
-                                               const char * const * aInvalidatedProps);
 
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();

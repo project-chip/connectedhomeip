@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for cc13x2 platform.
+ *          for cc13xx platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>

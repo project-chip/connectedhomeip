@@ -34,7 +34,7 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "timers.h"
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 

@@ -23,7 +23,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -187,13 +186,6 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 {
     Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ true);
     return aWriteHandler->AddStatus(aPath, status);
-}
-
-// No attribute access overrides on iOS and Android for now.
-// TODO (#16806): This function can be moved to InteractionModelEngine.
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
-{
-    return nullptr;
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)

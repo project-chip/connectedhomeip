@@ -25,17 +25,14 @@ NS_ASSUME_NONNULL_BEGIN
 @class MTRDeviceClusterData;
 // MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
 @protocol MTRDeviceControllerDataStoreAttributeStoreMethods
-- (nullable NSArray<NSDictionary *> *)getStoredAttributesForNodeID:(NSNumber *)nodeID;
 - (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;
-- (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
-- (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)clearAllStoredAttributes;
-- (void)unitTestPruneEmptyStoredAttributesBranches;
+- (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
+- (void)clearAllStoredClusterData;
+- (void)unitTestPruneEmptyStoredClusterDataBranches;
 - (NSString *)_endpointIndexKeyForNodeID:(NSNumber *)nodeID;
 - (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
-- (NSString *)_attributeIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
-- (NSString *)_attributeValueKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID;
+- (NSString *)_clusterDataKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 @end
 
 // Declare internal methods for testing
@@ -52,6 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Declarations for items compiled only for DEBUG configuration
 
 #ifdef DEBUG
+@interface MTRDeviceController (TestDebug)
+- (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
+@end
+
 @interface MTRBaseDevice (TestDebug)
 - (void)failSubscribers:(dispatch_queue_t)queue completion:(void (^)(void))completion;
 
@@ -62,6 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDevice (TestDebug)
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
+- (void)unitTestClearClusterData;
 @end
 #endif
 

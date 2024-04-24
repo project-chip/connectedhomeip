@@ -665,7 +665,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     }
     keypair      = nullptr;
     mInitialized = true;
-exit:
+
     _log_mbedTLS_error(result);
     return error;
 }
@@ -929,8 +929,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
 
     result = ECP256_GenerateKeyPair(&PublicKey, &PrivateKey, NULL);
 
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
     VerifyOrExit(result == gSecEcp256Success_c, error = CHIP_ERROR_INTERNAL);
 
     ecp_coordinate_copy((uint8_t *) fe, (const uint8_t *) &PrivateKey);
@@ -1040,7 +1038,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
         memcpy(p, (uint8_t *) &gen_point, SEC_ECP256_COORDINATE_LEN * 2);
     } while (0);
 
-exit:
     _log_mbedTLS_error(result);
     return error;
 }

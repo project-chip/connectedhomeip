@@ -46,7 +46,7 @@ void CreateDefaultFullBindingTable(BindingTable & table)
 {
     for (uint8_t i = 0; i < MATTER_BINDING_TABLE_SIZE; i++)
     {
-        table.Add(EmberBindingTableEntry::ForNode(i / 10, i % 5, 0, 0, MakeOptional<ClusterId>(i)));
+        table.Add(EmberBindingTableEntry::ForNode(i / 10, i % 5, 0, 0, std::make_optional<ClusterId>(i)));
     }
 }
 

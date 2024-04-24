@@ -20,6 +20,8 @@
 #import "MTRCommissionableBrowserResult_Internal.h"
 #import "MTRDeviceController.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
+#include <tracing/metric_macros.h>
 
 #include <controller/CHIPDeviceController.h>
 #include <lib/dnssd/platform/Dnssd.h>
@@ -35,6 +37,8 @@ using namespace chip::Ble;
 
 constexpr char kBleKey[] = "BLE";
 
+using namespace chip::Tracing::DarwinFramework;
+
 @implementation MTRCommissionableBrowserResultInterfaces
 @end
 
@@ -49,7 +53,7 @@ constexpr char kBleKey[] = "BLE";
 @implementation MTRCommissionableBrowserResult
 @end
 
-class CommissionableBrowserInternal : public CommissioningResolveDelegate,
+class CommissionableBrowserInternal : public DiscoverNodeDelegate,
                                       public DnssdBrowseDelegate
 #if CONFIG_NETWORK_LAYER_BLE
     ,
@@ -70,6 +74,7 @@ public:
         mController = controller;
         mDispatchQueue = queue;
         mDiscoveredResults = [[NSMutableDictionary alloc] init];
+        ResetCounters();
 
 #if CONFIG_NETWORK_LAYER_BLE
         ReturnErrorOnFailure(PlatformMgrImpl().StartBleScan(this));
@@ -100,6 +105,7 @@ public:
 
         ClearBleDiscoveredDevices();
         ClearDnssdDiscoveredDevices();
+        ResetCounters();
         mDiscoveredResults = nil;
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -107,6 +113,12 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
         return ChipDnssdStopBrowse(this);
+    }
+
+    void ResetCounters()
+    {
+        mOnNetworkDevicesAdded = mOnNetworkDevicesRemoved = 0;
+        mBLEDevicesAdded = mBLEDevicesRemoved = 0;
     }
 
     void ClearBleDiscoveredDevices()
@@ -144,12 +156,12 @@ public:
         mDiscoveredResults = discoveredResultsCopy;
     }
 
-    /////////// CommissioningResolveDelegate Interface /////////
+    /////////// DiscoverNodeDelegate Interface /////////
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
     {
         assertChipStackLockedByCurrentThread();
 
-        auto & commissionData = nodeData.commissionData;
+        auto & commissionData = nodeData.nodeData;
         auto key = [NSString stringWithUTF8String:commissionData.instanceName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
             // It should not happens.
@@ -197,6 +209,8 @@ public:
         VerifyOrReturn(mController != nil);
         VerifyOrReturn(mDispatchQueue != nil);
 
+        MATTER_LOG_METRIC(kMetricOnNetworkDevicesAdded, ++mOnNetworkDevicesAdded);
+
         auto key = [NSString stringWithUTF8String:service.mName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
             mDiscoveredResults[key] = [[MTRCommissionableBrowserResult alloc] init];
@@ -217,6 +231,8 @@ public:
         VerifyOrReturn(mDelegate != nil);
         VerifyOrReturn(mController != nil);
         VerifyOrReturn(mDispatchQueue != nil);
+
+        MATTER_LOG_METRIC(kMetricOnNetworkDevicesRemoved, ++mOnNetworkDevicesRemoved);
 
         auto key = [NSString stringWithUTF8String:service.mName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
@@ -269,6 +285,8 @@ public:
         result.commissioningMode = YES;
         result.params = chip::MakeOptional(chip::Controller::SetUpCodePairerParameters(connObj, false /* connected */));
 
+        MATTER_LOG_METRIC(kMetricBLEDevicesAdded, ++mBLEDevicesAdded);
+
         auto key = [NSString stringWithFormat:@"%@", connObj];
         mDiscoveredResults[key] = result;
 
@@ -290,6 +308,8 @@ public:
         auto result = mDiscoveredResults[key];
         mDiscoveredResults[key] = nil;
 
+        MATTER_LOG_METRIC(kMetricBLEDevicesRemoved, ++mBLEDevicesRemoved);
+
         dispatch_async(mDispatchQueue, ^{
             [mDelegate controller:mController didFindCommissionableDevice:result];
         });
@@ -301,6 +321,10 @@ private:
     id<MTRCommissionableBrowserDelegate> mDelegate;
     MTRDeviceController * mController;
     NSMutableDictionary<NSString *, MTRCommissionableBrowserResult *> * mDiscoveredResults;
+    int32_t mOnNetworkDevicesAdded;
+    int32_t mOnNetworkDevicesRemoved;
+    int32_t mBLEDevicesAdded;
+    int32_t mBLEDevicesRemoved;
 };
 
 @interface MTRCommissionableBrowser ()

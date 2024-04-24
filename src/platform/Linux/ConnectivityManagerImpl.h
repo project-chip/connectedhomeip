@@ -66,25 +66,25 @@ namespace DeviceLayer {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 struct GDBusWpaSupplicant
 {
-    enum WpaState
+    enum class WpaState
     {
         INIT,
-        WPA_CONNECTING,
-        WPA_CONNECTED,
-        WPA_NOT_CONNECTED,
-        WPA_NO_INTERFACE_PATH,
-        WPA_GOT_INTERFACE_PATH,
-        WPA_INTERFACE_CONNECTED,
+        CONNECTING,
+        CONNECTED,
+        NOT_CONNECTED,
+        NO_INTERFACE_PATH,
+        GOT_INTERFACE_PATH,
+        INTERFACE_CONNECTED,
     };
 
-    enum WpaScanning
+    enum class WpaScanningState
     {
-        WIFI_SCANNING_IDLE,
-        WIFI_SCANNING,
+        IDLE,
+        SCANNING,
     };
 
-    WpaState state                          = INIT;
-    WpaScanning scanState                   = WIFI_SCANNING_IDLE;
+    WpaState state                          = WpaState::INIT;
+    WpaScanningState scanState              = WpaScanningState::IDLE;
     WpaFiW1Wpa_supplicant1 * proxy          = nullptr;
     WpaFiW1Wpa_supplicant1Interface * iface = nullptr;
     WpaFiW1Wpa_supplicant1BSS * bss         = nullptr;

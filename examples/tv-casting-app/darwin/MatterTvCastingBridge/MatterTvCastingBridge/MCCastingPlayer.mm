@@ -89,8 +89,8 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 
 - (NSString * _Nonnull)description
 {
-    return [NSString stringWithFormat:@"%@ with Product ID: %hu and Vendor ID: %hu. Resolved IPAddr?: %@",
-                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO"];
+    return [NSString stringWithFormat:@"%@ with Product ID: %hu and Vendor ID: %hu. Resolved IPAddr?: %@. Supports Commissioner Generated Passcode?: %@.",
+                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO", self.supportsCommissionerGeneratedPasscode ? @"YES" : @"NO"];
 }
 
 - (NSString * _Nonnull)identifier
@@ -116,6 +116,11 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 - (uint32_t)deviceType
 {
     return _cppCastingPlayer->GetDeviceType();
+}
+
+- (bool)supportsCommissionerGeneratedPasscode
+{
+    return _cppCastingPlayer->GetSupportsCommissionerGeneratedPasscode();
 }
 
 - (NSArray * _Nonnull)ipAddresses

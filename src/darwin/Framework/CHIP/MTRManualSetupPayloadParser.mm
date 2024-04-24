@@ -24,6 +24,8 @@
 #import <setup_payload/ManualSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
 
+#include <string>
+
 @implementation MTRManualSetupPayloadParser {
     NSString * _decimalStringRepresentation;
     chip::ManualSetupPayloadParser * _chipManualSetupPayloadParser;
@@ -48,19 +50,11 @@
     chip::SetupPayload cPlusPluspayload;
     MTRSetupPayload * payload;
 
-    if (_chipManualSetupPayloadParser) {
-        CHIP_ERROR chipError = _chipManualSetupPayloadParser->populatePayload(cPlusPluspayload);
-
-        if (chipError == CHIP_NO_ERROR) {
-            payload = [[MTRSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
-        } else if (error) {
-            *error = [MTRError errorForCHIPErrorCode:chipError];
-        }
-    } else {
-        // Memory init has failed
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
-        }
+    CHIP_ERROR chipError = _chipManualSetupPayloadParser->populatePayload(cPlusPluspayload);
+    if (chipError == CHIP_NO_ERROR) {
+        payload = [[MTRSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
+    } else if (error) {
+        *error = [MTRError errorForCHIPErrorCode:chipError];
     }
 
     return payload;

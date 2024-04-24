@@ -60,7 +60,6 @@
 		3C9437942B3B47A10096E5F4 /* MCErrorUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C9437932B3B47A10096E5F4 /* MCErrorUtils.mm */; };
 		3CCB87212869085400771BAD /* MatterTvCastingBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CCB87202869085400771BAD /* MatterTvCastingBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3CCB8737286A555500771BAD /* libTvCastingCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CCB8735286A555500771BAD /* libTvCastingCommon.a */; };
-		3CCB8738286A555500771BAD /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CCB8736286A555500771BAD /* libmbedtls.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		3CCB873F286A593700771BAD /* DiscoveredNodeData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CCB8739286A593700771BAD /* DiscoveredNodeData.mm */; };
 		3CCB8740286A593700771BAD /* CastingServerBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CCB873A286A593700771BAD /* CastingServerBridge.h */; };
 		3CCB8741286A593700771BAD /* DiscoveredNodeData.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CCB873B286A593700771BAD /* DiscoveredNodeData.h */; };
@@ -151,7 +150,6 @@
 		3CCB871D2869085400771BAD /* MatterTvCastingBridge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MatterTvCastingBridge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CCB87202869085400771BAD /* MatterTvCastingBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MatterTvCastingBridge.h; sourceTree = "<group>"; };
 		3CCB8735286A555500771BAD /* libTvCastingCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTvCastingCommon.a; path = lib/libTvCastingCommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		3CCB8736286A555500771BAD /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = lib/libmbedtls.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CCB8739286A593700771BAD /* DiscoveredNodeData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DiscoveredNodeData.mm; sourceTree = "<group>"; };
 		3CCB873A286A593700771BAD /* CastingServerBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CastingServerBridge.h; sourceTree = "<group>"; };
 		3CCB873B286A593700771BAD /* DiscoveredNodeData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscoveredNodeData.h; sourceTree = "<group>"; };
@@ -183,7 +181,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3CCB8737286A555500771BAD /* libTvCastingCommon.a in Frameworks */,
-				3CCB8738286A555500771BAD /* libmbedtls.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,7 +230,6 @@
 			isa = PBXGroup;
 			children = (
 				3CCB871F2869085400771BAD /* MatterTvCastingBridge */,
-				3CCB8736286A555500771BAD /* libmbedtls.a */,
 				3CCB8735286A555500771BAD /* libTvCastingCommon.a */,
 				3CCB871E2869085400771BAD /* Products */,
 			);
@@ -556,7 +552,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -644,6 +639,10 @@
 		3CCB87252869085400771BAD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ARCHS[sdk=iphonesimulator*]" = (
+					arm64,
+					x86_64,
+				);
 				CHIP_ROOT = "$(PROJECT_DIR)/../../../..";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;

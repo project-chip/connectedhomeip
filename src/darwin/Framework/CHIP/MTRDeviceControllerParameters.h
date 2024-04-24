@@ -16,12 +16,6 @@
 
 #import <Matter/MTRDefines.h>
 
-#if defined(MTR_INTERNAL_INCLUDE) && defined(MTR_INCLUDED_FROM_UMBRELLA_HEADER)
-#error Internal includes should not happen from the umbrella header
-#endif
-
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)
-
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
@@ -32,9 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * interfaces inheriting from this one should be used to actually do the
  * initialization.
  */
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 MTR_NEWLY_AVAILABLE
-#endif
 @interface MTRDeviceControllerAbstractParameters : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -44,9 +36,7 @@ MTR_NEWLY_AVAILABLE
  * Parameters that can be used to initialize an MTRDeviceController which
  * has a node identity.
  */
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 MTR_NEWLY_AVAILABLE
-#endif
 @interface MTRDeviceControllerParameters : MTRDeviceControllerAbstractParameters
 
 /**
@@ -89,9 +79,7 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 MTR_NEWLY_AVAILABLE
-#endif
 @interface MTRDeviceControllerExternalCertificateParameters : MTRDeviceControllerParameters
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -142,5 +130,3 @@ MTR_NEWLY_AVAILABLE
 @end
 
 NS_ASSUME_NONNULL_END
-
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED || defined(MTR_INTERNAL_INCLUDE)

@@ -23,7 +23,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/data-model/FabricScopedPreEncodedValue.h>
 #include <app/data-model/PreEncodedValue.h>

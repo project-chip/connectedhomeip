@@ -18,16 +18,11 @@
 
 #pragma once
 
+#include "AppEvent.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <lib/core/CHIPError.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-#include "AppEvent.h"
-
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
-#include <app-common/zap-generated/attributes/Accessors.h>
-
-#include <lib/core/CHIPError.h>
 
 using namespace chip;
 

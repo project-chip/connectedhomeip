@@ -20,7 +20,6 @@
 
 #include "app/clusters/device-energy-management-server/device-energy-management-server.h"
 
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 

@@ -31,7 +31,7 @@ def create_hex_file(args):
 
     # there are 17 elements, each element will need 8 bytes in the struct
     # 4 for length of the element, and 4 for the pointer to the element
-    # factory data starts at 0xAC000 or 0xFE800, so the elements will
+    # factory data starts at 0xFE800, so the elements will
     # start 136 bytes after the start address
     factory_data_dict = json.load(args.factory_data_json_file[0])
     factory_data_schema = json.load(args.factory_data_schema[0])
@@ -41,10 +41,7 @@ def create_hex_file(args):
 
     struct_idx = 0
     values_idx = 0
-    if device_family == 'cc13x2_26x2':
-        value_address = 0xAC088
-    else:
-        value_address = 0xFE888
+    value_address = 0xFE888
 
     for element in factory_data:
         # get the length in hex and write to first hex file
@@ -137,12 +134,8 @@ def create_hex_file(args):
 
     # get hex file in a format that can be merged in a later step
     subprocess.call(['objcopy', args.factory_data_hex_file, '--input-target', 'ihex', '--output-target', 'binary', 'temp.bin'])
-    if device_family == 'cc13x2_26x2':
-        subprocess.call(['objcopy', 'temp.bin', '--input-target', 'binary', '--output-target',
-                        'ihex', args.factory_data_hex_file, '--change-addresses=0xac000'])
-    else:
-        subprocess.call(['objcopy', 'temp.bin', '--input-target', 'binary', '--output-target',
-                        'ihex', args.factory_data_hex_file, '--change-addresses=0xfe800'])
+    subprocess.call(['objcopy', 'temp.bin', '--input-target', 'binary', '--output-target',
+                     'ihex', args.factory_data_hex_file, '--change-addresses=0xfe800'])
     subprocess.call(['rm', 'temp.bin'])
 
 

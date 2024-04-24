@@ -25,20 +25,20 @@
 #error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
 
-#include <ble/BleConfig.h>
-#include <ble/BleError.h>
-#include <ble/BleLayer.h>
-#include <ble/BleUUID.h>
+#include <ble/Ble.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
 #include <platform/Darwin/BleScannerDelegate.h>
 #include <platform/LockTracker.h>
 #include <setup_payload/SetupPayload.h>
+#include <tracing/metric_event.h>
 
+#import "PlatformMetricKeys.h"
 #import "UUIDHelper.h"
 
 using namespace chip::Ble;
+using namespace chip::Tracing::DarwinPlatform;
 
 constexpr uint64_t kScanningWithDiscriminatorTimeoutInSeconds = 60;
 constexpr uint64_t kScanningWithoutDelegateTimeoutInSeconds = 120;
@@ -222,6 +222,8 @@ namespace DeviceLayer {
 } // namespace chip
 
 @interface BleConnection ()
+@property (nonatomic, readonly) int32_t totalDevicesAdded;
+@property (nonatomic, readonly) int32_t totalDevicesRemoved;
 @end
 
 @implementation BleConnection
@@ -237,6 +239,7 @@ namespace DeviceLayer {
         _found = false;
         _cachedPeripherals = [[NSMutableDictionary alloc] init];
         _currentMode = kUndefined;
+        [self _resetCounters];
     }
 
     return self;
@@ -330,6 +333,8 @@ namespace DeviceLayer {
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
+    MATTER_LOG_METRIC(kMetricBLECentralManagerState, static_cast<uint32_t>(central.state));
+
     switch (central.state) {
     case CBManagerStatePoweredOn:
         ChipLogDetail(Ble, "CBManagerState: ON");
@@ -374,6 +379,8 @@ namespace DeviceLayer {
     }
 
     NSNumber * isConnectable = [advertisementData objectForKey:CBAdvertisementDataIsConnectable];
+    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredPeripheral, [isConnectable boolValue]);
+
     if ([isConnectable boolValue] == NO) {
         ChipLogError(Ble, "A device (%p) with a matching Matter UUID has been discovered but it is not connectable.", peripheral);
         return;
@@ -389,6 +396,7 @@ namespace DeviceLayer {
             "A device (%p) with a matching Matter UUID has been discovered but the service data len does not match our expectation "
             "(serviceData = %s)",
             peripheral, [hexString UTF8String]);
+        MATTER_LOG_METRIC(kMetricBLEBadServiceDataLength, static_cast<uint32_t>([serviceData length]));
         return;
     }
 
@@ -398,6 +406,7 @@ namespace DeviceLayer {
             "A device (%p) with a matching Matter UUID has been discovered but the service data opCode not match our expectation "
             "(opCode = %u).",
             peripheral, opCode);
+        MATTER_LOG_METRIC(kMetricBLEBadOpCode, opCode);
         return;
     }
 
@@ -409,9 +418,11 @@ namespace DeviceLayer {
                 "A device (%p) with a matching Matter UUID has been discovered but the service data discriminator not match our "
                 "expectation (discriminator = %u).",
                 peripheral, discriminator);
+            MATTER_LOG_METRIC(kMetricBLEMismatchedDiscriminator);
             return;
         }
 
+        MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
         ChipLogProgress(Ble, "Connecting to device %p with discriminator: %d", peripheral, discriminator);
         [self connect:peripheral];
         [self stopScanning];
@@ -427,6 +438,8 @@ namespace DeviceLayer {
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
+    MATTER_LOG_METRIC_END(kMetricBLEConnectPeripheral);
+    MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredServices);
     [peripheral setDelegate:self];
     [peripheral discoverServices:nil];
 }
@@ -441,8 +454,11 @@ namespace DeviceLayer {
         ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%s]", [error.localizedDescription UTF8String]);
     }
 
+    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredServices, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
+
     for (CBService * service in peripheral.services) {
         if ([service.UUID.data isEqualToData:_shortServiceUUID.data] && !self.found) {
+            MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredCharacteristics);
             [peripheral discoverCharacteristics:nil forService:service];
             self.found = true;
             break;
@@ -451,12 +467,15 @@ namespace DeviceLayer {
 
     if (!self.found || error != nil) {
         ChipLogError(Ble, "Service not found on the device.");
+        MATTER_LOG_METRIC(kMetricBLEDiscoveredServices, CHIP_ERROR_INCORRECT_STATE);
         [self dispatchConnectionError:CHIP_ERROR_INCORRECT_STATE];
     }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
+    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
+
     if (nil != error) {
         ChipLogError(
             Ble, "BLE:Error finding Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
@@ -481,6 +500,7 @@ namespace DeviceLayer {
         ChipLogError(
             Ble, "BLE:Error writing Characteristics in Chip service on the device: [%s]", [error.localizedDescription UTF8String]);
         dispatch_async(_chipWorkQueue, ^{
+            MATTER_LOG_METRIC(kMetricBLEWriteChrValueFailed, BLE_ERROR_GATT_WRITE_FAILED);
             _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_WRITE_FAILED);
         });
     }
@@ -509,10 +529,12 @@ namespace DeviceLayer {
             [error.localizedDescription UTF8String]);
         dispatch_async(_chipWorkQueue, ^{
             if (isNotifying) {
+                MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_WRITE_FAILED);
                 // we're still notifying, so we must failed the unsubscription
                 _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
             } else {
                 // we're not notifying, so we must failed the subscription
+                MATTER_LOG_METRIC(kMetricBLEUpdateNotificationStateForChrFailed, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
                 _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
             }
         });
@@ -535,17 +557,20 @@ namespace DeviceLayer {
 
             if (msgBuf.IsNull()) {
                 ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
+                MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, CHIP_ERROR_NO_MEMORY);
                 _mBleLayer->HandleConnectionError((__bridge void *) peripheral, CHIP_ERROR_NO_MEMORY);
             } else if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
                 // since this error comes from device manager core
                 // we assume it would do the right thing, like closing the connection
                 ChipLogError(Ble, "Failed at handling incoming BLE data");
+                MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, CHIP_ERROR_INCORRECT_STATE);
             }
         });
     } else {
         ChipLogError(
             Ble, "BLE:Error receiving indication of Characteristics on the device: [%s]", [error.localizedDescription UTF8String]);
         dispatch_async(_chipWorkQueue, ^{
+            MATTER_LOG_METRIC(kMetricBLEUpdateValueForChrFailed, BLE_ERROR_GATT_INDICATE_FAILED);
             _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_INDICATE_FAILED);
         });
     }
@@ -558,6 +583,7 @@ namespace DeviceLayer {
     // If a peripheral has already been found, try to connect to it once BLE starts,
     // otherwise start scanning to find the peripheral to connect to.
     if (_peripheral != nil) {
+        MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
         [self connect:_peripheral];
     } else {
         [self startScanning];
@@ -597,11 +623,22 @@ namespace DeviceLayer {
     });
 }
 
+- (void)_resetCounters
+{
+    _totalDevicesAdded = 0;
+    _totalDevicesRemoved = 0;
+}
+
 - (void)startScanning
 {
     if (!_centralManager) {
         return;
     }
+
+    MATTER_LOG_METRIC_BEGIN(kMetricBLEScan);
+    MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredPeripheral);
+    MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
+    [self _resetCounters];
 
     auto scanOptions = @{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES };
     [_centralManager scanForPeripheralsWithServices:@[ _shortServiceUUID ] options:scanOptions];
@@ -613,6 +650,9 @@ namespace DeviceLayer {
         return;
     }
 
+    MATTER_LOG_METRIC_END(kMetricBLEScan);
+    [self _resetCounters];
+
     [self clearTimer];
     [_centralManager stopScan];
 }
@@ -623,6 +663,8 @@ namespace DeviceLayer {
         return;
     }
 
+    MATTER_LOG_METRIC_END(kMetricBLEDiscoveredMatchingPeripheral);
+    MATTER_LOG_METRIC_BEGIN(kMetricBLEConnectPeripheral);
     _peripheral = peripheral;
     [_centralManager connectPeripheral:peripheral options:nil];
 }
@@ -669,6 +711,7 @@ namespace DeviceLayer {
     [self removePeripheralsFromCache];
 
     if (peripheral) {
+        MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
         ChipLogProgress(Ble, "Connecting to cached device: %p", peripheral);
         [self connect:peripheral];
         [self stopScanning];
@@ -682,6 +725,7 @@ namespace DeviceLayer {
     _scannerDelegate = nil;
     _currentMode = kConnecting;
 
+    MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
     ChipLogProgress(Ble, "Connecting to device: %p", peripheral);
     [self connect:peripheral];
     [self stopScanning];
@@ -713,6 +757,7 @@ namespace DeviceLayer {
 
         timeoutTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
         dispatch_source_set_event_handler(timeoutTimer, ^{
+            MATTER_LOG_METRIC(kMetricBLEPeripheralRemoved, ++self->_totalDevicesRemoved);
             [self removePeripheralFromCache:peripheral];
         });
         dispatch_resume(timeoutTimer);
@@ -720,6 +765,11 @@ namespace DeviceLayer {
 
     auto timeout = static_cast<int64_t>(kCachePeripheralTimeoutInSeconds * NSEC_PER_SEC);
     dispatch_source_set_timer(timeoutTimer, dispatch_walltime(nullptr, timeout), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+
+    // Add only unique count of devices found
+    if (!_cachedPeripherals[peripheral]) {
+        MATTER_LOG_METRIC(kMetricBLEPeripheralAdded, ++_totalDevicesAdded);
+    }
 
     _cachedPeripherals[peripheral] = @{
         @"data" : data,

@@ -252,10 +252,17 @@ static void BOARD_ActionOnIdle(void)
 }
 
 extern void OTAIdleActivities(void);
+extern bool AppHaveBLEConnections(void);
 
 void vApplicationIdleHook(void)
 {
-    FS_vIdleTask(PDM_MAX_WRITES_INFINITE);
+#if PDM_SAVE_IDLE
+    /* While in BLE connection during commissioning, PDM saves should be paused */
+    if (!AppHaveBLEConnections())
+    {
+        FS_vIdleTask(PDM_MAX_WRITES_INFINITE);
+    }
+#endif
 
     OTAIdleActivities();
 

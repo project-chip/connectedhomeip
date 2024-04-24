@@ -33,12 +33,13 @@
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/util/af.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
@@ -257,18 +258,26 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpointId, ClusterId
     return cluster->emberCluster();
 }
 
+DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
+{
+    // shared data version storage
+    return &dataVersion;
+}
+
 namespace chip {
 namespace app {
 
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
+EndpointId EnabledEndpointsWithServerCluster::operator*() const
 {
-    return nullptr;
+    return emberAfEndpointFromIndex(mEndpointIndex);
 }
 
-EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
+EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) :
+    mEndpointCount(emberAfEndpointCount()), mClusterId(clusterId)
 {
     EnsureMatchingEndpoint();
 }
+
 EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
 {
     ++mEndpointIndex;
@@ -293,7 +302,13 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 }
 
 } // namespace app
+
 namespace Test {
+
+void ResetVersion()
+{
+    dataVersion = 0;
+}
 
 void BumpVersion()
 {
@@ -391,6 +406,16 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
     ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
     return attributeReport.EndOfAttributeReportIB();
+}
+
+void SetMockNodeConfig(const MockNodeConfig & config)
+{
+    mockConfig = &config;
+}
+
+void ResetMockNodeConfig()
+{
+    mockConfig = nullptr;
 }
 
 } // namespace Test

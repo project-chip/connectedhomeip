@@ -97,9 +97,9 @@ CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::TLVType::kTLVType_Structure, container));
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagFabricIndex), entry.fabricIndex));
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagLocalEndpoint), entry.local));
-    if (entry.clusterId.HasValue())
+    if (entry.clusterId.has_value())
     {
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagCluster), entry.clusterId.Value()));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagCluster), *entry.clusterId));
     }
     if (entry.type == MATTER_UNICAST_BINDING)
     {
@@ -202,12 +202,12 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     {
         ClusterId clusterId;
         ReturnErrorOnFailure(reader.Get(clusterId));
-        entry.clusterId.SetValue(clusterId);
+        entry.clusterId.emplace(clusterId);
         ReturnErrorOnFailure(reader.Next());
     }
     else
     {
-        entry.clusterId = NullOptional;
+        entry.clusterId = std::nullopt;
     }
     if (reader.GetTag() == TLV::ContextTag(kTagRemoteEndpoint))
     {

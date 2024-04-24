@@ -37,10 +37,10 @@ namespace PersistedStorage {
 constexpr size_t kMaxNumberOfKeys  = 200;
 constexpr size_t kMaxKeyValueBytes = 255;
 
-Internal::RamStorage KeyValueStoreManagerImpl::sKeysStorage         = { kNvmId_KvsKeys };
-Internal::RamStorage KeyValueStoreManagerImpl::sValuesStorage       = { kNvmId_KvsValues };
-Internal::RamStorage KeyValueStoreManagerImpl::sSubscriptionStorage = { kNvmId_KvsSubscription };
-Internal::RamStorage KeyValueStoreManagerImpl::sGroupsStorage       = { kNvmId_KvsGroups };
+Internal::RamStorage KeyValueStoreManagerImpl::sKeysStorage         = { kNvmId_KvsKeys, "Keys" };
+Internal::RamStorage KeyValueStoreManagerImpl::sValuesStorage       = { kNvmId_KvsValues, "Values" };
+Internal::RamStorage KeyValueStoreManagerImpl::sSubscriptionStorage = { kNvmId_KvsSubscription, "Subscriptions" };
+Internal::RamStorage KeyValueStoreManagerImpl::sGroupsStorage       = { kNvmId_KvsGroups, "Groups" };
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
@@ -169,13 +169,13 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     {
         /* Use kKeyId_KvsValues as base key id for all keys. */
         pdmInternalId = Internal::RamStorageKey::GetInternalId(kKeyId_KvsValues, keyId);
-        ChipLogProgress(DeviceLayer, "KVS, get the value of Matter key [%s] with PDM id: %i", key, pdmInternalId);
+        ChipLogProgress(DeviceLayer, "KVS val: get [%s][%i][%s]", key, pdmInternalId, GetValStorage(key)->GetName());
         err              = GetValStorage(key)->Read(pdmInternalId, 0, (uint8_t *) value, &valueSize);
         *read_bytes_size = valueSize;
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "KVS, Matter key [%s] not found in persistent storage.", key);
+        ChipLogProgress(DeviceLayer, "KVS key [%s] not found in persistent storage.", key);
     }
 
 exit:
@@ -204,8 +204,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
     /* Use kKeyId_KvsValues as base key id for all keys. */
     pdmInternalId = Internal::RamStorageKey::GetInternalId(kKeyId_KvsValues, keyId);
-    ChipLogProgress(DeviceLayer, "KVS, save in flash the value of the Matter key [%s] with PDM id: %i", key, pdmInternalId);
-
+    ChipLogProgress(DeviceLayer, "KVS val: set [%s][%i][%s]", key, pdmInternalId, GetValStorage(key)->GetName());
     err = GetValStorage(key)->Write(pdmInternalId, (uint8_t *) value, value_size);
     /* save the 'key' in flash such that it can be retrieved later on */
     if (err == CHIP_NO_ERROR)
@@ -213,21 +212,18 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
         if (putKey)
         {
             pdmInternalId = Internal::RamStorageKey::GetInternalId(kKeyId_KvsKeys, keyId);
-            ChipLogProgress(DeviceLayer, "KVS, save in flash the Matter key [%s] with PDM id: %i and length %d", key, pdmInternalId,
-                            strlen(key) + 1);
+            ChipLogProgress(DeviceLayer, "KVS key: set [%s][%i][%s]", key, pdmInternalId, GetKeyStorage(key)->GetName());
 
             err = GetKeyStorage(key)->Write(pdmInternalId, (uint8_t *) key, strlen(key) + 1);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the Matter key [%s] with PDM id: %i", key,
-                                pdmInternalId);
+                ChipLogProgress(DeviceLayer, "KVS key: error when setting [%s][%i]", key, pdmInternalId);
             }
         }
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "KVS, Error while saving in flash the value of the Matter key [%s] with PDM id: %i", key,
-                        pdmInternalId);
+        ChipLogProgress(DeviceLayer, "KVS val: error when setting [%s][%i]", key, pdmInternalId);
     }
 
 exit:
@@ -249,7 +245,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
         // entry exists so we can remove it
         pdmInternalId = Internal::RamStorageKey::GetInternalId(kKeyId_KvsKeys, keyId);
 
-        ChipLogProgress(DeviceLayer, "KVS, delete from flash the Matter key [%s] with PDM id: %i", key, pdmInternalId);
+        ChipLogProgress(DeviceLayer, "KVS key: del [%s][%i][%s]", key, pdmInternalId, GetKeyStorage(key)->GetName());
         err = GetKeyStorage(key)->Delete(pdmInternalId, -1);
 
         /* also delete the 'key string' from flash */
@@ -257,21 +253,17 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
         {
             /* Use kKeyId_KvsValues as base key id for all keys. */
             pdmInternalId = Internal::RamStorageKey::GetInternalId(kKeyId_KvsValues, keyId);
-            ChipLogProgress(DeviceLayer, "KVS, delete from flash the value of the Matter key [%s] with PDM id: %i", key,
-                            pdmInternalId);
+            ChipLogProgress(DeviceLayer, "KVS val: del [%s][%i][%s]", key, pdmInternalId, GetValStorage(key)->GetName());
 
             err = GetValStorage(key)->Delete(pdmInternalId, -1);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogProgress(DeviceLayer,
-                                "KVS, Error while deleting from flash the value of the Matter key [%s] with PDM id: %i", key,
-                                pdmInternalId);
+                ChipLogProgress(DeviceLayer, "KVS val: error when deleting [%s][%i]", key, pdmInternalId);
             }
         }
         else
         {
-            ChipLogProgress(DeviceLayer, "KVS, Error while deleting from flash the Matter key [%s] with PDM id: %i", key,
-                            pdmInternalId);
+            ChipLogProgress(DeviceLayer, "KVS key: error when deleting [%s][%i]", key, pdmInternalId);
         }
     }
 exit:

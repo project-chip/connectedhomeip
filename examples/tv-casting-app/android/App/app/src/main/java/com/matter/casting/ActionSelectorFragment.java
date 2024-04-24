@@ -33,6 +33,8 @@ public class ActionSelectorFragment extends Fragment {
   private final CastingPlayer selectedCastingPlayer;
 
   private View.OnClickListener selectContentLauncherButtonClickListener;
+  private View.OnClickListener selectApplicationBasicButtonClickListener;
+  private View.OnClickListener selectMediaPlaybackButtonClickListener;
   private View.OnClickListener disconnectButtonClickListener;
 
   public ActionSelectorFragment(CastingPlayer selectedCastingPlayer) {
@@ -64,6 +66,16 @@ public class ActionSelectorFragment extends Fragment {
           Log.d(TAG, "handle() called on selectContentLauncherButtonClickListener");
           callback.handleContentLauncherLaunchURLSelected(selectedCastingPlayer);
         };
+    this.selectApplicationBasicButtonClickListener =
+        v -> {
+          Log.d(TAG, "handle() called on selectApplicationBasicButtonClickListener");
+          callback.handleApplicationBasicReadVendorIDSelected(selectedCastingPlayer);
+        };
+    this.selectMediaPlaybackButtonClickListener =
+        v -> {
+          Log.d(TAG, "handle() called on selectMediaPlaybackButtonClickListener");
+          callback.handleMediaPlaybackSubscribeToCurrentStateSelected(selectedCastingPlayer);
+        };
 
     this.disconnectButtonClickListener =
         v -> {
@@ -82,6 +94,12 @@ public class ActionSelectorFragment extends Fragment {
     getView()
         .findViewById(R.id.selectContentLauncherLaunchURLButton)
         .setOnClickListener(selectContentLauncherButtonClickListener);
+    getView()
+        .findViewById(R.id.selectApplicationBasicReadVendorIDButton)
+        .setOnClickListener(selectApplicationBasicButtonClickListener);
+    getView()
+        .findViewById(R.id.selectMediaPlaybackSubscribeToCurrentStateButton)
+        .setOnClickListener(selectMediaPlaybackButtonClickListener);
 
     getView().findViewById(R.id.disconnectButton).setOnClickListener(disconnectButtonClickListener);
   }
@@ -90,6 +108,12 @@ public class ActionSelectorFragment extends Fragment {
   public interface Callback {
     /** Notifies listener to trigger transition on selection of Content Launcher cluster */
     void handleContentLauncherLaunchURLSelected(CastingPlayer selectedCastingPlayer);
+
+    /** Notifies listener to trigger transition on selection of Application Basic cluster */
+    void handleApplicationBasicReadVendorIDSelected(CastingPlayer selectedCastingPlayer);
+
+    /** Notifies listener to trigger transition on selection of Media PLayback cluster */
+    void handleMediaPlaybackSubscribeToCurrentStateSelected(CastingPlayer selectedCastingPlayer);
 
     /** Notifies listener to trigger transition on click of the Disconnect button */
     void handleDisconnect();

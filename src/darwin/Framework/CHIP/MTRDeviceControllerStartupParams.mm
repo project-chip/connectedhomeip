@@ -23,11 +23,7 @@
 #import "MTRP256KeypairBridge.h"
 #import "NSDataSpanConversion.h"
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#else
-#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPCert.h>

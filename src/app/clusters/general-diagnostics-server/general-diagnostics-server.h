@@ -19,9 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/CommandResponseHelper.h>
-#include <app/util/af.h>
 #include <platform/GeneralFaults.h>
 
 namespace chip {

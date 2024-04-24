@@ -17,11 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <bitmap name="Feature" type="bitmap32">
-      <cluster code="0x0004"/>
-      <field name="GroupNames" mask="0x1"/>
-  </bitmap>
-
   <bitmap name="NameSupportBitmap" type="bitmap8">
       <cluster code="0x0004"/>
       <field name="GroupNames" mask="0x80"/>
@@ -38,6 +33,12 @@ limitations under the License.
     <server init="false" tick="false">true</server>
 
     <globalAttribute side="either" code="0xFFFD" value="4"/>
+
+    <features>
+      <feature bit="0" code="GN" name="GroupNames" summary="The ability to store a name for a group.">
+        <optionalConform/>
+      </feature>
+    </features>
 
     <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80" writable="false" optional="false">NameSupport</attribute>
 

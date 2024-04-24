@@ -182,7 +182,7 @@ directory of this README). Most of the heavy lifting is done by the lark using
     content
 -   [matter_idl_parser.py](./matter_idl_parser.py) has a transformer that
     converts the text given by lark into a more type-safe (and type-rich) AST as
-    defined ing [matter_idl_types.py](./matter_idl_types.py)
+    defined in [matter_idl_types.py](./matter_idl_types.py)
 
 ## Code generation
 

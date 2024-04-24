@@ -193,7 +193,7 @@ else
                 shift
                 ;;
             --icd)
-                optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false "
+                optArgs+="chip_enable_icd_server=true chip_openthread_ftd=false sl_enable_test_event_trigger=true "
                 shift
                 ;;
             --low-power)
@@ -303,7 +303,7 @@ else
         {
             ShortCommitSha=$(git describe --always --dirty --exclude '*')
             branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.2-$branchName-$ShortCommitSha\" "
+            optArgs+="sl_matter_version_str=\"v1.3-$branchName-$ShortCommitSha\" "
         } &>/dev/null
     fi
 

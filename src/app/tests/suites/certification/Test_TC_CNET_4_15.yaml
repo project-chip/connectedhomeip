@@ -43,32 +43,6 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/30196
-    - label: "Precondition: Commission TH and DUT on WiFi network"
-      verification: |
-          ./chip-tool pairing ble-wifi 0x12344321 <ssid> <password> <setup-pin-code> <discriminator>
-
-          [1698912271.738597][32363:32366] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-          [1698912271.738606][32363:32366] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1698912271.738613][32363:32366] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
-          [1698912271.738617][32363:32366] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1698912271.738622][32363:32366] CHIP:CTL: Performing next commissioning step 'Cleanup'
-          [1698912271.738639][32363:32366] CHIP:IN: SecureSession[0x7fbb04014a50]: MarkForEviction Type:1 LSID:50170
-          [1698912271.738642][32363:32366] CHIP:SC: SecureSession[0x7fbb04014a50, LSID:50170]: State change 'kActive' --> 'kPendingEviction'
-          [1698912271.738666][32363:32366] CHIP:IN: SecureSession[0x7fbb04014a50]: Released - Type:1 LSID:50170
-          [1698912271.738672][32363:32366] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
-          [1698912271.738677][32363:32366] CHIP:TOO: Device commissioning completed with success
-          [1698912271.738691][32363:32366] CHIP:DMG: ICR moving to [AwaitingDe]
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
-
     - label: "Precondition: TH reads FeatureMap attribute from the DUT"
       command: "readAttribute"
       attribute: "FeatureMap"

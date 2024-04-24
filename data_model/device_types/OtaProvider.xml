@@ -57,16 +57,15 @@ Davis, CA 95616, USA
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0014" name="OTA Provider" revision="1">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
     <revision revision="1" summary="Initial release of this document"/>
   </revisionHistory>
   <classification class="utility" scope="node"/>
   <clusters>
-    <cluster id="0x0012" name="OTA Software Update Requestor" side="client">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0014" name="OTA Software Update Provider" side="server">
+    <cluster id="0x0029" name="OTA Software Update Provider" side="server">
       <mandatoryConform/>
+    </cluster>
+    <cluster id="0x002A" name="OTA Software Update Requestor" side="client">
+      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/clusters/mode-base-server/mode-base-server.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 #include <utility>

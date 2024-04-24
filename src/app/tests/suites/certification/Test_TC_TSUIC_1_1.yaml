@@ -85,17 +85,17 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+    - label: "Step 6: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
-      attribute: "AcceptedCommandList"
+      attribute: "GeneratedCommandList"
       response:
           value: []
           constraints:
               type: list
 
-    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
+    - label: "Step 7: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
-      attribute: "GeneratedCommandList"
+      attribute: "AcceptedCommandList"
       response:
           value: []
           constraints:

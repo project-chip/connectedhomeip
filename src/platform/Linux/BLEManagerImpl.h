@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <string>
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #include "bluez/BluezAdvertisement.h"
@@ -93,6 +93,8 @@ public:
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
 
+    static void NotifyBLEAdapterAdded(unsigned int aAdapterId, const char * aAdapterAddress);
+    static void NotifyBLEAdapterRemoved(unsigned int aAdapterId, const char * aAdapterAddress);
     static void NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error);
     static void NotifyBLEPeripheralAdvStartComplete(CHIP_ERROR error);
     static void NotifyBLEPeripheralAdvStopComplete(CHIP_ERROR error);
@@ -182,10 +184,14 @@ private:
     };
 
     void DriveBLEState();
+    void DisableBLEService(CHIP_ERROR err);
     BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
-    static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
     void InitiateScan(BleScanState scanType);
     void CleanScanConfig();
+
+    static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
+    static void HandleScanTimer(chip::System::Layer *, void * appState);
+    static void HandleConnectTimer(chip::System::Layer *, void * appState);
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;

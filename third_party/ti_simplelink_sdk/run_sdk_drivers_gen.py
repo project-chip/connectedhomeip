@@ -16,7 +16,8 @@ import sys
 parser = argparse.ArgumentParser()
 parser.add_argument('--sdk', help="TI SDK root")
 parser.add_argument('--chip-root', help="CHIP Root")
-parser.add_argument('--src-path', help="the path where the built drivers exist")
+parser.add_argument('--src-path-drivers', help="the path where the built drivers exist")
+parser.add_argument('--src-path-driverlib', help="the path where the built driverlib exist")
 parser.add_argument('--dest-path', help="path where drivers will be copied to")
 
 args = parser.parse_args()
@@ -34,21 +35,26 @@ if not os.path.isdir(GCC_ARMCOMPILER_PATH):
     print("Compiler Path is invalid: " + GCC_ARMCOMPILER_PATH)
     sys.exit(2)
 
-source_file = args.sdk + args.src_path
+source_file_drivers = args.sdk + args.src_path_drivers
+source_file_driverlib = args.sdk + args.src_path_driverlib
 dest_path = args.dest_path
 
 make_command = ["make", "-C", args.sdk, "CMAKE=cmake", "GCC_ARMCOMPILER=" +
                 GCC_ARMCOMPILER_PATH, "IAR_ARMCOMPILER=", "TICLANG_ARMCOMPILER=", "GENERATOR=Ninja"]
-
 pid = os.fork()
 if pid:
     status = os.wait()
-    if os.path.exists(source_file):
-        shutil.copy(source_file, dest_path)
+    if os.path.exists(source_file_drivers):
+        shutil.copy(source_file_drivers, dest_path)
     else:
         print("Driver does not exist or path is incorrect.")
         sys.exit(2)
 
+    if os.path.exists(source_file_driverlib):
+        shutil.copy(source_file_driverlib, dest_path)
+    else:
+        print("Driverlib does not exist or path is incorrect.")
+        sys.exit(2)
 else:
     make_command = ["make", "-C", args.sdk, "CMAKE=cmake", "GCC_ARMCOMPILER=" +
                     GCC_ARMCOMPILER_PATH, "IAR_ARMCOMPILER=", "TICLANG_ARMCOMPILER=", "GENERATOR=Ninja"]

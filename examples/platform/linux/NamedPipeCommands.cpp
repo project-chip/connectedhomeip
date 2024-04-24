@@ -26,6 +26,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <string>
+
 static constexpr const size_t kChipEventCmdBufSize = 256;
 
 CHIP_ERROR NamedPipeCommands::Start(std::string & path, NamedPipeCommandDelegate * delegate)

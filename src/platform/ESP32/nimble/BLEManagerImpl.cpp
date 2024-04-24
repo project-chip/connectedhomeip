@@ -31,9 +31,8 @@
 #if CONFIG_BT_NIMBLE_ENABLED
 
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #endif
-#include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
@@ -76,6 +75,7 @@ namespace Internal {
 
 namespace {
 
+TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 static constexpr uint16_t kNewConnectionScanTimeout = 60;
 static constexpr uint16_t kConnectTimeout           = 20;
@@ -123,8 +123,6 @@ uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
 ChipDeviceScanner & mDeviceScanner = Internal::ChipDeviceScanner::GetInstance();
 #endif
 BLEManagerImpl BLEManagerImpl::sInstance;
-constexpr System::Clock::Timeout BLEManagerImpl::kFastAdvertiseTimeout;
-
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
     { .type = BLE_GATT_SVC_TYPE_PRIMARY,
       .uuid = (ble_uuid_t *) (&ShortUUID_CHIPoBLEService),
@@ -221,6 +219,14 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #endif
     SuccessOrExit(err);
 
+    // Create FreeRTOS sw timer for BLE timeouts and interval change.
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
+                                       1,                   // == default timer period
+                                       false,               // no timer reload (==one-shot)
+                                       (void *) this,       // init timer id = ble obj context
+                                       BleAdvTimeoutHandler // timer callback handler
+    );
+
     mRXCharAttrHandle = 0;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     mC3CharAttrHandle = 0;
@@ -254,8 +260,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (val)
     {
-        mAdvertiseStartTime = System::SystemClock().GetMonotonicTimestamp();
-        ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
+        StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
     }
 
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
@@ -267,21 +272,31 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context)
+void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
-    static_cast<BLEManagerImpl *>(context)->HandleFastAdvertisementTimer();
-}
-
-void BLEManagerImpl::HandleFastAdvertisementTimer()
-{
-    System::Clock::Timestamp currentTimestamp = System::SystemClock().GetMonotonicTimestamp();
-
-    if (currentTimestamp - mAdvertiseStartTime >= kFastAdvertiseTimeout)
+    if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        mFlags.Set(Flags::kFastAdvertisingEnabled, 0);
-        mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
+        ChipLogProgress(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
+        BLEMgrImpl().mFlags.Set(Flags::kFastAdvertisingEnabled, 0);
+        BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
+
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+        BLEMgrImpl().mFlags.Clear(Flags::kExtAdvertisingEnabled);
+        BLEMgrImpl().StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS);
+#endif
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    else
+    {
+        ChipLogProgress(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
+        BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
+        BLEMgrImpl().mFlags.Set(Flags::kExtAdvertisingEnabled);
+        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        BLEMgrImpl().mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
+        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    }
+#endif
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
@@ -690,6 +705,28 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
         return CHIP_ERROR(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
     }
 }
+void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
+{
+    if (xTimerStop(sbleAdvTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    {
+        ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
+    }
+}
+void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
+{
+    if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
+    {
+        CancelBleAdvTimeoutTimer();
+    }
+
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(100)) != pdPASS)
+    {
+        ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
+    }
+}
 void BLEManagerImpl::DriveBLEState(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -977,8 +1014,25 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ExitNow();
     }
 
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    // Check for extended advertisement interval and redact VID/PID if past the initial period.
+    if (mFlags.Has(Flags::kExtAdvertisingEnabled))
+    {
+        deviceIdInfo.SetVendorId(0);
+        deviceIdInfo.SetProductId(0);
+        deviceIdInfo.SetExtendedAnnouncementFlag(true);
+    }
+#endif
+
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    deviceIdInfo.SetAdditionalDataFlag(true);
+    if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
+    {
+        deviceIdInfo.SetAdditionalDataFlag(true);
+    }
+    else
+    {
+        deviceIdInfo.SetAdditionalDataFlag(false);
+    }
 #endif
 
     VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(advData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
@@ -1565,8 +1619,23 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     else
     {
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+        if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
+        {
+            adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+            adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+        }
+        else
+        {
+            adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN;
+            adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX;
+        }
+#else
+
         adv_params.itvl_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
         adv_params.itvl_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+
+#endif
     }
 
     ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable)",
@@ -1673,7 +1742,7 @@ void BLEManagerImpl::OnDeviceScanned(const struct ble_hs_adv_fields & fields, co
     {
         if (!mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator()))
         {
-            printf("Discriminator didi not match \n");
+            ChipLogProgress(Ble, "Discriminator did not match");
             return;
         }
         ChipLogProgress(Ble, "Device Discriminator match. Attempting to connect");

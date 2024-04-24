@@ -28,6 +28,8 @@
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 
+#include <app-common/zap-generated/cluster-enums.h>
+
 #include "platform/internal/GenericConnectivityManagerImpl.h"
 #include "platform/internal/GenericConnectivityManagerImpl_UDP.h"
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT

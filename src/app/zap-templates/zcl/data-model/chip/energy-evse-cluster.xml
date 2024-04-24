@@ -96,6 +96,24 @@ limitations under the License.
     <description>Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management.</description>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
 
+    <features>
+      <feature bit="0" code="PREF" name="ChargingPreferences" summary="EVSE supports storing user charging preferences">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="SOC" name="SoCReporting" summary="EVSE supports reporting of vehicle State of Charge (SoC)">
+        <provisionalConform/>
+      </feature>
+      <feature bit="2" code="PNC" name="PlugAndCharge" summary="EVSE supports PLC to support Plug and Charge">
+        <provisionalConform/>
+      </feature>
+      <feature bit="3" code="RFID" name="RFID" summary="EVSE is fitted with an RFID reader">
+        <optionalConform/>
+      </feature>
+      <feature bit="4" code="V2X" name="V2X" summary="EVSE supports bi-directional charging / discharging">
+        <provisionalConform/>
+      </feature>
+    </features>
+
     <!--Attributes-->
     
     <attribute code="0x0000" side="server" type="StateEnum" define="STATE" isNullable="true" writable="false" optional="false" min="0x00" max="0x06">State</attribute>
@@ -224,13 +242,5 @@ limitations under the License.
       <field id="0" name="UID" type="octet_string" length="10" apiMaturity="provisional"/>
     </event>
   </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0099"/>
-    <field name="ChargingPreferences" mask="0x01"/>
-    <field name="SoCReporting" mask="0x02"/>
-    <field name="PlugAndCharge" mask="0x04"/>
-    <field name="RFID" mask="0x08"/>
-    <field name="V2X" mask="0x10"/>
-  </bitmap>
 
 </configurator>

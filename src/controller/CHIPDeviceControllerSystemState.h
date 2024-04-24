@@ -49,7 +49,7 @@
 #endif
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <transport/raw/BLE.h>
 #endif
 
@@ -167,8 +167,9 @@ public:
     // should be called to release the reference once it is no longer needed.
     DeviceControllerSystemState * Retain()
     {
-        VerifyOrDie(mRefCount < std::numeric_limits<uint32_t>::max());
-        ++mRefCount;
+        auto count = mRefCount++;
+        VerifyOrDie(count < std::numeric_limits<decltype(count)>::max()); // overflow
+        VerifyOrDie(!IsShutdown());                                       // avoid zombie
         return this;
     };
 
@@ -178,14 +179,15 @@ public:
     //
     // NB: The system state is owned by the factory; Relase() will not free it
     // but will free its members (Shutdown()).
-    void Release()
+    //
+    // Returns true if the system state was shut down in response to this call.
+    bool Release()
     {
-        VerifyOrDie(mRefCount > 0);
-
-        if (--mRefCount == 0)
-        {
-            Shutdown();
-        }
+        auto count = mRefCount--;
+        VerifyOrDie(count > 0); // underflow
+        VerifyOrReturnValue(count == 1, false);
+        Shutdown();
+        return true;
     };
     bool IsInitialized()
     {
@@ -195,6 +197,7 @@ public:
             mGroupDataProvider != nullptr && mReportScheduler != nullptr && mTimerDelegate != nullptr &&
             mSessionKeystore != nullptr && mSessionResumptionStorage != nullptr && mBDXTransferServer != nullptr;
     };
+    bool IsShutdown() { return mHaveShutDown; }
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
     Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() const { return mTCPEndPointManager; };

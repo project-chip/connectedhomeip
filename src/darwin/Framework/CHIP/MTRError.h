@@ -138,8 +138,8 @@ typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     MTRInteractionErrorCodePathsExhausted                            = 0xc8,
     MTRInteractionErrorCodeTimedRequestMismatch                      = 0xc9,
     MTRInteractionErrorCodeFailsafeRequired                          = 0xca,
-    MTRInteractionErrorInvalidInState            MTR_NEWLY_AVAILABLE = 0xcb,
-    MTRInteractionErrorNoCommandResponse         MTR_NEWLY_AVAILABLE = 0xcc,
+    MTRInteractionErrorCodeInvalidInState        MTR_NEWLY_AVAILABLE = 0xcb,
+    MTRInteractionErrorCodeNoCommandResponse     MTR_NEWLY_AVAILABLE = 0xcc,
 };
 // clang-format on
 

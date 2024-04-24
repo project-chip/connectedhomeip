@@ -27,6 +27,8 @@
 #include <lib/support/TestGroupData.h>
 #include <platform/LockTracker.h>
 
+#include <string>
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"
 #include "TraceHandlers.h"

@@ -20,7 +20,6 @@ import("${chip_root}/src/system/system.gni")
 
 source_set("commands") {
   sources = [
-    "Base64.cpp",
     "Help.cpp",
     "Help.h",
     "Meta.cpp",
@@ -37,7 +36,10 @@ source_set("commands") {
   }
 
   if (chip_enable_wifi) {
-    sources += [ "WiFi.cpp" ]
+    sources += [
+      "WiFi.cpp",
+      "WiFi.h",
+    ]
   }
 
   if (chip_enable_ble && chip_device_platform != "none") {

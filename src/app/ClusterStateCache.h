@@ -66,7 +66,8 @@ namespace app {
  * 2. The same cache cannot be used by multiple subscribe/read interactions at the same time.
  *
  */
-class ClusterStateCache : protected ReadClient::Callback
+template <bool CanEnableDataCaching>
+class ClusterStateCacheT : protected ReadClient::Callback
 {
 public:
     class Callback : public ReadClient::Callback
@@ -83,17 +84,17 @@ public:
         /*
          * Called anytime an attribute value has changed in the cache
          */
-        virtual void OnAttributeChanged(ClusterStateCache * cache, const ConcreteAttributePath & path){};
+        virtual void OnAttributeChanged(ClusterStateCacheT * cache, const ConcreteAttributePath & path){};
 
         /*
          * Called anytime any attribute in a cluster has changed in the cache
          */
-        virtual void OnClusterChanged(ClusterStateCache * cache, EndpointId endpointId, ClusterId clusterId){};
+        virtual void OnClusterChanged(ClusterStateCacheT * cache, EndpointId endpointId, ClusterId clusterId){};
 
         /*
          * Called anytime an endpoint was added to the cache
          */
-        virtual void OnEndpointAdded(ClusterStateCache * cache, EndpointId endpointId){};
+        virtual void OnEndpointAdded(ClusterStateCacheT * cache, EndpointId endpointId){};
     };
 
     /**
@@ -104,18 +105,25 @@ public:
      * @param [in] cacheData boolean to decide whether this cache would store attribute/event data/status,
      *             the default is true.
      */
-    ClusterStateCache(Callback & callback, Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing(),
-                      bool cacheData = true) :
+    ClusterStateCacheT(Callback & callback, Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing()) :
+        mCallback(callback), mBufferedReader(*this)
+    {
+        mHighestReceivedEventNumber = highestReceivedEventNumber;
+    }
+
+    template <bool DataCachingEnabled = CanEnableDataCaching, std::enable_if_t<DataCachingEnabled, bool> = true>
+    ClusterStateCacheT(Callback & callback, Optional<EventNumber> highestReceivedEventNumber = Optional<EventNumber>::Missing(),
+                       bool cacheData = true) :
         mCallback(callback),
         mBufferedReader(*this), mCacheData(cacheData)
     {
         mHighestReceivedEventNumber = highestReceivedEventNumber;
     }
 
-    ClusterStateCache(const ClusterStateCache &)             = delete;
-    ClusterStateCache(ClusterStateCache &&)                  = delete;
-    ClusterStateCache & operator=(const ClusterStateCache &) = delete;
-    ClusterStateCache & operator=(ClusterStateCache &&)      = delete;
+    ClusterStateCacheT(const ClusterStateCacheT &)             = delete;
+    ClusterStateCacheT(ClusterStateCacheT &&)                  = delete;
+    ClusterStateCacheT & operator=(const ClusterStateCacheT &) = delete;
+    ClusterStateCacheT & operator=(ClusterStateCacheT &&)      = delete;
 
     void SetHighestReceivedEventNumber(EventNumber highestReceivedEventNumber)
     {
@@ -534,8 +542,12 @@ private:
     // * If we got data for the attribute and we are not storing data
     //   oureselves, the size of the data, so we can still prioritize sending
     //   DataVersions correctly.
+    //
+    // The data for a single attribute is not going to be gigabytes in size, so
+    // using uint32_t for the size is fine; on 64-bit systems this can save
+    // quite a bit of space.
     using AttributeData  = Platform::ScopedMemoryBufferWithSize<uint8_t>;
-    using AttributeState = Variant<StatusIB, AttributeData, size_t>;
+    using AttributeState = std::conditional_t<CanEnableDataCaching, Variant<StatusIB, AttributeData, uint32_t>, uint32_t>;
     // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.
     //
     // mCurrentDataVersion represents a known data version for a cluster.  In order for this to have a
@@ -659,7 +671,7 @@ private:
     // on the wire if not all filters can be applied.
     void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector) const;
 
-    CHIP_ERROR GetElementTLVSize(TLV::TLVReader * apData, size_t & aSize);
+    CHIP_ERROR GetElementTLVSize(TLV::TLVReader * apData, uint32_t & aSize);
 
     Callback & mCallback;
     NodeState mCache;
@@ -672,8 +684,11 @@ private:
     std::map<ConcreteEventPath, StatusIB> mEventStatusCache;
     BufferedReadCallback mBufferedReader;
     ConcreteClusterPath mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
-    const bool mCacheData                   = true;
+    const bool mCacheData                   = CanEnableDataCaching;
 };
+
+using ClusterStateCache       = ClusterStateCacheT<true>;
+using ClusterStateCacheNoData = ClusterStateCacheT<false>;
 
 };     // namespace app
 };     // namespace chip

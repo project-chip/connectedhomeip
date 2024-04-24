@@ -21,6 +21,7 @@
 #include <platform/PlatformManager.h>
 
 #include <LockManager.h>
+#include <string>
 #include <utility>
 
 using chip::to_underlying;

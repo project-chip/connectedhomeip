@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include <functional>
+#include <string>
 #include <vector>
 
 class Device

@@ -455,6 +455,7 @@ static sl_status_t wfx_rsi_init(void)
         return status;
     }
 
+#ifdef SLI_SI91X_MCU_INTERFACE
     const uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
 
     // To check the Entropy of TRNG and verify TRNG functioning.
@@ -472,6 +473,7 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("TRNG Key Programming Failed");
         return status;
     }
+#endif // SLI_SI91X_MCU_INTERFACE
 
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
@@ -928,7 +930,6 @@ void ProcessEvent(WfxEvent_t inEvent)
 /* ARGSUSED */
 void wfx_rsi_task(void * arg)
 {
-    EventBits_t flags;
     (void) arg;
     sl_status_t status = wfx_rsi_init();
 

@@ -16,9 +16,7 @@
  *    limitations under the License.
  */
 
-#include "lib/support/CHIPMem.h"
 #include <access/AccessControl.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>

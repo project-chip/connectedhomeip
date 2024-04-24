@@ -2688,6 +2688,159 @@ cluster DoorLock = 257 {
   timed command access(invoke: administer) ClearAliroReaderConfig(): DefaultSuccess = 41;
 }
 
+/** Provides an interface for controlling and adjusting automatic window coverings. */
+cluster WindowCovering = 258 {
+  revision 5;
+
+  enum EndProductType : enum8 {
+    kRollerShade = 0;
+    kRomanShade = 1;
+    kBalloonShade = 2;
+    kWovenWood = 3;
+    kPleatedShade = 4;
+    kCellularShade = 5;
+    kLayeredShade = 6;
+    kLayeredShade2D = 7;
+    kSheerShade = 8;
+    kTiltOnlyInteriorBlind = 9;
+    kInteriorBlind = 10;
+    kVerticalBlindStripCurtain = 11;
+    kInteriorVenetianBlind = 12;
+    kExteriorVenetianBlind = 13;
+    kLateralLeftCurtain = 14;
+    kLateralRightCurtain = 15;
+    kCentralCurtain = 16;
+    kRollerShutter = 17;
+    kExteriorVerticalScreen = 18;
+    kAwningTerracePatio = 19;
+    kAwningVerticalScreen = 20;
+    kTiltOnlyPergola = 21;
+    kSwingingShutter = 22;
+    kSlidingShutter = 23;
+    kUnknown = 255;
+  }
+
+  enum Type : enum8 {
+    kRollerShade = 0;
+    kRollerShade2Motor = 1;
+    kRollerShadeExterior = 2;
+    kRollerShadeExterior2Motor = 3;
+    kDrapery = 4;
+    kAwning = 5;
+    kShutter = 6;
+    kTiltBlindTiltOnly = 7;
+    kTiltBlindLiftAndTilt = 8;
+    kProjectorScreen = 9;
+    kUnknown = 255;
+  }
+
+  bitmap ConfigStatus : bitmap8 {
+    kOperational = 0x1;
+    kOnlineReserved = 0x2;
+    kLiftMovementReversed = 0x4;
+    kLiftPositionAware = 0x8;
+    kTiltPositionAware = 0x10;
+    kLiftEncoderControlled = 0x20;
+    kTiltEncoderControlled = 0x40;
+  }
+
+  bitmap Feature : bitmap32 {
+    kLift = 0x1;
+    kTilt = 0x2;
+    kPositionAwareLift = 0x4;
+    kAbsolutePosition = 0x8;
+    kPositionAwareTilt = 0x10;
+  }
+
+  bitmap Mode : bitmap8 {
+    kMotorDirectionReversed = 0x1;
+    kCalibrationMode = 0x2;
+    kMaintenanceMode = 0x4;
+    kLedFeedback = 0x8;
+  }
+
+  bitmap OperationalStatus : bitmap8 {
+    kGlobal = 0x3;
+    kLift = 0xC;
+    kTilt = 0x30;
+  }
+
+  bitmap SafetyStatus : bitmap16 {
+    kRemoteLockout = 0x1;
+    kTamperDetection = 0x2;
+    kFailedCommunication = 0x4;
+    kPositionFailure = 0x8;
+    kThermalProtection = 0x10;
+    kObstacleDetected = 0x20;
+    kPower = 0x40;
+    kStopInput = 0x80;
+    kMotorJammed = 0x100;
+    kHardwareFailure = 0x200;
+    kManualOperation = 0x400;
+    kProtection = 0x800;
+  }
+
+  readonly attribute Type type = 0;
+  readonly attribute optional int16u physicalClosedLimitLift = 1;
+  readonly attribute optional int16u physicalClosedLimitTilt = 2;
+  readonly attribute optional nullable int16u currentPositionLift = 3;
+  readonly attribute optional nullable int16u currentPositionTilt = 4;
+  readonly attribute optional int16u numberOfActuationsLift = 5;
+  readonly attribute optional int16u numberOfActuationsTilt = 6;
+  readonly attribute ConfigStatus configStatus = 7;
+  readonly attribute optional nullable percent currentPositionLiftPercentage = 8;
+  readonly attribute optional nullable percent currentPositionTiltPercentage = 9;
+  readonly attribute OperationalStatus operationalStatus = 10;
+  readonly attribute optional nullable percent100ths targetPositionLiftPercent100ths = 11;
+  readonly attribute optional nullable percent100ths targetPositionTiltPercent100ths = 12;
+  readonly attribute EndProductType endProductType = 13;
+  readonly attribute optional nullable percent100ths currentPositionLiftPercent100ths = 14;
+  readonly attribute optional nullable percent100ths currentPositionTiltPercent100ths = 15;
+  readonly attribute optional int16u installedOpenLimitLift = 16;
+  readonly attribute optional int16u installedClosedLimitLift = 17;
+  readonly attribute optional int16u installedOpenLimitTilt = 18;
+  readonly attribute optional int16u installedClosedLimitTilt = 19;
+  attribute access(write: manage) Mode mode = 23;
+  readonly attribute optional SafetyStatus safetyStatus = 26;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct GoToLiftValueRequest {
+    int16u liftValue = 0;
+  }
+
+  request struct GoToLiftPercentageRequest {
+    percent100ths liftPercent100thsValue = 0;
+  }
+
+  request struct GoToTiltValueRequest {
+    int16u tiltValue = 0;
+  }
+
+  request struct GoToTiltPercentageRequest {
+    percent100ths tiltPercent100thsValue = 0;
+  }
+
+  /** Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt */
+  command UpOrOpen(): DefaultSuccess = 0;
+  /** Moves window covering to InstalledClosedLimitLift and InstalledCloseLimitTilt */
+  command DownOrClose(): DefaultSuccess = 1;
+  /** Stop any adjusting of window covering */
+  command StopMotion(): DefaultSuccess = 2;
+  /** Go to lift value specified */
+  command GoToLiftValue(GoToLiftValueRequest): DefaultSuccess = 4;
+  /** Go to lift percentage specified */
+  command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
+  /** Go to tilt value specified */
+  command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
+  /** Go to tilt percentage specified */
+  command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
+}
+
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
   revision 6;
@@ -3503,6 +3656,45 @@ endpoint 1 {
     handle command GetCredentialStatus;
     handle command GetCredentialStatusResponse;
     handle command ClearCredential;
+  }
+
+  server cluster WindowCovering {
+    ram      attribute type default = 0x00;
+    ram      attribute physicalClosedLimitLift default = 0x0000;
+    ram      attribute physicalClosedLimitTilt default = 0x0000;
+    ram      attribute currentPositionLift;
+    ram      attribute currentPositionTilt;
+    ram      attribute numberOfActuationsLift default = 0x0000;
+    ram      attribute numberOfActuationsTilt default = 0x0000;
+    ram      attribute configStatus default = 0x03;
+    ram      attribute currentPositionLiftPercentage;
+    ram      attribute currentPositionTiltPercentage;
+    ram      attribute operationalStatus default = 0x00;
+    ram      attribute targetPositionLiftPercent100ths;
+    ram      attribute targetPositionTiltPercent100ths;
+    ram      attribute endProductType default = 0x00;
+    ram      attribute currentPositionLiftPercent100ths;
+    ram      attribute currentPositionTiltPercent100ths;
+    ram      attribute installedOpenLimitLift default = 0x0000;
+    ram      attribute installedClosedLimitLift default = 0xFFFF;
+    ram      attribute installedOpenLimitTilt default = 0x0000;
+    ram      attribute installedClosedLimitTilt default = 0xFFFF;
+    ram      attribute mode default = 0x00;
+    ram      attribute safetyStatus default = 0x0000;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 5;
+
+    handle command UpOrOpen;
+    handle command DownOrClose;
+    handle command StopMotion;
+    handle command GoToLiftValue;
+    handle command GoToLiftPercentage;
+    handle command GoToTiltValue;
+    handle command GoToTiltPercentage;
   }
 
   server cluster ColorControl {

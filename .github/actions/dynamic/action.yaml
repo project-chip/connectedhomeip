@@ -1,0 +1,38 @@
+name: Dynamic
+description: Dynamically resolves another GitHub action
+inputs:
+  action:
+    description: Action reference
+    required: true
+  with:
+    description: Action inputs as multi-line YAML string
+    required: false
+    default: ""
+outputs:
+  outputs:
+    description: JSON object of outputs from the action
+    value: ${{ steps.run.outputs.outputs }}
+runs:
+  using: composite
+  steps:
+    - name: Instantiate
+      shell: bash
+      run: |
+        # Dynamically invoke ${{ inputs.action }}
+        with='${{ inputs.with }}'
+        [[ -z "$with" ]] || with="$(echo '    with:'; sed -e 's/^/      /' <<<"$with")"
+        mkdir -p ./.tmp/dynamic-action-instance
+        cat <<END >./.tmp/dynamic-action-instance/action.yaml
+        runs:
+          using: composite
+          steps:
+          - id: run
+            uses: ${{ inputs.action }}
+        $with
+        outputs:
+          outputs:
+            value: $(echo '$'){{ toJSON(steps.run.outputs) }}
+        END
+    - name: Run
+      id: run
+      uses: ./.tmp/dynamic-action-instance

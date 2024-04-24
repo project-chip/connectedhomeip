@@ -62,7 +62,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
 }
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                                nullptr_t
+                                                std::nullptr_t
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 ,
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry

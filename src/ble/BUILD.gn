@@ -29,10 +29,7 @@ buildconfig_header("ble_buildconfig") {
   header = "BleBuildConfig.h"
   header_dir = "ble"
 
-  defines = [
-    "CONFIG_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}",
-    "CHIP_ENABLE_CHIPOBLE_TEST=false",
-  ]
+  defines = [ "CONFIG_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}" ]
 
   if (chip_ble_project_config_include != "") {
     defines +=

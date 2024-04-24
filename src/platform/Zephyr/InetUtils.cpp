@@ -17,11 +17,13 @@
 
 #include "InetUtils.h"
 
+#include <zephyr/net/net_if.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace InetUtils {
 
-in6_addr ToZephyrAddr(const chip::Inet::IPAddress & address)
+in6_addr ToZephyrAddr(const Inet::IPAddress & address)
 {
     in6_addr zephyrAddr;
 
@@ -31,9 +33,14 @@ in6_addr ToZephyrAddr(const chip::Inet::IPAddress & address)
     return zephyrAddr;
 }
 
-net_if * GetInterface(chip::Inet::InterfaceId ifaceId)
+net_if * GetInterface(Inet::InterfaceId ifaceId)
 {
     return ifaceId.IsPresent() ? net_if_get_by_index(ifaceId.GetPlatformInterface()) : net_if_get_default();
+}
+
+net_if * GetWiFiInterface()
+{
+    return net_if_get_first_wifi();
 }
 
 } // namespace InetUtils

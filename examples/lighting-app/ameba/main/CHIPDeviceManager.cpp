@@ -84,10 +84,9 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
-    if (CONFIG_NETWORK_LAYER_BLE)
-    {
-        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-    }
+#if CONFIG_NETWORK_LAYER_BLE
+    ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+#endif
 
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 

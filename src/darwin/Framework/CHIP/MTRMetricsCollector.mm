@@ -17,8 +17,8 @@
 
 #import "MTRMetricsCollector.h"
 #import "MTRLogging_Internal.h"
-#include "MTRMetrics_Internal.h"
-#include <MTRMetrics.h>
+#import "MTRMetrics.h"
+#import "MTRMetrics_Internal.h"
 #import <MTRUnfairLock.h>
 #include <platform/Darwin/Tracing.h>
 #include <system/SystemClock.h>
@@ -74,16 +74,17 @@ using MetricEvent = chip::Tracing::MetricEvent;
     case ValueType::kUndefined:
         break;
     }
+    MTR_LOG_DEBUG("Initializing metric event data %s, type: %d, with time point %llu", event.key(), _type, _timePoint.count());
     return self;
 }
 
-- (void)setDurationFromMetricDataAndClearCounters:(MTRMetricData *)fromData
+- (void)setDurationFromMetricData:(MTRMetricData *)fromData
 {
     auto duration = _timePoint - fromData->_timePoint;
     _duration = [NSNumber numberWithDouble:double(duration.count()) / USEC_PER_SEC];
 
-    // Clear timepoints to minimize history
-    _timePoint = fromData->_timePoint = chip::System::Clock::Microseconds64(0);
+    MTR_LOG_DEBUG("Calculating duration for Matter metric with type %d, from type %d, (%llu - %llu) = %llu us (%llu s)",
+        _type, fromData->_type, _timePoint.count(), fromData->_timePoint.count(), duration.count(), [_duration unsignedLongLongValue]);
 }
 
 - (NSString *)description
@@ -184,7 +185,7 @@ static inline NSString * suffixNameForMetricType(MetricEvent::Type type)
     case MetricEvent::Type::kEndEvent:
         return @"_end";
     case MetricEvent::Type::kInstantEvent:
-        return @"_instant";
+        return @"_event";
     }
 }
 
@@ -200,19 +201,19 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     using ValueType = MetricEvent::Value::Type;
     switch (event.ValueType()) {
     case ValueType::kInt32:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %d", event.key(), static_cast<int>(event.type()), event.ValueInt32());
+        MTR_LOG_DEBUG("Received metric event, key: %s, type: %d, value: %d", event.key(), static_cast<int>(event.type()), event.ValueInt32());
         break;
     case ValueType::kUInt32:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: %u", event.key(), static_cast<int>(event.type()), event.ValueUInt32());
+        MTR_LOG_DEBUG("Received metric event, key: %s, type: %d, value: %u", event.key(), static_cast<int>(event.type()), event.ValueUInt32());
         break;
     case ValueType::kChipErrorCode:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, error value: %u", event.key(), static_cast<int>(event.type()), event.ValueErrorCode());
+        MTR_LOG_DEBUG("Received metric event, key: %s, type: %d, error value: %u", event.key(), static_cast<int>(event.type()), event.ValueErrorCode());
         break;
     case ValueType::kUndefined:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, value: nil", event.key(), static_cast<int>(event.type()));
+        MTR_LOG_DEBUG("Received metric event, key: %s, type: %d, value: nil", event.key(), static_cast<int>(event.type()));
         break;
     default:
-        MTR_LOG_INFO("Received metric event, key: %s, type: %d, unknown value", event.key(), static_cast<int>(event.type()));
+        MTR_LOG_DEBUG("Received metric event, key: %s, type: %d, unknown value", event.key(), static_cast<int>(event.type()));
         return;
     }
 
@@ -225,16 +226,15 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
         auto metricsBeginKey = [NSString stringWithFormat:@"%s%@", event.key(), suffixNameForMetricType(MetricEvent::Type::kBeginEvent)];
         MTRMetricData * beginMetric = _metricsDataCollection[metricsBeginKey];
         if (beginMetric) {
-            [data setDurationFromMetricDataAndClearCounters:beginMetric];
+            [data setDurationFromMetricData:beginMetric];
         } else {
             // Unbalanced end
             MTR_LOG_ERROR("Unable to find Begin event corresponding to Metric Event: %s", event.key());
         }
     }
 
-    // If this is a Begin event, capture only the first instance of it to account for the largest duration
-    // spent on the event. For the remaining events, capture the the most recent event
-    if (event.type() != MetricEvent::Type::kBeginEvent || ![_metricsDataCollection valueForKey:metricsKey]) {
+    // Add to the collection only if it does not exist as yet.
+    if (![_metricsDataCollection valueForKey:metricsKey]) {
         [_metricsDataCollection setValue:data forKey:metricsKey];
     }
 }
@@ -253,6 +253,12 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
         [_metricsDataCollection removeAllObjects];
     }
     return metrics;
+}
+
+- (void)resetMetrics
+{
+    std::lock_guard lock(_lock);
+    [_metricsDataCollection removeAllObjects];
 }
 
 @end

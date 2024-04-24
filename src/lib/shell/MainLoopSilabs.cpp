@@ -55,7 +55,7 @@ void ReadLine(char * buffer, size_t max)
 
 #ifdef BRD4325A
         // for 917 SoC board, we need to create a rx event before we wait for the shell activity
-        // NotifyShellProcessFromISR() is called once the buffer is filled
+        // NotifyShellProcess() is called once the buffer is filled
         while (streamer_read(streamer_get(), buffer + read, 1) == 1)
         {
             // Count how many characters were read; usually one but could be copy/paste

@@ -23,6 +23,10 @@ sealed class Device(
     )
 
   @Serializable
+  object DoorLock :
+    Device("doorlock", R.string.matter_door_lock, R.drawable.round_lock_24, 0x000A, 3842)
+
+  @Serializable
   object Unknown :
     Device("unknown", R.string.matter_device, R.drawable.round_device_unknown_24, 65535, 3840)
 

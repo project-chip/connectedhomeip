@@ -36,13 +36,13 @@ void TestAddingSameConcretePath(nlTestSuite * apSuite, void * apContext)
     BasicCommandPathRegistry<kQuickTestSize> basicCommandPathRegistry;
 
     ConcreteCommandPath concretePath(0, 0, 0);
-    Optional<uint16_t> commandRef;
+    std::optional<uint16_t> commandRef;
     uint16_t commandRefValue = 0;
 
     size_t idx = 0;
     for (idx = 0; idx < kQuickTestSize && err == CHIP_NO_ERROR; idx++)
     {
-        commandRef.SetValue(commandRefValue);
+        commandRef.emplace(commandRefValue);
         commandRefValue++;
         err = basicCommandPathRegistry.Add(concretePath, commandRef);
     }
@@ -56,8 +56,8 @@ void TestAddingSameCommandRef(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCommandPathRegistry<kQuickTestSize> basicCommandPathRegistry;
 
-    Optional<uint16_t> commandRef;
-    commandRef.SetValue(0);
+    std::optional<uint16_t> commandRef;
+    commandRef.emplace(0);
 
     uint16_t endpointValue = 0;
 
@@ -78,14 +78,14 @@ void TestAddingMaxNumberOfEntries(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCommandPathRegistry<kQuickTestSize> basicCommandPathRegistry;
 
-    Optional<uint16_t> commandRef;
+    std::optional<uint16_t> commandRef;
     uint16_t commandRefAndEndpointValue = 0;
 
     size_t idx = 0;
     for (idx = 0; idx < kQuickTestSize && err == CHIP_NO_ERROR; idx++)
     {
         ConcreteCommandPath concretePath(commandRefAndEndpointValue, 0, 0);
-        commandRef.SetValue(commandRefAndEndpointValue);
+        commandRef.emplace(commandRefAndEndpointValue);
         commandRefAndEndpointValue++;
         err = basicCommandPathRegistry.Add(concretePath, commandRef);
     }
@@ -100,14 +100,14 @@ void TestAddingTooManyEntries(nlTestSuite * apSuite, void * apContext)
     BasicCommandPathRegistry<kQuickTestSize> basicCommandPathRegistry;
     size_t maxPlusOne = kQuickTestSize + 1;
 
-    Optional<uint16_t> commandRef;
+    std::optional<uint16_t> commandRef;
     uint16_t commandRefAndEndpointValue = 0;
 
     size_t idx = 0;
     for (idx = 0; idx < maxPlusOne && err == CHIP_NO_ERROR; idx++)
     {
         ConcreteCommandPath concretePath(commandRefAndEndpointValue, 0, 0);
-        commandRef.SetValue(commandRefAndEndpointValue);
+        commandRef.emplace(commandRefAndEndpointValue);
         commandRefAndEndpointValue++;
         err = basicCommandPathRegistry.Add(concretePath, commandRef);
     }

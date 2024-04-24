@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <ble/BleUUID.h>
+#include <ble/Ble.h>
 
 #import <CoreBluetooth/CoreBluetooth.h>
 

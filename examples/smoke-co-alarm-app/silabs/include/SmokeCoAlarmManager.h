@@ -21,14 +21,17 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
-class SmokeCoAlarmManager
+class SmokeCoAlarmManager : public chip::TestEventTriggerHandler
 {
 public:
+    SmokeCoAlarmManager()  = default;
+    ~SmokeCoAlarmManager() = default;
+
     CHIP_ERROR Init();
 
     /**
@@ -36,6 +39,14 @@ public:
      *
      */
     void SelfTestingEventHandler();
+
+    /**
+     * @brief Delegates handling to global `emberAfHandleEventTrigger` function. DO NOT EXTEND.
+     *
+     * @param eventTrigger - trigger to process.
+     * @return CHIP_NO_ERROR if properly handled, else another CHIP_ERROR.
+     */
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
 private:
     friend SmokeCoAlarmManager & AlarmMgr(void);

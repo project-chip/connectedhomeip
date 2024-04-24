@@ -18,24 +18,18 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-
 #include "LEDWidget.h"
 
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-
 #include <assert.h>
-
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
-
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-
-#include <lib/support/CodeUtils.h>
-
-#include <platform/CHIPDeviceLayer.h>
 
 #if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(BRD4325B))
 #define LIGHT_LED 1
@@ -82,6 +76,9 @@ CHIP_ERROR AppTask::Init()
         SILABS_LOG("AlarmMgr::Init() failed");
         appError(err);
     }
+
+    // Register Smoke & Co Test Event Trigger
+    Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&AlarmMgr());
 
     sAlarmLED.Init(LIGHT_LED);
     sAlarmLED.Set(false);

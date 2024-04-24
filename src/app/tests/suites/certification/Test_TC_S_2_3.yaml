@@ -309,11 +309,10 @@ tests:
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
           1000 (1s) and a set of extension fields appropriate to AC1."
       verification: |
-          ./chip-tool scenesmanagement add-scene GroupID SceneID TransitionTime "SceneName" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": value}]}' nodeId endpointId
+          ./chip-tool scenesmanagement add-scene 0x0101 0x01 1000 "scene name" '[{"clusterID": "0x0006", "attributeValueList":[{"attributeID": "0x0001", "attributeValue": "0x01"}, ]}, {"clusterID": "0x0008", "attributeValueList":[{"attributeID": "0x0000", "attributeValue": "0x64"}, ]}]' 1 1
 
-          Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
+          Verify DUT sends a AddSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to 257  and the SceneID field set to 0x01 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
-          Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
           [1705680175.863785][5823:5825] CHIP:DMG: },
           [1705680175.863851][5823:5825] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0000
           [1705680175.863880][5823:5825] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0000
@@ -613,11 +612,12 @@ tests:
           set to G1 and the SceneID field set to 0x03."
       PICS: S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
       verification: |
-          ./chip-tool scenesmanagement view-scene GroupId SceneId Node-Id EndpointId
+          ./chip-tool scenesmanagement view-scene 0x0101 0x03 1 1
 
-          Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
+          Verify DUT sends a ViewSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to 257, the SceneID field set to 0x03, the TransitionTime field set to 1 and a set of extension fields appropriate to AC1 on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
 
-          Verify that the extension fields in the log match the ones expected and that the log output is similar to the following:
+          NOTE: The values below are expected to match the values from the specific AC tested
+
           [1707285444.028460][13682:13684] CHIP:DMG: },
           [1707285444.028553][13682:13684] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0001
           [1707285444.028579][13682:13684] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0001
@@ -627,13 +627,13 @@ tests:
           [1707285444.028706][13682:13684] CHIP:TOO:     sceneID: 3
           [1707285444.028717][13682:13684] CHIP:TOO:     transitionTime: 1
           [1707285444.028728][13682:13684] CHIP:TOO:     sceneName: scene name
-          [1707285444.028766][13682:13684] CHIP:TOO:     extensionFieldSets: XX entries
-          [1707285444.028814][13682:13684] CHIP:TOO:       [XX]: {
-          [1707285444.028828][13682:13684] CHIP:TOO:         ClusterID: XX
-          [1707285444.028853][13682:13684] CHIP:TOO:         AttributeValueList: XX entries
-          [1707285444.028882][13682:13684] CHIP:TOO:           [XX]: {
-          [1707285444.028896][13682:13684] CHIP:TOO:             AttributeID: XX
-          [1707285444.028913][13682:13684] CHIP:TOO:             AttributeValue: XX
+          [1707285444.028766][13682:13684] CHIP:TOO:     extensionFieldSets: 1 entries
+          [1707285444.028814][13682:13684] CHIP:TOO:       [1]: {
+          [1707285444.028828][13682:13684] CHIP:TOO:         ClusterID: 768
+          [1707285444.028853][13682:13684] CHIP:TOO:         AttributeValueList: 1 entries
+          [1707285444.028882][13682:13684] CHIP:TOO:           [1]: {
+          [1707285444.028896][13682:13684] CHIP:TOO:             AttributeID: 16386
+          [1707285444.028913][13682:13684] CHIP:TOO:             AttributeValue: 1
           [1707285444.028925][13682:13684] CHIP:TOO:            }
           [1707285444.028937][13682:13684] CHIP:TOO:        }
           [1707285444.028950][13682:13684] CHIP:TOO:    }

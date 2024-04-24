@@ -332,23 +332,22 @@ bool SetUpCodePairer::IdIsPresent(uint16_t vendorOrProductID)
 
 bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const
 {
-    if (nodeData.commissionData.commissioningMode == 0)
+    if (nodeData.nodeData.commissioningMode == 0)
     {
         ChipLogProgress(Controller, "Discovered device does not have an open commissioning window.");
         return false;
     }
 
     // The advertisement may not include a vendor id.
-    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.commissionData.vendorId) &&
-        mPayloadVendorID != nodeData.commissionData.vendorId)
+    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.nodeData.vendorId) && mPayloadVendorID != nodeData.nodeData.vendorId)
     {
         ChipLogProgress(Controller, "Discovered device does not match our vendor id.");
         return false;
     }
 
     // The advertisement may not include a product id.
-    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.commissionData.productId) &&
-        mPayloadProductID != nodeData.commissionData.productId)
+    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.nodeData.productId) &&
+        mPayloadProductID != nodeData.nodeData.productId)
     {
         ChipLogProgress(Controller, "Discovered device does not match our product id.");
         return false;
@@ -358,10 +357,10 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     switch (mCurrentFilter.type)
     {
     case Dnssd::DiscoveryFilterType::kShortDiscriminator:
-        discriminatorMatches = (((nodeData.commissionData.longDiscriminator >> 8) & 0x0F) == mCurrentFilter.code);
+        discriminatorMatches = (((nodeData.nodeData.longDiscriminator >> 8) & 0x0F) == mCurrentFilter.code);
         break;
     case Dnssd::DiscoveryFilterType::kLongDiscriminator:
-        discriminatorMatches = (nodeData.commissionData.longDiscriminator == mCurrentFilter.code);
+        discriminatorMatches = (nodeData.nodeData.longDiscriminator == mCurrentFilter.code);
         break;
     default:
         ChipLogError(Controller, "Unknown filter type; all matches will fail");

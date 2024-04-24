@@ -38,6 +38,11 @@ limitations under the License.
     <define>ADMINISTRATOR_COMMISSIONING_CLUSTER</define>
     <description>Commands to trigger a Node to allow a new Administrator to commission it.</description>
 
+    <features>
+      <feature bit="0" code="BC" name="Basic" summary="Node supports Basic Commissioning Method.">
+        <optionalConform/>
+      </feature>
+    </features>
     <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="CommissioningWindowStatusEnum" writable="false" optional="false">WindowStatus</attribute>
     <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" isNullable="true" optional="false">AdminFabricIndex</attribute>
     <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="vendor_id" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
@@ -64,9 +69,4 @@ limitations under the License.
     </command>
 
   </cluster>
-
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x003c" />
-    <field name="Basic" mask="0x01" />
-  </bitmap>
 </configurator>

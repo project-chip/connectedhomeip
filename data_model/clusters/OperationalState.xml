@@ -203,7 +203,10 @@ Davis, CA 95616, USA
     </event>
     <event id="0x01" name="OperationCompletion" priority="info">
       <access readPrivilege="view"/>
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
       <field id="0" name="CompletionErrorCode" type="enum8">
         <mandatoryConform/>
       </field>

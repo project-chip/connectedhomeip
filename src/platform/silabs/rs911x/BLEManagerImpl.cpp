@@ -51,7 +51,7 @@ extern "C" {
 }
 #endif
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
@@ -678,8 +678,9 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int32_t status = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    int32_t status          = 0;
+    bool postAdvChangeEvent = false;
 
     ChipLogProgress(DeviceLayer, "StartAdvertising start");
 
@@ -695,6 +696,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     else
     {
         ChipLogDetail(DeviceLayer, "Start BLE advertisement");
+        postAdvChangeEvent = true;
     }
 
     if (!(mFlags.Has(Flags::kAdvertising)))
@@ -719,6 +721,16 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
         }
         mFlags.Set(Flags::kAdvertising);
+
+        if (postAdvChangeEvent)
+        {
+            // Post CHIPoBLEAdvertisingChange event.
+            ChipDeviceEvent advChange;
+            advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+            advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
+
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
+        }
     }
     else
     {
@@ -726,8 +738,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
 
 exit:
+    // TODO: Add MapBLEError to return the correct error code
     ChipLogError(DeviceLayer, "StartAdvertising() End error: %s", ErrorStr(err));
-    return CHIP_NO_ERROR; // err;
+    return err;
 }
 
 int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void)
@@ -756,7 +769,6 @@ int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void)
     return rsi_ble_start_advertising_with_values(&ble_adv);
 }
 
-// TODO:: Implementation need to be done.
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -772,12 +784,16 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
             mFlags.Set(Flags::kFastAdvertisingEnabled, true);
             advertising_set_handle = 0xff;
             CancelBleAdvTimeoutTimer();
-        }
-        else
-        {
-            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
+
+            // Post CHIPoBLEAdvertisingChange event.
+            ChipDeviceEvent advChange;
+            advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+            advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+            err                                        = PlatformMgr().PostEvent(&advChange);
         }
     }
+
+    // TODO: Add MapBLEError to return the correct error code
     return err;
 }
 

@@ -197,8 +197,6 @@ OTA commands
 ```bash
 matterCli> ota
   query           Query for a new image. Usage: ota query
-  apply           Apply the current update. Usage: ota apply
-  notify          Notify the new image has been applied. Usage: ota notify <version>
   state           Gets state of a current image update process. Usage: ota state
   progress        Gets progress of a current image update process. Usage: ota progress
 ```

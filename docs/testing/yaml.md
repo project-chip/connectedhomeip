@@ -293,6 +293,11 @@ All YAML tests assume that the DUT has previously been commissioned before
 running. DUTs should be commissioned using chip-tool. Use the same KVS file when
 running the test.
 
+By default, the tests use node ID 0x12344321. The easiest way to run the tests
+is to commission with this node ID. Alternately, you can change the target node
+ID on the command line, as shown in the [Running the tests](#running-the-tests)
+section.
+
 #### Running the tests
 
 There are several options for running tests locally. Because the YAML runner
@@ -337,6 +342,10 @@ with --
 ./scripts/tests/yaml/chiptool.py tests Test_TC_OO_2_1 --server_path ./out/linux-x64-chip-tool/chip-tool -- nodeId 0x12344321
 
 ```
+
+Each test defines a default endpoint to target. Root node cluster tests run
+against endpoint 0 by default. Most other cluster tests run against endpoint 1.
+You can set the endpoint for the test using the `endpoint` config variable.
 
 #### Factory resetting the DUT
 

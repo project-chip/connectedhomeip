@@ -102,10 +102,6 @@
 #define MTR_UNSTABLE_API _MTR_UNAVAILABLE
 #endif
 
-#ifndef MTR_PER_CONTROLLER_STORAGE_ENABLED
-#define MTR_PER_CONTROLLER_STORAGE_ENABLED 1
-#endif
-
 #pragma mark - Types
 
 typedef NSData * MTRTLVBytes;

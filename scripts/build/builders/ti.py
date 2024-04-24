@@ -69,21 +69,16 @@ class TIApp(Enum):
 
 
 class TIBoard(Enum):
-    LP_CC2652R7 = auto()
     LP_EM_CC1354P10_6 = auto()
 
     def BoardName(self):
-        if self == TIBoard.LP_CC2652R7:
-            return 'LP_CC2652R7'
-        elif self == TIBoard.LP_EM_CC1354P10_6:
+        if self == TIBoard.LP_EM_CC1354P10_6:
             return 'LP_EM_CC1354P10_6'
         else:
             raise Exception('Unknown board type: %r' % self)
 
     def FamilyName(self):
-        if self == TIBoard.LP_CC2652R7:
-            return 'cc13x2x7_26x2x7'
-        elif self == TIBoard.LP_EM_CC1354P10_6:
+        if self == TIBoard.LP_EM_CC1354P10_6:
             return 'cc13x4_26x4'
         else:
             raise Exception('Unknown board type: %r' % self)
@@ -94,7 +89,7 @@ class TIBuilder(GnBuilder):
     def __init__(self,
                  root,
                  runner,
-                 board=TIBoard.LP_CC2652R7,
+                 board=TIBoard.LP_EM_CC1354P10_6,
                  app: TIApp = TIApp.LOCK,
                  openthread_ftd: Optional[bool] = None):
         super(TIBuilder, self).__init__(
@@ -121,11 +116,12 @@ class TIBuilder(GnBuilder):
 
     def build_outputs(self):
         items = {}
-        if (self.board == TIBoard.LP_CC2652R7):
+        if (self.board == TIBoard.LP_EM_CC1354P10_6):
             if (self.app == TIApp.LOCK
-                    or self.app == TIApp.PUMP
+                or self.app == TIApp.LIGHTING
+                or self.app == TIApp.PUMP
                     or self.app == TIApp.PUMP_CONTROLLER):
-                extensions = [".out", ".bin", ".out.map", "-bim.hex"]
+                extensions = [".out", ".out.map", "-mcuboot.hex"]
 
             else:
                 extensions = [".out", ".out.map"]

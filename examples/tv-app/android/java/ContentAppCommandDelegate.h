@@ -30,6 +30,8 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/JniReferences.h>
 
+#include <string>
+
 namespace chip {
 namespace AppPlatform {
 

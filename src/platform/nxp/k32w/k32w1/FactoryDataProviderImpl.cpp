@@ -15,29 +15,30 @@
  *    limitations under the License.
  */
 
-#include <platform/nxp/k32w/k32w1/FactoryDataProviderImpl.h>
-
-#if CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
 #include "fsl_adapter_flash.h"
-#endif
+#include <platform/nxp/k32w/k32w1/FactoryDataProviderImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
 
+#if !CHIP_USE_PLAIN_DAC_KEY
 // SSS adds 24 bytes of metadata when creating the blob
 static constexpr size_t kSssBlobMetadataLength = 24;
 static constexpr size_t kPrivateKeyBlobLength  = Crypto::kP256_PrivateKey_Length + kSssBlobMetadataLength;
+#endif
 
 FactoryDataProviderImpl::~FactoryDataProviderImpl()
 {
+#if !CHIP_USE_PLAIN_DAC_KEY
     SSS_KEY_OBJ_FREE(&mContext);
+#endif
 }
 
 CHIP_ERROR FactoryDataProviderImpl::Init()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
+#if CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST && !CHIP_USE_PLAIN_DAC_KEY
     SSS_RunApiTest();
 #endif
 
@@ -47,16 +48,56 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
         ChipLogError(DeviceLayer, "Factory data init failed with: %s", ErrorStr(error));
     }
 
+#if !CHIP_USE_PLAIN_DAC_KEY
     ReturnErrorOnFailure(SSS_InitContext());
-#if CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
     ReturnErrorOnFailure(SSS_ConvertDacKey());
-    ReturnErrorOnFailure(Validate());
-#endif
     ReturnErrorOnFailure(SSS_ImportPrivateKeyBlob());
+#endif
 
     return error;
 }
 
+#if CHIP_USE_PLAIN_DAC_KEY
+CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    Crypto::P256ECDSASignature signature;
+    Crypto::P256Keypair keypair;
+    Crypto::P256SerializedKeypair serializedKeypair;
+    uint8_t keyBuf[Crypto::kP256_PrivateKey_Length];
+    MutableByteSpan dacPrivateKeySpan(keyBuf);
+    uint16_t keySize = 0;
+
+    VerifyOrExit(!outSignBuffer.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!messageToSign.empty(), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(outSignBuffer.size() >= signature.Capacity(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    /* Get private key of DAC certificate from reserved section */
+    error = SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize);
+    SuccessOrExit(error);
+    dacPrivateKeySpan.reduce_size(keySize);
+    VerifyOrExit(keySize == Crypto::kP256_PrivateKey_Length, error = CHIP_ERROR_WRONG_KEY_TYPE);
+
+    /* Only the private key is used when signing */
+    error = serializedKeypair.SetLength(Crypto::kP256_PublicKey_Length + dacPrivateKeySpan.size());
+    SuccessOrExit(error);
+    memcpy(serializedKeypair.Bytes() + Crypto::kP256_PublicKey_Length, dacPrivateKeySpan.data(), dacPrivateKeySpan.size());
+
+    error = keypair.Deserialize(serializedKeypair);
+    SuccessOrExit(error);
+
+    error = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);
+    SuccessOrExit(error);
+
+    error = CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
+
+exit:
+    /* Sanitize temporary buffer */
+    memset(keyBuf, 0, Crypto::kP256_PrivateKey_Length);
+    return error;
+}
+
+#else
 CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
     Crypto::P256ECDSASignature signature;
@@ -118,7 +159,6 @@ exit:
     return error;
 }
 
-#if CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
 CHIP_ERROR FactoryDataProviderImpl::SSS_ConvertDacKey()
 {
     size_t blobSize                     = kPrivateKeyBlobLength;
@@ -126,10 +166,18 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_ConvertDacKey()
     uint8_t blob[kPrivateKeyBlobLength] = { 0 };
     uint8_t * data                      = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
     uint32_t offset                     = 0;
+    bool convNeeded                     = true;
 
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure(SSS_ExportBlob(blob, &blobSize, offset));
+    ReturnErrorOnFailure(SSS_ExportBlob(blob, &blobSize, offset, convNeeded));
+    if (!convNeeded)
+    {
+        ChipLogError(DeviceLayer, "SSS: DAC private key already converted to blob");
+        chip::Platform::MemoryFree(data);
+        return CHIP_NO_ERROR;
+    }
+
     ChipLogError(DeviceLayer, "SSS: extracted blob from DAC private key");
 
     hal_flash_status_t status = HAL_FlashRead(kFactoryDataStart, newSize - kSssBlobMetadataLength, data);
@@ -149,27 +197,42 @@ CHIP_ERROR FactoryDataProviderImpl::SSS_ConvertDacKey()
     chip::Platform::MemoryFree(data);
     ChipLogError(DeviceLayer, "SSS: sanitized RAM cache");
 
+    ReturnErrorOnFailure(Validate());
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FactoryDataProviderImpl::SSS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset)
+CHIP_ERROR FactoryDataProviderImpl::SSS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & offset, bool & isNeeded)
 {
-    uint8_t keyBuf[Crypto::kP256_PrivateKey_Length];
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    auto res         = kStatus_SSS_Success;
+
+    uint8_t keyBuf[kPrivateKeyBlobLength];
     MutableByteSpan dacPrivateKeySpan(keyBuf);
     uint16_t keySize = 0;
+    isNeeded         = true;
 
-    ReturnErrorOnFailure(
-        SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize, &offset));
+    error = SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize, &offset);
+    SuccessOrExit(error);
     dacPrivateKeySpan.reduce_size(keySize);
 
-    auto res = SSS_KEY_STORE_SET_KEY(&mContext, dacPrivateKeySpan.data(), Crypto::kP256_PrivateKey_Length, keySize * 8,
-                                     kSSS_KeyPart_Private);
-    VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    if (keySize == kPrivateKeyBlobLength)
+    {
+        isNeeded = false;
+        return CHIP_NO_ERROR;
+    }
+
+    res = SSS_KEY_STORE_SET_KEY(&mContext, dacPrivateKeySpan.data(), Crypto::kP256_PrivateKey_Length, keySize * 8,
+                                kSSS_KeyPart_Private);
+    VerifyOrExit(res == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     res = sss_sscp_key_store_export_key(&g_keyStore, &mContext, data, dataLen, kSSS_blobType_ELKE_blob);
-    VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(res == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    return CHIP_NO_ERROR;
+exit:
+    /* Sanitize temporary buffer */
+    memset(keyBuf, 0, Crypto::kP256_PrivateKey_Length);
+    return error;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * blob, size_t blobLen, uint32_t offset)
@@ -191,7 +254,6 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
 
     return CHIP_NO_ERROR;
 }
-#endif // CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
 
@@ -292,6 +354,7 @@ void FactoryDataProviderImpl::SSS_RunApiTest()
     SSS_KEY_OBJ_FREE(&mContext);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
+#endif // CHIP_USE_PLAIN_DAC_KEY
 
 } // namespace DeviceLayer
 } // namespace chip

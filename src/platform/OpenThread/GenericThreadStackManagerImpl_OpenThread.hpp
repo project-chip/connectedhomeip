@@ -52,6 +52,7 @@
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
@@ -222,6 +223,22 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
             else
             {
                 ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
+            }
+
+            ThreadDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetThreadDiagnosticsDelegate();
+
+            if (mIsAttached)
+            {
+                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
+            }
+            else
+            {
+                delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
+
+                GeneralFaults<kMaxNetworkFaults> current;
+                current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
+                delegate->OnNetworkFaultChanged(mNetworkFaults, current);
+                mNetworkFaults = current;
             }
         }
 
@@ -1197,78 +1214,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(v
     otThreadSetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
     Impl()->UnlockThreadStack();
-}
-
-template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otError aError, void * aContext)
-{
-    static_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext)->OnJoinerComplete(aError);
-}
-
-template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otError aError)
-{
-#if CHIP_PROGRESS_LOGGING
-
-    ChipLogProgress(DeviceLayer, "Join Thread network: %s", otThreadErrorToString(aError));
-
-    if (aError == OT_ERROR_NONE)
-    {
-        otError error = otThreadSetEnabled(mOTInst, true);
-
-        ChipLogProgress(DeviceLayer, "Start Thread network: %s", otThreadErrorToString(error));
-    }
-#endif // CHIP_PROGRESS_LOGGING
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(void)
-{
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    Impl()->LockThreadStack();
-    VerifyOrExit(!otDatasetIsCommissioned(mOTInst) && otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED,
-                 error = MapOpenThreadError(OT_ERROR_INVALID_STATE));
-    VerifyOrExit(otJoinerGetState(mOTInst) == OT_JOINER_STATE_IDLE, error = MapOpenThreadError(OT_ERROR_BUSY));
-
-    if (!otIp6IsEnabled(mOTInst))
-    {
-        SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
-    }
-
-    {
-        otJoinerDiscerner discerner;
-        // This is dead code to remove, so the placeholder value is OK.
-        // See ThreadStackManagerImpl.
-        uint16_t discriminator = 3840;
-
-        discerner.mLength = 12;
-        discerner.mValue  = discriminator;
-
-        ChipLogProgress(DeviceLayer, "Joiner Discerner: %u", discriminator);
-        otJoinerSetDiscerner(mOTInst, &discerner);
-    }
-
-    {
-        otJoinerPskd pskd;
-        // This is dead code to remove, so the placeholder value is OK.d
-        // See ThreadStackManagerImpl.
-        uint32_t pincode = 20202021;
-
-        snprintf(pskd.m8, sizeof(pskd.m8) - 1, "%09" PRIu32, pincode);
-
-        ChipLogProgress(DeviceLayer, "Joiner PSKd: %s", pskd.m8);
-        error = MapOpenThreadError(otJoinerStart(mOTInst, pskd.m8, NULL, NULL, NULL, NULL, NULL,
-                                                 &GenericThreadStackManagerImpl_OpenThread::OnJoinerComplete, this));
-    }
-
-exit:
-    Impl()->UnlockThreadStack();
-
-    ChipLogProgress(DeviceLayer, "Joiner start: %s", chip::ErrorStr(error));
-
-    return error;
 }
 
 template <class ImplClass>

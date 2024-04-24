@@ -22,6 +22,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-server.h>
@@ -491,12 +492,17 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     }
     else if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
+        // NOTE: the following lines were commented out due to issue #32875. In short, a popular
+        // commissioner is passing a null SSID argument and this logic breaks interoperability as a result.
+        // The spec has some inconsistency on this which also needs to be fixed. The commissioner maker is
+        // fixing its code and will return to un-comment this code, with that work tracked by Issue #32887.
+        //
         // SSID present on Thread violates the `[WI]` conformance.
-        if (req.ssid.HasValue())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
+        // if (req.ssid.HasValue())
+        // {
+        //     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+        //     return;
+        // }
 
         mCurrentOperationBreadcrumb = req.breadcrumb;
         mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);

@@ -20,7 +20,6 @@
 namespace chip {
 
 void NotifyShellProcess();
-void NotifyShellProcessFromISR();
 void WaitForShellActivity();
 void startShellTask();
 

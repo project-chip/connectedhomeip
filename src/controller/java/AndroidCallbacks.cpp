@@ -31,6 +31,7 @@
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
+#include <string>
 #include <type_traits>
 
 namespace chip {

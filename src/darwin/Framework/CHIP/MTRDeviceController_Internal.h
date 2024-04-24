@@ -35,12 +35,8 @@
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
-#import <Matter/MTRDiagnosticLogsType.h>
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#else
-#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTROTAProviderDelegate.h>
 
 @class MTRDeviceControllerStartupParamsInternal;
@@ -58,13 +54,6 @@ namespace Controller {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
-
-#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
-/**
- * The ID assigned to this controller at creation time.
- */
-@property (readonly, nonatomic) NSUUID * uniqueIdentifier;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #pragma mark - MTRDeviceControllerFactory methods
 
@@ -266,6 +255,8 @@ NS_ASSUME_NONNULL_BEGIN
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID;
 - (void)removeDevice:(MTRDevice *)device;
+
+- (NSNumber * _Nullable)syncGetCompressedFabricID;
 
 @end
 

@@ -112,6 +112,7 @@ k32w0_executable("light_app") {
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lighting-app/nxp/zap/",
     "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/third_party/mbedtls:mbedtls",

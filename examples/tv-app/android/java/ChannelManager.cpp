@@ -27,6 +27,8 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Channel;

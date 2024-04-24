@@ -29,6 +29,7 @@ namespace chip {
 namespace Controller {
 
 using namespace chip::app::Clusters;
+using namespace chip::Crypto;
 using chip::app::DataModel::MakeNullable;
 using chip::app::DataModel::NullNullable;
 
@@ -743,7 +744,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             if (mParams.GetCheckForMatchingFabric())
             {
-                chip::NodeId nodeId = mDeviceCommissioningInfo.remoteNodeId;
+                NodeId nodeId = mDeviceCommissioningInfo.remoteNodeId;
                 if (nodeId != kUndefinedNodeId)
                 {
                     mParams.SetRemoteNodeId(nodeId);

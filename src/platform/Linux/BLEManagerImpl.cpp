@@ -35,8 +35,8 @@
 #include <type_traits>
 #include <utility>
 
-#include <ble/BleError.h>
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -77,13 +77,6 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
 
-void HandleConnectTimeout(chip::System::Layer *, void * apEndpoint)
-{
-    VerifyOrDie(apEndpoint != nullptr);
-    static_cast<BluezEndpoint *>(apEndpoint)->CancelConnect();
-    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
-}
-
 } // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -116,16 +109,17 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
-    // Ensure scan resources are cleared (e.g. timeout timers).
+    // Make sure that timers are stopped before shutting down the BLE layer.
+    DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
+
     mDeviceScanner.Shutdown();
-    // Stop advertising and free resources.
     mBLEAdvertisement.Shutdown();
-    // Make sure that the endpoint is not used by the timer.
-    DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimeout, &mEndpoint);
-    // Release BLE connection resources (unregister from BlueZ).
     mEndpoint.Shutdown();
+
     mBluezObjectManager.Shutdown();
-    mFlags.Clear(Flags::kBluezBLELayerInitialized);
+    mFlags.Clear(Flags::kBluezManagerInitialized);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -257,6 +251,37 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
     switch (apEvent->Type)
     {
+    case DeviceEventType::kPlatformLinuxBLEAdapterAdded:
+        ChipLogDetail(DeviceLayer, "BLE adapter added: id=%u address=%s", apEvent->Platform.BLEAdapter.mAdapterId,
+                      apEvent->Platform.BLEAdapter.mAdapterAddress);
+        if (apEvent->Platform.BLEAdapter.mAdapterId == mAdapterId)
+        {
+            mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+            DriveBLEState();
+        }
+        break;
+    case DeviceEventType::kPlatformLinuxBLEAdapterRemoved:
+        ChipLogDetail(DeviceLayer, "BLE adapter removed: id=%u address=%s", apEvent->Platform.BLEAdapter.mAdapterId,
+                      apEvent->Platform.BLEAdapter.mAdapterAddress);
+        if (apEvent->Platform.BLEAdapter.mAdapterId == mAdapterId)
+        {
+            // Shutdown all BLE operations and release resources
+            mDeviceScanner.Shutdown();
+            mBLEAdvertisement.Shutdown();
+            mEndpoint.Shutdown();
+            // Drop reference to the adapter
+            mAdapter.reset();
+            // Clear all flags related to BlueZ BLE operations
+            mFlags.Clear(Flags::kBluezAdapterAvailable);
+            mFlags.Clear(Flags::kBluezBLELayerInitialized);
+            mFlags.Clear(Flags::kAdvertisingConfigured);
+            mFlags.Clear(Flags::kAppRegistered);
+            mFlags.Clear(Flags::kAdvertising);
+            CleanScanConfig();
+            // Indicate that the adapter is no longer available
+            err = BLE_ERROR_ADAPTER_UNAVAILABLE;
+        }
+        break;
     case DeviceEventType::kPlatformLinuxBLECentralConnected:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
@@ -328,9 +353,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-        DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
+        DisableBLEService(err);
         mFlags.Clear(Flags::kControlOpInProgress);
     }
 }
@@ -664,9 +687,23 @@ void BLEManagerImpl::DriveBLEState()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        DisableBLEService(err);
+    }
+}
+
+void BLEManagerImpl::DisableBLEService(CHIP_ERROR err)
+{
+    ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+    // Stop all timers if the error is other than BLE adapter unavailable. In case of BLE adapter
+    // beeing unavailable, we will keep timers running, as the adapter might become available in
+    // the nearest future (e.g. BlueZ restart due to crash). By doing that we will ensure that BLE
+    // adapter reappearance will not extend timeouts for the ongoing operations.
+    if (err != BLE_ERROR_ADAPTER_UNAVAILABLE)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
         DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
-        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
     }
 }
 
@@ -729,46 +766,54 @@ void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appSta
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
 {
+    CHIP_ERROR err = CHIP_ERROR_INCORRECT_STATE;
+
     DriveBLEState();
 
-    if (scanType == BleScanState::kNotScanning)
-    {
-        ChipLogError(Ble, "Invalid scan type requested");
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
-
-    if (!mFlags.Has(Flags::kBluezAdapterAvailable))
-    {
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, BLE_ERROR_ADAPTER_UNAVAILABLE);
-        return;
-    }
+    VerifyOrExit(scanType != BleScanState::kNotScanning,
+                 ChipLogError(Ble, "Invalid scan type requested: %d", to_underlying(scanType)));
+    VerifyOrExit(!mDeviceScanner.IsScanning(), ChipLogError(Ble, "BLE scan already in progress"));
+    VerifyOrExit(mFlags.Has(Flags::kBluezAdapterAvailable), err = BLE_ERROR_ADAPTER_UNAVAILABLE);
 
     mBLEScanConfig.mBleScanState = scanType;
 
-    CHIP_ERROR err = mDeviceScanner.Init(mAdapter.get(), this);
-    if (err != CHIP_NO_ERROR)
-    {
+    err = mDeviceScanner.Init(mAdapter.get(), this);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        ChipLogError(Ble, "Failed to create a BLE device scanner: %" CHIP_ERROR_FORMAT, err.Format());
-        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
-        return;
-    }
+        ChipLogError(Ble, "Failed to create BLE device scanner: %" CHIP_ERROR_FORMAT, err.Format());
+    });
 
-    err = mDeviceScanner.StartScan(kNewConnectionScanTimeout);
+    err = mDeviceScanner.StartScan();
+    VerifyOrExit(err == CHIP_NO_ERROR, {
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format());
+    });
+
+    err = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleScanTimer, this);
+    VerifyOrExit(err == CHIP_NO_ERROR, {
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        mDeviceScanner.StopScan();
+        ChipLogError(Ble, "Failed to start BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
+    });
+
+exit:
     if (err != CHIP_NO_ERROR)
     {
-        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        ChipLogError(Ble, "Failed to start a BLE can: %" CHIP_ERROR_FORMAT, err.Format());
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
-        return;
     }
+}
+
+void BLEManagerImpl::HandleScanTimer(chip::System::Layer *, void * appState)
+{
+    auto * manager = static_cast<BLEManagerImpl *>(appState);
+    manager->OnScanError(CHIP_ERROR_TIMEOUT);
+    manager->mDeviceScanner.StopScan();
 }
 
 void BLEManagerImpl::CleanScanConfig()
 {
     if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
-        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimeout, &mEndpoint);
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
 
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
@@ -788,8 +833,29 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
         mEndpoint.CancelConnect();
     // If in discovery mode, stop scan.
     else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
         mDeviceScanner.StopScan();
+    }
     return CHIP_NO_ERROR;
+}
+
+void BLEManagerImpl::NotifyBLEAdapterAdded(unsigned int aAdapterId, const char * aAdapterAddress)
+{
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kPlatformLinuxBLEAdapterAdded;
+    event.Platform.BLEAdapter.mAdapterId = aAdapterId;
+    Platform::CopyString(event.Platform.BLEAdapter.mAdapterAddress, aAdapterAddress);
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void BLEManagerImpl::NotifyBLEAdapterRemoved(unsigned int aAdapterId, const char * aAdapterAddress)
+{
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kPlatformLinuxBLEAdapterRemoved;
+    event.Platform.BLEAdapter.mAdapterId = aAdapterId;
+    Platform::CopyString(event.Platform.BLEAdapter.mAdapterAddress, aAdapterAddress);
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(CHIP_ERROR error)
@@ -859,15 +925,23 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     // We StartScan in the ChipStack thread.
     // StopScan should also be performed in the ChipStack thread.
     // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
+    DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
     mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, &mEndpoint);
+    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     CHIP_ERROR err = mEndpoint.ConnectDevice(device);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Ble, "Device connection failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
     ChipLogProgress(Ble, "New device connected: %s", address);
+}
+
+void BLEManagerImpl::HandleConnectTimer(chip::System::Layer *, void * appState)
+{
+    auto * manager = static_cast<BLEManagerImpl *>(appState);
+    manager->mEndpoint.CancelConnect();
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
 }
 
 void BLEManagerImpl::OnScanComplete()

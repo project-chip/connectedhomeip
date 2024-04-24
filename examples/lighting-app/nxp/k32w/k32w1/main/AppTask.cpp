@@ -236,7 +236,7 @@ void AppTask::InitServer(intptr_t arg)
 #endif
 
 #if defined(USE_SMU2_DYNAMIC)
-    VerifyOrDie(SMU2::Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
+    VerifyOrDie(SMU2::Init() == CHIP_NO_ERROR);
 #endif
 
     // Init ZCL Data Model and start server

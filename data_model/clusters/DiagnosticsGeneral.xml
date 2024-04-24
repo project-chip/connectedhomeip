@@ -65,9 +65,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DGGEN" scope="Node"/>
   <features>
-    <feature bit="0" code="DMTEST" name="DataModelTest" summary="Support specific testing needs for extended Data Model features">
-      <optionalConform/>
-    </feature>
+    <feature bit="0" code="DMTEST" name="DataModelTest" summary="Support specific testing needs for extended Data Model features"/>
   </features>
   <dataTypes>
     <enum name="BootReasonEnum">

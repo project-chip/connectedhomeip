@@ -30,7 +30,11 @@
 
 #pragma once
 
-#include "BleConfig.h"
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
+
+#include <cstdint>
 
 #include <lib/core/CHIPError.h>
 

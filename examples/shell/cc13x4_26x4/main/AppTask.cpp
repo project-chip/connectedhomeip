@@ -122,7 +122,7 @@ CHIP_ERROR AppTask::Init()
             ;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD_SED
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #elif CONFIG_OPENTHREAD_MTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);

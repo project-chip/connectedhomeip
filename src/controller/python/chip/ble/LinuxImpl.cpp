@@ -19,13 +19,18 @@
 #include <cstdint>
 #include <memory>
 
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/Linux/BlePlatformConfig.h>
 #include <platform/Linux/bluez/AdapterIterator.h>
 #include <platform/Linux/bluez/BluezObjectManager.h>
+#include <platform/Linux/bluez/ChipDeviceScanner.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
-#include <platform/internal/BLEManager.h>
+#include <platform/PlatformManager.h>
+#include <system/SystemClock.h>
+#include <system/SystemLayer.h>
 
 using namespace chip::DeviceLayer::Internal;
 
@@ -107,9 +112,29 @@ public:
 
     void ScannerShutdown() { mBluezObjectManager.Shutdown(); }
 
-    CHIP_ERROR ScannerStartScan(chip::System::Clock::Timeout timeout) { return mScanner.StartScan(timeout); }
+    CHIP_ERROR ScannerStartScan(chip::System::Clock::Timeout timeout)
+    {
+        CHIP_ERROR err = mScanner.StartScan();
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
-    CHIP_ERROR ScannerStopScan() { return mScanner.StopScan(); }
+        err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, HandleScannerTimer, this);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err, mScanner.StopScan());
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ScannerStopScan()
+    {
+        chip::DeviceLayer::SystemLayer().CancelTimer(HandleScannerTimer, this);
+        return mScanner.StopScan();
+    }
+
+    static void HandleScannerTimer(chip::System::Layer *, void * appState)
+    {
+        auto * delegate = static_cast<ScannerDelegateImpl *>(appState);
+        delegate->OnScanError(CHIP_ERROR_TIMEOUT);
+        delegate->mScanner.StopScan();
+    }
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
     {

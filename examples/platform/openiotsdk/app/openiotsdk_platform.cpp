@@ -32,6 +32,7 @@
 #endif
 
 #include <DeviceInfoProviderImpl.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/openiotsdk/Logging.h>
@@ -43,7 +44,6 @@
 #ifdef USE_CHIP_DATA_MODEL
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif // USE_CHIP_DATA_MODEL

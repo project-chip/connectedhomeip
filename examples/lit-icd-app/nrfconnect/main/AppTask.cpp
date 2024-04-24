@@ -296,7 +296,8 @@ void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
 
 void AppTask::IcdUatEventHandler(const AppEvent &)
 {
-    Server::GetInstance().GetICDManager().UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+    // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
+    PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 }
 
 void AppTask::FunctionTimerTimeoutCallback(k_timer * timer)

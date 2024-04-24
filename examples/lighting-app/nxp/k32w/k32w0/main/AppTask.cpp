@@ -987,3 +987,8 @@ extern "C" void OTAIdleActivities(void)
     OTA_TransactionResume();
 #endif
 }
+
+extern "C" bool AppHaveBLEConnections(void)
+{
+    return sHaveBLEConnections;
+}

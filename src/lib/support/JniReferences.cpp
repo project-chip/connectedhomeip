@@ -216,6 +216,22 @@ void JniReferences::CallVoidInt(JNIEnv * env, jobject object, const char * metho
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
+void JniReferences::CallVoidLong(JNIEnv * env, jobject object, const char * methodName, jlong argument)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jmethodID method;
+
+    err = JniReferences::FindMethod(env, object, methodName, "(J)V", &method);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Support, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(object, method, argument);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+}
+
 void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
 {
     if (cbErr == CHIP_JNI_ERROR_EXCEPTION_THROWN)

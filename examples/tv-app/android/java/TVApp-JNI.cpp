@@ -49,6 +49,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::AppPlatform;
 using namespace chip::Credentials;
+using namespace chip::Protocols::UserDirectedCommissioning;
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_matter_tv_server_tvapp_TvApp_##METHOD_NAME
 
@@ -204,15 +205,15 @@ class MyPincodeService : public PasscodeService
         bool foundApp = ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
         if (!foundApp)
         {
-            info.checkState = chip::Controller::TargetAppCheckState::kAppNotFound;
+            info.checkState = TargetAppCheckState::kAppNotFound;
         }
         else if (passcode != 0)
         {
-            info.checkState = chip::Controller::TargetAppCheckState::kAppFoundPasscodeReturned;
+            info.checkState = TargetAppCheckState::kAppFoundPasscodeReturned;
         }
         else
         {
-            info.checkState = chip::Controller::TargetAppCheckState::kAppFoundNoPasscode;
+            info.checkState = TargetAppCheckState::kAppFoundNoPasscode;
         }
         CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
         if (cdc != nullptr)

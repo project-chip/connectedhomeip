@@ -18,6 +18,7 @@
 // module headers
 #import <Matter/Matter.h>
 
+#import "MTRDeviceTestDelegate.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
@@ -1563,6 +1564,172 @@ static BOOL sNeedsStackShutdown = YES;
     [self waitForExpectations:@[ announceResponseExpectation1 ] timeout:kTimeoutInSeconds];
 }
 #endif // ENABLE_REAL_OTA_UPDATE_TESTS
+
+- (void)test008_TestWriteDefaultOTAProviders
+{
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    MTRDevice * device = [runner commissionWithNodeID:@(kDeviceId1)];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type dataValue = ^(uint16_t endpoint) {
+        return @{
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : @[
+                @{
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRStructureValueType,
+                        MTRValueKey : @[
+                            @{
+                                MTRContextTagKey : @(1),
+                                MTRDataKey : @ {
+                                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                                    MTRValueKey : @(kDeviceId1),
+                                },
+                            },
+                            @{
+                                MTRContextTagKey : @(2),
+                                MTRDataKey : @ {
+                                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                                    MTRValueKey : @(endpoint),
+                                },
+                            },
+                        ],
+                    },
+                },
+            ],
+        };
+    };
+
+    {
+        // Test with MTRBaseDevice first.
+        MTRBaseDevice * baseDevice = [MTRBaseDevice deviceWithNodeID:device.nodeID
+                                                          controller:device.deviceController];
+
+        __auto_type * cluster = [[MTRBaseClusterOTASoftwareUpdateRequestor alloc] initWithDevice:baseDevice
+                                                                                      endpointID:@(0)
+                                                                                           queue:queue];
+        __auto_type * providerLocation = [[MTROTASoftwareUpdateRequestorClusterProviderLocation alloc] init];
+        providerLocation.providerNodeID = @(kDeviceId1);
+        providerLocation.endpoint = @(0);
+        __auto_type * value = @[ providerLocation ];
+
+        __auto_type * writeBaseClusterExpectation = [self expectationWithDescription:@"Write succeeded via MTRBaseCluster"];
+        [cluster writeAttributeDefaultOTAProvidersWithValue:value
+                                                 completion:^(NSError * _Nullable error) {
+                                                     XCTAssertNil(error);
+                                                     [writeBaseClusterExpectation fulfill];
+                                                 }];
+        [self waitForExpectations:@[ writeBaseClusterExpectation ] timeout:kTimeoutInSeconds];
+
+        __auto_type * writeBaseDeviceExpectation = [self expectationWithDescription:@"Write succeeded via MTRBaseDevice"];
+        [baseDevice writeAttributeWithEndpointID:@(0)
+                                       clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID)
+                                           value:dataValue(0)
+                               timedWriteTimeout:nil
+                                           queue:queue
+                                      completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                          XCTAssertNil(error);
+                                          XCTAssertNotNil(values);
+                                          XCTAssertEqual(values.count, 1);
+
+                                          for (NSDictionary<NSString *, id> * value in values) {
+                                              XCTAssertNil(value[MTRErrorKey]);
+                                          }
+                                          [writeBaseDeviceExpectation fulfill];
+                                      }];
+        [self waitForExpectations:@[ writeBaseDeviceExpectation ] timeout:kTimeoutInSeconds];
+    }
+
+    {
+        // Now test with MTRDevice
+        __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+        // Make sure we don't have expected value notifications confusing our
+        // attribute reports.
+        delegate.skipExpectedValuesForWrite = YES;
+
+        XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Subscription established"];
+        delegate.onReportEnd = ^() {
+            [gotReportsExpectation fulfill];
+        };
+
+        [device setDelegate:delegate queue:queue];
+
+        [self waitForExpectations:@[ gotReportsExpectation ] timeout:60];
+
+        delegate.onReportEnd = nil;
+
+        __auto_type * expectedAttributePath = [MTRAttributePath attributePathWithEndpointID:@(0)
+                                                                                  clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                                                                attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID)];
+
+        __block __auto_type * expectedValue = dataValue(1);
+
+        __block __auto_type * writeExpectation = [self expectationWithDescription:@"Write succeeded via MTRCluster"];
+        delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+            XCTAssertNotNil(data);
+            XCTAssertEqual(data.count, 1);
+            NSDictionary<NSString *, id> * item = data[0];
+
+            XCTAssertNil(item[MTRErrorKey]);
+
+            MTRAttributePath * path = item[MTRAttributePathKey];
+            XCTAssertNotNil(path);
+
+            XCTAssertEqualObjects(path, expectedAttributePath);
+
+            NSDictionary<NSString *, id> * receivedValue = item[MTRDataKey];
+
+            // We can't use XCTAssertEqualObjects to compare receivedValue to
+            // expectedValue here, because receivedValue has a DataVersion
+            // that's missing from expectedValue, and the struct in it has an
+            // extra FabricIndex field.
+            XCTAssertEqualObjects(receivedValue[MTRTypeKey], MTRArrayValueType);
+
+            NSArray * receivedArray = receivedValue[MTRValueKey];
+            NSArray * expectedArray = expectedValue[MTRValueKey];
+
+            XCTAssertEqual(receivedArray.count, expectedArray.count);
+
+            for (NSUInteger i = 0; i < receivedArray.count; ++i) {
+                NSDictionary * receivedItem = receivedArray[i][MTRDataKey];
+                NSDictionary * expectedItem = expectedArray[i][MTRDataKey];
+
+                XCTAssertEqual(receivedItem[MTRTypeKey], MTRStructureValueType);
+                XCTAssertEqual(expectedItem[MTRTypeKey], MTRStructureValueType);
+
+                NSArray * receivedFields = receivedItem[MTRValueKey];
+                NSArray * expectedFields = expectedItem[MTRValueKey];
+
+                // Account for the extra FabricIndex.
+                XCTAssertEqual(receivedFields.count, expectedFields.count + 1);
+                for (NSUInteger j = 0; j < expectedFields.count; ++j) {
+                    XCTAssertEqualObjects(receivedFields[j], expectedFields[j]);
+                }
+            }
+
+            [writeExpectation fulfill];
+        };
+
+        __auto_type * cluster = [[MTRClusterOTASoftwareUpdateRequestor alloc] initWithDevice:device
+                                                                                  endpointID:@(0)
+                                                                                       queue:queue];
+        [cluster writeAttributeDefaultOTAProvidersWithValue:expectedValue
+                                      expectedValueInterval:@(0)];
+        [self waitForExpectations:@[ writeExpectation ] timeout:kTimeoutInSeconds];
+
+        expectedValue = dataValue(2);
+        writeExpectation = [self expectationWithDescription:@"Write succeeded via MTRDevice"];
+        [device writeAttributeWithEndpointID:@(0)
+                                   clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                 attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID)
+                                       value:expectedValue
+                       expectedValueInterval:@(0)
+                           timedWriteTimeout:nil];
+        [self waitForExpectations:@[ writeExpectation ] timeout:kTimeoutInSeconds];
+    }
+}
 
 - (void)test999_TearDown
 {

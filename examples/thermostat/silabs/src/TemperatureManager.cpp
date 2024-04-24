@@ -25,7 +25,6 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
-#include "semphr.h"
 
 /**********************************************************
  * Defines and Constants

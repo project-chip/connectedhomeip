@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <controller/java/ControllerConfig.h>
 #include <lib/support/JniReferences.h>
 
 #include <memory>
@@ -86,7 +87,8 @@ public:
     }
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
-    void CallJavaMethod(const char * methodName, jint argument);
+    void CallJavaIntMethod(const char * methodName, jint argument);
+    void CallJavaLongMethod(const char * methodName, jlong argument);
     CHIP_ERROR InitializeOperationalCredentialsIssuer();
 
     /**
@@ -270,6 +272,9 @@ private:
     chip::MutableCharSpan mUserActiveModeTriggerInstruction = chip::MutableCharSpan(mUserActiveModeTriggerInstructionBuffer);
     chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerHint;
 
+    uint32_t mIdleModeDuration    = 0;
+    uint32_t mActiveModeDuration  = 0;
+    uint16_t mActiveModeThreshold = 0;
     chip::Controller::CommissioningParameters mCommissioningParameter;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,

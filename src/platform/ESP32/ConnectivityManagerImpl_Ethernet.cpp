@@ -30,7 +30,7 @@
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/internal/BLEManager.h>
 
-#include "esp_eth_com.h"
+#include "esp_eth.h"
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"
@@ -43,7 +43,6 @@
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::TLV;
 using chip::DeviceLayer::Internal::ESP32Utils;
 namespace chip {
 namespace DeviceLayer {
@@ -88,28 +87,42 @@ void ConnectivityManagerImpl::OnEthernetIPv6AddressAvailable(const ip_event_got_
 
 void ConnectivityManagerImpl::OnEthernetPlatformEvent(const ChipDeviceEvent * event)
 {
-    switch (event->Platform.ESPSystemEvent.Id)
+    if (event->Type == DeviceEventType::kESPSystemEvent)
     {
-    case IP_EVENT_ETH_GOT_IP:
-        OnEthernetIPv4AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp);
-        break;
-    case IP_EVENT_ETH_LOST_IP:
-        OnEthernetIPv4AddressLost();
-        break;
-    case IP_EVENT_GOT_IP6:
-        if (strcmp(esp_netif_get_ifkey(event->Platform.ESPSystemEvent.Data.IpGotIp6.esp_netif), "ETH_DEF") == 0)
+        if (event->Platform.ESPSystemEvent.Base == IP_EVENT)
         {
-            OnEthernetIPv6AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp6);
+            switch (event->Platform.ESPSystemEvent.Id)
+            {
+            case IP_EVENT_ETH_GOT_IP:
+                OnEthernetIPv4AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp);
+                break;
+            case IP_EVENT_ETH_LOST_IP:
+                OnEthernetIPv4AddressLost();
+                break;
+            case IP_EVENT_GOT_IP6:
+                if (strcmp(esp_netif_get_ifkey(event->Platform.ESPSystemEvent.Data.IpGotIp6.esp_netif), "ETH_DEF") == 0)
+                {
+                    OnEthernetIPv6AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp6);
+                }
+                break;
+            default:
+                break;
+            }
         }
-        break;
-    case ETHERNET_EVENT_START:
-        ChipLogProgress(DeviceLayer, "Ethernet Started");
-        break;
-    case ETHERNET_EVENT_STOP:
-        ChipLogProgress(DeviceLayer, "Ethernet Stopped");
-        break;
-    default:
-        break;
+        else if (event->Platform.ESPSystemEvent.Base == ETH_EVENT)
+        {
+            switch (event->Platform.ESPSystemEvent.Id)
+            {
+            case ETHERNET_EVENT_START:
+                ChipLogProgress(DeviceLayer, "Ethernet Started");
+                break;
+            case ETHERNET_EVENT_STOP:
+                ChipLogProgress(DeviceLayer, "Ethernet Stopped");
+                break;
+            default:
+                break;
+            }
+        }
     }
 }
 

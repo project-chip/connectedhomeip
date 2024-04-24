@@ -17,7 +17,11 @@
 
 #include "TargetNavigatorManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/config.h>
 #include <json/json.h>
+
+#include <list>
+#include <string>
 
 using namespace std;
 using namespace chip::app;

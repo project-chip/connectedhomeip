@@ -48,18 +48,29 @@ static MTRTestKeys * sTestKeys = nil;
 // commissioning flows that have such a delegate.
 @interface NoOpAttestationDelegate : NSObject <MTRDeviceAttestationDelegate>
 @property (nonatomic) XCTestExpectation * expectation;
+@property (nonatomic) BOOL blockCommissioning;
 
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation;
+// If blockCommissioning is YES, this delegate will never proceed from
+// its attestation verification callback.
+- (instancetype)initWithExpectation:(XCTestExpectation *)expectation blockCommissioning:(BOOL)blockCommissioning;
 @end
 
 @implementation NoOpAttestationDelegate
+
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation
+{
+    return [self initWithExpectation:expectation blockCommissioning:NO];
+}
+
+- (instancetype)initWithExpectation:(XCTestExpectation *)expectation blockCommissioning:(BOOL)blockCommissioning;
 {
     if (!(self = [super init])) {
         return nil;
     }
 
     _expectation = expectation;
+    _blockCommissioning = blockCommissioning;
     return self;
 }
 
@@ -74,7 +85,10 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertEqualObjects(attestationDeviceInfo.productID, @(0x8001));
     XCTAssertEqualObjects(attestationDeviceInfo.basicInformationVendorID, @(0xFFF1));
     XCTAssertEqualObjects(attestationDeviceInfo.basicInformationProductID, @(0x8000));
-    [controller continueCommissioningDevice:opaqueDeviceHandle ignoreAttestationFailure:NO error:nil];
+
+    if (!self.blockCommissioning) {
+        [controller continueCommissioningDevice:opaqueDeviceHandle ignoreAttestationFailure:NO error:nil];
+    }
 }
 
 @end
@@ -241,7 +255,7 @@ static MTRTestKeys * sTestKeys = nil;
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
-- (void)doPairingAndWaitForProgress:(NSString *)trigger
+- (void)doPairingAndWaitForProgress:(NSString *)trigger attestationDelegate:(nullable id<MTRDeviceAttestationDelegate>)attestationDelegate
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Trigger message seen"];
     expectation.assertForOverFulfill = NO;
@@ -251,9 +265,19 @@ static MTRTestKeys * sTestKeys = nil;
         }
     });
 
+    XCTestExpectation * attestationExpectation;
+    if (attestationDelegate == nil) {
+        attestationExpectation = [self expectationWithDescription:@"Attestation delegate called"];
+        attestationDelegate = [[NoOpAttestationDelegate alloc] initWithExpectation:attestationExpectation];
+    }
+
+    // Make sure we exercise the codepath that has an attestation delegate and
+    // extends the fail-safe while waiting for that delegate.  And make sure our
+    // fail-safe extension is long enough that we actually trigger a fail-safe
+    // extension (so longer than the 1-minute default).
     __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:nil
-                                                                                 attestationDelegate:nil
-                                                                                   failSafeExtension:nil];
+                                                                                 attestationDelegate:attestationDelegate
+                                                                                   failSafeExtension:@(90)];
     [sController setDeviceControllerDelegate:controllerDelegate queue:dispatch_get_main_queue()];
     self.controllerDelegate = controllerDelegate;
 
@@ -264,13 +288,17 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertNil(error);
 
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+
+    if (attestationExpectation) {
+        [self waitForExpectations:@[ attestationExpectation ] timeout:kTimeoutInSeconds];
+    }
     MTRSetLogCallback(0, nil);
 }
 
-- (void)doPairingTestAfterCancellationAtProgress:(NSString *)trigger
+- (void)doPairingTestAfterCancellationAtProgress:(NSString *)trigger attestationDelegate:(nullable id<MTRDeviceAttestationDelegate>)attestationDelegate
 {
     // Run pairing up and wait for the trigger
-    [self doPairingAndWaitForProgress:trigger];
+    [self doPairingAndWaitForProgress:trigger attestationDelegate:attestationDelegate];
 
     // Call StopPairing and wait for the commissioningComplete callback
     XCTestExpectation * expectation = [self expectationWithDescription:@"commissioningComplete delegate method called"];
@@ -289,6 +317,11 @@ static MTRTestKeys * sTestKeys = nil;
     [self doPairingTestWithAttestationDelegate:nil failSafeExtension:nil];
 }
 
+- (void)doPairingTestAfterCancellationAtProgress:(NSString *)trigger
+{
+    [self doPairingTestAfterCancellationAtProgress:trigger attestationDelegate:nil];
+}
+
 - (void)test005_pairingAfterCancellation_ReadCommissioningInfo
 {
     // @"Sending read request for commissioning information"
@@ -304,6 +337,18 @@ static MTRTestKeys * sTestKeys = nil;
 {
     // Ensure CASE establishment has started by waiting for 'FindOrEstablishSession'
     [self doPairingTestAfterCancellationAtProgress:@"FindOrEstablishSession:"];
+}
+
+- (void)test008_pairingAfterCancellation_DeviceAttestationVerification
+{
+    // Cancel pairing while we are waiting for our client to decide what to do
+    // with the attestation information we got.
+    XCTestExpectation * attestationExpectation = [self expectationWithDescription:@"Blocking attestation delegate called"];
+    __auto_type * attestationDelegate = [[NoOpAttestationDelegate alloc] initWithExpectation:attestationExpectation blockCommissioning:YES];
+
+    [self doPairingTestAfterCancellationAtProgress:@"Successfully extended fail-safe timer to handle DA failure" attestationDelegate:attestationDelegate];
+
+    [self waitForExpectations:@[ attestationExpectation ] timeout:kTimeoutInSeconds];
 }
 
 @end

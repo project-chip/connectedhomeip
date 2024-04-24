@@ -1,0 +1,3 @@
+jsonschema>=4.17.0
+pycrypto>=2.6.1
+pycryptodome>=3.20.0

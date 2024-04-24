@@ -552,11 +552,13 @@ bool SilabsConfig::ValidConfigKey(Key key)
     return false;
 }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 void SilabsConfig::RunConfigUnitTest()
 {
     // Run common unit test.
     ::chip::DeviceLayer::Internal::RunConfigUnitTest<SilabsConfig>();
 }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 void SilabsConfig::RepackNvm3Flash(void)
 {

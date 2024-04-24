@@ -88,14 +88,6 @@ limitations under the License.
         <item name="ClientIdentifier" type="octet_string" length="20" optional="true" isNullable="true"/>
     </struct>
 
-    <bitmap name="Feature" type="bitmap32">
-      <cluster code="0x0031"/>
-      <field name="WiFiNetworkInterface" mask="0x1"/>
-      <field name="ThreadNetworkInterface" mask="0x2"/>
-      <field name="EthernetNetworkInterface" mask="0x4"/>
-      <field name="PerDeviceCredentials" mask="0x8"/>
-    </bitmap>
-
     <cluster>
         <name>Network Commissioning</name>
         <domain>CHIP</domain>
@@ -104,6 +96,21 @@ limitations under the License.
         <define>NETWORK_COMMISSIONING_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
+
+        <features>
+            <feature bit="0" code="WI" name="WiFiNetworkInterface" summary="Wi-Fi related features">
+            <optionalConform choice="a"/>
+            </feature>
+            <feature bit="1" code="TH" name="ThreadNetworkInterface" summary="Thread related features">
+            <optionalConform choice="a"/>
+            </feature>
+            <feature bit="2" code="ET" name="EthernetNetworkInterface" summary="Ethernet related features">
+            <optionalConform choice="a"/>
+            </feature>
+            <feature bit="3" code="PC" name="PerDeviceCredentials" summary="Device related features">
+            <optionalConform choice="a"/>
+            </feature>
+        </features>
 
         <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="int8u" writable="false" optional="false">
             <description>MaxNetworks</description>

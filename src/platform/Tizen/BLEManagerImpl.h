@@ -33,7 +33,6 @@
 #include <glib.h>
 
 #include <ble/Ble.h>
-#include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/SetupDiscriminator.h>

@@ -25,10 +25,7 @@
 #error This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
 #endif
 
-#include <ble/BleConfig.h>
-#include <ble/BleError.h>
-#include <ble/BleLayer.h>
-#include <ble/BleUUID.h>
+#include <ble/Ble.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Darwin/BlePlatformDelegate.h>
 

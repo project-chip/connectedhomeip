@@ -171,10 +171,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
     }
 
-    if (chip_device_platform == "cc13x2_26x2") {
-      device_layer_target_define = "CC13X2_26X2"
-      defines += [ "CHIP_DEVICE_LAYER_TARGET=cc13xx_26xx/cc13x2_26x2" ]
-    } else if (chip_device_platform == "cc13x4_26x4") {
+    if (chip_device_platform == "cc13x4_26x4") {
       device_layer_target_define = "CC13X4_26X4"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=cc13xx_26xx/cc13x4_26x4" ]
     } else if (chip_device_platform == "cc32xx") {
@@ -320,7 +317,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     found_device_layer_target_define = false
     possible_device_layer_target_defines = [
-      "CC13X2_26X2",
       "CC13X4_26X4",
       "CC32XX",
       "DARWIN",
@@ -519,9 +515,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/lib/support",
     ]
 
-    if (chip_device_platform == "cc13x2_26x2") {
-      _platform_target = "cc13xx_26xx/cc13x2_26x2"
-    } else if (chip_device_platform == "cc13x4_26x4") {
+    if (chip_device_platform == "cc13x4_26x4") {
       _platform_target = "cc13xx_26xx/cc13x4_26x4"
     } else if (chip_device_platform == "cc32xx") {
       _platform_target = "cc32xx"

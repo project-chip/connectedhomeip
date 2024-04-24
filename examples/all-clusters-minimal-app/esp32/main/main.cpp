@@ -36,7 +36,7 @@
 #include <common/CHIPDeviceManager.h>
 
 #include <app/server/OnboardingCodesUtil.h>
-#include <app/util/af.h>
+#include <app/util/endpoint-config-api.h>
 #include <binding-handler.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>

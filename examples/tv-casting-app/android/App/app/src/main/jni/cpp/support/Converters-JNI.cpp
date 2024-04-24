@@ -25,6 +25,30 @@ namespace support {
 
 using namespace chip;
 
+jobject convertLongFromCppToJava(jlong value)
+{
+    ChipLogProgress(AppServer, "convertLongFromCppToJava called");
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, nullptr, ChipLogError(AppServer, "Could not get JNIEnv for current thread"));
+
+    jclass responseTypeClass = env->FindClass("java/lang/Long");
+    if (responseTypeClass == nullptr)
+    {
+        ChipLogError(AppServer, "ConvertToJObject: Class for Response Type not found!");
+        env->ExceptionClear();
+        return nullptr;
+    }
+
+    jmethodID constructor = env->GetMethodID(responseTypeClass, "<init>", "(J)V");
+    if (constructor == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to access Long constructor");
+        env->ExceptionClear();
+        return nullptr;
+    }
+    return env->NewObject(responseTypeClass, constructor, value);
+}
+
 jobject convertMatterErrorFromCppToJava(CHIP_ERROR inErr)
 {
     ChipLogProgress(AppServer, "convertMatterErrorFromCppToJava() called");
@@ -127,7 +151,7 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
     // Get the constructor for the com/matter/casting/core/MatterCastingPlayer Java class
     jmethodID constructor =
         env->GetMethodID(matterCastingPlayerJavaClass, "<init>",
-                         "(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;IIIJ)V");
+                         "(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;IIIJZ)V");
     if (constructor == nullptr)
     {
         ChipLogError(AppServer, "convertCastingPlayerFromCppToJava() could not locate MatterCastingPlayer Java class constructor");
@@ -162,7 +186,8 @@ jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::
                                           env->NewStringUTF(player->GetId()), env->NewStringUTF(player->GetHostName()),
                                           env->NewStringUTF(player->GetDeviceName()), env->NewStringUTF(player->GetInstanceName()),
                                           jIpAddressList, (jint) (player->GetPort()), (jint) (player->GetProductId()),
-                                          (jint) (player->GetVendorId()), (jlong) (player->GetDeviceType()));
+                                          (jint) (player->GetVendorId()), (jlong) (player->GetDeviceType()),
+                                          static_cast<jboolean>(player->GetSupportsCommissionerGeneratedPasscode()));
     if (jMatterCastingPlayer == nullptr)
     {
         ChipLogError(AppServer, "convertCastingPlayerFromCppToJava(): Could not create MatterCastingPlayer Java object");

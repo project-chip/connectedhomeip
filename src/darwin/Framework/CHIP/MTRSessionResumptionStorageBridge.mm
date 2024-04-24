@@ -104,20 +104,19 @@ CHIP_ERROR MTRSessionResumptionStorageBridge::DeleteAll(chip::FabricIndex fabric
 {
     assertChipStackLockedByCurrentThread();
 
-    // NOTE: During controller startup, the Matter SDK thinks that the cert for
-    // a fabric index is changing and hence that it must remove session
-    // resumption data for that fabric index.  For us that does not matter,
-    // since we don't key that data on fabric index anyway.  But we do want to
-    // avoid doing this delete-on-startup so we can actually store session
-    // resumption data persistently.
+    // NOTE: During controller startup and shutdown, the SDK DeviceControllerFactory
+    // calls this method from ClearCASEResumptionStateOnFabricChange() due to fabric
+    // update or removal.  For us that does not matter, since we don't key resumption
+    // data on fabric index anyway.  But we do want to avoid executing the DeleteAll
+    // so we can actually store session resumption data persistently.
 
     // And that is the only use of DeleteAll for controllers in practice, in the
     // situations where we are using MTRSessionResumptionStorageBridge at all.
     // So just no-op this function, but verify that our assumptions hold.
     auto * controller = [mFactory runningControllerForFabricIndex:fabricIndex
                                       includeControllerStartingUp:NO
-                                    includeControllerShuttingDown:YES];
-    VerifyOrDieWithMsg(controller == nil, Controller, "Deleting resumption storage for controller outside startup");
+                                    includeControllerShuttingDown:NO];
+    VerifyOrDieWithMsg(controller == nil, Controller, "ResumptionStorage::DeleteAll called for running controller");
     return CHIP_NO_ERROR;
 }
 

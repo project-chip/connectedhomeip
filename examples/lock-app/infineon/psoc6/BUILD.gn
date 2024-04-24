@@ -15,9 +15,11 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/psoc6.gni")
-
 import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/Infineon/crypto/infineon_crypto.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/infineon/trustm/trustm_config.gni")
 import("${psoc6_sdk_build_root}/psoc6_executable.gni")
 import("${psoc6_sdk_build_root}/psoc6_sdk.gni")
 
@@ -116,6 +118,19 @@ psoc6_executable("lock_app") {
     "${examples_plat_dir}",
     "${psoc6_project_dir}/include",
   ]
+
+  if (chip_crypto == "platform") {
+    include_dirs += [ "${chip_root}/third_party/infineon/trustm" ]
+    include_dirs += [ "${chip_root}/examples/platform/infineon/trustm" ]
+    include_dirs += [ "${chip_root}/src/platform/Infineon/crypto/trustm" ]
+
+    defines = [ "ENABLE_DEVICE_ATTESTATION=1" ]
+
+    public_deps += [
+      "${chip_root}/src/platform/Infineon/crypto/${infineon_crypto_impl}:infineon_crypto_lib",
+      "${chip_root}/third_party/infineon/trustm:optiga-trust-m",
+    ]
+  }
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",

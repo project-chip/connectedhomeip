@@ -28,6 +28,12 @@
 
 static struct stream_flash_ctx stream;
 
+#ifdef CONFIG_CHIP_OTA_REQUEST_UPGRADE_PERMANENT
+#define UPDATE_TYPE BOOT_UPGRADE_PERMANENT
+#else
+#define UPDATE_TYPE BOOT_UPGRADE_TEST
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -85,7 +91,7 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
     // Schedule update of image
-    int err = boot_request_upgrade(BOOT_UPGRADE_PERMANENT);
+    int err = boot_request_upgrade(UPDATE_TYPE);
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
     if (!err)

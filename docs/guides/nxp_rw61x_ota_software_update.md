@@ -223,6 +223,10 @@ To generate the OTA update image the same procedure can be followed from the
 sub-section, replacing the "--version "1.0"" argument with "--version "2.0""
 (recent version of the update).
 
+Note : When building the update image, the build arguments
+`nxp_software_version=2 nxp_sofware_version_string=\"2.0\"` can be added to the
+`gn gen` command in order to specify the upgraded version.
+
 When the signed binary of the update is generated, the file should be converted
 into OTA format. To do so, the ota_image_tool is provided in the repo and can be
 used to convert a binary file into an .ota file.

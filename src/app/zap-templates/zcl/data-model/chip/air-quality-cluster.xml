@@ -25,18 +25,24 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <features>
+      <feature bit="0" code="FAIR" name="Fair" summary="Cluster supports the Fair air quality level">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="MOD" name="Moderate" summary="Cluster supports the Moderate air quality level">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="VPOOR" name="VeryPoor" summary="Cluster supports the Very poor air quality level">
+        <optionalConform/>
+      </feature>
+      <feature bit="3" code="XPOOR" name="ExtremelyPoor" summary="Cluster supports the Extremely poor air quality level">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="AIR_QUALITY" type="AirQualityEnum" min="0" max="6" writable="false" isNullable="false" default="0" optional="false">AirQuality</attribute>
   </cluster>
-
-  <!-- Feature Map -->
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x005B" />
-    <field name="Fair" mask="0x01" />
-    <field name="Moderate" mask="0x02" />
-    <field name="VeryPoor" mask="0x04" />
-    <field name="ExtremelyPoor" mask="0x08" />
-  </bitmap>
 
   <!-- Cluster Data Types -->
   <enum name="AirQualityEnum" type="enum8">

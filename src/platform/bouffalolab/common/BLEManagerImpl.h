@@ -14,10 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
+#include <ble/Ble.h>
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/conn.h>

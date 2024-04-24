@@ -205,7 +205,7 @@ inline constexpr size_t kMaxRotatingIdLen         = 50;
 inline constexpr size_t kMaxPairingInstructionLen = 128;
 
 /// Data that is specific to commisionable/commissioning node discovery
-struct CommissionNodeData
+struct DnssdNodeData
 {
     size_t rotatingIdLen                                      = 0;
     uint32_t deviceType                                       = 0;
@@ -214,19 +214,19 @@ struct CommissionNodeData
     uint16_t productId                                        = 0;
     uint16_t pairingHint                                      = 0;
     uint8_t commissioningMode                                 = 0;
-    uint8_t commissionerPasscode                              = 0;
+    bool supportsCommissionerGeneratedPasscode                = false;
     uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
     char instanceName[Commission::kInstanceNameMaxLength + 1] = {};
     char deviceName[kMaxDeviceNameLen + 1]                    = {};
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
 
-    CommissionNodeData() {}
+    DnssdNodeData() {}
 
     void Reset()
     {
         // Let constructor clear things as default
-        this->~CommissionNodeData();
-        new (this) CommissionNodeData();
+        this->~DnssdNodeData();
+        new (this) DnssdNodeData();
     }
 
     bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
@@ -272,10 +272,8 @@ struct CommissionNodeData
             ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
         }
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
-        if (commissionerPasscode > 0)
-        {
-            ChipLogDetail(Discovery, "\tCommissioner Passcode: %u", commissionerPasscode);
-        }
+        ChipLogDetail(Discovery, "\tSupports Commissioner Generated Passcode: %s",
+                      supportsCommissionerGeneratedPasscode ? "true" : "false");
     }
 };
 
@@ -289,9 +287,7 @@ struct ResolvedNodeData
 #if CHIP_PROGRESS_LOGGING
         // Would be nice to log the interface id, but sorting out how to do so
         // across our different InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
-                        ChipLogValueX64(operationalData.peerId.GetCompressedFabricId()),
-                        ChipLogValueX64(operationalData.peerId.GetNodeId()));
+        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatPeerId, ChipLogValuePeerId(operationalData.peerId));
         resolutionData.LogDetail();
 #endif // CHIP_PROGRESS_LOGGING
     }
@@ -300,12 +296,14 @@ struct ResolvedNodeData
 struct DiscoveredNodeData
 {
     CommonResolutionData resolutionData;
-    CommissionNodeData commissionData;
+    DnssdNodeData nodeData;
+    DiscoveryType nodeType;
 
     void Reset()
     {
         resolutionData.Reset();
-        commissionData.Reset();
+        nodeData.Reset();
+        nodeType = DiscoveryType::kUnknown;
     }
     DiscoveredNodeData() { Reset(); }
 
@@ -313,7 +311,7 @@ struct DiscoveredNodeData
     {
         ChipLogDetail(Discovery, "Discovered node:");
         resolutionData.LogDetail();
-        commissionData.LogDetail();
+        nodeData.LogDetail();
     }
 };
 
@@ -321,10 +319,10 @@ struct DiscoveredNodeData
 ///   - Commissioners
 ///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
 ///     connected to thread/wifi or devices with a commissioning window open)
-class CommissioningResolveDelegate
+class DiscoverNodeDelegate
 {
 public:
-    virtual ~CommissioningResolveDelegate() = default;
+    virtual ~DiscoverNodeDelegate() = default;
 
     /// Called within the CHIP event loop once a node is discovered.
     ///

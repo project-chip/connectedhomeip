@@ -26,7 +26,6 @@
 #include <platform/CHIPDeviceConfig.h> // For CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 
 #include <stdbool.h> // For bool
-#include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
 #include <app/util/basic-types.h>
@@ -310,3 +309,15 @@ typedef chip::Protocols::InteractionModel::Status (*EmberAfClusterPreAttributeCh
 #define MAX_INT16U_VALUE (0xFFFF)
 
 /** @} END addtogroup */
+
+namespace chip {
+namespace app {
+
+enum class MarkAttributeDirty
+{
+    kIfChanged,
+    kNo,
+};
+
+} // namespace app
+} // namespace chip

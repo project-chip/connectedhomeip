@@ -276,6 +276,24 @@ public:
     void OnUserDirectedCommissioningRequest(UDCClientState state) override;
 
     /**
+     * UserConfirmationProvider callback.
+     *
+     * Notification that a Cancel UDC protocol message was received.
+     *
+     * This code will call the registered UserPrompter's HidePromptsOnCancel
+     */
+    void OnCancel(UDCClientState state) override;
+
+    /**
+     * UserConfirmationProvider callback.
+     *
+     * Notification that a CommissionerPasscodeReady UDC protocol message was received.
+     *
+     * This code will trigger the Commissioner to begin commissioning
+     */
+    void OnCommissionerPasscodeReady(UDCClientState state) override;
+
+    /**
      * This method should be called after the user has given consent for commissioning of the client
      * indicated in the UserPrompter's PromptForCommissionOKPermission callback
      */

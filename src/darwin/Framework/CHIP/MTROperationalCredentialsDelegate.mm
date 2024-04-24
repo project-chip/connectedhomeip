@@ -64,17 +64,8 @@ CHIP_ERROR MTROperationalCredentialsDelegate::Init(
 
     // Make copies of the certificates, just in case the API consumer
     // has them as MutableData.
-    mRootCert = [NSData dataWithData:rootCert];
-    if (mRootCert == nil) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    if (icaCert != nil) {
-        mIntermediateCert = [NSData dataWithData:icaCert];
-        if (mIntermediateCert == nil) {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
+    mRootCert = [rootCert copy];
+    mIntermediateCert = [icaCert copy];
 
     return CHIP_NO_ERROR;
 }

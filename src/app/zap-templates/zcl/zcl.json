@@ -2,6 +2,7 @@
     "description": "Matter SDK ZCL data",
     "category": "matter",
     "version": 1,
+    "requiredFeatureLevel": 102,
     "xmlRoot": [
         ".",
         "./data-model/chip/",

@@ -30,9 +30,9 @@ class PairAddressPaseCommand(controller: ChipDeviceController, credsIssue: Crede
     PairingModeType.ADDRESS_PASE_ONLY,
     PairingNetworkType.NONE
   ) {
-  override fun onPairingComplete(errorCode: Int) {
+  override fun onPairingComplete(errorCode: Long) {
     logger.log(Level.INFO, "onPairingComplete with error code: $errorCode")
-    if (errorCode == 0) {
+    if (errorCode == 0L) {
       setSuccess()
     } else {
       setFailure("onPairingComplete failure")

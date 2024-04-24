@@ -21,6 +21,7 @@ env
 
 app="$1"
 sdkconfig_name="$2"
+idf_target="$3"
 root=examples/$app/esp32
 
 shift 1
@@ -30,15 +31,15 @@ if [ -z "$app" ]; then
     exit 1
 fi
 
+supported_idf_target=("esp32" "esp32c3" "esp32c2" "esp32c6" "esp32s3" "esp32h2")
+
+if [ -z "$idf_target" ] || [[ ! "${supported_idf_target[*]}" =~ "$idf_target" ]]; then
+    idf_target="esp32"
+fi
+
 source "$IDF_PATH/export.sh"
 source "scripts/activate.sh"
 # shellcheck source=/dev/null
-
-if [ "$sdkconfig_name" == "sdkconfig_c3devkit.defaults" ]; then
-    idf_target="esp32c3"
-else
-    idf_target="esp32"
-fi
 
 rm -f "$root"/sdkconfig
 (
@@ -48,4 +49,7 @@ rm -f "$root"/sdkconfig
     echo "build $sdkconfig_name failed"
     exit 1
 }
-cp "$root"/build/chip-"$app".elf "$root"/build/"${sdkconfig_name%".defaults"}"-chip-"$app".elf
+
+project_name=$(grep -o 'project([^)]*)' "$root"/CMakeLists.txt | sed 's/project(\(.*\))/\1/')
+
+cp "$root"/build/"$project_name".elf "$root"/build/"${sdkconfig_name%".defaults"}"-"$project_name".elf

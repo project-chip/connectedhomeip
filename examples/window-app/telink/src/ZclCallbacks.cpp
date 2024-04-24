@@ -17,7 +17,6 @@
  */
 
 #include "AppTask.h"
-#include "PWMDevice.h"
 #include "WindowCovering.h"
 #include <AppConfig.h>
 

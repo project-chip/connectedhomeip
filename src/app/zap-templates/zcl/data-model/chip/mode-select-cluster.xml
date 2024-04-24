@@ -40,6 +40,12 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="2"/>
 
+    <features>
+      <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="MODE_DESCRIPTION"   type="char_string"                        length="64"  writable="false" optional="false" isNullable="false">Description</attribute>
@@ -59,8 +65,5 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0050"/>
-    <field name="OnOff" mask="0x1"/>
-  </bitmap>
+
 </configurator>

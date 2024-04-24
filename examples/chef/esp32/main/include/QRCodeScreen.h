@@ -31,6 +31,7 @@
 #if CONFIG_HAVE_DISPLAY
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 class QRCodeScreen : public Screen

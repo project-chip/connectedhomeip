@@ -276,7 +276,9 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
 def _GetPurposefulFailureTests() -> Set[str]:
     """Tests that fail in YAML on purpose."""
     return {
-        "TestPurposefulFailureEqualities.yaml"
+        "TestPurposefulFailureEqualities.yaml",
+        "TestPurposefulFailureExtraReportingOnToggle.yaml",
+        "TestPurposefulFailureNotNullConstraint.yaml",
     }
 
 

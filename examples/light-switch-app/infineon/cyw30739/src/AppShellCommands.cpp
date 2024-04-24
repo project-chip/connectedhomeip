@@ -365,7 +365,7 @@ CHIP_ERROR GroupBindCommandHandler(int argc, char ** argv)
     entry->local                   = 1; // Hardcoded to endpoint 1 for now
     entry->fabricIndex             = atoi(argv[0]);
     entry->groupId                 = atoi(argv[1]);
-    entry->clusterId.SetValue(atoi(argv[3]));
+    entry->clusterId.emplace(atoi(argv[3]));
 
     DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::BindingWorkerHandler, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
@@ -384,7 +384,7 @@ CHIP_ERROR UnicastBindCommandHandler(int argc, char ** argv)
     entry->fabricIndex             = atoi(argv[0]);
     entry->nodeId                  = atoi(argv[1]);
     entry->remote                  = atoi(argv[2]);
-    entry->clusterId.SetValue(atoi(argv[3]));
+    entry->clusterId.emplace(atoi(argv[3]));
 
     DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::BindingWorkerHandler, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
