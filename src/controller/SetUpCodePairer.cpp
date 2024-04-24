@@ -387,7 +387,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
 
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
-    NotifyCommissionableDeviceDiscovered((Dnssd::CommonResolutionData &) nodeData.Get<Dnssd::CommissionNodeData>());
+    NotifyCommissionableDeviceDiscovered(nodeData.Get<Dnssd::CommissionNodeData>());
 }
 
 void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonResolutionData & resolutionData)

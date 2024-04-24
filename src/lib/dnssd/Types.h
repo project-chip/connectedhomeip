@@ -225,7 +225,6 @@ struct CommissionNodeData : public CommonResolutionData
 
     void Reset()
     {
-        CommonResolutionData::Reset();
         // Let constructor clear things as default
         this->~CommissionNodeData();
         new (this) CommissionNodeData();
@@ -235,7 +234,7 @@ struct CommissionNodeData : public CommonResolutionData
 
     void LogDetail() const
     {
-        ChipLogDetail(Discovery, "Discovered commissionable/commissioners node:");
+        ChipLogDetail(Discovery, "Discovered commissionable/commissioner node:");
         CommonResolutionData::LogDetail();
 
         if (rotatingIdLen > 0)

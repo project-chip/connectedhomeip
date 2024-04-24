@@ -180,7 +180,7 @@ public:
         result.discriminator = @(commissionData.longDiscriminator);
         result.commissioningMode = commissionData.commissioningMode != 0;
 
-        auto & resolutionData = commissionData;
+        const CommonResolutionData & resolutionData = commissionData;
         auto * interfaces = result.interfaces;
         interfaces[@(resolutionData.interfaceId.GetPlatformInterface())].resolutionData = chip::MakeOptional(resolutionData);
 
