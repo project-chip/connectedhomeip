@@ -95,7 +95,7 @@ jobs:
     build_darwin_fuzzing:
         name: Build on Darwin
         timeout-minutes: 90
-        runs-on: macos-latest
+        runs-on: macos-13
         if: github.actor != 'restyled-io[bot]'
 
         steps:
