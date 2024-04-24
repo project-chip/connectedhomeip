@@ -1070,8 +1070,7 @@ static NSString * const sAttributesKey = @"attributes";
 
     // After the handling of the report, if we detected a device configuration change, notify the delegate
     // of the same.
-    if (_deviceConfigurationChanged)
-    {
+    if (_deviceConfigurationChanged) {
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if (delegate) {
             dispatch_async(_delegateQueue, ^{
@@ -1110,32 +1109,28 @@ static NSString * const sAttributesKey = @"attributes";
 
 // When we receive an attribute report, check if there are any changes in parts list, server list, device type list, cluster revision
 // or feature map attributes of the descriptor cluster. If yes, make a note that the device configuration changed.
-- (void) _noteDeviceConfigurationChanged:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (void)_noteDeviceConfigurationChanged:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     for (NSDictionary<NSString *, id> * attribute in attributeReport) {
         MTRAttributePath * attributePath = attribute[MTRAttributePathKey];
 
-        if (attributePath.cluster.unsignedLongValue != MTRClusterDescriptorID)
-        {
+        if (attributePath.cluster.unsignedLongValue != MTRClusterDescriptorID) {
             return;
         }
 
-        switch (attributePath.attribute.unsignedLongValue)
-        {
-            case MTRClusterDescriptorAttributePartsListID:
-            case MTRClusterDescriptorAttributeServerListID:
-            case MTRClusterDescriptorAttributeDeviceTypeListID:
-            case MTRClusterDescriptorAttributeClusterRevisionID:
-            case MTRClusterDescriptorAttributeFeatureMapID:
-            {
-                // If changes are detected, note that the device configuration has changed.
-                NSDictionary * cachedAttributeDataValue = [self _cachedAttributeValueForPath:attributePath];
-                if (cachedAttributeDataValue != nil && ![self _attributeDataValue:attribute[MTRDataKey] isEqualToDataValue:cachedAttributeDataValue])
-                {
-                    _deviceConfigurationChanged = YES;
-                    break;
-                }
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRClusterDescriptorAttributePartsListID:
+        case MTRClusterDescriptorAttributeServerListID:
+        case MTRClusterDescriptorAttributeDeviceTypeListID:
+        case MTRClusterDescriptorAttributeClusterRevisionID:
+        case MTRClusterDescriptorAttributeFeatureMapID: {
+            // If changes are detected, note that the device configuration has changed.
+            NSDictionary * cachedAttributeDataValue = [self _cachedAttributeValueForPath:attributePath];
+            if (cachedAttributeDataValue != nil && ![self _attributeDataValue:attribute[MTRDataKey] isEqualToDataValue:cachedAttributeDataValue]) {
+                _deviceConfigurationChanged = YES;
+                break;
             }
+        }
         }
     }
 }

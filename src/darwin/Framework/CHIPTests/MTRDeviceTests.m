@@ -3048,7 +3048,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device setDelegate:delegate queue:queue];
 
     // Wait for subscription set up and intitial reports received.
-    [self waitForExpectations:@[ subscriptionExpectation, gotInitialReportsExpectation, ] timeout:60];
+    [self waitForExpectations:@[
+        subscriptionExpectation,
+        gotInitialReportsExpectation,
+    ]
+                      timeout:60];
 
     XCTestExpectation * gotAttributeReportExpectation = [self expectationWithDescription:@"Attribute report has been received"];
     XCTestExpectation * gotAttributeReportEndExpectation = [self expectationWithDescription:@"Attribute report has ended"];
@@ -3068,25 +3072,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             XCTAssert(dataValue != nil);
             NSArray<NSNumber *> * partsList = dataValue[MTRValueKey];
             XCTAssert([partsList isEqual:(@[
-                                            @{
-                                                MTRDataKey : @ {
-                                                    MTRTypeKey : MTRUnsignedIntegerValueType,
-                                                    MTRValueKey : @1,
-                                                }
-                                            },
-                                            @{
-                                                MTRDataKey : @ {
-                                                    MTRTypeKey : MTRUnsignedIntegerValueType,
-                                                    MTRValueKey : @2,
-                                                }
-                                            },
-                                            @{
-                                                MTRDataKey : @ {
-                                                    MTRTypeKey : MTRUnsignedIntegerValueType,
-                                                    MTRValueKey : @3,
-                                                }
-                                            },
-                                        ])]);
+                @{
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @1,
+                    }
+                },
+                @{
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @2,
+                    }
+                },
+                @{
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @3,
+                    }
+                },
+            ])]);
             [gotAttributeReportExpectation fulfill];
         }
     };
@@ -3102,29 +3106,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Inject the attribute report with parts list changed.
     [device unitTestInjectAttributeReport:@[ @{
         MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(0x001D) attributeID:@(3)],
-        MTRDataKey : @{
-                MTRTypeKey : MTRArrayValueType,
-                MTRValueKey : @[
-                    @{
-                        MTRDataKey : @ {
-                            MTRTypeKey : MTRUnsignedIntegerValueType,
-                            MTRValueKey : @1,
-                        }
-                    },
-                    @{
-                        MTRDataKey : @ {
-                            MTRTypeKey : MTRUnsignedIntegerValueType,
-                            MTRValueKey : @2,
-                        }
-                    },
-                    @{
-                        MTRDataKey : @ {
-                            MTRTypeKey : MTRUnsignedIntegerValueType,
-                            MTRValueKey : @3,
-                        }
-                    },
-                ],
-        }}]];
+        MTRDataKey : @ {
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : @[
+                @{
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @1,
+                    }
+                },
+                @{
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @2,
+                    }
+                },
+                @{
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @3,
+                    }
+                },
+            ],
+        }
+    } ]];
 
     [self waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:60];
 }
