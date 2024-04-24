@@ -22,21 +22,22 @@
  *
  */
 
-#include <gtest/gtest.h>
+
 #include <math.h>
 #include <memory>
 #include <stdio.h>
+
+#include <gtest/gtest.h>
 
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/verhoeff/Verhoeff.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <setup_payload/AdditionalDataPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <lib/support/verhoeff/Verhoeff.h>
 
 using namespace chip;
 
