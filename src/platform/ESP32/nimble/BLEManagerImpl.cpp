@@ -212,14 +212,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
 
-    // Initialize the Chip BleLayer.
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
-#else
-    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
-#endif
-    SuccessOrExit(err);
-
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
                                        1,                   // == default timer period
@@ -227,6 +219,16 @@ CHIP_ERROR BLEManagerImpl::_Init()
                                        (void *) this,       // init timer id = ble obj context
                                        BleAdvTimeoutHandler // timer callback handler
     );
+
+    VerifyOrReturnError(sbleAdvTimeoutTimer != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // Initialize the Chip BleLayer.
+#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
+#else
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
+#endif
+    SuccessOrExit(err);
 
     mRXCharAttrHandle = 0;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -251,6 +253,25 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 exit:
     return err;
+}
+
+void BLEManagerImpl::_Shutdown()
+{
+    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
+    xTimerDelete(sbleAdvTimeoutTimer, portMAX_DELAY);
+    sbleAdvTimeoutTimer = nullptr;
+
+    BleLayer::Shutdown();
+
+    // selectively setting kGATTServiceStarted flag, in order to notify the state machine to stop the CHIPoBLE GATT service
+    mFlags.ClearAll().Set(Flags::kGATTServiceStarted);
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+
+#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+    OnChipBleConnectReceived = nullptr;
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -708,6 +729,8 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 }
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 {
+    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
+
     if (xTimerStop(sbleAdvTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
@@ -715,6 +738,8 @@ void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 }
 void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 {
+    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
+
     if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
     {
         CancelBleAdvTimeoutTimer();
@@ -844,7 +869,8 @@ void BLEManagerImpl::DriveBLEState(void)
     // Stop the CHIPoBLE GATT service if needed.
     if (mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kGATTServiceStarted))
     {
-        // TODO: Not supported
+        DeinitESPBleLayer();
+        mFlags.ClearAll();
     }
 
 exit:
@@ -968,6 +994,56 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     err = bleprph_set_random_addr();
 exit:
     return err;
+}
+
+void BLEManagerImpl::DeinitESPBleLayer()
+{
+    VerifyOrReturn(DeinitBLE() == CHIP_NO_ERROR);
+    BLEManagerImpl::ClaimBLEMemory(nullptr, nullptr);
+}
+
+void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
+{
+    TaskHandle_t handle = xTaskGetHandle("nimble_host");
+    if (handle)
+    {
+        ChipLogDetail(DeviceLayer, "Schedule ble memory reclaiming since nimble host is still running");
+
+        // Rescheduling it for later, 2 seconds is an arbitrary value, keeping it a bit more so that
+        // we dont have to reschedule it again
+        SystemLayer().StartTimer(System::Clock::Seconds32(2), ClaimBLEMemory, nullptr);
+    }
+    else
+    {
+        // Free up all the space occupied by ble and add it to heap
+        esp_err_t err = ESP_OK;
+
+#if CONFIG_IDF_TARGET_ESP32
+        err = esp_bt_mem_release(ESP_BT_MODE_BTDM);
+#elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32H2 ||          \
+    CONFIG_IDF_TARGET_ESP32C6
+        err = esp_bt_mem_release(ESP_BT_MODE_BLE);
+#endif
+
+        VerifyOrReturn(err == ESP_OK, ChipLogError(DeviceLayer, "BLE deinit failed"));
+        ChipLogProgress(DeviceLayer, "BLE deinit successful and memory reclaimed");
+        // TODO: post an event when ble is deinitialized and memory is added to heap
+    }
+}
+
+CHIP_ERROR BLEManagerImpl::DeinitBLE()
+{
+    VerifyOrReturnError(ble_hs_is_enabled(), CHIP_ERROR_INCORRECT_STATE, ChipLogProgress(DeviceLayer, "BLE already deinited"));
+    VerifyOrReturnError(0 == nimble_port_stop(), MapBLEError(ESP_FAIL), ChipLogError(DeviceLayer, "nimble_port_stop() failed"));
+
+    esp_err_t err = nimble_port_deinit();
+    VerifyOrReturnError(err == ESP_OK, MapBLEError(err));
+
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+    err = esp_nimble_hci_and_controller_deinit();
+#endif
+
+    return MapBLEError(err);
 }
 
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
