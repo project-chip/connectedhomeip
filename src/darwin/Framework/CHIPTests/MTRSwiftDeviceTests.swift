@@ -305,7 +305,7 @@ class MTRSwiftDeviceTests : XCTestCase {
         wait(for: [ expectedValueReportedExpectation, expectedValueRemovedExpectation ], timeout: 5, enforceOrder: true)
         
         // Test if previous value is reported on a write
-        let testOnTimeValue : uint32 = 10;
+        let testOnTimeValue : UInt32 = 10;
         let onTimeWriteSuccess = expectation(description: "OnTime write success");
         let onTimePreviousValue = expectation(description: "OnTime previous value");
         delegate.onAttributeDataReceived = { (data: [[ String: Any ]]) -> Void in
