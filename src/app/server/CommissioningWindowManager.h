@@ -57,21 +57,21 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static constexpr System::Clock::Seconds16 MaxCommissioningTimeout()
+    static constexpr System::Clock::Seconds32 MaxCommissioningTimeout()
     {
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
         // Specification section 2.3.1 - Extended Announcement Duration up to 48h
-        return System::Clock::Seconds16(60 * 60 * 48);
+        return System::Clock::Seconds32(60 * 60 * 48);
 #else
         // Specification section 5.4.2.3. Announcement Duration says 15 minutes.
-        return System::Clock::Seconds16(15 * 60);
+        return System::Clock::Seconds32(15 * 60);
 #endif
     }
 
-    System::Clock::Seconds16 MinCommissioningTimeout() const
+    System::Clock::Seconds32 MinCommissioningTimeout() const
     {
         // Specification section 5.4.2.3. Announcement Duration says 3 minutes.
-        return mMinCommissioningTimeoutOverride.ValueOr(System::Clock::Seconds16(3 * 60));
+        return mMinCommissioningTimeoutOverride.ValueOr(System::Clock::Seconds32(3 * 60));
     }
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
@@ -81,7 +81,7 @@ public:
      */
     CHIP_ERROR
     OpenBasicCommissioningWindow(
-        System::Clock::Seconds16 commissioningTimeout      = System::Clock::Seconds16(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS),
+        System::Clock::Seconds32 commissioningTimeout      = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS),
         CommissioningWindowAdvertisement advertisementMode = chip::CommissioningWindowAdvertisement::kAllSupported);
 
     /**
@@ -89,10 +89,10 @@ public:
      * the Administrator Commmissioning cluster implementation.
      */
     CHIP_ERROR
-    OpenBasicCommissioningWindowForAdministratorCommissioningCluster(System::Clock::Seconds16 commissioningTimeout,
+    OpenBasicCommissioningWindowForAdministratorCommissioningCluster(System::Clock::Seconds32 commissioningTimeout,
                                                                      FabricIndex fabricIndex, VendorId vendorId);
 
-    CHIP_ERROR OpenEnhancedCommissioningWindow(System::Clock::Seconds16 commissioningTimeout, uint16_t discriminator,
+    CHIP_ERROR OpenEnhancedCommissioningWindow(System::Clock::Seconds32 commissioningTimeout, uint16_t discriminator,
                                                Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
                                                FabricIndex fabricIndex, VendorId vendorId);
 
@@ -127,7 +127,7 @@ public:
 
     // For tests only, allow overriding the spec-defined minimum value of the
     // commissioning window timeout.
-    void OverrideMinCommissioningTimeout(System::Clock::Seconds16 timeout) { mMinCommissioningTimeoutOverride.SetValue(timeout); }
+    void OverrideMinCommissioningTimeout(System::Clock::Seconds32 timeout) { mMinCommissioningTimeoutOverride.SetValue(timeout); }
 
 private:
     //////////// SessionDelegate Implementation ///////////////
@@ -145,7 +145,7 @@ private:
 
     // Start a timer that will call HandleCommissioningWindowTimeout, and then
     // start advertising and listen for PASE.
-    CHIP_ERROR OpenCommissioningWindow(System::Clock::Seconds16 commissioningTimeout);
+    CHIP_ERROR OpenCommissioningWindow(System::Clock::Seconds32 commissioningTimeout);
 
     // Start advertising and listening for PASE connections.  Should only be
     // called when a commissioning window timeout timer is running.
@@ -218,7 +218,7 @@ private:
 
     // For tests only, so that we can test the commissioning window timeout
     // without having to wait 3 minutes.
-    Optional<System::Clock::Seconds16> mMinCommissioningTimeoutOverride;
+    Optional<System::Clock::Seconds32> mMinCommissioningTimeoutOverride;
 
     // The PASE session we are using, so we can handle CloseSession properly.
     SessionHolderWithDelegate mPASESession;

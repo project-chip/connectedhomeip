@@ -227,7 +227,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commissioningTimeout)
+CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds32 commissioningTimeout)
 {
     VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() && commissioningTimeout >= MinCommissioningTimeout(),
                         CHIP_ERROR_INVALID_ARGUMENT);
@@ -287,7 +287,7 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds16 commissioningTimeout,
+CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 commissioningTimeout,
                                                                     CommissioningWindowAdvertisement advertisementMode)
 {
     RestoreDiscriminator();
@@ -315,7 +315,7 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds16 co
 
 CHIP_ERROR
 CommissioningWindowManager::OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
-    System::Clock::Seconds16 commissioningTimeout, FabricIndex fabricIndex, VendorId vendorId)
+    System::Clock::Seconds32 commissioningTimeout, FabricIndex fabricIndex, VendorId vendorId)
 {
     ReturnErrorOnFailure(OpenBasicCommissioningWindow(commissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly));
 
@@ -325,7 +325,7 @@ CommissioningWindowManager::OpenBasicCommissioningWindowForAdministratorCommissi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds16 commissioningTimeout, uint16_t discriminator,
+CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds32 commissioningTimeout, uint16_t discriminator,
                                                                        Spake2pVerifier & verifier, uint32_t iterations,
                                                                        ByteSpan salt, FabricIndex fabricIndex, VendorId vendorId)
 {

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,19 +15,27 @@
  *    limitations under the License.
  */
 
-#include <inet/InetInterface.h>
-
-struct in6_addr;
-struct net_if;
+#include "Advertiser.h"
 
 namespace chip {
-namespace DeviceLayer {
-namespace InetUtils {
+namespace Dnssd {
 
-in6_addr ToZephyrAddr(const Inet::IPAddress & address);
-net_if * GetInterface(Inet::InterfaceId ifaceId = Inet::InterfaceId::Null());
-net_if * GetWiFiInterface();
+ServiceAdvertiser * ServiceAdvertiser::sInstance = nullptr;
 
-} // namespace InetUtils
-} // namespace DeviceLayer
+ServiceAdvertiser & ServiceAdvertiser::Instance()
+{
+    if (sInstance == nullptr)
+    {
+        sInstance = &GetDefaultAdvertiser();
+    }
+
+    return *sInstance;
+}
+
+void ServiceAdvertiser::SetInstance(ServiceAdvertiser & advertiser)
+{
+    sInstance = &advertiser;
+}
+
+} // namespace Dnssd
 } // namespace chip

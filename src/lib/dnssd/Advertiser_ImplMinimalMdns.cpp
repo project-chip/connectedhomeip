@@ -975,10 +975,14 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 AdvertiserMinMdns gAdvertiser;
 } // namespace
 
-ServiceAdvertiser & ServiceAdvertiser::Instance()
+#if CHIP_DNSSD_DEFAULT_MINIMAL
+
+ServiceAdvertiser & GetDefaultAdvertiser()
 {
     return gAdvertiser;
 }
+
+#endif // CHIP_DNSSD_DEFAULT_MINIMAL
 
 } // namespace Dnssd
 } // namespace chip

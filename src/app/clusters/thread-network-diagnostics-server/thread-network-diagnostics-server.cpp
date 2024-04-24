@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-provider.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -30,6 +31,9 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <tracing/macros.h>
+#include <tracing/metric_event.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -133,6 +137,60 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
     return CHIP_NO_ERROR;
 }
 
+class ThreadDiagnosticsDelegate : public DeviceLayer::ThreadDiagnosticsDelegate
+{
+    // Notified when the Node’s connection status to a Thread network has changed.
+    void OnConnectionStatusChanged(ConnectionStatusEnum newConnectionStatus) override
+    {
+        ChipLogProgress(Zcl, "ThreadDiagnosticsDelegate: OnConnectionStatusChanged");
+
+        Events::ConnectionStatus::Type event{ newConnectionStatus };
+
+        // ThreadNetworkDiagnostics cluster should exist only for endpoint 0.
+        if (emberAfContainsServer(kRootEndpointId, ThreadNetworkDiagnostics::Id))
+        {
+            // If Thread Network Diagnostics cluster is implemented on this endpoint
+            EventNumber eventNumber;
+
+            if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
+            {
+                ChipLogError(Zcl, "ThreadDiagnosticsDelegate: Failed to record ConnectionStatus event");
+            }
+        }
+    }
+
+    // Notified when the Node’s faults related to a Thread network have changed.
+    void OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
+                               const GeneralFaults<kMaxNetworkFaults> & current) override
+    {
+        ChipLogProgress(Zcl, "ThreadDiagnosticsDelegate: OnNetworkFaultChanged");
+
+        /* Verify that the data size matches the expected one. */
+        static_assert(sizeof(*current.data()) == sizeof(NetworkFaultEnum));
+
+        DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()),
+                                                            current.size());
+        DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
+                                                             previous.size());
+
+        Events::NetworkFaultChange::Type event{ currentList, previousList };
+
+        // ThreadNetworkDiagnostics cluster should exist only for endpoint 0.
+        if (emberAfContainsServer(kRootEndpointId, ThreadNetworkDiagnostics::Id))
+        {
+            // If Thread Network Diagnostics cluster is implemented on this endpoint
+            EventNumber eventNumber;
+
+            if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
+            {
+                ChipLogError(Zcl, "ThreadDiagnosticsDelegate: Failed to record NetworkFaultChange event");
+            }
+        }
+    }
+};
+
+ThreadDiagnosticsDelegate gDiagnosticDelegate;
+
 } // anonymous namespace
 
 bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
@@ -147,4 +205,5 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandl
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
+    GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(&gDiagnosticDelegate);
 }
