@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <cstdint>
 #include <protocols/secure_channel/PairingSession.h>
 
 #include <app/SpecificationDefinedRevisions.h>
@@ -237,7 +238,16 @@ void PairingSession::Clear()
         // middle of our handshake. In that case, there is no point in trying to
         // do MRP resends of the last message we sent. So, abort the exchange
         // instead of just closing it.
+
+        // ExchangeContext::Abort will auto-release the underlying values. Since
+        // we are using reference counted handles, we Retain to increase the
+        // reference count before Abort, so that Abort() just closes without
+        // invalidagint context reference counts
+        const uint32_t referenceCount = mExchangeCtxt.Value()->GetReferenceCount();
+        mExchangeCtxt.Value()->Retain();
         mExchangeCtxt.Value()->Abort();
+        VerifyOrDie(referenceCount == mExchangeCtxt.Value()->GetReferenceCount());
+
         mExchangeCtxt.ClearValue();
     }
     mSecureSessionHolder.Release();
