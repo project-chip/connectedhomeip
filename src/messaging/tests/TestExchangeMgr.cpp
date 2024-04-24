@@ -53,6 +53,8 @@ using namespace chip::Messaging;
 
 struct TestContext : Test::LoopbackMessagingContext
 {
+    // TODO Add TearDown function during changing test framework to Pigweed to make it more clear how does it work.
+    // Currently, the TearDown function is from LoopbackMessagingContext
     virtual CHIP_ERROR SetUp()
     {
 #if CHIP_CRYPTO_PSA
