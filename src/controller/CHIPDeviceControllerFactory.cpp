@@ -76,7 +76,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
 CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mSystemState->IsShutdown(), CHIP_NO_ERROR);
+    VerifyOrReturnError(mSystemState->IsShutDown(), CHIP_NO_ERROR);
 
     FactoryInitParams params;
     params.systemLayer        = mSystemState->SystemLayer();
@@ -404,6 +404,7 @@ void DeviceControllerFactory::Shutdown()
 {
     if (mSystemState != nullptr)
     {
+        VerifyOrDie(mSystemState->IsShutDown());
         Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
