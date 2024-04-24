@@ -135,12 +135,19 @@ Complete the following steps:
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
 
-#### Enable experimental Bluetooth support in BlueZ
+#### Enable experimental Bluetooth support and disable battery plugin in BlueZ
 
 The Matter application on Linux uses BlueZ to communicate with the Bluetooth
 controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
 the features required by the Matter application by default. To enable these
 features, you need to enable experimental Bluetooth support in BlueZ.
+
+Also disable the battery plugin from BlueZ, because iOS devices advertises a
+battery service via BLE, which requires pairing if accessed. BlueZ includes a
+battery plugin by default which tries to connect to the battery service. The
+authentication fails, because in this case no BLE pairing has been done. If the
+BlueZ battery plugin is not disabled, the BLE connection will be terminated
+during the Matter commissioning process.
 
 1. Edit the `bluetooth.service` unit by running the following command:
 
@@ -153,7 +160,7 @@ features, you need to enable experimental Bluetooth support in BlueZ.
     ```ini
     [Service]
     ExecStart=
-    ExecStart=/usr/lib/bluetooth/bluetoothd -E
+    ExecStart=/usr/lib/bluetooth/bluetoothd -E -P battery
     ```
 
 1. Restart the Bluetooth service by running the following command:
