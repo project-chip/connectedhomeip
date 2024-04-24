@@ -211,14 +211,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
 
-    // Initialize the Chip BleLayer.
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
-#else
-    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
-#endif
-    SuccessOrExit(err);
-
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
                                        1,                   // == default timer period
@@ -226,6 +218,16 @@ CHIP_ERROR BLEManagerImpl::_Init()
                                        (void *) this,       // init timer id = ble obj context
                                        BleAdvTimeoutHandler // timer callback handler
     );
+
+    VerifyOrReturnError(sbleAdvTimeoutTimer != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // Initialize the Chip BleLayer.
+#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
+#else
+    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
+#endif
+    SuccessOrExit(err);
 
     mRXCharAttrHandle = 0;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -254,8 +256,11 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
-    BleLayer::Shutdown();
+    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
     xTimerDelete(sbleAdvTimeoutTimer, portMAX_DELAY);
+    sbleAdvTimeoutTimer = nullptr;
+
+    BleLayer::Shutdown();
 
     // selectively setting kGATTServiceStarted flag, in order to notify the state machine to stop the CHIPoBLE GATT service
     mFlags.ClearAll().Set(Flags::kGATTServiceStarted);
@@ -723,6 +728,8 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 }
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 {
+    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
+
     if (xTimerStop(sbleAdvTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
@@ -730,6 +737,8 @@ void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 }
 void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 {
+    VerifyOrReturn(sbleAdvTimeoutTimer != nullptr);
+
     if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
     {
         CancelBleAdvTimeoutTimer();
