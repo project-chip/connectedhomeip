@@ -371,6 +371,11 @@ static NSString * const sAttributesKey = @"attributes";
     // ReadClient).  Nil if we have had no such failures.
     NSDate * _Nullable _lastSubscriptionFailureTime;
     MTRDeviceConnectivityMonitor * _connectivityMonitor;
+
+    // This boolean keeps track of any device configuration changes received in an attribute report
+    // and when the report ends, we notify the delegate. Device configuration changes include parts
+    // list, server list, device list, cluster revision and feature map updates.
+    BOOL _deviceConfigurationChanged;
 }
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -1063,6 +1068,19 @@ static NSString * const sAttributesKey = @"attributes";
         _clustersToPersist = nil;
     }
 
+    // After the handling of the report, if we detected a device configuration change, notify the delegate
+    // of the same.
+    if (_deviceConfigurationChanged)
+    {
+        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+        if (delegate) {
+            dispatch_async(_delegateQueue, ^{
+                if ([delegate respondsToSelector:@selector(deviceConfigurationChanged:)])
+                    [delegate deviceConfigurationChanged:self];
+            });
+        }
+    }
+
 // For unit testing only
 #ifdef DEBUG
     id delegate = _weakDelegate.strongObject;
@@ -1090,9 +1108,43 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
+// When we receive an attribute report, check if there are any changes in parts list, server list, device type list, cluster revision
+// or feature map attributes of the descriptor cluster. If yes, make a note that the device configuration changed.
+- (void) _noteDeviceConfigurationChanged:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+    for (NSDictionary<NSString *, id> * attribute in attributeReport) {
+        MTRAttributePath * attributePath = attribute[MTRAttributePathKey];
+
+        if (attributePath.cluster.unsignedLongValue != MTRClusterDescriptorID)
+        {
+            return;
+        }
+
+        switch (attributePath.attribute.unsignedLongValue)
+        {
+            case MTRClusterDescriptorAttributePartsListID:
+            case MTRClusterDescriptorAttributeServerListID:
+            case MTRClusterDescriptorAttributeDeviceTypeListID:
+            case MTRClusterDescriptorAttributeClusterRevisionID:
+            case MTRClusterDescriptorAttributeFeatureMapID:
+            {
+                // If changes are detected, note that the device configuration has changed.
+                NSDictionary * cachedAttributeDataValue = [self _cachedAttributeValueForPath:attributePath];
+                if (cachedAttributeDataValue != nil && ![self _attributeDataValue:attribute[MTRDataKey] isEqualToDataValue:cachedAttributeDataValue])
+                {
+                    _deviceConfigurationChanged = YES;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     std::lock_guard lock(_lock);
+
+    [self _noteDeviceConfigurationChanged:attributeReport];
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
     [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
@@ -1103,6 +1155,15 @@ static NSString * const sAttributesKey = @"attributes";
 {
     dispatch_async(self.queue, ^{
         [self _handleEventReport:eventReport];
+    });
+}
+
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+    dispatch_async(self.queue, ^{
+        [self _handleReportBegin];
+        [self _handleAttributeReport:attributeReport];
+        [self _handleReportEnd];
     });
 }
 #endif

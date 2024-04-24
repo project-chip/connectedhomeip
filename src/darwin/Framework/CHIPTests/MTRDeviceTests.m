@@ -2974,6 +2974,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
     NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreAttributeCountAfterSecondSubscription - attributesReportedWithSecondSubscription;
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
+    [sController removeDevice:device];
 }
 
 - (void)test032_MTRPathClassesEncoding
@@ -3019,6 +3020,115 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRCommandPath * decodedCommandPath = decodedValue;
     XCTAssertEqualObjects(originalCommandPath, decodedCommandPath);
 }
+
+#ifdef DEBUG
+- (void)test033_TestMTRDeviceDeviceConfigurationChanged
+{
+    // Ensure the test starts with clean slate.
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Check if subscription is set up and initial reports are received.
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+    XCTestExpectation * gotInitialReportsExpectation = [self expectationWithDescription:@"Initial Attribute and Event reports have been received"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.onReachable = ^() {
+        [subscriptionExpectation fulfill];
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotInitialReportsExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    // Wait for subscription set up and intitial reports received.
+    [self waitForExpectations:@[ subscriptionExpectation, gotInitialReportsExpectation, ] timeout:60];
+
+    XCTestExpectation * gotAttributeReportExpectation = [self expectationWithDescription:@"Attribute report has been received"];
+    XCTestExpectation * gotAttributeReportEndExpectation = [self expectationWithDescription:@"Attribute report has ended"];
+    XCTestExpectation * deviceConfigurationChangedExpectation = [self expectationWithDescription:@"Device configuration changed was receieved"];
+    __block unsigned attributeReportsReceived = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        attributeReportsReceived += attributeReport.count;
+        XCTAssert(attributeReportsReceived > 0);
+        for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+            MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+            XCTAssert(attributePath != nil);
+
+            XCTAssert(attributePath.cluster.unsignedLongValue == MTRClusterDescriptorID);
+            XCTAssert(attributePath.attribute.unsignedLongValue == MTRClusterDescriptorAttributePartsListID);
+
+            NSDictionary * dataValue = attributeDict[MTRDataKey];
+            XCTAssert(dataValue != nil);
+            NSArray<NSNumber *> * partsList = dataValue[MTRValueKey];
+            XCTAssert([partsList isEqual:(@[
+                                            @{
+                                                MTRDataKey : @ {
+                                                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                                                    MTRValueKey : @1,
+                                                }
+                                            },
+                                            @{
+                                                MTRDataKey : @ {
+                                                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                                                    MTRValueKey : @2,
+                                                }
+                                            },
+                                            @{
+                                                MTRDataKey : @ {
+                                                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                                                    MTRValueKey : @3,
+                                                }
+                                            },
+                                        ])]);
+            [gotAttributeReportExpectation fulfill];
+        }
+    };
+
+    delegate.onReportEnd = ^() {
+        [gotAttributeReportEndExpectation fulfill];
+    };
+
+    delegate.onDeviceConfigurationChanged = ^() {
+        [deviceConfigurationChangedExpectation fulfill];
+    };
+
+    // Inject the attribute report with parts list changed.
+    [device unitTestInjectAttributeReport:@[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(0x001D) attributeID:@(3)],
+        MTRDataKey : @{
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : @[
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @1,
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @2,
+                        }
+                    },
+                    @{
+                        MTRDataKey : @ {
+                            MTRTypeKey : MTRUnsignedIntegerValueType,
+                            MTRValueKey : @3,
+                        }
+                    },
+                ],
+        }}]];
+
+    [self waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:60];
+}
+#endif
 
 @end
 
