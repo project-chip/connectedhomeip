@@ -185,6 +185,8 @@ static_library("ESP32") {
     sources += [
       "ESP32DeviceInfoProvider.cpp",
       "ESP32DeviceInfoProvider.h",
+      "StaticESP32DeviceInfoProvider.cpp",
+      "StaticESP32DeviceInfoProvider.h",
     ]
   }
 

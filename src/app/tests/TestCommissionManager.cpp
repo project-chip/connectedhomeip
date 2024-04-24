@@ -239,7 +239,7 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     NL_TEST_ASSERT(suite, !sAdminVendorIdDirty);
 
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds16(1);
+    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds32(1);
     constexpr uint16_t kTimeoutMs              = 1000;
     constexpr unsigned kSleepPadding           = 100;
     commissionMgr.OverrideMinCommissioningTimeout(kTimeoutSeconds);

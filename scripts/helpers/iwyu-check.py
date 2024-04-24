@@ -51,42 +51,38 @@ def find_program(names):
 @click.command()
 @click.option(
     '--log-level',
-    default='INFO',
+    show_default=True,
+    default='info',
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
-    help='Determines the verbosity of script output.')
+    help='Set the verbosity of script output.')
 @click.option(
     '--no-log-timestamps',
     default=False,
     is_flag=True,
-    help='Skip timestamps in log output')
+    help='Skip timestamps in log output.')
 @click.option(
     '--compile-commands-glob',
     show_default=True,
-    default=os.path.join(proj_root_dir, "out", "debug", "compile_commands*.json"),
-    help='Set global pattern for compile_commands.json files'
-)
-@click.option(
-    '--scanning-destination',
-    show_default=True,
-    default=os.path.join(proj_root_dir, "src", "platform"),
-    help='Set scanning destination file(s) or directory /ies in project'
-)
+    default=os.path.join(proj_root_dir, "out", "debug",
+                         "compile_commands*.json"),
+    help='Set global pattern for compile_commands.json files.')
 @click.option(
     '--mapping-file-dir',
-    help='Set mapping file directory /ies manually. File should have name iwyu.imp'
-)
+    help='Set directory with iwyu.imp mapping file.')
 @click.option(
     '--iwyu-args',
     show_default=True,
     default="-Xiwyu --no_fwd_decls",
-    help='Set custom arg(s) for include what you use'
-)
+    help='Set custom arg(s) for include what you use.')
 @click.option(
     '--clang-args',
     default="",
-    help='Set custom arg(s) for clang'
-)
-def main(compile_commands_glob, scanning_destination, mapping_file_dir,
+    help='Set custom arg(s) for clang.')
+@click.argument(
+    'source',
+    nargs=-1,
+    type=click.Path(exists=True))
+def main(compile_commands_glob, source, mapping_file_dir,
          iwyu_args, clang_args, log_level, no_log_timestamps):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
@@ -114,8 +110,10 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir,
     for compile_commands in compile_commands_glob:
 
         compile_commands_path = os.path.dirname(compile_commands)
-        compile_commands_file = os.path.join(compile_commands_path, "compile_commands.json")
-        logging.debug("Copy compile command file %s to %s", compile_commands, compile_commands_file)
+        compile_commands_file = os.path.join(
+            compile_commands_path, "compile_commands.json")
+        logging.debug("Copy compile command file %s to %s",
+                      compile_commands, compile_commands_file)
 
         with contextlib.suppress(shutil.SameFileError):
             shutil.copyfile(compile_commands, compile_commands_file)
@@ -153,14 +151,14 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir,
 
         command_arr = [
             iwyu,
-            "-p", compile_commands_path, scanning_destination,
+            "-p", compile_commands_path, *source,
             "--", iwyu_args,
             "-Xiwyu", "--mapping_file=" + mapping_file_dir + "/iwyu.imp",
         ] + platform_clang_args + [clang_args]
 
         logging.info("Used compile commands: %s", compile_commands)
         logging.info("Scanning includes for platform: %s", platform)
-        logging.info("Scanning destination: %s", scanning_destination)
+        logging.info("Scanning sources(s): %s", ", ".join(source))
 
         logging.debug("Command: %s", " ".join(command_arr))
         status = subprocess.Popen(" ".join(command_arr),
@@ -175,13 +173,13 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir,
         for line in status.stdout:
             line = line.rstrip()
 
-            if re.match(r"^warning:.*$", line):
+            if re.search(r"^warning:", line):
                 logger = logging.warning
-            elif re.match(r"^.*([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\.cpp should [a-zA-Z]+ these lines:$", line):
+            elif re.search(r"should (add|remove)? these lines:$", line):
                 logger = logging.warning
-            elif re.match(r"^.*([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\.[a-zA-Z]+ has correct #includes/fwd-decls\)$", line):
+            elif re.search(r"has correct #includes/fwd-decls\)$", line):
                 logger = logging.info
-            elif re.match(r"^The full include-list for .*$", line):
+            elif re.search(r"^The full include-list for", line):
                 logger = logging.warning
                 warning_in_files += 1
 
@@ -190,7 +188,8 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir,
         logging.info("============== IWYU output end  ================")
 
     if warning_in_files:
-        logging.error("Number of files with include issues: %d", warning_in_files)
+        logging.error("Number of files with include issues: %d",
+                      warning_in_files)
         sys.exit(2)
     else:
         logging.info("Every include looks good!")

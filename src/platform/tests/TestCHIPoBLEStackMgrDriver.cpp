@@ -16,6 +16,7 @@
  */
 
 #include "TestCHIPoBLEStackMgr.h"
+#include <gtest/gtest.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <stdlib.h>
 
@@ -24,7 +25,8 @@ int main(int argc, char * argv[])
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     if (argc == 2 && atoi(argv[1]) == 1)
     {
-        return TestCHIPoBLEStackManager();
+        testing::InitGoogleTest(nullptr, nullptr);
+        return RUN_ALL_TESTS();
     }
     return 0;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

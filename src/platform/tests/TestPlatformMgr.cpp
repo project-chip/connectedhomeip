@@ -30,12 +30,10 @@
 
 #include <atomic>
 
+#include <gtest/gtest.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestExtendedAssertions.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
-#include <nlunit-test.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
@@ -49,24 +47,41 @@ using namespace chip::DeviceLayer;
 //      Unit tests
 // =================================
 
-static void TestPlatformMgr_InitShutdown(nlTestSuite * inSuite, void * inContext)
+class TestPlatformMgr : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite()
+    {
+        CHIP_ERROR error = chip::Platform::MemoryInit();
+        EXPECT_EQ(error, CHIP_NO_ERROR);
+
+        // Set up a fake commissionable data provider since required by internals of several
+        // Device/SystemLayer components.
+        static chip::DeviceLayer::TestOnlyCommissionableDataProvider commissionable_data_provider;
+        chip::DeviceLayer::SetCommissionableDataProvider(&commissionable_data_provider);
+    }
+
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestPlatformMgr, InitShutdown)
 {
     CHIP_ERROR err = PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     PlatformMgr().Shutdown();
 }
 
-static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestPlatformMgr, BasicEventLoopTask)
 {
     std::atomic<int> counterRun{ 0 };
 
-    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().InitChipStack());
+    EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
     // Start/stop the event loop task a few times.
     for (size_t i = 0; i < 3; i++)
     {
-        NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().StartEventLoopTask());
+        EXPECT_EQ(PlatformMgr().StartEventLoopTask(), CHIP_NO_ERROR);
 
         std::atomic<int> counterSync{ 2 };
 
@@ -98,7 +113,7 @@ static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inC
         for (size_t t = 0; counterSync != 0 && t < 1000; t++)
             chip::test_utils::SleepMillis(1);
 
-        NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().StopEventLoopTask());
+        EXPECT_EQ(PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR);
 
         // Sleep for a short time to allow the event loop to stop.
         // Note, in some platform implementations the event loop thread
@@ -107,7 +122,7 @@ static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inC
         chip::test_utils::SleepMillis(10);
     }
 
-    NL_TEST_ASSERT(inSuite, counterRun == (3 * 2));
+    EXPECT_EQ(counterRun, (3 * 2));
 
     PlatformMgr().Shutdown();
 }
@@ -123,18 +138,18 @@ static void StopTheLoop(intptr_t)
     stopResult = PlatformMgr().StopEventLoopTask();
 }
 
-static void TestPlatformMgr_BasicRunEventLoop(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestPlatformMgr, BasicRunEventLoop)
 {
     stopRan = false;
 
-    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().InitChipStack());
+    EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
     PlatformMgr().ScheduleWork(StopTheLoop);
 
-    NL_TEST_ASSERT(inSuite, !stopRan);
+    EXPECT_FALSE(stopRan);
     PlatformMgr().RunEventLoop();
-    NL_TEST_ASSERT(inSuite, stopRan);
-    NL_TEST_ASSERT_SUCCESS(inSuite, stopResult);
+    EXPECT_TRUE(stopRan);
+    EXPECT_EQ(stopResult, CHIP_NO_ERROR);
 
     PlatformMgr().Shutdown();
 }
@@ -147,51 +162,48 @@ static void SleepSome(intptr_t)
     sleepRan = true;
 }
 
-static void TestPlatformMgr_RunEventLoopTwoTasks(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestPlatformMgr, RunEventLoopTwoTasks)
 {
     stopRan  = false;
     sleepRan = false;
 
-    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().InitChipStack());
+    EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
     PlatformMgr().ScheduleWork(SleepSome);
     PlatformMgr().ScheduleWork(StopTheLoop);
 
-    NL_TEST_ASSERT(inSuite, !stopRan);
-    NL_TEST_ASSERT(inSuite, !sleepRan);
+    EXPECT_FALSE(stopRan);
+    EXPECT_FALSE(sleepRan);
     PlatformMgr().RunEventLoop();
-    NL_TEST_ASSERT(inSuite, stopRan);
-    NL_TEST_ASSERT(inSuite, sleepRan);
+    EXPECT_TRUE(stopRan);
+    EXPECT_TRUE(sleepRan);
 
     PlatformMgr().Shutdown();
 }
 
-void StopAndSleep(intptr_t arg)
-{
-    // Ensure that we don't proceed after stopping until the sleep is done too.
-    StopTheLoop(arg);
-    SleepSome(arg);
-}
-
-static void TestPlatformMgr_RunEventLoopStopBeforeSleep(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
 {
     stopRan  = false;
     sleepRan = false;
 
-    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().InitChipStack());
+    EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-    PlatformMgr().ScheduleWork(StopAndSleep);
+    PlatformMgr().ScheduleWork([](intptr_t arg) {
+        // Ensure that we don't proceed after stopping until the sleep is done too.
+        StopTheLoop(arg);
+        SleepSome(arg);
+    });
 
-    NL_TEST_ASSERT(inSuite, !stopRan);
-    NL_TEST_ASSERT(inSuite, !sleepRan);
+    EXPECT_FALSE(stopRan);
+    EXPECT_FALSE(sleepRan);
     PlatformMgr().RunEventLoop();
-    NL_TEST_ASSERT(inSuite, stopRan);
-    NL_TEST_ASSERT(inSuite, sleepRan);
+    EXPECT_TRUE(stopRan);
+    EXPECT_TRUE(sleepRan);
 
     PlatformMgr().Shutdown();
 }
 
-static void TestPlatformMgr_TryLockChipStack(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestPlatformMgr, TryLockChipStack)
 {
     bool locked = PlatformMgr().TryLockChipStack();
     if (locked)
@@ -202,22 +214,14 @@ static int sEventRecieved = 0;
 
 void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    // NL_TEST_ASSERT(inSuite, arg == 12345);
+    EXPECT_EQ(arg, 12345);
     sEventRecieved++;
 }
 
-static void TestPlatformMgr_AddEventHandler(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestPlatformMgr, AddEventHandler)
 {
     sEventRecieved = 0;
-    NL_TEST_ASSERT_SUCCESS(inSuite, PlatformMgr().AddEventHandler(DeviceEventHandler, 12345));
-
-#if 0
-    while (sEventRecieved == 0)
-    {
-    }
-
-    NL_TEST_ASSERT(inSuite, sEventRecieved > 0);
-#endif
+    EXPECT_EQ(PlatformMgr().AddEventHandler(DeviceEventHandler, 12345), CHIP_NO_ERROR);
 }
 
 class MockSystemLayer : public System::LayerImpl
@@ -233,76 +237,21 @@ public:
     }
 };
 
-static void TestPlatformMgr_MockSystemLayer(nlTestSuite * inSuite, void * inContext)
+TEST_F(TestPlatformMgr, MockSystemLayerTest)
 {
     MockSystemLayer systemLayer;
 
     DeviceLayer::SetSystemLayerForTesting(&systemLayer);
-    NL_TEST_ASSERT(inSuite, &DeviceLayer::SystemLayer() == static_cast<chip::System::Layer *>(&systemLayer));
+    EXPECT_EQ(&DeviceLayer::SystemLayer(), static_cast<chip::System::Layer *>(&systemLayer));
 
     CHIP_ERROR err = PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, &DeviceLayer::SystemLayer() == static_cast<chip::System::Layer *>(&systemLayer));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(&DeviceLayer::SystemLayer(), static_cast<chip::System::Layer *>(&systemLayer));
 
-    NL_TEST_ASSERT(
-        inSuite, DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, nullptr, nullptr) == CHIP_APPLICATION_ERROR(1));
-    NL_TEST_ASSERT(inSuite, DeviceLayer::SystemLayer().ScheduleWork(nullptr, nullptr) == CHIP_APPLICATION_ERROR(2));
+    EXPECT_EQ(DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, nullptr, nullptr), CHIP_APPLICATION_ERROR(1));
+    EXPECT_EQ(DeviceLayer::SystemLayer().ScheduleWork(nullptr, nullptr), CHIP_APPLICATION_ERROR(2));
 
     PlatformMgr().Shutdown();
 
     DeviceLayer::SetSystemLayerForTesting(nullptr);
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-static const nlTest sTests[] = {
-
-    NL_TEST_DEF("Test PlatformMgr::Init/Shutdown", TestPlatformMgr_InitShutdown),
-    NL_TEST_DEF("Test basic PlatformMgr::StartEventLoopTask", TestPlatformMgr_BasicEventLoopTask),
-    NL_TEST_DEF("Test basic PlatformMgr::RunEventLoop", TestPlatformMgr_BasicRunEventLoop),
-    NL_TEST_DEF("Test PlatformMgr::RunEventLoop with two tasks", TestPlatformMgr_RunEventLoopTwoTasks),
-    NL_TEST_DEF("Test PlatformMgr::RunEventLoop with stop before sleep", TestPlatformMgr_RunEventLoopStopBeforeSleep),
-    NL_TEST_DEF("Test PlatformMgr::TryLockChipStack", TestPlatformMgr_TryLockChipStack),
-    NL_TEST_DEF("Test PlatformMgr::AddEventHandler", TestPlatformMgr_AddEventHandler),
-    NL_TEST_DEF("Test mock System::Layer", TestPlatformMgr_MockSystemLayer),
-
-    NL_TEST_SENTINEL()
-};
-
-/**
- *  Set up the test suite.
- */
-int TestPlatformMgr_Setup(void * inContext)
-{
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    if (error != CHIP_NO_ERROR)
-        return FAILURE;
-
-    // Setup a fake commissionable data provider since required by internals of several
-    // Device/SystemLayer components.
-    static chip::DeviceLayer::TestOnlyCommissionableDataProvider commissionable_data_provider;
-    chip::DeviceLayer::SetCommissionableDataProvider(&commissionable_data_provider);
-
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestPlatformMgr_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    return SUCCESS;
-}
-
-int TestPlatformMgr()
-{
-    nlTestSuite theSuite = { "PlatformMgr tests", &sTests[0], TestPlatformMgr_Setup, TestPlatformMgr_Teardown };
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestPlatformMgr);

@@ -246,7 +246,7 @@ JNI_METHOD(jobject, removeCastingPlayerChangeListener)(JNIEnv * env, jobject, jo
 
         return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
     }
-    else if (DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject.ObjectRef() == nullptr)
+    else if (!DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject.HasValidObjectRef())
     {
         ChipLogError(
             AppServer,
