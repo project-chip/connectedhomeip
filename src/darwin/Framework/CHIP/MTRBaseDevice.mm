@@ -47,6 +47,7 @@
 #include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
+#include <app/data-model/List.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
@@ -365,7 +366,7 @@ public:
 
     [self.deviceController getSessionForNode:self.nodeID
                                   completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                                      NSError * _Nullable error) {
+                                      NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                                       if (error != nil) {
                                           dispatch_async(queue, ^{
                                               errorHandler(error);
@@ -633,10 +634,11 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVW
     }
     NSString * typeName = ((NSDictionary *) object)[MTRTypeKey];
     id value = ((NSDictionary *) object)[MTRValueKey];
-    if (!typeName) {
+    if (![typeName isKindOfClass:[NSString class]]) {
         MTR_LOG_ERROR("Error: Object to encode is corrupt");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
     if ([typeName isEqualToString:MTRSignedIntegerValueType]) {
         if (![value isKindOfClass:[NSNumber class]]) {
             MTR_LOG_ERROR("Error: Object to encode has corrupt signed integer type: %@", [value class]);
@@ -1219,10 +1221,53 @@ private:
             auto onFailureCb = [failureCb, bridge](
                                    const app::ConcreteAttributePath * attribPath, CHIP_ERROR aError) { failureCb(bridge, aError); };
 
-            return chip::Controller::WriteAttribute<MTRDataValueDictionaryDecodableType>(session,
+            // To handle list chunking properly, we have to convert lists into
+            // DataModel::List here, because that's special-cased in
+            // WriteClient.
+            if (![value isKindOfClass:NSDictionary.class]) {
+                MTR_LOG_ERROR("Error: Unsupported object to write as attribute value: %@", value);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            NSDictionary<NSString *, id> * dataValue = value;
+            NSString * typeName = dataValue[MTRTypeKey];
+            if (![typeName isKindOfClass:NSString.class]) {
+                MTR_LOG_ERROR("Error: Object to encode is corrupt: %@", dataValue);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            if (![typeName isEqualToString:MTRArrayValueType]) {
+                return chip::Controller::WriteAttribute<MTRDataValueDictionaryDecodableType>(session,
+                    static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+                    static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
+                    static_cast<chip::AttributeId>([attributeID unsignedLongValue]), MTRDataValueDictionaryDecodableType(value),
+                    onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]));
+            }
+
+            // Now we are dealing with a list.
+            NSArray<NSDictionary<NSString *, id> *> * arrayValue = value[MTRValueKey];
+            if (![arrayValue isKindOfClass:NSArray.class]) {
+                MTR_LOG_ERROR("Error: Object to encode claims to be a list but isn't: %@", arrayValue);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            std::vector<MTRDataValueDictionaryDecodableType> encodableVector;
+            encodableVector.reserve(arrayValue.count);
+
+            for (NSDictionary<NSString *, id> * arrayItem in arrayValue) {
+                if (![arrayItem isKindOfClass:NSDictionary.class]) {
+                    MTR_LOG_ERROR("Error: Can't encode corrupt list: %@", arrayValue);
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+
+                encodableVector.push_back(MTRDataValueDictionaryDecodableType(arrayItem[MTRDataKey]));
+            }
+
+            DataModel::List<MTRDataValueDictionaryDecodableType> encodableList(encodableVector.data(), encodableVector.size());
+            return chip::Controller::WriteAttribute<DataModel::List<MTRDataValueDictionaryDecodableType>>(session,
                 static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
                 static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
-                static_cast<chip::AttributeId>([attributeID unsignedLongValue]), MTRDataValueDictionaryDecodableType(value),
+                static_cast<chip::AttributeId>([attributeID unsignedLongValue]), encodableList,
                 onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]));
         });
     std::move(*bridge).DispatchAction(self);
@@ -1603,7 +1648,7 @@ exit:
     [self.deviceController
         getSessionForNode:self.nodeID
                completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                   NSError * _Nullable error) {
+                   NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                    if (error != nil) {
                        dispatch_async(queue, ^{
                            reportHandler(nil, error);
@@ -2597,6 +2642,7 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
+    [super encodeWithCoder:coder];
     [coder encodeObject:_attribute forKey:sAttributeKey];
 }
 
@@ -2663,6 +2709,35 @@ static NSString * const sAttributeKey = @"attributeKey";
     return ConcreteEventPath([self.endpoint unsignedShortValue], static_cast<ClusterId>([self.cluster unsignedLongValue]),
         static_cast<EventId>([self.event unsignedLongValue]));
 }
+
+static NSString * const sEventKey = @"eventKey";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super initWithCoder:decoder];
+    if (self == nil) {
+        return nil;
+    }
+
+    _event = [decoder decodeObjectOfClass:[NSNumber class] forKey:sEventKey];
+    if (_event && ![_event isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTREventPath decoded %@ for event, not NSNumber.", _event);
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [super encodeWithCoder:coder];
+    [coder encodeObject:_event forKey:sEventKey];
+}
 @end
 
 @implementation MTREventPath (Deprecated)
@@ -2717,6 +2792,35 @@ static NSString * const sAttributeKey = @"attributeKey";
 - (id)copyWithZone:(NSZone *)zone
 {
     return [MTRCommandPath commandPathWithEndpointID:self.endpoint clusterID:self.cluster commandID:_command];
+}
+
+static NSString * const sCommandKey = @"commandKey";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super initWithCoder:decoder];
+    if (self == nil) {
+        return nil;
+    }
+
+    _command = [decoder decodeObjectOfClass:[NSNumber class] forKey:sCommandKey];
+    if (_command && ![_command isKindOfClass:[NSNumber class]]) {
+        MTR_LOG_ERROR("MTRCommandPath decoded %@ for command, not NSNumber.", _command);
+        return nil;
+    }
+
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [super encodeWithCoder:coder];
+    [coder encodeObject:_command forKey:sCommandKey];
 }
 @end
 

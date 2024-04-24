@@ -24,7 +24,6 @@
 #pragma once
 #include <memory>
 
-#include <app/AttributeAccessInterface.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>

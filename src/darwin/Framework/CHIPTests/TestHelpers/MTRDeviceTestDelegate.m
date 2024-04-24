@@ -60,4 +60,8 @@
     }
 }
 
+- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device
+{
+    return self.skipExpectedValuesForWrite;
+}
 @end

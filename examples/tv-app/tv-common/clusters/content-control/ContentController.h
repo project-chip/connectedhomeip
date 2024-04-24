@@ -18,9 +18,8 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/content-control-server/content-control-server.h>
-#include <vector>
 
 using ContentControlDelegate = chip::app::Clusters::ContentControl::Delegate;
 using ResetPINResponseType   = chip::app::Clusters::ContentControl::Commands::ResetPINResponse::Type;

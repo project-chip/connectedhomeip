@@ -119,18 +119,14 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 @implementation MTRDeviceTests
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 static BOOL slocalTestStorageEnabledBeforeUnitTest;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 + (void)setUp
 {
     XCTestExpectation * pairingExpectation = [[XCTestExpectation alloc] initWithDescription:@"Pairing Complete"];
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
     slocalTestStorageEnabledBeforeUnitTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
     MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = YES;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -181,13 +177,11 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 {
     ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), nil, kTimeoutInSeconds);
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
     // Restore testing setting to previous state, and remove all persisted attributes
     MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = slocalTestStorageEnabledBeforeUnitTest;
     [sController.controllerDataStore clearAllStoredAttributes];
     NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
     XCTAssertEqual(storedAttributesAfterClear.count, 0);
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
@@ -2569,6 +2563,71 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif // MTR_ENABLE_PROVISIONAL
 }
 
+- (void)test029_MTRDeviceWriteCoalescing
+{
+    // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
+    [sController.controllerDataStore clearAllStoredAttributes];
+    NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedAttributesAfterClear.count, 0);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Given reachable state becomes true before underlying OnSubscriptionEstablished callback, this expectation is necessary but
+    // not sufficient as a mark to the end of reports
+    XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.onReportEnd = ^() {
+        [gotReportsExpectation fulfill];
+    };
+    // Skip reports for expected values so we actually have some idea of what
+    // the server is reporting.
+    delegate.skipExpectedValuesForWrite = YES;
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ gotReportsExpectation ] timeout:60];
+
+    delegate.onReportEnd = nil;
+
+    uint16_t testOnTimeValue = 10;
+    XCTestExpectation * onTimeWriteSuccess = [self expectationWithDescription:@"OnTime write success"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
+            MTRAttributePath * path = attributeReponseValue[MTRAttributePathKey];
+            if (path.cluster.unsignedIntValue == MTRClusterIDTypeOnOffID && path.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOnOffAttributeOnTimeID) {
+                NSDictionary * dataValue = attributeReponseValue[MTRDataKey];
+                NSNumber * onTimeValue = dataValue[MTRValueKey];
+                if ([onTimeValue isEqual:@(testOnTimeValue + 4)]) {
+                    [onTimeWriteSuccess fulfill];
+                } else {
+                    // The first write we did might get reported, but none of
+                    // the other ones should be.
+                    XCTAssertEqualObjects(onTimeValue, @(testOnTimeValue + 1));
+                }
+            }
+        }
+    };
+
+    __auto_type writeOnTimeValue = ^(uint16_t value) {
+        NSDictionary * writeValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(value) };
+        [device writeAttributeWithEndpointID:@(1)
+                                   clusterID:@(MTRClusterIDTypeOnOffID)
+                                 attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
+                                       value:writeValue
+                       expectedValueInterval:@(0)
+                           timedWriteTimeout:nil];
+    };
+
+    writeOnTimeValue(testOnTimeValue + 1);
+    writeOnTimeValue(testOnTimeValue + 2);
+    writeOnTimeValue(testOnTimeValue + 3);
+    writeOnTimeValue(testOnTimeValue + 4);
+
+    [self waitForExpectations:@[ onTimeWriteSuccess ] timeout:10];
+}
+
 - (void)test900_SubscribeAllAttributes
 {
     MTRBaseDevice * device = GetConnectedDevice();
@@ -2839,7 +2898,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqualObjects(cluster.endpointID, @(0));
 }
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 - (void)test031_MTRDeviceAttributeCacheLocalTestStorage
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -2912,7 +2970,50 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesAfterSecondSubscription.count - attributesReportedWithSecondSubscription;
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
+- (void)test032_MTRPathClassesEncoding
+{
+    NSError * encodeError;
+    NSData * encodedData;
+    NSError * decodeError;
+    id decodedValue;
+
+    // Test attribute path encode / decode
+    MTRAttributePath * originalAttributePath = [MTRAttributePath attributePathWithEndpointID:@(101) clusterID:@(102) attributeID:@(103)];
+    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalAttributePath requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError);
+
+    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRAttributePath class]] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError);
+    XCTAssertTrue([decodedValue isKindOfClass:[MTRAttributePath class]]);
+
+    MTRAttributePath * decodedAttributePath = decodedValue;
+    XCTAssertEqualObjects(originalAttributePath, decodedAttributePath);
+
+    // Test event path encode / decode
+    MTREventPath * originalEventPath = [MTREventPath eventPathWithEndpointID:@(201) clusterID:@(202) eventID:@(203)];
+    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalEventPath requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError);
+
+    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTREventPath class]] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError);
+    XCTAssertTrue([decodedValue isKindOfClass:[MTREventPath class]]);
+
+    MTREventPath * decodedEventPath = decodedValue;
+    XCTAssertEqualObjects(originalEventPath, decodedEventPath);
+
+    // Test command path encode / decode
+    MTRCommandPath * originalCommandPath = [MTRCommandPath commandPathWithEndpointID:@(301) clusterID:@(302) commandID:@(303)];
+    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalCommandPath requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError);
+
+    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRCommandPath class]] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError);
+    XCTAssertTrue([decodedValue isKindOfClass:[MTRCommandPath class]]);
+
+    MTRCommandPath * decodedCommandPath = decodedValue;
+    XCTAssertEqualObjects(originalCommandPath, decodedCommandPath);
+}
 
 @end
 

@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
 #include <app/util/ember-compatibility-functions.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>

@@ -287,10 +287,6 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionD
 
     mState = kState_Initialized;
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    mTestBleEndPoint = NULL;
-#endif
-
     return CHIP_NO_ERROR;
 }
 
@@ -443,10 +439,6 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
 
     (*retEndPoint)->Init(this, connObj, role, autoClose);
     (*retEndPoint)->mBleTransport = mBleTransport;
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    mTestBleEndPoint = *retEndPoint;
-#endif
 
     return CHIP_NO_ERROR;
 }

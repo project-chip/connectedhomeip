@@ -25,10 +25,13 @@
  */
 
 #include "SMU2Manager.h"
+
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/KeyValueStoreManager.h>
 
 using namespace chip::DeviceLayer;
 using namespace chip::DeviceLayer::Internal;
+using namespace chip::DeviceLayer::PersistedStorage;
 
 namespace chip::SMU2 {
 namespace {
@@ -38,8 +41,6 @@ static const uint32_t AREA_END   = (0x489C87FFU);
 static const uint32_t AREA_SIZE  = (AREA_END - AREA_START);
 
 uint8_t mAreaId = 0;
-
-PersistentStorageDelegate * mStorage = nullptr;
 
 memAreaCfg_t mAreaDescriptor;
 bool mDeviceCommissioned = false;
@@ -92,7 +93,7 @@ void EventHandler(const ChipDeviceEvent * event, intptr_t)
         if (mDeviceCommissioned)
         {
             mUseAllocator = true;
-            mStorage->SyncSetKeyValue(GetSMU2AllocatorKey().KeyName(), (void *) &mUseAllocator, (uint16_t) sizeof(mUseAllocator));
+            KeyValueStoreMgr().Put(GetSMU2AllocatorKey().KeyName(), (void *) &mUseAllocator, (uint16_t) sizeof(mUseAllocator));
             ResetBLEController();
             RegisterArea();
         }
@@ -103,22 +104,20 @@ void EventHandler(const ChipDeviceEvent * event, intptr_t)
 
 } // anonymous namespace
 
-CHIP_ERROR Init(PersistentStorageDelegate * storage)
+CHIP_ERROR Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t size  = (uint16_t) sizeof(mUseAllocator);
-    mStorage       = storage;
-
-    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     PlatformMgr().AddEventHandler(EventHandler, reinterpret_cast<intptr_t>(nullptr));
 
-    err = mStorage->SyncGetKeyValue(GetSMU2AllocatorKey().KeyName(), (void *) &mUseAllocator, size);
+    size_t bytesRead = 0;
+    err              = KeyValueStoreMgr().Get(GetSMU2AllocatorKey().KeyName(), (void *) &mUseAllocator, size, &bytesRead);
 
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         mUseAllocator = false;
-        err           = mStorage->SyncSetKeyValue(GetSMU2AllocatorKey().KeyName(), (void *) &mUseAllocator, size);
+        err           = KeyValueStoreMgr().Put(GetSMU2AllocatorKey().KeyName(), (void *) &mUseAllocator, size);
     }
     ReturnErrorOnFailure(err);
 
@@ -137,7 +136,7 @@ CHIP_ERROR Deactivate(void)
     if (mUseAllocator)
     {
         mUseAllocator = false;
-        err           = mStorage->SyncDeleteKeyValue(GetSMU2AllocatorKey().KeyName());
+        err           = KeyValueStoreMgr().Delete(GetSMU2AllocatorKey().KeyName());
         ReturnErrorOnFailure(err);
 
         UnregisterArea();

@@ -34,6 +34,8 @@
 #include <platform/PlatformManager.h>
 #include <zap-generated/endpoint_config.h>
 
+#include <string>
+
 namespace chip {
 namespace AppPlatform {
 

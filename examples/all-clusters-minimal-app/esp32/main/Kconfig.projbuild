@@ -48,10 +48,6 @@ menu "Demo"
             depends on IDF_TARGET_ESP32C2
     endchoice
 
-    config CHIP_PROJECT_CONFIG
-        string "CHIP Project Configuration file"
-        default "main/include/CHIPProjectConfig.h"
-
     choice
       prompt "Rendezvous Mode"
       default RENDEZVOUS_MODE_BLE if BT_ENABLED
