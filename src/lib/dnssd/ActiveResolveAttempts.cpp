@@ -19,8 +19,6 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <algorithm>
-
 using namespace chip;
 
 namespace mdns {
@@ -282,6 +280,32 @@ Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextSch
     }
 
     return Optional<ScheduledAttempt>::Missing();
+}
+
+bool ActiveResolveAttempts::ShouldResolveIpAddress(PeerId peerId) const
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (item.attempt.IsEmpty())
+        {
+            continue;
+        }
+        if (item.attempt.IsBrowse())
+        {
+            return true;
+        }
+
+        if (item.attempt.IsResolve())
+        {
+            auto & data = item.attempt.ResolveData();
+            if (data.peerId == peerId)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 bool ActiveResolveAttempts::IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const
