@@ -457,7 +457,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
     uint8_t nist256_header[] = { 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,
                                  0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00 };
 
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
 
     if (CHIP_NO_ERROR != get_trustm_keyid_from_keypair(mKeypair, &keyid))
     {
