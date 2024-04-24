@@ -242,7 +242,7 @@ void PairingSession::Clear()
         // ExchangeContext::Abort will auto-release the underlying values. Since
         // we are using reference counted handles, we Retain to increase the
         // reference count before Abort, so that Abort() just closes without
-        // invalidagint context reference counts
+        // invalidating handle reference counts
         const uint32_t referenceCount = mExchangeCtxt.Value()->GetReferenceCount();
         mExchangeCtxt.Value()->Retain();
         mExchangeCtxt.Value()->Abort();
