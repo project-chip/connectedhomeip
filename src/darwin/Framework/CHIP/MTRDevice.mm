@@ -374,7 +374,7 @@ static NSString * const sAttributesKey = @"attributes";
 
     // This boolean keeps track of any device configuration changes received in an attribute report
     // and when the report ends, we notify the delegate. Device configuration changes include parts
-    // list, server list, device list, cluster revision and feature map updates.
+    // list, server list, device type list, cluster revision and feature map updates.
     BOOL _deviceConfigurationChanged;
 }
 
