@@ -1,22 +1,22 @@
 <Database>
   <Device>
-   <ChipInfo Vendor="Silicon Labs" Name="MGM240PB22VNA1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000" Aliases="MGM240PB22VNA2" />
+   <ChipInfo Vendor="Silicon Labs" Name="MGM240PB22VNA1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000" Aliases="MGM240PB22VNA2; MGM240PB22VNA3" />
    <FlashBankInfo Name="M33 Flash" BaseAddr="0x08000000" MaxSize="0x180000" Loader="mgm24/Series2_bobcat.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
   </Device>
   <Device>
-   <ChipInfo Vendor="Silicon Labs" Name="MGM240PB32VNA1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000" Aliases="MGM240PB32VNA2" />
+   <ChipInfo Vendor="Silicon Labs" Name="MGM240PB32VNA1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000" Aliases="MGM240PB32VNA2; MGM240PB32VNA3" />
    <FlashBankInfo Name="M33 Flash" BaseAddr="0x08000000" MaxSize="0x180000" Loader="mgm24/Series2_bobcat.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
   </Device>
   <Device>
-   <ChipInfo Vendor="Silicon Labs" Name="MGM240SD22VNA1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000" Aliases="MGM240SD22VNA2" />
+   <ChipInfo Vendor="Silicon Labs" Name="MGM240SD22VNA1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000" Aliases="MGM240SD22VNA2; MGM240SD22VNA3" />
    <FlashBankInfo Name="M33 Flash" BaseAddr="0x08000000" MaxSize="0x180000" Loader="mgm24/Series2_bobcat.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
   </Device>
   <Device>
-   <ChipInfo Vendor="Silicon Labs" Name="MGM240L022RNF1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000"  Aliases="MGM240L022RNF2" />
+   <ChipInfo Vendor="Silicon Labs" Name="MGM240L022RNF1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000"  Aliases="MGM240L022RNF2; MGM240L022RNF3" />
    <FlashBankInfo Name="M33 Flash" BaseAddr="0x08000000" MaxSize="0x180000" Loader="mgm24/Series2_bobcat.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
   </Device>
   <Device>
-   <ChipInfo Vendor="Silicon Labs" Name="MGM240LD22VIF1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000"  Aliases="MGM240LD22VIF2" />
+   <ChipInfo Vendor="Silicon Labs" Name="MGM240LD22VIF1" Core="JLINK_CORE_CORTEX_M33" WorkRAMAddr="0x20000000" WorkRAMSize="0x8000"  Aliases="MGM240LD22VIF2; MGM240LD22VIF3" />
    <FlashBankInfo Name="M33 Flash" BaseAddr="0x08000000" MaxSize="0x180000" Loader="mgm24/Series2_bobcat.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
   </Device>
   <Device>

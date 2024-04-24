@@ -5,7 +5,7 @@ ifeq ($(OS),Windows_NT)
 	POSIX_TOOL_PATH := None/
 endif
 TOOLCHAIN_DIR := 
-SDK_PATH := /Volumes/Resources/git/matter/stash/third_party/silabs/gecko_sdk
+SDK_PATH := /Volumes/Resources/git/matter/release/third_party/silabs/gecko_sdk
 
 ARM_GCC_DIR_WIN = 
 ARM_GCC_DIR_OSX = 

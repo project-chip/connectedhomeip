@@ -221,9 +221,10 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
+                    <state>SILABS_PROVISION_PROTOCOL_V1=0</state>
                     <state>CHIP_CONFIG_SHA256_CONTEXT_SIZE=256</state>
                     <state>CHIP_SYSTEM_CONFIG_USE_SOCKETS=1</state>
-                    <state>SILABS_PROVISION_PROTOCOL_V1=0</state>
+                    <state>OTA_ENCRYPTION_ENABLE=1</state>
                     <state>SL_PROVISION_CHANNEL_ENABLED=1</state>
                     <state>EFR32MG24A010F1024IM48=1</state>
                     <state>SL_APP_PROPERTIES=1</state>
@@ -357,8 +358,6 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$FILE_DIR$</state>
-                    <state>$PROJ_DIR$\config</state>
-                    <state>$PROJ_DIR$\autogen</state>
                     <state>$PROJ_DIR$\..\..\generator</state>
                     <state>$PROJ_DIR$\..\..\..\examples</state>
                     <state>$PROJ_DIR$\..\..\..\examples\platform\silabs</state>
@@ -395,6 +394,8 @@
                     <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\platform\common\toolchain\inc</state>
                     <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\platform\service\system\inc</state>
                     <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\platform\service\sleeptimer\inc</state>
+                    <state>$PROJ_DIR$\config</state>
+                    <state>$PROJ_DIR$\autogen</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -568,9 +569,10 @@
                 </option>
                 <option>
                     <name>ADefines</name>
+                    <state>SILABS_PROVISION_PROTOCOL_V1=0</state>
                     <state>CHIP_CONFIG_SHA256_CONTEXT_SIZE=256</state>
                     <state>CHIP_SYSTEM_CONFIG_USE_SOCKETS=1</state>
-                    <state>SILABS_PROVISION_PROTOCOL_V1=0</state>
+                    <state>OTA_ENCRYPTION_ENABLE=1</state>
                     <state>SL_PROVISION_CHANNEL_ENABLED=1</state>
                     <state>EFR32MG24A010F1024IM48=1</state>
                     <state>SL_APP_PROPERTIES=1</state>
@@ -671,8 +673,6 @@
                 <option>
                     <name>AUserIncludes</name>
                     <state>$FILE_DIR$</state>
-                    <state>$PROJ_DIR$\config</state>
-                    <state>$PROJ_DIR$\autogen</state>
                     <state>$PROJ_DIR$\..\..\generator</state>
                     <state>$PROJ_DIR$\..\..\..\examples</state>
                     <state>$PROJ_DIR$\..\..\..\examples\platform\silabs</state>
@@ -709,6 +709,8 @@
                     <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\platform\common\toolchain\inc</state>
                     <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\platform\service\system\inc</state>
                     <state>$PROJ_DIR$\..\..\..\third_party\silabs\gecko_sdk\platform\service\sleeptimer\inc</state>
+                    <state>$PROJ_DIR$\config</state>
+                    <state>$PROJ_DIR$\autogen</state>
                 </option>
                 <option>
                     <name>AExtraOptionsCheckV2</name>

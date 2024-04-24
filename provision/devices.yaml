@@ -36,7 +36,7 @@ efr32mg24:
 
 mgm24:
   ram_addr: 0x20000000
-  flash_addr: 0x0000000
+  flash_addr: 0x8000000
   stack_size: 0x8000
   firmware:
     - version: "1.0"
