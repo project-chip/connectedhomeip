@@ -79,7 +79,7 @@ class TestUDP : public ::testing::Test
 {
 protected:
     TestUDP() { inContext = new TestContext(); }
-    void SetUp() { EXPECT_EQ(inContext->Init(), CHIP_NO_ERROR); }
+    void SetUp() { ASSERT_EQ(inContext->Init(), CHIP_NO_ERROR); }
     void TearDown() { inContext->Shutdown(); }
     TestContext * inContext;
 };
