@@ -64,8 +64,7 @@ public:
         EXPECT_EQ(packetHeader.GetMessageCounter(), kMessageCounter);
 
         size_t data_len = msgBuf->DataLength();
-        int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
-        EXPECT_EQ(compare, 0);
+        EXPECT_EQ(0, memcmp(msgBuf->Start(), PAYLOAD, data_len));
 
         ReceiveHandlerCallCount++;
     }
@@ -79,7 +78,7 @@ class TestUDP : public ::testing::Test
 {
 protected:
     TestUDP() { inContext = new TestContext(); }
-    void SetUp() { EXPECT_EQ(inContext->Init(), CHIP_NO_ERROR); }
+    void SetUp() { ASSERT_EQ(inContext->Init(), CHIP_NO_ERROR); }
     void TearDown() { inContext->Shutdown(); }
     TestContext * inContext;
 };

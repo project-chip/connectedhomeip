@@ -66,19 +66,19 @@ TEST(TestPeerAddress, TestToString)
         IPAddress::FromString("::1", ip);
         PeerAddress::UDP(ip, 1122).ToString(buff);
 
-        EXPECT_EQ(0, strcmp(buff, "UDP:[::1]:1122"));
+        EXPECT_STREQ(buff, "UDP:[::1]:1122");
     }
 
     {
         IPAddress::FromString("::1", ip);
         PeerAddress::TCP(ip, 1122).ToString(buff);
 
-        EXPECT_EQ(0, strcmp(buff, "TCP:[::1]:1122"));
+        EXPECT_STREQ(buff, "TCP:[::1]:1122");
     }
 
     {
         PeerAddress::BLE().ToString(buff);
-        EXPECT_EQ(0, strcmp(buff, "BLE"));
+        EXPECT_STREQ(buff, "BLE");
     }
 
     {
@@ -96,7 +96,7 @@ TEST(TestPeerAddress, TestToString)
         PeerAddress udp = PeerAddress(Transport::Type::kUdp);
         udp.SetPort(5840);
         udp.ToString(buff);
-        EXPECT_EQ(0, strcmp(buff, "UDP:[::]:5840"));
+        EXPECT_STREQ(buff, "UDP:[::]:5840");
     }
 }
 

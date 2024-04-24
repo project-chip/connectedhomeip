@@ -75,13 +75,11 @@ public:
     {
         PacketHeader packetHeader;
 
-        CHIP_ERROR error = packetHeader.DecodeAndConsume(msgBuf);
-        EXPECT_EQ(error, CHIP_NO_ERROR);
+        EXPECT_EQ(packetHeader.DecodeAndConsume(msgBuf), CHIP_NO_ERROR);
 
         if (mCallback)
         {
-            int err = mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, mCallbackData);
-            EXPECT_EQ(err, 0);
+            EXPECT_EQ(mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, mCallbackData), 0);
         }
 
         mReceiveHandlerCallCount++;
@@ -122,7 +120,7 @@ public:
     void SingleMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
         chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::NewWithData(PAYLOAD, sizeof(PAYLOAD));
-        EXPECT_FALSE(buffer.IsNull());
+        ASSERT_FALSE(buffer.IsNull());
 
         PacketHeader header;
         header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageCounter(kMessageCounter);
@@ -165,7 +163,7 @@ class TestTCP : public ::testing::Test
 {
 protected:
     TestTCP() { inContext = new TestContext(); }
-    void SetUp() { EXPECT_EQ(inContext->Init(), CHIP_NO_ERROR); }
+    void SetUp() { ASSERT_EQ(inContext->Init(), CHIP_NO_ERROR); }
     void TearDown() { inContext->Shutdown(); }
     TestContext * inContext;
 };
@@ -391,9 +389,9 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(TestContext * ctx)
 
     Transport::PeerAddress lPeerAddress    = Transport::PeerAddress::TCP(addr);
     TCPBase::ActiveConnectionState * state = tcp.FindActiveConnection(lPeerAddress);
-    EXPECT_NE(state, nullptr);
+    ASSERT_NE(state, nullptr);
     Inet::TCPEndPoint * lEndPoint = state->mEndPoint;
-    EXPECT_NE(lEndPoint, nullptr);
+    ASSERT_NE(lEndPoint, nullptr);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestData testData[2];
