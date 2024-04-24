@@ -1078,6 +1078,7 @@ static NSString * const sAttributesKey = @"attributes";
                     [delegate deviceConfigurationChanged:self];
             });
         }
+        _deviceConfigurationChanged = NO;
     }
 
 // For unit testing only
