@@ -761,6 +761,7 @@ public:
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
      * kAttestationVerification: AttestationErrorInfo if there is an error
+     * kAttestationRevocationCheck: AttestationErrorInfo if there is an error
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
@@ -786,6 +787,7 @@ public:
     virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
     virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
     virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;
+    virtual void BypassDeviceAttestation()                                                                          = 0;
 };
 
 } // namespace Controller

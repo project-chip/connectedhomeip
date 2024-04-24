@@ -610,7 +610,7 @@ public:
      *
      * @param[in] info Structure contatining all the required information for validating the device attestation.
      */
-    CHIP_ERROR ValidateDACChainRevocationStatus(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
+    CHIP_ERROR CheckForRevokedDACChain(const Credentials::DeviceAttestationVerifier::AttestationInfo & info);
 
     /**
      * @brief
@@ -792,6 +792,11 @@ private:
 
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 
+    Credentials::AttestationVerificationResult attestationInformationVerificationResult =
+        Credentials::AttestationVerificationResult::kNotImplemented;
+    Credentials::AttestationVerificationResult dacChainRevocationStatusResult =
+        Credentials::AttestationVerificationResult::kNotImplemented;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
@@ -892,9 +897,8 @@ private:
     static void OnDeviceAttestationInformationVerification(void * context,
                                                            const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
                                                            Credentials::AttestationVerificationResult result);
-    static void OnDACChainRevocationStatusVerification(void * context,
-                                                       const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
-                                                       Credentials::AttestationVerificationResult result);
+    static void OnDACChainRevocationStatus(void * context, const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
+                                           Credentials::AttestationVerificationResult result);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                            const ByteSpan & rcac, Optional<IdentityProtectionKeySpan> ipk,
@@ -1020,6 +1024,8 @@ private:
     // extend it).
     void ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device, CommissioningParameters & params, CommissioningStage step);
 
+    bool IsAttestationInformationMissing(CommissioningParameters & params);
+
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -1029,7 +1035,7 @@ private:
     chip::Callback::Callback<Credentials::DeviceAttestationVerifier::OnAttestationInformationVerification>
         mDeviceAttestationInformationVerificationCallback;
     chip::Callback::Callback<Credentials::DeviceAttestationVerifier::OnAttestationInformationVerification>
-        mDACChainRevocationStatusVerificationCallback;
+        mDACChainRevocationStatusCallback;
 
     chip::Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;

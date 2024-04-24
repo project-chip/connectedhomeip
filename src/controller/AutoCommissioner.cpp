@@ -388,7 +388,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSendAttestationRequest:
         return CommissioningStage::kAttestationVerification;
     case CommissioningStage::kAttestationVerification:
-        return CommissioningStage::kAttestationRevocationCheck;
+        return mBypassDeviceAttestation ? CommissioningStage::kSendOpCertSigningRequest
+                                        : CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
@@ -577,6 +578,7 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mStopCommissioning       = false;
+    mBypassDeviceAttestation = false;
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
     mNeedsNetworkSetup =

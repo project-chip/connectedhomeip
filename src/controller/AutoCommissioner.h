@@ -37,6 +37,7 @@ public:
 
     CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
     void StopCommissioning() { mStopCommissioning = true; };
+    void BypassDeviceAttestation() override { mBypassDeviceAttestation = true; }
 
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
@@ -92,7 +93,8 @@ private:
                  mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId));
     };
 
-    bool mStopCommissioning = false;
+    bool mStopCommissioning       = false;
+    bool mBypassDeviceAttestation = false;
 
     DeviceCommissioner * mCommissioner                               = nullptr;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;

@@ -607,12 +607,12 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     return CHIP_NO_ERROR;
 }
 
-void DefaultDACVerifier::ValidateDACChainRevocationStatus(const AttestationInfo & info,
-                                                          Callback::Callback<OnAttestationInformationVerification> * onCompletion)
+void DefaultDACVerifier::CheckForRevokedDACChain(const AttestationInfo & info,
+                                                 Callback::Callback<OnAttestationInformationVerification> * onCompletion)
 {
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
-    // TODO
+    // TODO(#xyz): Implement default version of CheckForRevokedDACChain
 
     onCompletion->mCall(onCompletion->mContext, info, attestationError);
 }

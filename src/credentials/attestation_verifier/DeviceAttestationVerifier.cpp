@@ -70,11 +70,12 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    void ValidateDACChainRevocationStatus(const AttestationInfo & info,
-                                          Callback::Callback<OnAttestationInformationVerification> * onCompletion) override
+    void CheckForRevokedDACChain(const AttestationInfo & info,
+                                 Callback::Callback<OnAttestationInformationVerification> * onCompletion) override
     {
         (void) info;
         (void) onCompletion;
+        VerifyOrDie(false);
     }
 };
 
