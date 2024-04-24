@@ -512,19 +512,21 @@ class HostBuilder(GnBuilder):
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
-            self._Execute(['find', os.path.join(self.output_dir, 'obj/src/'), '-depth',
-                           '-name', 'tests', '-exec', 'rm', '-rf', '{}', '+'], title="Cleanup unit tests")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
                            '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'out/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, '**/tests/*'),
                            '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
                            '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'out/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
             self._Execute(['lcov', '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
