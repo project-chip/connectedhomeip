@@ -497,25 +497,6 @@ def BuildNxpTarget():
     return target
 
 
-def BuildCC13x2x7Target():
-    target = BuildTarget('ti', TIBuilder)
-
-    # board
-    target.AppendFixedTargets([
-        TargetPart('cc13x2x7_26x2x7', board=TIBoard.LP_CC2652R7),
-    ])
-
-    target.AppendFixedTargets([
-        TargetPart('lighting', app=TIApp.LIGHTING),
-        TargetPart('lock', app=TIApp.LOCK),
-        TargetPart('pump', app=TIApp.PUMP),
-        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER),
-    ])
-    target.AppendModifier(name="mtd", openthread_ftd=False)
-
-    return target
-
-
 def BuildCC13x4Target():
     target = BuildTarget('ti', TIBuilder)
 
@@ -790,7 +771,6 @@ BUILD_TARGETS = [
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
     Buildcc32xxTarget(),
-    BuildCC13x2x7Target(),
     BuildCC13x4Target(),
     BuildCyw30739Target(),
     BuildEfr32Target(),

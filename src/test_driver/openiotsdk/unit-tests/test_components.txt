@@ -1,1 +1,11 @@
 accesstest
+ASN1Tests
+MinimalMdnsCoreTests
+MinimalMdnsRecordsTests
+MinimalMdnsRespondersTests
+CoreTests
+MdnsTests
+PlatformTests
+SystemLayerTests
+TestShell
+SetupPayloadTests

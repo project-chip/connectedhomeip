@@ -16,27 +16,27 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
-
 #include <app/icd/server/ICDServerConfig.h>
 
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-#include <app/icd/server/ICDCheckInSender.h>   // nogncheck
-#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
-#endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
-
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app/AppConfig.h>
 #include <app/SubscriptionsInfoProvider.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <crypto/SessionKeystore.h>
-#include <functional>
 #include <lib/support/BitFlags.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <system/SystemClock.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDCheckInSender.h>   // nogncheck
+#include <app/icd/server/ICDMonitoringTable.h> // nogncheck
+#endif                                         // CHIP_CONFIG_ENABLE_ICD_CIP
 
 namespace chip {
 namespace Crypto {
@@ -54,10 +54,12 @@ class TestICDManager;
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
-class ICDManager : public ICDListener
+class ICDManager : public ICDListener, public TestEventTriggerHandler
 {
 public:
-    // This structure is used for the creation an ObjectPool of ICDStateObserver pointers
+    /**
+     * @brief This structure is used for the creation an ObjectPool of ICDStateObserver pointers
+     */
     struct ObserverPointer
     {
         ObserverPointer(ICDStateObserver * obs) : mObserver(obs) {}
@@ -71,11 +73,31 @@ public:
         ActiveMode,
     };
 
-    // This enum class represents to all ICDStateObserver callbacks available from the
-    // mStateObserverPool for the ICDManager.
+    /**
+     * @brief This enum class represents to all ICDStateObserver callbacks available from the
+     *        mStateObserverPool for the ICDManager.
+     *
+     *        EnterActiveMode, TransitionToIdle and EnterIdleMode will always be called as a trio in the same order.
+     *        Each event will only be called once per cycle.
+     *        EnterActiveMode will always be called first, when the ICD has transitioned to ActiveMode.
+     *        TransitionToIdle will always be second. This event will only be called the first time there is
+     *        `ICD_ACTIVE_TIME_JITTER_MS` remaining to the ActiveMode timer.
+     *         When this event is called, the ICD is still in ActiveMode.
+     *        If the ActiveMode timer is increased due to the TransitionToIdle event, the event will not be called a second time in
+     *        a given cycle.
+     *        OnEnterIdleMode will always the third when the ICD has transitioned to IdleMode.
+     *
+     *        The ICDModeChange event can occur independently from the EnterActiveMode, TransitionToIdle and EnterIdleMode.
+     *        It will typpically hapen at the ICDManager init when a client is already registered with the ICD before the
+     *        OnEnterIdleMode event or when a client send a register command after the OnEnterActiveMode event. Nothing prevents the
+     *        ICDModeChange event to happen multiple times per cycle or while the ICD is in IdleMode.
+     *
+     *        See src/app/icd/server/ICDStateObserver.h for more information on the APIs each event triggers
+     */
     enum class ObserverEventType : uint8_t
     {
         EnterActiveMode,
+        EnterIdleMode,
         TransitionToIdle,
         ICDModeChange,
     };
@@ -85,22 +107,31 @@ public:
      *        This type can be used to implement specific verifiers that can be used in the CheckInMessagesWouldBeSent function.
      *        The goal is to avoid having multiple functions that implement the iterator loop with only the check changing.
      *
-     * @return true if at least one Check-In message would be sent
-     *         false No Check-In messages would be sent
+     * @return true: if at least one Check-In message would be sent
+     *         false: No Check-In messages would be sent
      */
-
     using ShouldCheckInMsgsBeSentFunction = bool(FabricIndex aFabricIndex, NodeId subjectID);
 
-    ICDManager() {}
+    ICDManager()  = default;
+    ~ICDManager() = default;
+
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * manager);
+              Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider);
     void Shutdown();
-    void UpdateICDMode();
-    void UpdateOperationState(OperationalState state);
-    void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
-    bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
+
+    /**
+     * @brief SupportsFeature verifies if a given FeatureMap bit is enabled
+     *
+     * @param[in] feature FeatureMap bit to verify
+     *
+     * @return true: if the FeatureMap bit is enabled in the ICDM cluster attribute.
+     *         false: if the FeatureMap bit is not enabled in the ICDM cluster attribute.
+     *                if we failed to read the FeatureMap attribute.
+     */
     bool SupportsFeature(Clusters::IcdManagement::Feature feature);
+
     ICDConfigurationData::ICDMode GetICDMode() { return ICDConfigurationData::GetInstance().GetICDMode(); };
+
     /**
      * @brief Adds the referenced observer in parameters to the mStateObserverPool
      * A maximum of CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE observers can be concurrently registered
@@ -111,27 +142,29 @@ public:
 
     /**
      * @brief Remove the referenced observer in parameters from the mStateObserverPool
+     *        If the observer is not present in the object pool, we do nothing
      */
     void ReleaseObserver(ICDStateObserver * observer);
 
     /**
-     * @brief Associates the ObserverEventType parameters to the correct
-     *  ICDStateObservers function and calls it for all observers in the mStateObserverPool
-     */
-    void postObserverEvent(ObserverEventType event);
-    OperationalState GetOperationalState() { return mOperationalState; }
-
-    /**
      * @brief Ensures that the remaining Active Mode duration is at least the smaller of 30000 milliseconds and stayActiveDuration.
      *
-     * @param stayActiveDuration The duration (in milliseconds) requested by the client to stay in Active Mode
+     * @param[in] stayActiveDuration The duration (in milliseconds) requested by the client to stay in Active Mode
      * @return The duration (in milliseconds) the device will stay in Active Mode
      */
     uint32_t StayActiveRequest(uint32_t stayActiveDuration);
 
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-    void SendCheckInMsgs();
+    /**
+     * @brief TestEventTriggerHandler for the ICD feature set
+     *
+     * @param[in] eventTrigger Event trigger to handle.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR - No erros during the processing
+     *                    CHIP_ERROR_INVALID_ARGUMENT - eventTrigger isn't a valid value
+     */
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     /**
      * @brief Trigger the ICDManager to send Check-In message if necessary
      *
@@ -151,47 +184,108 @@ public:
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     void SetTestFeatureMapValue(uint32_t featureMap) { mFeatureMap = featureMap; };
-#if !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     bool GetIsBootUpResumeSubscriptionExecuted() { return mIsBootUpResumeSubscriptionExecuted; };
 #endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #endif
 
     // Implementation of ICDListener functions.
     // Callers must origin from the chip task context or hold the ChipStack lock.
+
     void OnNetworkActivity() override;
     void OnKeepActiveRequest(KeepActiveFlags request) override;
     void OnActiveRequestWithdrawal(KeepActiveFlags request) override;
     void OnICDManagementServerEvent(ICDManagementEvents event) override;
     void OnSubscriptionReport() override;
 
-protected:
+private:
+    friend class TestICDManager;
     /**
-     * @brief Hepler function that extends the Active Mode duration as well as the Active Mode Jitter timer for the transition to
-     * iddle mode.
+     * @brief UpdateICDMode evaluates in which mode the ICD can be in; SIT or LIT mode.
+     *        If the current operating mode does not match the evaluated operating mode, function updates the ICDMode and triggers
+     *        all necessary operations.
+     *        For a SIT ICD, this function does nothing.
+     *        For a LIT ICD, the function checks if the ICD has a registration in the ICDMonitoringTable to determine which ICDMode
+     *        the ICD must be in.
+     */
+    void UpdateICDMode();
+
+    /**
+     * @brief UpdateOperationState updates the OperationState of the ICD to the requested one.
+     *        IdleMode -> IdleMode     : No actions are necessary, do nothing.
+     *        IdleMode -> ActiveMode   : Transition the device to ActiveMode, start the  ActiveMode timer and trigger all necessary
+     *                                   operations. These operations could be : Send Check-In messages
+     *                                                                           Send subscription reports
+     *                                                                           Process user actions
+     *        ActiveMode -> ActiveMode : Increase remaining ActiveMode timer to one ActiveModeThreshold.
+     *                                   If ActiveModeThreshold is 0, do nothing.
+     *        ActiveMode -> IdleMode   : Transition ICD to IdleMode and start the IdleMode timer.
+     *
+     * @param state requested OperationalState for the ICD to transition to
+     */
+    void UpdateOperationState(OperationalState state);
+
+    /**
+     * @brief Set or Remove a keep ActiveMode requirement for the given flag
+     *        If state is true and the ICD is in IdleMode, transition the ICD to ActiveMode
+     *        If state is false and the ICD is in ActiveMode, check whether we can transition the ICD to IdleMode.
+     *        If we can, transition the ICD to IdleMode.
+     *
+     * @param flag KeepActiveFlag to remove or add
+     * @param state true: adding a flag requirement
+     *              false: removing a flag requirement
+     */
+    void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
+
+    /**
+     * @brief Associates the ObserverEventType parameters to the correct
+     *  ICDStateObservers function and calls it for all observers in the mStateObserverPool
+     */
+    void postObserverEvent(ObserverEventType event);
+
+    /**
+     * @brief Hepler function that extends the ActiveMode timer as well as the Active Mode Jitter timer for the transition to
+     *        idle mode event.
      */
     void ExtendActiveMode(System::Clock::Milliseconds16 extendDuration);
 
-    friend class TestICDManager;
-
+    /**
+     * @brief Timer callback function for when the IdleMode timer expires
+     *
+     * @param appState pointer to the ICDManager
+     */
     static void OnIdleModeDone(System::Layer * aLayer, void * appState);
+
+    /**
+     * @brief Timer callback function for when the ActiveMode timer expires
+     *
+     * @param appState pointer to the ICDManager
+     */
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);
 
     /**
-     * @brief Callback function called shortly before the device enters idle mode to allow checks to be made. This is currently only
-     * called once to prevent entering in a loop if some events re-trigger this check (for instance if a check for subscription
-     * before entering idle mode leads to emiting a report, we will re-enter UpdateOperationState and check again for subscription,
-     * etc.)
+     * @brief Timer Callback function called shortly before the device enters idle mode to allow checks to be made.
+     *        This is currently only called once to prevent entering in a loop if some events re-trigger this check (for instance if
+     *        a check for subscriptions before entering idle mode leads to emiting a report, we will re-enter UpdateOperationState
+     *        and check again for subscription, etc.)
+     *
+     * @param appState pointer to the ICDManager
      */
     static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    uint8_t mCheckInRequestCount = 0;
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    /**
+     * @brief Function triggers all necessary Check-In messages to be sent.
+     *
+     * @note For each ICDMonitoring entry, we check if should send a Check-In message with
+     *       ShouldCheckInMsgsBeSentAtActiveModeFunction. If we should, we allocate an ICDCheckInSender which tries to send a
+     *       Check-In message to the registered client.
+     */
+    void SendCheckInMsgs();
 
-    uint8_t mOpenExchangeContextCount = 0;
-
-private:
-#if CHIP_CONFIG_ENABLE_ICD_CIP
+    /**
+     * @brief See function implementation in .cpp for details on this function.
+     */
     bool ShouldCheckInMsgsBeSentAtActiveModeFunction(FabricIndex aFabricIndex, NodeId subjectID);
 
     /**
@@ -212,11 +306,15 @@ private:
     OperationalState mOperationalState = OperationalState::ActiveMode;
     bool mTransitionToIdleCalled       = false;
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
+    uint8_t mOpenExchangeContextCount = 0;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+    uint8_t mCheckInRequestCount = 0;
+
 #if !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     bool mIsBootUpResumeSubscriptionExecuted = false;
 #endif // !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION && CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
     Messaging::ExchangeManager * mExchangeManager  = nullptr;

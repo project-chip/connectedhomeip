@@ -84,6 +84,7 @@ using namespace ::chip;
 {
     if (self = [super init]) {
         _filterByFabric = YES;
+        _assumeUnknownAttributesReportable = YES;
     }
     return self;
 }
@@ -93,6 +94,7 @@ using namespace ::chip;
     auto other = [[MTRReadParams alloc] init];
     other.filterByFabric = self.filterByFabric;
     other.minEventNumber = self.minEventNumber;
+    other.assumeUnknownAttributesReportable = self.assumeUnknownAttributesReportable;
     return other;
 }
 
@@ -124,6 +126,7 @@ using namespace ::chip;
     auto other = [[MTRSubscribeParams alloc] initWithMinInterval:self.minInterval maxInterval:self.maxInterval];
     other.filterByFabric = self.filterByFabric;
     other.minEventNumber = self.minEventNumber;
+    other.assumeUnknownAttributesReportable = self.assumeUnknownAttributesReportable;
     other.replaceExistingSubscriptions = self.replaceExistingSubscriptions;
     other.reportEventsUrgently = self.reportEventsUrgently;
     other.resubscribeAutomatically = self.resubscribeAutomatically;

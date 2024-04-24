@@ -45,6 +45,7 @@ DiscoveryDelegateImpl * DiscoveryDelegateImpl::GetInstance()
 
 void DiscoveryDelegateImpl::HandleOnAdded(matter::casting::memory::Strong<matter::casting::core::CastingPlayer> player)
 {
+    ChipLogProgress(AppServer, "DiscoveryDelegateImpl::HandleOnAdded() called");
     if (commissionersCount == 0)
     {
         ChipLogProgress(AppServer, "Select discovered Casting Player (start index = 0) to request commissioning");
@@ -58,7 +59,7 @@ void DiscoveryDelegateImpl::HandleOnAdded(matter::casting::memory::Strong<matter
 
 void DiscoveryDelegateImpl::HandleOnUpdated(matter::casting::memory::Strong<matter::casting::core::CastingPlayer> player)
 {
-    ChipLogProgress(AppServer, "Updated CastingPlayer with ID: %s", player->GetId());
+    ChipLogProgress(AppServer, "DiscoveryDelegateImpl::HandleOnUpdated() Updated CastingPlayer with ID: %s", player->GetId());
 }
 
 void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
@@ -294,7 +295,7 @@ void PrintBindings()
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                        binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
     }
 }
 

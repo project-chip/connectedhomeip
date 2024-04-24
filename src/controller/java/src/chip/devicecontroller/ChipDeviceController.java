@@ -757,12 +757,13 @@ public class ChipDeviceController {
 
   /* Shuts down all active subscriptions. */
   public void shutdownSubscriptions() {
-    shutdownSubscriptions(deviceControllerPtr, null, null, null);
+    ChipInteractionClient.shutdownSubscriptions(deviceControllerPtr, null, null, null);
   }
 
   /* Shuts down all active subscriptions for the fabric at the given fabricIndex */
   public void shutdownSubscriptions(int fabricIndex) {
-    shutdownSubscriptions(deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
+    ChipInteractionClient.shutdownSubscriptions(
+        deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
   }
 
   /**
@@ -772,7 +773,7 @@ public class ChipDeviceController {
    * @param peerNodeId the node ID of the device for which subscriptions should be canceled
    */
   public void shutdownSubscriptions(int fabricIndex, long peerNodeId) {
-    shutdownSubscriptions(
+    ChipInteractionClient.shutdownSubscriptions(
         deviceControllerPtr, Integer.valueOf(fabricIndex), Long.valueOf(peerNodeId), null);
   }
 
@@ -784,7 +785,7 @@ public class ChipDeviceController {
    * @param subscriptionId the ID of the subscription on the node which should be canceled
    */
   public void shutdownSubscriptions(int fabricIndex, long peerNodeId, long subscriptionId) {
-    shutdownSubscriptions(
+    ChipInteractionClient.shutdownSubscriptions(
         deviceControllerPtr,
         Integer.valueOf(fabricIndex),
         Long.valueOf(peerNodeId),
@@ -825,7 +826,7 @@ public class ChipDeviceController {
       int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -863,7 +864,7 @@ public class ChipDeviceController {
       int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -889,7 +890,7 @@ public class ChipDeviceController {
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -923,7 +924,7 @@ public class ChipDeviceController {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(
             subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -975,7 +976,7 @@ public class ChipDeviceController {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(
             subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1006,7 +1007,7 @@ public class ChipDeviceController {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(
             subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
-    subscribe(
+    ChipInteractionClient.subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1036,7 +1037,7 @@ public class ChipDeviceController {
       List<ChipAttributePath> attributePaths,
       int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1060,7 +1061,7 @@ public class ChipDeviceController {
   public void readEventPath(
       ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths, int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1080,7 +1081,7 @@ public class ChipDeviceController {
       int imTimeoutMs,
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1101,7 +1102,7 @@ public class ChipDeviceController {
       boolean isFabricFiltered,
       int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1133,7 +1134,7 @@ public class ChipDeviceController {
       boolean isFabricFiltered,
       int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1155,7 +1156,7 @@ public class ChipDeviceController {
       int imTimeoutMs,
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(
+    ChipInteractionClient.read(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1184,7 +1185,7 @@ public class ChipDeviceController {
       int timedRequestTimeoutMs,
       int imTimeoutMs) {
     WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
-    write(
+    ChipInteractionClient.write(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1210,7 +1211,7 @@ public class ChipDeviceController {
       int timedRequestTimeoutMs,
       int imTimeoutMs) {
     InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
-    invoke(
+    ChipInteractionClient.invoke(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1236,7 +1237,7 @@ public class ChipDeviceController {
       int timedRequestTimeoutMs,
       int imTimeoutMs) {
     ExtendableInvokeCallbackJni jniCallback = new ExtendableInvokeCallbackJni(callback);
-    extendableInvoke(
+    ChipInteractionClient.extendableInvoke(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
         devicePtr,
@@ -1377,55 +1378,6 @@ public class ChipDeviceController {
 
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
-
-  static native void subscribe(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      List<ChipAttributePath> attributePaths,
-      List<ChipEventPath> eventPaths,
-      List<DataVersionFilter> dataVersionFilters,
-      int minInterval,
-      int maxInterval,
-      boolean keepSubscriptions,
-      boolean isFabricFiltered,
-      int imTimeoutMs,
-      @Nullable Long eventMin);
-
-  static native void read(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      List<ChipAttributePath> attributePaths,
-      List<ChipEventPath> eventPaths,
-      List<DataVersionFilter> dataVersionFilters,
-      boolean isFabricFiltered,
-      int imTimeoutMs,
-      @Nullable Long eventMin);
-
-  static native void write(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      List<AttributeWriteRequest> attributeList,
-      int timedRequestTimeoutMs,
-      int imTimeoutMs);
-
-  static native void invoke(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      InvokeElement invokeElement,
-      int timedRequestTimeoutMs,
-      int imTimeoutMs);
-
-  static native void extendableInvoke(
-      long deviceControllerPtr,
-      long callbackHandle,
-      long devicePtr,
-      List<InvokeElement> invokeElementList,
-      int timedRequestTimeoutMs,
-      int imTimeoutMs);
 
   private native long newDeviceController(ControllerParams params);
 
@@ -1579,12 +1531,6 @@ public class ChipDeviceController {
   private native long onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
   private native int getFabricIndex(long deviceControllerPtr);
-
-  private native void shutdownSubscriptions(
-      long deviceControllerPtr,
-      @Nullable Integer fabricIndex,
-      @Nullable Long peerNodeId,
-      @Nullable Long subscriptionId);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
 

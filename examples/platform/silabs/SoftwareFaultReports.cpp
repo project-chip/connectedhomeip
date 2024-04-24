@@ -20,7 +20,7 @@
 #include "FreeRTOS.h"
 #include "silabs_utils.h"
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -89,18 +89,18 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
 {
 #if SILABS_LOG_ENABLED
-    uint32_t cfsr  = SCB->CFSR;
-    uint32_t hfsr  = SCB->HFSR;
-    uint32_t mmfar = SCB->MMFAR;
-    uint32_t bfar  = SCB->BFAR;
-    uint32_t r0    = sp[0];
-    uint32_t r1    = sp[1];
-    uint32_t r2    = sp[2];
-    uint32_t r3    = sp[3];
-    uint32_t r12   = sp[4];
-    uint32_t lr    = sp[5];
-    uint32_t pc    = sp[6];
-    uint32_t psr   = sp[7];
+    [[maybe_unused]] uint32_t cfsr  = SCB->CFSR;
+    [[maybe_unused]] uint32_t hfsr  = SCB->HFSR;
+    [[maybe_unused]] uint32_t mmfar = SCB->MMFAR;
+    [[maybe_unused]] uint32_t bfar  = SCB->BFAR;
+    [[maybe_unused]] uint32_t r0    = sp[0];
+    [[maybe_unused]] uint32_t r1    = sp[1];
+    [[maybe_unused]] uint32_t r2    = sp[2];
+    [[maybe_unused]] uint32_t r3    = sp[3];
+    [[maybe_unused]] uint32_t r12   = sp[4];
+    [[maybe_unused]] uint32_t lr    = sp[5];
+    [[maybe_unused]] uint32_t pc    = sp[6];
+    [[maybe_unused]] uint32_t psr   = sp[7];
 
     ChipLogError(NotSpecified, "HardFault:");
     ChipLogError(NotSpecified, "SCB->CFSR   0x%08lx", cfsr);

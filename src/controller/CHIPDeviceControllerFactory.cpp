@@ -73,41 +73,36 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     return err;
 }
 
-CHIP_ERROR DeviceControllerFactory::InitSystemState()
+CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
 {
+    VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSystemState->IsShutdown(), CHIP_NO_ERROR);
+
     FactoryInitParams params;
-    if (mSystemState != nullptr)
-    {
-        params.systemLayer        = mSystemState->SystemLayer();
-        params.udpEndPointManager = mSystemState->UDPEndPointManager();
+    params.systemLayer        = mSystemState->SystemLayer();
+    params.udpEndPointManager = mSystemState->UDPEndPointManager();
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
+    params.tcpEndPointManager = mSystemState->TCPEndPointManager();
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-        params.bleLayer = mSystemState->BleLayer();
+    params.bleLayer = mSystemState->BleLayer();
 #endif
-        params.listenPort                = mListenPort;
-        params.fabricIndependentStorage  = mFabricIndependentStorage;
-        params.enableServerInteractions  = mEnableServerInteractions;
-        params.groupDataProvider         = mSystemState->GetGroupDataProvider();
-        params.sessionKeystore           = mSystemState->GetSessionKeystore();
-        params.fabricTable               = mSystemState->Fabrics();
-        params.operationalKeystore       = mOperationalKeystore;
-        params.opCertStore               = mOpCertStore;
-        params.certificateValidityPolicy = mCertificateValidityPolicy;
-        params.sessionResumptionStorage  = mSessionResumptionStorage;
-    }
+    params.listenPort                = mListenPort;
+    params.fabricIndependentStorage  = mFabricIndependentStorage;
+    params.enableServerInteractions  = mEnableServerInteractions;
+    params.groupDataProvider         = mSystemState->GetGroupDataProvider();
+    params.sessionKeystore           = mSystemState->GetSessionKeystore();
+    params.fabricTable               = mSystemState->Fabrics();
+    params.operationalKeystore       = mOperationalKeystore;
+    params.opCertStore               = mOpCertStore;
+    params.certificateValidityPolicy = mCertificateValidityPolicy;
+    params.sessionResumptionStorage  = mSessionResumptionStorage;
 
     return InitSystemState(params);
 }
 
 CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 {
-    if (mSystemState != nullptr && mSystemState->IsInitialized())
-    {
-        return CHIP_NO_ERROR;
-    }
-
     if (mSystemState != nullptr)
     {
         Platform::Delete(mSystemState);
@@ -305,6 +300,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerRCAC                       = params.controllerRCAC;
     controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
     controllerParams.removeFromFabricTableOnShutdown      = params.removeFromFabricTableOnShutdown;
+    controllerParams.deleteFromFabricTableOnShutdown      = params.deleteFromFabricTableOnShutdown;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
@@ -330,10 +326,8 @@ void DeviceControllerFactory::ControllerInitialized(const DeviceController & con
 
 CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceController & controller)
 {
-    VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.controllerVendorId != VendorId::Unspecified, CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(InitSystemState());
+    ReturnErrorOnFailure(ReinitSystemStateIfNecessary());
 
     ControllerInitParams controllerParams;
     PopulateInitParams(controllerParams, params);
@@ -350,10 +344,8 @@ CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceCo
 
 CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner)
 {
-    VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.controllerVendorId != VendorId::Unspecified, CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(InitSystemState());
+    ReturnErrorOnFailure(ReinitSystemStateIfNecessary());
 
     CommissionerInitParams commissionerParams;
 
@@ -391,9 +383,16 @@ void DeviceControllerFactory::RetainSystemState()
     (void) mSystemState->Retain();
 }
 
-void DeviceControllerFactory::ReleaseSystemState()
+bool DeviceControllerFactory::ReleaseSystemState()
 {
-    mSystemState->Release();
+    return mSystemState->Release();
+}
+
+CHIP_ERROR DeviceControllerFactory::EnsureAndRetainSystemState()
+{
+    ReturnErrorOnFailure(ReinitSystemStateIfNecessary());
+    RetainSystemState();
+    return CHIP_NO_ERROR;
 }
 
 DeviceControllerFactory::~DeviceControllerFactory()

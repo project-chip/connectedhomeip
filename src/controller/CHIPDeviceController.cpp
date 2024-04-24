@@ -61,7 +61,7 @@
 #include <tracing/macros.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <transport/raw/BLE.h>
 #endif
 
@@ -70,6 +70,7 @@
 #include <memory>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string>
 #include <time.h>
 
 using namespace chip::Inet;
@@ -109,7 +110,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->UDPEndPointManager()));
-    mDNSResolver.SetCommissioningDelegate(this);
+    mDNSResolver.SetDiscoveryDelegate(this);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
 
     mVendorId = params.controllerVendorId;
@@ -135,6 +136,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     mState       = State::Initialized;
 
     mRemoveFromFabricTableOnShutdown = params.removeFromFabricTableOnShutdown;
+    mDeleteFromFabricTableOnShutdown = params.deleteFromFabricTableOnShutdown;
 
     if (GetFabricIndex() != kUndefinedFabricIndex)
     {
@@ -381,8 +383,9 @@ void DeviceController::Shutdown()
 
     VerifyOrReturn(mState != State::NotInitialized);
 
+    // If our state is initialialized it means mSystemState is valid,
+    // and we can use it below before we release our reference to it.
     ChipLogDetail(Controller, "Shutting down the controller");
-
     mState = State::NotInitialized;
 
     if (mFabricIndex != kUndefinedFabricIndex)
@@ -400,13 +403,13 @@ void DeviceController::Shutdown()
         // existing sessions too?
         mSystemState->SessionMgr()->ExpireAllSessionsForFabric(mFabricIndex);
 
-        if (mRemoveFromFabricTableOnShutdown)
+        if (mDeleteFromFabricTableOnShutdown)
         {
-            FabricTable * fabricTable = mSystemState->Fabrics();
-            if (fabricTable != nullptr)
-            {
-                fabricTable->Forget(mFabricIndex);
-            }
+            mSystemState->Fabrics()->Delete(mFabricIndex);
+        }
+        else if (mRemoveFromFabricTableOnShutdown)
+        {
+            mSystemState->Fabrics()->Forget(mFabricIndex);
         }
     }
 
@@ -1227,31 +1230,41 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(
 }
 
 void DeviceCommissioner::OnArmFailSafeExtendedForDeviceAttestation(
-    void * context, const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
+    void * context, const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &)
 {
-    // If this function starts using "data", need to fix ExtendArmFailSafeForDeviceAttestation accordingly.
+    ChipLogProgress(Controller, "Successfully extended fail-safe timer to handle DA failure");
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
-    if (!commissioner->mDeviceBeingCommissioned)
+    // We have completed our command invoke, but we're not going to finish the
+    // commissioning step until our client examines the attestation
+    // information.  Clear out mInvokeCancelFn (which points at the
+    // CommandSender we just finished using) now, so it's not dangling.
+    commissioner->mInvokeCancelFn = nullptr;
+
+    commissioner->HandleDeviceAttestationCompleted();
+}
+
+void DeviceCommissioner::HandleDeviceAttestationCompleted()
+{
+    if (!mDeviceBeingCommissioned)
     {
         return;
     }
 
-    auto & params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
+    auto & params                                                      = mDefaultCommissioner->GetCommissioningParameters();
     Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
     if (deviceAttestationDelegate)
     {
         ChipLogProgress(Controller, "Device attestation completed, delegating continuation to client");
-        deviceAttestationDelegate->OnDeviceAttestationCompleted(commissioner, commissioner->mDeviceBeingCommissioned,
-                                                                *commissioner->mAttestationDeviceInfo,
-                                                                commissioner->mAttestationResult);
+        deviceAttestationDelegate->OnDeviceAttestationCompleted(this, mDeviceBeingCommissioned, *mAttestationDeviceInfo,
+                                                                mAttestationResult);
     }
     else
     {
         ChipLogProgress(Controller, "Device attestation failed and no delegate set, failing commissioning");
         CommissioningDelegate::CommissioningReport report;
-        report.Set<AttestationErrorInfo>(commissioner->mAttestationResult);
-        commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
+        report.Set<AttestationErrorInfo>(mAttestationResult);
+        CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
     }
 }
 
@@ -1368,9 +1381,7 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
 
     if (!waitForFailsafeExtension)
     {
-        // Callee does not use data argument.
-        const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType data;
-        OnArmFailSafeExtendedForDeviceAttestation(this, data);
+        HandleDeviceAttestationCompleted();
     }
 }
 

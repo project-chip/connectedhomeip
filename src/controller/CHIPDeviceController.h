@@ -72,7 +72,7 @@
 #endif
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
 
@@ -126,14 +126,26 @@ struct ControllerInitParams
 
     /**
      * Controls whether shutdown of the controller removes the corresponding
-     * entry from the fabric table.  For now the removal is just from the
-     * in-memory table, not from storage, which means that after controller
-     * shutdown the storage and the in-memory fabric table will be out of sync.
-     * This is acceptable for implementations that don't actually store any of
-     * the fabric table information, but if someone wants a true removal at some
-     * point another option will need to be added here.
+     * entry from the in-memory fabric table, but NOT from storage.
+     *
+     * Note that this means that after controller shutdown the storage and
+     * in-memory versions of the fabric table will be out of sync.
+     * For compatibility reasons this is the default behavior.
+     *
+     * @see deleteFromFabricTableOnShutdown
      */
     bool removeFromFabricTableOnShutdown = true;
+
+    /**
+     * Controls whether shutdown of the controller deletes the corresponding
+     * entry from the fabric table (both in-memory and storage).
+     *
+     * If both `removeFromFabricTableOnShutdown` and this setting are true,
+     * this setting will take precedence.
+     *
+     * @see removeFromFabricTableOnShutdown
+     */
+    bool deleteFromFabricTableOnShutdown = false;
 
     /**
      * Specifies whether to utilize the fabric table entry for the given FabricIndex
@@ -394,6 +406,7 @@ protected:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     bool mRemoveFromFabricTableOnShutdown = true;
+    bool mDeleteFromFabricTableOnShutdown = false;
 
     FabricTable::AdvertiseIdentity mAdvertiseIdentity = FabricTable::AdvertiseIdentity::Yes;
 
@@ -943,6 +956,7 @@ private:
     static void OnArmFailSafeExtendedForDeviceAttestation(
         void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error);
+    void HandleDeviceAttestationCompleted();
 
     static void OnICDManagementRegisterClientResponse(
         void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);

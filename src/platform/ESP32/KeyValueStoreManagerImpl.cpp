@@ -24,12 +24,12 @@
 #include <platform/ESP32/ScopedNvsHandle.h>
 #include <platform/KeyValueStoreManager.h>
 
-#include <algorithm>
 #include <string.h>
 
 #include "nvs.h"
 #include "nvs_flash.h"
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 

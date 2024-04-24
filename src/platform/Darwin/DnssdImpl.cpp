@@ -17,6 +17,7 @@
 #include "DnssdImpl.h"
 #include "DnssdType.h"
 #include "MdnsError.h"
+#include "UserDefaults.h"
 
 #include <cstdio>
 
@@ -25,8 +26,11 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <string>
+
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
+using namespace chip::Platform;
 
 namespace {
 
@@ -74,7 +78,14 @@ void LogOnFailure(const char * name, DNSServiceErrorType err)
  */
 CHIP_ERROR StartSRPTimer(uint16_t timeoutInMSecs, ResolveContext * ctx)
 {
+    // Check to see if a user default value exists for the SRP timeout. If it does, override the timeoutInMSecs with user default
+    // value. To override the timeout value, use ` defaults write org.csa-iot.matter.darwin SRPTimeoutInMSecsOverride
+    // <timeoutinMsecs>` See UserDefaults.mm for details.
+    timeoutInMSecs = GetUserDefaultDnssdSRPTimeoutInMSecs().value_or(timeoutInMSecs);
+
     VerifyOrReturnValue(ctx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(Discovery, "Starting timer to wait for %d milliseconds for possible SRP resolve results for %s", timeoutInMSecs,
+                    ctx->instanceName.c_str());
     return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs),
                                                        ResolveContext::SRPTimerExpiredCallback, static_cast<void *>(ctx));
 }
@@ -269,6 +280,13 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
 
     if (flags & kDNSServiceFlagsMoreComing)
     {
+        // If we now don't need to have a timer while we wait for SRP results, ensure that there is no such
+        // timer running.  Otherwise the timer could fire before we get the rest of the results that flags
+        // say are coming, and trigger a finalize before we have all the data that is already available.
+        if (!sdCtx->shouldStartSRPTimerForResolve)
+        {
+            sdCtx->CancelSRPTimerIfRunning();
+        }
         return;
     }
 
@@ -278,6 +296,7 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     // we are done. Otherwise start the timer to give the resolve on SRP domain some extra time to complete.
     if (!sdCtx->shouldStartSRPTimerForResolve)
     {
+        ChipLogDetail(Discovery, "No need to start SRP resolve timer for %s; completing resolve", sdCtx->instanceName.c_str());
         sdCtx->Finalize();
     }
     else
@@ -361,8 +380,8 @@ static CHIP_ERROR ResolveWithContext(ResolveContext * sdCtx, uint32_t interfaceI
 static CHIP_ERROR Resolve(ResolveContext * sdCtx, uint32_t interfaceId, chip::Inet::IPAddressType addressType, const char * type,
                           const char * name, const char * domain)
 {
-    ChipLogProgress(Discovery, "Resolve type=%s name=%s interface=%" PRIu32, StringOrNullMarker(type), StringOrNullMarker(name),
-                    interfaceId);
+    ChipLogProgress(Discovery, "Resolve type=%s name=%s domain=%s interface=%" PRIu32, StringOrNullMarker(type),
+                    StringOrNullMarker(name), StringOrNullMarker(domain), interfaceId);
 
     auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
@@ -404,7 +423,7 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     return Resolve(sdCtx, interfaceId, addressType, type, name, domain);
 }
 
-static CHIP_ERROR Resolve(CommissioningResolveDelegate * delegate, uint32_t interfaceId, chip::Inet::IPAddressType addressType,
+static CHIP_ERROR Resolve(DiscoverNodeDelegate * delegate, uint32_t interfaceId, chip::Inet::IPAddressType addressType,
                           const char * type, const char * name)
 {
     auto counterHolder = GetCounterHolder(name);
@@ -566,7 +585,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
     return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName, domain);
 }
 
-CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, CommissioningResolveDelegate * delegate)
+CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DiscoverNodeDelegate * delegate)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);

@@ -216,7 +216,6 @@ public class DiscoveryExampleFragment extends Fragment {
   public void onPause() {
     super.onPause();
     Log.i(TAG, "onPause() called");
-    stopDiscovery();
   }
 
   /** Interface for notifying the host. */
@@ -351,6 +350,10 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
             ? (aux.isEmpty() ? "" : ", ") + "Device Type: " + player.getDeviceType()
             : "";
     aux += (aux.isEmpty() ? "" : ", ") + "Resolved IP?: " + (player.getIpAddresses().size() > 0);
+    aux +=
+        (aux.isEmpty() ? "" : ", ")
+            + "Supports Commissioner Generated Passcode: "
+            + (player.getSupportsCommissionerGeneratedPasscode());
 
     aux = aux.isEmpty() ? aux : "\n" + aux;
     return main + aux;

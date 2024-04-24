@@ -20,7 +20,6 @@
 
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-delegate.h>
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 
