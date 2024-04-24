@@ -26,6 +26,6 @@ jobs:
     if: "git diff --name-only HEAD^..HEAD data_model/ | grep -q spec_sha"
     steps:
       - name: Error Message
-        run: echo This pull request attempts to update data_model directory, but is missing updates to spec_sha file with the latest version of the sha.
+        run: echo This pull request attempts to update data_model directory, but is missing updates to spec_sha file with the latest version of the sha. Files in the data_model directory are generated automatically and should not be updated manually.
       - name: Fail Job
         run: exit 1
