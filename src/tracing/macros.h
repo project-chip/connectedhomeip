@@ -26,6 +26,10 @@
 //    MATTER_TRACE_END(label, group)
 //    MATTER_TRACE_INSTANT(label, group)
 //    MATTER_TRACE_SCOPE(label, group)
+
+// Tracing macro to trace monotonically increasing counter values.
+//  MATTER_TRACE_COUNTER(label)
+
 #include <matter/tracing/macros_impl.h>
 #include <tracing/log_declares.h>
 #include <tracing/registry.h>
@@ -78,6 +82,7 @@
 #define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_TRACE_COUNTER(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
 #define MATTER_LOG_MESSAGE_SEND(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_MESSAGE_RECEIVED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)

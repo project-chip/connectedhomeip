@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <ble/BleConfig.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/CodeUtils.h>
@@ -285,17 +285,26 @@ private:
             return CHIP_NO_ERROR;
         }
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        // permanent failure if heap was insufficient
+        return CHIP_ERROR_NO_MEMORY;
+#else
         entryToUse = FindLeastRecentUsedEntry();
-#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        VerifyOrReturnError(entryToUse != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        // Drop the least recent entry to allow for a new alloc.
+        mEntries.ReleaseObject(entryToUse);
+        entryToUse = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config, *this);
+
         if (entryToUse == nullptr)
         {
-            return CHIP_ERROR_NO_MEMORY;
+            // this is NOT expected: we freed an object to have space
+            return CHIP_ERROR_INTERNAL;
         }
 
-        mEntries.ResetObject(entryToUse, sessionRole, ephemeralInitiatorNodeID, config, *this);
         entry = entryToUse;
         return CHIP_NO_ERROR;
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     }
 
     CHECK_RETURN_VALUE UnauthenticatedSession * FindEntry(UnauthenticatedSession::SessionRole sessionRole,

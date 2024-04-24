@@ -26,9 +26,13 @@ namespace Controller {
 AndroidCurrentFabricRemover::AndroidCurrentFabricRemover(DeviceController * controller, jobject jCallbackObject) :
     CurrentFabricRemover(controller), mOnRemoveCurrentFabricCallback(OnRemoveCurrentFabric, this)
 {
-    JNIEnv * env  = JniReferences::GetInstance().GetEnvForCurrentThread();
-    mJavaCallback = env->NewGlobalRef(jCallbackObject);
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
+    if (mJavaCallback.Init(jCallbackObject) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Fail to init mJavaObjectRef");
+        return;
+    }
     jclass callbackClass = env->GetObjectClass(jCallbackObject);
 
     mOnSuccessMethod = env->GetMethodID(callbackClass, "onSuccess", "(J)V");
@@ -46,13 +50,6 @@ AndroidCurrentFabricRemover::AndroidCurrentFabricRemover(DeviceController * cont
     }
 }
 
-AndroidCurrentFabricRemover::~AndroidCurrentFabricRemover()
-{
-    ChipLogError(Controller, "Delete AndroidCurrentFabricRemover");
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    env->DeleteGlobalRef(mJavaCallback);
-}
-
 CHIP_ERROR AndroidCurrentFabricRemover::RemoveCurrentFabric(DeviceController * controller, NodeId remoteNodeId, jobject jcallback)
 {
     // Not using Platform::New because we want to keep our constructor private.
@@ -66,6 +63,7 @@ CHIP_ERROR AndroidCurrentFabricRemover::RemoveCurrentFabric(DeviceController * c
     if (err != CHIP_NO_ERROR)
     {
         delete remover;
+        remover = nullptr;
     }
     // Else will clean up when the callback is called.
     return err;
@@ -75,21 +73,21 @@ void AndroidCurrentFabricRemover::OnRemoveCurrentFabric(void * context, NodeId r
 {
     auto * self = static_cast<AndroidCurrentFabricRemover *>(context);
 
-    if (self->mJavaCallback != nullptr)
+    if (self != nullptr && self->mJavaCallback.HasValidObjectRef())
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (err == CHIP_NO_ERROR)
         {
             if (self->mOnSuccessMethod != nullptr)
             {
-                env->CallVoidMethod(self->mJavaCallback, self->mOnSuccessMethod, static_cast<jlong>(remoteNodeId));
+                env->CallVoidMethod(self->mJavaCallback.ObjectRef(), self->mOnSuccessMethod, static_cast<jlong>(remoteNodeId));
             }
         }
         else
         {
             if (self->mOnErrorMethod != nullptr)
             {
-                env->CallVoidMethod(self->mJavaCallback, self->mOnErrorMethod, static_cast<jint>(err.GetValue()),
+                env->CallVoidMethod(self->mJavaCallback.ObjectRef(), self->mOnErrorMethod, static_cast<jint>(err.GetValue()),
                                     static_cast<jlong>(remoteNodeId));
             }
         }

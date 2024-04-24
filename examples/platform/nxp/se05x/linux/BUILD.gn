@@ -25,7 +25,7 @@ config("app-main-config") {
 
 source_set("ota-test-event-trigger") {
   sources = [
-    "${chip_root}/src/app/clusters/ota-requestor/OTATestEventTriggerDelegate.h",
+    "${chip_root}/src/app/clusters/ota-requestor/OTATestEventTriggerHandler.h",
   ]
 }
 

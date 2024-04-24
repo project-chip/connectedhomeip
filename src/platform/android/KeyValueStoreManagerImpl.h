@@ -24,6 +24,7 @@
 #pragma once
 
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,10 +47,10 @@ private:
 
     static KeyValueStoreManagerImpl sInstance;
 
-    jobject mKeyValueStoreManagerObject = nullptr;
-    jmethodID mGetMethod                = nullptr;
-    jmethodID mSetMethod                = nullptr;
-    jmethodID mDeleteMethod             = nullptr;
+    chip::JniGlobalReference mKeyValueStoreManagerObject;
+    jmethodID mGetMethod    = nullptr;
+    jmethodID mSetMethod    = nullptr;
+    jmethodID mDeleteMethod = nullptr;
 };
 
 /**

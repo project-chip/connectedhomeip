@@ -19,7 +19,7 @@
       android:id="@+id/address_commissioning_fragment_flow"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
-      app:constraint_referenced_ids="addressLabel,addressEditText,discriminatorLabel,discriminatorEditText,pincodeLabel,pincodeEditText"
+      app:constraint_referenced_ids="addressLabel,addressEditText,discriminatorLabel,discriminatorEditText,pincodeLabel,pincodeEditText,portLabel,portEditText"
       app:flow_horizontalStyle="packed"
       app:flow_wrapMode="aligned"
       app:flow_maxElementsWrap="2"
@@ -74,6 +74,22 @@
       android:layout_margin="16dp"
       android:inputType="number"
       android:text="@string/default_pincode" />
+
+  <TextView
+      android:id="@+id/portLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/enter_port_label_text" />
+
+  <EditText
+      android:id="@+id/portEditText"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:inputType="number"
+      android:text="@string/default_port" />
 
   <LinearLayout
       android:layout_width="match_parent"

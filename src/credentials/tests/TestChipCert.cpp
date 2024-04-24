@@ -33,6 +33,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -2191,6 +2192,20 @@ static void TestChipCert_PDCIdentityGeneration(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, ValidateChipNetworkIdentity(tlvCert) == CHIP_NO_ERROR);
 }
 
+static void TestChipCert_KeypairConversion(nlTestSuite * inSuite, void * inContext)
+{
+    P256SerializedKeypair keypair;
+    NL_TEST_ASSERT_SUCCESS(inSuite, GetTestCertKeypair(kPDCID01, keypair));
+
+    uint8_t buffer[kP256ECPrivateKeyDERLength];
+    MutableByteSpan keypairDer(buffer);
+    NL_TEST_ASSERT_SUCCESS(inSuite, ConvertECDSAKeypairRawToDER(keypair, keypairDer));
+
+    // Technically the curve name and public key are optional in the DER format,
+    // but both our code and standard tools include them, so we can just compare.
+    NL_TEST_ASSERT(inSuite, keypairDer.data_equal(sTestCert_PDCID01_KeypairDER));
+}
+
 /**
  *  Set up the test suite.
  */
@@ -2251,6 +2266,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test extracting PublicKey and SKID from chip certificate", TestChipCert_ExtractPublicKeyAndSKID),
     NL_TEST_DEF("Test PDC Identity Validation", TestChipCert_PDCIdentityValidation),
     NL_TEST_DEF("Test PDC Identity Generation", TestChipCert_PDCIdentityGeneration),
+    NL_TEST_DEF("Test keypair conversion", TestChipCert_KeypairConversion),
     NL_TEST_SENTINEL()
 };
 // clang-format on

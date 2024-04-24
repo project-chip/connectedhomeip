@@ -18,35 +18,12 @@
 
 #pragma once
 
-#include "SmokeCOAlarmManager.h"
+#include <stdint.h>
+
 #include <app/TestEventTriggerDelegate.h>
-
-namespace chip {
-
-class AmebaTestEventTriggerDelegate : public TestEventTriggerDelegate
-{
-public:
-    explicit AmebaTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
-
-    /**
-     * @brief Checks to see if `enableKey` provided matches value chosen by the manufacturer.
-     * @param enableKey Buffer of the key to verify.
-     * @return True or False.
-     */
-    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
-
-    /**
-     * @brief User handler for handling the test event trigger based on `eventTrigger` provided.
-     * @param eventTrigger Event trigger to handle.
-     * @return CHIP_NO_ERROR on success or CHIP_ERROR_INVALID_ARGUMENT on failure.
-     */
-    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
-
-private:
-    ByteSpan mEnableKey;
-};
-
-} // namespace chip
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 /**
  * @brief User handler for handling the test event trigger
@@ -55,7 +32,38 @@ private:
  *
  * @param eventTrigger Event trigger to handle
  *
+ * @warning *** DO NOT USE FOR STANDARD CLUSTER EVENT TRIGGERS ***
+ *
  * @retval true on success
  * @retval false if error happened
  */
-bool emberAfHandleEventTrigger(uint64_t eventTrigger);
+bool AmebaHandleGlobalTestEventTrigger(uint64_t eventTrigger);
+
+namespace chip {
+
+class AmebaTestEventTriggerDelegate : public TestEventTriggerDelegate, TestEventTriggerHandler
+{
+public:
+    explicit AmebaTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey)
+    {
+        VerifyOrDie(AddHandler(this) == CHIP_NO_ERROR);
+    }
+
+    /**
+     * @brief Checks to see if `enableKey` provided matches value chosen by the manufacturer.
+     * @param enableKey Buffer of the key to verify.
+     * @return True or False.
+     */
+    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
+
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
+    {
+        // WARNING: LEGACY SUPPORT ONLY, DO NOT EXTEND FOR STANDARD CLUSTERS
+        return (AmebaHandleGlobalTestEventTrigger(eventTrigger)) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+private:
+    ByteSpan mEnableKey;
+};
+
+} // namespace chip

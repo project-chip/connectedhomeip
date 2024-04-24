@@ -34,7 +34,7 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "timers.h"
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -656,7 +656,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
     else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
     {
         // Advertisement time expired. Stop advertising
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertissement");
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertisement");
         BLEMgr().SetAdvertisingEnabled(false);
     }
 }

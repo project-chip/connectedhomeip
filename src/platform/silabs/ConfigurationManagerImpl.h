@@ -73,7 +73,6 @@ private:
     void RunConfigUnitTest(void) override;
 
     // ===== Private members reserved for use by this class only.
-    uint32_t rebootCause;
     static void DoFactoryReset(intptr_t arg);
 };
 

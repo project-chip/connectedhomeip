@@ -28,15 +28,4 @@ bool DefaultTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enable
     return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
 }
 
-CHIP_ERROR DefaultTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
-{
-    if (eventTrigger == kQueryTrigger)
-    {
-        ChipLogProgress(DeviceLayer, "DefaultTestEventTriggerDelegate: event triggered");
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_INVALID_ARGUMENT;
-}
-
 } // namespace chip

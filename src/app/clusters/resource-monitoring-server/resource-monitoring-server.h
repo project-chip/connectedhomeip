@@ -91,10 +91,10 @@ public:
     bool HasFeature(ResourceMonitoring::Feature aFeature) const;
 
     // Attribute setters
-    chip::Protocols::InteractionModel::Status UpdateCondition(uint8_t aNewCondition);
-    chip::Protocols::InteractionModel::Status UpdateChangeIndication(ChangeIndicationEnum aNewChangeIndication);
-    chip::Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool aNewInPlaceIndicator);
-    chip::Protocols::InteractionModel::Status UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime);
+    Protocols::InteractionModel::Status UpdateCondition(uint8_t aNewCondition);
+    Protocols::InteractionModel::Status UpdateChangeIndication(ChangeIndicationEnum aNewChangeIndication);
+    Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool aNewInPlaceIndicator);
+    Protocols::InteractionModel::Status UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime);
 
     void SetReplacementProductListManagerInstance(ReplacementProductListManager * instance);
 
@@ -196,7 +196,7 @@ public:
      * @return Status::Success      If the command was handled successfully.
      * @return All Other            PreResetCondition() or PostResetCondition() failed, these are application specific.
      */
-    virtual chip::Protocols::InteractionModel::Status OnResetCondition();
+    virtual Protocols::InteractionModel::Status OnResetCondition();
 
     /**
      * This method may be overwritten by the SDK User, if the SDK User wants to do something before the reset.
@@ -206,7 +206,7 @@ public:
      * @return Status::Success      All good, the reset may proceed.
      * @return All Other            The reset should not proceed. The reset command will fail.
      */
-    virtual chip::Protocols::InteractionModel::Status PreResetCondition();
+    virtual Protocols::InteractionModel::Status PreResetCondition();
 
     /**
      * This method may be overwritten by the SDK User, if the SDK User wants to do something after the reset.
@@ -217,7 +217,7 @@ public:
      * @return All Other            Something went wrong. The attributes will already be updated. But the reset command will report
      *                              the failure.
      */
-    virtual chip::Protocols::InteractionModel::Status PostResetCondition();
+    virtual Protocols::InteractionModel::Status PostResetCondition();
 };
 
 } // namespace ResourceMonitoring

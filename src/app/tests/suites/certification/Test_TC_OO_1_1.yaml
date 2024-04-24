@@ -38,38 +38,75 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 5
+          value: 6
           constraints:
               type: int16u
 
-    - label: "Step 3a: TH reads from the DUT the FeatureMap attribute."
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      PICS: ( !OO.S.F00 && !OO.S.F01 )
-      response:
-          value: 0
-          constraints:
-              type: bitmap32
-
     - label:
-          "Step 3b: Given OO.S.F00(LT) ensure featuremap has the correct bit set"
+          "Step 3a: Given OO.S.F00(LT) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: OO.S.F00
+      PICS: ( OO.S.F00 && !OO.S.F02 )
       response:
           constraints:
               type: bitmap32
               hasMasksSet: [0x1]
+    - label:
+          "Step 3b: Given OO.S.F00(LT) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: ( !( OO.S.F00 && !OO.S.F02 ) )
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
 
     - label:
           "Step 3c: Given OO.S.F01(DF) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: OO.S.F01
+      PICS: ( OO.S.F01 && !OO.S.F02 )
       response:
           constraints:
               type: bitmap32
               hasMasksSet: [0x2]
+    - label:
+          "Step 3d: Given OO.S.F01(DF) ensure featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: ( !( OO.S.F01 && !OO.S.F02 ) )
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x2]
+
+    - label:
+          "Step 3e: Given OO.S.F02(OFFONLY) TH reads from the DUT the FeatureMap
+          attribute."
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: ( OO.S.F02 && !OO.S.F00 && !OO.S.F01 )
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+    - label:
+          "Step 3f: Given OO.S.F02(OFFONLY) TH reads from the DUT the FeatureMap
+          attribute."
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: ( !( OO.S.F02 && !OO.S.F00 && !OO.S.F01 ) )
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x4]
+    - label: "Step 3g: All remaining shall be zero"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0xFFFFFFF8]
 
     - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
@@ -115,10 +152,32 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2]
+              contains: [0]
 
     - label:
-          "Step 6b: TH reads the feature dependent(OO.S.F00) commands in
+          "Step 6b: TH reads the feature dependent(OO.S.F02) commands in
+          AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      PICS: ( !OO.S.F02 )
+      response:
+          constraints:
+              type: list
+              contains: [1, 2]
+
+    - label:
+          "Step 6c: TH reads the feature dependent(OO.S.F02) commands in
+          AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      PICS: OO.S.F02
+      response:
+          constraints:
+              type: list
+              excludes: [1, 2]
+
+    - label:
+          "Step 6d: TH reads the feature dependent(OO.S.F00) commands in
           AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -127,6 +186,17 @@ tests:
           constraints:
               type: list
               contains: [64, 65, 66]
+
+    - label:
+          "Step 6e: TH reads the feature dependent(OO.S.F00) commands in
+          AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      PICS: ( !OO.S.F00 )
+      response:
+          constraints:
+              type: list
+              excludes: [64, 65, 66]
 
     - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"

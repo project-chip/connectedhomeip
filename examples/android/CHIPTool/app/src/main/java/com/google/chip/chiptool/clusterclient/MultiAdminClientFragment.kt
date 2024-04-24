@@ -102,7 +102,7 @@ class MultiAdminClientFragment : Fragment() {
   inner class ChipControllerCallback : GenericChipDeviceListener() {
     override fun onConnectDeviceComplete() {}
 
-    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+    override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
       Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
     }
 
@@ -121,8 +121,16 @@ class MultiAdminClientFragment : Fragment() {
 
   private suspend fun sendBasicCommissioningCommandClick() {
     val testDuration = binding.timeoutEd.text.toString().toInt()
+    val devicePtr =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
     deviceController.openPairingWindowCallback(
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      devicePtr,
       testDuration,
       object : OpenCommissioningCallback {
         override fun onError(status: Int, deviceId: Long) {
@@ -140,7 +148,13 @@ class MultiAdminClientFragment : Fragment() {
     val testDuration = binding.timeoutEd.text.toString().toInt()
     val testIteration = 1000
     val devicePointer =
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
 
     var setupPinCode: Long? = null
     if (!binding.setupPinCodeEd.text.toString().isEmpty()) {
@@ -181,6 +195,14 @@ class MultiAdminClientFragment : Fragment() {
         null
       )
 
+    val devicePointer =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
     deviceController.invoke(
       object : InvokeCallback {
         override fun onError(ex: Exception?) {
@@ -193,7 +215,7 @@ class MultiAdminClientFragment : Fragment() {
           showMessage("Revoke Commissioning success")
         }
       },
-      getConnectedDevicePointer(),
+      devicePointer,
       invokeElement,
       timedInvokeTimeout,
       0
@@ -208,6 +230,16 @@ class MultiAdminClientFragment : Fragment() {
     val attributeId = attribute.id
     val attributeName = attribute.name
     val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
+
+    val devicePointer =
+      try {
+        ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+      } catch (e: IllegalStateException) {
+        Log.d(TAG, "getConnectedDevicePointer exception", e)
+        showMessage("Get DevicePointer fail!")
+        return
+      }
+
     deviceController.readAttributePath(
       object : ReportCallback {
         override fun onReport(nodeState: NodeState?) {
@@ -230,14 +262,10 @@ class MultiAdminClientFragment : Fragment() {
           showMessage("read $attributeName - error : ${e?.message}")
         }
       },
-      getConnectedDevicePointer(),
+      devicePointer,
       listOf(attributePath),
       0
     )
-  }
-
-  private suspend fun getConnectedDevicePointer(): Long {
-    return ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
   }
 
   private fun showMessage(msg: String) {

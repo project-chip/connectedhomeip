@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/util/af-enums.h>
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -33,12 +33,16 @@ namespace OvenCavityOperationalState {
 class OvenCavityOperationalStateDelegate : public OperationalState::Delegate
 {
 private:
-    inline static const Clusters::OperationalState::GenericOperationalState mOperationalStateList[] = {
+    inline static const Clusters::OperationalState::GenericOperationalState opStateList[] = {
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError))
     };
+
+    Span<const OperationalState::GenericOperationalState> mOperationalStateList =
+        Span<const OperationalState::GenericOperationalState>(opStateList);
+    Span<const CharSpan> mOperationalPhaseList;
 
 public:
     /**
@@ -73,42 +77,28 @@ public:
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
      */
-    void HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err) override
-    {
-        // This command in not supported.
-        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-    };
+    void HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Resume
      * @param[out] get operational error after callback.
      */
-    void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override
-    {
-        // This command in not supported.
-        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-    };
+    void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
      */
-    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override
-    {
-        // This command in not supported.
-        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-    };
+    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Stop
      * @param[out] get operational error after callback.
      */
-    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override
-    {
-        // This command in not supported.
-        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
-    };
+    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 };
+
+Instance * GetOperationalStateInstance();
 
 void Shutdown();
 

@@ -24,11 +24,12 @@
 
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/basic-types.h>
@@ -285,6 +286,10 @@ class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallbac
 public:
     void OnDone(chip::app::ReadHandler & apReadHandlerObj) override {}
     chip::app::ReadHandler::ApplicationCallback * GetAppCallback() override { return nullptr; }
+    chip::app::InteractionModelEngine * GetInteractionModelEngine() override
+    {
+        return chip::app::InteractionModelEngine::GetInstance();
+    }
 };
 
 } // namespace

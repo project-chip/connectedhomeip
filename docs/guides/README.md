@@ -7,6 +7,7 @@
 -   [ASR - Getting Started Guide](./asr_getting_started_guide.md)
 -   [Espressif (ESP32) - Getting Started Guide](./esp32/README.md)
 -   [Infineon PSoC6 - Software Update](./infineon_psoc6_software_update.md)
+-   [Infineon Trust M Provisioning](./infineon_trustm_provisioning.md)
 -   [Linux - Simulated Devices](./simulated_device_linux.md)
 -   [mbedOS - Adding a new target](./mbedos_add_new_target.md)
 -   [mbedOS - Commissioning](./mbedos_commissioning.md)
@@ -34,7 +35,6 @@
 ## Development Guides
 
 -   [Access Control](./access-control-guide.md)
--   [IP Commissioning](./ip_commissioning.md)
 
 ## Setup Guides
 

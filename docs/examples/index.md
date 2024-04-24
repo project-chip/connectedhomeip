@@ -19,7 +19,6 @@ air-quality-sensor-app/**/README
 :maxdepth: 1
 
 all-clusters-app/**/README
-all-clusters-app/**/Readme
 ```
 
 ## All clusters minimal example
@@ -29,7 +28,6 @@ all-clusters-app/**/Readme
 :maxdepth: 1
 
 all-clusters-minimal-app/**/README
-all-clusters-minimal-app/**/Readme
 ```
 
 ## Bridge example
@@ -114,6 +112,15 @@ kotlin-matter-controller/README
 virtual-device-app/**/README
 ```
 
+## Laundry washer example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+laundry-washer-app/**/README
+```
+
 ## Lighting example
 
 ```{toctree}
@@ -178,7 +185,6 @@ ota-provider-app/**/README
 :maxdepth: 1
 
 ota-requestor-app/**/README
-ota-requestor-app/**/Readme
 ```
 
 ## Persistent storage example
@@ -207,7 +213,6 @@ pigweed-app/**/README
 :maxdepth: 1
 
 pump-app/**/README
-pump-app/cc13x2x7_26x2x7/doc/programming*
 ```
 
 ## Pump controller example
@@ -217,7 +222,6 @@ pump-app/cc13x2x7_26x2x7/doc/programming*
 :maxdepth: 1
 
 pump-controller-app/**/README
-pump-controller-app/cc13x2x7_26x2x7/doc/programming*
 ```
 
 ## Refrigerator example
@@ -282,7 +286,6 @@ temperature-measurement-app/**/README
 :maxdepth: 1
 
 thermostat/**/README
-thermostat/**/Readme
 thermostat/qpg/APPLICATION
 ```
 

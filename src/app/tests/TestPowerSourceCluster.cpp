@@ -19,7 +19,7 @@
 #include "lib/support/CHIPMem.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/power-source-server/power-source-server.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
@@ -31,7 +31,6 @@
 #include <messaging/Flags.h>
 #include <nlunit-test.h>
 #include <protocols/interaction_model/Constants.h>
-#include <type_traits>
 
 #include <vector>
 

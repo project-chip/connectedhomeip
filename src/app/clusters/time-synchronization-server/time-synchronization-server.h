@@ -21,16 +21,10 @@
 
 #pragma once
 
-#ifndef TIME_SYNC_ENABLE_TSC_FEATURE
-#define TIME_SYNC_ENABLE_TSC_FEATURE 1
-#endif
-
 #include "TimeSyncDataProvider.h"
 #include "time-synchronization-delegate.h"
 
-#if TIME_SYNC_ENABLE_TSC_FEATURE
-#include <app/ReadClient.h>
-#endif
+#include <app/AppConfig.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/config.h>
@@ -39,6 +33,12 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
+
+// NOTE: this is part of AppConfig, so this has to be checked for AFTER the inclusion
+//       of that header
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+#include <app/ReadClient.h>
+#endif
 
 namespace chip {
 namespace app {

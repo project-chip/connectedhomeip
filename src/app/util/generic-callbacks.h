@@ -21,11 +21,7 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
-#include <app/CommandHandler.h>
-#include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
 /** @brief Cluster Init
@@ -38,35 +34,6 @@
  * @param clusterId   Ver.: always
  */
 void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/** @brief Allow Network Write Attribute
- *
- * This function is called by the application framework before it writes an
- * attribute in response to a write attribute request from an external device.
- * The value passed into this callback is the value to which the attribute is to
- * be set by the framework.
-        Example:    In mirroring simple metering data
- * on an Energy Services Interface (ESI) (formerly called Energy Service Portal
- * (ESP) in SE 1.0).), a mirrored simple meter needs to write read-only
- * attributes on its mirror. The-meter-mirror sample application, located in
- * app/framework/sample-apps, uses this callback to allow the mirrored device to
- * write simple metering attributes on the mirror regardless of the fact that
- * most simple metering attributes are defined as read-only by the ZigBee
- * specification.
-        Note:   The ZCL specification does not (as of this
- * writing) specify any permission-level security for writing writeable
- * attributes. As far as the ZCL specification is concerned, if an attribute is
- * writeable, any device that has a link key for the device should be able to
- * write that attribute. Furthermore if an attribute is read only, it should not
- * be written over the air. Thus, if you implement permissions for writing
- * attributes as a feature, you MAY be operating outside the specification. This
- * is unlikely to be a problem for writing read-only attributes, but it may be a
- * problem for attributes that are writeable according to the specification but
- * restricted by the application implementing this callback.
- */
-EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                          chip::AttributeId attributeId, uint8_t * value,
-                                                                          uint8_t type);
 
 /** @brief Attribute Read Access
  *
@@ -105,15 +72,15 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * emberAfMainTickCallback.
         If the application was successfully able to
  * read the attribute and write it into the passed buffer, it should return a
- * value of EMBER_ZCL_STATUS_SUCCESS. Ensure that the size of the externally
+ * value of InteractionModel::Status::Success. Ensure that the size of the externally
  * managed attribute value is smaller than what the buffer can hold. In the case
  * of a buffer overflow throw an appropriate error such as
- * EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED. Any other return value indicates the
+ * InteractionModel::Status::ResourceExhausted. Any other return value indicates the
  * application was not able to read the attribute.
  */
-EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                               const EmberAfAttributeMetadata * attributeMetadata,
+                                                                               uint8_t * buffer, uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -151,19 +118,21 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
  * Framework and updated occasionally by the application code from within the
  * emberAfMainTickCallback.
         If the application was successfully able to
- * write the attribute, it returns a value of EMBER_ZCL_STATUS_SUCCESS. Any
+ * write the attribute, it returns a value of InteractionModel::Status::Success. Any
  * other return value indicates the application was not able to write the
  * attribute.
  */
-EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+chip::Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint,
+                                                                                chip::ClusterId clusterId,
+                                                                                const EmberAfAttributeMetadata * attributeMetadata,
+                                                                                uint8_t * buffer);
 
 /** @brief Pre Attribute Change
  *
  * This function is called by the application framework before it changes an
  * attribute value.  The value passed into this callback is the value to which
  * the attribute is to be set by the framework.  The application should return
- * chip::Protocols::InteractionModel::Status::Success to permit the change or
+ * Protocols::InteractionModel::Status::Success to permit the change or
  * any other code to reject it.
  */
 chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,

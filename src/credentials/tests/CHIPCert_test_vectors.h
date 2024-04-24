@@ -28,12 +28,11 @@
 
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPCertificateSet.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace TestCerts {
-
-using namespace chip::Credentials;
 
 enum TestCert
 {
@@ -72,12 +71,14 @@ enum class TestCertLoadFlags : uint8_t
 extern CHIP_ERROR GetTestCert(TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert);
 extern const char * GetTestCertName(TestCert certType);
 extern CHIP_ERROR GetTestCertPubkey(TestCert certType, ByteSpan & pubkey);
+extern CHIP_ERROR GetTestCertPrivkey(TestCert certType, ByteSpan & privkey);
+extern CHIP_ERROR GetTestCertKeypair(TestCert certType, Crypto::P256SerializedKeypair & keypair);
 extern CHIP_ERROR GetTestCertSKID(TestCert certType, ByteSpan & skid);
 extern CHIP_ERROR GetTestCertAKID(TestCert certType, ByteSpan & akid);
 
-extern CHIP_ERROR DecodeTestCert(ChipCertificateData & certData, TestCert certType);
-extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags,
-                               BitFlags<CertDecodeFlags> decodeFlags);
+extern CHIP_ERROR DecodeTestCert(Credentials::ChipCertificateData & certData, TestCert certType);
+extern CHIP_ERROR LoadTestCert(Credentials::ChipCertificateSet & certSet, TestCert certType,
+                               BitFlags<TestCertLoadFlags> certLoadFlags, BitFlags<Credentials::CertDecodeFlags> decodeFlags);
 
 extern const TestCert gTestCerts[];
 extern const size_t gNumTestCerts;
@@ -213,6 +214,7 @@ extern const ByteSpan sTestCert_PDCID01_PrivateKey;
 extern const ByteSpan sTestCert_PDCID01_SubjectKeyId;   // empty
 extern const ByteSpan sTestCert_PDCID01_AuthorityKeyId; // empty
 extern const ByteSpan sTestCert_PDCID01_KeyId;
+extern const ByteSpan sTestCert_PDCID01_KeypairDER;
 
 } // namespace TestCerts
 } // namespace chip

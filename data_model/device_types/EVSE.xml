@@ -65,34 +65,6 @@ Davis, CA 95616, USA
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0011" name="Power Source" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0090" name="Electrical Power Measurement" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0098" name="Device Energy Management" side="server">
-      <mandatoryConform/>
-      <features>
-        <feature code="" name="PA">
-          <mandatoryConform/>
-        </feature>
-        <feature code="" name="PFR">
-          <otherwiseConform>
-            <mandatoryConform>
-              <feature name="PFA"/>
-            </mandatoryConform>
-            <optionalConform/>
-          </otherwiseConform>
-        </feature>
-        <feature code="" name="PFA">
-          <optionalConform/>
-        </feature>
-      </features>
-    </cluster>
     <cluster id="0x0099" name="Energy EVSE" side="server">
       <mandatoryConform/>
     </cluster>

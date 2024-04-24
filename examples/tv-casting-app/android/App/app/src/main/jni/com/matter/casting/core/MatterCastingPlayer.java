@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2023 Project CHIP Authors
+ *   Copyright (c) 2024 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,9 @@
  */
 package com.matter.casting.core;
 
+import com.matter.casting.support.EndpointFilter;
+import com.matter.casting.support.MatterCallback;
+import com.matter.casting.support.MatterError;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +30,13 @@ import java.util.Objects;
  * the service discovered/resolved.
  */
 public class MatterCastingPlayer implements CastingPlayer {
+  private static final String TAG = MatterCastingPlayer.class.getSimpleName();
+  /**
+   * Time (in sec) to keep the commissioning window open, if commissioning is required. Must be >= 3
+   * minutes.
+   */
+  public static final long MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
+
   private boolean connected;
   private String deviceId;
   private String deviceName;
@@ -37,6 +47,9 @@ public class MatterCastingPlayer implements CastingPlayer {
   private int productId;
   private int vendorId;
   private long deviceType;
+  private boolean supportsCommissionerGeneratedPasscode;
+
+  protected long _cppCastingPlayer;
 
   public MatterCastingPlayer(
       boolean connected,
@@ -48,7 +61,8 @@ public class MatterCastingPlayer implements CastingPlayer {
       int port,
       int productId,
       int vendorId,
-      long deviceType) {
+      long deviceType,
+      boolean supportsCommissionerGeneratedPasscode) {
     this.connected = connected;
     this.deviceId = deviceId;
     this.hostName = hostName;
@@ -59,6 +73,7 @@ public class MatterCastingPlayer implements CastingPlayer {
     this.productId = productId;
     this.vendorId = vendorId;
     this.deviceType = deviceType;
+    this.supportsCommissionerGeneratedPasscode = supportsCommissionerGeneratedPasscode;
   }
 
   /**
@@ -121,6 +136,14 @@ public class MatterCastingPlayer implements CastingPlayer {
   }
 
   @Override
+  public boolean getSupportsCommissionerGeneratedPasscode() {
+    return this.supportsCommissionerGeneratedPasscode;
+  }
+
+  @Override
+  public native List<Endpoint> getEndpoints();
+
+  @Override
   public String toString() {
     return this.deviceId;
   }
@@ -137,4 +160,51 @@ public class MatterCastingPlayer implements CastingPlayer {
     MatterCastingPlayer that = (MatterCastingPlayer) o;
     return Objects.equals(this.deviceId, that.deviceId);
   }
+
+  /**
+   * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
+   * If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on
+   * disk, this will execute the user directed commissioning process.
+   *
+   * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window
+   *     open, if commissioning is required. Needs to be >= MIN_CONNECTION_TIMEOUT_SEC.
+   * @param desiredEndpointFilter (Optional) Attributes (such as VendorId) describing an Endpoint
+   *     that the client wants to interact with after commissioning. If this value is passed in, the
+   *     VerifyOrEstablishConnection will force User Directed Commissioning, in case the desired
+   *     Endpoint is not found in the on device CastingStore.
+   * @return A CompletableFuture that completes when the VerifyOrEstablishConnection is completed.
+   *     The CompletableFuture will be completed with a Void value if the
+   *     VerifyOrEstablishConnection is successful. Otherwise, the CompletableFuture will be
+   *     completed with an Exception. The Exception will be of type
+   *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
+   *     CastingException will contain the error code and message from the CastingApp.
+   */
+  @Override
+  public native MatterError verifyOrEstablishConnection(
+      long commissioningWindowTimeoutSec,
+      EndpointFilter desiredEndpointFilter,
+      MatterCallback<Void> successCallback,
+      MatterCallback<MatterError> failureCallback);
+
+  /**
+   * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
+   * If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on
+   * disk, this will execute the user directed commissioning process.
+   *
+   * @return A CompletableFuture that completes when the VerifyOrEstablishConnection is completed.
+   *     The CompletableFuture will be completed with a Void value if the
+   *     VerifyOrEstablishConnection is successful. Otherwise, the CompletableFuture will be
+   *     completed with an Exception. The Exception will be of type
+   *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
+   *     CastingException will contain the error code and message from the CastingApp.
+   */
+  @Override
+  public MatterError verifyOrEstablishConnection(
+      MatterCallback<Void> successCallback, MatterCallback<MatterError> failureCallback) {
+    return verifyOrEstablishConnection(
+        MIN_CONNECTION_TIMEOUT_SEC, null, successCallback, failureCallback);
+  }
+
+  @Override
+  public native void disconnect();
 }

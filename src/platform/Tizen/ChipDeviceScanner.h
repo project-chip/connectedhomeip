@@ -28,7 +28,7 @@
 #include <bluetooth.h>
 #include <glib.h>
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemClock.h>
 
@@ -86,7 +86,7 @@ public:
     ~ChipDeviceScanner(void);
 
     /// Initiate a scan for devices, with the given timeout & scan filter data
-    CHIP_ERROR StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType, ScanFilterData & filterData);
+    CHIP_ERROR StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType, const ScanFilterData & filterData);
 
     /// Stop any currently running scan
     CHIP_ERROR StopChipScan(void);
@@ -99,10 +99,11 @@ private:
     static void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * info, void * userData);
     static gboolean TimerExpiredCb(gpointer user_data);
     static CHIP_ERROR TriggerScan(ChipDeviceScanner * userData);
-    void CheckScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
-    int RegisterScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
-    void UnRegisterScanFilter(void);
-    int CreateLEScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
+
+    int CreateLEScanFilter(ScanFilterType filterType);
+    int RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
+    int SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData);
+    void UnRegisterScanFilter();
 
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     bool mIsScanning                      = false;

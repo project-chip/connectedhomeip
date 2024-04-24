@@ -20,12 +20,12 @@
 #include <app/AttributePathExpandIterator.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
-#include <app/ObjectList.h>
 #include <app/util/mock/Constants.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/LinkedList.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -41,7 +41,7 @@ using P = app::ConcreteAttributePath;
 
 void TestAllWildcard(nlTestSuite * apSuite, void * apContext)
 {
-    app::ObjectList<app::AttributePathParams> clusInfo;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo;
 
     app::ConcreteAttributePath path;
     P paths[] = {
@@ -144,7 +144,7 @@ void TestAllWildcard(nlTestSuite * apSuite, void * apContext)
 
 void TestWildcardEndpoint(nlTestSuite * apSuite, void * apContext)
 {
-    app::ObjectList<app::AttributePathParams> clusInfo;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mClusterId   = Test::MockClusterId(3);
     clusInfo.mValue.mAttributeId = Test::MockAttributeId(3);
 
@@ -167,7 +167,7 @@ void TestWildcardEndpoint(nlTestSuite * apSuite, void * apContext)
 
 void TestWildcardCluster(nlTestSuite * apSuite, void * apContext)
 {
-    app::ObjectList<app::AttributePathParams> clusInfo;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId  = Test::kMockEndpoint3;
     clusInfo.mValue.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
 
@@ -193,7 +193,7 @@ void TestWildcardCluster(nlTestSuite * apSuite, void * apContext)
 
 void TestWildcardClusterGlobalAttributeNotInMetadata(nlTestSuite * apSuite, void * apContext)
 {
-    app::ObjectList<app::AttributePathParams> clusInfo;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId  = Test::kMockEndpoint3;
     clusInfo.mValue.mAttributeId = app::Clusters::Globals::Attributes::AttributeList::Id;
 
@@ -219,7 +219,7 @@ void TestWildcardClusterGlobalAttributeNotInMetadata(nlTestSuite * apSuite, void
 
 void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
 {
-    app::ObjectList<app::AttributePathParams> clusInfo;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId = Test::kMockEndpoint2;
     clusInfo.mValue.mClusterId  = Test::MockClusterId(3);
 
@@ -252,7 +252,7 @@ void TestWildcardAttribute(nlTestSuite * apSuite, void * apContext)
 
 void TestNoWildcard(nlTestSuite * apSuite, void * apContext)
 {
-    app::ObjectList<app::AttributePathParams> clusInfo;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo;
     clusInfo.mValue.mEndpointId  = Test::kMockEndpoint2;
     clusInfo.mValue.mClusterId   = Test::MockClusterId(3);
     clusInfo.mValue.mAttributeId = Test::MockAttributeId(3);
@@ -277,21 +277,21 @@ void TestNoWildcard(nlTestSuite * apSuite, void * apContext)
 void TestMultipleClusInfo(nlTestSuite * apSuite, void * apContext)
 {
 
-    app::ObjectList<app::AttributePathParams> clusInfo1;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo1;
 
-    app::ObjectList<app::AttributePathParams> clusInfo2;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo2;
     clusInfo2.mValue.mClusterId   = Test::MockClusterId(3);
     clusInfo2.mValue.mAttributeId = Test::MockAttributeId(3);
 
-    app::ObjectList<app::AttributePathParams> clusInfo3;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo3;
     clusInfo3.mValue.mEndpointId  = Test::kMockEndpoint3;
     clusInfo3.mValue.mAttributeId = app::Clusters::Globals::Attributes::ClusterRevision::Id;
 
-    app::ObjectList<app::AttributePathParams> clusInfo4;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo4;
     clusInfo4.mValue.mEndpointId = Test::kMockEndpoint2;
     clusInfo4.mValue.mClusterId  = Test::MockClusterId(3);
 
-    app::ObjectList<app::AttributePathParams> clusInfo5;
+    SingleLinkedListNode<app::AttributePathParams> clusInfo5;
     clusInfo5.mValue.mEndpointId  = Test::kMockEndpoint2;
     clusInfo5.mValue.mClusterId   = Test::MockClusterId(3);
     clusInfo5.mValue.mAttributeId = Test::MockAttributeId(3);

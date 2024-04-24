@@ -22,13 +22,15 @@
 
 #include "ContentAppAttributeDelegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/util/config.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <platform/PlatformManager.h>
 #include <zap-generated/endpoint_config.h>
+
+#include <string>
 
 namespace chip {
 namespace AppPlatform {
@@ -43,13 +45,14 @@ std::string ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttri
         return "";
     }
 
+    DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read being called for endpoint %d cluster %d attribute %d",
                     aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
-    jstring resp =
-        (jstring) env->CallObjectMethod(mContentAppEndpointManager, mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
-                                        static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId));
+    jstring resp = static_cast<jstring>(
+        env->CallObjectMethod(mContentAppEndpointManager.ObjectRef(), mReadAttributeMethod, static_cast<jint>(aPath.mEndpointId),
+                              static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId)));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Java exception in ContentAppAttributeDelegate::Read");

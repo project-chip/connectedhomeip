@@ -50,6 +50,7 @@ public:
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
     CHIP_ERROR InitBoardFwk(void);
+    void CleanReset();
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.

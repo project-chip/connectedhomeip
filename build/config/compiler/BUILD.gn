@@ -343,7 +343,7 @@ config("cosmetic_default") {
 }
 
 config("runtime_default") {
-  if (is_clang) {
+  if (is_clang) {  # Using Pigweed clang instead of Darwin host clang
     configs = [
       "$dir_pw_toolchain/host_clang:no_system_libcpp",
       "$dir_pw_toolchain/host_clang:xcode_sysroot",
@@ -395,11 +395,16 @@ declare_args() {
 }
 
 config("sanitize_address") {
+  defines = []
   cflags = [
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
   ]
   ldflags = cflags
+
+  if ((target_os == "mac" || target_os == "ios") && !is_clang) {
+    defines += [ "_LIBCPP_HAS_NO_ASAN" ]
+  }
 }
 
 config("sanitize_thread") {

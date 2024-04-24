@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023 Project CHIP Authors
+#   Copyright (c) 2023-2024 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,6 +19,10 @@
 # and safeguarded so that they only are applied when building Matter.
 
 if CHIP
+
+config CHIP_PROJECT_CONFIG
+    string "Project configuration file for Matter"
+    default "include/CHIPProjectConfig.h"
 
 config LOG
     default y
@@ -106,6 +110,8 @@ config GPIO
 config BT
     default y
 
+if BT
+
 config BT_PERIPHERAL
     default y
 
@@ -157,9 +163,11 @@ choice B9X_BLE_CTRL_MAC_TYPE
     default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 endchoice
 
+endif
+
 # Board retention config
-if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
-config BOARD_TLSR9X_NON_RETENTION_RAM_CODE
+if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
+config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
     default y if PM
 
 config TELINK_B9x_MATTER_RETENTION_LAYOUT
@@ -170,7 +178,7 @@ config PWM
 endif
 
 # Board non-retention config
-if BOARD_TLSR9528A || BOARD_TLSR9518ADK80D
+if BOARD_TLSR9528A || BOARD_TLSR9258A || BOARD_TLSR9518ADK80D
 config PWM
     default y
 endif
@@ -211,12 +219,18 @@ config SETTINGS_NVS_SECTOR_SIZE_MULT
 
 # Set sector counter of NVS
 config SETTINGS_NVS_SECTOR_COUNT
-    default 10
+    default 12
 
 # Enable OpenThread
 
 config NET_L2_OPENTHREAD
     default y
+
+if NET_L2_OPENTHREAD
+
+config CHIP_OPENTHREAD_CONFIG
+    string "Custom OpenThread configuration file"
+    default "../../platform/telink/project_include/OpenThreadConfig.h"
 
 choice CHIP_THREAD_DEVICE_ROLE
     prompt "Thread network device role"
@@ -255,6 +269,8 @@ config OPENTHREAD_MANUAL_START
 config OPENTHREAD_DEFAULT_TX_POWER
     default 3 if PM
     default 9
+
+endif # NET_L2_OPENTHREAD
 
 config NET_TX_STACK_SIZE
     default 554 if PM
@@ -328,5 +344,8 @@ config PWM_SHELL
 
 config OPENTHREAD_SHELL
     default n
+
+config CHIP_TASK_STACK_SIZE
+	default 4864 if PM
 
 endif

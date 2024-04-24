@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3C40586E2B632DC500C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C40586D2B632DC500C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleView.swift */; };
+		3C4058702B632DDB00C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C40586F2B632DDB00C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift */; };
+		3C4F52302B51F32000BB8A10 /* MCContentLauncherLaunchURLExampleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C4F522F2B51F32000BB8A10 /* MCContentLauncherLaunchURLExampleViewModel.swift */; };
+		3C4F52322B5721D000BB8A10 /* MCContentLauncherLaunchURLExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C4F52312B5721D000BB8A10 /* MCContentLauncherLaunchURLExampleView.swift */; };
+		3C621CB12B6078A9005CDBA3 /* MCApplicationBasicReadVendorIDExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C621CB02B6078A9005CDBA3 /* MCApplicationBasicReadVendorIDExampleView.swift */; };
+		3C621CB32B6078B7005CDBA3 /* MCApplicationBasicReadVendorIDExampleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C621CB22B6078B7005CDBA3 /* MCApplicationBasicReadVendorIDExampleViewModel.swift */; };
+		3C621CB52B607FFD005CDBA3 /* MCActionSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C621CB42B607FFD005CDBA3 /* MCActionSelectorView.swift */; };
 		3C69204A2AA1368F00D0F613 /* MCInitializationExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C6920492AA1368F00D0F613 /* MCInitializationExample.swift */; };
 		3C81C75328F8C79E001CB9D1 /* StartFromCacheView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C81C75228F8C79E001CB9D1 /* StartFromCacheView.swift */; };
 		3C81C75528F8C7B6001CB9D1 /* StartFromCacheViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C81C75428F8C7B6001CB9D1 /* StartFromCacheViewModel.swift */; };
@@ -51,6 +58,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3C40586D2B632DC500C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCMediaPlaybackSubscribeToCurrentStateExampleView.swift; sourceTree = "<group>"; };
+		3C40586F2B632DDB00C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift; sourceTree = "<group>"; };
+		3C4F522F2B51F32000BB8A10 /* MCContentLauncherLaunchURLExampleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCContentLauncherLaunchURLExampleViewModel.swift; sourceTree = "<group>"; };
+		3C4F52312B5721D000BB8A10 /* MCContentLauncherLaunchURLExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCContentLauncherLaunchURLExampleView.swift; sourceTree = "<group>"; };
+		3C621CB02B6078A9005CDBA3 /* MCApplicationBasicReadVendorIDExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCApplicationBasicReadVendorIDExampleView.swift; sourceTree = "<group>"; };
+		3C621CB22B6078B7005CDBA3 /* MCApplicationBasicReadVendorIDExampleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCApplicationBasicReadVendorIDExampleViewModel.swift; sourceTree = "<group>"; };
+		3C621CB42B607FFD005CDBA3 /* MCActionSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCActionSelectorView.swift; sourceTree = "<group>"; };
 		3C6920492AA1368F00D0F613 /* MCInitializationExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCInitializationExample.swift; sourceTree = "<group>"; };
 		3C75075E284C1DF800D7DB3A /* TvCasting.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TvCasting.entitlements; sourceTree = "<group>"; };
 		3C7507AC285299DF00D7DB3A /* CommissionerDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommissionerDiscoveryView.swift; sourceTree = "<group>"; };
@@ -131,6 +145,13 @@
 				3C94377C2B364D380096E5F4 /* MCDiscoveryExampleViewModel.swift */,
 				3C94378F2B3B3FF90096E5F4 /* MCConnectionExampleView.swift */,
 				3C94377E2B364D510096E5F4 /* MCConnectionExampleViewModel.swift */,
+				3C621CB42B607FFD005CDBA3 /* MCActionSelectorView.swift */,
+				3C4F52312B5721D000BB8A10 /* MCContentLauncherLaunchURLExampleView.swift */,
+				3C4F522F2B51F32000BB8A10 /* MCContentLauncherLaunchURLExampleViewModel.swift */,
+				3C621CB02B6078A9005CDBA3 /* MCApplicationBasicReadVendorIDExampleView.swift */,
+				3C621CB22B6078B7005CDBA3 /* MCApplicationBasicReadVendorIDExampleViewModel.swift */,
+				3C40586D2B632DC500C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleView.swift */,
+				3C40586F2B632DDB00C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift */,
 				EAF14298296D561900E17793 /* CertTestView.swift */,
 				EAF1429A296D57DF00E17793 /* CertTestViewModel.swift */,
 				3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */,
@@ -248,9 +269,14 @@
 			files = (
 				3C81C75328F8C79E001CB9D1 /* StartFromCacheView.swift in Sources */,
 				3C94377F2B364D510096E5F4 /* MCConnectionExampleViewModel.swift in Sources */,
+				3C4058702B632DDB00C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift in Sources */,
 				3C81C75528F8C7B6001CB9D1 /* StartFromCacheViewModel.swift in Sources */,
 				3CCB8745286A5D0F00771BAD /* CommissionerDiscoveryView.swift in Sources */,
+				3C621CB12B6078A9005CDBA3 /* MCApplicationBasicReadVendorIDExampleView.swift in Sources */,
 				3CCB8746286A5D0F00771BAD /* CommissionerDiscoveryViewModel.swift in Sources */,
+				3C4F52302B51F32000BB8A10 /* MCContentLauncherLaunchURLExampleViewModel.swift in Sources */,
+				3C621CB32B6078B7005CDBA3 /* MCApplicationBasicReadVendorIDExampleViewModel.swift in Sources */,
+				3C621CB52B607FFD005CDBA3 /* MCActionSelectorView.swift in Sources */,
 				3C81C75928F8E42D001CB9D1 /* ConnectionViewModel.swift in Sources */,
 				3CA1CA7A28E281080023ED44 /* ClusterSelectorView.swift in Sources */,
 				3C94378E2B3B3CB00096E5F4 /* MCDiscoveryExampleView.swift in Sources */,
@@ -259,6 +285,7 @@
 				3C94377D2B364D380096E5F4 /* MCDiscoveryExampleViewModel.swift in Sources */,
 				3CCB8747286A5D0F00771BAD /* CommissioningView.swift in Sources */,
 				3CCB8748286A5D0F00771BAD /* CommissioningViewModel.swift in Sources */,
+				3C4F52322B5721D000BB8A10 /* MCContentLauncherLaunchURLExampleView.swift in Sources */,
 				3CAC955B29BA948700BEA5C3 /* ExampleDAC.swift in Sources */,
 				3CA1CA7E28E284950023ED44 /* MediaPlaybackViewModel.swift in Sources */,
 				3CCB8749286A5D0F00771BAD /* ContentLauncherView.swift in Sources */,
@@ -268,6 +295,7 @@
 				3CC0E8FC2841DD3400EC6A18 /* ContentView.swift in Sources */,
 				3CA1CA7C28E282150023ED44 /* MediaPlaybackView.swift in Sources */,
 				3CC0E8FA2841DD3400EC6A18 /* TvCastingApp.swift in Sources */,
+				3C40586E2B632DC500C7C6D6 /* MCMediaPlaybackSubscribeToCurrentStateExampleView.swift in Sources */,
 				3C9437902B3B3FF90096E5F4 /* MCConnectionExampleView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,7 +340,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -398,6 +425,10 @@
 		3CC0E9052841DD3500EC6A18 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ARCHS[sdk=iphonesimulator*]" = (
+					arm64,
+					x86_64,
+				);
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;

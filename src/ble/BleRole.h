@@ -18,6 +18,10 @@
 
 #pragma once
 
+#ifndef _CHIP_BLE_BLE_H
+#error "Please include <ble/Ble.h> instead!"
+#endif
+
 namespace chip {
 namespace Ble {
 

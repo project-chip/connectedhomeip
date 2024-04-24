@@ -607,7 +607,7 @@ tests:
     - label:
           "Step 13a: TH reads NumberOfHoliDay SchedulesSupported attribute from
           DUT"
-      PICS: DRLK.S.F0b && DRLK.S.A0015
+      PICS: DRLK.S.F0b && DRLK.S.A0016
       command: "readAttribute"
       attribute: "NumberOfHolidaySchedulesSupported"
       response:

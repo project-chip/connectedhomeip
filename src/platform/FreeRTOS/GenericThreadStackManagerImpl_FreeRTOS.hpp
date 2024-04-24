@@ -101,6 +101,32 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::_UnlockThreadStack(void)
     xSemaphoreGive(mThreadStackLock);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+template <class ImplClass>
+void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::_WaitOnSrpClearAllComplete()
+{
+    // Only 1 task can be blocked on a srpClearAll request
+    if (mSrpClearAllRequester == nullptr)
+    {
+        mSrpClearAllRequester = xTaskGetCurrentTaskHandle();
+        // Wait on OnSrpClientNotification which confirms the slearing is done.
+        // It will notify this current task with NotifySrpClearAllComplete.
+        // However, we won't wait more than 2s.
+        ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(2000));
+        mSrpClearAllRequester = nullptr;
+    }
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::_NotifySrpClearAllComplete()
+{
+    if (mSrpClearAllRequester)
+    {
+        xTaskNotifyGive(mSrpClearAllRequester);
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
 template <class ImplClass>
 void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::SignalThreadActivityPending()
 {

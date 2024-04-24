@@ -23,13 +23,15 @@
 
 #pragma once
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "ChipDeviceScanner.h"
 #include <luna-service2/lunaservice.h>
+
+#include <string>
 
 namespace chip {
 namespace DeviceLayer {

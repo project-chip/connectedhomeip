@@ -28,7 +28,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -426,7 +426,7 @@ void BLEManagerImpl::DriveBLEState(void)
             ChipLogProgress(DeviceLayer, "CHIPoBLE stop advertising");
             wiced_bt_start_advertisements(BTM_BLE_ADVERT_OFF, BLE_ADDR_PUBLIC, NULL);
 
-            /* Delete the heap allocated during BLE Advertisment Stop */
+            /* Delete the heap allocated during BLE Advertisement Stop */
             if (p_heap)
             {
                 wiced_bt_delete_heap(p_heap);

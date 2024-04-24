@@ -54,172 +54,112 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0090" name="Electrical Power Measurement" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="EMR" scope="Endpoint"/>
+  <clusterIds>
+    <clusterId id="0x0090" name="Electrical Power Measurement"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="EPM" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="DIRC" name="DirectCurrent" summary="Measurement of direct current">
+    <feature bit="0" code="DIRC" name="DirectCurrent" summary="Supports measurement of direct current">
       <optionalConform choice="a" more="true"/>
     </feature>
-    <feature bit="1" code="ALTC" name="AlternatingCurrent" summary="Measurement of alternating current">
+    <feature bit="1" code="ALTC" name="AlternatingCurrent" summary="Supports measurement of alternating current">
       <optionalConform choice="a" more="true"/>
     </feature>
-    <feature bit="2" code="THRP" name="ThreePhasePower" summary="Represents a three-phase connection">
+    <feature bit="2" code="POLY" name="PolyphasePower" summary="Supports polyphase measurements">
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
     </feature>
-    <feature bit="3" code="HARM" name="Harmonics" summary="Measurement of AC harmonics">
+    <feature bit="3" code="HARM" name="Harmonics" summary="Supports measurement of AC harmonics">
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
     </feature>
-    <feature bit="4" code="PWRQ" name="PowerQuality" summary="Measurement of AC harmonic phases">
+    <feature bit="4" code="PWRQ" name="PowerQuality" summary="Supports measurement of AC harmonic phases">
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
     </feature>
   </features>
   <dataTypes>
-    <enum name="MeasurementTypeEnum">
-      <item value="0" name="Unspecified">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Voltage">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Current">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="ActivePower">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="RMSCurrent">
-        <mandatoryConform>
-          <feature name="ALTC"/>
-        </mandatoryConform>
-      </item>
-      <item value="5" name="RMSPower">
-        <mandatoryConform>
-          <feature name="ALTC"/>
-        </mandatoryConform>
-      </item>
-      <item value="6" name="ApparentPower">
-        <mandatoryConform>
-          <feature name="ALTC"/>
-        </mandatoryConform>
-      </item>
-      <item value="7" name="ReactivePower">
-        <mandatoryConform>
-          <feature name="ALTC"/>
-        </mandatoryConform>
-      </item>
-      <item value="8" name="Frequency">
-        <mandatoryConform>
-          <feature name="ALTC"/>
-        </mandatoryConform>
-      </item>
-      <item value="9" name="PowerFactor">
-        <mandatoryConform>
-          <feature name="ALTC"/>
-        </mandatoryConform>
-      </item>
-      <item value="10" name="LineCurrent">
-        <mandatoryConform>
-          <feature name="ALTC"/>
-        </mandatoryConform>
-      </item>
-      <item value="11" name="NeutralCurrent">
-        <mandatoryConform>
-          <feature name="THRP"/>
-        </mandatoryConform>
-      </item>
-    </enum>
     <enum name="PowerModeEnum">
-      <item value="0" name="Unspecified">
+      <item value="0" name="Unknown">
         <mandatoryConform/>
       </item>
-      <item value="1" name="DC"/>
-      <item value="2" name="AC"/>
+      <item value="1" name="DC" summary="Direct current">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="AC" summary="Alternating current, either single-phase or polyphase">
+        <mandatoryConform/>
+      </item>
     </enum>
     <struct name="HarmonicMeasurementStruct">
       <field id="0" name="Order" type="uint8" default="1">
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="min" value="1"/>
       </field>
-      <field id="1" name="Measurement" type="int32" default="null">
-        <access read="true"/>
+      <field id="1" name="Measurement" type="int64" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
-      </field>
-    </struct>
-    <struct name="MeasurementAccuracyStruct">
-      <field id="0" name="MeasurementType" type="MeasurementTypeEnum">
-        <access read="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Measured" type="bool" default="false">
-        <access read="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="PercentTypical" type="percent100ths" default="0">
-        <access read="true"/>
-        <quality nullable="true"/>
-        <optionalConform choice="a"/>
-      </field>
-      <field id="3" name="FixedTypical" type="int64" default="0">
-        <access read="true"/>
-        <quality nullable="true"/>
-        <optionalConform choice="a"/>
-        <constraint type="min" value="0"/>
-      </field>
-      <field id="4" name="PercentMin" type="percent100ths" default="0">
-        <access read="true"/>
-        <optionalConform/>
-      </field>
-      <field id="4" name="FixedMin" type="int64" default="0">
-        <access read="true"/>
-        <optionalConform/>
-        <constraint type="min" value="0"/>
-      </field>
-      <field id="5" name="PercentMax" type="percent100ths" default="0">
-        <access read="true"/>
-        <optionalConform/>
-      </field>
-      <field id="5" name="FixedMax" type="int64" default="0">
-        <access read="true"/>
-        <optionalConform/>
-        <constraint type="min" value="0"/>
+        <constraint type="between" from="-2" to="2"/>
       </field>
     </struct>
     <struct name="MeasurementRangeStruct">
-      <field id="0" name="MeasurementType" type="MeasurementTypeEnum" default="0">
-        <access read="true"/>
+      <field id="0" name="MeasurementType" type="ref_MeasurementTypeEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Min" type="int64" default="null">
-        <access read="true"/>
-        <quality nullable="true"/>
+      <field id="1" name="Min" type="int64">
         <mandatoryConform/>
+        <constraint type="between" from="-2" to="2"/>
       </field>
-      <field id="2" name="MinTimestamp" type="epoch-s" default="null">
-        <access read="true"/>
-        <quality nullable="true"/>
+      <field id="2" name="Max" type="int64">
         <mandatoryConform/>
+        <constraint type="between" from="-2" to="2"/>
       </field>
-      <field id="3" name="Max" type="int64" default="null">
-        <access read="true"/>
-        <quality nullable="true"/>
-        <mandatoryConform/>
+      <field id="3" name="StartTimestamp" type="epoch-s">
+        <mandatoryConform>
+          <attribute name="EndTimestamp"/>
+        </mandatoryConform>
       </field>
-      <field id="4" name="MaxTimestamp" type="epoch-s" default="null">
-        <access read="true"/>
-        <quality nullable="true"/>
-        <mandatoryConform/>
+      <field id="4" name="EndTimestamp" type="epoch-s">
+        <constraint type="min" value="StartTimestamp+1"/>
+      </field>
+      <field id="5" name="MinTimestamp" type="epoch-s">
+        <mandatoryConform>
+          <attribute name="EndTimestamp"/>
+        </mandatoryConform>
+      </field>
+      <field id="6" name="MaxTimestamp" type="epoch-s">
+        <mandatoryConform>
+          <attribute name="EndTimestamp"/>
+        </mandatoryConform>
+        <constraint type="min" value="MinTimestamp+1"/>
+      </field>
+      <field id="7" name="StartSystime" type="systime-ms">
+        <mandatoryConform>
+          <attribute name="EndSystime"/>
+        </mandatoryConform>
+      </field>
+      <field id="8" name="EndSystime" type="systime-ms">
+        <constraint type="min" value="StartSystime+1"/>
+      </field>
+      <field id="9" name="MinSystime" type="systime-ms">
+        <mandatoryConform>
+          <attribute name="EndSystime"/>
+        </mandatoryConform>
+      </field>
+      <field id="10" name="MaxSystime" type="systime-ms">
+        <mandatoryConform>
+          <attribute name="EndSystime"/>
+        </mandatoryConform>
+        <constraint type="min" value="MinSystime+1"/>
       </field>
     </struct>
   </dataTypes>
@@ -228,69 +168,109 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="Accuracy" type="list">
-      <entry type="MeasurementAccuracyStruct"/>
+    <attribute id="0x0001" name="NumberOfMeasurementTypes" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
+      <constraint type="min" value="1"/>
     </attribute>
-    <attribute id="0x0002" name="Ranges" type="list">
+    <attribute id="0x0002" name="Accuracy" type="list">
+      <entry type="ref_MeasurementAccuracyStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="countBetween" from="1" to="NumberOfMeasurementTypes"/>
+    </attribute>
+    <attribute id="0x0003" name="Ranges" type="list" default="empty">
       <entry type="MeasurementRangeStruct"/>
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false"/>
+      <optionalConform/>
+      <constraint type="countBetween" from="0" to="NumberOfMeasurementTypes"/>
+    </attribute>
+    <attribute id="0x0004" name="Voltage" type="voltage-mV" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <optionalConform/>
+      <constraint type="between" from="-2" to="2"/>
+    </attribute>
+    <attribute id="0x0005" name="ActiveCurrent" type="amperage-mA" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <optionalConform/>
+      <constraint type="between" from="-2" to="2"/>
+    </attribute>
+    <attribute id="0x0006" name="ReactiveCurrent" type="amperage-mA" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint type="between" from="-2" to="2"/>
+    </attribute>
+    <attribute id="0x0007" name="ApparentCurrent" type="amperage-mA" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint type="between" from="0" to="2"/>
+    </attribute>
+    <attribute id="0x0008" name="ActivePower" type="power-mW" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
+      <constraint type="between" from="-2" to="2"/>
     </attribute>
-    <attribute id="0x0003" name="Voltage" type="int64" default="null">
+    <attribute id="0x0009" name="ReactivePower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0004" name="Current" type="int64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0005" name="ActivePower" type="int64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0006" name="RMSCurrent" type="int64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
+      <optionalConform>
         <feature name="ALTC"/>
-      </mandatoryConform>
+      </optionalConform>
+      <constraint type="between" from="-2" to="2"/>
     </attribute>
-    <attribute id="0x0007" name="RMSPower" type="int64" default="null">
+    <attribute id="0x000A" name="ApparentPower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
+      <optionalConform>
         <feature name="ALTC"/>
-      </mandatoryConform>
+      </optionalConform>
+      <constraint type="between" from="-2" to="2"/>
     </attribute>
-    <attribute id="0x0008" name="ApparentPower" type="int64" default="null">
+    <attribute id="0x000B" name="RMSVoltage" type="voltage-mV" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
+      <optionalConform>
         <feature name="ALTC"/>
-      </mandatoryConform>
+      </optionalConform>
+      <constraint type="between" from="-2" to="2"/>
     </attribute>
-    <attribute id="0x0009" name="ReactivePower" type="int64" default="null">
+    <attribute id="0x000C" name="RMSCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
+      <optionalConform>
         <feature name="ALTC"/>
-      </mandatoryConform>
+      </optionalConform>
+      <constraint type="between" from="-2" to="2"/>
     </attribute>
-    <attribute id="0x000A" name="Frequency" type="int64" default="null">
+    <attribute id="0x000D" name="RMSPower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
+      <optionalConform>
         <feature name="ALTC"/>
-      </mandatoryConform>
+      </optionalConform>
+      <constraint type="between" from="-2" to="2"/>
+    </attribute>
+    <attribute id="0x000E" name="Frequency" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
       <constraint type="between" from="0" to="1000000"/>
     </attribute>
-    <attribute id="0x000B" name="HarmonicCurrents" type="list" default="null">
+    <attribute id="0x000F" name="HarmonicCurrents" type="list" default="null">
       <entry type="HarmonicMeasurementStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
@@ -299,7 +279,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000C" name="HarmonicPhases" type="list" default="null">
+    <attribute id="0x0010" name="HarmonicPhases" type="list" default="null">
       <entry type="HarmonicMeasurementStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
@@ -308,51 +288,28 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000D" name="PowerFactor" type="int64" default="null">
+    <attribute id="0x0011" name="PowerFactor" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <optionalConform/>
-      <constraint type="between" from="-10000" to="+10000"/>
-    </attribute>
-    <attribute id="0x000E" name="LineCurrent" type="int64" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
+      <optionalConform>
         <feature name="ALTC"/>
-      </mandatoryConform>
-      <constraint type="min" value="0"/>
+      </optionalConform>
+      <constraint type="between" from="-10000" to="10000"/>
     </attribute>
-    <attribute id="0x000F" name="NeutralCurrent" type="int64" default="null">
+    <attribute id="0x0012" name="NeutralCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="THRP"/>
-      </mandatoryConform>
+      <optionalConform>
+        <feature name="POLY"/>
+      </optionalConform>
+      <constraint type="between" from="-2" to="2"/>
     </attribute>
   </attributes>
   <events>
-    <event id="0x00" name="MeasurementPeriodRange" priority="info">
+    <event id="0x00" name="MeasurementPeriodRanges" priority="info">
       <access readPrivilege="view"/>
-      <mandatoryConform/>
-      <field id="0" name="MeasurementType" type="MeasurementTypeEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="PeriodStart" type="epoch-s">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="PeriodEnd" type="epoch-s">
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="Min" type="int64">
-        <mandatoryConform/>
-      </field>
-      <field id="4" name="MinTimestamp" type="epoch-s">
-        <mandatoryConform/>
-      </field>
-      <field id="5" name="Max" type="int64">
-        <mandatoryConform/>
-      </field>
-      <field id="6" name="MaxTimestamp" type="epoch-s">
+      <field id="0" name="Ranges" type="list" default="R V">
+        <entry type="MeasurementRangeStruct"/>
         <mandatoryConform/>
       </field>
     </event>

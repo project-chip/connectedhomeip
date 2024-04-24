@@ -2,9 +2,10 @@ import argparse
 import atexit
 import builtins
 import logging
+import os
+import pathlib
 
 import chip.CertificateAuthority
-import chip.discovery
 import chip.FabricAdmin
 import chip.logging
 import chip.native
@@ -51,7 +52,10 @@ def ReplInit(debug):
 certificateAuthorityManager = None
 
 
+@atexit.register
 def StackShutdown():
+    if not certificateAuthorityManager:
+        return
     certificateAuthorityManager.Shutdown()
     builtins.chipStack.Shutdown()
 
@@ -77,50 +81,91 @@ def mattersetdebug(enableDebugMode: bool = True):
     builtins.enableDebugMode = enableDebugMode
 
 
-console = Console()
+def main():
+    console = Console()
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-p", "--storagepath",
-    help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)",
-    action="store",
-    default="/tmp/repl-storage.json")
-parser.add_argument(
-    "-d", "--debug", help="Set default logging level to debug.", action="store_true")
-parser.add_argument(
-    "-t", "--trust-store", help="Path to the PAA trust store.", action="store", default="./credentials/development/paa-root-certs")
-args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-p", "--storagepath",
+        help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)",
+        action="store",
+        default="/tmp/repl-storage.json")
+    parser.add_argument(
+        "-d", "--debug", help="Set default logging level to debug.", action="store_true")
+    parser.add_argument(
+        "-t", "--trust-store", help="Path to the PAA trust store.", action="store", default="./credentials/development/paa-root-certs")
+    args = parser.parse_args()
 
-chip.native.Init()
+    if not os.path.exists(args.trust_store):
+        # there is a chance that the script is being run from a sub-path of a checkout.
+        # try to adjust for convenience
+        store_path = pathlib.Path(args.trust_store)
+        if not store_path.is_absolute():
+            prefix = pathlib.Path().absolute()
+            while prefix != prefix.parent:
+                if prefix.joinpath(store_path).exists():
+                    oldpath = args.trust_store
+                    args.trust_store = prefix.joinpath(store_path).as_posix()
+                    console.print(f'''
+[bold] Replacing [/] store path {oldpath} with {args.trust_store}
+Note that you are still running from {os.getcwd()} so other relative paths may be off.
+                    ''')
+                    break
+                prefix = prefix.parent
 
-ReplInit(args.debug)
-chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=False)
-certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
+    if not os.path.exists(args.trust_store):
+        console.print(f'''
+[bold red] Missing directory:     [/]{args.trust_store}
+[bold] Your current directory: [/]{os.getcwd()}
 
-certificateAuthorityManager.LoadAuthoritiesFromStorage()
+Please add a valid `--trust-store` argument to your script. If using jupyterlab,
+the command should look like:
 
-if (len(certificateAuthorityManager.activeCaList) == 0):
-    ca = certificateAuthorityManager.NewCertificateAuthority()
-    ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
-elif (len(certificateAuthorityManager.activeCaList[0].adminList) == 0):
-    certificateAuthorityManager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+%run {{module.path}} --trust-store /chip/root/credentials/development/paa-root-certs
 
-caList = certificateAuthorityManager.activeCaList
+or run `os.chdir` to the root of your CHIP repository checkout.
+        ''')
+        # nothing we can do ... things will NOT work
+        return
 
-devCtrl = caList[0].adminList[0].NewController(paaTrustStorePath=args.trust_store)
-builtins.devCtrl = devCtrl
+    chip.native.Init()
 
-atexit.register(StackShutdown)
+    global certificateAuthorityManager
+    global chipStack
+    global caList
+    global devCtrl
 
-console.print(
-    '\n\n[blue]The following objects have been created:')
+    ReplInit(args.debug)
 
-console.print(
-    '''\t[red]certificateAuthorityManager[blue]:\tManages a list of CertificateAuthority instances.
-\t[red]caList[blue]:\t\t\t\tThe list of CertificateAuthority instances.
-\t[red]caList[n][m][blue]:\t\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
+    chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=False)
+    certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
-console.print(
-    f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): '
-    f'has been initialized to manage [bold red]caList[0].adminList[0][blue] (FabricId = {caList[0].adminList[0].fabricId}), '
-    'and is available as [bold red]devCtrl')
+    certificateAuthorityManager.LoadAuthoritiesFromStorage()
+
+    if not certificateAuthorityManager.activeCaList:
+        ca = certificateAuthorityManager.NewCertificateAuthority()
+        ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+    elif not certificateAuthorityManager.activeCaList[0].adminList:
+        certificateAuthorityManager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+
+    caList = certificateAuthorityManager.activeCaList
+
+    devCtrl = caList[0].adminList[0].NewController(paaTrustStorePath=args.trust_store)
+    builtins.devCtrl = devCtrl
+
+    console.print(
+        '\n\n[blue]The following objects have been created:')
+
+    console.print(
+        '''\t[red]certificateAuthorityManager[blue]:\tManages a list of CertificateAuthority instances.
+    \t[red]caList[blue]:\t\t\t\tThe list of CertificateAuthority instances.
+    \t[red]caList[n][m][blue]:\t\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
+
+    console.print(
+        f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): '
+        f'has been initialized to manage [bold red]caList[0].adminList[0][blue] (FabricId = {caList[0].adminList[0].fabricId}), '
+        'and is available as [bold red]devCtrl')
+
+
+if __name__ == "__main__":
+    main()

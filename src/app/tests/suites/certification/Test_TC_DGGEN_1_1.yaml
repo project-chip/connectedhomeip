@@ -40,10 +40,20 @@ tests:
               type: int16u
 
     - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      PICS: "!DGGEN.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      PICS: DGGEN.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
           constraints:
               type: bitmap32
 
@@ -178,6 +188,6 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [2]
           constraints:
               type: list
+              contains: [2]

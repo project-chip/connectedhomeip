@@ -16,6 +16,8 @@ name: Build example - nRF Connect SDK
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
 
@@ -37,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:32
+            image: ghcr.io/project-chip/chip-build-nrf-platform:47
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -49,7 +51,7 @@ jobs:
               with:
                 platform: nrfconnect
             - name: Detect changed paths
-              uses: dorny/paths-filter@v2
+              uses: dorny/paths-filter@v3
               id: changed_paths
               with:
                   filters: |

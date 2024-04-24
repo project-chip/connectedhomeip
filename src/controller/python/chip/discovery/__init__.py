@@ -26,6 +26,12 @@ from chip.discovery.types import DiscoverFailureCallback_t, DiscoverSuccessCallb
 from chip.native import PyChipError
 
 
+class DiscoveryType(enum.IntEnum):
+    DISCOVERY_NETWORK_ONLY = 0
+    DISCOVERY_NETWORK_ONLY_WITHOUT_PASE_AUTO_RETRY = 1
+    DISCOVERY_ALL = 2
+
+
 class FilterType(enum.IntEnum):
     # These must match chip::Dnssd::DiscoveryFilterType values (barring the naming convention)
     NONE = 0

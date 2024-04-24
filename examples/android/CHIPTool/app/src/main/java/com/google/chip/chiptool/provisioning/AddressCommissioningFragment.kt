@@ -51,6 +51,7 @@ class AddressCommissioningFragment : Fragment() {
       val address = binding.addressEditText.text.toString()
       val discriminator = binding.discriminatorEditText.text.toString()
       val pincode = binding.pincodeEditText.text.toString()
+      val port = binding.portEditText.text.toString()
 
       if (address.isEmpty() || discriminator.isEmpty() || pincode.isEmpty()) {
         Log.e(TAG, "Address, discriminator, or pincode was empty: $address $discriminator $pincode")
@@ -62,7 +63,8 @@ class AddressCommissioningFragment : Fragment() {
           CHIPDeviceInfo(
             discriminator = discriminator.toInt(),
             setupPinCode = pincode.toLong(),
-            ipAddress = address
+            ipAddress = address,
+            port = port.toInt()
           )
         )
     }
@@ -169,7 +171,7 @@ class AddressCommissioningFragment : Fragment() {
     val deviceController = ChipClient.getDeviceController(requireContext())
     for (i in 0..10) {
       val device = deviceController.getDiscoveredDevice(i) ?: break
-      ipAddressList.add("${device.ipAddress}, ${device.discriminator}")
+      ipAddressList.add("${device.ipAddress}, ${device.discriminator}, ${device.port}")
     }
     requireActivity().runOnUiThread {
       binding.discoverListSpinner.adapter =
@@ -179,9 +181,11 @@ class AddressCommissioningFragment : Fragment() {
           override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
             val address = ipAddressList[position].split(",")[0].trim()
             val discriminator = ipAddressList[position].split(",")[1].trim()
+            val port = ipAddressList[position].split(",")[2].trim()
 
             binding.addressEditText.setText(address)
             binding.discriminatorEditText.setText(discriminator)
+            binding.portEditText.setText(port)
           }
 
           override fun onNothingSelected(parent: AdapterView<*>) {}

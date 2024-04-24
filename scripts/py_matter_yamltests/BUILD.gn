@@ -55,6 +55,7 @@ pw_python_package("matter_yamltests") {
     "test_pics_checker.py",
     "test_parser_builder.py",
     "test_pseudo_clusters.py",
+    "test_yaml_parser.py",
     "test_yaml_loader.py",
   ]
 

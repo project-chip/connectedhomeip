@@ -50,21 +50,28 @@
  *      drive BLE data and control input up the stack.
  */
 
-#include <ble/BleConfig.h>
+#define _CHIP_BLE_BLE_H
+#include "BleLayer.h"
 
-#if CONFIG_NETWORK_LAYER_BLE
-
-#include <string.h>
-
-#include <ble/BLEEndPoint.h>
-#include <ble/BleApplicationDelegate.h>
-#include <ble/BleLayer.h>
-#include <ble/BlePlatformDelegate.h>
-#include <ble/BleUUID.h>
+#include <cstring>
+#include <utility>
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SetupDiscriminator.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
+
+#include "BLEEndPoint.h"
+#include "BleApplicationDelegate.h"
+#include "BleConfig.h"
+#include "BleConnectionDelegate.h"
+#include "BleError.h"
+#include "BleLayerDelegate.h"
+#include "BlePlatformDelegate.h"
+#include "BleRole.h"
+#include "BleUUID.h"
 
 // Magic values expected in first 2 bytes of valid BLE transport capabilities request or response:
 #define CAPABILITIES_MSG_CHECK_BYTE_1 0b01100101
@@ -287,10 +294,6 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionD
 
     mState = kState_Initialized;
 
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    mTestBleEndPoint = NULL;
-#endif
-
     return CHIP_NO_ERROR;
 }
 
@@ -298,6 +301,11 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplication
                           chip::System::Layer * systemLayer)
 {
     return Init(platformDelegate, nullptr, appDelegate, systemLayer);
+}
+
+void BleLayer::IndicateBleClosing()
+{
+    mState = kState_Disconnecting;
 }
 
 void BleLayer::Shutdown()
@@ -438,10 +446,6 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
 
     (*retEndPoint)->Init(this, connObj, role, autoClose);
     (*retEndPoint)->mBleTransport = mBleTransport;
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    mTestBleEndPoint = *retEndPoint;
-#endif
 
     return CHIP_NO_ERROR;
 }
@@ -791,5 +795,3 @@ void BleLayer::OnConnectionError(void * appState, CHIP_ERROR err)
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* CONFIG_NETWORK_LAYER_BLE */

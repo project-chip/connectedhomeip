@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -43,7 +44,7 @@ public:
     inline bool HasFeature(Feature feature)
     {
         uint32_t map;
-        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == EMBER_ZCL_STATUS_SUCCESS);
+        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == Protocols::InteractionModel::Status::Success);
         return success ? (map & to_underlying(feature)) : false;
     }
 

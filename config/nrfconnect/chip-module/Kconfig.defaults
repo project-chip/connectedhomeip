@@ -20,32 +20,9 @@
 
 if CHIP
 
-config LOG
-    default y
-
-if LOG
-
-choice LOG_MODE
-    default LOG_MODE_MINIMAL
-endchoice
-
-choice MATTER_LOG_LEVEL_CHOICE
-	default MATTER_LOG_LEVEL_DBG
-endchoice
-
-config CHIP_APP_LOG_LEVEL
-    default 4 # debug
-
-config LOG_DEFAULT_LEVEL
-    default 1 # error
-
-config CHIP_LOG_SIZE_OPTIMIZATION
-    default y
-
-endif
-
-config PRINTK_SYNC
-    default y
+# ==============================================================================
+# System configuration
+# ==============================================================================
 
 config ASSERT
     default y
@@ -62,43 +39,52 @@ config HW_STACK_PROTECTION
 config FPU
     default y
 
-config SHELL
-    default y
-
-config SHELL_MINIMAL
-    default y
-
-# Enable getting reboot reasons information
-config HWINFO
-	bool
-	default y
-
-config HWINFO_SHELL
-	bool
-	default n
-
-config PTHREAD_IPC
-    bool
-    default n
-
 config POSIX_MAX_FDS
-    int
     default 16
 
-# Application stack size
 config MAIN_STACK_SIZE
     default 6144
 
 config INIT_STACKS
     default y
 
+config SYSTEM_WORKQUEUE_STACK_SIZE
+    default 2560 if CHIP_WIFI
+
+config HEAP_MEM_POOL_SIZE
+    default 80000 if CHIP_WIFI
+
+config CHIP_MALLOC_SYS_HEAP_SIZE
+    default 30720 if CHIP_WIFI
+    default 8192 if NET_L2_OPENTHREAD
+
+# We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
+config COMMON_LIBC_MALLOC_ARENA_SIZE
+    default -1
+
+config NVS_LOOKUP_CACHE_SIZE
+    default 512
+
+# ==============================================================================
+# Zephyr networking configuration
+# ==============================================================================
+
 config NET_IPV6_MLD
     default y
+
+config NET_IPV6_NBR_CACHE
+    default y if CHIP_WIFI
+    default n if NET_L2_OPENTHREAD
+
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+    default 6
 
 config NET_IF_MCAST_IPV6_ADDR_COUNT
     default 14
 
-# Network buffers
+config NET_IF_IPV6_PREFIX_COUNT
+    default NET_IF_UNICAST_IPV6_ADDR_COUNT if CHIP_WIFI
+
 config NET_PKT_RX_COUNT
     default 8
 
@@ -111,7 +97,12 @@ config NET_BUF_RX_COUNT
 config NET_BUF_TX_COUNT
     default 16
 
-# Bluetooth Low Energy configs
+config NET_SOCKETS_POLL_MAX
+    default 6 if CHIP_WIFI
+
+# ==============================================================================
+# Bluetooth Low Energy configuration
+# ==============================================================================
 
 config BT
     default y
@@ -162,98 +153,94 @@ config BT_BUF_ACL_TX_SIZE
 config BT_RX_STACK_SIZE
     default 1200
 
+# Increase maximum data length of PDU supported in the Controller
+config BT_CTLR_DATA_LENGTH_MAX
+    default 251 if SOC_SERIES_NRF52X
+
 config BT_CTLR_ECDH
-    bool
     default n
 
 config BT_CTLR_LE_ENC
-    bool
     default n
 
 config BT_DEVICE_NAME_GATT_WRITABLE
-    bool
     default n
 
 config BT_GATT_CACHING
-    bool
     default n
 
 # Disable 2M PHY due to interoperability issues.
 config BT_CTLR_PHY_2M
     default n
 
-# Enable NFC support
+config MPSL_FEM_NRF21540_RUNTIME_PA_GAIN_CONTROL
+    default y if MPSL_FEM
+
+# ==============================================================================
+# NFC configuration
+# ==============================================================================
 
 config CHIP_NFC_COMMISSIONING
     default y
 
 # Disable not needed NFC callback to save flash
 config NFC_THREAD_CALLBACK
-    bool
     default n
+
+# ==============================================================================
+# DFU configuration
+# ==============================================================================
 
 config CHIP_OTA_REQUESTOR
     default y
 
-# All boards besides nRF7002DK use QSPI NOR external flash
-if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
-
+# All boards except nRF7002DK use QSPI NOR external flash
 config CHIP_QSPI_NOR
-    default y
-
-endif # BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
+    default y if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
 
 # nRF7002DK uses SPI NOR external flash
-
-if BOARD_NRF7002DK_NRF5340_CPUAPP
-
 config CHIP_SPI_NOR
-    default y
+    default y if BOARD_NRF7002DK_NRF5340_CPUAPP
 
-endif # BOARD_NRF7002DK_NRF5340_CPUAPP
+config BOOT_IMAGE_ACCESS_HOOKS
+    default y if SOC_SERIES_NRF53X
 
-# Enable extended discovery
-config CHIP_EXTENDED_DISCOVERY
-    default n
+config UPDATEABLE_IMAGE_NUMBER
+    default 2 if SOC_SERIES_NRF53X
 
-config NVS_LOOKUP_CACHE_SIZE
-    default 512
-
-# Enable OpenThread
+# ==============================================================================
+# OpenThread configuration
+# ==============================================================================
 
 config NET_L2_OPENTHREAD
     default y if !WIFI_NRF700X
 
 if NET_L2_OPENTHREAD
 
-# Disable OpenThread shell
-config OPENTHREAD_SHELL
-    default n
-
-# Disable certain parts of Zephyr IPv6 stack
-config NET_IPV6_NBR_CACHE
-    bool
-    default n
-
 # Increase the default RX stack size
 config IEEE802154_NRF5_RX_STACK_SIZE
     default 1024
 
 config OPENTHREAD_THREAD_STACK_SIZE
-	default 4096
+    default 6144 if PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
+    default 4096
 
-endif
+config OPENTHREAD_DEFAULT_TX_POWER
+    default 20 if MPSL_FEM
+    default 3 if SOC_SERIES_NRF53X
+    default 8 if SOC_SERIES_NRF52X
+
+endif # NET_L2_OPENTHREAD
+
+# ==============================================================================
+# Wi-Fi configuration
+# ==============================================================================
 
 if CHIP_WIFI
 
 choice WPA_SUPP_LOG_LEVEL_CHOICE
-	default WPA_SUPP_LOG_LEVEL_ERR
+    default WPA_SUPP_LOG_LEVEL_ERR
 endchoice
-
-# increase the prefixes limit to match
-# maximum number of IPv6 addresses per interface
-config NET_IF_IPV6_PREFIX_COUNT
-    default 6
 
 # it saves us 20kB of FLASH
 config WPA_SUPP_NO_DEBUG
@@ -272,65 +259,31 @@ config NRF_WIFI_LOW_POWER
 config NRF700X_RX_NUM_BUFS
     default 16
 
-config NRF700X_TX_MAX_DATA_SIZE
-    default 1280
-
-config NRF700X_RX_MAX_DATA_SIZE
-    default 1280
-
 config NRF700X_MAX_TX_TOKENS
     default 10
 
 config NRF700X_MAX_TX_AGGREGATION
     default 1
 
-config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
+# it saves 25kB of FLASH
+config WPA_SUPP_ADVANCED_FEATURES
     default n
 
-config SYSTEM_WORKQUEUE_STACK_SIZE
-    default 2560
+endif # CHIP_WIFI
 
-# align these numbers to match the OpenThread config
-config NET_IF_UNICAST_IPV6_ADDR_COUNT
-    default 6
-
-config NET_IF_MCAST_IPV6_ADDR_COUNT
-    default 8
-
-config NET_SOCKETS_POLL_MAX
-    default 6
-
-config MBEDTLS_SSL_OUT_CONTENT_LEN
-    default 900
-
-# options managed by IP4/IP6 simultaneous support
-# aligned here to match OpenThread config
-config NET_MAX_ROUTERS
-    default 1
-
-config NET_MAX_CONN
-    default 4
-
-config SHELL_STACK_SIZE
-    default 2616
-
-config HEAP_MEM_POOL_SIZE
-    default 80000
-
-endif
-
-config CHIP_MALLOC_SYS_HEAP_SIZE
-    default 28672 if CHIP_WIFI
-    default 8192 if NET_L2_OPENTHREAD
-
-# Enable mbedTLS from nrf_security library
+# ==============================================================================
+# Crypto configuration
+# ==============================================================================
 
 choice OPENTHREAD_SECURITY
-	default OPENTHREAD_NRF_SECURITY_CHOICE
+    default OPENTHREAD_NRF_SECURITY_PSA_CHOICE if CHIP_CRYPTO_PSA
+    default OPENTHREAD_NRF_SECURITY_CHOICE
+    
 endchoice
 
-config PSA_CRYPTO_DRIVER_CC3XX
-	default n
+choice RNG_GENERATOR_CHOICE
+    default XOSHIRO_RANDOM_GENERATOR if SOC_SERIES_NRF53X
+endchoice
 
 config OBERON_BACKEND
     default y
@@ -340,17 +293,44 @@ config MBEDTLS_ENABLE_HEAP
 
 config MBEDTLS_HEAP_SIZE
     default 8192
+    
+# Enable PSA Crypto dependencies for Matter
+
+config CHIP_CRYPTO_PSA
+    default y if !CHIP_WIFI
+
+if CHIP_CRYPTO_PSA
+
+config PSA_CRYPTO_DRIVER_CC3XX
+    default n
+
+config PSA_WANT_ALG_SHA_224
+    default n
+
+# Extend the maximum number of PSA key slots to fit Matter requirements
+config MBEDTLS_PSA_KEY_SLOT_COUNT
+    default 64
+
+if PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON
+
+# Do not use CC3XX hash driver when both Oberon and CC3xx are enabled.
+config PSA_USE_CC3XX_HASH_DRIVER
+    default n
+
+endif
+
+# Spake2+ support
+config MBEDTLS_MD_C
+    default y
+
+endif
+
+if !CHIP_CRYPTO_PSA
 
 config NRF_SECURITY_ADVANCED
     default y
 
 config MBEDTLS_AES_C
-    default y
-
-config MBEDTLS_ECP_C
-    default y
-
-config MBEDTLS_ECP_DP_SECP256R1_ENABLED
     default y
 
 config MBEDTLS_CTR_DRBG_C
@@ -359,20 +339,40 @@ config MBEDTLS_CTR_DRBG_C
 config MBEDTLS_CIPHER_MODE_CTR
     default y
 
+config MBEDTLS_SHA1_C
+    default y if CHIP_WIFI
+
 config MBEDTLS_SHA256_C
     default y
 
 config MBEDTLS_PK_C
     default y
 
+config MBEDTLS_PKCS5_C
+    default y
+
 config MBEDTLS_PK_WRITE_C
     default y
 
 config MBEDTLS_X509_CREATE_C
-    default y if !CHIP_CRYPTO_PSA
+    default y
 
 config MBEDTLS_X509_CSR_WRITE_C
-    default y if !CHIP_CRYPTO_PSA
+    default y
+
+config MBEDTLS_ECP_C
+    default y
+
+config MBEDTLS_ECP_DP_SECP256R1_ENABLED
+    default y
+
+endif
+
+config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
+    default n if CHIP_WIFI
+
+config MBEDTLS_SSL_OUT_CONTENT_LEN
+    default 900 if CHIP_WIFI
 
 # Disable unneeded crypto operations
 
@@ -406,19 +406,56 @@ config MBEDTLS_SSL_SRV_C
 config MBEDTLS_SSL_COOKIE_C
     default n
 
-# Disable not used shell modules
+# ==============================================================================
+# Logging configuration
+# ==============================================================================
 
-config SHELL_WILDCARD
+config LOG
+    default y
+
+if LOG
+
+choice LOG_MODE
+    default LOG_MODE_MINIMAL
+endchoice
+
+choice MATTER_LOG_LEVEL_CHOICE
+    default MATTER_LOG_LEVEL_DBG
+endchoice
+
+config CHIP_APP_LOG_LEVEL
+    default 4 # debug
+
+config LOG_DEFAULT_LEVEL
+    default 1 # error
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+    default y
+
+# disable synchronous printk to avoid blocking IRQs which
+# may affect time sensitive components
+config PRINTK_SYNC
     default n
 
-config SHELL_VT100_COLORS
-    default n
+endif # LOG
 
-config SHELL_STATS
-    default n
+# ==============================================================================
+# Shell configuration
+# ==============================================================================
+
+config SHELL
+    default y
+
+if SHELL
+
+config SHELL_STACK_SIZE
+    default 2616 if CHIP_WIFI
+
+config SHELL_MINIMAL
+    default y if !CHIP_MEMORY_PROFILING
 
 config KERNEL_SHELL
-    default n
+    default n if !CHIP_MEMORY_PROFILING
 
 config SENSOR_SHELL
     default n
@@ -441,42 +478,12 @@ config CLOCK_CONTROL_NRF_SHELL
 config FLASH_SHELL
     default n
 
-if MPSL_FEM
+config HWINFO_SHELL
+    default n
 
-config MPSL_FEM_NRF21540_RUNTIME_PA_GAIN_CONTROL
-	default y
+config OPENTHREAD_SHELL
+    default n if !CHIP_MEMORY_PROFILING
 
-endif # MPSL_FEM
-
-config OPENTHREAD_DEFAULT_TX_POWER
-	default 20 if MPSL_FEM
-	default 3 if SOC_SERIES_NRF53X && !MPSL_FEM
-	default 8 if SOC_SERIES_NRF52X && !MPSL_FEM
-
-# SoC series related configuration
-
-if SOC_SERIES_NRF52X
-
-# Increase maximum data length of PDU supported in the Controller
-config BT_CTLR_DATA_LENGTH_MAX
-    default 251
-
-endif # SOC_SERIES_NRF52X
-
-if SOC_SERIES_NRF53X
-
-config BOOT_IMAGE_ACCESS_HOOKS
-    default y
-
-config UPDATEABLE_IMAGE_NUMBER
-    default 2
-
-# Generate random numbers using Xoroshiro algorithm instead of direct calls
-# to the cryptocell library to workaround firmware hangs.
-choice RNG_GENERATOR_CHOICE
-    default XOROSHIRO_RANDOM_GENERATOR
-endchoice
-
-endif # SOC_SERIES_NRF53X
+endif # SHELL
 
 endif

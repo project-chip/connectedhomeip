@@ -17,12 +17,13 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/error-mapping.h>
+#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -229,7 +230,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::SetCookingParameters::DecodableType & req)
 {
     ChipLogDetail(Zcl, "Microwave Oven Control: HandleSetCookingParameters");
-    Status status;
+    Status status = Status::Success;
     uint8_t opState;
     uint8_t modeValue;
     uint8_t reqCookMode;
@@ -317,9 +318,9 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         VerifyOrExit(
             mSupportedWattLevels > 0,
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, count of supported watt levels is 0"));
-
-        reqWattSettingIndex = wattSettingIndex.ValueOr(mSupportedWattLevels - 1);
-        VerifyOrExit(reqWattSettingIndex <= (mSupportedWattLevels - 1), status = Status::ConstraintError;
+        uint8_t maxWattSettingIndex = static_cast<uint8_t>(mSupportedWattLevels - 1);
+        reqWattSettingIndex         = wattSettingIndex.ValueOr(maxWattSettingIndex);
+        VerifyOrExit(reqWattSettingIndex <= maxWattSettingIndex, status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, wattSettingIndex is out of range"));
 
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting, NullOptional,

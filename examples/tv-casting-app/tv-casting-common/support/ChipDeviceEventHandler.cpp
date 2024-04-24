@@ -155,8 +155,8 @@ void ChipDeviceEventHandler::HandleBindingsChangedViaCluster(const chip::DeviceL
                             "nodeId=0x" ChipLogFormatX64
                             " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                             binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                            binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-            if (binding.type == EMBER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
+                            binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
+            if (binding.type == MATTER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
             {
                 ChipLogProgress(AppServer,
                                 "ChipDeviceEventHandler::HandleBindingsChangedViaCluster Matched accessingFabricIndex with "

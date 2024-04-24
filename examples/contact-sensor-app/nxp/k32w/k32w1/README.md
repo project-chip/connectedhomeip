@@ -19,6 +19,8 @@ into an existing Matter network and can be controlled by this network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
+-   [Long Idle Time ICD Support](#long-idle-time-icd-support)
+-   [Manufacturing data](#manufacturing-data)
 -   [Flashing](#flashing)
     -   [Flashing the NBU image](#flashing-the-nbu-image)
     -   [Flashing the host image](#flashing-the-host-image)
@@ -30,7 +32,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Known issues](#known-issues)
 -   [Low power](#low-power)
 
-</hr>
+    </hr>
 
 ## Introduction
 
@@ -91,7 +93,7 @@ states are depicted:
     service connectivity.
 
 NOTE: LED2 will be disabled when CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR is
-enabled. On K32W1 EVK board, `PTB0` is wired to LED2 also is wired to CS (Chip
+enabled. On K32W1 EVK board, `PTB0` is wired to `LED2` also is wired to CS (Chip
 Select) External Flash Memory. OTA image is stored in external memory because of
 it's size. If LED2 is enabled then it will affect External Memory CS and OTA
 will not work.
@@ -99,16 +101,20 @@ will not work.
 **RGB LED** shows the state of the simulated contact sensor. when the LED is
 lit, the sensor is contacted, when not lit, the sensor is non-contacted.
 
-**Button SW2** can be used to start BLE advertising. A SHORT press of the button
-will enable Bluetooth LE advertising for a predefined period of time. A LONG
-Press Button SW2 initiates a factory reset. After an initial period of 3
-seconds, LED 2 and RGB LED will flash in unison to signal the pending reset.
-After 6 seconds will cause the device to reset its persistent configuration and
-initiate a reboot. The reset action can be cancelled by press SW2 button at any
-point before the 6 second limit.
+**Button SW2**. SHORT press function is overloaded depending on the device type
+and commissioning state. If the device is not commissioned, a SHORT press of the
+button will enable Bluetooth LE advertising for a predefined period of time. If
+the device is commissioned and is acting as a LIT ICD then a SHORT press of the
+button will enable Active Mode. A LONG Press of Button SW2 initiates a factory
+reset. After an initial period of 3 seconds, LED 2 and RGB LED will flash in
+unison to signal the pending reset. After 6 seconds will cause the device to
+reset its persistent configuration and initiate a reboot. The reset action can
+be cancelled by press SW2 button at any point before the 6 second limit.
 
 **Button SW3** can be used to change the state of the simulated contact sensor.
-The button behaves as a toggle, swapping the state every time it is pressed.
+The button behaves as a toggle, swapping the state every time it is short
+pressed. When long pressed, it does a clean soft reset that takes into account
+Matter shutdown procedure.
 
 ## Building
 
@@ -125,8 +131,9 @@ In order to build the Matter example, we recommend using a Linux distribution
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W1_SDK_ROOT=/home/user/Desktop/SDK_K32W1/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ scripts/checkout_submodules.py --shallow --platform nxp --recursive
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w1
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ gn gen out/debug --args="chip_with_ot_cli=0 is_debug=false chip_openthread_ftd=false chip_crypto=\"platform\""
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ gn gen out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w1$ ninja -C out/debug
 ```
 
@@ -135,6 +142,50 @@ set to 1.
 
 After a successful build, the `elf` and `srec` files are found in `out/debug/` -
 `see the files prefixed with chip-k32w1-contact-example`.
+
+## Long Idle Time ICD Support
+
+By default, contact-sensor is compiled as SIT ICD (Short Idle Time
+Intermittently Connected Device) - see rules from k32w1_sdk.gni:
+
+```
+chip_ot_idle_interval_ms = 2000           # 2s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 600            # 10min Idle Mode Interval
+nxp_active_mode_duration_ms = 10000       # 10s Active Mode Interval
+nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
+nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+```
+
+If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified
+as gn argument and the above parameters can be modified to comply with LIT
+requirements (e.g.: LIT devices must configure
+`chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
+
+```
+chip_ot_idle_interval_ms = 15000          # 15s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 3600           # 60min Idle Mode Interval
+nxp_active_mode_duration_ms = 0           # 0 Active Mode Interval
+nxp_active_mode_threshold_ms = 30000      # 30s Active Mode Threshold
+```
+
+ICD parameters that may be disabled once LIT functionality is enabled:
+
+```
+chip_persist_subscriptions: try once to re-establish subscriptions from the server side after reboot
+chip_subscription_timeout_resumption: same as above + try to re-establish timeout out subscriptions
+using Fibonacci backoff for retries pacing.
+```
+
+## Manufacturing data
+
+Use `chip_with_factory_data=1` in the gn build command to enable factory data.
+
+For a full guide on manufacturing flow, please see
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
 
 ## Flashing
 
@@ -153,7 +204,7 @@ path -
 [K32W148 board quick start guide](https://www.nxp.com/document/guide/getting-started-with-the-k32w148-development-platform:GS-K32W148EVK)
 can be used for updating the `NBU/radio` core:
 
--   Section 2.4 – Get Software – install `SPSDK` (Secure Provisioning Command
+-   Section 2.5 – Get Software – install `SPSDK` (Secure Provisioning Command
     Line Tool)
 -   Section 3.3 – Updating `NBU` for Wireless examples - use the corresponding
     `.sb3` file found in the SDK package at path
@@ -256,7 +307,7 @@ In `OTAP` application
     the image only for the CM33 core
 -   keep other settings at default values
 
-### Convert sb3 into ota file
+### Convert `sb3` into `ota` file
 
 In order to build an OTA image, use NXP wrapper over the standard tool
 `src/app/ota_image_tool.py`:
@@ -273,7 +324,7 @@ Please see more in the
 [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
 
 Here is an example that generates an OTA image with application update TLV from
-a sb3 file:
+a `sb3` file:
 
 ```
 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 43033 -vs "1.0" -da sha256 --app-input-file ~/binaries/chip-k32w1-43033.sb3 ~/binaries/chip-k32w1-43033.ota

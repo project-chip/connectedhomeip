@@ -106,8 +106,16 @@ private:
                       OperationSourceEnum opSource = OperationSourceEnum::kUnspecified);
     const char * lockStateToString(DlLockState lockState) const;
 
-    bool weekDayScheduleInAction(uint16_t userIndex) const;
-    bool yearDayScheduleInAction(uint16_t userIndex) const;
+    // Returns true if week day schedules should apply to the user, there are
+    // schedules defined for the user, and access is not currently allowed by
+    // those schedules.  The outparam indicates whether there were in fact any
+    // year day schedules defined for the user.
+    bool weekDayScheduleForbidsAccess(uint16_t userIndex, bool * haveSchedule) const;
+    // Returns true if year day schedules should apply to the user, there are
+    // schedules defined for the user, and access is not currently allowed by
+    // those schedules.  The outparam indicates whether there were in fact any
+    // year day schedules defined for the user.
+    bool yearDayScheduleForbidsAccess(uint16_t userIndex, bool * haveSchedule) const;
 
     static void OnLockActionCompleteCallback(chip::System::Layer *, void * callbackContext);
 

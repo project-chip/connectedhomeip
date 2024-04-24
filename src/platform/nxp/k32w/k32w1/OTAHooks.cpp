@@ -39,7 +39,7 @@ extern "C" void HAL_ResetMCU(void);
 
 #define ResetMCU HAL_ResetMCU
 
-#if USE_SMU2_AS_SYSTEM_MEMORY
+#if USE_SMU2_STATIC
 // The attribute specifier should not be changed.
 static chip::OTAFirmwareProcessor gApplicationProcessor __attribute__((section(".smu2")));
 #else

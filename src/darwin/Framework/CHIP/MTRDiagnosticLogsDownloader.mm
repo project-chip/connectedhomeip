@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)writeToFile:(NSData *)data error:(out NSError **)error;
 
-- (BOOL)compare:(NSString *)fileDesignator
+- (BOOL)matches:(NSString *)fileDesignator
     fabricIndex:(NSNumber *)fabricIndex
          nodeID:(NSNumber *)nodeID;
 
@@ -139,8 +139,7 @@ public:
 
 private:
     static void OnTransferTimeout(chip::System::Layer * layer, void * context);
-    MTRDiagnosticLogsDownloader * mDelegate;
-    AbortHandler mAbortHandler;
+    MTRDiagnosticLogsDownloader * __weak mDelegate;
 };
 
 @implementation Download
@@ -162,11 +161,10 @@ private:
                 Download * strongSelf = weakSelf;
                 if (strongSelf) {
                     // If a fileHandle exists, it means that the BDX session has been initiated and a file has
-                    // been created to host the data of the session. So even if there is an error it may be some
+                    // been created to host the data of the session. So even if there is an error there may be some
                     // data in the logs that the caller may find useful. For this reason, fileURL is passed in even
                     // when there is an error but fileHandle is not nil.
                     completion(strongSelf->_fileHandle ? fileURL : nil, bdxError);
-                    [strongSelf deleteFile];
 
                     done(strongSelf);
                 }
@@ -192,15 +190,12 @@ private:
     VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusBusy)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_BUSY]]);
     VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusDenied)], [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_ACCESS_DENIED]]);
 
-    // If there is not logs for the given type, forward it to the caller with a nil url and stop here.
-    VerifyOrReturn(![status isEqual:@(MTRDiagnosticLogsStatusNoLogs)], [self success]);
-
-    // If the whole log content fits into the response LogContent field, forward it to the caller
+    // If the whole log content fits into the response LogContent field or if there is no log, forward it to the caller
     // and stop here.
-    if ([status isEqual:@(MTRDiagnosticLogsStatusExhausted)]) {
+    if ([status isEqual:@(MTRDiagnosticLogsStatusExhausted)] || [status isEqual:@(MTRDiagnosticLogsStatusNoLogs)]) {
         NSError * writeError = nil;
         [self writeToFile:response.logContent error:&writeError];
-        VerifyOrReturn(nil == writeError, [self failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL]]);
+        VerifyOrReturn(nil == writeError, [self failure:writeError]);
 
         [self success];
         return;
@@ -238,7 +233,7 @@ private:
     [[NSFileManager defaultManager] removeItemAtPath:[_fileURL path] error:&error];
     if (nil != error) {
         // There is an error but there is really not much we can do at that point besides logging it.
-        MTR_LOG_ERROR("Error: %@", error);
+        MTR_LOG_ERROR("Error trying to delete the log file: %@. Error: %@", _fileURL, error);
     }
 }
 
@@ -249,11 +244,11 @@ private:
     [_fileHandle writeData:data error:error];
 }
 
-- (BOOL)compare:(NSString *)fileDesignator
+- (BOOL)matches:(NSString *)fileDesignator
     fabricIndex:(NSNumber *)fabricIndex
          nodeID:(NSNumber *)nodeID
 {
-    return [_fileDesignator isEqualToString:fileDesignator] && _fabricIndex == fabricIndex && _nodeID == nodeID;
+    return [_fileDesignator isEqualToString:fileDesignator] && [_fabricIndex isEqualToNumber:fabricIndex] && [_nodeID isEqualToNumber:nodeID];
 }
 
 - (void)failure:(NSError * _Nullable)error
@@ -329,7 +324,7 @@ private:
 - (Download * _Nullable)get:(NSString *)fileDesignator fabricIndex:(NSNumber *)fabricIndex nodeID:(NSNumber *)nodeID
 {
     for (Download * download in _downloads) {
-        if ([download compare:fileDesignator fabricIndex:fabricIndex nodeID:nodeID]) {
+        if ([download matches:fileDesignator fabricIndex:fabricIndex nodeID:nodeID]) {
             return download;
         }
     }
@@ -344,6 +339,8 @@ private:
                  completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                        done:(void (^)(Download * finishedDownload))done
 {
+    assertChipStackLockedByCurrentThread();
+
     auto download = [[Download alloc] initWithType:type fabricIndex:fabricIndex nodeID:nodeID queue:queue completion:completion done:done];
     VerifyOrReturnValue(nil != download, nil);
 
@@ -353,6 +350,8 @@ private:
 
 - (void)remove:(Download *)download
 {
+    assertChipStackLockedByCurrentThread();
+
     [_downloads removeObject:download];
 }
 @end
@@ -525,9 +524,7 @@ CHIP_ERROR DiagnosticLogsDownloaderBridge::OnTransferBegin(chip::bdx::BDXTransfe
         }
     };
 
-    // Ideally we would like to handle aborts a bit differently since this only works
-    // because our BDX stack supports one transfer at a time.
-    mAbortHandler = ^(NSError * error) {
+    auto abortHandler = ^(NSError * error) {
         assertChipStackLockedByCurrentThread();
         auto err = [MTRError errorToCHIPErrorCode:error];
         transfer->Reject(err);
@@ -537,7 +534,7 @@ CHIP_ERROR DiagnosticLogsDownloaderBridge::OnTransferBegin(chip::bdx::BDXTransfe
                                                   fabricIndex:fabricIndex
                                                        nodeID:nodeId
                                                    completion:completionHandler
-                                                 abortHandler:mAbortHandler];
+                                                 abortHandler:abortHandler];
     return CHIP_NO_ERROR;
 }
 
@@ -587,8 +584,6 @@ CHIP_ERROR DiagnosticLogsDownloaderBridge::OnTransferData(chip::bdx::BDXTransfer
             transfer->Continue();
         }
     };
-
-    mAbortHandler = nil;
 
     [mDelegate handleBDXTransferSessionDataForFileDesignator:fileDesignator
                                                  fabricIndex:fabricIndex

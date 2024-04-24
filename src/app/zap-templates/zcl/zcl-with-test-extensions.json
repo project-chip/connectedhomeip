@@ -2,6 +2,7 @@
     "description": "Matter SDK ZCL data with some extensions",
     "category": "matter",
     "version": 1,
+    "requiredFeatureLevel": 102,
     "xmlRoot": [
         ".",
         "./data-model/chip/",
@@ -49,6 +50,7 @@
         "energy-preference-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-measurement-cluster.xml",
+        "electrical-power-measurement-cluster.xml",
         "energy-evse-cluster.xml",
         "energy-evse-mode-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
@@ -71,8 +73,10 @@
         "level-control-cluster.xml",
         "localization-configuration-cluster.xml",
         "low-power-cluster.xml",
+        "measurement-and-sensing.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
+        "messages-cluster.xml",
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "mode-select-extensions.xml",
@@ -85,6 +89,7 @@
         "operational-state-oven-cluster.xml",
         "operational-state-rvc-cluster.xml",
         "oven-mode-cluster.xml",
+        "power-topology-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",
@@ -179,7 +184,7 @@
             "MaxPathsPerInvoke"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
-        "Descriptor": ["ClusterRevision"],
+        "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
             "ESACanGenerate",
@@ -248,7 +253,9 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReason"
+            "BootReason",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Group Key Management": [
             "ClusterRevision",
@@ -413,18 +420,8 @@
             "OnMode",
             "FeatureMap"
         ],
-        "RVC Clean Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "OnMode",
-            "FeatureMap"
-        ],
-        "RVC Run Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Operational State": [
             "OperationalState",
             "OperationalError",
@@ -608,8 +605,33 @@
             "CumulativeEnergyImported",
             "CumulativeEnergyExported",
             "PeriodicEnergyImported",
-            "PeriodicEnergyExported"
+            "PeriodicEnergyExported",
+            "CumulativeEnergyReset",
+            "FeatureMap"
         ],
+        "Electrical Power Measurement": [
+            "PowerMode",
+            "NumberOfMeasurementTypes",
+            "Accuracy",
+            "Ranges",
+            "Voltage",
+            "ActiveCurrent",
+            "ReactiveCurrent",
+            "ApparentCurrent",
+            "ActivePower",
+            "ReactivePower",
+            "ApparentPower",
+            "RMSVoltage",
+            "RMSCurrent",
+            "RMSPower",
+            "Frequency",
+            "HarmonicCurrents",
+            "HarmonicPhases",
+            "PowerFactor",
+            "NeutralCurrent",
+            "FeatureMap"
+        ],
+        "Power Topology": ["FeatureMap"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"]
     },

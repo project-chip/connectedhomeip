@@ -218,6 +218,21 @@ class TestOnlyPyBatchCommandsOverrides(ctypes.Structure):
                 ('overrideCommandRefsList', POINTER(ctypes.c_uint16)), ('overrideCommandRefsListLength', ctypes.c_size_t)]
 
 
+class TestOnlyPyOnDoneInfo(ctypes.Structure):
+    ''' TestOnly struct for overriding aspects of batch command to send invalid commands.
+
+    We are using the following struct for passing the information of TestOnlyPyBatchCommandsOverrides between Python and C++:
+
+    ```c
+    struct TestOnlyPyOnDoneInfo
+    {
+        size_t responseMessageCount;
+    };
+    ```
+    '''
+    _fields_ = [('responseMessageCount', ctypes.c_size_t)]
+
+
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
 #                                                                                         void * commandStatusBuf);
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct)(uint64_t commandSenderPtr,

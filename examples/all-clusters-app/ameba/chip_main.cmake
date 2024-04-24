@@ -153,13 +153,17 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
+    ${chip_dir}/src/app/clusters/microwave-oven-control-server/microwave-oven-control-server.cpp
+
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp
@@ -168,6 +172,10 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp
+
     ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/BindingHandler.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/DeviceCallbacks.cpp
@@ -177,8 +185,11 @@ list(
     ${chip_dir}/examples/all-clusters-app/ameba/main/ManualOperationCommand.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/SmokeCOAlarmManager.cpp
 
+    ${chip_dir}/examples/microwave-oven-app/microwave-oven-common/src/microwave-oven-device.cpp
+
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp
 
@@ -226,6 +237,8 @@ target_include_directories(
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
+    ${chip_dir}/examples/microwave-oven-app/microwave-oven-common
+    ${chip_dir}/examples/microwave-oven-app/microwave-oven-common/include
     ${chip_dir}/examples/energy-management-app/energy-management-common/include
     ${chip_dir}/examples/all-clusters-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba

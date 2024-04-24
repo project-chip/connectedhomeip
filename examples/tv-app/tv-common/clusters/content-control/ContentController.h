@@ -18,9 +18,8 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/content-control-server/content-control-server.h>
-#include <vector>
 
 using ContentControlDelegate = chip::app::Clusters::ContentControl::Delegate;
 using ResetPINResponseType   = chip::app::Clusters::ContentControl::Commands::ResetPINResponse::Type;
@@ -57,5 +56,5 @@ public:
 protected:
 private:
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
+    static constexpr uint32_t kEndpointFeatureMap = 3;
 };

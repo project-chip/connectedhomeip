@@ -366,7 +366,7 @@ If you haven't implemented a real EVSE but want to simulate plugging in an EV
 then you can use a few of the test event triggers to simulate these scenarios.
 
 The test event triggers values can be found in:
-[EnergyEvseTestEventTriggerDelegate.h](../../../src/app/clusters/energy-evse-server/EnergyEvseTestEventTriggerDelegate.h)
+[EnergyEvseTestEventTriggerHandler.h](../../../src/app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h)
 
 -   0x0099000000000000 - Simulates the EVSE being installed on a 32A supply
 -   0x0099000000000002 - Simulates the EVSE being plugged in (this should

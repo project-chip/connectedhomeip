@@ -34,15 +34,11 @@ samples so you can see the experience end to end.
 
 A Casting Client (e.g. a mobile phone app) is expected to be a Matter
 Commissionable Node and a `CastingPlayer` (i.e. a TV) is expected to be a Matter
-Commissioner. In the context of the
-[Matter Video Player architecture](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc),
-a `CastingPlayer` would map to
-[Casting "Video" Player](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction).
-The `CastingPlayer` is expected to be hosting one or more `Endpoints` (some of
-which can represent
-[Content Apps](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction)
-in the Matter Video Player architecture) that support one or more Matter Media
-`Clusters`.
+Commissioner. In the context of the Matter Video Player architecture, a
+`CastingPlayer` would map to Casting "Video" Player. The `CastingPlayer` is
+expected to be hosting one or more `Endpoints` (some of which can represent
+Content Apps in the Matter Video Player architecture) that support one or more
+Matter Media `Clusters`.
 
 The steps to start a casting session are:
 
@@ -67,6 +63,9 @@ Next, you're ready to:
 1. [Read](#read-operations) endpoint attributes like playback state.
 1. [Subscribe](#subscriptions) to playback events.
 
+In order to illustrate these steps, refer to the figure below
+![workflow of casting video player](./diagram/workflow_of_casting_video_player.png)
+
 ## Build and Setup
 
 The Casting Client is expected to consume the Matter TV Casting library built
@@ -77,6 +76,8 @@ consume each platform's specific libraries. The libraries MUST be built with the
 client's specific values for `CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and
 `CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID` updated in the
 [CHIPProjectAppConfig.h](tv-casting-common/include/CHIPProjectAppConfig.h) file.
+Other values like the `CHIP_DEVICE_CONFIG_DEVICE_NAME` may be updated as well to
+correspond to the client being built.
 
 ### Initialize the Casting Client
 
@@ -88,10 +89,10 @@ A Casting Client must first initialize the Matter SDK and define the following
 `DataProvider` objects for the the Matter Casting library to use throughout the
 client's lifecycle:
 
-1.  **Rotating Device Identifier** - Refer to the Matter specification for
-    details on how to generate the
-    [Rotating Device Identifier](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/rendezvous/DeviceDiscovery.adoc#245-rotating-device-identifier)).
-    Then, instantiate a `DataProvider` object as described below.
+1.  **Rotating Device Identifier** - "This unique per-device identifier SHALL
+    consist of a randomly-generated 128-bit or longer octet string." Refer to
+    the Matter specification for more details. Instantiate a `DataProvider`
+    object as described below to provide this identifier.
 
     On Linux, define a `RotatingDeviceIdUniqueIdProvider` to provide the Casting
     Client's `RotatingDeviceIdUniqueId`, by implementing a
@@ -149,14 +150,17 @@ client's lifecycle:
     ```
 
 2.  **Commissioning Data** - This object contains the passcode, discriminator,
-    etc which identify the app and are provided to the `CastingPlayer` during
-    the commissioning process. Refer to the Matter specification's
-    [Onboarding Payload](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/qr_code/OnboardingPayload.adoc#ref_OnboardingPayload)
-    section for details on commissioning data.
+    etc. which identify the app and are provided to the `CastingPlayer` during
+    the commissioning process. "A Passcode SHALL be included as a 27-bit
+    unsigned integer, which serves as proof of possession during commissioning."
+    "A Discriminator SHALL be included as a 12-bit unsigned integer, which SHALL
+    match the value which a device advertises during commissioning." Refer to
+    the Matter specification's "Onboarding Payload" section for more details on
+    commissioning data.
 
-    On Linux, define a function `InitCommissionableDataProvider` to initialize
-    initialize a `LinuxCommissionableDataProvider` that can provide the required
-    values to the `CastingApp`.
+    On Linux, define a function `InitCommissionableDataProvider` to initialize a
+    `LinuxCommissionableDataProvider` that can provide the required values to
+    the `CastingApp`.
 
     ```c
     CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options) {
@@ -214,9 +218,8 @@ client's lifecycle:
 3.  **Device Attestation Credentials** - This object contains the
     `DeviceAttestationCertificate`, `ProductAttestationIntermediateCertificate`,
     etc. and implements a way to sign messages when called upon by the Matter TV
-    Casting Library as part of the
-    [Device Attestation process](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/device_attestation/Device_Attestation_Specification.adoc)
-    during commissioning.
+    Casting Library as part of the Matter Device Attestation process during
+    commissioning.
 
     On Linux, implement a define a `dacProvider` to provide the Casting Client's
     Device Attestation Credentials, by implementing a
@@ -484,8 +487,8 @@ potentially skipping the longer commissioning process and instead, simply
 re-establishing the CASE session. This cache can be cleared by calling the
 `ClearCache` API on the `CastingApp`, say when the user signs out of the app.
 See API and its documentation for [Linux](tv-casting-common/core/CastingApp.h),
-Android and
-[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
+[Android](android/App/app/src/main/jni/com/matter/casting/core/CastingApp.java)
+and [iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
 
 ### Discover Casting Players
 
@@ -685,7 +688,7 @@ func startDiscovery() {
 }
 ```
 
-Note: You will need to connect with a Casting Player as described below to see
+Note: You will need to connect with a Casting Player as described below to se
 the list of Endpoints that they support. Refer to the
 [Connection](#connect-to-a-casting-player) section for details on how to
 discover available endpoints supported by a Casting Player.
@@ -693,16 +696,16 @@ discover available endpoints supported by a Casting Player.
 ### Connect to a Casting Player
 
 _{Complete Connection examples: [Linux](linux/simple-app-helper.cpp) |
-[iOS](darwin/TvCasting/TvCasting/MCConnectionExampleViewModel.swift)}_
+[Android](android/App/app/src/main/java/com/matter/casting/ConnectionExampleFragment.java)
+| [iOS](darwin/TvCasting/TvCasting/MCConnectionExampleViewModel.swift)}_
 
 Each `CastingPlayer` object created during
 [Discovery](#discover-casting-players) contains information such as
 `deviceName`, `vendorId`, `productId`, etc. which can help the user pick the
 right `CastingPlayer`. A Casting Client can attempt to connect to the
-`selectedCastingPlayer` using
-[Matter User Directed Commissioning (UDC)](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/rendezvous/UserDirectedCommissioning.adoc).
-The Matter TV Casting library locally caches information required to reconnect
-to a `CastingPlayer`, once the Casting client has been commissioned by it. After
+`selectedCastingPlayer` using Matter User Directed Commissioning (UDC). The
+Matter TV Casting library locally caches information required to reconnect to a
+`CastingPlayer`, once the Casting client has been commissioned by it. After
 that, the Casting client is able to skip the full UDC process by establishing
 CASE with the `CastingPlayer` directly. Once connected, the `CastingPlayer`
 object will contain the list of available Endpoints on that `CastingPlayer`.
@@ -740,6 +743,60 @@ targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler,
 ...
 ```
 
+On Android, the Casting Client may call `verifyOrEstablishConnection` on the
+`CastingPlayer` object it wants to connect to.
+
+```java
+private static final long MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
+
+EndpointFilter desiredEndpointFilter = new EndpointFilter();
+desiredEndpointFilter.vendorId = DESIRED_ENDPOINT_VENDOR_ID;
+
+MatterError err = targetCastingPlayer.verifyOrEstablishConnection(
+                      MIN_CONNECTION_TIMEOUT_SEC,
+                      desiredEndpointFilter,
+                      new MatterCallback<Void>() {
+                        @Override
+                        public void handle(Void v) {
+                          Log.i(
+                              TAG,
+                              "Connected to CastingPlayer with deviceId: "
+                                  + targetCastingPlayer.getDeviceId());
+                          getActivity()
+                              .runOnUiThread(
+                                  () -> {
+                                    connectionFragmentStatusTextView.setText(
+                                        "Connected to Casting Player with device name: "
+                                            + targetCastingPlayer.getDeviceName()
+                                            + "\n\n");
+                                    connectionFragmentNextButton.setEnabled(true);
+                                  });
+                        }
+                      },
+                      new MatterCallback<MatterError>() {
+                        @Override
+                        public void handle(MatterError err) {
+                          Log.e(TAG, "CastingPLayer connection failed: " + err);
+                          getActivity()
+                              .runOnUiThread(
+                                  () -> {
+                                    connectionFragmentStatusTextView.setText(
+                                        "Casting Player connection failed due to: " + err + "\n\n");
+                                  });
+                        }
+                      });
+
+if (err.hasError())
+{
+    getActivity()
+        .runOnUiThread(
+            () -> {
+                connectionFragmentStatusTextView.setText(
+                    "Casting Player connection failed due to: " + err + "\n\n");
+            });
+}
+```
+
 On iOS, the Casting Client may call `verifyOrEstablishConnection` on the
 `MCCastingPlayer` object it wants to connect to and handle any `NSErrors` that
 may happen in the process.
@@ -773,7 +830,10 @@ func connect(selectedCastingPlayer: MCCastingPlayer?) {
 
 ### Select an Endpoint on the Casting Player
 
-_{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp) |
+[Android](android/App/app/src/main/java/com/matter/casting/EndpointSelectorExample.java)
+|
+[iOS](darwin/TvCasting/TvCasting/MCContentLauncherLaunchURLExampleViewModel.swift)}_
 
 On a successful connection with a `CastingPlayer`, a Casting Client may select
 one of the Endpoints to interact with based on its attributes (e.g. Vendor ID,
@@ -799,33 +859,93 @@ if (it != endpoints.end())
 }
 ```
 
+On Android, it can select an `Endpoint` as shown below.
+
+```java
+private static final Integer SAMPLE_ENDPOINT_VID = 65521;
+
+private Endpoint selectFirstEndpointByVID()
+{
+    Endpoint endpoint = null;
+    if(selectedCastingPlayer != null)
+    {
+        List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
+        if (endpoints == null)
+        {
+            Log.e(TAG, "No Endpoints found on CastingPlayer");
+        }
+        else
+        {
+            endpoint = endpoints
+                    .stream()
+                    .filter(e -> SAMPLE_ENDPOINT_VID.equals(e.getVendorId()))
+                    .findFirst()
+                    .get();
+        }
+    }
+    return endpoint;
+}
+```
+
+On iOS, it can select an `MCEndpoint` similarly and as shown below.
+
+```swift
+// VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
+let sampleEndpointVid: Int = 65521
+...
+// select the MCEndpoint on the MCCastingPlayer to invoke the command on
+if let endpoint: MCEndpoint = castingPlayer.endpoints().filter({ $0.vendorId().intValue == sampleEndpointVid}).first
+{
+...
+}
+```
+
 ## Interacting with a Casting Endpoint
 
 Once the Casting Client has selected an `Endpoint`, it is ready to
 [issue commands](#issuing-commands) to it, [read](#read-operations) current
 playback state, and [subscribe](#subscriptions) to playback events.
 
-Refer to the following platform specific files for a list of clusters, command
-and attributes supported by the Matter TV Casting library:
+Refer to the following platform specific files, to find the list of clusters,
+commands and attributes, with their request/response types available for use
+with the Matter TV Casting library.
 
-1. Linux:
+For Linux, refer to the following files:
+
+1. For a list of supported clusters, commands and attributes:
    [tv-casting-common/clusters/Clusters.h](tv-casting-common/clusters/Clusters.h)
-
-Refer to the following platform specific files for the IDs and request /
-response types to use with these APIs:
-
-1. Linux:
+2. For the IDs and request / response types to use with these APIs:
    [/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h](/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h)
+
+For Android, refer to the following files:
+
+1. For a list of supported clusters, commands and attributes:
+   [/src/controller/java/generated/java/chip/devicecontroller/ChipClusters.java](/src/controller/java/generated/java/chip/devicecontroller/ChipClusters.java)
+
+On iOS, refer to the following files:
+
+1. For a list of supported clusters, commands and attribute:
+   [darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.h](darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCClusterObjects.h)
+2. For the IDs and request / response types to use with the commands:
+   [darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandObjects.h](darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandObjects.h)
+   and
+   [darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandPayloads.h](darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCCommandPayloads.h)
+3. For attribute [read operations](#read-operations) and
+   [subscriptions](#subscriptions):
+   [darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCAttributeObjects.h](darwin/MatterTvCastingBridge/MatterTvCastingBridge/zap-generated/MCAttributeObjects.h)
 
 ### Issuing Commands
 
-_{Complete Command invocation examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Command invocation examples: [Linux](linux/simple-app-helper.cpp) |
+[Android](android/App/app/src/main/java/com/matter/casting/ContentLauncherLaunchURLExampleFragment.java)
+|
+[iOS](darwin/TvCasting/TvCasting/MCContentLauncherLaunchURLExampleViewModel.swift)}_
 
-The Casting Client can get a reference to a `endpoint` on a `CastingPlayer`,
+The Casting Client can get a reference to an `Endpoint` on a `CastingPlayer`,
 check if it supports the required cluster/command, and send commands to it. It
 can then handle any command response / error the `CastingPlayer` sends back.
 
-On Linux, for example, given an `endpoint`, it can send a `LaunchURL` command
+On Linux, for example, given an `Endpoint`, it can send a `LaunchURL` command
 (part of the Content Launcher cluster) by calling the `Invoke` API on a
 `Command` of type
 `matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type>`
@@ -865,9 +985,112 @@ void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::cast
 }
 ```
 
+On Android, given an `Endpoint`, it can send a `LaunchURL` command (part of the
+Content Launcher cluster) by calling the `launchURL` API on a
+`ChipClusters.ContentLauncherCluster` object.
+
+```java
+// get ChipClusters.ContentLauncherCluster from the endpoint
+ChipClusters.ContentLauncherCluster cluster =
+    endpoint.getCluster(ChipClusters.ContentLauncherCluster.class);
+if (cluster == null) {
+    Log.e(TAG, "Could not get ContentLauncherCluster for endpoint with ID: " + endpoint.getId());
+    return;
+}
+
+// call launchURL on the cluster object while passing in a
+// ChipClusters.ContentLauncherCluster.LauncherResponseCallback and request parameters
+cluster.launchURL(
+    new ChipClusters.ContentLauncherCluster.LauncherResponseCallback() {
+    @Override
+    public void onSuccess(Integer status, Optional<String> data) {
+        Log.d(TAG, "LaunchURL success. Status: " + status + ", Data: " + data);
+        new Handler(Looper.getMainLooper())
+            .post(
+                () -> {
+                TextView launcherResult = getView().findViewById(R.id.launcherResult);
+                launcherResult.setText(
+                    "LaunchURL result\nStatus: " + status + ", Data: " + data);
+                });
+    }
+
+    @Override
+    public void onError(Exception error) {
+        Log.e(TAG, "LaunchURL failure " + error);
+        new Handler(Looper.getMainLooper())
+            .post(
+                () -> {
+                TextView launcherResult = getView().findViewById(R.id.launcherResult);
+                launcherResult.setText("LaunchURL result\nError: " + error);
+                });
+    }
+    },
+    contentUrl,
+    Optional.of(contentDisplayString),
+    Optional.empty());
+```
+
+On iOS, given an `MCEndpoint` endpoint, it can send a `LaunchURL` command (part
+of the Content Launcher cluster) by calling the `invoke` API on a
+`MCContentLauncherClusterLaunchURLCommand`
+
+```swift
+// validate that the selected endpoint supports the ContentLauncher cluster
+if(!endpoint.hasCluster(MCEndpointClusterTypeContentLauncher))
+{
+    self.Log.error("No ContentLauncher cluster supporting endpoint found")
+    DispatchQueue.main.async
+    {
+        self.status = "No ContentLauncher cluster supporting endpoint found"
+    }
+    return
+}
+
+// get ContentLauncher cluster from the endpoint
+let contentLaunchercluster: MCContentLauncherCluster = endpoint.cluster(for: MCEndpointClusterTypeContentLauncher) as! MCContentLauncherCluster
+
+// get the launchURLCommand from the contentLauncherCluster
+let launchURLCommand: MCContentLauncherClusterLaunchURLCommand? = contentLaunchercluster.launchURLCommand()
+if(launchURLCommand == nil)
+{
+    self.Log.error("LaunchURL not supported on cluster")
+    DispatchQueue.main.async
+    {
+        self.status = "LaunchURL not supported on cluster"
+    }
+    return
+}
+
+// create the LaunchURL request
+let request: MCContentLauncherClusterLaunchURLParams = MCContentLauncherClusterLaunchURLParams()
+request.contentURL = contentUrl
+request.displayString = displayString
+
+// call invoke on launchURLCommand while passing in a completion block
+launchURLCommand!.invoke(request, context: nil, completion: { context, err, response in
+    DispatchQueue.main.async
+    {
+        if(err == nil)
+        {
+            self.Log.info("LaunchURLCommand invoke completion success with \(String(describing: response))")
+            self.status = "Success. Response data: \(String(describing: response?.data))"
+        }
+        else
+        {
+            self.Log.error("LaunchURLCommand invoke completion failure with \(String(describing: err))")
+            self.status = "Failure: \(String(describing: err))"
+        }
+    }
+},
+timedInvokeTimeoutMs: 5000) // time out after 5000ms
+```
+
 ### Read Operations
 
-_{Complete Attribute Read examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Attribute Read examples: [Linux](linux/simple-app-helper.cpp) |
+[Android](android/App/app/src/main/java/com/matter/casting/ApplicationBasicReadVendorIDExampleFragment.java)
+|
+[iOS](darwin/TvCasting/TvCasting/MCApplicationBasicReadVendorIDExampleViewModel.swift)}_
 
 The `CastingClient` may read an Attribute from the `Endpoint` on the
 `CastingPlayer`. It should ensure that the desired cluster / attribute are
@@ -914,10 +1137,107 @@ void ReadApplicationBasicVendorID(matter::casting::memory::Strong<matter::castin
 }
 ```
 
+On Android, given an `Endpoint`, the `VendorID` can be read, by calling
+`readVendorIDAttribute` on the `ChipClusters.ApplicationBasicCluster` object.
+
+```java
+// get ChipClusters.ApplicationBasic from the endpoint
+ChipClusters.ApplicationBasicCluster cluster = endpoint.getCluster(ChipClusters.ApplicationBasicCluster.class);
+if (cluster == null) {
+    Log.e(TAG, "Could not get ApplicationBasicCluster for endpoint with ID: " + endpoint.getId());
+    return;
+}
+
+// call readVendorIDAttribute on the cluster object while passing in a
+// ChipClusters.IntegerAttributeCallback
+cluster.readVendorIDAttribute(new ChipClusters.IntegerAttributeCallback() {
+    @Override
+    public void onSuccess(int value) {
+        Log.d(TAG, "ReadVendorID success. Value: " + value);
+        new Handler(Looper.getMainLooper())
+                .post(
+                        () -> {
+                            TextView vendorIdResult = getView().findViewById(R.id.vendorIdResult);
+                            vendorIdResult.setText(
+                                    "Read VendorID result\nValue: " + value );
+                        });
+    }
+
+    @Override
+    public void onError(Exception error) {
+        Log.e(TAG, "ReadVendorID failure " + error);
+        new Handler(Looper.getMainLooper())
+                .post(
+                        () -> {
+                            TextView vendorIdResult = getView().findViewById(R.id.vendorIdResult);
+                            vendorIdResult.setText("Read VendorID result\nError: " + error);
+                        });
+    }
+});
+```
+
+On iOS, given a `MCEndpoint`, the `VendorID` can be read similarly, by calling
+the `read` API on the `MCApplicationBasicClusterVendorIDAttribute`
+
+```swift
+// validate that the selected endpoint supports the ApplicationBasic cluster
+if(!endpoint.hasCluster(MCEndpointClusterTypeApplicationBasic))
+{
+    self.Log.error("No ApplicationBasic cluster supporting endpoint found")
+    DispatchQueue.main.async
+    {
+        self.status = "No ApplicationBasic cluster supporting endpoint found"
+    }
+    return
+}
+
+// get ApplicationBasic cluster from the endpoint
+let applicationBasiccluster: MCApplicationBasicCluster = endpoint.cluster(for: MCEndpointClusterTypeApplicationBasic) as! MCApplicationBasicCluster
+
+// get the vendorIDAttribute from the applicationBasiccluster
+let vendorIDAttribute: MCApplicationBasicClusterVendorIDAttribute? = applicationBasiccluster.vendorIDAttribute()
+if(vendorIDAttribute == nil)
+{
+    self.Log.error("VendorID attribute not supported on cluster")
+    DispatchQueue.main.async
+    {
+        self.status = "VendorID attribute not supported on cluster"
+    }
+    return
+}
+
+// call read on vendorIDAttribute and pass in a completion block
+vendorIDAttribute!.read(nil) { context, before, after, err in
+    DispatchQueue.main.async
+    {
+        if(err != nil)
+        {
+            self.Log.error("Error when reading VendorID value \(String(describing: err))")
+            self.status = "Error when reading VendorID value \(String(describing: err))"
+            return
+        }
+
+        if(before != nil)
+        {
+            self.Log.info("Read VendorID value: \(String(describing: after)) Before: \(String(describing: before))")
+            self.status = "Read VendorID value: \(String(describing: after)) Before: \(String(describing: before))"
+        }
+        else
+        {
+            self.Log.info("Read VendorID value: \(String(describing: after))")
+            self.status = "Read VendorID value: \(String(describing: after))"
+        }
+    }
+}
+```
+
 ### Subscriptions
 
-_{Complete Attribute subscription examples:
-[Linux](linux/simple-app-helper.cpp)}_
+_{Complete Attribute subscription examples: [Linux](linux/simple-app-helper.cpp)
+|
+[Android](android/App/app/src/main/java/com/matter/casting/MediaPlaybackSubscribeToCurrentStateExampleFragment.java)
+|
+|[iOS](darwin/TvCasting/TvCasting/MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift)}_
 
 A Casting Client may subscribe to an attribute on an `Endpoint` of the
 `CastingPlayer` to get data reports when the attributes change.
@@ -966,7 +1286,112 @@ void SubscribeToMediaPlaybackCurrentState(matter::casting::memory::Strong<matter
 }
 ```
 
+On Android, given an `Endpoint`, `CurrentState` can be subscribe to by calling
+`subscribeCurrentStateAttribute` on a `ChipClusters.MediaPlaybackCluster`
+object.
+
+```java
+                    // get ChipClusters.MediaPlaybackCluster from the endpoint
+                    ChipClusters.MediaPlaybackCluster cluster =
+                            endpoint.getCluster(ChipClusters.MediaPlaybackCluster.class);
+                    if (cluster == null) {
+                        Log.e(
+                                TAG,
+                                "Could not get ApplicationBasicCluster for endpoint with ID: " + endpoint.getId());
+                        return;
+                    }
+
+                    // call subscribeCurrentStateAttribute on the cluster object while passing in a
+                    // ChipClusters.IntegerAttributeCallback and [0, 1] for min and max interval params
+                    cluster.subscribeCurrentStateAttribute(new ChipClusters.IntegerAttributeCallback() {
+                        @Override
+                        public void onSuccess(int value) {
+                            Log.d(TAG, "Read success on subscription. Value: " + value + " @ " + new Date());
+                            new Handler(Looper.getMainLooper())
+                                    .post(
+                                            () -> {
+                                                TextView currentStateResult = getView().findViewById(R.id.currentStateResult);
+                                                currentStateResult.setText(
+                                                        "Current State result\nValue: " + value );
+                                            });
+                        }
+
+                        @Override
+                        public void onError(Exception error) {
+                            Log.e(TAG, "Read failure on subscription: " + error);
+                            new Handler(Looper.getMainLooper())
+                                    .post(
+                                            () -> {
+                                                TextView currentStateResult = getView().findViewById(R.id.currentStateResult);
+                                                currentStateResult.setText("Current State result\nError: " + error);
+                                            });
+                        }
+                    }, 0, 1);
+```
+
+On iOS, given a `MCEndpoint`, `CurrentState` can be subscribed to by calling the
+`subscribe` API on the it can subscribe to the `CurrentState` (part of the Media
+Playback Basic cluster) by calling the `Subscribe` API on the
+`MCMediaPlaybackClusterCurrentStateAttribute`
+
+```swift
+// validate that the selected endpoint supports the MediaPlayback cluster
+if(!endpoint.hasCluster(MCEndpointClusterTypeMediaPlayback))
+{
+    self.Log.error("No MediaPlayback cluster supporting endpoint found")
+    DispatchQueue.main.async
+    {
+        self.status = "No MediaPlayback cluster supporting endpoint found"
+    }
+    return
+}
+
+// get MediaPlayback cluster from the endpoint
+let mediaPlaybackCluster: MCMediaPlaybackCluster = endpoint.cluster(for: MCEndpointClusterTypeMediaPlayback) as! MCMediaPlaybackCluster
+
+// get the currentStateAttribute from the mediaPlaybackCluster
+let currentStateAttribute: MCMediaPlaybackClusterCurrentStateAttribute? = mediaPlaybackCluster.currentStateAttribute()
+if(currentStateAttribute == nil)
+{
+    self.Log.error("CurrentState attribute not supported on cluster")
+    DispatchQueue.main.async
+    {
+        self.status = "CurrentState attribute not supported on cluster"
+    }
+    return
+}
+
+// call read on currentStateAttribute and pass in a completion block
+currentStateAttribute!.read(nil) { context, before, after, err in
+
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "HH:mm:ss"
+    let currentTime = dateFormatter.string(from: Date())
+    DispatchQueue.main.async
+    {
+        if(err != nil)
+        {
+            self.Log.error("Error when reading CurrentState value \(String(describing: err)) at \(currentTime)")
+            self.status = "Error when reading CurrentState value \(String(describing: err)) at \(currentTime)"
+            return
+        }
+        if(before != nil)
+        {
+            self.Log.info("Read CurrentState value: \(String(describing: after)) Before: \(String(describing: before)) at \(currentTime)")
+            self.status = "Read CurrentState value: \(String(describing: after)) Before: \(String(describing: before)) at \(currentTime)"
+        }
+        else
+        {
+            self.Log.info("Read CurrentState value: \(String(describing: after)) at \(currentTime)")
+            self.status = "Read CurrentState value: \(String(describing: after)) at \(currentTime)"
+        }
+    }
+}
+```
+
 The Casting client can Shutdown all running Subscriptions by calling the
-`ShutdownAllSubscriptions` API on the `CastingApp`. See API and its
-documentation for [Linux](tv-casting-common/core/CastingApp.h), Android and
-[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
+`ShutdownAllSubscriptions` API on the `CastingApp` on Linux/Android and
+`MCCastingApp` on iOS. See API and its documentation for
+[Linux](tv-casting-common/core/CastingApp.h),
+[Android](android/App/app/src/main/jni/com/matter/casting/core/CastingApp.java)
+and [iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).

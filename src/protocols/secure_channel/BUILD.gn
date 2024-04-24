@@ -1,5 +1,30 @@
 import("//build_overrides/chip.gni")
 
+source_set("check-in-counter") {
+  sources = [ "CheckInCounter.h" ]
+
+  deps = [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("check-in-message") {
+  sources = [
+    "CheckinMessage.cpp",
+    "CheckinMessage.h",
+  ]
+
+  public_deps = [ ":check-in-counter" ]
+
+  deps = [
+    ":type_definitions",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 static_library("type_definitions") {
   output_name = "libSecureChannelTypes"
 
@@ -12,6 +37,7 @@ static_library("type_definitions") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/lib/support:type-traits",
     "${chip_root}/src/protocols:type_definitions",
     "${chip_root}/src/system",
   ]
@@ -29,8 +55,6 @@ static_library("secure_channel") {
     "CASEServer.h",
     "CASESession.cpp",
     "CASESession.h",
-    "CheckinMessage.cpp",
-    "CheckinMessage.h",
     "DefaultSessionResumptionStorage.cpp",
     "DefaultSessionResumptionStorage.h",
     "PASESession.cpp",
@@ -51,10 +75,12 @@ static_library("secure_channel") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":check-in-message",
     ":type_definitions",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:type-traits",
     "${chip_root}/src/messaging",
     "${chip_root}/src/system",
     "${chip_root}/src/tracing",
@@ -62,5 +88,5 @@ static_library("secure_channel") {
     "${chip_root}/src/transport",
   ]
 
-  deps = [ "${chip_root}/src/app:revision_info" ]
+  deps = [ "${chip_root}/src/app:constants" ]
 }

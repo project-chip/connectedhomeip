@@ -19,6 +19,7 @@
 
 #include <app/clusters/channel-server/channel-server.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
@@ -31,6 +32,8 @@ using ChannelInfoType           = chip::app::Clusters::Channel::Structs::Channel
 using AdditionalInfoType        = chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type;
 using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
 using PageTokenType             = chip::app::Clusters::Channel::Structs::PageTokenStruct::Type;
+using ProgramType               = chip::app::Clusters::Channel::Structs::ProgramStruct::Type;
+using ChannelPagingType         = chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type;
 
 class ChannelManager : public ChannelDelegate
 {
@@ -62,9 +65,10 @@ public:
                                    const chip::ByteSpan & data) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 private:
-    jobject mChannelManagerObject      = nullptr;
+    chip::JniGlobalReference mChannelManagerObject;
     jmethodID mGetChannelListMethod    = nullptr;
     jmethodID mGetLineupMethod         = nullptr;
     jmethodID mGetCurrentChannelMethod = nullptr;
@@ -73,6 +77,11 @@ private:
     jmethodID mChangeChannelByNumberMethod = nullptr;
     jmethodID mSkipChannelMethod           = nullptr;
 
+    jmethodID mGetProgramGuideMethod     = nullptr;
+    jmethodID mRecordProgramMethod       = nullptr;
+    jmethodID mCancelRecordProgramMethod = nullptr;
+
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
+    static constexpr uint32_t kEndpointFeatureMap = 3;
+    static constexpr uint16_t kClusterRevision    = 2;
 };

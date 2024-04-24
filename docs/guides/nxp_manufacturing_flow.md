@@ -1,8 +1,4 @@
----
-orphan: true
----
-
-# NXP manufacturing data guide
+# NXP Manufacturing data
 
 By default, the example application is configured to use generic test
 certificates and provisioning data embedded with the application code. It is
@@ -112,30 +108,30 @@ Here is the interpretation of the **required** parameters:
 --pai_cert         -> path to the PAI (der format) location
 --spake2p_path     -> path to the spake2p tool
 --out              -> name of the binary that will be used for storing all the generated data
-
-
 ```
 
 Here is the interpretation of the **optional** parameters:
 
 ```shell
---dac_key_password     -> Password to decode DAC key
---dac_key_use_sss_blob -> Used when --dac_key contains a path to an encrypted blob, instead of the
-                          actual DAC private key. The blob metadata size is 24, so the total length
-                          of the resulting value is private key length (32) + 24 = 56. False by default.
---spake2p_verifier     -> SPAKE2+ verifier (passed as base64 encoded string). If this option is set,
-                          all SPAKE2+ inputs will be encoded in the final binary. The spake2p tool
-                          will not be used to generate a new verifier on the fly.
---aes128_key           -> 128 bits AES key used to encrypt the whole dataset. Please make sure
-                          that the target application/board supports this feature: it has access to
-                          the private key and implements a mechanism which can be used to decrypt
-                          the factory data information.
---date                 -> Manufacturing Date (YYYY-MM-DD format)
---part_number          -> Part number as string
---product_url          -> Product URL as string
---product_label        -> Product label as string
---serial_num           -> Serial Number
---unique_id            -> Unique id used for rotating device id generation
+--dac_key_password      -> Password to decode DAC key
+--dac_key_use_sss_blob  -> Used when --dac_key contains a path to an encrypted blob, instead of the
+                           actual DAC private key. The blob metadata size is 24, so the total length
+                           of the resulting value is private key length (32) + 24 = 56. False by default.
+--spake2p_verifier      -> SPAKE2+ verifier (passed as base64 encoded string). If this option is set,
+                           all SPAKE2+ inputs will be encoded in the final binary. The spake2p tool
+                           will not be used to generate a new verifier on the fly.
+--aes128_key            -> 128 bits AES key used to encrypt the whole dataset. Please make sure
+                           that the target application/board supports this feature: it has access to
+                           the private key and implements a mechanism which can be used to decrypt
+                           the factory data information.
+--date                  -> Manufacturing Date (YYYY-MM-DD format)
+--part_number           -> Part number as string
+--product_url           -> Product URL as string
+--product_label         -> Product label as string
+--serial_num            -> Serial Number
+--unique_id             -> Unique id used for rotating device id generation
+--product_finish        -> Visible finish of the product
+--product_primary_color -> Representative color of the visible parts of the product
 ```
 
 ## 3. Write provisioning data
@@ -157,8 +153,18 @@ loadfile factory_data.bin 0xf4000
 where `0xf4000` is the value of `__MATTER_FACTORY_DATA_START` in the
 corresponding .map file (can be different if using a custom linker script).
 
-For the **RT1060**, **RT1170** and **RW61X** platform, the binary needs to be
-written using `MCUXpresso Flash Tool GUI` at the address value corresponding to
+For **RW61X** platform, the binary needs to be written in the internal flash at
+location given by `__MATTER_FACTORY_DATA_START`, using `JLink`:
+
+```
+loadfile factory_data.bin 0xBFFF000
+```
+
+where `0xBFFF000` is the value of `__FACTORY_DATA_START` in the corresponding
+.map file (can be different if using a custom linker script).
+
+For the **RT1060** and **RT1170** platform, the binary needs to be written using
+`MCUXpresso Flash Tool GUI` at the address value corresponding to
 `__FACTORY_DATA_START` (the map file of the application should be checked to get
 the exact value).
 
@@ -198,6 +204,8 @@ Also, demo **DAC**, **PAI** and **PAA** certificates needed in case
 
 ## 6. Increased security for DAC private key
 
+### 6.1 K32W1
+
 Supported platforms:
 
 -   K32W1 - `src/plaftorm/nxp/k32w/k32w1/FactoryDataProviderImpl.h`
@@ -205,6 +213,45 @@ Supported platforms:
 For platforms that have a secure subsystem (`SSS`), the DAC private key can be
 converted to an encrypted blob. This blob will overwrite the DAC private key in
 factory data and will be imported in the `SSS` at initialization, by the factory
+data provider instance.
+
+The application will check at initialization whether the DAC private key has
+been converted or not and convert it if needed. However, the conversion process
+should be done at manufacturing time for security reasons.
+
+There is no need for an extra binary.
+
+-   Write factory data binary.
+-   Build the application with `chip_with_factory_data=1` set.
+-   Write the application to the board and use it as usual.
+
+Factory data should now contain a corresponding encrypted blob instead of the
+DAC private key.
+
+If an encrypted blob of the DAC private key is already available (e.g. obtained
+previously, using other methods), then the conversion process shall be skipped.
+Instead, option `--dac_key_use_sss_blob` can be used in the factory data
+generation command:
+
+```shell
+python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid "0x1037" --pid "0xA221" --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "12345678" --date "2023-01-01" --hw_version 1 --hw_version_str "1.0" --cert_declaration ./Chip-Test-CD-1037-A221.der --dac_cert ./Chip-DAC-NXP-1037-A221-Cert.der --dac_key ./Chip-DAC-NXP-1037-A221-Key-encrypted-blob.bin --pai_cert ./Chip-PAI-NXP-1037-A221-Cert.der --spake2p_path ./out/spake2p --unique_id "00112233445566778899aabbccddeeff" --dac_key_use_sss_blob --out ./factory_data_with_blob.bin
+```
+
+Please note that `--dac_key` now points to a binary file that contains the
+encrypted blob.
+
+The user can use the DAC private in plain text instead of using the `SSS` by
+adding the following gn argument `chip_use_plain_dac_key=true`.
+
+### 6.2 RW61X
+
+Supported platforms:
+
+-   RW61X - `src/plaftorm/nxp/rt/rw61x/FactoryDataProviderImpl.h`
+
+For platforms that have a secure subsystem (`SE50`), the DAC private key can be
+converted to an encrypted blob. This blob will overwrite the DAC private key in
+factory data and will be imported in the `SE50` before to sign, by the factory
 data provider instance.
 
 The conversion process shall happen at manufacturing time and should be run one
@@ -221,24 +268,3 @@ After the conversion process:
     without `chip_convert_dac_private_key` arg, since conversion already
     happened.
 -   Write the application to the board.
-
-If you are using Jlink, you can see a conversion script example in:
-
-```shell
-./scripts/tools/nxp/factory_data_generator/k32w1/example_convert_dac_private_key.jlink
-```
-
-Factory data should now contain a corresponding encrypted blob instead of the
-DAC private key.
-
-If an encrypted blob of the DAC private key is already available (e.g. obtained
-previously, using other methods), then the conversion process shall be skipped.
-Instead, option `--dac_key_use_sss_blob` can be used in the factory data
-generation command:
-
-```shell
-python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid "0x1037" --pid "0xA221" --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "12345678" --date "2023-01-01" --hw_version 1 --hw_version_str "1.0" --cert_declaration ./Chip-Test-CD-1037-A221.der --dac_cert ./Chip-DAC-NXP-1037-A221-Cert.der --dac_key ./Chip-DAC-NXP-1037-A221-Key-encrypted-blob.bin --pai_cert ./Chip-PAI-NXP-1037-A221-Cert.der --spake2p_path ./out/spake2p --unique_id "00112233445566778899aabbccddeeff" --dac_key_use_sss_blob --out ./factory_data_with_blob.bin
-```
-
-Please note that `--dac_key` now points to a binary file that contains the
-encrypted blob.

@@ -54,11 +54,16 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0510" name="Content App Observer" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0510" name="Content App Observer"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="APPOBSERVER" scope="Endpoint"/>
   <dataTypes>
     <enum name="StatusEnum">
@@ -71,7 +76,7 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <commands>
-    <command id="0x00" name="ContentAppMessage" response="ContentAppMessageResponse">
+    <command id="0x00" name="ContentAppMessage" direction="commandToServer" response="ContentAppMessageResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Data" type="string">
@@ -84,7 +89,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="ContentAppMessageResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>

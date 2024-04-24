@@ -19,9 +19,48 @@
 
 #include <lib/core/CHIPConfig.h>
 
+#include <mutex>
 #include <new>
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#include <dispatch/dispatch.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
 namespace chip {
+namespace detail {
+
+#if CHIP_CONFIG_GLOBALS_LAZY_INIT
+
+struct NonAtomicOnce
+{
+    bool mInitialized = false;
+    void call(void (*func)(void *), void * context)
+    {
+        if (!mInitialized)
+        {
+            mInitialized = true;
+            func(context);
+        }
+    }
+};
+
+struct AtomicOnce
+{
+// dispatch_once (if available) is more efficient than std::call_once because
+// it takes advantage of the additional assumption that the dispatch_once_t
+// is allocated within a static / global.
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_once_t mOnce = 0;
+    void call(void (*func)(void *), void * context) { dispatch_once_f(&mOnce, context, func); }
+#else // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    std::once_flag mOnce;
+    void call(void (*func)(void *), void * context) { std::call_once(mOnce, func, context); }
+#endif
+};
+
+#endif // CHIP_CONFIG_GLOBALS_LAZY_INIT
+
+} // namespace detail
 
 /**
  * A wrapper for global object that enables initialization and destruction to
@@ -29,9 +68,16 @@ namespace chip {
  *
  * The contained object of type T is default constructed, possibly lazily.
  *
- * This class is generally NOT thread-safe; external synchronization is required.
+ * Values of this type MUST be globals or static class members.
+ *
+ * This class is not thread-safe; external synchronization is required.
+ * @see AtomicGlobal<T> for a thread-safe variant.
  */
+#if CHIP_CONFIG_GLOBALS_LAZY_INIT
+template <class T, class OnceStrategy = detail::NonAtomicOnce>
+#else  // CHIP_CONFIG_GLOBALS_LAZY_INIT
 template <class T>
+#endif // CHIP_CONFIG_GLOBALS_LAZY_INIT
 class Global
 {
 public:
@@ -39,6 +85,11 @@ public:
     /// NOT thread-safe, external synchronization is required.
     T & get() { return _get(); }
     T * operator->() { return &_get(); }
+
+    // Globals are not copyable or movable
+    Global(const Global &)             = delete;
+    Global(const Global &&)            = delete;
+    Global & operator=(const Global &) = delete;
 
 #if CHIP_CONFIG_GLOBALS_LAZY_INIT
 public:
@@ -49,24 +100,22 @@ private:
     // Zero-initialize everything. We should technically leave mStorage uninitialized,
     // but that can sometimes cause clang to be unable to constant-initialize the object.
     alignas(T) unsigned char mStorage[sizeof(T)] = {};
-    bool mInitialized                            = false;
-
-    T & _value() { return *reinterpret_cast<T *>(mStorage); }
+    OnceStrategy mOnce;
 
     T & _get()
     {
-        if (!mInitialized)
-        {
-            new (mStorage) T();
-            mInitialized = true;
-#if !CHIP_CONFIG_GLOBALS_NO_DESTRUCT
-            CHIP_CXA_ATEXIT(&destroy, this);
-#endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
-        }
-        return _value();
+        T * value = reinterpret_cast<T *>(mStorage);
+        mOnce.call(&create, value);
+        return *value;
     }
-
-    static void destroy(void * context) { static_cast<Global<T> *>(context)->_value().~T(); }
+    static void create(void * value)
+    {
+        new (value) T();
+#if !CHIP_CONFIG_GLOBALS_NO_DESTRUCT
+        CHIP_CXA_ATEXIT(&destroy, value);
+#endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
+    }
+    static void destroy(void * value) { static_cast<T *>(value)->~T(); }
 
 #else // CHIP_CONFIG_GLOBALS_LAZY_INIT
 public:
@@ -99,5 +148,16 @@ private:
 #endif // CHIP_CONFIG_GLOBALS_NO_DESTRUCT
 #endif // CHIP_CONFIG_GLOBALS_LAZY_INIT
 };
+
+/**
+ * A variant of Global<T> that is thread-safe.
+ */
+template <class T>
+using AtomicGlobal =
+#if CHIP_CONFIG_GLOBALS_LAZY_INIT
+    Global<T, detail::AtomicOnce>;
+#else  // CHIP_CONFIG_GLOBALS_LAZY_INIT
+    Global<T>; // eager globals are already thread-safe
+#endif // CHIP_CONFIG_GLOBALS_LAZY_INIT
 
 } // namespace chip

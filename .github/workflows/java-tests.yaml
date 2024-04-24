@@ -16,6 +16,8 @@ name: Java Tests
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -40,7 +42,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-java:32
+            image: ghcr.io/project-chip/chip-build-java:47
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -131,6 +133,17 @@ jobs:
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
                      --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '                    
+            - name: Run IM Extendable Invoke Test
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "im" \
+                     --tool-args "onnetwork-long-im-extendable-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
                      --factoryreset \
                   '
             - name: Run IM Read Test

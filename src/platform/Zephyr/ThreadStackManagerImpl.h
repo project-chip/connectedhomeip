@@ -71,6 +71,10 @@ protected:
     bool _TryLockThreadStack();
     void _UnlockThreadStack();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    void _WaitOnSrpClearAllComplete();
+    void _NotifySrpClearAllComplete();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     // ===== Methods that override the GenericThreadStackManagerImpl_OpenThread abstract interface.
 
     void _ProcessThreadActivity() {}
@@ -82,6 +86,10 @@ private:
 
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
     friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    k_sem mSrpClearAllSemaphore;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     static ThreadStackManagerImpl sInstance;
 

@@ -63,8 +63,6 @@ tests:
           [1657221603.350739][368108:368108] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
           [1657221603.350773][368108:368108] CHIP:SVR: Manual pairing code: [749701123365521327694]
           [1657221603.350846][368108:368108] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 4dd11284
-          [1657221603.353048][368108:368113] CHIP:DL: TRACE: Bluez mainloop starting Thread
-          [1657221603.353167][368108:368111] CHIP:DL: TRACE: Bus acquired for name MATTER-3841
       disabled: true
 
     - label:

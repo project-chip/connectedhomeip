@@ -27,14 +27,14 @@
 #pragma once
 
 #include "EventLoggingDelegate.h"
-#include "EventLoggingTypes.h"
 #include <access/SubjectDescriptor.h>
+#include <app/EventLoggingTypes.h>
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/ObjectList.h>
 #include <app/util/basic-types.h>
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/LinkedList.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <system/SystemClock.h>
@@ -359,7 +359,7 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const SingleLinkedListNode<EventPathParams> * apEventPathList,
                                 EventNumber & aEventMin, size_t & aEventCount,
                                 const Access::SubjectDescriptor & aSubjectDescriptor);
     /**

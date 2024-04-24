@@ -39,9 +39,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/SessionParameters.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -93,7 +93,6 @@ void PASESession::Clear()
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
     memset(&mPASEVerifier, 0, sizeof(mPASEVerifier));
-    memset(&mKe[0], 0, sizeof(mKe));
     mNextExpectedMsg.ClearValue();
 
     mSpake2p.Clear();
@@ -106,7 +105,6 @@ void PASESession::Clear()
         chip::Platform::MemoryFree(mSalt);
         mSalt = nullptr;
     }
-    mKeLen           = sizeof(mKe);
     mPairingComplete = false;
     PairingSession::Clear();
 }
@@ -197,7 +195,7 @@ CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Sp
     mIterationCount = pbkdf2IterCount;
     mNextExpectedMsg.SetValue(MsgType::PBKDFParamRequest);
     mPairingComplete = false;
-    mLocalMRPConfig  = mrpLocalConfig;
+    mLocalMRPConfig  = mrpLocalConfig.ValueOr(GetDefaultMRPConfig());
 
     ChipLogDetail(SecureChannel, "Waiting for PBKDF param request");
 
@@ -220,14 +218,14 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
 
     mRole = CryptoContext::SessionRole::kInitiator;
 
-    mExchangeCtxt = exchangeCtxt;
+    mExchangeCtxt.Emplace(*exchangeCtxt);
 
     // When commissioning starts, the peer is assumed to be active.
-    mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->MarkActiveRx();
+    mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->MarkActiveRx();
 
-    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
+    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
 
-    mLocalMRPConfig = mrpLocalConfig;
+    mLocalMRPConfig = mrpLocalConfig.ValueOr(GetDefaultMRPConfig());
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
@@ -246,11 +244,12 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
 {
     MATTER_TRACE_SCOPE("OnResponseTimeout", "PASESession");
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "PASESession::OnResponseTimeout was called by null exchange"));
-    VerifyOrReturn(mExchangeCtxt == nullptr || mExchangeCtxt == ec,
+    VerifyOrReturn(!mExchangeCtxt.HasValue() || &mExchangeCtxt.Value().Get() == ec,
                    ChipLogError(SecureChannel, "PASESession::OnResponseTimeout exchange doesn't match"));
     // If we were waiting for something, mNextExpectedMsg had better have a value.
     ChipLogError(SecureChannel, "PASESession timed out while waiting for a response from the peer. Expected message type was %u",
                  to_underlying(mNextExpectedMsg.Value()));
+    MATTER_TRACE_COUNTER("PASETimeout");
     // Discard the exchange so that Clear() doesn't try closing it.  The
     // exchange will handle that.
     DiscardExchange();
@@ -262,8 +261,15 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
 CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
 {
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
-    return session.InitFromSecret(*mSessionManager->GetSessionKeystore(), ByteSpan(mKe, mKeLen), ByteSpan(),
-                                  CryptoContext::SessionInfoType::kSessionEstablishment, mRole);
+
+    SessionKeystore & keystore = *mSessionManager->GetSessionKeystore();
+    AutoReleaseSymmetricKey<HkdfKeyHandle> hkdfKey(keystore);
+
+    ReturnErrorOnFailure(mSpake2p.GetKeys(keystore, hkdfKey.KeyHandle()));
+    ReturnErrorOnFailure(session.InitFromSecret(keystore, hkdfKey.KeyHandle(), ByteSpan{} /* salt */,
+                                                CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
@@ -302,8 +308,8 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     // Update commissioning hash with the pbkdf2 param request that's being sent.
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ req->Start(), req->DataLength() }));
 
-    ReturnErrorOnFailure(
-        mExchangeCtxt->SendMessage(MsgType::PBKDFParamRequest, std::move(req), SendFlags(SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->SendMessage(MsgType::PBKDFParamRequest, std::move(req),
+                                                            SendFlags(SendMessageFlags::kExpectResponse)));
 
     mNextExpectedMsg.SetValue(MsgType::PBKDFParamResponse);
 
@@ -358,7 +364,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
+        mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            GetRemoteSessionParameters());
     }
 
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
@@ -422,8 +429,8 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ resp->Start(), resp->DataLength() }));
     ReturnErrorOnFailure(SetupSpake2p());
 
-    ReturnErrorOnFailure(
-        mExchangeCtxt->SendMessage(MsgType::PBKDFParamResponse, std::move(resp), SendFlags(SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(mExchangeCtxt.Value()->SendMessage(MsgType::PBKDFParamResponse, std::move(resp),
+                                                            SendFlags(SendMessageFlags::kExpectResponse)));
     ChipLogDetail(SecureChannel, "Sent PBKDF param response");
 
     mNextExpectedMsg.SetValue(MsgType::PASE_Pake1);
@@ -477,7 +484,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
             SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
-            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
+            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+                GetRemoteSessionParameters());
         }
 
         // TODO - Add a unit test that exercises mHavePBKDFParameters path
@@ -502,7 +510,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
         if (tlvReader.Next() != CHIP_END_OF_TLV)
         {
             SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
-            mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
+            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+                GetRemoteSessionParameters());
         }
     }
 
@@ -552,7 +561,7 @@ CHIP_ERROR PASESession::SendMsg1()
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg));
 
     ReturnErrorOnFailure(
-        mExchangeCtxt->SendMessage(MsgType::PASE_Pake1, std::move(msg), SendFlags(SendMessageFlags::kExpectResponse)));
+        mExchangeCtxt.Value()->SendMessage(MsgType::PASE_Pake1, std::move(msg), SendFlags(SendMessageFlags::kExpectResponse)));
     ChipLogDetail(SecureChannel, "Sent spake2p msg1");
 
     mNextExpectedMsg.SetValue(MsgType::PASE_Pake2);
@@ -572,6 +581,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
     size_t verifier_len = kMAX_Hash_Length;
 
     ChipLogDetail(SecureChannel, "Received spake2p msg1");
+    MATTER_TRACE_SCOPE("Pake1", "PASESession");
 
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
@@ -613,13 +623,15 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg2));
 
-        err = mExchangeCtxt->SendMessage(MsgType::PASE_Pake2, std::move(msg2), SendFlags(SendMessageFlags::kExpectResponse));
+        err =
+            mExchangeCtxt.Value()->SendMessage(MsgType::PASE_Pake2, std::move(msg2), SendFlags(SendMessageFlags::kExpectResponse));
         SuccessOrExit(err);
 
         mNextExpectedMsg.SetValue(MsgType::PASE_Pake3);
     }
 
     ChipLogDetail(SecureChannel, "Sent spake2p msg2");
+    MATTER_TRACE_COUNTER("Pake2");
 
 exit:
 
@@ -670,7 +682,6 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
     SuccessOrExit(err = mSpake2p.ComputeRoundTwo(Y, Y_len, verifier, &verifier_len));
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
-    SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
     msg2 = nullptr;
 
     {
@@ -689,7 +700,8 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg3));
 
-        err = mExchangeCtxt->SendMessage(MsgType::PASE_Pake3, std::move(msg3), SendFlags(SendMessageFlags::kExpectResponse));
+        err =
+            mExchangeCtxt.Value()->SendMessage(MsgType::PASE_Pake3, std::move(msg3), SendFlags(SendMessageFlags::kExpectResponse));
         SuccessOrExit(err);
 
         mNextExpectedMsg.SetValue(MsgType::StatusReport);
@@ -711,6 +723,7 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(SecureChannel, "Received spake2p msg3");
+    MATTER_TRACE_COUNTER("Pake3");
 
     mNextExpectedMsg.ClearValue();
 
@@ -732,7 +745,6 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     VerifyOrExit(peer_verifier_len == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     SuccessOrExit(err = mSpake2p.KeyConfirm(peer_verifier, peer_verifier_len));
-    SuccessOrExit(err = mSpake2p.GetKeys(mKe, &mKeLen));
 
     // Send confirmation to peer that we succeeded so they can start using the session.
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
@@ -752,7 +764,8 @@ void PASESession::OnSuccessStatusReport()
     Finish();
 }
 
-CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
+CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode,
+                                              Optional<uintptr_t> protocolData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (protocolCode)
@@ -778,25 +791,25 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     // mExchangeCtxt can be nullptr if this is the first message (PBKDFParamRequest) received by PASESession
     // via UnsolicitedMessageHandler. The exchange context is allocated by exchange manager and provided
     // to the handler (PASESession object).
-    if (mExchangeCtxt != nullptr)
+    if (mExchangeCtxt.HasValue())
     {
-        if (mExchangeCtxt != exchange)
+        if (&mExchangeCtxt.Value().Get() != exchange)
         {
             ReturnErrorOnFailure(CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
     else
     {
-        mExchangeCtxt = exchange;
+        mExchangeCtxt.Emplace(*exchange);
     }
 
-    if (!mExchangeCtxt->GetSessionHandle()->IsUnauthenticatedSession())
+    if (!mExchangeCtxt.Value()->GetSessionHandle()->IsUnauthenticatedSession())
     {
         ChipLogError(SecureChannel, "PASESession received PBKDFParamRequest over encrypted session.  Ignoring.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
+    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((mNextExpectedMsg.HasValue() && payloadHeader.HasMessageType(mNextExpectedMsg.Value())) ||
@@ -825,7 +838,7 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
     if (msgType == MsgType::PBKDFParamRequest || msgType == MsgType::PBKDFParamResponse || msgType == MsgType::PASE_Pake1 ||
         msgType == MsgType::PASE_Pake2 || msgType == MsgType::PASE_Pake3)
     {
-        SuccessOrExit(err = mExchangeCtxt->FlushAcks());
+        SuccessOrExit(err = mExchangeCtxt.Value()->FlushAcks());
     }
 #endif // CHIP_CONFIG_SLOW_CRYPTO
 
@@ -871,6 +884,7 @@ exit:
         DiscardExchange();
         Clear();
         ChipLogError(SecureChannel, "Failed during PASE session setup: %" CHIP_ERROR_FORMAT, err.Format());
+        MATTER_TRACE_COUNTER("PASEFail");
         // Do this last in case the delegate frees us.
         NotifySessionEstablishmentError(err);
     }

@@ -18,6 +18,7 @@
 #import "MCCastingPlayer.h"
 
 #import "MCCastingApp.h"
+#import "MCEndpoint_Internal.h"
 #import "MCErrorUtils.h"
 
 #import "core/CastingPlayer.h"
@@ -78,18 +79,18 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     });
 }
 
-- (NSString * _Nonnull)description
-{
-    return [NSString stringWithFormat:@"%@ with Product ID: %d and Vendor ID: %d. Resolved IPAddr?: %@",
-                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO"];
-}
-
 - (instancetype _Nonnull)initWithCppCastingPlayer:(matter::casting::memory::Strong<matter::casting::core::CastingPlayer>)cppCastingPlayer
 {
     if (self = [super init]) {
         _cppCastingPlayer = cppCastingPlayer;
     }
     return self;
+}
+
+- (NSString * _Nonnull)description
+{
+    return [NSString stringWithFormat:@"%@ with Product ID: %hu and Vendor ID: %hu. Resolved IPAddr?: %@. Supports Commissioner Generated Passcode?: %@.",
+                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO", self.supportsCommissionerGeneratedPasscode ? @"YES" : @"NO"];
 }
 
 - (NSString * _Nonnull)identifier
@@ -117,6 +118,11 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return _cppCastingPlayer->GetDeviceType();
 }
 
+- (bool)supportsCommissionerGeneratedPasscode
+{
+    return _cppCastingPlayer->GetSupportsCommissionerGeneratedPasscode();
+}
+
 - (NSArray * _Nonnull)ipAddresses
 {
     NSMutableArray * ipAddresses = [NSMutableArray new];
@@ -128,11 +134,16 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return ipAddresses;
 }
 
-// TODO convert to Obj-C endpoints and return
-/*- (NSArray<MCEndpoint *> * _Nonnull)endpoints
+- (NSArray<MCEndpoint *> * _Nonnull)endpoints
 {
-    return [NSMutableArray new];
-}*/
+    NSMutableArray * endpoints = [NSMutableArray new];
+    const std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> cppEndpoints = _cppCastingPlayer->GetEndpoints();
+    for (matter::casting::memory::Strong<matter::casting::core::Endpoint> cppEndpoint : cppEndpoints) {
+        MCEndpoint * endpoint = [[MCEndpoint alloc] initWithCppEndpoint:cppEndpoint];
+        [endpoints addObject:endpoint];
+    }
+    return endpoints;
+}
 
 - (BOOL)isEqualToMCCastingPlayer:(MCCastingPlayer * _Nullable)other
 {

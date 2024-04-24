@@ -33,13 +33,7 @@
 using namespace chip;
 using namespace chip::Crypto;
 
-CHIPP256KeypairBridge::~CHIPP256KeypairBridge()
-{
-    VerifyOrReturn(mDelegate != nullptr);
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr);
-    env->DeleteGlobalRef(mDelegate);
-}
+CHIPP256KeypairBridge::~CHIPP256KeypairBridge() {}
 
 CHIP_ERROR CHIPP256KeypairBridge::SetDelegate(jobject delegate)
 {
@@ -47,12 +41,11 @@ CHIP_ERROR CHIPP256KeypairBridge::SetDelegate(jobject delegate)
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
-
-    mDelegate = env->NewGlobalRef(delegate);
-
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/KeypairDelegate", mKeypairDelegateClass);
+    ReturnErrorOnFailure(mDelegate.Init(delegate));
+    jclass keypairDelegateClass;
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/KeypairDelegate", keypairDelegateClass);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to find class for KeypairDelegate."));
-
+    SuccessOrExit(err = mKeypairDelegateClass.Init(static_cast<jobject>(keypairDelegateClass)));
     err = JniReferences::GetInstance().FindMethod(env, delegate, "createCertificateSigningRequest", "()[B",
                                                   &mCreateCertificateSigningRequestMethod);
     VerifyOrExit(err == CHIP_NO_ERROR,
@@ -126,8 +119,8 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg
     err = JniReferences::GetInstance().N2J_ByteArray(env, msg, static_cast<uint32_t>(msg_length), jniMsg);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     VerifyOrReturnError(jniMsg != nullptr, err);
-
-    signedResult = env->CallObjectMethod(mDelegate, mEcdsaSignMessageMethod, jniMsg);
+    VerifyOrReturnError(mDelegate.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    signedResult = env->CallObjectMethod(mDelegate.ObjectRef(), mEcdsaSignMessageMethod, jniMsg);
 
     if (env->ExceptionCheck())
     {
@@ -166,8 +159,8 @@ CHIP_ERROR CHIPP256KeypairBridge::SetPubkey()
 
     env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
-
-    publicKey = env->CallObjectMethod(mDelegate, mGetPublicKeyMethod);
+    VerifyOrReturnError(mDelegate.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    publicKey = env->CallObjectMethod(mDelegate.ObjectRef(), mGetPublicKeyMethod);
     if (env->ExceptionCheck())
     {
         ChipLogError(Controller, "Java exception in KeypairDelegate.getPublicKey()");

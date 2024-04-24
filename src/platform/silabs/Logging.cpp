@@ -140,7 +140,7 @@ static void PrintLog(const char * msg)
         PigweedLogger::putString(msg, sz);
 #else
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
-#endif
+#endif // SILABS_LOG_OUT_UART
 
 #if SILABS_LOG_OUT_RTT || PW_RPC_ENABLED
         const char * newline = "\r\n";

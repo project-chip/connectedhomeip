@@ -16,9 +16,6 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 
-arm_float_abi = "soft"
-arm_cpu = "cortex-m4"
-
 openthread_project_core_config_file = "OpenThreadConfig.h"
 
 chip_ble_project_config_include = "<CHIPProjectConfig.h>"
