@@ -63,6 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDevice (TestDebug)
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
+- (void)unitTestClearClusterData;
 @end
 #endif
 
