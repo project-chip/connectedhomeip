@@ -534,10 +534,10 @@ This is the list of all supported partitions:
     00 -----------------> 0x00 Bootable flag
     00 -----------------> 0x00 Image type (0x00 = SSBL)
 
-004000000f020101: Application partition
+00400000c9040101: Application partition
 
     00400000 -----------> 0x00004000 Start Address
-    0f02 ---------------> 0x020f Number of 512-bytes pages
+    c904 ---------------> 0x04c9 Number of 512-bytes pages
     01 -----------------> 0x01 Bootable flag
     01 -----------------> 0x01 Image type (0x01 = Application)
 
