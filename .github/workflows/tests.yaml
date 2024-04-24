@@ -328,7 +328,7 @@ jobs:
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-latest
+        runs-on: macos-13
 
         steps:
             - name: Checkout
@@ -584,7 +584,7 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1"
 
         if: github.actor != 'restyled-io[bot]' && false
-        runs-on: macos-latest
+        runs-on: macos-13
 
         steps:
             - name: Checkout
