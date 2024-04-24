@@ -9,6 +9,6 @@ RawTransportTests
 RetransmitTests
 SecureChannelTests
 SetupPayloadTestsNL
-SupportTests
+SupportTestsNL
 TransportLayerTests
 UserDirectedCommissioningTests

@@ -9,3 +9,4 @@ PlatformTests
 SystemLayerTests
 TestShell
 SetupPayloadTests
+SupportTests
