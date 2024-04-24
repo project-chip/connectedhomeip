@@ -188,16 +188,25 @@ BluezObjectManager::NotificationsDelegates BluezObjectManager::GetDeviceNotifica
     return delegates;
 }
 
-void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * aObj)
+void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, BluezObject * aObj)
 {
-    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(reinterpret_cast<BluezObject *>(aObj)));
-    if (adapter)
+    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(aObj));
+    // Verify that the adapter is properly initialized - the class property must be set.
+    // BlueZ can export adapter objects on the bus before it is fully initialized. Such
+    // adapter objects are not usable and must be ignored.
+    //
+    // TODO: Find a better way to determine whether the adapter interface exposed by
+    //       BlueZ D-Bus service is fully functional. The current approach is based on
+    //       the assumption that the class property is non-zero, which is true only
+    //       for BR/EDR + LE adapters. LE-only adapters do not have HCI command to read
+    //       the class property and BlueZ sets it to 0 as a default value.
+    if (adapter && bluez_adapter1_get_class(adapter.get()) != 0)
     {
         NotifyAdapterAdded(adapter.get());
         return;
     }
 
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(aObj));
     if (device)
     {
         for (auto delegate : GetDeviceNotificationsDelegates(device.get()))
@@ -207,9 +216,9 @@ void BluezObjectManager::OnObjectAdded(GDBusObjectManager * aMgr, GDBusObject * 
     }
 }
 
-void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject * aObj)
+void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, BluezObject * aObj)
 {
-    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(reinterpret_cast<BluezObject *>(aObj)));
+    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(aObj));
     if (adapter)
     {
         RemoveAdapterSubscriptions(adapter.get());
@@ -217,7 +226,7 @@ void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject 
         return;
     }
 
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(aObj));
     if (device)
     {
         for (auto delegate : GetDeviceNotificationsDelegates(device.get()))
@@ -227,10 +236,22 @@ void BluezObjectManager::OnObjectRemoved(GDBusObjectManager * aMgr, GDBusObject 
     }
 }
 
-void BluezObjectManager::OnInterfacePropertiesChanged(GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface,
+void BluezObjectManager::OnInterfacePropertiesChanged(GDBusObjectManagerClient * aMgr, BluezObject * aObj, GDBusProxy * aIface,
                                                       GVariant * aChangedProps, const char * const * aInvalidatedProps)
 {
-    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(reinterpret_cast<BluezObject *>(aObj)));
+    uint32_t classValue = 0;
+    GAutoPtr<BluezAdapter1> adapter(bluez_object_get_adapter1(aObj));
+    // When the adapter's readonly class property is set, it means that the adapter has been
+    // fully initialized and is ready to be used. It's most likely that the adapter has been
+    // previously ignored in the OnObjectAdded callback, so now we can notify the application
+    // about the new adapter.
+    if (adapter && g_variant_lookup(aChangedProps, "Class", "u", &classValue) && classValue != 0)
+    {
+        NotifyAdapterAdded(adapter.get());
+        return;
+    }
+
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(aObj));
     if (device)
     {
         for (auto delegate : GetDeviceNotificationsDelegates(device.get()))
@@ -256,18 +277,19 @@ CHIP_ERROR BluezObjectManager::SetupObjectManager()
 
     g_signal_connect(mObjectManager.get(), "object-added",
                      G_CALLBACK(+[](GDBusObjectManager * mgr, GDBusObject * obj, BluezObjectManager * self) {
-                         return self->OnObjectAdded(mgr, obj);
+                         return self->OnObjectAdded(mgr, reinterpret_cast<BluezObject *>(obj));
                      }),
                      this);
     g_signal_connect(mObjectManager.get(), "object-removed",
                      G_CALLBACK(+[](GDBusObjectManager * mgr, GDBusObject * obj, BluezObjectManager * self) {
-                         return self->OnObjectRemoved(mgr, obj);
+                         return self->OnObjectRemoved(mgr, reinterpret_cast<BluezObject *>(obj));
                      }),
                      this);
     g_signal_connect(mObjectManager.get(), "interface-proxy-properties-changed",
                      G_CALLBACK(+[](GDBusObjectManagerClient * mgr, GDBusObjectProxy * obj, GDBusProxy * iface, GVariant * changed,
                                     const char * const * invalidated, BluezObjectManager * self) {
-                         return self->OnInterfacePropertiesChanged(mgr, obj, iface, changed, invalidated);
+                         return self->OnInterfacePropertiesChanged(mgr, reinterpret_cast<BluezObject *>(obj), iface, changed,
+                                                                   invalidated);
                      }),
                      this);
 
