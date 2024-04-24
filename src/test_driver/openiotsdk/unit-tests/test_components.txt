@@ -1,10 +1,12 @@
 accesstest
-SystemLayerTests
 ASN1Tests
+MinimalMdnsCoreTests
 MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
 CoreTests
+MdnsTests
 PlatformTests
 RawTransportTests
+SystemLayerTests
 TestShell
 SetupPayloadTests
