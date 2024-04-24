@@ -165,7 +165,7 @@ class TestTCP : public ::testing::Test
 {
 protected:
     TestTCP() { inContext = new TestContext(); }
-    void SetUp() { EXPECT_EQ(inContext->Init(), CHIP_NO_ERROR); }
+    void SetUp() { ASSERT_EQ(inContext->Init(), CHIP_NO_ERROR); }
     void TearDown() { inContext->Shutdown(); }
     TestContext * inContext;
 };
