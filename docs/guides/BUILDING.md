@@ -199,22 +199,27 @@ permanently, you need to make the following changes:
 
 ## Installing ZAP tool
 
-`bootstrap.sh` will download a compatible ZAP tool version and set it up in
-`$PATH`. If you want to install or use a different version of the tool, you may
-download one from the ZAP project's
-[Releases](https://github.com/project-chip/zap/releases) page.
+For platforms defined in [`scripts/setup/zap.json`](/scripts/setup/zap.json),
+`bootstrap.sh` will download a compatible ZAP tool version from CIPD and set it
+up in `$PATH`.
 
-### Linux ARM
+ZAP releases are copied to CIPD by an automated bot. You can check if a release
+was copied by looking at tags created for
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/zap)
+in various platforms.
 
-Zap does not provide binary releases for arm. Rosetta solves this for Darwin,
-however for linux arm you will have to use a local ZAP, generally through
-setting `$ZAP_DEVELOPMENT_PATH` (see the section `Which zap to use` below).
+### Custom ZAP
+
+If you want to install or use a different version of the tool, you may download
+one from the [ZAP releases](https://github.com/project-chip/zap/releases) or
+build it from source.
 
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
-so you can download a compatible version from the zap project
-[Releases](https://github.com/project-chip/zap/releases). To checkout as source
-code the corresponding tag should exist in the zap
-[repository tags](https://github.com/project-chip/zap/tags) list.
+so you can refer to it to find a compatible version. The version is also
+maintained at [`scripts/setup/zap.version`](/scripts/setup/zap.version).
+
+To check out as source code, the corresponding tag should exist in the
+[ZAP repository tags](https://github.com/project-chip/zap/tags) list.
 
 Example commands:
 
