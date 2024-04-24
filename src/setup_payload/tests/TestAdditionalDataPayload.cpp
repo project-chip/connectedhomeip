@@ -22,7 +22,6 @@
  *
  */
 
-
 #include <math.h>
 #include <memory>
 #include <stdio.h>
