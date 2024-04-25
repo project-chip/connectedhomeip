@@ -167,7 +167,7 @@ class SizeContext:
                 try:
                     self.db.add_sizes_from_zipfile(io.BytesIO(blob),
                                                    {'artifact': i})
-                except:
+                except Exception:
                     # Report in case the zipfile is invalid, however do not fail
                     # all the rest (behave as if artifact download has failed)
                     traceback.print_last()
