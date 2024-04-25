@@ -144,7 +144,7 @@ TEST_F(TestUdcMessages, TestUDCServerUserConfirmationProvider)
     EXPECT_STREQ(testCallback.mState.GetInstanceName(), instanceName2);
 }
 
-#if false
+#if 0
 // TODO Fix test below
 // the following test case is not reliable (fails on mac, clang platforms for example)
 TEST_F(TestUdcMessages, TestUDCServerInstanceNameResolver)
