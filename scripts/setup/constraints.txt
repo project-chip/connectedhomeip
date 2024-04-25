@@ -49,7 +49,7 @@ colorama==0.4.6
     #   west
 coloredlogs==15.0.1
     # via -r requirements.all.txt
-construct==2.10.70
+construct==2.10.54
     # via
     #   -r requirements.esp32.txt
     #   esp-coredump
