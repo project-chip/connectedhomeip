@@ -124,17 +124,17 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         jsonVal["deviceName"]         = dnsSdInfo->deviceName;
         jsonVal["pairingInstruction"] = dnsSdInfo->pairingInstruction;
         jsonVal["pairingHint"]        = dnsSdInfo->pairingHint;
-        if (dnsSdInfo->GetMrpRetryIntervalIdle().HasValue())
+        if (dnsSdInfo->GetMrpRetryIntervalIdle().has_value())
         {
-            jsonVal["mrpRetryIntervalIdle"] = dnsSdInfo->GetMrpRetryIntervalIdle().Value().count();
+            jsonVal["mrpRetryIntervalIdle"] = dnsSdInfo->GetMrpRetryIntervalIdle()->count();
         }
-        if (dnsSdInfo->GetMrpRetryIntervalActive().HasValue())
+        if (dnsSdInfo->GetMrpRetryIntervalActive().has_value())
         {
-            jsonVal["mrpRetryIntervalActive"] = dnsSdInfo->GetMrpRetryIntervalActive().Value().count();
+            jsonVal["mrpRetryIntervalActive"] = dnsSdInfo->GetMrpRetryIntervalActive()->count();
         }
-        if (dnsSdInfo->GetMrpRetryActiveThreshold().HasValue())
+        if (dnsSdInfo->GetMrpRetryActiveThreshold().has_value())
         {
-            jsonVal["mrpRetryActiveThreshold"] = dnsSdInfo->GetMrpRetryActiveThreshold().Value().count();
+            jsonVal["mrpRetryActiveThreshold"] = dnsSdInfo->GetMrpRetryActiveThreshold()->count();
         }
         jsonVal["supportsTcp"] = dnsSdInfo->supportsTcp;
         {
@@ -188,17 +188,17 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
         ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
-        if (dnsSdInfo->GetMrpRetryIntervalIdle().HasValue())
+        if (dnsSdInfo->GetMrpRetryIntervalIdle().has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle().Value().count());
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle()->count());
         }
         else
         {
             ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
         }
-        if (dnsSdInfo->GetMrpRetryIntervalActive().HasValue())
+        if (dnsSdInfo->GetMrpRetryIntervalActive().has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive().Value().count());
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive()->count());
         }
         else
         {
