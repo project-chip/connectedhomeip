@@ -170,7 +170,7 @@ class SizeContext:
                 except Exception:
                     # Report in case the zipfile is invalid, however do not fail
                     # all the rest (behave as if artifact download has failed)
-                    traceback.print_last()
+                    traceback.print_exc()
 
     def read_inputs(self):
         """Read size report from github and/or local files."""
