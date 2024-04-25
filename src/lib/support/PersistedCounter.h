@@ -142,7 +142,7 @@ public:
         VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() + mEpoch >= mNextEpoch, CHIP_ERROR_INTERNAL);
 
         // Previous check did not take into consideration that the counter value can be equal to the max counter value or rollover.
-        // TODO(#...): PersistedCounter allows rollover so this check is incorrect. We need a Counter class that adequatly manages
+        // TODO(#33175): PersistedCounter allows rollover so this check is incorrect. We need a Counter class that adequatly manages
         //             rollover behavior for counters that cannot rollover.
         // VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() < mNextEpoch, CHIP_ERROR_INTERNAL);
 
@@ -174,7 +174,7 @@ public:
 
             // Previous check did not take into consideration that the counter value can be equal to the max counter value or
             // rollover.
-            // TODO(#...): PersistedCounter allows rollover so this check is incorrect. We need a Counter class that adequatly
+            // TODO(#33175): PersistedCounter allows rollover so this check is incorrect. We need a Counter class that adequatly
             // manages
             //             rollover behavior for counters that cannot rollover.
             // VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() < mNextEpoch, CHIP_ERROR_INTERNAL);
