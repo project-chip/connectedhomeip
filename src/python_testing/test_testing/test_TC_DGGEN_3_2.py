@@ -33,7 +33,7 @@ class TestSpec():
 
 TEST_CASES = [
     TestSpec(1, 0, True),
-    TestSpec(1, 1, True),  # I think this is ok...to have the feature on when it's not needed?
+    TestSpec(1, 1, True),
     TestSpec(2, 0, False),
     TestSpec(2, 1, True),
 ]
