@@ -104,10 +104,10 @@ void VerifyStatusReport(const System::PacketBufferHandle & msg, StatusCode expec
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ASSERT_FALSE(msg.IsNull())
+    ASSERT_FALSE(msg.IsNull());
 
     System::PacketBufferHandle msgCopy = msg.CloneData();
-    ASSERT_FALSE(msgCopy.IsNull())
+    ASSERT_FALSE(msgCopy.IsNull());
 
     SecureChannel::StatusReport report;
     err = report.Parse(std::move(msgCopy));
