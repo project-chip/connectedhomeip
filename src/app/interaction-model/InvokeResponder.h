@@ -24,12 +24,36 @@ namespace chip {
 namespace app {
 namespace InteractionModel {
 
-/// Aids in writing invoke replies:
-///   - Has access to the raw data encoder for response data content (via `ResponseEncoder`)
-///   - `Complete` handling:
-///      - MUST be called exactly once
-///      - called with an error, makes TLV data written to be discarded (Invokes may only either
-///        succeed or fully fail)
+/// Handles encoding of an invoke response for a specific invoke request.
+///
+/// This class handles a single response (i.e. a CommandDataIB within the
+/// matter protocol) and is responsible for constructing its corresponding
+/// response (i.e. a InvokeResponseIB within the matter protocol)
+///
+/// Invoke responses MUST contain exacltly ONE of:
+///   - response data (accessed via `ResponseEncoder`)
+///   - A status, which may be success or failure, both of which may
+///     contain a cluster-specific error code.
+///
+/// To encode a response, `Complete` MUST be called.
+///
+/// `Complete` requirements
+///   - Complete with InteractionModel::Status::Success will respond with data
+///     some response data was written. 
+///   - Any other case (including success with cluster specific codes) implies
+///     no response data and a status will be encoded instead
+///       - this includes the case when some response data was written already.
+///         In that case, the response data will be rolled back and only the status
+///         will be encoded.
+///
+/// Creating a response MUST be retried at most once, if and only if `Complete`
+/// returns CHIP_ERROR_BUFFER_TOO_SMALL:
+///   - FlushPendingResponses MUST be called to make as much buffer space as possible
+///     available for encoding
+///   - The response encoding (including `ResponseEncoder` usage and calling Complete)
+///     MUST be retried once more. If the final Complete returns an error, the result
+///     of the invoke will be an error status.
+///
 class InvokeResponder
 {
 public:
@@ -59,6 +83,9 @@ public:
     ///
     ///   - responseCommandId must correspond with the data encoded in the returned encoder
     ///   - Complete(CHIP_NO_ERROR) MUST be called to flush the reply
+    ///
+    /// If encoder returns CHIP_ERROR_BUFFER_TOO_SMALL, FlushPendingResponses should be
+    /// used to attempt to free up buffer space then encoding should be tried again.
     virtual DataModel::WrappedStructEncoder & ResponseEncoder(CommandId responseCommandId) = 0;
 
     /// Signal completing of the reply.
@@ -88,7 +115,12 @@ public:
     ///   - CHIP_ERROR_BUFFER_TOO_SMALL will return IF AND ONLY IF the responder was unable
     ///     to fully serialize the given reply/error data.
     ///
-    ///     If such an error is returned, the caller MUST retry by calling
+    ///     If such an error is returned, the caller MUST retry by calling FlushPendingResponses
+    ///     first and then re-encoding the reply content (use ResponseEncoder if applicable and
+    ///     call Complete again)
+    ///
+    ///   - Any other error (i.e. different from CHIP_NO_ERROR) mean that the invoke response 
+    ///     will contain an error and such an error is considered permanent.
     ///
     virtual CHIP_ERROR Complete(StatusIB error) = 0;
 };
