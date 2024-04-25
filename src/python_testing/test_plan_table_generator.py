@@ -15,8 +15,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import logging
 import importlib
 import os
+import sys
 from pathlib import Path
 
 import click
@@ -35,11 +37,42 @@ def indent_multiline(multiline: str, num_spaces: int) -> str:
 @click.argument('classname', type=str)
 @click.argument('test', type=str)
 def main(filename, classname, test):
-    module = importlib.import_module(Path(os.path.basename(filename)).stem)
-    test_class = getattr(module, classname)
+    '''
+        This script generates the Test Procedure table for the test plans document
+        from the python script steps. In order to use this generator, the test
+        automation script conform to the following requirements:
+        - automated in python
+        - test implements the steps_ function to provide steps information to the TH
+        - TestStep list returned from the steps_ function includes both description
+          and expectation fields
+        - test does not gate any steps on PICS (top level PICS ok)
+
+
+        Usage: test_plan_table_generator.py filename classname test
+
+          filename - name of the file where the test is automated
+          classname - name of the MatterBaseTest class
+          test - name of the test to generate the table for (include the test_ portion)
+    '''
+    try:
+        module = importlib.import_module(Path(os.path.basename(filename)).stem)
+    except ModuleNotFoundError as e:
+        logging.error(f'Unable to load python module from {filename}. Please ensure this is a valid python file path')
+        return -1
+
+    try:
+        test_class = getattr(module, classname)
+    except AttributeError as e:
+        logging.error(f'Unable to load the test class {classname}. Please ensure this class is implemented in {filename}')
+        return -1
+
     config = generate_mobly_test_config(MatterTestConfig())
     test_instance = test_class(config)
-    steps = test_instance.get_test_steps(test)
+    steps = test_instance.get_defined_test_steps(test)
+    if not steps:
+        logging.error(f'Unable to find steps for test {test}. Please ensure the steps_ function is implemented')
+        return -1
+
     indent = 6
     header_num = f'{"**#**":<{indent}}'
     header_num_step = f'|{header_num} |*TestStep*   '
@@ -59,4 +92,4 @@ def main(filename, classname, test):
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

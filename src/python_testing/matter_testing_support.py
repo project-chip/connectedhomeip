@@ -684,10 +684,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             in order using self.step(number), where number is the test_plan_number
             from each TestStep.
         '''
-        steps = self._get_defined_test_steps(test)
+        steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def _get_defined_test_steps(self, test: str) -> list[TestStep]:
+    def get_defined_test_steps(self, test: str) -> list[TestStep]:
         steps_name = 'steps_' + test[5:]
         try:
             fn = getattr(self, steps_name)
