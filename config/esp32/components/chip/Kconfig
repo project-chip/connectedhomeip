@@ -632,12 +632,13 @@ menu "CHIP Device Layer"
                 When set, WoBLE advertisements will stop while a WoBLE connection is active.
 
         config USE_BLE_ONLY_FOR_COMMISSIONING
-	    bool "Use BLE only for commissioning"
-	    default y
-	    help
-            Disable this flag if BLE is used for any other purpose than commissioning.
-            When enabled, it deinitialized the BLE on successful commissioning, and on
-            bootup do not initialize the BLE if device is already provisioned with Wi-Fi/Thread credentials.
+            depends on BT_ENABLED
+            bool "Use BLE only for commissioning"
+            default y
+            help
+                Disable this flag if BLE is used for any other purpose than commissioning.
+                When enabled, it deinitialized the BLE on successful commissioning, and on
+                bootup do not initialize the BLE if device is already provisioned with Wi-Fi/Thread credentials.
 
     endmenu
 
