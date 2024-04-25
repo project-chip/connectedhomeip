@@ -305,8 +305,8 @@ bool NodeDataIsEmpty(const CommissionNodeData & node)
 
     if (node.longDiscriminator != 0 || node.vendorId != 0 || node.productId != 0 || node.commissioningMode != 0 ||
         node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 || node.mrpRetryIntervalIdle.has_value() ||
-        node.mrpRetryIntervalActive.has_value() || node.mrpRetryActiveThreshold.has_value() || node.isICDOperatingAsLIT.has_value() ||
-        node.supportsTcp || node.supportsCommissionerGeneratedPasscode != 0)
+        node.mrpRetryIntervalActive.has_value() || node.mrpRetryActiveThreshold.has_value() ||
+        node.isICDOperatingAsLIT.has_value() || node.supportsTcp || node.supportsCommissionerGeneratedPasscode != 0)
     {
         return false;
     }
