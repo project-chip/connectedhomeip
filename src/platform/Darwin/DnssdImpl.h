@@ -262,8 +262,8 @@ struct ResolveContext : public GenericContext
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
 
-    // Indicates whether the timer for 250 msecs should be started
-    // to give the resolve on SRP domain some extra time to complete.
+    // Indicates whether the timer should be started to give the resolve
+    // on SRP domain some extra time to complete.
     bool shouldStartSRPTimerForResolve = false;
     bool isSRPTimerRunning             = false;
 

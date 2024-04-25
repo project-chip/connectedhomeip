@@ -515,9 +515,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                 SILABS_LOG("Network is already provisioned, Ble advertisement not enabled");
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
                 // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
-                PlatformMgr().LockChipStack();
-                ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
-                PlatformMgr().UnlockChipStack();
+                PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
             }
         }

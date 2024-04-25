@@ -84,7 +84,7 @@ struct GroupTableCodec
         TLV::TLVType inner;
         ReturnErrorOnFailure(writer.StartContainer(TagEndpoints(), TLV::kTLVType_Array, inner));
         GroupDataProvider::GroupEndpoint mapping;
-        auto iter = mProvider->IterateEndpoints(mFabric, MakeOptional(mInfo.group_id));
+        auto iter = mProvider->IterateEndpoints(mFabric, std::make_optional(mInfo.group_id));
         if (nullptr != iter)
         {
             while (iter->Next(mapping))

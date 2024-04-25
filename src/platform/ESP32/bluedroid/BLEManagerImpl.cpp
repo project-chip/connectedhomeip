@@ -220,8 +220,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral);
     mFlags.Set(Flags::kFastAdvertisingEnabled, !mIsCentral);
-    OnChipBleConnectReceived = HandleIncomingBleConnection;
-
 #else
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
@@ -740,11 +738,6 @@ void BLEManagerImpl::ConnectDevice(esp_bd_addr_t & addr, esp_ble_addr_type_t add
     {
         ChipLogError(Ble, "Failed to connect to rc=%d", rc);
     }
-}
-
-void HandleIncomingBleConnection(BLEEndPoint * bleEP)
-{
-    ChipLogProgress(DeviceLayer, "CHIPoBLE connection received");
 }
 #endif
 

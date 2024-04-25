@@ -21,15 +21,15 @@
 namespace chip {
 namespace Controller {
 
-void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeData)
+void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::CommissionNodeData & nodeData)
 {
     // Ignore nodes with closed comissioning window
-    VerifyOrReturn(nodeData.nodeData.commissioningMode != 0);
+    VerifyOrReturn(nodeData.commissioningMode != 0);
     VerifyOrReturn(mActiveDeviceCommissioner != nullptr);
 
-    const uint16_t port = nodeData.resolutionData.port;
+    const uint16_t port = nodeData.port;
     char buf[chip::Inet::IPAddress::kMaxStringLength];
-    nodeData.resolutionData.ipAddress[0].ToString(buf);
+    nodeData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
     // Cancel discovery timer.
@@ -38,9 +38,8 @@ void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::Disco
     // Stop Mdns discovery.
     mActiveDeviceCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
 
-    Inet::InterfaceId interfaceId =
-        nodeData.resolutionData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.resolutionData.interfaceId : Inet::InterfaceId::Null();
-    auto peerAddress = Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], port, interfaceId);
+    Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId : Inet::InterfaceId::Null();
+    auto peerAddress              = Transport::PeerAddress::UDP(nodeData.ipAddress[0], port, interfaceId);
 
     RendezvousParameters keyExchangeParams = RendezvousParameters().SetSetupPINCode(mSetupPasscode).SetPeerAddress(peerAddress);
 
