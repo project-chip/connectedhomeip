@@ -39,7 +39,7 @@ namespace InteractionModel {
 ///
 /// `Complete` requirements
 ///   - Complete with InteractionModel::Status::Success will respond with data
-///     some response data was written. 
+///     some response data was written.
 ///   - Any other case (including success with cluster specific codes) implies
 ///     no response data and a status will be encoded instead
 ///       - this includes the case when some response data was written already.
@@ -119,7 +119,7 @@ public:
     ///     first and then re-encoding the reply content (use ResponseEncoder if applicable and
     ///     call Complete again)
     ///
-    ///   - Any other error (i.e. different from CHIP_NO_ERROR) mean that the invoke response 
+    ///   - Any other error (i.e. different from CHIP_NO_ERROR) mean that the invoke response
     ///     will contain an error and such an error is considered permanent.
     ///
     virtual CHIP_ERROR Complete(StatusIB error) = 0;
@@ -193,7 +193,7 @@ public:
     {
         VerifyOrReturnError(mCompleteState == CompleteState::kNeverCalled, CHIP_ERROR_INCORRECT_STATE);
         // this is a final complete, including retry handling
-        mCompleteState     = CompleteState::kComplete;
+        mCompleteState = CompleteState::kComplete;
         CHIP_ERROR err = mWriter->Complete(status);
 
         if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -219,7 +219,7 @@ public:
     {
         VerifyOrReturnError(mCompleteState == CompleteState::kNeverCalled, CHIP_ERROR_INCORRECT_STATE);
         // this is a final complete, including retry handling
-        mCompleteState     = CompleteState::kComplete;
+        mCompleteState = CompleteState::kComplete;
         CHIP_ERROR err = data.Encode(ResponseEncoder(ReplyData::GetCommandId()));
         if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
         {
