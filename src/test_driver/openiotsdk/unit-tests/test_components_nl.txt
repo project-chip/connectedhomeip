@@ -3,7 +3,6 @@ DataModelTests
 InetLayerTests
 MessagingLayerTests
 RawTransportTests
-RetransmitTests
 SecureChannelTests
 SetupPayloadTestsNL
 SupportTestsNL
