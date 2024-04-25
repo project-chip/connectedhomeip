@@ -277,7 +277,7 @@ private:
 
 enum ReplyAsyncFlags
 {
-    // Some commmands that are expensive to process (e.g. crypto).
+    // Some commands that are expensive to process (e.g. crypto).
     // Implementations may choose to send an ack on the message right away to
     // avoid MRP retransmits.
     kSlowCommandHandling = 0x0001,
