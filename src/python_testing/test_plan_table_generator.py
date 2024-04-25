@@ -41,18 +41,18 @@ def main(filename, classname, test):
         This script generates the Test Procedure table for the test plans document
         from the python script steps. In order to use this generator, the test
         automation script conform to the following requirements:
-        - automated in python
-        - test implements the steps_ function to provide steps information to the TH
-        - TestStep list returned from the steps_ function includes both description
-          and expectation fields
-        - test does not gate any steps on PICS (top level PICS ok)
+
+            - automated in python\n
+            - test implements the steps_ function to provide steps information to the TH\n
+            - TestStep list returned from the steps_ function includes both description and expectation fields\n
+            - test does not gate any steps on PICS (top level PICS ok)\n
 
 
         Usage: test_plan_table_generator.py filename classname test
 
-          filename - name of the file where the test is automated
-          classname - name of the MatterBaseTest class
-          test - name of the test to generate the table for (include the test_ portion)
+          filename - name of the file where the test is automated\n
+          classname - name of the MatterBaseTest class\n
+          test - name of the test to generate the table for (include the test_ portion)\n
     '''
     try:
         module = importlib.import_module(Path(os.path.basename(filename)).stem)
