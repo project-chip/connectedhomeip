@@ -19,75 +19,54 @@
 #include <string>
 
 #include <lib/core/CHIPError.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
 
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
+namespace chip {
 namespace {
 
-using namespace chip;
-
-void RangeConstructor(nlTestSuite * inSuite, void * /*inContext*/)
+TEST(ChipErrorTest, RangeConstructor)
 {
-    ChipError error(ChipError::Range::kSDK, /*value=*/1, "file_name", /*line=*/2);
+    ChipError error(ChipError::Range::kSDK, /*value=*/1, __FILE__, __LINE__);
 #if CHIP_CONFIG_ERROR_SOURCE
-    NL_TEST_ASSERT(inSuite, std::string(error.GetFile()) == "file_name");
-    NL_TEST_ASSERT(inSuite, error.GetLine() == 2);
+    EXPECT_EQ(error.GetFile(), __FILE__);
+    EXPECT_EQ(error.GetLine(), 30u);
 #if __cplusplus >= 202002L
     std::source_location location = error.GetSourceLocation();
-    NL_TEST_ASSERT(inSuite, error.line() == 37);
-    NL_TEST_ASSERT(inSuite, error.file_name() == "TestCHIPError.cpp");
+    EXPECT_EQ(location.line(), 30u);
+    EXPECT_EQ(location.file_name(), __FILE__);
 #endif // __cplusplus >= 202002L
 #endif // CHIP_CONFIG_ERROR_SOURCE
 }
 
-void SdkPartConstructor(nlTestSuite * inSuite, void * /*inContext*/)
+TEST(ChipErrorTest, SdkPartConstructor)
 {
-    ChipError error(ChipError::SdkPart::kCore, /*code=*/1, "file_name", /*line=*/2);
+    ChipError error(ChipError::SdkPart::kCore, /*code=*/1, __FILE__, __LINE__);
 #if CHIP_CONFIG_ERROR_SOURCE
-    NL_TEST_ASSERT(inSuite, std::string(error.GetFile()) == "file_name");
-    NL_TEST_ASSERT(inSuite, error.GetLine() == 2);
+    EXPECT_EQ(error.GetFile(), __FILE__);
+    EXPECT_EQ(error.GetLine(), 44u);
 #if __cplusplus >= 202002L
     std::source_location location = error.GetSourceLocation();
-    NL_TEST_ASSERT(inSuite, error.line() == 49);
-    NL_TEST_ASSERT(inSuite, error.file_name() == "TestCHIPError.cpp");
+    EXPECT_EQ(location.line(), 44u);
+    EXPECT_EQ(location.file_name(), __FILE__);
 #endif // __cplusplus >= 202002L
 #endif // CHIP_CONFIG_ERROR_SOURCE
 }
 
-void StorageTypeConstructor(nlTestSuite * inSuite, void * /*inContext*/)
+TEST(ChipErrorTest, StorageTypeConstructor)
 {
-    ChipError error(/*error=*/1, "file_name", /*line=*/2);
-    NL_TEST_ASSERT(inSuite, error.AsInteger() == 1);
+    ChipError error(/*error=*/1, __FILE__, __LINE__);
+    EXPECT_EQ(error.AsInteger(), 1u);
 #if CHIP_CONFIG_ERROR_SOURCE
-    NL_TEST_ASSERT(inSuite, std::string(error.GetFile()) == "file_name");
-    NL_TEST_ASSERT(inSuite, error.GetLine() == 2);
+    EXPECT_EQ(error.GetFile(), __FILE__);
+    EXPECT_EQ(error.GetLine(), 58u);
 #if __cplusplus >= 202002L
     std::source_location location = error.GetSourceLocation();
-    NL_TEST_ASSERT(inSuite, error.line() == 61);
-    NL_TEST_ASSERT(inSuite, error.file_name() == "TestCHIPError.cpp");
+    EXPECT_EQ(location.line(), 58u);
+    EXPECT_EQ(location.file_name(), __FILE__);
 #endif // __cplusplus >= 202002L
 #endif // CHIP_CONFIG_ERROR_SOURCE
 }
-
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-static const nlTest sTests[] = { NL_TEST_DEF("RangeConstructor", RangeConstructor),
-                                 NL_TEST_DEF("SdkPartConstructor", SdkPartConstructor),
-                                 NL_TEST_DEF("StorageTypeConstructor", StorageTypeConstructor), NL_TEST_SENTINEL() };
 
 } // namespace
-
-int TestCHIPError()
-{
-    nlTestSuite theSuite = { "Test CHIP_ERROR string conversions", &sTests[0], nullptr, nullptr };
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestCHIPError)
+} // namespace chip
