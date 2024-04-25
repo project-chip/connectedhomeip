@@ -7,6 +7,7 @@ MinimalMdnsRecordsTests
 MinimalMdnsRespondersTests
 CoreTests
 MdnsTests
+CredentialsTest
 PlatformTests
 RawTransportTests
 SystemLayerTests
