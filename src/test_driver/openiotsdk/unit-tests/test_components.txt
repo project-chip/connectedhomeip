@@ -12,3 +12,4 @@ PlatformTests
 TestShell
 SetupPayloadTests
 SupportTests
+UserDirectedCommissioningTests
