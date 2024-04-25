@@ -18,7 +18,7 @@
 #include "TvApp-JNI.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
@@ -27,7 +27,7 @@
 
 using namespace chip;
 
-static constexpr size_t kOnffManagerTableSize = EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT;
+static constexpr size_t kOnffManagerTableSize = MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT;
 
 namespace {
 
@@ -46,7 +46,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: OnOffManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::OnOff::Id,
-                                                       EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kOnffManagerTableSize,
                    ChipLogError(Zcl, "TV Android App::OnOff::NewManager: endpoint %d not found", endpoint));
 
@@ -68,7 +68,7 @@ void OnOffManager::NewManager(jint endpoint, jobject manager)
 OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id, MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kOnffManagerTableSize ? nullptr : gOnOffManagerTable[ep]);
 }
 
@@ -84,8 +84,9 @@ void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
 jboolean OnOffManager::SetOnOff(jint endpoint, bool value)
 {
     chip::DeviceLayer::StackLock stack;
-    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    chip::Protocols::InteractionModel::Status status =
+        app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
+    return status == chip::Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
@@ -94,8 +95,7 @@ CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
-    mOnOffManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mOnOffManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mOnOffManagerObject.Init(managerObject));
 
     jclass OnOffManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(OnOffManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -113,17 +113,18 @@ CHIP_ERROR OnOffManager::InitializeWithObjects(jobject managerObject)
 
 void OnOffManager::HandleOnOffChanged(bool value)
 {
+    DeviceLayer::StackUnlock unlock;
     ChipLogProgress(Zcl, "OnOffManager::HandleOnOffChanged");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
-    VerifyOrReturn(mOnOffManagerObject != nullptr, ChipLogProgress(Zcl, "mOnOffManagerObject null"));
+    VerifyOrReturn(mOnOffManagerObject.HasValidObjectRef(), ChipLogProgress(Zcl, "mOnOffManagerObject null"));
     VerifyOrReturn(mHandleOnOffChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleOnOffChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mOnOffManagerObject, mHandleOnOffChangedMethod, static_cast<jboolean>(value));
+    env->CallVoidMethod(mOnOffManagerObject.ObjectRef(), mHandleOnOffChangedMethod, static_cast<jboolean>(value));
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in OnOffManager::HandleOnOffChanged");

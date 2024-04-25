@@ -76,6 +76,14 @@ void Instant(const char * label, const char * group)
     }
 }
 
+void Counter(const char * label)
+{
+    for (auto & backend : gTracingBackends)
+    {
+        backend.TraceCounter(label);
+    }
+}
+
 void LogMessageSend(::chip::Tracing::MessageSendInfo & info)
 {
     for (auto & backend : gTracingBackends)
@@ -113,6 +121,14 @@ void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo & info)
     for (auto & backend : gTracingBackends)
     {
         backend.LogNodeDiscoveryFailed(info);
+    }
+}
+
+void LogMetricEvent(const ::chip::Tracing::MetricEvent & event)
+{
+    for (auto & backend : gTracingBackends)
+    {
+        backend.LogMetricEvent(event);
     }
 }
 

@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		39589F162B91556B00BE040C /* MCInteractionModelStructs.h in Headers */ = {isa = PBXBuildFile; fileRef = 39589F152B91556B00BE040C /* MCInteractionModelStructs.h */; };
+		39589F182B91557700BE040C /* MCInteractionModelStructs.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39589F172B91557700BE040C /* MCInteractionModelStructs.mm */; };
+		39BF57C52B8CFF790081653C /* MCAttributeObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 39BF57C42B8CFF790081653C /* MCAttributeObjects.h */; };
+		39BF57C72B8CFFB90081653C /* MCAttributeObjects.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39BF57C62B8CFFB90081653C /* MCAttributeObjects.mm */; };
+		39BF57C92B8D66540081653C /* NSStringSpanConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 39BF57C82B8D66540081653C /* NSStringSpanConversion.h */; };
+		39BF57CB2B8E54F80081653C /* NSDataSpanConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 39BF57CA2B8E54F80081653C /* NSDataSpanConversion.h */; };
+		39BF57CD2B8FC0EF0081653C /* MCClusterObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 39BF57CC2B8FC0EF0081653C /* MCClusterObjects.h */; };
+		39BF57CF2B8FC1030081653C /* MCClusterObjects.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39BF57CE2B8FC1030081653C /* MCClusterObjects.mm */; };
+		39D4D2502B97942D00BF3CFE /* MCCommandObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 39D4D24F2B97942D00BF3CFE /* MCCommandObjects.h */; };
+		39D4D2522B97943D00BF3CFE /* MCCommandObjects.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39D4D2512B97943D00BF3CFE /* MCCommandObjects.mm */; };
+		39DB29E92B9A3B1D0071334A /* MCCommandPayloads.h in Headers */ = {isa = PBXBuildFile; fileRef = 39DB29E82B9A3B1D0071334A /* MCCommandPayloads.h */; };
+		39DB29EB2B9A3B2D0071334A /* MCCommandPayloads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 39DB29EA2B9A3B2D0071334A /* MCCommandPayloads.mm */; };
 		3C0474062B3F7E5F0012AE95 /* MCEndpointFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C0474052B3F7E5F0012AE95 /* MCEndpointFilter.h */; };
 		3C04740C2B4604CF0012AE95 /* MCCryptoUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C04740B2B4604CF0012AE95 /* MCCryptoUtils.h */; };
 		3C04740E2B4605B40012AE95 /* MCCryptoUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C04740D2B4605B40012AE95 /* MCCryptoUtils.mm */; };
@@ -34,16 +46,10 @@
 		3C4F52282B51DB3000BB8A10 /* MCCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C4F52272B51DB3000BB8A10 /* MCCommand.h */; };
 		3C4F522A2B51DFAE00BB8A10 /* MCCommand_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C4F52292B51DFAE00BB8A10 /* MCCommand_Internal.h */; };
 		3C4F522C2B51E02800BB8A10 /* MCCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C4F522B2B51E02800BB8A10 /* MCCommand.mm */; };
-		3C4F52342B57338B00BB8A10 /* MCClusterObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C4F52332B57338B00BB8A10 /* MCClusterObjects.h */; };
-		3C4F52362B5733A200BB8A10 /* MCClusterObjects.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C4F52352B5733A200BB8A10 /* MCClusterObjects.mm */; };
-		3C621CA12B5F6CF8005CDBA3 /* MCCommandObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C621CA02B5F6CF8005CDBA3 /* MCCommandObjects.h */; };
-		3C621CA32B5F6D08005CDBA3 /* MCCommandObjects.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C621CA22B5F6D08005CDBA3 /* MCCommandObjects.mm */; };
 		3C621CA52B605A6A005CDBA3 /* MCAttribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C621CA42B605A6A005CDBA3 /* MCAttribute.h */; };
 		3C621CA72B605AA1005CDBA3 /* MCObserver.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C621CA62B605AA1005CDBA3 /* MCObserver.h */; };
 		3C621CA92B605C52005CDBA3 /* MCAttribute_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C621CA82B605C52005CDBA3 /* MCAttribute_Internal.h */; };
 		3C621CAB2B605C6E005CDBA3 /* MCAttribute.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C621CAA2B605C6E005CDBA3 /* MCAttribute.mm */; };
-		3C621CAD2B605E94005CDBA3 /* MCAttributeObjects.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C621CAC2B605E94005CDBA3 /* MCAttributeObjects.h */; };
-		3C621CAF2B605EA7005CDBA3 /* MCAttributeObjects.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C621CAE2B605EA7005CDBA3 /* MCAttributeObjects.mm */; };
 		3C66FBFC290327BB00B63FE7 /* AppParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C66FBFB290327BB00B63FE7 /* AppParameters.mm */; };
 		3C6920462AA1093300D0F613 /* MCDeviceAttestationCredentialsProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C6920452AA1093300D0F613 /* MCDeviceAttestationCredentialsProvider.h */; };
 		3C6920482AA1094000D0F613 /* MCDeviceAttestationCredentialsProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C6920472AA1094000D0F613 /* MCDeviceAttestationCredentialsProvider.mm */; };
@@ -54,7 +60,6 @@
 		3C9437942B3B47A10096E5F4 /* MCErrorUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C9437932B3B47A10096E5F4 /* MCErrorUtils.mm */; };
 		3CCB87212869085400771BAD /* MatterTvCastingBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CCB87202869085400771BAD /* MatterTvCastingBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3CCB8737286A555500771BAD /* libTvCastingCommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CCB8735286A555500771BAD /* libTvCastingCommon.a */; };
-		3CCB8738286A555500771BAD /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CCB8736286A555500771BAD /* libmbedtls.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		3CCB873F286A593700771BAD /* DiscoveredNodeData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CCB8739286A593700771BAD /* DiscoveredNodeData.mm */; };
 		3CCB8740286A593700771BAD /* CastingServerBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CCB873A286A593700771BAD /* CastingServerBridge.h */; };
 		3CCB8741286A593700771BAD /* DiscoveredNodeData.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CCB873B286A593700771BAD /* DiscoveredNodeData.h */; };
@@ -80,6 +85,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		39589F152B91556B00BE040C /* MCInteractionModelStructs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCInteractionModelStructs.h; sourceTree = "<group>"; };
+		39589F172B91557700BE040C /* MCInteractionModelStructs.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCInteractionModelStructs.mm; sourceTree = "<group>"; };
+		399049A62B9FC4ED000C91F0 /* MCCommandPayloads_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommandPayloads_Internal.h; sourceTree = "<group>"; };
+		39BF57C42B8CFF790081653C /* MCAttributeObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCAttributeObjects.h; sourceTree = "<group>"; };
+		39BF57C62B8CFFB90081653C /* MCAttributeObjects.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCAttributeObjects.mm; sourceTree = "<group>"; };
+		39BF57C82B8D66540081653C /* NSStringSpanConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSStringSpanConversion.h; sourceTree = "<group>"; };
+		39BF57CA2B8E54F80081653C /* NSDataSpanConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSDataSpanConversion.h; sourceTree = "<group>"; };
+		39BF57CC2B8FC0EF0081653C /* MCClusterObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCClusterObjects.h; sourceTree = "<group>"; };
+		39BF57CE2B8FC1030081653C /* MCClusterObjects.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCClusterObjects.mm; sourceTree = "<group>"; };
+		39D4D24F2B97942D00BF3CFE /* MCCommandObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommandObjects.h; sourceTree = "<group>"; };
+		39D4D2512B97943D00BF3CFE /* MCCommandObjects.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCommandObjects.mm; sourceTree = "<group>"; };
+		39DB29E82B9A3B1D0071334A /* MCCommandPayloads.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommandPayloads.h; sourceTree = "<group>"; };
+		39DB29EA2B9A3B2D0071334A /* MCCommandPayloads.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCommandPayloads.mm; sourceTree = "<group>"; };
 		3C0474052B3F7E5F0012AE95 /* MCEndpointFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCEndpointFilter.h; sourceTree = "<group>"; };
 		3C04740B2B4604CF0012AE95 /* MCCryptoUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCryptoUtils.h; sourceTree = "<group>"; };
 		3C04740D2B4605B40012AE95 /* MCCryptoUtils.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCryptoUtils.mm; sourceTree = "<group>"; };
@@ -112,16 +130,10 @@
 		3C4F52272B51DB3000BB8A10 /* MCCommand.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommand.h; sourceTree = "<group>"; };
 		3C4F52292B51DFAE00BB8A10 /* MCCommand_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommand_Internal.h; sourceTree = "<group>"; };
 		3C4F522B2B51E02800BB8A10 /* MCCommand.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCommand.mm; sourceTree = "<group>"; };
-		3C4F52332B57338B00BB8A10 /* MCClusterObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCClusterObjects.h; sourceTree = "<group>"; };
-		3C4F52352B5733A200BB8A10 /* MCClusterObjects.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCClusterObjects.mm; sourceTree = "<group>"; };
-		3C621CA02B5F6CF8005CDBA3 /* MCCommandObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCCommandObjects.h; sourceTree = "<group>"; };
-		3C621CA22B5F6D08005CDBA3 /* MCCommandObjects.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCCommandObjects.mm; sourceTree = "<group>"; };
 		3C621CA42B605A6A005CDBA3 /* MCAttribute.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCAttribute.h; sourceTree = "<group>"; };
 		3C621CA62B605AA1005CDBA3 /* MCObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCObserver.h; sourceTree = "<group>"; };
 		3C621CA82B605C52005CDBA3 /* MCAttribute_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCAttribute_Internal.h; sourceTree = "<group>"; };
 		3C621CAA2B605C6E005CDBA3 /* MCAttribute.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCAttribute.mm; sourceTree = "<group>"; };
-		3C621CAC2B605E94005CDBA3 /* MCAttributeObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCAttributeObjects.h; sourceTree = "<group>"; usesTabs = 0; };
-		3C621CAE2B605EA7005CDBA3 /* MCAttributeObjects.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MCAttributeObjects.mm; sourceTree = "<group>"; };
 		3C66FBFA2903279A00B63FE7 /* AppParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppParameters.h; sourceTree = "<group>"; };
 		3C66FBFB290327BB00B63FE7 /* AppParameters.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppParameters.mm; sourceTree = "<group>"; };
 		3C6920452AA1093300D0F613 /* MCDeviceAttestationCredentialsProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCDeviceAttestationCredentialsProvider.h; sourceTree = "<group>"; };
@@ -138,7 +150,6 @@
 		3CCB871D2869085400771BAD /* MatterTvCastingBridge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MatterTvCastingBridge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CCB87202869085400771BAD /* MatterTvCastingBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MatterTvCastingBridge.h; sourceTree = "<group>"; };
 		3CCB8735286A555500771BAD /* libTvCastingCommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTvCastingCommon.a; path = lib/libTvCastingCommon.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		3CCB8736286A555500771BAD /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = lib/libmbedtls.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CCB8739286A593700771BAD /* DiscoveredNodeData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DiscoveredNodeData.mm; sourceTree = "<group>"; };
 		3CCB873A286A593700771BAD /* CastingServerBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CastingServerBridge.h; sourceTree = "<group>"; };
 		3CCB873B286A593700771BAD /* DiscoveredNodeData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscoveredNodeData.h; sourceTree = "<group>"; };
@@ -170,13 +181,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				3CCB8737286A555500771BAD /* libTvCastingCommon.a in Frameworks */,
-				3CCB8738286A555500771BAD /* libmbedtls.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		395241F42B854EA700F7DB91 /* zap-generated */ = {
+			isa = PBXGroup;
+			children = (
+				39BF57C42B8CFF790081653C /* MCAttributeObjects.h */,
+				39BF57C62B8CFFB90081653C /* MCAttributeObjects.mm */,
+				39BF57CC2B8FC0EF0081653C /* MCClusterObjects.h */,
+				39BF57CE2B8FC1030081653C /* MCClusterObjects.mm */,
+				39589F152B91556B00BE040C /* MCInteractionModelStructs.h */,
+				39589F172B91557700BE040C /* MCInteractionModelStructs.mm */,
+				39D4D24F2B97942D00BF3CFE /* MCCommandObjects.h */,
+				39D4D2512B97943D00BF3CFE /* MCCommandObjects.mm */,
+				39DB29E82B9A3B1D0071334A /* MCCommandPayloads.h */,
+				39DB29EA2B9A3B2D0071334A /* MCCommandPayloads.mm */,
+				399049A62B9FC4ED000C91F0 /* MCCommandPayloads_Internal.h */,
+			);
+			path = "zap-generated";
+			sourceTree = "<group>";
+		};
 		3C94378A2B3654720096E5F4 /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -202,7 +230,6 @@
 			isa = PBXGroup;
 			children = (
 				3CCB871F2869085400771BAD /* MatterTvCastingBridge */,
-				3CCB8736286A555500771BAD /* libmbedtls.a */,
 				3CCB8735286A555500771BAD /* libTvCastingCommon.a */,
 				3CCB871E2869085400771BAD /* Products */,
 			);
@@ -219,6 +246,7 @@
 		3CCB871F2869085400771BAD /* MatterTvCastingBridge */ = {
 			isa = PBXGroup;
 			children = (
+				395241F42B854EA700F7DB91 /* zap-generated */,
 				3C94378A2B3654720096E5F4 /* Core */,
 				3C94378B2B36547A0096E5F4 /* Support */,
 				3C94378C2B3654960096E5F4 /* Clusters */,
@@ -243,12 +271,6 @@
 				3C621CA42B605A6A005CDBA3 /* MCAttribute.h */,
 				3C621CA82B605C52005CDBA3 /* MCAttribute_Internal.h */,
 				3C621CAA2B605C6E005CDBA3 /* MCAttribute.mm */,
-				3C4F52332B57338B00BB8A10 /* MCClusterObjects.h */,
-				3C4F52352B5733A200BB8A10 /* MCClusterObjects.mm */,
-				3C621CA02B5F6CF8005CDBA3 /* MCCommandObjects.h */,
-				3C621CA22B5F6D08005CDBA3 /* MCCommandObjects.mm */,
-				3C621CAC2B605E94005CDBA3 /* MCAttributeObjects.h */,
-				3C621CAE2B605EA7005CDBA3 /* MCAttributeObjects.mm */,
 				3C4F521F2B507C4A00BB8A10 /* MCEndpointClusterType.h */,
 				3C4F52132B4F31DC00BB8A10 /* MCDeviceTypeStruct.h */,
 				3C4F52152B4F31FA00BB8A10 /* MCDeviceTypeStruct.m */,
@@ -272,6 +294,8 @@
 				3C9437932B3B47A10096E5F4 /* MCErrorUtils.mm */,
 				3C04740B2B4604CF0012AE95 /* MCCryptoUtils.h */,
 				3C04740D2B4605B40012AE95 /* MCCryptoUtils.mm */,
+				39BF57CA2B8E54F80081653C /* NSDataSpanConversion.h */,
+				39BF57C82B8D66540081653C /* NSStringSpanConversion.h */,
 				3CCB873A286A593700771BAD /* CastingServerBridge.h */,
 				3CCB873D286A593700771BAD /* CastingServerBridge.mm */,
 				3C66FBFA2903279A00B63FE7 /* AppParameters.h */,
@@ -318,23 +342,28 @@
 				3CD6D01A298CDA2100D7569A /* CommissionerDiscoveryDelegateImpl.h in Headers */,
 				3CF71C0E2A992DA2003A5CE5 /* MCDataSource.h in Headers */,
 				3C4F52142B4F31DC00BB8A10 /* MCDeviceTypeStruct.h in Headers */,
+				39BF57CD2B8FC0EF0081653C /* MCClusterObjects.h in Headers */,
+				39D4D2502B97942D00BF3CFE /* MCCommandObjects.h in Headers */,
 				3C26AC8C2926FE0C00BA6881 /* DeviceAttestationCredentialsProviderImpl.hpp in Headers */,
 				3C621CA52B605A6A005CDBA3 /* MCAttribute.h in Headers */,
 				3CD73F1C2A9E8396009D82D1 /* MCCommissionableDataProvider.h in Headers */,
 				3C4F521E2B4F4B3B00BB8A10 /* MCEndpoint_Internal.h in Headers */,
+				39BF57C92B8D66540081653C /* NSStringSpanConversion.h in Headers */,
+				39DB29E92B9A3B1D0071334A /* MCCommandPayloads.h in Headers */,
 				3C4F52262B50899700BB8A10 /* MCCluster_Internal.h in Headers */,
 				3CF71C0A2A992D0D003A5CE5 /* MCCastingApp.h in Headers */,
 				3C4F521C2B4F4B1B00BB8A10 /* MCCastingPlayer_Internal.h in Headers */,
 				3CD73F172A9E6884009D82D1 /* MCRotatingDeviceIdUniqueIdProvider.h in Headers */,
 				3C4F52102B4E18C800BB8A10 /* MCEndpoint.h in Headers */,
 				3C4F52282B51DB3000BB8A10 /* MCCommand.h in Headers */,
+				39BF57CB2B8E54F80081653C /* NSDataSpanConversion.h in Headers */,
 				3C621CA92B605C52005CDBA3 /* MCAttribute_Internal.h in Headers */,
 				3CF71C102A99312D003A5CE5 /* MCCommissionableData.h in Headers */,
 				3C4F522A2B51DFAE00BB8A10 /* MCCommand_Internal.h in Headers */,
 				3CD73F202A9EA060009D82D1 /* MCDeviceAttestationCredentials.h in Headers */,
 				3CCB8740286A593700771BAD /* CastingServerBridge.h in Headers */,
-				3C4F52342B57338B00BB8A10 /* MCClusterObjects.h in Headers */,
 				3CE5ECCE2A673B30007CF331 /* CommissioningCallbackHandlers.h in Headers */,
+				39589F162B91556B00BE040C /* MCInteractionModelStructs.h in Headers */,
 				3CCB8742286A593700771BAD /* ConversionUtils.hpp in Headers */,
 				3C621CA72B605AA1005CDBA3 /* MCObserver.h in Headers */,
 				3C9437922B3B478E0096E5F4 /* MCErrorUtils.h in Headers */,
@@ -342,10 +371,9 @@
 				3CCB8741286A593700771BAD /* DiscoveredNodeData.h in Headers */,
 				3C0474062B3F7E5F0012AE95 /* MCEndpointFilter.h in Headers */,
 				3CCB87212869085400771BAD /* MatterTvCastingBridge.h in Headers */,
-				3C621CA12B5F6CF8005CDBA3 /* MCCommandObjects.h in Headers */,
 				3C4F52202B507C4A00BB8A10 /* MCEndpointClusterType.h in Headers */,
 				3C6920462AA1093300D0F613 /* MCDeviceAttestationCredentialsProvider.h in Headers */,
-				3C621CAD2B605E94005CDBA3 /* MCAttributeObjects.h in Headers */,
+				39BF57C52B8CFF790081653C /* MCAttributeObjects.h in Headers */,
 				3C04740C2B4604CF0012AE95 /* MCCryptoUtils.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -450,22 +478,23 @@
 				3C4E53B228E5184C00F293E8 /* TargetNavigatorTypes.mm in Sources */,
 				3C6920482AA1094000D0F613 /* MCDeviceAttestationCredentialsProvider.mm in Sources */,
 				3CE5ECD02A673E2C007CF331 /* CommissioningCallbackHandlers.m in Sources */,
+				39BF57CF2B8FC1030081653C /* MCClusterObjects.mm in Sources */,
 				3CD73F192A9E68A7009D82D1 /* MCRotatingDeviceIdUniqueIdProvider.mm in Sources */,
+				39589F182B91557700BE040C /* MCInteractionModelStructs.mm in Sources */,
+				39DB29EB2B9A3B2D0071334A /* MCCommandPayloads.mm in Sources */,
 				3CF8532728E37F1000F07B9F /* MatterError.mm in Sources */,
 				3C4F522C2B51E02800BB8A10 /* MCCommand.mm in Sources */,
 				3C4E53B628E5595A00F293E8 /* ContentLauncherTypes.mm in Sources */,
 				3C81C75028F7A7D3001CB9D1 /* VideoPlayer.m in Sources */,
 				3CCB8744286A593700771BAD /* ConversionUtils.mm in Sources */,
-				3C621CA32B5F6D08005CDBA3 /* MCCommandObjects.mm in Sources */,
 				3CF71C0C2A992D25003A5CE5 /* MCCastingApp.mm in Sources */,
 				3C621CAB2B605C6E005CDBA3 /* MCAttribute.mm in Sources */,
 				3C4F52122B4E18ED00BB8A10 /* MCEndpoint.mm in Sources */,
 				3C4E53B028E4F28100F293E8 /* MediaPlaybackTypes.mm in Sources */,
 				3C04740E2B4605B40012AE95 /* MCCryptoUtils.mm in Sources */,
-				3C4F52362B5733A200BB8A10 /* MCClusterObjects.mm in Sources */,
 				3CD73F1E2A9E83C1009D82D1 /* MCCommissionableDataProvider.mm in Sources */,
 				3CD73F222A9EA078009D82D1 /* MCDeviceAttestationCredentials.mm in Sources */,
-				3C621CAF2B605EA7005CDBA3 /* MCAttributeObjects.mm in Sources */,
+				39BF57C72B8CFFB90081653C /* MCAttributeObjects.mm in Sources */,
 				3C2346252B362BBB00FA276E /* MCCastingPlayerDiscovery.mm in Sources */,
 				3C4F52242B507CA800BB8A10 /* MCCluster.mm in Sources */,
 				3C66FBFC290327BB00B63FE7 /* AppParameters.mm in Sources */,
@@ -474,6 +503,7 @@
 				3C26AC9329282B8100BA6881 /* DeviceAttestationCredentialsHolder.m in Sources */,
 				3C26AC902927008900BA6881 /* DeviceAttestationCredentialsProviderImpl.mm in Sources */,
 				3CCB873F286A593700771BAD /* DiscoveredNodeData.mm in Sources */,
+				39D4D2522B97943D00BF3CFE /* MCCommandObjects.mm in Sources */,
 				3C4F52162B4F31FA00BB8A10 /* MCDeviceTypeStruct.m in Sources */,
 				3C2696FB2B4A5FC50026E771 /* MCEndpointFilter.m in Sources */,
 				3C81C74C28F7A777001CB9D1 /* ContentApp.mm in Sources */,
@@ -522,7 +552,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -610,6 +639,10 @@
 		3CCB87252869085400771BAD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ARCHS[sdk=iphonesimulator*]" = (
+					arm64,
+					x86_64,
+				);
 				CHIP_ROOT = "$(PROJECT_DIR)/../../../..";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;

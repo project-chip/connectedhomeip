@@ -17,6 +17,8 @@
  */
 
 #include "AppTask.h"
+#include "ButtonManager.h"
+#include "LEDManager.h"
 #include <LockManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model/Nullable.h>
@@ -32,25 +34,14 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace TelinkDoorLock::LockInitParams;
 
-namespace {
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-LEDWidget sLockLED;
-#endif
-} // namespace
-
 AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(LockActionEventHandler);
-#endif
     InitCommonParts();
 
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    sLockLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios));
-    sLockLED.Set(LockMgr().IsLocked());
-#endif
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, LockMgr().IsLocked());
 
     chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
     chip::EndpointId endpointId{ kExampleEndpointId };
@@ -158,45 +149,97 @@ void AppTask::LockStateChanged(LockManager::State_t state)
     {
     case LockManager::State_t::kState_LockInitiated:
         LOG_INF("Callback: Lock action initiated");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sLockLED.Blink(50, 50);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, 50, 50);
         break;
     case LockManager::State_t::kState_LockCompleted:
         LOG_INF("Callback: Lock action completed");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sLockLED.Set(true);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, true);
         break;
     case LockManager::State_t::kState_UnlockInitiated:
         LOG_INF("Callback: Unlock action initiated");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sLockLED.Blink(50, 50);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, 50, 50);
         break;
     case LockManager::State_t::kState_UnlockCompleted:
         LOG_INF("Callback: Unlock action completed");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sLockLED.Set(false);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, false);
         break;
     case LockManager::State_t::kState_UnlatchInitiated:
         LOG_INF("Callback: Unbolt action initiated");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sLockLED.Blink(75, 25);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, 75, 25);
         break;
     case LockManager::State_t::kState_UnlatchCompleted:
         LOG_INF("Callback: Unbolt action completed");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sLockLED.Blink(25, 75);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, 25, 75);
         break;
     case LockManager::State_t::kState_NotFulyLocked:
         LOG_INF("Callback: Lock not fully locked. Unexpected state");
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-        sLockLED.Blink(10, 90);
-#endif
+        LedManager::getInstance().setLed(LedManager::EAppLed_App0, 10, 90);
         break;
     }
+}
+
+void AppTask::LockJammedEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = LockJammedActionHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTask::LockJammedActionHandler(AppEvent * aEvent)
+{
+    LOG_INF("Sending a lock jammed event");
+
+    /* Generating Door Lock Jammed event */
+    DoorLockServer::Instance().SendLockAlarmEvent(kExampleEndpointId, AlarmCodeEnum::kLockJammed);
+}
+
+void AppTask::LockStateEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = LockStateActionHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTask::LockStateActionHandler(AppEvent * aEvent)
+{
+    LOG_INF("Sending a lock state event");
+
+    // This code was written for testing purpose only
+    // For real door status the level detection may be used instead of pulse
+    static DoorStateEnum mDoorState = DoorStateEnum::kDoorOpen;
+    if (mDoorState == DoorStateEnum::kDoorOpen)
+    {
+        mDoorState = DoorStateEnum::kDoorClosed;
+    }
+    else
+    {
+        mDoorState = DoorStateEnum::kDoorOpen;
+    }
+
+    /* Generating Door Lock Status event */
+    DoorLockServer::Instance().SetDoorState(kExampleEndpointId, mDoorState);
+}
+
+void AppTask::LinkButtons(ButtonManager & buttonManager)
+{
+    buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
+    buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
+    buttonManager.addCallback(LockJammedEventHandler, 2, true);
+    buttonManager.addCallback(LockStateEventHandler, 3, true);
+}
+
+void AppTask::LinkLeds(LedManager & ledManager)
+{
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    ledManager.linkLed(LedManager::EAppLed_Status, 0);
+    ledManager.linkLed(LedManager::EAppLed_App0, 1);
+#else
+    ledManager.linkLed(LedManager::EAppLed_App0, 0);
+#endif // CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 }

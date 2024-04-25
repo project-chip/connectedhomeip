@@ -30,6 +30,7 @@ static_library("server") {
   sources = [
     "AclStorage.cpp",
     "AclStorage.h",
+    "AppDelegate.h",
     "CommissioningModeProvider.h",
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",
@@ -51,16 +52,23 @@ static_library("server") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/dnssd:naming",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  # TODO: Server.cpp uses TestGroupData.h. Unsure why test code would be in such a central place
+  #       This dependency is split since it should probably be removed (or naming should
+  #       be updated if this is not really "testing" even though headers are Test*.h)
+  public_deps += [ "${chip_root}/src/lib/support:testing" ]
 
   if (chip_enable_icd_server) {
     public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]

@@ -17,6 +17,7 @@
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#include "em_rmu.h"
 #include "sl_system_kernel.h"
 
 #ifdef ENABLE_WSTK_LEDS
@@ -43,12 +44,15 @@ extern "C" {
 
 #include "sl_component_catalog.h"
 #include "sl_mbedtls.h"
-#include "sl_system_init.h"
 #if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#ifdef SL_CATALOG_CLI_PRESENT
+#include "sl_iostream.h"
+#include "sl_iostream_stdio.h"
+#endif //
 #include "uart.h"
 #endif
 
-#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
+#ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
 #include "SEGGER_SYSVIEW.h"
 #endif
 }
@@ -67,15 +71,20 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-    sl_system_init();
+    mRebootCause = RMU_ResetCauseGet();
+    // Clear register so it does accumualate the causes of each reset
+    RMU_ResetCauseClear();
+
+#if SILABS_LOG_OUT_UART && defined(SL_CATALOG_CLI_PRESENT)
+    sl_iostream_set_default(sl_iostream_stdio_handle);
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
     sl_ot_sys_init();
 #endif
 
-#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
+#ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
     SEGGER_SYSVIEW_Conf();
-    SEGGER_SYSVIEW_Start();
 #endif
 
 #if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI

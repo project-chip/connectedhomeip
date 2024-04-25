@@ -424,6 +424,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRGeneralDiagnosticsClusterPayloadTestRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRGeneralDiagnosticsClusterPayloadTestResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::PayloadTestResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRSoftwareDiagnosticsClusterResetWatermarksParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

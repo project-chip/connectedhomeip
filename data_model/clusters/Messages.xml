@@ -55,6 +55,8 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 
+:xrefstyle: short
+
 Copyright (C) Connectivity Standards Alliance (2021). All rights reserved. This
 information within this document is the property of the Connectivity Standards
 Alliance and its use and disclosure are restricted.
@@ -91,6 +93,8 @@ are made.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0097" name="Messages" revision="3">
   <revisionHistory>
@@ -98,6 +102,9 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Updated from SE1.4 version; CCB 1819"/>
     <revision revision="3" summary="Initial Matter release; renamed from EnergyMessaging to Messages"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0097" name="Messages"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MESS" scope="Endpoint"/>
   <features>
     <feature bit="0" code="CONF" name="ReceivedConfirmation">
@@ -179,49 +186,45 @@ Davis, CA 95616, USA
     </bitmap>
     <struct name="MessageResponseOptionStruct">
       <field id="0" name="MessageResponseID" type="uint32">
-        <mandatoryConform>
-          <feature name="RESP"/>
-        </mandatoryConform>
+        <mandatoryConform/>
         <constraint type="min" value="1"/>
       </field>
       <field id="1" name="Label" type="string">
-        <mandatoryConform>
-          <feature name="RPLY"/>
-        </mandatoryConform>
+        <mandatoryConform/>
         <constraint type="maxLength" value="32"/>
       </field>
     </struct>
     <struct name="MessageStruct">
       <field id="0" name="MessageID" type="MessageID">
-        <access read="true" fabricSensitive="true"/>
+        <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="Priority" type="MessagePriorityEnum" default="0">
-        <access read="true" fabricSensitive="true"/>
+        <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="MessageControl" type="MessageControlBitmap" default="0">
-        <access read="true" fabricSensitive="true"/>
+        <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="StartTime" type="epoch-s" default="0">
-        <access read="true" fabricSensitive="true"/>
+        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="4" name="Duration" type="uint16" default="0">
-        <access read="true" fabricSensitive="true"/>
+      <field id="4" name="Duration" type="uint64" default="0">
+        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="5" name="MessageText" type="string">
-        <access read="true" fabricSensitive="true"/>
+        <access fabricSensitive="true"/>
         <mandatoryConform/>
         <constraint type="maxLength" value="256"/>
       </field>
       <field id="6" name="Responses" type="list" default="empty">
         <entry type="MessageResponseOptionStruct"/>
-        <access read="true" fabricSensitive="true"/>
+        <access fabricSensitive="true"/>
         <mandatoryConform>
           <feature name="RESP"/>
         </mandatoryConform>
@@ -245,21 +248,86 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="PresentMessagesRequest" response="Y">
+    <command id="0x00" name="PresentMessagesRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="Messages" type="list">
-        <entry type="MessageStruct"/>
+      <field id="0" name="MessageID" type="MessageID">
         <mandatoryConform/>
       </field>
+      <field id="1" name="Priority" type="MessagePriorityEnum" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MessageControl" type="MessageControlBitmap" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="StartTime" type="epoch-s" default="0">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="Duration" type="uint64" default="0">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="MessageText" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="256"/>
+      </field>
+      <field id="6" name="Responses" type="list" default="empty">
+        <entry type="MessageResponseOptionStruct"/>
+        <mandatoryConform>
+          <feature name="RESP"/>
+        </mandatoryConform>
+        <constraint type="maxCount" value="4"/>
+      </field>
     </command>
-    <command id="0x01" name="CancelMessagesRequest" response="Y">
+    <command id="0x01" name="CancelMessagesRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="MessageIDs" type="list">
         <entry type="MessageID"/>
         <mandatoryConform/>
+        <constraint type="maxCount" value="8"/>
       </field>
     </command>
   </commands>
+  <events>
+    <event id="0x00" name="MessageQueued" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="MessageID" type="MessageID">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="MessagePresented" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="MessageID" type="MessageID">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x02" name="MessageComplete" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="MessageID" type="MessageID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ResponseID" type="uint32" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="RESP"/>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="Reply" type="string" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="RPLY"/>
+        </mandatoryConform>
+        <constraint type="maxLength" value="256"/>
+      </field>
+      <field id="3" name="FutureMessagesPreference" type="FutureMessagePreferenceEnum" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
 </cluster>

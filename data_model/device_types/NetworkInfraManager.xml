@@ -55,14 +55,17 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="" name="Network Infrastructure Manager" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0090" name="Network Infrastructure Manager" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
   <clusters>
-    <cluster id="" name="Network Identity Management" side="server">
+    <cluster id="0x0450" name="Network Identity Management" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0451" name="Wi" side="server">
       <mandatoryConform/>
     </cluster>
   </clusters>

@@ -20,7 +20,9 @@
 #import "MTRLogging_Internal.h"
 #import "MTRServerAttribute_Internal.h"
 #import "MTRServerEndpoint_Internal.h"
+#import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
+
 #import <Matter/MTRServerAttribute.h>
 
 #include <app/reporting/reporting.h>
@@ -32,7 +34,12 @@ using namespace chip;
 
 MTR_DIRECT_MEMBERS
 @implementation MTRServerAttribute {
+    // _lock always protects access to _deviceController, _value,
+    // _serializedValue, and _parentCluster.
+    os_unfair_lock _lock;
     MTRDeviceController * __weak _deviceController;
+    NSDictionary<NSString *, id> * _value;
+    app::ConcreteClusterPath _parentCluster;
 }
 
 - (nullable instancetype)initAttributeWithID:(NSNumber *)attributeID initialValue:(NSDictionary<NSString *, id> *)value requiredReadPrivilege:(MTRAccessControlEntryPrivilege)requiredReadPrivilege writable:(BOOL)writable
@@ -66,13 +73,14 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
+    _lock = OS_UNFAIR_LOCK_INIT;
     _attributeID = attributeID;
     _requiredReadPrivilege = requiredReadPrivilege;
     _writable = writable;
     _parentCluster = app::ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 
     // Now call setValue to store the value and its serialization.
-    if ([self setValue:value] == NO) {
+    if ([self setValueInternal:value logIfNotAssociated:NO] == NO) {
         return nil;
     }
 
@@ -80,6 +88,11 @@ MTR_DIRECT_MEMBERS
 }
 
 - (BOOL)setValue:(NSDictionary<NSString *, id> *)value
+{
+    return [self setValueInternal:value logIfNotAssociated:YES];
+}
+
+- (BOOL)setValueInternal:(NSDictionary<NSString *, id> *)value logIfNotAssociated:(BOOL)logIfNotAssociated
 {
     id serializedValue;
     id dataType = value[MTRTypeKey];
@@ -95,8 +108,13 @@ MTR_DIRECT_MEMBERS
             return NO;
         }
         for (id item in dataValueList) {
+            if (![item isKindOfClass:NSDictionary.class]) {
+                MTR_LOG_ERROR("MTRServerAttribute value array should contain dictionaries");
+            }
+            NSDictionary<NSString *, id> * itemDictionary = item;
+
             NSError * encodingError;
-            NSData * encodedItem = MTREncodeTLVFromDataValueDictionary(item, &encodingError);
+            NSData * encodedItem = MTREncodeTLVFromDataValueDictionary(itemDictionary[MTRDataKey], &encodingError);
             if (encodedItem == nil) {
                 return NO;
             }
@@ -111,15 +129,26 @@ MTR_DIRECT_MEMBERS
         }
     }
 
-    // We serialized properly, so should be good to go on the value.
+    // We serialized properly, so should be good to go on the value.  Lock
+    // around our ivar accesses.
+    std::lock_guard lock(_lock);
+
     _value = [value copy];
+
+    MTR_LOG_DEFAULT("Attribute value updated: %@", [self _descriptionWhileLocked]); // Logs new value as part of our description.
 
     MTRDeviceController * deviceController = _deviceController;
     if (deviceController == nil) {
-        // We're not bound to a controller, so safe to directly update _serializedValue.
+        // We're not bound to a controller, so safe to directly update
+        // _serializedValue.
+        if (logIfNotAssociated) {
+            MTR_LOG_DEFAULT("Not publishing value for attribute " ChipLogFormatMEI "; not bound to a controller",
+                ChipLogValueMEI(static_cast<AttributeId>(_attributeID.unsignedLongLongValue)));
+        }
         _serializedValue = serializedValue;
     } else {
         [deviceController asyncDispatchToMatterQueue:^{
+            std::lock_guard lock(self->_lock);
             auto changed = ![self->_serializedValue isEqual:serializedValue];
             self->_serializedValue = serializedValue;
             if (changed) {
@@ -132,27 +161,72 @@ MTR_DIRECT_MEMBERS
     return YES;
 }
 
-- (BOOL)associateWithController:(MTRDeviceController *)controller
+- (NSDictionary<NSString *, id> *)value
 {
+    std::lock_guard lock(_lock);
+    return [_value copy];
+}
+
+- (BOOL)associateWithController:(nullable MTRDeviceController *)controller
+{
+    std::lock_guard lock(_lock);
+
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
         MTR_LOG_ERROR("Cannot associate MTRServerAttribute with controller %@; already associated with controller %@",
             controller.uniqueIdentifier, existingController.uniqueIdentifier);
-#else
-        MTR_LOG_ERROR("Cannot associate MTRServerAttribute with controller; already associated with a different controller");
-#endif
         return NO;
     }
 
     _deviceController = controller;
+
+    MTR_LOG_DEFAULT("Associated %@ with controller", [self _descriptionWhileLocked]);
 
     return YES;
 }
 
 - (void)invalidate
 {
+    std::lock_guard lock(_lock);
+
     _deviceController = nil;
+}
+
+- (BOOL)addToCluster:(const app::ConcreteClusterPath &)cluster
+{
+    std::lock_guard lock(_lock);
+
+    if (_parentCluster.mClusterId != kInvalidClusterId) {
+        MTR_LOG_ERROR("Cannot add attribute to cluster " ChipLogFormatMEI "; already added to cluster " ChipLogFormatMEI, ChipLogValueMEI(cluster.mClusterId), ChipLogValueMEI(_parentCluster.mClusterId));
+        return NO;
+    }
+
+    _parentCluster = cluster;
+    return YES;
+}
+
+- (void)updateParentCluster:(const app::ConcreteClusterPath &)cluster
+{
+    std::lock_guard lock(_lock);
+    _parentCluster = cluster;
+}
+
+- (const app::ConcreteClusterPath &)parentCluster
+{
+    std::lock_guard lock(_lock);
+    return _parentCluster;
+}
+
+- (NSString *)description
+{
+    std::lock_guard lock(_lock);
+    return [self _descriptionWhileLocked];
+}
+
+- (NSString *)_descriptionWhileLocked
+{
+    os_unfair_lock_assert_owner(&_lock);
+    return [NSString stringWithFormat:@"<MTRServerAttribute endpoint %u, cluster " ChipLogFormatMEI ", id " ChipLogFormatMEI ", value '%@'>", static_cast<EndpointId>(_parentCluster.mEndpointId), ChipLogValueMEI(_parentCluster.mClusterId), ChipLogValueMEI(_attributeID.unsignedLongLongValue), _value];
 }
 
 @end

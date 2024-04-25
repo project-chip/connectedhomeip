@@ -109,7 +109,12 @@ public:
     /**
      * @brief Initializes the key derivation operation.
      */
-    CHIP_ERROR Init(psa_algorithm_t algorithm, const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info);
+    CHIP_ERROR Init(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info);
+
+    /**
+     * @brief Initializes the key derivation operation.
+     */
+    CHIP_ERROR Init(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info);
 
     /**
      * @brief Derives raw key material from the operation.
@@ -139,7 +144,9 @@ public:
     CHIP_ERROR DeriveKey(const psa_key_attributes_t & attributes, psa_key_id_t & keyId);
 
 private:
-    psa_key_id_t mSecretKeyId                 = 0;
+    CHIP_ERROR InitOperation(psa_key_id_t hkdfKey, const ByteSpan & salt, const ByteSpan & info);
+
+    psa_key_id_t mSecretKeyId                 = PSA_KEY_ID_NULL;
     psa_key_derivation_operation_t mOperation = PSA_KEY_DERIVATION_OPERATION_INIT;
 };
 

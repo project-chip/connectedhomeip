@@ -37,7 +37,7 @@ public:
     CHIP_ERROR SetUp(JNIEnv * env, jobject inHandler);
 
 protected:
-    jobject mObject               = nullptr;
+    chip::JniGlobalReference mObject;
     jclass mClazz                 = nullptr;
     jclass mSuperClazz            = nullptr;
     jmethodID mMethod             = nullptr;
@@ -89,9 +89,9 @@ public:
 
         chip::DeviceLayer::StackUnlock unlock;
         CHIP_ERROR err = CHIP_NO_ERROR;
-        VerifyOrExit(mObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(mObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
         VerifyOrExit(mMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        env->CallVoidMethod(mObject, mMethod, jResponseData);
+        env->CallVoidMethod(mObject.ObjectRef(), mMethod, jResponseData);
     exit:
         if (err != CHIP_NO_ERROR)
         {

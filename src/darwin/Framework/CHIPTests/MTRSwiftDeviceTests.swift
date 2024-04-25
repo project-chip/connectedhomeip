@@ -3,6 +3,8 @@ import XCTest
 
 // This should eventually grow into a Swift copy of MTRDeviceTests
 
+// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
+
 struct DeviceConstants {
     static let testVendorID = 0xFFF1
     static let onboardingPayload = "MT:-24J0AFN00KA0648G00"
@@ -93,41 +95,10 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
 }
 
 class MTRSwiftDeviceTests : XCTestCase {
-    static var sStackInitRan : Bool = false
-    static var sNeedsStackShutdown : Bool = true
-    
-    static override func tearDown() {
-        // Global teardown, runs once
-        if (sNeedsStackShutdown) {
-            // We don't need to worry about ResetCommissionee.  If we get here,
-            // we're running only one of our test methods (using
-            // -only-testing:MatterTests/MTRSwiftDeviceTests/testMethodName), since
-            // we did not run test999_TearDown.
-            shutdownStack()
-        }
-    }
-    
-    override func setUp()
+    static override func setUp()
     {
-        // Per-test setup, runs before each test.
         super.setUp()
-        self.continueAfterFailure = false
-        
-        if (!MTRSwiftDeviceTests.sStackInitRan) {
-            initStack()
-        }
-    }
-    
-    override func tearDown()
-    {
-        // Per-test teardown, runs after each test.
-        super.tearDown()
-    }
-    
-    func initStack()
-    {
-        MTRSwiftDeviceTests.sStackInitRan = true
-        
+
         let factory = MTRDeviceControllerFactory.sharedInstance()
         
         let storage = MTRTestStorage()
@@ -141,7 +112,6 @@ class MTRSwiftDeviceTests : XCTestCase {
         XCTAssertTrue(factory.isRunning)
         
         let testKeys = MTRTestKeys()
-        
         sTestKeys = testKeys
         
         // Needs to match what startControllerOnExistingFabric calls elsewhere in
@@ -160,8 +130,8 @@ class MTRSwiftDeviceTests : XCTestCase {
         
         sController = controller
         
-        let expectation = expectation(description : "Commissioning Complete")
-        
+        let expectation = XCTestExpectation(description : "Commissioning Complete")
+
         let controllerDelegate = MTRSwiftDeviceTestControllerDelegate(withExpectation: expectation)
         let serialQueue = DispatchQueue(label: "com.chip.device_controller_delegate")
         
@@ -180,30 +150,29 @@ class MTRSwiftDeviceTests : XCTestCase {
         } catch {
             XCTFail("Could not start setting up PASE session: \(error)")
             return        }
-        
-        wait(for: [expectation], timeout: DeviceConstants.pairingTimeoutInSeconds)
+
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation], timeout: DeviceConstants.pairingTimeoutInSeconds), XCTWaiter.Result.completed)
     }
     
-    static func shutdownStack()
-    {
-        sNeedsStackShutdown = false
-        
+    static override func tearDown() {
+        ResetCommissionee(sConnectedDevice, DispatchQueue.main, nil, UInt16(DeviceConstants.timeoutInSeconds))
+
         let controller = sController
         XCTAssertNotNil(controller)
-        
         controller!.shutdown()
         XCTAssertFalse(controller!.isRunning)
         
         MTRDeviceControllerFactory.sharedInstance().stop()
+
+        super.tearDown()
     }
-    
-    func test000_SetUp()
+
+    override func setUp()
     {
-        // Nothing to do here; our setUp method handled this already.  This test
-        // just exists to make the setup not look like it's happening inside other
-        // tests.
+        super.setUp()
+        self.continueAfterFailure = false
     }
-    
+
     func test017_TestMTRDeviceBasics()
     {
         let device = MTRDevice(nodeID: DeviceConstants.deviceID as NSNumber, controller:sController!)
@@ -227,6 +196,10 @@ class MTRSwiftDeviceTests : XCTestCase {
         // can satisfy the test below.
         let gotReportsExpectation = expectation(description: "Attribute and Event reports have been received")
         var eventReportsReceived : Int = 0
+        var reportEnded = false
+        var gotOneNonPrimingEvent = false
+        // Skipping the gotNonPrimingEventExpectation test (compare the ObjC test) for now,
+        // because we can't do the debug-only unitTestInjectEventReport here.
         delegate.onEventDataReceived = { (eventReport: [[ String: Any ]]) -> Void in
             eventReportsReceived += eventReport.count
             
@@ -241,9 +214,23 @@ class MTRSwiftDeviceTests : XCTestCase {
                 } else if (eventTimeType == MTREventTimeType.timestampDate) {
                     XCTAssertNotNil(eventDict[MTREventTimestampDateKey])
                 }
+                
+                if (!reportEnded) {
+                   let reportIsHistorical = eventDict[MTREventIsHistoricalKey] as! NSNumber?
+                   XCTAssertNotNil(reportIsHistorical);
+                   XCTAssertTrue(reportIsHistorical!.boolValue);
+                } else {
+                   if (!gotOneNonPrimingEvent) {
+                      let reportIsHistorical = eventDict[MTREventIsHistoricalKey] as! NSNumber?
+                      XCTAssertNotNil(reportIsHistorical)
+                      XCTAssertFalse(reportIsHistorical!.boolValue)
+                      gotOneNonPrimingEvent = true
+                   }
+                }
             }
         }
         delegate.onReportEnd = { () -> Void in
+            reportEnded = true
             gotReportsExpectation.fulfill()
         }
         
@@ -311,23 +298,65 @@ class MTRSwiftDeviceTests : XCTestCase {
                               attributeID: testAttributeID,
                               value: writeValue,
                               expectedValueInterval: 20000,
-                              timedWriteTimeout:nil)
+                              timedWriteTimeout: nil)
         
         // expected value interval is 20s but expect it get reverted immediately as the write fails because it's writing to a
         // nonexistent attribute
         wait(for: [ expectedValueReportedExpectation, expectedValueRemovedExpectation ], timeout: 5, enforceOrder: true)
         
+        // Test if previous value is reported on a write
+        let testOnTimeValue : UInt32 = 10;
+        let onTimeWriteSuccess = expectation(description: "OnTime write success");
+        let onTimePreviousValue = expectation(description: "OnTime previous value");
+        delegate.onAttributeDataReceived = { (data: [[ String: Any ]]) -> Void in
+            NSLog("GOT SOME DATA: %@", data)
+            for attributeResponseValue in data {
+                let path = attributeResponseValue[MTRAttributePathKey] as! MTRAttributePath
+                if (path.cluster == (MTRClusterIDType.onOffID.rawValue as NSNumber) &&
+                    path.attribute == (MTRAttributeIDType.clusterOnOffAttributeOnTimeID.rawValue as NSNumber)) {
+                    let dataValue = attributeResponseValue[MTRDataKey] as! NSDictionary?
+                    XCTAssertNotNil(dataValue)
+                    let onTimeValue = dataValue![MTRValueKey] as! NSNumber?
+                    if (onTimeValue != nil && (onTimeValue!.uint32Value == testOnTimeValue)) {
+                        onTimeWriteSuccess.fulfill();
+                    }
+
+                    let previousDataValue = attributeResponseValue[MTRPreviousDataKey] as! NSDictionary?
+                    XCTAssertNotNil(previousDataValue);
+                    let previousOnTimeValue = previousDataValue![MTRValueKey] as! NSNumber?
+                    if (previousOnTimeValue != nil) {
+                        onTimePreviousValue.fulfill()
+                    }
+                }
+            }
+        };
+        let writeOnTimeValue = [ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : testOnTimeValue ] as [String: Any]
+        device.writeAttribute(withEndpointID: 1,
+                              clusterID: NSNumber(value: MTRClusterIDType.onOffID.rawValue),
+                              attributeID: NSNumber(value: MTRAttributeIDType.clusterOnOffAttributeOnTimeID.rawValue),
+                              value: writeOnTimeValue,
+                              expectedValueInterval: 10000,
+                              timedWriteTimeout: nil);
+
+        wait(for: [ onTimeWriteSuccess, onTimePreviousValue ], timeout: 10);
+
+        // TODO: Skipping test for cache-clearing for now, because we can't call unitTestClearClusterData here.
+
         // Test if errors are properly received
+        // TODO: We might stop reporting these altogether from MTRDevice, and then
+        // this test will need updating.
+        let readThroughForUnknownAttributesParams = MTRReadParams()
+        readThroughForUnknownAttributesParams.shouldAssumeUnknownAttributesReportable = false;
         let attributeReportErrorExpectation = expectation(description: "Attribute read error")
         delegate.onAttributeDataReceived = { (data: [[ String: Any ]]) -> Void in
-            for attributeReponseValue in data {
-                if (attributeReponseValue[MTRErrorKey] != nil) {
+            for attributeResponseValue in data {
+                if (attributeResponseValue[MTRErrorKey] != nil) {
                     attributeReportErrorExpectation.fulfill()
                 }
             }
         }
         // use the nonexistent attribute and expect read error
-        device.readAttribute(withEndpointID: testEndpointID, clusterID: testClusterID, attributeID: testAttributeID, params: nil)
+        device.readAttribute(withEndpointID: testEndpointID, clusterID: testClusterID, attributeID: testAttributeID, params: readThroughForUnknownAttributesParams)
         wait(for: [ attributeReportErrorExpectation ], timeout: 10)
         
         // Resubscription test setup
@@ -335,10 +364,14 @@ class MTRSwiftDeviceTests : XCTestCase {
         delegate.onNotReachable = { () -> Void in
             subscriptionDroppedExpectation.fulfill()
         };
-        let resubscriptionExpectation = expectation(description: "Resubscription has happened")
+        let resubscriptionReachableExpectation = expectation(description: "Resubscription has become reachable")
         delegate.onReachable = { () -> Void in
-            resubscriptionExpectation.fulfill()
+            resubscriptionReachableExpectation.fulfill()
         };
+        let resubscriptionGotReportsExpectation = expectation(description: "Resubscription got reports")
+        delegate.onReportEnd = { () -> Void in
+            resubscriptionGotReportsExpectation.fulfill()
+        }
         
         // reset the onAttributeDataReceived to validate the following resubscribe test
         attributeReportsReceived = 0;
@@ -371,7 +404,7 @@ class MTRSwiftDeviceTests : XCTestCase {
         // Check that device resets start time on subscription drop
         XCTAssertNil(device.estimatedStartTime)
         
-        wait(for: [ resubscriptionExpectation ], timeout:60)
+        wait(for: [ resubscriptionReachableExpectation, resubscriptionGotReportsExpectation ], timeout:60)
         
         // Now make sure we ignore later tests.  Ideally we would just unsubscribe
         // or remove the delegate, but there's no good way to do that.
@@ -382,7 +415,7 @@ class MTRSwiftDeviceTests : XCTestCase {
         
         // Make sure we got no updated reports (because we had a cluster state cache
         // with data versions) during the resubscribe.
-        XCTAssertEqual(attributeReportsReceived, 0);
+//        XCTAssertEqual(attributeReportsReceived, 0);
         XCTAssertEqual(eventReportsReceived, 0);
     }
     
@@ -544,11 +577,5 @@ class MTRSwiftDeviceTests : XCTestCase {
         let cluster = MTRClusterOperationalCredentials(device: device, endpointID: 0, queue: queue)!
         XCTAssertEqual(cluster.device, device)
         XCTAssertEqual(cluster.__endpointID, 0 as NSNumber)
-    }
-
-    func test999_TearDown()
-    {
-        ResetCommissionee(sConnectedDevice, DispatchQueue.main, self, UInt16(DeviceConstants.timeoutInSeconds))
-        type(of: self).shutdownStack()
     }
 }

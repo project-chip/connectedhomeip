@@ -59,10 +59,13 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="utility" picsCode="PSCFG" scope="Endpoint"/>
+  <clusterIds>
+    <clusterId id="0x002E" name="Power Source Configuration"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="PSCFG" scope="Node"/>
   <attributes>
     <attribute id="0x0000" name="Sources" type="list">
-      <entry type="ref_DataTypeEndpointNumber"/>
+      <entry type="endpoint-no"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>

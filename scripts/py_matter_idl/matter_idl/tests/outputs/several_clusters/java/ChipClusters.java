@@ -25,6 +25,7 @@ import chip.devicecontroller.model.ClusterState;
 import chip.devicecontroller.model.EndpointState;
 import chip.devicecontroller.model.InvokeElement;
 import chip.devicecontroller.model.NodeState;
+import chip.devicecontroller.model.Status;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -120,7 +121,7 @@ public class ChipClusters {
         boolean isFabricFiltered) {
       ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
-      ChipDeviceController.read(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, isFabricFiltered, timeoutMillis.orElse(0L).intValue(), null);
+      ChipInteractionClient.read(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, isFabricFiltered, timeoutMillis.orElse(0L).intValue(), null);
     }
 
     protected void writeAttribute(
@@ -131,7 +132,7 @@ public class ChipClusters {
       WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
       byte[] tlv = encodeToTlv(value);
       AttributeWriteRequest writeRequest = AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, tlv);
-      ChipDeviceController.write(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(writeRequest), timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
+      ChipInteractionClient.write(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(writeRequest), timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
     }
 
     protected void subscribeAttribute(
@@ -141,7 +142,7 @@ public class ChipClusters {
         int maxInterval) {
       ReportCallbackJni jniCallback = new ReportCallbackJni(callback, callback, null);
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
-      ChipDeviceController.subscribe(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L).intValue(), null);
+      ChipInteractionClient.subscribe(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L).intValue(), null);
     }
 
     protected void invoke(
@@ -152,7 +153,7 @@ public class ChipClusters {
       InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
       byte[] tlv = encodeToTlv(value);
       InvokeElement element = InvokeElement.newInstance(endpointId, clusterId, commandId, tlv, null);
-      ChipDeviceController.invoke(0, jniCallback.getCallbackHandle(), devicePtr, element, timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
+      ChipInteractionClient.invoke(0, jniCallback.getCallbackHandle(), devicePtr, element, timedRequestTimeoutMs, timeoutMillis.orElse(0L).intValue());
     }
 
     private static native byte[] encodeToTlv(BaseTLVType value);
@@ -161,7 +162,6 @@ public class ChipClusters {
 
     @Deprecated
     public void deleteCluster(long chipClusterPtr) {}
-    
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
       super.finalize();
@@ -242,8 +242,15 @@ public class ChipClusters {
     }
 
     @Override
-    public void onResponse(ChipAttributePath attributePath) {
-      callback.onSuccess();
+    public void onResponse(ChipAttributePath attributePath, Status status) {
+      if (status.getStatus() == Status.Code.Success)
+      {
+        callback.onSuccess();
+      }
+      else
+      {
+        callback.onError(new StatusException(status.getStatus()));
+      }
     }
 
     @Override

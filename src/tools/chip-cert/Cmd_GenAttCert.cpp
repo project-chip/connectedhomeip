@@ -23,10 +23,6 @@
  *
  */
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
 #include "chip-cert.h"
 
 #include <lib/support/SafeInt.h>

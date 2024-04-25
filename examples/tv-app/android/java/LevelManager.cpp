@@ -18,7 +18,7 @@
 #include "TvApp-JNI.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
@@ -27,7 +27,7 @@
 
 using namespace chip;
 
-static constexpr size_t kLevelManagerTableSize = EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
+static constexpr size_t kLevelManagerTableSize = MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
 
 namespace {
 
@@ -46,7 +46,7 @@ void LevelManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: LevelManager::NewManager");
     uint16_t ep = emberAfGetClusterServerEndpointIndex(static_cast<chip::EndpointId>(endpoint), app::Clusters::LevelControl::Id,
-                                                       EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     VerifyOrReturn(ep < kLevelManagerTableSize,
                    ChipLogError(Zcl, "TV Android App::Level::NewManager: endpoint %d not found", endpoint));
 
@@ -68,7 +68,7 @@ void LevelManager::NewManager(jint endpoint, jobject manager)
 LevelManager * GetLevelManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::LevelControl::Id,
-                                                       EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return ((ep >= kLevelManagerTableSize) ? nullptr : gLevelManagerTable[ep]);
 }
 
@@ -83,9 +83,9 @@ void LevelManager::PostLevelChanged(chip::EndpointId endpoint, uint8_t value)
 
 jboolean LevelManager::SetLevel(jint endpoint, jint value)
 {
-    EmberAfStatus status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(static_cast<chip::EndpointId>(endpoint),
-                                                                                      static_cast<uint8_t>(value));
-    return status == EMBER_ZCL_STATUS_SUCCESS;
+    chip::Protocols::InteractionModel::Status status = app::Clusters::LevelControl::Attributes::CurrentLevel::Set(
+        static_cast<chip::EndpointId>(endpoint), static_cast<uint8_t>(value));
+    return status == chip::Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR LevelManager::InitializeWithObjects(jobject managerObject)
@@ -94,8 +94,7 @@ CHIP_ERROR LevelManager::InitializeWithObjects(jobject managerObject)
     VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
     JniLocalReferenceScope scope(env);
 
-    mLevelManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturnLogError(mLevelManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnLogErrorOnFailure(mLevelManagerObject.Init(managerObject));
 
     jclass LevelManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturnLogError(LevelManagerClass != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -113,17 +112,18 @@ CHIP_ERROR LevelManager::InitializeWithObjects(jobject managerObject)
 
 void LevelManager::HandleLevelChanged(uint8_t value)
 {
+    DeviceLayer::StackUnlock unlock;
     ChipLogProgress(Zcl, "LevelManager::HandleLevelChanged");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
-    VerifyOrReturn(mLevelManagerObject != nullptr, ChipLogProgress(Zcl, "mLevelManagerObject null"));
+    VerifyOrReturn(mLevelManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mLevelManagerObject is not valid"));
     VerifyOrReturn(mHandleLevelChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleLevelChangedMethod null"));
 
     env->ExceptionClear();
-    env->CallVoidMethod(mLevelManagerObject, mHandleLevelChangedMethod, static_cast<jint>(value));
+    env->CallVoidMethod(mLevelManagerObject.ObjectRef(), mHandleLevelChangedMethod, static_cast<jint>(value));
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in LevelManager::HandleLevelChanged");

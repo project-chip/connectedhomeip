@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0098" name="Device Energy Management" revision="3">
   <revisionHistory>
@@ -61,6 +63,9 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
     <revision revision="3" summary="Updates to match cluster spec updates"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0098" name="Device Energy Management"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DEM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PA" name="PowerAdjustment" summary="Allows an EMS to make a temporary power
@@ -130,10 +135,10 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="AdjustmentCauseEnum">
-      <item value="0" name="Local" summary="The adjustment is to optimize the local energy usage">
+      <item value="0" name="LocalOptimization" summary="The adjustment is to optimize the local energy usage">
         <optionalConform/>
       </item>
-      <item value="1" name="Grid" summary="The adjustment is to optimize the grid energy usage">
+      <item value="1" name="GridOptimization" summary="The adjustment is to optimize the grid energy usage">
         <optionalConform/>
       </item>
     </enum>
@@ -237,13 +242,13 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="ForecastUpdateReasonEnum">
-      <item value="0" name="Internal" summary="The update was due to internal ESA device optimization">
+      <item value="0" name="InternalOptimization" summary="The update was due to internal ESA device optimization">
         <optionalConform/>
       </item>
-      <item value="1" name="Local" summary="The update was due to local EMS optimization">
+      <item value="1" name="LocalOptimization" summary="The update was due to local EMS optimization">
         <optionalConform/>
       </item>
-      <item value="2" name="Grid" summary="The update was due to grid optimization">
+      <item value="2" name="GridOptimization" summary="The update was due to grid optimization">
         <optionalConform/>
       </item>
     </enum>
@@ -257,36 +262,31 @@ Davis, CA 95616, USA
       <item value="2" name="GridOptOut" summary="The user has opted out of grid EMS optimizations only">
         <mandatoryConform/>
       </item>
-      <item value="3" name="OptOut" summary="The user has opted out of all optimizations">
+      <item value="3" name="OptOut" summary="The user has opted out of all external optimizations">
         <mandatoryConform/>
       </item>
     </enum>
     <struct name="ConstraintsStruct">
       <field id="0" name="StartTime" type="epoch-s">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="Duration" type="elapsed-s">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="between" from="0" to="86400"/>
       </field>
       <field id="2" name="NominalPower" type="power-mW">
-        <access read="true" write="true"/>
         <mandatoryConform>
           <feature name="PFR"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
       <field id="3" name="MaximumEnergy" type="energy-mWh">
-        <access read="true" write="true"/>
         <mandatoryConform>
           <feature name="PFR"/>
         </mandatoryConform>
       </field>
       <field id="4" name="LoadControl" type="int8">
-        <access read="true" write="true"/>
         <mandatoryConform>
           <feature name="SFR"/>
         </mandatoryConform>
@@ -294,181 +294,146 @@ Davis, CA 95616, USA
     </struct>
     <struct name="CostStruct">
       <field id="0" name="CostType" type="CostTypeEnum" default="0">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="Value" type="int32" default="0">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="DecimalPoints" type="uint8" default="0">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="Currency" type="uint16" default="0">
-        <access read="true"/>
         <optionalConform/>
         <constraint type="max" value="999"/>
       </field>
     </struct>
     <struct name="ForecastStruct">
       <field id="0" name="ForecastId" type="uint16" default="0">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="ActiveSlotNumber" type="uint16" default="0">
-        <access read="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="StartTime" type="epoch-s">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="EndTime" type="epoch-s">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="EarliestStartTime" type="epoch-s">
-        <access read="true"/>
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="STA"/>
         </mandatoryConform>
       </field>
       <field id="5" name="LatestEndTime" type="epoch-s">
-        <access read="true"/>
         <mandatoryConform>
           <feature name="STA"/>
         </mandatoryConform>
       </field>
       <field id="6" name="IsPauseable" type="bool">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="7" name="Slots" type="list">
         <entry type="SlotStruct"/>
-        <access read="true"/>
         <mandatoryConform/>
         <constraint type="maxCount" value="10"/>
       </field>
       <field id="8" name="ForecastUpdateReason" type="ForecastUpdateReasonEnum">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="PowerAdjustStruct">
       <field id="0" name="MinPower" type="power-mW" default="0">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="MaxPower" type="power-mW" default="0">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="MinDuration" type="elapsed-s" default="0">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="MaxDuration" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
     </struct>
     <struct name="SlotAdjustmentStruct">
       <field id="0" name="SlotIndex" type="uint8">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="NominalPower" type="power-mW">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
       <field id="2" name="Duration" type="elapsed-s">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </struct>
     <struct name="SlotStruct">
       <field id="0" name="MinDuration" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="MaxDuration" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="DefaultDuration" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="ElapsedSlotTime" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="RemainingSlotTime" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="5" name="SlotIsPauseable" type="bool">
-        <access read="true"/>
         <mandatoryConform>
           <feature name="PAU"/>
         </mandatoryConform>
       </field>
       <field id="6" name="MinPauseDuration" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform>
           <feature name="PAU"/>
         </mandatoryConform>
       </field>
       <field id="7" name="MaxPauseDuration" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform>
           <feature name="PAU"/>
         </mandatoryConform>
       </field>
       <field id="8" name="ManufacturerESAState" type="uint16">
-        <access read="true"/>
         <mandatoryConform>
           <feature name="SFR"/>
         </mandatoryConform>
       </field>
       <field id="9" name="NominalPower" type="power-mW">
-        <access read="true"/>
         <mandatoryConform>
           <feature name="PFR"/>
         </mandatoryConform>
       </field>
       <field id="10" name="MinPower" type="power-mW">
-        <access read="true"/>
         <mandatoryConform>
           <feature name="PFR"/>
         </mandatoryConform>
       </field>
       <field id="11" name="MaxPower" type="power-mW">
-        <access read="true"/>
         <mandatoryConform>
           <feature name="PFR"/>
         </mandatoryConform>
       </field>
       <field id="12" name="NominalEnergy" type="energy-mWh">
-        <access read="true"/>
         <mandatoryConform>
           <feature name="PFR"/>
         </mandatoryConform>
       </field>
       <field id="13" name="Costs" type="list">
         <entry type="CostStruct"/>
-        <access read="true"/>
         <optionalConform/>
         <constraint type="maxCount" value="5"/>
       </field>
       <field id="14" name="MinPowerAdjustment" type="power-mW">
-        <access read="true"/>
         <mandatoryConform>
           <andTerm>
             <feature name="FA"/>
@@ -477,7 +442,6 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="15" name="MaxPowerAdjustment" type="power-mW">
-        <access read="true"/>
         <mandatoryConform>
           <andTerm>
             <feature name="FA"/>
@@ -486,7 +450,6 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="16" name="MinDurationAdjustment" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform>
           <andTerm>
             <feature name="FA"/>
@@ -498,7 +461,6 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="17" name="MaxDurationAdjustment" type="elapsed-s">
-        <access read="true"/>
         <mandatoryConform>
           <andTerm>
             <feature name="FA"/>
@@ -512,7 +474,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <commands>
-    <command id="0x00" name="PowerAdjustRequest" response="Y">
+    <command id="0x00" name="PowerAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PA"/>
@@ -530,13 +492,13 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x01" name="CancelPowerAdjustRequest" response="Y">
+    <command id="0x01" name="CancelPowerAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PA"/>
       </mandatoryConform>
     </command>
-    <command id="0x02" name="StartTimeAdjustRequest" response="Y">
+    <command id="0x02" name="StartTimeAdjustRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="STA"/>
@@ -550,7 +512,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x03" name="PauseRequest" response="Y">
+    <command id="0x03" name="PauseRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PAU"/>
@@ -564,13 +526,13 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x04" name="ResumeRequest" response="Y">
+    <command id="0x04" name="ResumeRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="PAU"/>
       </mandatoryConform>
     </command>
-    <command id="0x05" name="ModifyForecastRequest" response="Y">
+    <command id="0x05" name="ModifyForecastRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="FA"/>
@@ -588,7 +550,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x06" name="RequestConstraintBasedForecast" response="Y">
+    <command id="0x06" name="RequestConstraintBasedForecast" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CON"/>
@@ -603,7 +565,7 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x07" name="CancelRequest" response="Y">
+    <command id="0x07" name="CancelRequest" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <orTerm>

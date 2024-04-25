@@ -17,8 +17,9 @@
  */
 
 #include "AccountLoginManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
-#include <app/util/af.h>
+#include <app/util/config.h>
 
 using namespace std;
 using namespace chip::app::Clusters::AccountLogin;
@@ -63,4 +64,21 @@ void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINRes
 
     response.setupPIN = CharSpan::fromCharString(mSetupPin);
     helper.Success(response);
+}
+
+uint16_t AccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    if (!success)
+    {
+        ChipLogError(Zcl, "AccountLoginManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }

@@ -24,7 +24,6 @@
 #include <lib/support/Span.h>
 #include <string>
 
-#define JNI_LOCAL_REF_COUNT 256
 namespace chip {
 /// Exposes the underlying UTF string from a jni string
 class JniUtfString
@@ -182,74 +181,4 @@ public:
 private:
     jobject mGlobalRef = nullptr;
 };
-
-class JniLocalReferenceScope
-{
-public:
-    explicit JniLocalReferenceScope(JNIEnv * env) : mEnv(env)
-    {
-        if (mEnv->PushLocalFrame(JNI_LOCAL_REF_COUNT) == 0)
-        {
-            mlocalFramePushed = true;
-        }
-    }
-
-    ~JniLocalReferenceScope()
-    {
-        if (mlocalFramePushed)
-        {
-            mEnv->PopLocalFrame(nullptr);
-            mlocalFramePushed = false;
-        }
-    }
-
-    // Delete copy constructor and copy assignment operator
-    JniLocalReferenceScope(const JniLocalReferenceScope &)             = delete;
-    JniLocalReferenceScope & operator=(const JniLocalReferenceScope &) = delete;
-
-private:
-    JNIEnv * const mEnv;
-    bool mlocalFramePushed = false;
-};
-
-class JniGlobalReference
-{
-public:
-    JniGlobalReference() {}
-
-    CHIP_ERROR Init(jobject aObjectRef)
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-        VerifyOrReturnError(aObjectRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-        VerifyOrReturnError(mObjectRef == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mObjectRef = env->NewGlobalRef(aObjectRef);
-        VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrReturnError(mObjectRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-        return CHIP_NO_ERROR;
-    }
-
-    JniGlobalReference(JniGlobalReference && aOther)
-    {
-        mObjectRef        = aOther.mObjectRef;
-        aOther.mObjectRef = nullptr;
-    }
-
-    ~JniGlobalReference()
-    {
-        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-        if (env != nullptr && mObjectRef != nullptr)
-        {
-            env->DeleteGlobalRef(mObjectRef);
-        }
-    }
-
-    jobject ObjectRef() { return mObjectRef; }
-
-    bool HasValidObjectRef() { return mObjectRef != nullptr; }
-
-private:
-    jobject mObjectRef = nullptr;
-};
-
 } // namespace chip

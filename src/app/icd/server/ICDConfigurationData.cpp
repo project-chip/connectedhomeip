@@ -37,20 +37,24 @@ System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
     return mSlowPollingInterval;
 }
 
-CHIP_ERROR ICDConfigurationData::SetModeDurations(Optional<uint32_t> activeModeDuration_ms, Optional<uint32_t> idleModeDuration_ms)
+CHIP_ERROR ICDConfigurationData::SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
+                                                  Optional<System::Clock::Milliseconds32> idleModeDuration)
 {
-    VerifyOrReturnError(activeModeDuration_ms.HasValue() || idleModeDuration_ms.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(activeModeDuration.HasValue() || idleModeDuration.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint32_t tmpIdleModeDuration_s =
-        idleModeDuration_ms.HasValue() ? (idleModeDuration_ms.Value() / kMillisecondsPerSecond) : mIdleModeDuration_s;
-    uint32_t tmpActiveModeDuration_ms = activeModeDuration_ms.HasValue() ? activeModeDuration_ms.Value() : mActiveModeDuration_ms;
+    // Convert idleModeDuration to seconds for the correct precision
+    System::Clock::Seconds32 tmpIdleModeDuration = idleModeDuration.HasValue()
+        ? std::chrono::duration_cast<System::Clock::Seconds32>(idleModeDuration.Value())
+        : mIdleModeDuration;
 
-    VerifyOrReturnError(tmpActiveModeDuration_ms <= (tmpIdleModeDuration_s * kMillisecondsPerSecond), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(tmpIdleModeDuration_s <= kMaxIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(tmpIdleModeDuration_s >= kMinIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
+    System::Clock::Milliseconds32 tmpActiveModeDuration = activeModeDuration.ValueOr(mActiveModeDuration);
 
-    mIdleModeDuration_s    = tmpIdleModeDuration_s;
-    mActiveModeDuration_ms = tmpActiveModeDuration_ms;
+    VerifyOrReturnError(tmpActiveModeDuration <= tmpIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(tmpIdleModeDuration <= kMaxIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(tmpIdleModeDuration >= kMinIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mIdleModeDuration   = tmpIdleModeDuration;
+    mActiveModeDuration = tmpActiveModeDuration;
 
     return CHIP_NO_ERROR;
 }

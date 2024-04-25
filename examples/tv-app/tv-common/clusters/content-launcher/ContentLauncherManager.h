@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
@@ -15,10 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <app/clusters/content-launch-server/content-launch-server.h>
+
+#include <list>
+#include <string>
 #include <vector>
 
 using chip::CharSpan;
@@ -54,6 +55,7 @@ public:
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 protected:
     std::list<std::string> mAcceptHeaderList;
@@ -62,5 +64,6 @@ protected:
 
 private:
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
+    static constexpr uint32_t kEndpointFeatureMap = 3;
+    static constexpr uint16_t kClusterRevision    = 2;
 };

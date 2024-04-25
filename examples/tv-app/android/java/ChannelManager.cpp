@@ -27,6 +27,8 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Channel;
@@ -57,17 +59,21 @@ void ChannelManager::NewManager(jint endpoint, jobject manager)
 
 CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetChannelList");
-    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetChannelListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
-        jobjectArray channelInfoList = (jobjectArray) env->CallObjectMethod(mChannelManagerObject, mGetChannelListMethod);
+        jobjectArray channelInfoList =
+            (jobjectArray) env->CallObjectMethod(mChannelManagerObject.ObjectRef(), mGetChannelListMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ChannelManager::HandleGetChannelList");
@@ -133,6 +139,7 @@ exit:
 
 CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type lineupInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -140,11 +147,13 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetLineup");
-    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetLineupMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     {
-        jobject channelLineupObject = env->CallObjectMethod(mChannelManagerObject, mGetLineupMethod);
+        jobject channelLineupObject = env->CallObjectMethod(mChannelManagerObject.ObjectRef(), mGetLineupMethod);
         if (channelLineupObject != nullptr)
         {
             jclass channelLineupClazz = env->GetObjectClass(channelLineupObject);
@@ -196,6 +205,7 @@ exit:
 
 CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEncoder)
 {
+    DeviceLayer::StackUnlock unlock;
     chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type channelInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -203,11 +213,13 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetCurrentChannel");
-    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetCurrentChannelMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+    env->ExceptionClear();
+
     {
-        jobject channelInfoObject = env->CallObjectMethod(mChannelManagerObject, mGetCurrentChannelMethod);
+        jobject channelInfoObject = env->CallObjectMethod(mChannelManagerObject.ObjectRef(), mGetCurrentChannelMethod);
         if (channelInfoObject != nullptr)
         {
             jclass channelClass = env->GetObjectClass(channelInfoObject);
@@ -272,19 +284,21 @@ exit:
 
 void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match)
 {
+    DeviceLayer::StackUnlock unlock;
     std::string name(match.data(), match.size());
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannel name %s", name.c_str());
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
+    VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mChangeChannelMethod != nullptr, ChipLogError(Zcl, "mChangeChannelMethod null"));
+
+    env->ExceptionClear();
 
     {
         UtfString jniname(env, name.c_str());
-        env->ExceptionClear();
-        jobject channelObject = env->CallObjectMethod(mChannelManagerObject, mChangeChannelMethod, jniname.jniValue());
+        jobject channelObject = env->CallObjectMethod(mChannelManagerObject.ObjectRef(), mChangeChannelMethod, jniname.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in ChannelManager::HandleChangeChannel");
@@ -318,6 +332,7 @@ exit:
 
 bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
@@ -325,12 +340,12 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannelByNumber majorNumber %d, minorNumber %d", majorNumber,
                     minorNumber);
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
+    VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mChangeChannelByNumberMethod != nullptr, ChipLogError(Zcl, "mChangeChannelByNumberMethod null"));
 
     env->ExceptionClear();
 
-    ret = env->CallBooleanMethod(mChannelManagerObject, mChangeChannelByNumberMethod, static_cast<jint>(majorNumber),
+    ret = env->CallBooleanMethod(mChannelManagerObject.ObjectRef(), mChangeChannelByNumberMethod, static_cast<jint>(majorNumber),
                                  static_cast<jint>(minorNumber));
     if (env->ExceptionCheck())
     {
@@ -346,18 +361,19 @@ exit:
 
 bool ChannelManager::HandleSkipChannel(const int16_t & count)
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleSkipChannel count %d", count);
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
+    VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mSkipChannelMethod != nullptr, ChipLogError(Zcl, "mSkipChannelMethod null"));
 
     env->ExceptionClear();
 
-    ret = env->CallBooleanMethod(mChannelManagerObject, mSkipChannelMethod, static_cast<jint>(count));
+    ret = env->CallBooleanMethod(mChannelManagerObject.ObjectRef(), mSkipChannelMethod, static_cast<jint>(count));
     if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in ChannelManager::HandleSkipChannel");
@@ -378,6 +394,7 @@ void ChannelManager::HandleGetProgramGuide(
     const chip::Optional<chip::app::DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
     const chip::Optional<chip::ByteSpan> & data)
 {
+    DeviceLayer::StackUnlock unlock;
     ProgramGuideResponseType response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -390,8 +407,10 @@ void ChannelManager::HandleGetProgramGuide(
     std::vector<JniUtfString *> needToFreeStrings;
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetProgramGuide");
-    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetProgramGuideMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
 
     {
         // NOTE: this example app does not pass the Data, PageToken, ChannelsArray or ExternalIdList through to the Java layer
@@ -401,7 +420,7 @@ void ChannelManager::HandleGetProgramGuide(
         jobjectArray externalIDListArray = (jobjectArray) env->NewObjectArray(0, env->FindClass("java/util/Map$Entry"), NULL);
 
         jobject resp = env->CallObjectMethod(
-            mChannelManagerObject, mGetProgramGuideMethod, static_cast<jlong>(startTime.ValueOr(0)),
+            mChannelManagerObject.ObjectRef(), mGetProgramGuideMethod, static_cast<jlong>(startTime.ValueOr(0)),
             static_cast<jlong>(endTime.ValueOr(0)), channelsArray, jToken.jniValue(),
             static_cast<jboolean>(recordingFlag.ValueOr(0).Raw() != 0), externalIDListArray, jData.jniValue());
         if (env->ExceptionCheck())
@@ -590,13 +609,14 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
                                          const DataModel::DecodableList<AdditionalInfo> & externalIdList,
                                          const chip::ByteSpan & data)
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleRecordProgram");
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
+    VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mRecordProgramMethod != nullptr, ChipLogError(Zcl, "mRecordProgramMethod null"));
 
     env->ExceptionClear();
@@ -608,7 +628,7 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
         UtfString jData(env, "");
         jobjectArray externalIDListArray = (jobjectArray) env->NewObjectArray(0, env->FindClass("java/util/Map$Entry"), NULL);
 
-        ret = env->CallBooleanMethod(mChannelManagerObject, mRecordProgramMethod, jIdentifier.jniValue(),
+        ret = env->CallBooleanMethod(mChannelManagerObject.ObjectRef(), mRecordProgramMethod, jIdentifier.jniValue(),
                                      static_cast<jboolean>(shouldRecordSeries), externalIDListArray, jData.jniValue());
         if (env->ExceptionCheck())
         {
@@ -627,13 +647,14 @@ bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIde
                                                const DataModel::DecodableList<AdditionalInfo> & externalIdList,
                                                const chip::ByteSpan & data)
 {
+    DeviceLayer::StackUnlock unlock;
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
     JniLocalReferenceScope scope(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleCancelRecordProgram");
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
+    VerifyOrExit(mChannelManagerObject.HasValidObjectRef(), ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mCancelRecordProgramMethod != nullptr, ChipLogError(Zcl, "mCancelRecordProgramMethod null"));
 
     env->ExceptionClear();
@@ -645,7 +666,7 @@ bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIde
         UtfString jData(env, "");
         jobjectArray externalIDListArray = (jobjectArray) env->NewObjectArray(0, env->FindClass("java/util/Map$Entry"), NULL);
 
-        ret = env->CallBooleanMethod(mChannelManagerObject, mCancelRecordProgramMethod, jIdentifier.jniValue(),
+        ret = env->CallBooleanMethod(mChannelManagerObject.ObjectRef(), mCancelRecordProgramMethod, jIdentifier.jniValue(),
                                      static_cast<jboolean>(shouldRecordSeries), externalIDListArray, jData.jniValue());
         if (env->ExceptionCheck())
         {
@@ -665,10 +686,10 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ChannelManager"));
 
-    mChannelManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturn(mChannelManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef ChannelManager"));
+    VerifyOrReturn(mChannelManagerObject.Init(managerObject) == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Failed to init mChannelManagerObject"));
 
-    jclass managerClass = env->GetObjectClass(mChannelManagerObject);
+    jclass managerClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get ChannelManager Java class"));
 
     mGetChannelListMethod = env->GetMethodID(managerClass, "getChannelList", "()[Lcom/matter/tv/server/tvapp/ChannelInfo;");
@@ -742,12 +763,29 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
 
 uint32_t ChannelManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return mDynamicEndpointFeatureMap;
+        return kEndpointFeatureMap;
     }
 
     uint32_t featureMap = 0;
     Attributes::FeatureMap::Get(endpoint, &featureMap);
     return featureMap;
+}
+
+uint16_t ChannelManager::GetClusterRevision(chip::EndpointId endpoint)
+{
+    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return kClusterRevision;
+    }
+
+    uint16_t clusterRevision = 0;
+    bool success =
+        (Attributes::ClusterRevision::Get(endpoint, &clusterRevision) == chip::Protocols::InteractionModel::Status::Success);
+    if (!success)
+    {
+        ChipLogError(Zcl, "ChannelManager::GetClusterRevision error reading cluster revision");
+    }
+    return clusterRevision;
 }

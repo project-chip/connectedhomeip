@@ -22,6 +22,7 @@ network.
 -   [Building](#building)
     -   [Overwrite board config files](#overwrite-board-config-files)
     -   [Known issues building](#known-issues-building)
+-   [Long Idle Time ICD Support](#long-idle-time-icd-support)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
@@ -39,9 +40,7 @@ network.
     -   [OTA Testing](#ota-testing)
     -   [Known issues ota](#known-issues-ota)
 -   [Low power](#low-power)
-
-    -   [Known issues power](#known-issues-low-power)
-
+    -   [Known issues low power](#known-issues-low-power)
 -   [Removing SSBL Upgrade region](#removing-ssbl-upgrade-region)
 
     </hr>
@@ -94,6 +93,11 @@ In this example, to commission the device onto a Project CHIP network, it must
 be discoverable over Bluetooth LE. For security reasons, you must start
 Bluetooth LE advertising manually after powering up the device by pressing
 Button USERINTERFACE.
+
+## LIT ICD Active Mode
+
+If the device is acting as a LIT ICD and it's already commissioned, then Button
+USERINTERFACE can be pressed for forcing the switch to Active Mode.
 
 ### Bluetooth LE Rendezvous
 
@@ -216,7 +220,7 @@ Start building the application:
 
 ```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ gn gen out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/contact-sensor-app/nxp/k32w/k32w0$ ninja -C out/debug
 ```
 
@@ -242,6 +246,16 @@ In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
 running oscillator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
 
+K32W0x1 supports antenna diversity feature, which is a technique that maximizes
+the performance of an antenna system, allowing the radio signal to be switched
+between two antennas that have very low correlation between their received
+signals. Typically, this is achieved by spacing two antennas around 0.25
+wavelengths apart or by using 2 orthogonal types of polarization. This is
+controlled by software. K32W0x1 provides an output (`ADO`) on one of `DIO7`,
+`DIO9` or `DIO19` and optionally its complement (`ADE`) on `DIO6` that can be
+used to control an antenna switch. In order to use this feature, user must set
+`use_antenna_diversity` to 1.
+
 In case signing errors are encountered when running the "sign_images.sh" script
 (run automatically) install the recommanded packages (python version > 3, pip3,
 pycrypto, pycryptodome):
@@ -257,6 +271,42 @@ pycryptodome           3.9.8
 ```
 
 The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
+
+## Long Idle Time ICD Support
+
+By default, contact-sensor is compiled as SIT ICD (Short Idle Time
+Intermittently Connected Device) - see rules from k32w0_sdk.gni:
+
+```
+chip_ot_idle_interval_ms = 2000           # 2s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 600            # 10min Idle Mode Interval
+nxp_active_mode_duration_ms = 10000       # 10s Active Mode Interval
+nxp_active_mode_threshold_ms = 1000       # 1s Active Mode Threshold
+nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+```
+
+If LIT ICD support is needed then `chip_enable_icd_lit=true` must be specified
+as gn argument and the above parameters can be modified to comply with LIT
+requirements (e.g.: LIT devices must configure
+`chip_ot_idle_interval_ms > 15000`). Example LIT configuration:
+
+```
+chip_ot_idle_interval_ms = 15000          # 15s Idle Intervals
+chip_ot_active_interval_ms = 500          # 500ms Active Intervals
+
+nxp_idle_mode_duration_s = 3600           # 60min Idle Mode Interval
+nxp_active_mode_duration_ms = 0           # 0 Active Mode Interval
+nxp_active_mode_threshold_ms = 30000      # 30s Active Mode Threshold
+```
+
+ICD parameters that may be disabled once LIT functionality is enabled:
+
+```
+chip_persist_subscriptions: try to re-establish subscriptions from the server side after reboot
+chip_subscription_timeout_resumption: same as above but retries are using a Fibonacci backoff
+```
 
 ### Overwrite board config files
 
@@ -298,7 +348,7 @@ Please use the following build args:
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 
 There are factory data generated binaries available in
 examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.

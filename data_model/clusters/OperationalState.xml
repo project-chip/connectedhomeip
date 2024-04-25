@@ -60,8 +60,22 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
     <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states. Define reserved ranges for base/derived clusters."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0060" name="Operational State"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="OPSTATE" scope="Endpoint"/>
   <dataTypes>
+    <enum name="ErrorStateEnum">
+      <item from="0x00" to="0x3F" name="GeneralErrors" summary="Generally applicable values for error, defined herein">
+        <mandatoryConform/>
+      </item>
+      <item from="0x40" to="0x7F" name="DerivedClusterErrors" summary="Derived Cluster defined errors">
+        <mandatoryConform/>
+      </item>
+      <item from="0x80" to="0xBF" name="ManufacturerError" summary="Vendor specific errors">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="OperationalStateEnum">
       <item from="0x00" to="0x3F" name="GeneralStates" summary="Generally applicable values for state, defined herein">
         <mandatoryConform/>
@@ -74,18 +88,7 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="ErrorStateStruct">
-      <field id="0" name="ErrorStateID" type="enum8" default="0">
-        <enum>
-          <item from="0x00" to="0x3F" name="GeneralErrors" summary="Generally applicable values for error, defined herein">
-            <mandatoryConform/>
-          </item>
-          <item from="0x40" to="0x7F" name="DerivedClusterErrors" summary="Derived Cluster defined errors">
-            <mandatoryConform/>
-          </item>
-          <item from="0x80" to="0xBF" name="ManufacturerError" summary="Vendor specific errors">
-            <mandatoryConform/>
-          </item>
-        </enum>
+      <field id="0" name="ErrorStateID" type="ErrorStateEnum" default="0">
         <mandatoryConform/>
       </field>
       <field id="1" name="ErrorStateLabel" type="string" default="empty">
@@ -143,6 +146,53 @@ Davis, CA 95616, USA
       <constraint type="desc"/>
     </attribute>
   </attributes>
+  <commands>
+    <command id="0x00" name="Pause" direction="commandToServer" response="OperationalCommandResponse">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <command name="Resume"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </command>
+    <command id="0x01" name="Stop" direction="commandToServer" response="OperationalCommandResponse">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <command name="Start"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </command>
+    <command id="0x02" name="Start" direction="commandToServer" response="OperationalCommandResponse">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+    </command>
+    <command id="0x03" name="Resume" direction="commandToServer" response="OperationalCommandResponse">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <command name="Pause"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </command>
+    <command id="0x04" name="OperationalCommandResponse" direction="responseFromServer">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <orTerm>
+          <command name="Pause"/>
+          <command name="Stop"/>
+          <command name="Start"/>
+          <command name="Resume"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="CommandResponseState" type="ErrorStateStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
   <events>
     <event id="0x00" name="OperationalError" priority="critical">
       <access readPrivilege="view"/>
@@ -153,7 +203,10 @@ Davis, CA 95616, USA
     </event>
     <event id="0x01" name="OperationCompletion" priority="info">
       <access readPrivilege="view"/>
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
       <field id="0" name="CompletionErrorCode" type="enum8">
         <mandatoryConform/>
       </field>

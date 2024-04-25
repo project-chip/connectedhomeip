@@ -1637,6 +1637,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -1693,10 +1697,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1738,7 +1754,7 @@ cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 cluster ThreadNetworkDiagnostics = 53 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
@@ -2724,6 +2740,10 @@ cluster IcdManagement = 70 {
     optional octet_string<16> verificationKey = 1;
   }
 
+  request struct StayActiveRequestRequest {
+    int32u stayActiveDuration = 0;
+  }
+
   response struct StayActiveResponse = 4 {
     int32u promisedActiveDuration = 0;
   }
@@ -2733,7 +2753,7 @@ cluster IcdManagement = 70 {
   /** Unregister a client from an end device */
   fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
   /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayActiveRequest(): StayActiveResponse = 3;
+  command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
 /** This cluster supports creating a simple timer functionality. */
@@ -2907,7 +2927,7 @@ provisional cluster OvenMode = 73 {
 
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
-cluster LaundryDryerControls = 74 {
+provisional cluster LaundryDryerControls = 74 {
   revision 1;
 
   enum DrynessLevelEnum : enum8 {
@@ -4091,6 +4111,111 @@ provisional cluster ValveConfigurationAndControl = 129 {
   command Close(): DefaultSuccess = 1;
 }
 
+/** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
+provisional cluster ElectricalPowerMeasurement = 144 {
+  revision 1;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+  }
+
+  enum PowerModeEnum : enum8 {
+    kUnknown = 0;
+    kDC = 1;
+    kAC = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kDirectCurrent = 0x1;
+    kAlternatingCurrent = 0x2;
+    kPolyphasePower = 0x4;
+    kHarmonics = 0x8;
+    kPowerQuality = 0x10;
+  }
+
+  struct MeasurementAccuracyRangeStruct {
+    int64s rangeMin = 0;
+    int64s rangeMax = 1;
+    optional percent100ths percentMax = 2;
+    optional percent100ths percentMin = 3;
+    optional percent100ths percentTypical = 4;
+    optional int64u fixedMax = 5;
+    optional int64u fixedMin = 6;
+    optional int64u fixedTypical = 7;
+  }
+
+  struct MeasurementAccuracyStruct {
+    MeasurementTypeEnum measurementType = 0;
+    boolean measured = 1;
+    int64s minMeasuredValue = 2;
+    int64s maxMeasuredValue = 3;
+    MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
+  }
+
+  struct HarmonicMeasurementStruct {
+    int8u order = 0;
+    nullable int64s measurement = 1;
+  }
+
+  struct MeasurementRangeStruct {
+    MeasurementTypeEnum measurementType = 0;
+    int64s min = 1;
+    int64s max = 2;
+    optional epoch_s startTimestamp = 3;
+    optional epoch_s endTimestamp = 4;
+    optional epoch_s minTimestamp = 5;
+    optional epoch_s maxTimestamp = 6;
+    optional systime_ms startSystime = 7;
+    optional systime_ms endSystime = 8;
+    optional systime_ms minSystime = 9;
+    optional systime_ms maxSystime = 10;
+  }
+
+  info event MeasurementPeriodRanges = 0 {
+    MeasurementRangeStruct ranges[] = 0;
+  }
+
+  readonly attribute PowerModeEnum powerMode = 0;
+  readonly attribute int8u numberOfMeasurementTypes = 1;
+  readonly attribute MeasurementAccuracyStruct accuracy[] = 2;
+  readonly attribute optional MeasurementRangeStruct ranges[] = 3;
+  readonly attribute optional nullable voltage_mv voltage = 4;
+  readonly attribute optional nullable amperage_ma activeCurrent = 5;
+  readonly attribute optional nullable amperage_ma reactiveCurrent = 6;
+  readonly attribute optional nullable amperage_ma apparentCurrent = 7;
+  readonly attribute nullable power_mw activePower = 8;
+  readonly attribute optional nullable power_mw reactivePower = 9;
+  readonly attribute optional nullable power_mw apparentPower = 10;
+  readonly attribute optional nullable voltage_mv RMSVoltage = 11;
+  readonly attribute optional nullable amperage_ma RMSCurrent = 12;
+  readonly attribute optional nullable power_mw RMSPower = 13;
+  readonly attribute optional nullable int64s frequency = 14;
+  readonly attribute optional nullable HarmonicMeasurementStruct harmonicCurrents[] = 15;
+  readonly attribute optional nullable HarmonicMeasurementStruct harmonicPhases[] = 16;
+  readonly attribute optional nullable int64s powerFactor = 17;
+  readonly attribute optional nullable amperage_ma neutralCurrent = 18;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
 provisional cluster ElectricalEnergyMeasurement = 145 {
   revision 1;
@@ -4139,8 +4264,15 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
     MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
   }
 
+  struct CumulativeEnergyResetStruct {
+    optional nullable epoch_s importedResetTimestamp = 0;
+    optional nullable epoch_s exportedResetTimestamp = 1;
+    optional nullable systime_ms importedResetSystime = 2;
+    optional nullable systime_ms exportedResetSystime = 3;
+  }
+
   struct EnergyMeasurementStruct {
-    int64s energy = 0;
+    energy_mwh energy = 0;
     optional epoch_s startTimestamp = 1;
     optional epoch_s endTimestamp = 2;
     optional systime_ms startSystime = 3;
@@ -4162,6 +4294,7 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
   readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyExported = 2;
   readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyImported = 3;
   readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyExported = 4;
+  readonly attribute optional nullable CumulativeEnergyResetStruct cumulativeEnergyReset = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4367,7 +4500,7 @@ provisional cluster DemandResponseLoadControl = 150 {
 }
 
 /** This cluster provides an interface for passing messages to be presented by a device. */
-cluster Messages = 151 {
+provisional cluster Messages = 151 {
   revision 3;
 
   enum FutureMessagePreferenceEnum : enum8 {
@@ -4410,7 +4543,7 @@ cluster Messages = 151 {
     MessagePriorityEnum priority = 1;
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
-    nullable int16u duration = 4;
+    nullable int64u duration = 4;
     char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }
@@ -4444,7 +4577,7 @@ cluster Messages = 151 {
     MessagePriorityEnum priority = 1;
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
-    nullable int16u duration = 4;
+    nullable int64u duration = 4;
     char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }
@@ -4848,8 +4981,8 @@ provisional cluster EnergyEvse = 153 {
 }
 
 /** This cluster provides an interface to specify preferences for how devices should consume energy. */
-cluster EnergyPreference = 155 {
-  revision 1; // NOTE: Default/not specifically set
+provisional cluster EnergyPreference = 155 {
+  revision 1;
 
   enum EnergyPriorityEnum : enum8 {
     kComfort = 0;
@@ -4873,6 +5006,27 @@ cluster EnergyPreference = 155 {
   readonly attribute optional EnergyPriorityEnum energyPriorities[] = 2;
   readonly attribute optional BalanceStruct lowPowerModeSensitivities[] = 3;
   attribute optional int8u currentLowPowerModeSensitivity = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** The Power Topology Cluster provides a mechanism for expressing how power is flowing between endpoints. */
+provisional cluster PowerTopology = 156 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kNodeTopology = 0x1;
+    kTreeTopology = 0x2;
+    kSetTopology = 0x4;
+    kDynamicPowerFlow = 0x8;
+  }
+
+  readonly attribute optional endpoint_no availableEndpoints[] = 0;
+  readonly attribute optional endpoint_no activeEndpoints[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6324,7 +6478,7 @@ cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-provisional cluster FanControl = 514 {
+cluster FanControl = 514 {
   revision 4;
 
   enum AirflowDirectionEnum : enum8 {
@@ -6891,7 +7045,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 cluster OccupancySensing = 1030 {
-  revision 3;
+  revision 4;
 
   enum OccupancySensorTypeEnum : enum8 {
     kPIR = 0;
@@ -8157,7 +8311,6 @@ cluster ContentLauncher = 1290 {
   bitmap SupportedProtocolsBitmap : bitmap32 {
     kDASH = 0x1;
     kHLS = 0x2;
-    kWebRTC = 0x2;
   }
 
   struct DimensionStruct {
@@ -8422,7 +8575,7 @@ cluster AccountLogin = 1294 {
 }
 
 /** This cluster is used for managing the content control (including "parental control") settings on a media device such as a TV, or Set-top Box. */
-cluster ContentControl = 1295 {
+provisional cluster ContentControl = 1295 {
   revision 1; // NOTE: Default/not specifically set
 
   bitmap Feature : bitmap32 {
@@ -8505,7 +8658,7 @@ cluster ContentControl = 1295 {
 }
 
 /** This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse. */
-cluster ContentAppObserver = 1296 {
+provisional cluster ContentAppObserver = 1296 {
   revision 1; // NOTE: Default/not specifically set
 
   enum StatusEnum : enum8 {

@@ -35,23 +35,41 @@ assert(target_os == "freertos")
 assert(nxp_platform == "rt/rw61x")
 
 declare_args() {
-  # This defines the device type as a "thermostat" by default,
-  # use "all-clusters" in order to build the all-clusters-app
-  nxp_device_type = "thermostat"
+  # Allows to start the tcp download test app
+  tcp_download = false
+
+  # Allows to start the wifi connect test app
+  wifi_connect = false
+
+  # The 2 params below are used only if tcp_download or wifi_connect are true, otherwise they're unused.
+  wifi_ssid = ""
+  wifi_password = ""
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
 }
 
 example_platform_dir = "${chip_root}/examples/platform/nxp/${nxp_platform}"
+common_example_dir = "${chip_root}/examples/platform/nxp/common"
 
-if (nxp_device_type == "thermostat") {
-  app_common_folder = "${nxp_device_type}/nxp/zap"
-} else {
-  app_common_folder = "${nxp_device_type}-app/${nxp_device_type}-common"
+if (tcp_download == true && wifi_connect == true) {
+  assert("Cannot enable tcp_download and wifi_connect at the same time!")
 }
+
+app_common_folder = "all-clusters-app/all-clusters-common"
 
 # Create here the SDK instance.
 # Particular sources/defines/includes could be added/changed depending on the target application.
 rt_sdk("sdk") {
   defines = []
+
+  # To be moved, temporary mbedtls config fix to build app with factory data
+  if (chip_enable_secure_dac_private_key_storage == 1) {
+    defines += [
+      "MBEDTLS_NIST_KW_C",
+      "MBEDTLS_PSA_CRYPTO_CLIENT",
+    ]
+  }
 
   cflags = []
   public_deps = []
@@ -75,6 +93,15 @@ rt_sdk("sdk") {
 
   # Indicate the default path to OpenThreadConfig.h
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
+
+  # For matter with BR feature, increase FreeRTOS heap size
+  if (chip_enable_wifi && chip_enable_openthread) {
+    defines += [ "configTOTAL_HEAP_SIZE=(size_t)(160 * 1024)" ]
+  }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
 }
 
 # Create the SDK driver instance.
@@ -85,12 +112,18 @@ rw61x_sdk_drivers("sdk_driver") {
 rt_executable("all_cluster_app") {
   output_name = "chip-rw61x-all-cluster-example"
 
-  defines = [ "CONFIG_RENDEZVOUS_MODE=7" ]
+  defines = [
+    "CONFIG_RENDEZVOUS_MODE=7",
+    "CONFIG_APP_FREERTOS_OS=1",
+  ]
+
+  if (chip_enable_openthread) {
+    defines += [ "CONFIG_NET_L2_OPENTHREAD=1" ]
+  }
 
   include_dirs = [
     "../../common/main/include",
     "../../common/main",
-
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
     "${chip_root}/examples/providers/",
   ]
@@ -98,33 +131,53 @@ rt_executable("all_cluster_app") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
-    "../../common/main/AppFactoryDataDefaultImpl.cpp",
-    "../../common/main/AppMatterButtonEmpty.cpp",
-    "../../common/main/AppMatterCli.cpp",
     "../../common/main/AppTask.cpp",
-    "../../common/main/CHIPDeviceManager.cpp",
     "../../common/main/DeviceCallbacks.cpp",
     "../../common/main/ZclCallbacks.cpp",
     "../../common/main/include/AppEvent.h",
     "../../common/main/include/AppTask.h",
-    "../../common/main/include/CHIPDeviceManager.h",
     "../../common/main/include/DeviceCallbacks.h",
     "../../common/main/main.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
-
-  if (nxp_device_type == "all-clusters") {
-    defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
+  if (chip_enable_secure_dac_private_key_storage == 1) {
     sources += [
-      "${chip_root}/examples/${app_common_folder}/src/EnergyEvseDelegateImpl.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/EnergyEvseManager.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/energy-evse-stub.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/smco-stub.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
+      "${example_platform_dir}/factory_data/source/AppFactoryDataExample.cpp",
+    ]
+  } else {
+    sources += [
+      "${common_example_dir}/factory_data/source/AppFactoryDataDefaultImpl.cpp",
     ]
   }
+
+  # App common files
+  include_dirs += [
+    "${common_example_dir}/icd/include",
+    "${common_example_dir}/matter_button/include",
+    "${common_example_dir}/matter_cli/include",
+    "${common_example_dir}/device_manager/include",
+    "${common_example_dir}/device_callbacks/include",
+    "${common_example_dir}/app_task/include",
+    "${common_example_dir}/factory_data/include",
+  ]
+
+  sources += [
+    "${common_example_dir}/app_task/source/AppTaskBase.cpp",
+    "${common_example_dir}/app_task/source/AppTaskFreeRTOS.cpp",
+    "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
+    "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
+    "${common_example_dir}/icd/source/ICDUtil.cpp",
+    "${common_example_dir}/matter_button/source/AppMatterButtonEmpty.cpp",
+    "${common_example_dir}/matter_cli/source/AppMatterCli.cpp",
+  ]
+
+  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+
+  sources += [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+  ]
 
   if (chip_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]
@@ -135,17 +188,53 @@ rt_executable("all_cluster_app") {
   }
 
   if (chip_enable_ota_requestor) {
+    include_dirs += [ "${common_example_dir}/ota_requestor/include" ]
     sources += [
-      "${chip_root}/examples/platform/nxp/common/OTARequestorInitiator.cpp",
-      "${chip_root}/examples/platform/nxp/common/OTARequestorInitiator.h",
+      "${common_example_dir}/ota_requestor/source/OTARequestorInitiator.cpp",
+      "${common_example_dir}/ota_requestor/source/OTARequestorInitiatorCommon.cpp",
     ]
-    include_dirs += [ "${chip_root}/examples/platform/nxp/common" ]
+  }
+
+  if (wifi_connect) {
+    defines += [
+      "WIFI_CONNECT_TASK=1",
+      "WIFI_CONNECT=1",
+    ]
+
+    if (!chip_enable_matter_cli) {
+      assert(wifi_ssid != "" && wifi_password != "",
+             "WiFi SSID and password must be specified at build time!")
+    }
+
+    if (wifi_ssid != "") {
+      defines += [ "WIFI_SSID=\"${wifi_ssid}\"" ]
+    }
+
+    if (wifi_password != "") {
+      defines += [ "WIFI_PASSWORD=\"${wifi_password}\"" ]
+    }
+
+    include_dirs += [ "${common_example_dir}/wifi_connect/include" ]
+    sources += [ "${common_example_dir}/wifi_connect/source/WifiConnect.cpp" ]
+  }
+
+  if (tcp_download) {
+    defines += [ "CONFIG_CHIP_TCP_DOWNLOAD=1" ]
+    defines += [
+      "WIFI_CONNECT=1",
+      "WIFI_SSID=\"${wifi_ssid}\"",
+      "WIFI_PASSWORD=\"${wifi_password}\"",
+    ]
+
+    include_dirs += [ "${common_example_dir}/tcp_download_test/include" ]
+    sources +=
+        [ "${common_example_dir}/tcp_download_test/source/TcpDownload.cpp" ]
   }
 
   # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false
   # The would add to the build a dedicated application assert implementation.
   if (!sdk_fsl_assert_support) {
-    sources += [ "../../common/main/AppAssert.cpp" ]
+    sources += [ "${common_example_dir}/app_assert/source/AppAssert.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

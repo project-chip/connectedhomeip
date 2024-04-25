@@ -146,6 +146,22 @@ tests:
       verification: |
           Repeat the test step 8 for below mentioned values 1, 2,3, 4, 5, 6,7, 8, 9,10 and 11 and verify that TH receives the write command and updates the respective value. Verify that TH reads ActiveCalendarType attribute value and it is the same as the value that was set before
 
+          ./chip-tool timeformatlocalization write active-calendar-type 1 1 0
+
+          Verify that write request is successful on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685530839.323951][17790:17790] CHIP:DMG:                         StatusIB =
+          [1685530839.323956][17790:17790] CHIP:DMG:                         {
+          [1685530839.323961][17790:17790] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1685530839.323965][17790:17790] CHIP:DMG:                         },
+
+          ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
+          Verify  ActiveCalendarType attribute value is 1 on the TH(chip-tool) Log and and below is the sample log provided for raspi platform:
+
+          [1685530893.728748][17790:17790] CHIP:DMG:
+          [1685530893.728752][17790:17790] CHIP:DMG:                                 Data = 1,
+          [1685530893.728755][17790:17790] CHIP:DMG:                         },
 
           ./chip-tool timeformatlocalization write active-calendar-type 2 1 0
 
@@ -336,7 +352,7 @@ tests:
       command: "writeAttribute"
       attribute: "ActiveCalendarType"
       arguments:
-          value: 50
+          value: CalendarTypeEnum.UnknownEnumValue(50)
       response:
           error: CONSTRAINT_ERROR
 
@@ -345,6 +361,6 @@ tests:
       command: "writeAttribute"
       attribute: "HourFormat"
       arguments:
-          value: 5
+          value: HourFormatEnum.UnknownEnumValue(5)
       response:
           error: CONSTRAINT_ERROR

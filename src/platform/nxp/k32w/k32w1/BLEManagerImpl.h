@@ -23,6 +23,7 @@
 #include "RNG_Interface.h"
 #include "fwk_messaging.h"
 #include "fwk_os_abs.h"
+#include "fwk_platform.h"
 #include "fwk_platform_ble.h"
 #include "hci_transport.h"
 
@@ -35,6 +36,10 @@
 /* host task configuration */
 #define HOST_TASK_PRIORITY (4U)
 #define HOST_TASK_STACK_SIZE (gHost_TaskStackSize_c / sizeof(StackType_t))
+
+#ifndef HCI_RESET_WAIT_TIME_US
+#define HCI_RESET_WAIT_TIME_US 30000
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -51,6 +56,7 @@ public:
 
     CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) override;
     BLEManagerCommon * GetImplInstance() override;
+    CHIP_ERROR ResetController() override;
 
 private:
     static BLEManagerImpl sInstance;

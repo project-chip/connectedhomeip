@@ -25,9 +25,9 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/AttributePathParams.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CASESessionManager.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventManagement.h>
@@ -36,7 +36,6 @@
 #include <app/MessageDef/DataVersionFilterIBs.h>
 #include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
-#include <app/ObjectList.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <app/SubscriptionResumptionStorage.h>
@@ -45,6 +44,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/LinkedList.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
@@ -70,6 +70,7 @@ class TestReportScheduler;
 } // namespace reporting
 
 class InteractionModelEngine;
+class TestInteractionModelEngine;
 
 /**
  *  @class ReadHandler
@@ -224,9 +225,9 @@ public:
     ReadHandler(ManagementCallback & apCallback, Observer * observer);
 #endif
 
-    const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
-    const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
-    const ObjectList<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
+    const SingleLinkedListNode<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
+    const SingleLinkedListNode<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
+    const SingleLinkedListNode<DataVersionFilter> * GetDataVersionFilterList() const { return mpDataVersionFilterList; }
 
     void GetReportingIntervals(uint16_t & aMinInterval, uint16_t & aMaxInterval) const
     {
@@ -275,7 +276,7 @@ private:
 
     /**
      * Returns SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
-     * For an ICD publisher, this SHALL be set to the idle mode interval.
+     * For an ICD publisher, this SHALL be set to the idle mode duration.
      * Otherwise, this SHALL be set to 60 minutes.
      */
     uint16_t GetPublisherSelectedIntervalLimit();
@@ -433,6 +434,7 @@ private:
     //
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
+    friend class TestInteractionModelEngine;
 
     // The report scheduler needs to be able to access StateFlag private functions ShouldStartReporting(), CanStartReporting(),
     // ForceDirtyState() and IsDirty() to know when to schedule a run so it is declared as a friend class.
@@ -550,9 +552,9 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
 
-    ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
-    ObjectList<EventPathParams> * mpEventPathList           = nullptr;
-    ObjectList<DataVersionFilter> * mpDataVersionFilterList = nullptr;
+    SingleLinkedListNode<AttributePathParams> * mpAttributePathList   = nullptr;
+    SingleLinkedListNode<EventPathParams> * mpEventPathList           = nullptr;
+    SingleLinkedListNode<DataVersionFilter> * mpDataVersionFilterList = nullptr;
 
     ManagementCallback & mManagementCallback;
 

@@ -55,11 +55,11 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0301" name="Thermostat" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0301" name="Thermostat" revision="3">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="New data model format and notation, added Clusters required for Matter support, restricted legacy elements to Zigbee only"/>
+    <revision revision="3" summary="Addition of Energy Preference cluster and updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -82,13 +82,13 @@ Davis, CA 95616, USA
         <condition name="Zigbee"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x0038" name="TimeSync" side="server">
+    <cluster id="0x0038" name="Time Synchronization" side="server">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
       </otherwiseConform>
     </cluster>
-    <cluster id="0x0038" name="TimeSync" side="client">
+    <cluster id="0x0038" name="Time Synchronization" side="client">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
@@ -98,16 +98,16 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
     <cluster id="0x009B" name="Energy Preference" side="server">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0202" name="Fan Control" side="client">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </cluster>
     <cluster id="0x0204" name="Thermostat User Interface Configuration" side="server">
       <optionalConform/>

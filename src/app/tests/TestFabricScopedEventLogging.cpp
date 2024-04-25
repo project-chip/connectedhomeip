@@ -27,7 +27,6 @@
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
-#include <app/ObjectList.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
@@ -37,6 +36,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/EnforceFormat.h>
+#include <lib/support/LinkedList.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/Constants.h>
@@ -137,7 +137,7 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::EventNumber startingEventNumber,
-                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo,
+                            size_t expectedNumEvents, chip::SingleLinkedListNode<chip::app::EventPathParams> * clusterInfo,
                             const chip::Access::SubjectDescriptor & aSubjectDescriptor)
 {
     CHIP_ERROR err;
@@ -220,7 +220,7 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     NL_TEST_ASSERT(apSuite, (eid2 + 1) == eid3);
     NL_TEST_ASSERT(apSuite, (eid3 + 1) == eid4);
 
-    chip::app::ObjectList<chip::app::EventPathParams> paths[2];
+    chip::SingleLinkedListNode<chip::app::EventPathParams> paths[2];
 
     paths[0].mValue.mEndpointId = kTestEndpointId1;
     paths[0].mValue.mClusterId  = kLivenessClusterId;
@@ -247,7 +247,7 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     CheckLogReadOut(apSuite, logMgmt, 0, 1, paths, descriptor);
 
     // Fabric event + wildcard test, only have one fabric-scoped event with fabric 2
-    chip::app::ObjectList<chip::app::EventPathParams> pathsWithWildcard[2];
+    chip::SingleLinkedListNode<chip::app::EventPathParams> pathsWithWildcard[2];
     paths[0].mValue.mEndpointId = kTestEndpointId1;
     paths[0].mValue.mClusterId  = kLivenessClusterId;
 

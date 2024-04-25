@@ -16,7 +16,6 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
-import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
 
@@ -161,6 +160,21 @@ source_set("chip_version_header") {
   deps = [ ":gen_chip_version" ]
 }
 
+source_set("testing") {
+  sources = [
+    "TestGroupData.h",
+    "TestPersistentStorageDelegate.h",
+  ]
+}
+
+source_set("type-traits") {
+  sources = [ "TypeTraits.h" ]
+}
+
+source_set("static-support") {
+  sources = [ "static_support_smart_ptr.h" ]
+}
+
 static_library("support") {
   output_name = "libSupportLayer"
 
@@ -178,8 +192,11 @@ static_library("support") {
     "BytesToHex.cpp",
     "BytesToHex.h",
     "CHIPArgParser.cpp",
+    "CHIPArgParser.hpp",
     "CHIPCounter.h",
     "CHIPMemString.h",
+    "CommonIterator.h",
+    "CommonPersistentData.h",
     "DLLUtil.h",
     "DefaultStorageKeyAllocator.h",
     "Defer.h",
@@ -187,23 +204,31 @@ static_library("support") {
     "FibonacciUtils.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
+    "Fold.h",
+    "FunctionTraits.h",
     "IniEscaping.cpp",
     "IniEscaping.h",
+    "IntrusiveList.h",
     "Iterators.h",
+    "LambdaBridge.h",
     "LifetimePersistedCounter.h",
+    "LinkedList.h",
     "ObjectLifeCycle.h",
     "PersistedCounter.h",
+    "PersistentData.h",
     "PersistentStorageAudit.cpp",
     "PersistentStorageAudit.h",
     "PersistentStorageMacros.h",
     "Pool.cpp",
     "Pool.h",
+    "PoolWrapper.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
     "ReferenceCountedHandle.h",
+    "SafePointerCast.h",
+    "SafeString.h",
     "Scoped.h",
-    "SerializableIntegerSet.cpp",
-    "SerializableIntegerSet.h",
+    "ScopedBuffer.h",
     "SetupDiscriminator.h",
     "SortUtils.h",
     "StateMachine.h",
@@ -253,15 +278,16 @@ static_library("support") {
     ":safeint",
     ":span",
     ":text_only_logging",
+    ":type-traits",
     ":verifymacros",
     ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/core:encoding",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/platform:platform_config_header",
     "${chip_root}/src/system:system_config_header",
     "${nlassert_root}:nlassert",
-    "${nlio_root}:nlio",
   ]
 
   # These are needed because we include CHIPCore.h, which uses config
@@ -324,6 +350,7 @@ pw_static_library("pw_tests_wrapper") {
   public_deps = [
     "$dir_pw_log:impl",
     "$dir_pw_unit_test",
+    "$dir_pw_unit_test:logging",
   ]
   sources = [
     "UnitTest.cpp",
@@ -336,6 +363,7 @@ static_library("testing_nlunit") {
   output_dir = "${root_out_dir}/lib"
 
   sources = [
+    "UnitTestContext.h",
     "UnitTestExtendedAssertions.h",
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",

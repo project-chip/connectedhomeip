@@ -31,49 +31,26 @@
 
 namespace chip {
 namespace app {
-
-class RequiredPrivilege
+namespace RequiredPrivilege {
+inline chip::Access::Privilege ForReadAttribute(const ConcreteAttributePath & path)
 {
-    using Privilege = Access::Privilege;
+    return MatterGetAccessPrivilegeForReadAttribute(path.mClusterId, path.mAttributeId);
+}
 
-    static constexpr Privilege kPrivilegeMapper[] = { Privilege::kView, Privilege::kOperate, Privilege::kManage,
-                                                      Privilege::kAdminister };
+inline chip::Access::Privilege ForWriteAttribute(const ConcreteAttributePath & path)
+{
+    return MatterGetAccessPrivilegeForWriteAttribute(path.mClusterId, path.mAttributeId);
+}
 
-    static_assert(ArraySize(kPrivilegeMapper) > kMatterAccessPrivilegeView &&
-                      kPrivilegeMapper[kMatterAccessPrivilegeView] == Privilege::kView,
-                  "Must map privilege correctly");
-    static_assert(ArraySize(kPrivilegeMapper) > kMatterAccessPrivilegeOperate &&
-                      kPrivilegeMapper[kMatterAccessPrivilegeOperate] == Privilege::kOperate,
-                  "Must map privilege correctly");
-    static_assert(ArraySize(kPrivilegeMapper) > kMatterAccessPrivilegeManage &&
-                      kPrivilegeMapper[kMatterAccessPrivilegeManage] == Privilege::kManage,
-                  "Must map privilege correctly");
-    static_assert(ArraySize(kPrivilegeMapper) > kMatterAccessPrivilegeAdminister &&
-                      kPrivilegeMapper[kMatterAccessPrivilegeAdminister] == Privilege::kAdminister,
-                  "Must map privilege correctly");
-    static_assert(ArraySize(kPrivilegeMapper) > kMatterAccessPrivilegeMaxValue, "Must map all privileges");
+inline chip::Access::Privilege ForInvokeCommand(const ConcreteCommandPath & path)
+{
+    return MatterGetAccessPrivilegeForInvokeCommand(path.mClusterId, path.mCommandId);
+}
 
-public:
-    static Privilege ForReadAttribute(const ConcreteAttributePath & path)
-    {
-        return kPrivilegeMapper[MatterGetAccessPrivilegeForReadAttribute(path.mClusterId, path.mAttributeId)];
-    }
-
-    static Privilege ForWriteAttribute(const ConcreteAttributePath & path)
-    {
-        return kPrivilegeMapper[MatterGetAccessPrivilegeForWriteAttribute(path.mClusterId, path.mAttributeId)];
-    }
-
-    static Privilege ForInvokeCommand(const ConcreteCommandPath & path)
-    {
-        return kPrivilegeMapper[MatterGetAccessPrivilegeForInvokeCommand(path.mClusterId, path.mCommandId)];
-    }
-
-    static Privilege ForReadEvent(const ConcreteEventPath & path)
-    {
-        return kPrivilegeMapper[MatterGetAccessPrivilegeForReadEvent(path.mClusterId, path.mEventId)];
-    }
-};
-
+inline chip::Access::Privilege ForReadEvent(const ConcreteEventPath & path)
+{
+    return MatterGetAccessPrivilegeForReadEvent(path.mClusterId, path.mEventId);
+}
+} // namespace RequiredPrivilege
 } // namespace app
 } // namespace chip

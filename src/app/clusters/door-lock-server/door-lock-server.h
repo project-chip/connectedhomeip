@@ -29,7 +29,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -86,6 +86,18 @@ struct EmberAfDoorLockEndpointContext
     chip::System::Clock::Timestamp lockoutEndTimestamp;
     int wrongCodeEntryAttempts;
 };
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DoorLock {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace DoorLock
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 /**
  * @brief Door Lock Server Plugin class.
@@ -190,7 +202,8 @@ public:
     inline bool SupportsAnyCredential(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId)
-            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials);
+            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials,
+                    Feature::kAliroProvisioning);
     }
 
     inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
@@ -294,15 +307,17 @@ private:
     bool findUserIndexByCredential(chip::EndpointId endpointId, CredentialTypeEnum credentialType, chip::ByteSpan credentialData,
                                    uint16_t & userIndex, uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo);
 
-    EmberAfStatus createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
-                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                             const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
-                             const Nullable<CredentialRuleEnum> & credentialRule,
-                             const Nullable<CredentialStruct> & credential = Nullable<CredentialStruct>());
-    EmberAfStatus modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
-                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                             const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
-                             const Nullable<CredentialRuleEnum> & credentialRule);
+    chip::Protocols::InteractionModel::ClusterStatusCode
+    createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId, uint16_t userIndex,
+               const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+               const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
+               const Nullable<CredentialRuleEnum> & credentialRule,
+               const Nullable<CredentialStruct> & credential = Nullable<CredentialStruct>());
+    chip::Protocols::InteractionModel::Status
+    modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId, uint16_t userIndex,
+               const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+               const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
+               const Nullable<CredentialRuleEnum> & credentialRule);
     chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
                                                         chip::NodeId sourceNodeId, uint16_t userIndex, bool sendUserChangeEvent);
     chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
@@ -464,7 +479,7 @@ private:
     bool engageLockout(chip::EndpointId endpointId);
 
     static void sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                    EmberAfStatus status);
+                                    chip::Protocols::InteractionModel::ClusterStatusCode status);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands
@@ -531,7 +546,7 @@ private:
      */
     template <typename T>
     bool GetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      EmberAfStatus (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
+                      chip::Protocols::InteractionModel::Status (*getFn)(chip::EndpointId endpointId, T * value), T & value) const;
 
     /**
      * @brief Set generic attribute value
@@ -546,7 +561,7 @@ private:
      */
     template <typename T>
     bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
-                      EmberAfStatus (*setFn)(chip::EndpointId endpointId, T value), T value);
+                      chip::Protocols::InteractionModel::Status (*setFn)(chip::EndpointId endpointId, T value), T value);
 
     // AttributeAccessInterface's Read API
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
@@ -693,7 +708,7 @@ private:
         const chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::DecodableType & commandData);
 
     static constexpr size_t kDoorLockClusterServerMaxEndpointCount =
-        EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+        MATTER_DM_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
     static_assert(kDoorLockClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "DoorLock Endpoint count error");
 
     std::array<EmberAfDoorLockEndpointContext, kDoorLockClusterServerMaxEndpointCount> mEndpointCtx;
@@ -723,9 +738,9 @@ enum class DlAssetSource : uint8_t
  */
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    DlCredentialStatus status;         /**< Indicates if credential slot is occupied or not. */
-    CredentialTypeEnum credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::ByteSpan credentialData;     /**< Credential data bytes. */
+    DlCredentialStatus status = DlCredentialStatus::kAvailable; /**< Indicates if credential slot is occupied or not. */
+    CredentialTypeEnum credentialType;                          /**< Specifies the type of the credential (PIN, RFID, etc.). */
+    chip::ByteSpan credentialData;                              /**< Credential data bytes. */
 
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */

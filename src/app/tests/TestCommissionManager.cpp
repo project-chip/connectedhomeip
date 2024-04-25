@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/TestEventTriggerDelegate.h>
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -31,6 +32,8 @@
 #include <protocols/secure_channel/PASESession.h>
 
 #include <nlunit-test.h>
+
+using namespace chip::Crypto;
 
 using chip::CommissioningWindowAdvertisement;
 using chip::CommissioningWindowManager;
@@ -98,6 +101,8 @@ void InitializeChip(nlTestSuite * suite)
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
     initParams.reportScheduler = &sReportScheduler;
+    static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     err = chip::Server::GetInstance().Init(initParams);
 
@@ -234,7 +239,7 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     NL_TEST_ASSERT(suite, !sAdminVendorIdDirty);
 
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds16(1);
+    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds32(1);
     constexpr uint16_t kTimeoutMs              = 1000;
     constexpr unsigned kSleepPadding           = 100;
     commissionMgr.OverrideMinCommissioningTimeout(kTimeoutSeconds);
@@ -328,9 +333,9 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     CHIP_ERROR err = chip::DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(originDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     uint16_t newDiscriminator = static_cast<uint16_t>(originDiscriminator + 1);
-    chip::Spake2pVerifier verifier;
-    constexpr uint32_t kIterations = chip::kSpake2p_Min_PBKDF_Iterations;
-    uint8_t salt[chip::kSpake2p_Min_PBKDF_Salt_Length];
+    Spake2pVerifier verifier;
+    constexpr uint32_t kIterations = kSpake2p_Min_PBKDF_Iterations;
+    uint8_t salt[kSpake2p_Min_PBKDF_Salt_Length];
     chip::ByteSpan saltData(salt);
 
     NL_TEST_ASSERT(suite, !sWindowStatusDirty);

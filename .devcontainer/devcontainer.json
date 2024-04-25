@@ -14,7 +14,7 @@
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
     ],
-    "initializeCommand": ".devcontainer/build.sh --tag matter-dev-environment:local --version 22",
+    "initializeCommand": "bash .devcontainer/build.sh --tag matter-dev-environment:local --version 22",
     "image": "matter-dev-environment:local",
     "remoteUser": "vscode",
     "customizations": {

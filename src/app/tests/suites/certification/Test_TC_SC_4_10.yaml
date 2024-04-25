@@ -42,7 +42,7 @@ tests:
       verification: |
           avahi-browse -rt _matter._tcp
           On the TH(Chip-tool) Log: Verify the DUT is advertising for:
-          -SII key is higher than the SLEEPY_IDLE_INTERVAL default value (> 300 milliseconds)
+          - SII key is higher than the SESSION_IDLE_INTERVAL default value (> 500 milliseconds)
           - SII key and SAI key is less than 3600000 (1hour in milliseconds)
 
           +   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local

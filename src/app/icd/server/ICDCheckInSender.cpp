@@ -64,7 +64,8 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
         size_t writtenBytes                                     = 0;
         Encoding::LittleEndian::BufferWriter writer(activeModeThresholdBuffer, sizeof(activeModeThresholdBuffer));
 
-        writer.Put16(ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
+        uint16_t activeModeThreshold_ms = ICDConfigurationData::GetInstance().GetActiveModeThreshold().count();
+        writer.Put16(activeModeThreshold_ms);
         VerifyOrReturnError(writer.Fit(writtenBytes), CHIP_ERROR_INTERNAL);
 
         ByteSpan activeModeThresholdByteSpan(writer.Buffer(), writtenBytes);

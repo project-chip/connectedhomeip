@@ -70,13 +70,13 @@ void Light::UpdateState()
 {
     if (mTargetLightIsOn.HasValue())
     {
-        EmberAfStatus status = OnOffServer::Instance().setOnOffValue(
+        chip::Protocols::InteractionModel::Status status = OnOffServer::Instance().setOnOffValue(
             mEndpointId, mTargetLightIsOn.Value() ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id,
             false /* initiatedByLevelChange */);
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != chip::Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(AppServer, "Failed to set on/off value: %d", status);
+            ChipLogError(AppServer, "Failed to set on/off value: %d", chip::to_underlying(status));
         }
 
         mTargetLightIsOn.ClearValue();

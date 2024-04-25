@@ -28,12 +28,19 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
+
+#if CONFIG_DIAG_LOGS_DEMO
+#include "DiagnosticLogsProviderDelegateImpl.h"
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#endif
 
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::BooleanState;
+#if CONFIG_DIAG_LOGS_DEMO
+using namespace ::chip::app::Clusters::DiagnosticLogs;
+#endif
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type, uint16_t size, uint8_t * value)
 {
@@ -96,3 +103,11 @@ void logBooleanStateEvent(bool state)
         ChipLogProgress(Zcl, "booleanstate: failed to reacord state-change event");
     }
 }
+
+#if CONFIG_DIAG_LOGS_DEMO
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
+{
+    auto & logProvider = LogProvider::GetInstance();
+    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
+}
+#endif

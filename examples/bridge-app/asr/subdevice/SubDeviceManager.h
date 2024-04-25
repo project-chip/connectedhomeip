@@ -68,8 +68,8 @@ extern "C" {
 int AddDeviceEndpoint(SubDevice * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
                       const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId);
 CHIP_ERROR RemoveDeviceEndpoint(SubDevice * dev);
-EmberAfStatus HandleReadBridgedDeviceBasicAttribute(SubDevice * dev, chip::AttributeId attributeId, uint8_t * buffer,
-                                                    uint16_t maxReadLength);
+Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(SubDevice * dev, chip::AttributeId attributeId,
+                                                                          uint8_t * buffer, uint16_t maxReadLength);
 void HandleDeviceStatusChanged(SubDevice * dev, SubDevice::Changed_t itemChangedMask);
 void Init_Bridge_Endpoint();
 #ifdef __cplusplus

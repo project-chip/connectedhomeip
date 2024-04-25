@@ -54,14 +54,20 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050E" name="Account Login" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050E" name="Account Login" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Add support for 8 character PIN code, Add Node to Login, Logout commands. Add LoggedOut event."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x050E" name="Account Login"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="ALOGIN" scope="Endpoint"/>
   <commands>
-    <command id="0x00" name="GetSetupPIN" response="GetSetupPINResponse">
+    <command id="0x00" name="GetSetupPIN" direction="commandToServer" response="GetSetupPINResponse">
       <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="TempAccountIdentifier" type="string">
@@ -70,14 +76,14 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="GetSetupPINResponse" direction="responseFromServer">
-      <access invokePrivilege="operate" fabricScoped="true"/>
+      <access fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="SetupPIN" type="string">
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </command>
-    <command id="0x02" name="Login" response="Y">
+    <command id="0x02" name="Login" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="TempAccountIdentifier" type="string">
@@ -86,12 +92,27 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="SetupPIN" type="string">
         <mandatoryConform/>
-        <constraint type="minLength" value="11"/>
+        <constraint type="minLength" value="8"/>
+      </field>
+      <field id="2" name="Node" type="node-id">
+        <optionalConform/>
       </field>
     </command>
-    <command id="0x03" name="Logout" response="Y">
+    <command id="0x03" name="Logout" direction="commandToServer" response="Y">
       <access invokePrivilege="operate" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
+      <field id="0" name="Node" type="node-id">
+        <optionalConform/>
+      </field>
     </command>
   </commands>
+  <events>
+    <event id="0x00" name="LoggedOut" priority="critical">
+      <access readPrivilege="admin" fabricSensitive="true"/>
+      <optionalConform/>
+      <field id="0" name="Node" type="node-id">
+        <optionalConform/>
+      </field>
+    </event>
+  </events>
 </cluster>

@@ -41,7 +41,7 @@ RecordWriter & RecordWriter::WriteQName(const FullQName & qname)
     size_t qNameWriteStart = mOutput->WritePos();
     bool isFullyCompressed = true;
 
-    for (uint16_t i = 0; i < qname.nameCount; i++)
+    for (size_t i = 0; i < qname.nameCount; i++)
     {
 
         // find out if the record part remaining already is located somewhere

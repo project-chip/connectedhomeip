@@ -23,7 +23,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "BLEAppSvc.h"
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -110,6 +110,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
     }
     else
     {
+        matter_ble_stack_open();
+        matter_ble_add_service();
+        BLEMgrImpl().SetStackInit();
         mFlags.Set(Flags::kFlag_StackInitialized, true);
         log_i("ble is alread open!\n");
     }

@@ -25,7 +25,6 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/InteractionModelEngine.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
@@ -41,6 +40,7 @@
 namespace chip {
 namespace app {
 
+class InteractionModelEngine;
 class TestReadInteraction;
 
 namespace reporting {
@@ -179,7 +179,7 @@ private:
     // of those will fail to match.  This function should return false if either nothing in the list matches the given
     // endpoint+cluster in the path or there is an entry in the list that matches the endpoint+cluster in the path but does not
     // match the current data version of that cluster.
-    bool IsClusterDataVersionMatch(const ObjectList<DataVersionFilter> * aDataVersionFilterList,
+    bool IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFilter> * aDataVersionFilterList,
                                    const ConcreteReadAttributePath & aPath);
 
     /**

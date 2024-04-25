@@ -48,7 +48,7 @@ tests:
       response:
           constraints:
               type: list
-              maxLength: 16
+              maxLength: 4
 
     - label:
           "Step 3: TH reads from the DUT the mandatory attribute:
@@ -60,7 +60,7 @@ tests:
           constraints:
               type: enum8
               minValue: 0
-              maxValue: 15
+              maxValue: 3
 
     - label:
           "Step 4:TH writes a supported SelectedDrynessLevel attribute that is

@@ -22,6 +22,8 @@ import android.util.Log
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ControllerParams
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
+import chip.devicecontroller.ICDCheckInDelegate
+import chip.devicecontroller.ICDClientInfo
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
 import chip.platform.ChipMdnsCallbackImpl
@@ -31,6 +33,7 @@ import chip.platform.NsdManagerServiceResolver
 import chip.platform.PreferencesConfigurationManager
 import chip.platform.PreferencesKeyValueStoreManager
 import com.google.chip.chiptool.attestation.ExampleAttestationTrustStoreDelegate
+import com.google.chip.chiptool.clusterclient.ICDCheckInCallback
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -43,17 +46,42 @@ object ChipClient {
   /* 0xFFF4 is a test vendor ID, replace with your assigned company ID */
   const val VENDOR_ID = 0xFFF4
 
+  private var icdCheckInCallback: ICDCheckInCallback? = null
+
   fun getDeviceController(context: Context): ChipDeviceController {
     getAndroidChipPlatform(context)
 
     if (!this::chipDeviceController.isInitialized) {
       chipDeviceController =
-        ChipDeviceController(ControllerParams.newBuilder().setControllerVendorId(VENDOR_ID).build())
+        ChipDeviceController(
+          ControllerParams.newBuilder()
+            .setControllerVendorId(VENDOR_ID)
+            .setEnableServerInteractions(true)
+            .build()
+        )
 
       // Set delegate for attestation trust store for device attestation verifier.
       // It will replace the default attestation trust store.
       chipDeviceController.setAttestationTrustStoreDelegate(
         ExampleAttestationTrustStoreDelegate(chipDeviceController)
+      )
+
+      chipDeviceController.setICDCheckInDelegate(
+        object : ICDCheckInDelegate {
+          override fun onCheckInComplete(info: ICDClientInfo) {
+            Log.d(TAG, "onCheckInComplete : $info")
+            icdCheckInCallback?.notifyCheckInMessage(info)
+          }
+
+          override fun onKeyRefreshNeeded(info: ICDClientInfo): ByteArray? {
+            Log.d(TAG, "onKeyRefreshNeeded : $info")
+            return null
+          }
+
+          override fun onKeyRefreshDone(errorCode: Long) {
+            Log.d(TAG, "onKeyRefreshDone : $errorCode")
+          }
+        }
       )
     }
 
@@ -69,7 +97,10 @@ object ChipClient {
           AndroidBleManager(context),
           PreferencesKeyValueStoreManager(context),
           PreferencesConfigurationManager(context),
-          NsdManagerServiceResolver(context),
+          NsdManagerServiceResolver(
+            context,
+            NsdManagerServiceResolver.NsdManagerResolverAvailState()
+          ),
           NsdManagerServiceBrowser(context),
           ChipMdnsCallbackImpl(),
           DiagnosticDataProviderImpl(context)
@@ -77,6 +108,10 @@ object ChipClient {
     }
 
     return androidPlatform
+  }
+
+  fun setICDCheckInCallback(callback: ICDCheckInCallback) {
+    icdCheckInCallback = callback
   }
 
   /**

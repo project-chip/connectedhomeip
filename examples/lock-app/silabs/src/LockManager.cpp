@@ -21,14 +21,11 @@
 
 #include "AppConfig.h"
 #include "AppTask.h"
-#include <FreeRTOS.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
 LockManager LockManager::sLock;
-
-TimerHandle_t sLockTimer;
 
 using namespace ::chip::DeviceLayer::Internal;
 using namespace EFR32DoorLock::LockInitParams;
@@ -77,17 +74,16 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
-    // Create FreeRTOS sw timer for lock timer.
-    sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel
-                              1,                // == default timer period
-                              false,            // no timer reload (==one-shot)
-                              (void *) this,    // init timer id = lock obj context
-                              TimerEventHandler // timer callback handler
+    // Create cmsis os sw timer for lock timer.
+    mLockTimer = osTimerNew(TimerEventHandler, // timer callback handler
+                            osTimerOnce,       // no timer reload (one-shot timer)
+                            (void *) this,     // pass the app task obj context
+                            NULL               // No osTimerAttr_t to provide.
     );
 
-    if (sLockTimer == NULL)
+    if (mLockTimer == NULL)
     {
-        SILABS_LOG("sLockTimer timer create failed");
+        SILABS_LOG("mLockTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
@@ -222,38 +218,30 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
 
 void LockManager::StartTimer(uint32_t aTimeoutMs)
 {
-    if (xTimerIsTimerActive(sLockTimer))
+    // Starts or restarts the function timer
+    if (osTimerStart(mLockTimer, pdMS_TO_TICKS(aTimeoutMs)) != osOK)
     {
-        SILABS_LOG("app timer already started!");
-        CancelTimer();
-    }
-
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ms if the change period command
-    // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sLockTimer, pdMS_TO_TICKS(aTimeoutMs), pdMS_TO_TICKS(100)) != pdPASS)
-    {
-        SILABS_LOG("sLockTimer timer start() failed");
+        SILABS_LOG("mLockTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
 
 void LockManager::CancelTimer(void)
 {
-    if (xTimerStop(sLockTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    if (osTimerStop(mLockTimer) == osError)
     {
-        SILABS_LOG("sLockTimer stop() failed");
+        SILABS_LOG("mLockTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
 
-void LockManager::TimerEventHandler(TimerHandle_t xTimer)
+void LockManager::TimerEventHandler(void * timerCbArg)
 {
-    // Get lock obj context from timer id.
-    LockManager * lock = static_cast<LockManager *>(pvTimerGetTimerID(xTimer));
+    // The callback argument is the light obj context assigned at timer creation.
+    LockManager * lock = static_cast<LockManager *>(timerCbArg);
 
     // The timer event handler will be called in the context of the timer task
-    // once sLockTimer expires. Post an event to apptask queue with the actual handler
+    // once mLockTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;

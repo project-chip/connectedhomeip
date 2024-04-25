@@ -14,15 +14,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/util/attribute-table.h>
 
-// this file contains all the common includes for clusters in the zcl-util
+#include <app/util/attribute-table-detail.h>
 
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
-
-// for pulling in defines dealing with EITHER server or client
-#include "app/util/common.h"
 #include <app/util/config.h>
-#include <app/util/error-mapping.h>
+#include <app/util/ember-strings.h>
 #include <app/util/generic-callbacks.h>
 #include <app/util/odd-sized-integers.h>
 #include <lib/core/CHIPConfig.h>
@@ -30,18 +29,164 @@
 #include <app/reporting/reporting.h>
 #include <protocols/interaction_model/Constants.h>
 
-using namespace chip;
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
+#define EM_BIG_ENDIAN true
+#else
+#define EM_BIG_ENDIAN false
+#endif
 
-EmberAfStatus emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                         EmberAfAttributeType dataType)
+using chip::Protocols::InteractionModel::Status;
+
+using namespace chip;
+using namespace chip::app;
+
+namespace {
+// Zigbee spec says types between signed 8 bit and signed 64 bit
+bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, false /* override read-only */);
+    return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                    EmberAfAttributeType dataType)
+/**
+ * @brief Simple integer comparison function.
+ * Compares two values of a known length as integers.
+ * Signed integer comparison are supported for numbers with length of
+ * 4 (bytes) or less.
+ * The integers are in native endianness.
+ *
+ * @return -1, if val1 is smaller
+ *          0, if they are the same or if two negative numbers with length
+ *          greater than 4 is being compared
+ *          1, if val2 is smaller.
+ *
+ * You can pass in val1 as NULL, which will assume that it is
+ * pointing to an array of all zeroes. This is used so that
+ * default value of NULL is treated as all zeroes.
+ */
+int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */);
+    if (len == 0)
+    {
+        // no length means nothing to compare.  Shouldn't even happen, since len is sizeof(some-integer-type).
+        return 0;
+    }
+
+    if (signedNumber)
+    { // signed number comparison
+        if (len <= 4)
+        { // only number with 32-bits or less is supported
+            int32_t accum1 = 0x0;
+            int32_t accum2 = 0x0;
+            int32_t all1s  = -1;
+
+            for (uint16_t i = 0; i < len; i++)
+            {
+                uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+                accum1 |= j << (8 * (len - 1 - i));
+
+                uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+                accum2 |= k << (8 * (len - 1 - i));
+            }
+
+            // sign extending, no need for 32-bits numbers
+            if (len < 4)
+            {
+                if ((accum1 & (1 << (8 * len - 1))) != 0)
+                { // check sign
+                    accum1 |= all1s - ((1 << (len * 8)) - 1);
+                }
+                if ((accum2 & (1 << (8 * len - 1))) != 0)
+                { // check sign
+                    accum2 |= all1s - ((1 << (len * 8)) - 1);
+                }
+            }
+
+            if (accum1 > accum2)
+            {
+                return 1;
+            }
+            if (accum1 < accum2)
+            {
+                return -1;
+            }
+
+            return 0;
+        }
+
+        // not supported
+        return 0;
+    }
+
+    // regular unsigned number comparison
+    for (uint16_t i = 0; i < len; i++)
+    {
+        uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+        uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+
+        if (j > k)
+        {
+            return 1;
+        }
+        if (k > j)
+        {
+            return -1;
+        }
+    }
+    return 0;
+}
+
+/**
+ * @brief write an attribute, performing all the checks.
+ *
+ * This function will attempt to write the attribute value from
+ * the provided pointer. This function will only check that the
+ * attribute exists. If it does it will write the value into
+ * the attribute table for the given attribute.
+ *
+ * This function will not check to see if the attribute is
+ * writable since the read only / writable characteristic
+ * of an attribute only pertains to external devices writing
+ * over the air. Because this function is being called locally
+ * it assumes that the device knows what it is doing and has permission
+ * to perform the given operation.
+ *
+ * if true is passed in for overrideReadOnlyAndDataType then the data type is
+ * not checked and the read-only flag is ignored. This mode is meant for
+ * testing or setting the initial value of the attribute on the device.
+ *
+ * this returns:
+ * - Status::UnsupportedEndpoint: if endpoint isn't supported by the device.
+ * - Status::UnsupportedCluster: if cluster isn't supported on the endpoint.
+ * - Status::UnsupportedAttribute: if attribute isn't supported in the cluster.
+ * - Status::InvalidDataType: if the data type passed in doesnt match the type
+ *           stored in the attribute table
+ * - Status::UnsupportedWrite: if the attribute isnt writable
+ * - Status::ConstraintError: if the value is set out of the allowable range for
+ *           the attribute
+ * - Status::Success: if the attribute was found and successfully written
+ */
+Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
+                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty);
+} // anonymous namespace
+
+Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
+                                  EmberAfAttributeType dataType)
+{
+    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, false /* override read-only */,
+                              MarkAttributeDirty::kIfChanged);
+}
+
+Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
+                             EmberAfAttributeType dataType)
+{
+    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */,
+                              MarkAttributeDirty::kIfChanged);
+}
+
+Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
+                             EmberAfAttributeType dataType, MarkAttributeDirty markDirty)
+{
+    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */, markDirty);
 }
 
 //------------------------------------------------------------------------------
@@ -103,18 +248,88 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
     return false;
 }
 
-EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
-                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType)
+namespace {
+
+/**
+ * Helper function to determine whether the attribute value for the given
+ * attribute is changing.  On success, the isChanging outparam will be set to
+ * whether the value is changing.
+ */
+Status AttributeValueIsChanging(EndpointId endpoint, ClusterId cluster, AttributeId attributeID,
+                                const EmberAfAttributeMetadata * metadata, uint8_t * newValueData, bool * isChanging)
+{
+    EmberAfAttributeType attributeType = metadata->attributeType;
+
+    // We don't know how to size our buffer for strings in general, but if the
+    // string happens to fit into our fixed-size buffer, great.
+    size_t valueSize               = metadata->size;
+    constexpr size_t kMaxValueSize = 16; // ipv6adr
+    if (valueSize > kMaxValueSize)
+    {
+        if (emberAfIsStringAttributeType(attributeType) || emberAfIsLongStringAttributeType(attributeType))
+        {
+            // It's a string that may not fit in our buffer.  Just claim it's
+            // changing, since we have no way to tell.
+            *isChanging = true;
+            return Status::Success;
+        }
+
+        // Very much unexpected
+        ChipLogError(Zcl, "Attribute type %d has too-large size %u", attributeType, static_cast<unsigned>(valueSize));
+        return Status::ConstraintError;
+    }
+
+    uint8_t oldValueBuffer[kMaxValueSize];
+    // Cast to uint16_t is safe, because we checked valueSize <= kMaxValueSize above.
+    if (emberAfReadAttribute(endpoint, cluster, attributeID, oldValueBuffer, static_cast<uint16_t>(valueSize)) != Status::Success)
+    {
+        // We failed to read the old value, so flag the value as changing to be safe.
+        *isChanging = true;
+        return Status::Success;
+    }
+
+    if (emberAfIsStringAttributeType(attributeType))
+    {
+        size_t oldLength = emberAfStringLength(oldValueBuffer);
+        size_t newLength = emberAfStringLength(newValueData);
+        // The first byte of the buffer is the string length, and
+        // oldLength/newLength refer to the number of bytes after that.  We want
+        // to include that first byte in our comparison, because null and empty
+        // string have different values there but both return 0 from
+        // emberAfStringLength.
+        *isChanging = (oldLength != newLength) || (memcmp(oldValueBuffer, newValueData, oldLength + 1) != 0);
+    }
+    else if (emberAfIsLongStringAttributeType(attributeType))
+    {
+        size_t oldLength = emberAfLongStringLength(oldValueBuffer);
+        size_t newLength = emberAfLongStringLength(newValueData);
+        // The first two bytes of the buffer are the string length, and
+        // oldLength/newLength refer to the number of bytes after that.  We want
+        // to include those first two bytes in our comparison, because null and
+        // empty string have different values there but both return 0 from
+        // emberAfLongStringLength.
+        *isChanging = (oldLength != newLength) || (memcmp(oldValueBuffer, newValueData, oldLength + 2) != 0);
+    }
+    else
+    {
+        *isChanging = (memcmp(newValueData, oldValueBuffer, valueSize) != 0);
+    }
+
+    return Status::Success;
+}
+
+Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
+                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
-    record.endpoint      = endpoint;
-    record.clusterId     = cluster;
-    record.attributeId   = attributeID;
-    EmberAfStatus status = emAfReadOrWriteAttribute(&record, &metadata,
-                                                    nullptr, // buffer
-                                                    0,       // buffer size
-                                                    false);  // write?
+    record.endpoint    = endpoint;
+    record.clusterId   = cluster;
+    record.attributeId = attributeID;
+    Status status      = emAfReadOrWriteAttribute(&record, &metadata,
+                                                  nullptr, // buffer
+                                                  0,       // buffer size
+                                                  false);  // write?
 
     // if we dont support that attribute
     if (metadata == nullptr)
@@ -130,18 +345,18 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         if (dataType != metadata->attributeType)
         {
             ChipLogProgress(Zcl, "%p invalid data type", "WRITE ERR: ");
-            return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
+            return Status::InvalidDataType;
         }
 
         if (metadata->IsReadOnly())
         {
             ChipLogProgress(Zcl, "%p attr not writable", "WRITE ERR: ");
-            return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+            return Status::UnsupportedWrite;
         }
     }
 
     // if the value the attribute is being set to is out of range
-    // return EMBER_ZCL_STATUS_CONSTRAINT_ERROR
+    // return Status::ConstraintError
     if ((metadata->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
     {
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
@@ -178,19 +393,32 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             // null value is always in-range for a nullable attribute.
             (!metadata->IsNullable() || !IsNullValue(data, dataLen, isAttributeSigned)))
         {
-            return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+            return Status::ConstraintError;
         }
+    }
+
+    // Check whether anything is actually changing, before we do any work here.
+    bool valueChanging;
+    Status imStatus = AttributeValueIsChanging(endpoint, cluster, attributeID, metadata, data, &valueChanging);
+    if (imStatus != Status::Success)
+    {
+        return imStatus;
+    }
+
+    if (!valueChanging)
+    {
+        // Just do nothing.
+        return Status::Success;
     }
 
     const app::ConcreteAttributePath attributePath(endpoint, cluster, attributeID);
 
     // Pre write attribute callback for all attribute changes,
     // regardless of cluster.
-    Protocols::InteractionModel::Status imStatus =
-        MatterPreAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+    imStatus = MatterPreAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
     if (imStatus != Protocols::InteractionModel::Status::Success)
     {
-        return app::ToEmberAfStatus(imStatus);
+        return imStatus;
     }
 
     // Pre-write attribute callback specific
@@ -198,12 +426,12 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     status = emAfClusterPreAttributeChangedCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
 
     // Ignore the following write operation and return success
-    if (status == EMBER_ZCL_STATUS_WRITE_IGNORED)
+    if (status == Status::WriteIgnored)
     {
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return Status::Success;
     }
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Status::Success)
     {
         return status;
     }
@@ -215,7 +443,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
                                       0,     // buffer size - unused
                                       true); // write?
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Status::Success)
     {
         return status;
     }
@@ -224,7 +452,10 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     // The callee will weed out attributes that do not need to be stored.
     emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
 
-    MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
+    if (markDirty != MarkAttributeDirty::kNo)
+    {
+        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
+    }
 
     // Post write attribute callback for all attributes changes, regardless
     // of cluster.
@@ -234,15 +465,16 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     // to the cluster that the attribute lives in.
     emAfClusterAttributeChangedCallback(attributePath);
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Status::Success;
 }
 
-EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                   uint16_t readLength)
+} // anonymous namespace
+
+Status emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr, uint16_t readLength)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
-    EmberAfStatus status;
+    Status status;
     record.endpoint    = endpoint;
     record.clusterId   = cluster;
     record.attributeId = attributeID;
@@ -250,7 +482,7 @@ EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attri
                                                   false); // write?
 
     // failed, print debug info
-    if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
+    if (status == Status::ResourceExhausted)
     {
         ChipLogProgress(Zcl, "READ: attribute size too large for caller");
     }

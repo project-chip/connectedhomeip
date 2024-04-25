@@ -495,11 +495,12 @@ void AppTask::UpdateClusterState(void)
     /* write the new attribute value based on attribute setter API.
        example API usage of on-off attribute:
 
-        EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
+        Protocols::InteractionModel::Status status = Clusters::OnOff::Attributes::OnOff::Set(QPG_LIGHT_ENDPOINT_ID,
+       LightingMgr().IsTurnedOn());
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
+            ChipLogError(NotSpecified, "ERR: updating on/off %x", to_underlying(status));
         }
     */
 }

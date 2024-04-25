@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/JniReferences.h>
 
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
@@ -48,11 +49,15 @@ public:
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 private:
-    jobject mContentLauncherManagerObject           = nullptr;
+    chip::JniGlobalReference mContentLauncherManagerObject;
     jmethodID mGetAcceptHeaderMethod                = nullptr;
     jmethodID mGetSupportedStreamingProtocolsMethod = nullptr;
     jmethodID mLaunchContentMethod                  = nullptr;
     jmethodID mLaunchUrlMethod                      = nullptr;
+
+    // TODO: set this based upon meta data from app
+    static constexpr uint16_t kClusterRevision = 2;
 };

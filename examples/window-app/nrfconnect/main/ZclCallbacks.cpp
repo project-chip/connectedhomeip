@@ -31,7 +31,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
-#include <app/util/af.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters::WindowCovering;
@@ -82,17 +81,17 @@ void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::Concre
 
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint)
 {
-    const auto logOnFailure = [](EmberAfStatus status, const char * attributeName) {
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+    const auto logOnFailure = [](Protocols::InteractionModel::Status status, const char * attributeName) {
+        if (status != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(Zcl, "Failed to set WindowCovering %s: %x", attributeName, status);
+            ChipLogError(Zcl, "Failed to set WindowCovering %s: %x", attributeName, to_underlying(status));
         }
     };
 
     app::DataModel::Nullable<chip::Percent100ths> currentPercent100ths;
     app::DataModel::Nullable<chip::Percent100ths> targetPercent100ths;
     app::DataModel::Nullable<chip::Percent> currentPercentage;
-    EmberAfStatus status;
+    Protocols::InteractionModel::Status status;
 
     status = Attributes::CurrentPositionLiftPercentage::Get(endpoint, currentPercentage);
     if (currentPercentage.IsNull())

@@ -14,22 +14,32 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w1_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-import("${k32w1_sdk_build_root}/k32w1_executable.gni")
-import("${k32w1_sdk_build_root}/k32w1_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 declare_args() {
   chip_software_version = 0
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
+  chip_with_diag_logs_demo = true
 }
 
 assert(current_os == "freertos")
 
+common_example_dir = "${chip_root}/examples/platform/nxp/common"
 k32w1_platform_dir = "${chip_root}/examples/platform/nxp/k32w/k32w1"
 k32w1_sdk_root = getenv("NXP_K32W1_SDK_ROOT")
 
@@ -65,10 +75,20 @@ k32w1_sdk("sdk") {
       "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
     ]
   }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
+
+  if (chip_with_diag_logs_demo) {
+    defines += [ "CONFIG_DIAG_LOGS_DEMO=1" ]
+  }
 }
 
 k32w1_executable("contact_sensor_app") {
   output_name = "chip-k32w1-contact-example"
+
+  defines = []
 
   sources = [
     "${k32w1_platform_dir}/util/LEDWidget.cpp",
@@ -82,10 +102,11 @@ k32w1_executable("contact_sensor_app") {
     "main/main.cpp",
   ]
 
+  include_dirs = [ "${common_example_dir}/diagnostic_logs" ]
+
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/contact-sensor-app/contact-sensor-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform:syscalls_stub",
@@ -93,16 +114,34 @@ k32w1_executable("contact_sensor_app") {
     "${k32w1_platform_dir}/app/support:freertos_mbedtls_utils",
   ]
 
+  #lit and sit are using different zap files
+  if (chip_enable_icd_lit) {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
+
+    defines += [ "CHIP_ENABLE_LIT=1" ]
+  } else {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/" ]
+  }
+
   if (chip_openthread_ftd) {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+      "${openthread_root}:libopenthread-cli-ftd",
+      "${openthread_root}:libopenthread-ftd",
     ]
   } else {
     deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+      "${openthread_root}:libopenthread-cli-mtd",
+      "${openthread_root}:libopenthread-mtd",
     ]
+  }
+
+  #lit and sit are using different zap files
+  if (chip_enable_icd_lit) {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
+
+    defines += [ "CHIP_ENABLE_LIT=1" ]
+  } else {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/" ]
   }
 
   cflags = [ "-Wconversion" ]
@@ -116,13 +155,23 @@ k32w1_executable("contact_sensor_app") {
   ldflags = [
     "-Wl,--defsym=__heap_size__=0",
     "-Wl,--defsym=__stack_size__=0x480",
-    "-Wl,--defsym=gNvmSectors=8",
     "-Wl,--defsym=lp_ram_lower_limit=0x04000000",
     "-Wl,--defsym=lp_ram_upper_limit=0x2001C000",
     "-Wl,-print-memory-usage",
     "-Wl,--no-warn-rwx-segments",
     "-T" + rebase_path(ldscript, root_build_dir),
   ]
+
+  if (chip_with_factory_data == 1) {
+    ldflags += [ "-Wl,--defsym=gUseFactoryData_d=1" ]
+  }
+
+  if (chip_with_diag_logs_demo) {
+    sources += [
+      "${common_example_dir}/diagnostic_logs/DiagnosticLogsProviderDelegateImpl.cpp",
+      "${common_example_dir}/diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h",
+    ]
+  }
 
   output_dir = root_out_dir
 }

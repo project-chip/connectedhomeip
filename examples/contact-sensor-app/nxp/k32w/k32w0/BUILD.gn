@@ -13,12 +13,15 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/k32w0_sdk.gni")
+import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 
-import("${k32w0_sdk_build_root}/k32w0_executable.gni")
-import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+
+import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -26,6 +29,9 @@ import("${chip_root}/src/platform/device.gni")
 declare_args() {
   chip_software_version = 0
   chip_simple_hash_verification = 0
+
+  # Setup discriminator as argument
+  setup_discriminator = 3840
 }
 
 if (chip_pw_tokenizer_logging) {
@@ -70,10 +76,16 @@ k32w0_sdk("sdk") {
       "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_software_version}",
     ]
   }
+
+  defines += [
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setup_discriminator}",
+  ]
 }
 
 k32w0_executable("contact_sensor_app") {
   output_name = "chip-k32w0x-contact-example"
+
+  defines = []
 
   sources = [
     "${k32w0_platform_dir}/util/LEDWidget.cpp",
@@ -93,13 +105,12 @@ k32w0_executable("contact_sensor_app") {
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
     ]
 
-    defines = [ "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1" ]
+    defines += [ "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1" ]
   }
 
   deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/contact-sensor-app/contact-sensor-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform:syscalls_stub",
@@ -119,6 +130,15 @@ k32w0_executable("contact_sensor_app") {
     ]
   }
 
+  #lit and sit are using different zap files
+  if (chip_enable_icd_lit) {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-lit/" ]
+
+    defines += [ "CHIP_ENABLE_LIT=1" ]
+  } else {
+    deps += [ "${chip_root}/examples/contact-sensor-app/nxp/zap-sit/" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
@@ -129,6 +149,7 @@ k32w0_executable("contact_sensor_app") {
 
   ldflags = [
     "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,--defsym=__stack_size__=0x480",
     "-Wl,-print-memory-usage",
   ]
 

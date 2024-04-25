@@ -11,333 +11,274 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 266.1.2. [TC-EEVSE-2.1] Attributes with DUT as Server
+name: 265.1.2. [TC-EEVSE-2.1] Attributes with DUT as Server
 
 PICS:
     - EEVSE.S
 
 config:
-    nodeId: "0x12344321"
-    cluster: "Basic Information"
-    endpoint: 0
+    nodeId: 0x12344321
+    cluster: "Energy EVSE"
+    endpoint: 1
 
 tests:
-    - label:
-          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
-          test)."
-      verification: |
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Step 2: TH reads from the DUT the State attribute"
+      command: "readAttribute"
+      attribute: "State"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 6
 
-    - label: "Step 2: TH reads from the DUT the State attribute."
-      verification: |
-          ./chip-tool energyevse read state 1 1
-
-          On TH(chip-tool), Verify the State value between 0 and 6 inclusive.
-
-          [1703746501.478667][1324:1326] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0000 DataVersion: 1471857723
-          [1703746501.482885][1324:1326] CHIP:TOO:   State: 0
-      disabled: true
-
-    - label: "Step 3: TH reads from the DUT the SupplyState attribute."
+    - label: "Step 3: TH reads from the DUT the SupplyState attribute"
       PICS: EEVSE.S.A0001
-      verification: |
-          ./chip-tool energyevse read supply-state 1 1
+      command: "readAttribute"
+      attribute: "SupplyState"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
 
-          On TH(chip-tool), Verify the SupplyState value between 0 and 4 inclusive.
-
-          [1703746567.014836][1331:1333] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0001 DataVersion: 1471857723
-          [1703746567.014912][1331:1333] CHIP:TOO:   SupplyState: 0
-      disabled: true
-
-    - label: "Step 4: TH reads from the DUT the FaultState attribute."
+    - label: "Step 4: TH reads from the DUT the FaultState attribute"
       PICS: EEVSE.S.A0002
-      verification: |
-          ./chip-tool energyevse read fault-state 1 1
+      command: "readAttribute"
+      attribute: "FaultState"
+      response:
+          constraints:
+              type: enum8
+              anyOf: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255]
 
-          On TH(chip-tool), Verify the FaultState value between 0 to 15 and 255 inclusive.
-
-          [1703746609.539647][1339:1341] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0002 DataVersion: 1471857723
-          [1703746609.539748][1339:1341] CHIP:TOO:   FaultState: 0
-      disabled: true
-
-    - label: "Step 5: TH reads from the DUT the ChargingEnabledUntil attribute."
+    - label: "Step 5: TH reads from the DUT the ChargingEnabledUntil attribut"
       PICS: EEVSE.S.A0003
-      verification: |
-          ./chip-tool energyevse read charging-enabled-until 1 1
-
-          On TH(chip-tool), Verify the ChargingEnabledUntil attribute contains epoch-s value or null.
-
-          [1703746659.995945][1410:1412] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0003 DataVersion: 1471857723
-          [1703746659.996071][1410:1412] CHIP:TOO:   ChargingEnabledUntil: null
-      disabled: true
+      command: "readAttribute"
+      attribute: "ChargingEnabledUntil"
+      response:
+          constraints:
+              type: epoch-s
+              minValue: 0
+              maxValue: 4294967295
 
     - label:
-          "Step 6: TH reads from the DUT the DischargingEnabledUntil attribute."
+          "Step 6: TH reads from the DUT the DischargingEnabledUntil attribute"
       PICS: EEVSE.S.A0004
-      verification: |
-          ./chip-tool energyevse read discharging-enabled-until 1 1
+      command: "readAttribute"
+      attribute: "DischargingEnabledUntil"
+      response:
+          constraints:
+              type: epoch-s
+              minValue: 0
+              maxValue: 4294967295
 
-          On TH(chip-tool), Verify the DischargingEnabledUntil attribute contains epoch-s value or null.
-
-          [1703746787.751096][1849:1851] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0004 DataVersion: 1471857723
-          [1703746787.751173][1849:1851] CHIP:TOO:   DischargingEnabledUntil: null
-      disabled: true
-
-    - label: "Step 7: TH reads from the DUT the CircuitCapacity attribute."
+    - label: "Step 7: TH reads from the DUT the CircuitCapacity attribute"
       PICS: EEVSE.S.A0005
-      verification: |
-          ./chip-tool energyevse read circuit-capacity 1 1
+      command: "readAttribute"
+      attribute: "CircuitCapacity"
+      response:
+          constraints:
+              type: amperage_ma
+              minValue: 0
 
-          On TH(chip-tool), Verify the CircuitCapacity contains an amperage-mA value is in the range of 0 to 80000.
-
-          [1703746836.529283][1855:1857] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0005 DataVersion: 1471857723
-          [1703746836.529406][1855:1857] CHIP:TOO:   CircuitCapacity: 0
-      disabled: true
-
-    - label: "Step 8: TH reads from the DUT the MinimumChargeCurrent attribute."
+    - label: "Step 8: TH reads from the DUT the MinimumChargeCurrent attribute"
       PICS: EEVSE.S.A0006
-      verification: |
-          ./chip-tool energyevse read minimum-charge-current 1 1
+      command: "readAttribute"
+      attribute: "MinimumChargeCurrent"
+      response:
+          constraints:
+              type: amperage_ma
+              minValue: 0
 
-          On TH(chip-tool), Verify the MinimumChargeCurrent contains an amperage-mA value is in the range of 0 to 80000.
-
-          [1703746900.151431][1861:1863] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0006 DataVersion: 1471857723
-          [1703746900.151511][1861:1863] CHIP:TOO:   MinimumChargeCurrent: 6000
-      disabled: true
-
-    - label: "Step 9: TH reads from the DUT the MaximumChargeCurrent attribute."
+    - label: "Step 9: TH reads from the DUT the MaximumChargeCurrent attribute"
       PICS: EEVSE.S.A0007
-      verification: |
-          ./chip-tool energyevse read maximum-charge-current 1 1
-
-          On TH(chip-tool), Verify the MaximumChargeCurrent contains an amperage-mA value is in the range of 0 80000.
-
-          [1703746980.955341][1866:1868] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0007 DataVersion: 1471857723
-          [1703746980.955401][1866:1868] CHIP:TOO:   MaximumChargeCurrent: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "MaximumChargeCurrent"
+      response:
+          constraints:
+              type: amperage_ma
+              minValue: 0
 
     - label:
-          "Step 10: TH reads from the DUT the MaximumDischargeCurrent attribute."
+          "Step 10: TH reads from the DUT the MaximumDischargeCurrent attribute"
       PICS: EEVSE.S.A0008
-      verification: |
-          ./chip-tool energyevse read maximum-discharge-current 1 1
-
-          On TH(chip-tool), Verify the MaximumDischargeCurrent contains an amperage-mA value is in the range of 0 80000.
-
-          [1703747035.548962][1870:1872] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0008 DataVersion: 1471857723
-          [1703747035.549016][1870:1872] CHIP:TOO:   MaximumDischargeCurrent: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "MaximumDischargeCurrent"
+      response:
+          constraints:
+              type: amperage_ma
+              minValue: 0
 
     - label:
           "Step 11: TH writes to the DUT the UserMaximumChargeCurrent attribute
-          value 30000."
+          value 3000"
       PICS: EEVSE.S.A0009
-      verification: |
-          ./chip-tool energyevse write user-maximum-charge-current 30000 1 1
-
-          On TH(chip-tool), Verify the SUCCESS response for UserMaximumChargeCurrent attribute successful write.
-
-          [1703747211.562507][1880:1882] CHIP:DMG:                         StatusIB =
-          [1703747211.562536][1880:1882] CHIP:DMG:                         {
-          [1703747211.562599][1880:1882] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1703747211.562629][1880:1882] CHIP:DMG:                         },
-          [1703747211.562677][1880:1882] CHIP:DMG:
-          [1703747211.562703][1880:1882] CHIP:DMG:                 },
-      disabled: true
+      command: "writeAttribute"
+      attribute: "UserMaximumChargeCurrent"
+      arguments:
+          value: 30000
 
     - label:
           "Step 11a: TH reads from the DUT the UserMaximumChargeCurrent
-          attribute."
+          attribute"
       PICS: EEVSE.S.A0009
-      verification: |
-          ./chip-tool energyevse read user-maximum-charge-current 1 1
-
-          On TH(chip-tool), Verify the UserMaximumChargeCurrent attribute contains the amperage-mA value 30000.
-
-          [1703747252.643892][1886:1888] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0009 DataVersion: 1471857725
-          [1703747252.643979][1886:1888] CHIP:TOO:   UserMaximumChargeCurrent: 30000
-      disabled: true
+      command: "readAttribute"
+      attribute: "UserMaximumChargeCurrent"
+      response:
+          value: 30000
+          constraints:
+              type: amperage_ma
 
     - label:
           "Step 12: TH writes to the DUT the RandomizationDelayWindow attribute
-          value 600."
+          value 600"
       PICS: EEVSE.S.A000A
-      verification: |
-          ./chip-tool energyevse write randomization-delay-window 600 1 1
-
-          On TH(chip-tool), Verify the SUCCESS response for RandomizationDelayWindow attribute successful write.
-
-          [1703747329.583214][1890:1892] CHIP:DMG:                         StatusIB =
-          [1703747329.583244][1890:1892] CHIP:DMG:                         {
-          [1703747329.583273][1890:1892] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1703747329.583301][1890:1892] CHIP:DMG:                         },
-      disabled: true
+      command: "writeAttribute"
+      attribute: "RandomizationDelayWindow"
+      arguments:
+          value: 600
 
     - label:
           "Step 12a: TH reads from the DUT the RandomizationDelayWindow
-          attribute."
+          attribute"
       PICS: EEVSE.S.A000A
-      verification: |
-          ./chip-tool energyevse read randomization-delay-window 1 1
+      command: "readAttribute"
+      attribute: "RandomizationDelayWindow"
+      response:
+          value: 600
+          constraints:
+              type: elapsed_s
 
-          On TH(chip-tool), Verify the RandomizationDelayWindow attribute contains elapsed-s value 600.
-
-          [1703747373.495538][1893:1895] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_000A DataVersion: 1471857726
-          [1703747373.495591][1893:1895] CHIP:TOO:   RandomizationDelayWindow: 600
-      disabled: true
-
-    - label: "Step 13: TH reads from the DUT the NextChargeStartTime attribute."
+    - label: "Step 13: TH reads from the DUT the NextChargeStartTime attribute"
       PICS: EEVSE.S.A0023
-      verification: |
-          ./chip-tool energyevse read next-charge-start-time 1 1
+      command: "readAttribute"
+      attribute: "NextChargeStartTime"
+      response:
+          constraints:
+              type: epoch-s
+              minValue: 0
+              maxValue: 4294967295
 
-          On TH(chip-tool), Verify the NextChargeStartTime attribute contains epoch-s value or null.
-
-          [1703747468.300635][1902:1904] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0023 DataVersion: 1471857726
-          [1703747468.300690][1902:1904] CHIP:TOO:   NextChargeStartTime: null
-      disabled: true
-
-    - label:
-          "Step 14: TH reads from the DUT the NextChargeTargetTime attribute."
+    - label: "Step 14: TH reads from the DUT the NextChargeTargetTime attribute"
       PICS: EEVSE.S.A0024
-      verification: |
-          ./chip-tool energyevse read next-charge-target-time 1 1
-
-          On TH(chip-tool), Verify the NextChargeTargetTime attribute contains epoch-s value or null.
-
-          [1703747509.059648][1906:1908] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0024 DataVersion: 1471857726
-          [1703747509.059700][1906:1908] CHIP:TOO:   NextChargeTargetTime: null
-      disabled: true
+      command: "readAttribute"
+      attribute: "NextChargeTargetTime"
+      response:
+          constraints:
+              type: epoch-s
+              minValue: 0
+              maxValue: 4294967295
 
     - label:
-          "Step 15: TH reads from the DUT the NextChargeRequiredEnergy
-          attribute."
+          "Step 15: TH reads from the DUT the NextChargeRequiredEnergy attribute"
       PICS: EEVSE.S.A0025
-      verification: |
-          ./chip-tool energyevse read next-charge-required-energy 1 1
+      command: "readAttribute"
+      attribute: "NextChargeRequiredEnergy"
+      response:
+          constraints:
+              type: energy-mWh
+              minValue: 0
 
-          On TH(chip-tool), Verify the NextChargeRequiredEnergy attribute energy-mWh value is in the valid range(min 0) or null.
-
-          [1703747579.793082][1917:1919] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0025 DataVersion: 1471857726
-          [1703747579.793170][1917:1919] CHIP:TOO:   NextChargeRequiredEnergy: null
-      disabled: true
-
-    - label: "Step 16: TH reads from the DUT the NextChargeTargetSoC attribute."
+    - label: "Step 16: TH reads from the DUT the NextChargeTargetSoC attribute"
       PICS: EEVSE.S.A0026
-      verification: |
-          ./chip-tool energyevse read next-charge-target-so-c 1 1
-
-          On TH(chip-tool), Verify the NextChargeTargetSoC attribute contains a percent value, or null.
-
-          [1703747625.575922][1922:1924] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0026 DataVersion: 1471857726
-          [1703747625.576013][1922:1924] CHIP:TOO:   NextChargeTargetSoC: null
-      disabled: true
+      command: "readAttribute"
+      attribute: "NextChargeTargetSoC"
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
 
     - label:
           "Step 17: TH writes to the DUT the ApproximateEVEfficiency attribute
-          value 3500."
+          value 3500"
       PICS: EEVSE.S.A0027
-      verification: |
-          ./chip-tool energyevse write approximate-evefficiency 3500 1 1
-
-          On TH(chip-tool), Verify the SUCCESS response for ApproximateEVEfficiency attribute successful write.
-
-          [1703747688.527575][1927:1929] CHIP:DMG:                         StatusIB =
-          [1703747688.527603][1927:1929] CHIP:DMG:                         {
-          [1703747688.527631][1927:1929] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1703747688.527678][1927:1929] CHIP:DMG:                         },
-      disabled: true
+      command: "writeAttribute"
+      attribute: "ApproximateEVEfficiency"
+      arguments:
+          value: 3500
 
     - label:
-          "Step 17a: TH reads from the DUT the ApproximateEVEfficiency
-          attribute."
+          "Step 17a: TH reads from the DUT the ApproximateEVEfficiency attribute"
       PICS: EEVSE.S.A0027
-      verification: |
-          ./chip-tool energyevse read approximate-evefficiency 1 1
+      command: "readAttribute"
+      attribute: "ApproximateEVEfficiency"
+      response:
+          value: 3500
+          constraints:
+              type: int16u
 
-          On TH(chip-tool), Verify the ApproximateEVEfficiency attribute contains the uint16 value 3500.
-
-          [1703747727.592819][1930:1932] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0027 DataVersion: 1471857728
-          [1703747727.592870][1930:1932] CHIP:TOO:   ApproximateEVEfficiency: 3500
-      disabled: true
-
-    - label: "Step 18: TH reads from the DUT the StateOfCharge attribute."
+    - label: "Step 18: TH reads from the DUT the StateOfCharge attribute"
       PICS: EEVSE.S.A0030
-      verification: |
-          ./chip-tool energyevse read state-of-charge 1 1
+      command: "readAttribute"
+      attribute: "StateOfCharge"
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
 
-          On TH(chip-tool), Verify the StateOfCharge attribute contains a percent value, or null.
-
-          [1703747792.711492][1934:1936] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0030 DataVersion: 1471857728
-          [1703747792.711546][1934:1936] CHIP:TOO:   StateOfCharge: null
-      disabled: true
-
-    - label: "Step 19: TH reads from the DUT the BatteryCapacity attribute."
+    - label: "Step 19: TH reads from the DUT the BatteryCapacity attribute"
       PICS: EEVSE.S.A0031
-      verification: |
-          ./chip-tool energyevse read battery-capacity 1 1
+      command: "readAttribute"
+      attribute: "BatteryCapacity"
+      response:
+          constraints:
+              type: energy-mWh
+              minValue: 0
 
-          On TH(chip-tool), Verify the BatteryCapacity attribute contains an energy-mWh value or null.
-
-          [1703747831.580988][1942:1944] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0031 DataVersion: 1471857728
-          [1703747831.581068][1942:1944] CHIP:TOO:   BatteryCapacity: null
-      disabled: true
-
-    - label: "Step 20: TH reads from the DUT the VehicleID attribute."
+    - label: "Step 20: TH reads from the DUT the VehicleID attribute"
       PICS: EEVSE.S.A0032
-      verification: |
-          ./chip-tool energyevse read vehicle-id 1 1
+      command: "readAttribute"
+      attribute: "VehicleID"
+      response:
+          constraints:
+              type: char_string
+              maxLength: 32
 
-          On TH(chip-tool), Verify the VehicleID attribute contains a string value, or null.
-
-          [1703747885.083733][1948:1950] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0032 DataVersion: 1471857728
-          [1703747885.083795][1948:1950] CHIP:TOO:   VehicleID: null
-      disabled: true
-
-    - label: "Step 21: TH reads from the DUT the SessionID attribute."
+    - label: "Step 21: TH reads from the DUT the SessionID attribute"
       PICS: EEVSE.S.A0040
-      verification: |
-          ./chip-tool energyevse read session-id 1 1
+      command: "readAttribute"
+      attribute: "SessionID"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 2147483647
 
-          On TH(chip-tool), Verify the SessionID attribute contains a uint32 value, or null.
-          [1703747940.652133][1953:1955] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0040 DataVersion: 1471857728
-          [1703747940.652210][1953:1955] CHIP:TOO:   SessionID: null
-      disabled: true
-
-    - label: "Step 22: TH reads from the DUT the SessionDuration attribute."
+    - label: "Step 22: TH reads from the DUT the SessionDuration attribute"
       PICS: EEVSE.S.A0041
-      verification: |
-          ./chip-tool energyevse read session-duration 1 1
+      command: "readAttribute"
+      attribute: "SessionDuration"
+      response:
+          constraints:
+              type: elapsed_s
+              minValue: 0
+              maxValue: 2147483647
 
-          On TH(chip-tool), Verify the SessionDuration attribute contains an elapsed-s value or null.
-
-          [1703747993.886193][1957:1959] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0041 DataVersion: 1471857728
-          [1703747993.886248][1957:1959] CHIP:TOO:   SessionDuration: null
-      disabled: true
-
-    - label:
-          "Step 23: TH reads from the DUT the SessionEnergyCharged attribute."
+    - label: "Step 23: TH reads from the DUT the SessionEnergyCharged attribute"
       PICS: EEVSE.S.A0042
-      verification: |
-          ./chip-tool energyevse read session-energy-charged 1 1
-
-          On TH(chip-tool), Verify the SessionEnergyCharged attribute energy-mWh value is in the valid range(min 0) or null.
-
-          [1703748035.855732][1962:1964] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0042 DataVersion: 1471857728
-          [1703748035.855811][1962:1964] CHIP:TOO:   SessionEnergyCharged: null
-      disabled: true
+      command: "readAttribute"
+      attribute: "SessionEnergyCharged"
+      response:
+          constraints:
+              type: energy-mWh
+              minValue: 0
 
     - label:
-          "Step 24: TH reads from the DUT the SessionEnergyDischarged attribute."
+          "Step 24: TH reads from the DUT the SessionEnergyDischarged attribute"
       PICS: EEVSE.S.A0043
-      verification: |
-          ./chip-tool energyevse read session-energy-discharged 1 1
-
-          On TH(chip-tool), Verify the SessionEnergyDischarged attribute energy-mWh value is in the valid range(min 0) or null.
-
-          [1703748130.507623][1967:1970] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0043 DataVersion: 1471857728
-          [1703748130.507701][1967:1970] CHIP:TOO:   SessionEnergyDischarged: null
-      disabled: true
+      command: "readAttribute"
+      attribute: "SessionEnergyDischarged"
+      response:
+          constraints:
+              type: energy-mWh
+              minValue: 0

@@ -55,7 +55,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else if (clusterId == ColorControl::Id)
     {
-        EmberAfStatus status;
+        Protocols::InteractionModel::Status status;
         /* ignore several attributes that are currently not processed */
         if ((attributeId == ColorControl::Attributes::RemainingTime::Id) ||
             (attributeId == ColorControl::Attributes::EnhancedColorMode::Id) ||

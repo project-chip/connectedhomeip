@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "ICD Management"
     endpoint: 0
+    beforeRebootICDCounter:
+        type: int32u
+        defaultValue: 0
 
 tests:
     - label: "Read the commissioner node ID"
@@ -35,6 +38,78 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    # chip-tool will register itself with the ICD during the tests.
+    - label: "Read RegisteredClients For Registration During Commissioning"
+      command: "readAttribute"
+      attribute: "RegisteredClients"
+      response:
+          value:
+              [
+                  {
+                      CheckInNodeID: commissionerNodeId,
+                      MonitoredSubject: commissionerNodeId,
+                  },
+              ]
+
+    - label: "Read ICDCounter"
+      command: "readAttribute"
+      attribute: "ICDCounter"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
+          saveAs: beforeRebootICDCounter
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Connect to the device again"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Wait for 1S"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    # Verifies ICDCounter increment and Check-In message at reboot
+    - label: "Read ICDCounter after reboot"
+      command: "readAttribute"
+      attribute: "ICDCounter"
+      response:
+          constraints:
+              # It is possible ICD hasn't had time to send a Check-In message after reboot
+              minValue: beforeRebootICDCounter + 100
+              maxValue: beforeRebootICDCounter + 101
+
+    - label: "Verify the ICD is operating as a LIT ICD"
+      command: "readAttribute"
+      attribute: OperatingMode
+      response:
+          value: 1
+
+    - label: "Unregister Client Registered During Commissioning"
+      command: "UnregisterClient"
+      arguments:
+          values:
+              - name: "CheckInNodeID"
+                value: commissionerNodeId
+
+    - label: "Verify the ICD is operating as a SIT ICD"
+      command: "readAttribute"
+      attribute: OperatingMode
+      response:
+          value: 0
 
     - label: "Read Feature Map"
       command: "readAttribute"
@@ -59,15 +134,6 @@ tests:
       attribute: "ActiveModeThreshold"
       response:
           value: 5000
-
-    - label: "Read ICDCounter"
-      command: "readAttribute"
-      attribute: "ICDCounter"
-      response:
-          constraints:
-              type: int32u
-              minValue: 0x0
-              maxValue: 0xFFFFFFFF
 
     - label: "Read UserActiveModeTriggerHint"
       command: "readAttribute"
@@ -118,26 +184,6 @@ tests:
                 value: 102
       response:
           error: NOT_FOUND
-
-    # chip-tool will register itself with the ICD during the tests.
-    - label: "Read RegisteredClients For Registration During Commissioning"
-      command: "readAttribute"
-      attribute: "RegisteredClients"
-      response:
-          value:
-              [
-                  {
-                      CheckInNodeID: commissionerNodeId,
-                      MonitoredSubject: commissionerNodeId,
-                  },
-              ]
-
-    - label: "Unregister Client Registered During Commissioning"
-      command: "UnregisterClient"
-      arguments:
-          values:
-              - name: "CheckInNodeID"
-                value: commissionerNodeId
 
     - label: "Register 1.0 (key too short)"
       command: "RegisterClient"
@@ -329,3 +375,82 @@ tests:
                 value: 102
       response:
           error: NOT_FOUND
+
+    - label:
+          "Wait for a little bit less than the active mode duration (10000ms)"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 9000
+
+    - label:
+          "StayActive Scenario 1: Confirm the promised active duration is
+          increased to a specific if a value less than 30000ms is requested and
+          the device does not intend to stay active longer"
+      command: "StayActiveRequest"
+      arguments:
+          values:
+              - name: "StayActiveDuration"
+                value: 20000
+      response:
+          values:
+              - name: "PromisedActiveDuration"
+                constraints:
+                    type: int32u
+                    minValue: 19500
+                    maxValue: 20500
+
+    - label:
+          "Wait for a little bit less than the new promied active mode duration
+          (20000ms)"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 19000
+
+    - label:
+          "StayActive Scenario 2: Confirm the promised active duration is
+          reduced to 30000ms if a value greater than 30000ms is requested"
+      command: "StayActiveRequest"
+      arguments:
+          values:
+              - name: "StayActiveDuration"
+                value: 35000
+      response:
+          values:
+              - name: "PromisedActiveDuration"
+                constraints:
+                    type: int32u
+                    minValue: 29500
+                    maxValue: 30500
+
+    - label:
+          "Wait for a 20000 less than the new promied active mode duration
+          (30000ms)"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label:
+          "StayActive Scenario 3: confirm that the device ignores the request if
+          the device intends to stay active longer than the requested duration
+          we should have about 20000ms left here"
+      command: "StayActiveRequest"
+      arguments:
+          values:
+              - name: "StayActiveDuration"
+                value: 10000
+      response:
+          values:
+              - name: "PromisedActiveDuration"
+                constraints:
+                    type: int32u
+                    minValue: 19500
+                    maxValue: 20500

@@ -32,14 +32,23 @@ public:
                     "The timeout for getting the log. If the timeout expires, completion will be called with whatever has been "
                     "retrieved by that point (which might be none or a partial log). If the timeout is set to 0, the request will "
                     "not expire and completion will not be called until the log is fully retrieved or an error occurs.");
+        AddArgument("async", 0, 1, &mIsAsyncCommand,
+                    "By default the command waits for the download to finish before returning. If async is true the command will "
+                    "not wait and the download will proceed in the background");
+        AddArgument("filepath", &mFilePath, "An optional filepath to save the download log content to.");
     }
 
     /////////// CHIPCommandBridge Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout > 0 ? mTimeout + 10 : 300);
+    }
 
 private:
     chip::NodeId mNodeId;
     uint8_t mLogType;
     uint16_t mTimeout;
+    chip::Optional<char *> mFilePath;
+    chip::Optional<bool> mIsAsyncCommand;
 };

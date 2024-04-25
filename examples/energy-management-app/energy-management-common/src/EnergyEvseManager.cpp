@@ -35,6 +35,12 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     EndpointId aEndpointId = mDelegate->GetEndpointId();
     CHIP_ERROR err;
 
+    if (aProvider == nullptr)
+    {
+        ChipLogError(AppServer, "GetSafeAttributePersistenceProvider returned NULL");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
     // Restore ChargingEnabledUntil value
     DataModel::Nullable<uint32_t> tempChargingEnabledUntil;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ChargingEnabledUntil::Id),

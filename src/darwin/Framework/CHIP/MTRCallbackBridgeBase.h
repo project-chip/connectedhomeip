@@ -83,7 +83,7 @@ protected:
 
         [device.deviceController getSessionForCommissioneeDevice:device.nodeID
                                                       completion:^(chip::Messaging::ExchangeManager * exchangeManager,
-                                                          const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                                                          const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                                                           MaybeDoAction(exchangeManager, session, error);
                                                       }];
     }
@@ -93,8 +93,8 @@ protected:
         LogRequestStart();
 
         [controller getSessionForNode:nodeID
-                           completion:^(chip::Messaging::ExchangeManager * exchangeManager,
-                               const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                           completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                               const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                                MaybeDoAction(exchangeManager, session, error);
                            }];
     }
@@ -215,6 +215,8 @@ private:
         }
 
         if (!callbackBridge->mQueue) {
+            ChipLogDetail(Controller, "%s %f seconds: can't dispatch response; no queue", callbackBridge->mCookie.UTF8String,
+                -[callbackBridge->mRequestTime timeIntervalSinceNow]);
             if (!callbackBridge->mKeepAlive) {
                 delete callbackBridge;
             }

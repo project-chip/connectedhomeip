@@ -35,12 +35,25 @@ static int32_t sFault_FuzzExchangeHeader_Arguments[1];
 static class nl::FaultInjection::Manager sChipFaultInMgr;
 static const nl::FaultInjection::Name sManagerName  = "chip";
 static const nl::FaultInjection::Name sFaultNames[] = {
-    "AllocExchangeContext", "DropIncomingUDPMsg",   "DropOutgoingUDPMsg", "AllocBinding", "SendAlarm",
-    "HandleAlarm",          "FuzzExchangeHeaderTx", "RMPDoubleTx",        "RMPSendError", "BDXBadBlockCounter",
-    "BDXAllocTransfer",     "CASEKeyConfirm",       "SecMgrBusy",
+    "AllocExchangeContext",
+    "DropIncomingUDPMsg",
+    "DropOutgoingUDPMsg",
+    "AllocBinding",
+    "SendAlarm",
+    "HandleAlarm",
+    "FuzzExchangeHeaderTx",
+    "RMPDoubleTx",
+    "RMPSendError",
+    "BDXBadBlockCounter",
+    "BDXAllocTransfer",
+    "SecMgrBusy",
+    "IMInvoke_SeparateResponses",
+    "IMInvoke_SeparateResponsesInvertResponseOrder",
+    "IMInvoke_SkipSecondResponse",
 #if CONFIG_NETWORK_LAYER_BLE
     "CHIPOBLESend",
 #endif // CONFIG_NETWORK_LAYER_BLE
+    "CASEServerBusy",
 };
 
 /**

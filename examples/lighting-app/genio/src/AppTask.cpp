@@ -66,8 +66,6 @@
 #error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
 #endif
 
-#define UNUSED_PARAMETER(a) (a = a)
-
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
 using chip::Shell::PrintCommandHelp;

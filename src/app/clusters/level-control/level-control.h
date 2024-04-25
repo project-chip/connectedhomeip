@@ -19,9 +19,9 @@
 
 // Rate of level control tick execution.
 // To increase tick frequency (for more granular updates of device state based
-// on level), redefine EMBER_AF_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND.
-#ifndef EMBER_AF_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND
-#define EMBER_AF_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND 32
+// on level), redefine MATTER_DM_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND.
+#ifndef MATTER_DM_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND
+#define MATTER_DM_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND 32
 #endif
 
 #include <stdint.h>

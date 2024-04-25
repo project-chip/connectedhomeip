@@ -47,7 +47,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
 
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
 
     <attribute side="server" code="0x0000" define="OCCUPANCY" type="OccupancyBitmap" min="0x00" max="0x01" writable="false" reportable="true" optional="false">Occupancy</attribute>
     <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="OccupancySensorTypeEnum" min="0x00" max="0xFE" writable="false" optional="false">OccupancySensorType</attribute>

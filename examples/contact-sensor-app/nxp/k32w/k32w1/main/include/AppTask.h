@@ -30,8 +30,13 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#include <platform/nxp/k32w/k32w1/FactoryDataProviderImpl.h>
+#endif
+
 #include "FreeRTOS.h"
 #include "fsl_component_button.h"
+#include "fsl_pm_core.h"
 #include "timers.h"
 
 // Application-defined error codes in the CHIP_ERROR space.
@@ -41,10 +46,14 @@
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+#define APP_ERROR_PM_REGISTER_LP_CALLBACK_FAILED CHIP_APPLICATION_ERROR(0x07)
 
 class AppTask
 {
 public:
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProviderImpl;
+#endif
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
@@ -60,6 +69,8 @@ public:
     static void OnIdentifyStart(Identify * identify);
     static void OnIdentifyStop(Identify * identify);
 
+    static status_t LowPowerCallback(pm_event_type_t eventType, uint8_t powerState, void * data);
+
 private:
     friend AppTask & GetAppTask(void);
 
@@ -74,22 +85,26 @@ private:
     static void FunctionTimerEventHandler(void * aGenericEvent);
     static button_status_t KBD_Callback(void * buttonHandle, button_callback_message_t * message, void * callbackParam);
     static void HandleKeyboard(void);
-    static void OTAHandler(void * aGenericEvent);
+    static void SoftResetHandler(void * aGenericEvent);
     static void BleHandler(void * aGenericEvent);
     static void BleStartAdvertising(intptr_t arg);
     static void ContactActionEventHandler(void * aGenericEvent);
     static void ResetActionEventHandler(void * aGenericEvent);
     static void InstallEventHandler(void * aGenericEvent);
+#if CHIP_ENABLE_LIT
+    static void UserActiveModeHandler(void * aGenericEvent);
+    static void UserActiveModeTrigger(intptr_t arg);
+#endif
 
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
     static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     void StartTimer(uint32_t aTimeoutInMs);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static void InitOTA(intptr_t arg);
-    static void StartOTAQuery(intptr_t arg);
 #endif
 
     static void UpdateClusterStateInternal(intptr_t arg);

@@ -1018,6 +1018,10 @@ cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
+  bitmap Feature : bitmap32 {
+    kDataModelTest = 0x1;
+  }
+
   struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
@@ -1074,10 +1078,22 @@ cluster GeneralDiagnostics = 51 {
     nullable posix_ms posixTimeMs = 1;
   }
 
+  request struct PayloadTestRequestRequest {
+    octet_string<16> enableKey = 0;
+    int8u value = 1;
+    int16u count = 2;
+  }
+
+  response struct PayloadTestResponse = 4 {
+    octet_string payload = 0;
+  }
+
   /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
+  /** Request a variable length payload response. */
+  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -2020,8 +2036,8 @@ endpoint 0 {
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0002;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
@@ -2098,6 +2114,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
+  device type ma_powersource = 17, version 1;
   device type ma_contactsensor = 21, version 1;
 
 
@@ -2106,11 +2123,13 @@ endpoint 1 {
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
 
     handle command Identify;
+    handle command TriggerEffect;
   }
 
   server cluster Descriptor {
@@ -2126,15 +2145,25 @@ endpoint 1 {
   }
 
   server cluster PowerSource {
-    ram      attribute status;
-    ram      attribute order;
-    ram      attribute description;
+    ram      attribute status default = 1;
+    ram      attribute order default = 1;
+    ram      attribute description default = "Primary Battery";
+    ram      attribute batVoltage default = 4100;
+    ram      attribute batPercentRemaining default = 95;
+    ram      attribute batTimeRemaining default = 5184000;
+    ram      attribute batChargeLevel default = 0;
+    ram      attribute batReplacementNeeded default = 0;
+    ram      attribute batReplaceability default = 1;
+    ram      attribute batPresent default = 1;
+    ram      attribute batCapacity default = 350;
+    ram      attribute batChargeState default = 4;
+    ram      attribute batFunctionalWhileCharging default = 1;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x06;
     ram      attribute clusterRevision default = 1;
   }
 

@@ -1190,6 +1190,8 @@ public class ClusterWriteMapping {
     );
     writeValveConfigurationAndControlInteractionInfo.put("writeDefaultOpenLevelAttribute", writeValveConfigurationAndControlDefaultOpenLevelAttributeInteractionInfo);
     writeAttributeMap.put("valveConfigurationAndControl", writeValveConfigurationAndControlInteractionInfo);
+    Map<String, InteractionInfo> writeElectricalPowerMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("electricalPowerMeasurement", writeElectricalPowerMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeElectricalEnergyMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("electricalEnergyMeasurement", writeElectricalEnergyMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeDemandResponseLoadControlInteractionInfo = new LinkedHashMap<>();
@@ -1356,6 +1358,8 @@ public class ClusterWriteMapping {
     );
     writeEnergyPreferenceInteractionInfo.put("writeCurrentLowPowerModeSensitivityAttribute", writeEnergyPreferenceCurrentLowPowerModeSensitivityAttributeInteractionInfo);
     writeAttributeMap.put("energyPreference", writeEnergyPreferenceInteractionInfo);
+    Map<String, InteractionInfo> writePowerTopologyInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("powerTopology", writePowerTopologyInteractionInfo);
     Map<String, InteractionInfo> writeEnergyEvseModeInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeEnergyEvseModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo energyEvseModestartUpModeCommandParameterInfo =

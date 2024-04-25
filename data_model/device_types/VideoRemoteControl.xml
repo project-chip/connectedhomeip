@@ -55,10 +55,10 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002A" name="Video Remote Control" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x002A" name="Video Remote Control" revision="2">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
     <revision revision="1" summary="Initial release of this document"/>
+    <revision revision="2" summary="Added Content Control cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -101,6 +101,12 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x050E" name="Account Login" side="client">
       <optionalConform/>
+    </cluster>
+    <cluster id="0x050F" name="Content Control" side="client">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
   </clusters>
 </deviceType>

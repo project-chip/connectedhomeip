@@ -22,6 +22,10 @@
             "path": "../../zap-templates/partials/cluster-objects-struct.zapt"
         },
         {
+            "name": "cluster_enums_enum",
+            "path": "../../zap-templates/partials/cluster-enums-enum.zapt"
+        },
+        {
             "name": "cluster_objects_field_init",
             "path": "../../zap-templates/partials/cluster-objects-field-init.zapt"
         },
@@ -40,11 +44,6 @@
             "path": "../../zap-templates/templates/app/callback.zapt",
             "name": "ZCL callback header",
             "output": "callback.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/print-cluster.zapt",
-            "name": "ZCL print-cluster header",
-            "output": "print-cluster.h"
         },
         {
             "path": "../../zap-templates/templates/app/attributes/Accessors.zapt",

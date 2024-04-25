@@ -341,9 +341,9 @@ class BaseTestHelper:
         self.logger.info("Commissioning finished.")
         return True
 
-    def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int):
+    def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int, discoveryType: int = 2):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
-        if not self.devCtrl.CommissionWithCode(setupPayload, nodeid):
+        if not self.devCtrl.CommissionWithCode(setupPayload, nodeid, chip.discovery.DiscoveryType(discoveryType)):
             self.logger.info(
                 "Failed to finish commissioning device {}".format(setupPayload))
             return False
@@ -749,9 +749,9 @@ class BaseTestHelper:
 
         #
         # Now write the attribute from fabric2, give it some time before checking if the report
-        # was received.
+        # was received.  Use a different value from before, so there is an actual change.
         #
-        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
+        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(5))])
         time.sleep(2)
 
         sub.Shutdown()
@@ -761,7 +761,8 @@ class BaseTestHelper:
             return False
 
         #
-        # Do the same test again, but reversing the roles of fabric1 and fabric2.
+        # Do the same test again, but reversing the roles of fabric1 and fabric2.  And again
+        # writing a different value, so there is an actual value change.
         #
         self.logger.info("Testing fabric-isolated CASE eviction (reverse)")
 
@@ -773,7 +774,7 @@ class BaseTestHelper:
             self.devCtrl.CloseSession(nodeid)
             await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
-        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
+        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(6))])
         time.sleep(2)
 
         sub.Shutdown()

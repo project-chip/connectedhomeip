@@ -68,7 +68,7 @@ public:
 class PendingNotificationMap
 {
 public:
-    static constexpr uint8_t kMaxPendingNotifications = EMBER_BINDING_TABLE_SIZE;
+    static constexpr uint8_t kMaxPendingNotifications = MATTER_BINDING_TABLE_SIZE;
 
     friend class Iterator;
 
@@ -88,9 +88,9 @@ public:
             return *this;
         }
 
-        bool operator!=(const Iterator & rhs) { return mIndex != rhs.mIndex; }
+        bool operator!=(const Iterator & rhs) const { return mIndex != rhs.mIndex; }
 
-        bool operator==(const Iterator & rhs) { return mIndex == rhs.mIndex; }
+        bool operator==(const Iterator & rhs) const { return mIndex == rhs.mIndex; }
 
     private:
         PendingNotificationMap * mMap;

@@ -21,9 +21,9 @@ from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_support import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from TC_EEVSE_Utils import EEVSEBaseTestHelper, EventChangeCallback
+from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +123,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("4")
         await self.send_test_event_trigger_pluggedin()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EVConnected)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVConnected)
 
         self.step("4a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand)
@@ -147,7 +147,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("6")
         await self.send_test_event_trigger_charge_demand()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStarted)
 
         self.step("6a")
         await self.check_evse_attribute("State", expected_state)
@@ -172,7 +172,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         # Sleep for the charging duration plus a couple of seconds to check it has stopped
         time.sleep(charging_duration + 2)
         # check EnergyTransferredStoped (EvseStopped)
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStopped)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStopped)
         expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVSEStopped
         self.validate_energy_transfer_stopped_event(event_data, session_id, expected_state, expected_reason)
 
@@ -188,7 +188,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         max_charge_current = 12000
 
         await self.send_enable_charge_command(charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStarted)
 
         self.step("8a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging)
@@ -228,7 +228,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("10")
         await self.send_test_event_trigger_charge_demand_clear()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStopped)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStopped)
         expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVStopped
         self.validate_energy_transfer_stopped_event(event_data, session_id, expected_state, expected_reason)
 
@@ -239,7 +239,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_test_event_trigger_charge_demand()
         # Check we get EnergyTransferStarted again
         await self.send_enable_charge_command(charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStarted)
         self.validate_energy_transfer_started_event(event_data, session_id, expected_state, expected_max_charge)
 
         self.step("11a")
@@ -247,7 +247,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("12")
         await self.send_test_event_trigger_charge_demand_clear()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStopped)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStopped)
         expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVStopped
         self.validate_energy_transfer_stopped_event(event_data, session_id, expected_state, expected_reason)
 
@@ -256,7 +256,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("13")
         await self.send_test_event_trigger_pluggedin_clear()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EVNotDetected)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVNotDetected)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand
         self.validate_ev_not_detected_event(event_data, session_id, expected_state, expected_duration=0, expected_charged=0)
 
@@ -280,13 +280,13 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         session_id = session_id + 1
 
         # Check we get a new EVConnected event with updated session ID
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EVConnected)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVConnected)
         self.validate_ev_connected_event(event_data, session_id)
 
         self.step("14a")
         await self.send_test_event_trigger_charge_demand()
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging  # This is the value at the event time
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStarted)
         self.validate_energy_transfer_started_event(event_data, session_id, expected_state, expected_max_charge)
 
         self.step("14b")
@@ -295,7 +295,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("15")
         await self.send_disable_command()
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging  # This is the value prior to stopping
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStopped)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EnergyTransferStopped)
         expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVSEStopped
         self.validate_energy_transfer_stopped_event(event_data, session_id, expected_state, expected_reason)
 
@@ -307,7 +307,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("17")
         await self.send_test_event_trigger_pluggedin_clear()
-        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EVNotDetected)
+        event_data = events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVNotDetected)
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand
         self.validate_ev_not_detected_event(event_data, session_id, expected_state, expected_duration=0, expected_charged=0)
 

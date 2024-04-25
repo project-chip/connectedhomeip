@@ -32,12 +32,19 @@ public final class ClusterState {
   private static final String TAG = "ClusterState";
   private Map<Long, AttributeState> attributes;
   private Map<Long, ArrayList<EventState>> events;
+  private Map<Long, Status> attributeStatuses;
+  private Map<Long, ArrayList<Status>> eventStatuses;
   private Optional<Long> dataVersion;
 
-  public ClusterState(
-      Map<Long, AttributeState> attributes, Map<Long, ArrayList<EventState>> events) {
+  protected ClusterState(
+      Map<Long, AttributeState> attributes,
+      Map<Long, ArrayList<EventState>> events,
+      Map<Long, Status> attributeStatuses,
+      Map<Long, ArrayList<Status>> eventStatuses) {
     this.attributes = attributes;
     this.events = events;
+    this.attributeStatuses = attributeStatuses;
+    this.eventStatuses = eventStatuses;
     this.dataVersion = Optional.empty();
   }
 
@@ -45,8 +52,16 @@ public final class ClusterState {
     return attributes;
   }
 
+  public Map<Long, Status> getAttributeStatuses() {
+    return attributeStatuses;
+  }
+
   public Map<Long, ArrayList<EventState>> getEventStates() {
     return events;
+  }
+
+  public Map<Long, ArrayList<Status>> getEventStatuses() {
+    return eventStatuses;
   }
 
   public void setDataVersion(long version) {
@@ -127,6 +142,25 @@ public final class ClusterState {
                 builder.append(": ");
                 builder.append(
                     eventState.getJson() == null ? "null" : eventState.getJson().toString());
+                builder.append("\n");
+              });
+        });
+    attributeStatuses.forEach(
+        (attributeId, status) -> {
+          builder.append("Attribute Status ");
+          builder.append(attributeId);
+          builder.append(": ");
+          builder.append(status.toString());
+          builder.append("\n");
+        });
+    eventStatuses.forEach(
+        (eventId, status) -> {
+          status.forEach(
+              (eventState) -> {
+                builder.append("Event Status");
+                builder.append(eventId);
+                builder.append(": ");
+                builder.append(status.toString());
                 builder.append("\n");
               });
         });

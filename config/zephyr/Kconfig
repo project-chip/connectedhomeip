@@ -334,6 +334,7 @@ if CHIP_ENABLE_ICD_SUPPORT
 
 config CHIP_ICD_SLOW_POLL_INTERVAL
 	int "Intermittently Connected Device slow polling interval (ms)"
+	default 30000 if CHIP_ICD_LIT_SUPPORT
 	default 1000
 	help
 	  Provides the Intermittently Connected Device slow polling interval in milliseconds while the
@@ -347,33 +348,57 @@ config CHIP_ICD_FAST_POLLING_INTERVAL
 	  Provides the Intermittently Connected Device fast polling interval in milliseconds while the
 	  device is in the active mode. It determines the fastest frequency at which the device will be able
 	  to receive the messages in the active mode. The CHIP_ICD_FAST_POLLING_INTERVAL shall be smaller than
-	  CHIP_ICD_ACTIVE_MODE_INTERVAL.
+	  CHIP_ICD_ACTIVE_MODE_DURATION.
 
-config CHIP_ICD_IDLE_MODE_INTERVAL
-	int "Intermittently Connected Device idle mode interval (s)"
+config CHIP_ICD_IDLE_MODE_DURATION
+	int "Intermittently Connected Device idle mode duration (s)"
+	default 300 if CHIP_ICD_LIT_SUPPORT
 	default 120
 	help
-	  Provides the Intermittently Connected Device idle mode interval in seconds.
+	  Provides the Intermittently Connected Device idle mode duration in seconds.
 	  It determines the maximum amount of time the device can stay in the idle mode, which means the
 	  device may be unreachable and not able to receive messages.
 
-config CHIP_ICD_ACTIVE_MODE_INTERVAL
-	int "Intermittently Connected Device active mode interval (ms)"
+config CHIP_ICD_ACTIVE_MODE_DURATION
+	int "Intermittently Connected Device active mode duration (ms)"
 	default 300
 	help
-	  Provides the Intermittently Connected Device active mode interval in milliseconds.
+	  Provides the Intermittently Connected Device active mode duration in milliseconds.
 	  It determines the minimum amount of time the device shall stay in the active mode.
 
 config CHIP_ICD_ACTIVE_MODE_THRESHOLD
 	int "Intermittently Connected Device active mode threshold (ms)"
+	default 5000 if CHIP_ICD_LIT_SUPPORT
 	default 300
 	help
 	  Provides the Intermittently Connected Device active mode threshold in milliseconds.
 	  It determines the minimum amount of time the device shall stay in the active mode after the network activity.
+	  For LIT devices it cannot be set to a value smaller than 5000 ms.
+
+config CHIP_ICD_LIT_SUPPORT
+	bool "Intermittenly Connected Device Long Idle Time support"
+	imply CHIP_ICD_CHECK_IN_SUPPORT
+	imply CHIP_ICD_UAT_SUPPORT
+	help
+	  Enables the Intermittently Connected Device Long Idle Time support in Matter.
+	  It also implies the ICD Check-In and UAT features support that are mandatory for LIT device.
+
+config CHIP_ICD_CHECK_IN_SUPPORT
+	bool "Intermittenly Connected Device Check-In protocol support"
+	help
+	  Enables the Check-In protocol support in Matter. It allows an ICD device to notify the registered
+	  ICD clients that it is available for communication.
+
+config CHIP_ICD_UAT_SUPPORT
+	bool "Intermittenly Connected Device User Active Mode Trigger support"
+	help
+	  Enables the User Active Mode Trigger (UAT) support in Matter. It allows the User to use application specific
+	  means (e.g. button press) to trigger an ICD device to enter the active mode and become responsive.
 
 config CHIP_ICD_CLIENTS_PER_FABRIC
 	int "Intermittently Connected Device number of clients per fabric"
 	default 2
+	depends on CHIP_ICD_CHECK_IN_SUPPORT
 	help
 	  Provides the Intermittently Connected Device number of clients per fabric. It determines the maximum number
 	  of clients per fabric that can be registered to receive notification from a device if their subscription is lost.
@@ -507,5 +532,23 @@ config CHIP_OTA_IMAGE_EXTRA_ARGS
 	  building Matter OTA image.
 
 endif
+
+config CHIP_BLE_EXT_ADVERTISING
+	bool "Bluetooth LE extended advertising"
+	help
+	  Enable Bluetooth LE extended advertising, which allows the device to advertise
+	  Matter service over Bluetooth LE for a period of time longer than 15 minutes.
+	  If this config is true, 
+	  CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS define can be set up to 172800 seconds (48h).
+
+config CHIP_BLE_ADVERTISING_DURATION
+	int "Bluetooth LE advertising duration in minutes"
+	range 15 2880 if CHIP_BLE_EXT_ADVERTISING
+	range 0 15
+	default 15
+	help
+	  Specify how long the device will advertise Matter service over Bluetooth LE in minutes.
+	  If CHIP_BLE_EXT_ADVERTISING is set to false, the maximum duration time is 15 minutes, 
+	  else the maximum duration time can be extended to 2880 minutes (48h).
 
 endif

@@ -33,6 +33,10 @@
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 #include <app/util/attribute-storage.h>
+#include <controller/CHIPDeviceController.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#include <string>
 
 namespace chip {
 namespace AppPlatform {
@@ -46,6 +50,46 @@ using ContentControlDelegate      = app::Clusters::ContentControl::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
+
+inline constexpr uint8_t kMaxClientNodes = 8;
+
+class ContentAppClientCommandSender
+{
+public:
+    ContentAppClientCommandSender() :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    {}
+
+    bool IsBusy() const { return mIsBusy; }
+    CHIP_ERROR SendContentAppMessage(chip::Controller::DeviceCommissioner * commissioner, chip::NodeId destinationId,
+                                     chip::EndpointId endPointId, char * data, char * encodingHint);
+
+protected:
+    CHIP_ERROR SendMessage(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
+
+    void Cleanup();
+
+private:
+    static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                    const chip::SessionHandle & sessionHandle);
+    static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
+
+    using ContentAppMessageResponseDecodableType =
+        chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::DecodableType;
+
+    static void OnCommandResponse(void * context, const ContentAppMessageResponseDecodableType & response);
+    static void OnCommandFailure(void * context, CHIP_ERROR error);
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    bool mIsBusy                 = false;
+    chip::NodeId mDestinationId  = 0;
+    chip::EndpointId mEndPointId = 0;
+
+    std::string mData;
+    std::string mEncodingHint;
+};
 
 class DLL_EXPORT ContentApp
 {
@@ -65,11 +109,25 @@ public:
     virtual MediaPlaybackDelegate * GetMediaPlaybackDelegate()             = 0;
     virtual TargetNavigatorDelegate * GetTargetNavigatorDelegate()         = 0;
 
-    EmberAfStatus HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);
-    EmberAfStatus HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
+    Protocols::InteractionModel::Status HandleReadAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer,
+                                                            uint16_t maxReadLength);
+    Protocols::InteractionModel::Status HandleWriteAttribute(ClusterId clusterId, AttributeId attributeId, uint8_t * buffer);
+
+    void AddClientNode(NodeId clientNodeId);
+    uint8_t GetClientNodeCount() const { return mClientNodeCount; }
+    NodeId GetClientNode(uint8_t index) const { return mClientNodes[index]; }
+
+    void SendAppObserverCommand(chip::Controller::DeviceCommissioner * commissioner, NodeId clientNodeId, char * data,
+                                char * encodingHint);
 
 protected:
     EndpointId mEndpointId = 0;
+
+    uint8_t mClientNodeCount     = 0;
+    uint8_t mNextClientNodeIndex = 0;
+    NodeId mClientNodes[kMaxClientNodes];
+
+    ContentAppClientCommandSender mContentAppClientCommandSender;
 };
 
 } // namespace AppPlatform

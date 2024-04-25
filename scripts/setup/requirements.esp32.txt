@@ -6,6 +6,7 @@ pyparsing>=3.0.3,<3.1
 idf-component-manager
 pygdbmi<=0.9.0.2
 reedsolo>=1.5.3,<=1.5.4
+bitarray==2.6.0
 bitstring>=3.1.6,<4
 ecdsa>=0.16.0
 construct==2.10.54

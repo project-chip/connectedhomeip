@@ -40,7 +40,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917))
+#ifdef SL_CATALOG_SIMPLE_LED_LED1_PRESENT
 #define LIGHT_LED 1
 #else
 #define LIGHT_LED 0
@@ -117,7 +117,7 @@ CHIP_ERROR AppTask::StartAppTask()
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
-    QueueHandle_t sAppEventQueue = *(static_cast<QueueHandle_t *>(pvParameter));
+    osMessageQueueId_t sAppEventQueue = *(static_cast<osMessageQueueId_t *>(pvParameter));
 
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -134,11 +134,11 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
-        while (eventReceived == pdTRUE)
+        osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
+        while (eventReceived == osOK)
         {
             sAppTask.DispatchEvent(&event);
-            eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
+            eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, 0);
         }
     }
 }
@@ -246,10 +246,10 @@ void AppTask::UpdateClusterState(intptr_t context)
     uint8_t newValue = LightMgr().IsLightOn();
 
     // write the new on/off value
-    EmberAfStatus status = OnOffServer::Instance().setOnOffValue(1, newValue, false);
+    Protocols::InteractionModel::Status status = OnOffServer::Instance().setOnOffValue(1, newValue, false);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        SILABS_LOG("ERR: updating on/off %x", status);
+        SILABS_LOG("ERR: updating on/off %x", to_underlying(status));
     }
 }

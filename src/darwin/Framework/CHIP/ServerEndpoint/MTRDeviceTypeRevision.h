@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
  * A representation of a "device type revision" in the sense used in the Matter
  * specification.  This has an identifier and a version number.
  */
+NS_SWIFT_SENDABLE
 MTR_NEWLY_AVAILABLE
 @interface MTRDeviceTypeRevision : NSObject <NSCopying>
 

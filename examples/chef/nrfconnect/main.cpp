@@ -43,6 +43,13 @@
 #include "Rpc.h"
 #endif
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+#include "MigrationManager.h"
+#endif
+#endif
+
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
@@ -51,7 +58,11 @@ using namespace chip::DeviceLayer;
 
 namespace {
 constexpr int kExtDiscoveryTimeoutSecs = 20;
-}
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
+#endif
+} // namespace
 
 int main()
 {
@@ -110,6 +121,9 @@ int main()
 
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    initParams.operationalKeystore = &sPSAOperationalKeystore;
+#endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     err = chip::Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)

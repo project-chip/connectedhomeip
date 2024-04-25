@@ -36,15 +36,15 @@
 namespace chip {
 namespace rpc {
 
-constexpr pw::Status ToPwStatus(EmberAfStatus ember_status)
+constexpr pw::Status ToPwStatus(Protocols::InteractionModel::Status ember_status)
 {
     switch (ember_status)
     {
-    case EMBER_ZCL_STATUS_SUCCESS:
+    case Protocols::InteractionModel::Status::Success:
         return pw::OkStatus();
-    case EMBER_ZCL_STATUS_NOT_FOUND:
+    case Protocols::InteractionModel::Status::NotFound:
         return pw::Status::NotFound();
-    case EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS:
+    case Protocols::InteractionModel::Status::UnsupportedAccess:
         return pw::Status::PermissionDenied();
     default:
         return pw::Status::Unknown();

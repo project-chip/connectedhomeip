@@ -55,12 +55,12 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010B" name="Dimmable Plug" revision="3">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010B" name="Dimmable Plug" revision="4">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="New data model format and notation"/>
-    <revision revision="3" summary="Added optional occupancy sensing and measurement clusters for energy and power"/>
+    <revision revision="3" summary="Added optional occupancy sensing"/>
+    <revision revision="4" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -79,7 +79,7 @@ Davis, CA 95616, USA
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="LT">
+        <feature code="" name="Lighting">
           <mandatoryConform/>
         </feature>
       </features>
@@ -87,10 +87,10 @@ Davis, CA 95616, USA
     <cluster id="0x0008" name="Level Control" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="OO">
+        <feature code="" name="OnOff">
           <mandatoryConform/>
         </feature>
-        <feature code="" name="LT">
+        <feature code="" name="Lighting">
           <mandatoryConform/>
         </feature>
       </features>
@@ -113,12 +113,6 @@ Davis, CA 95616, USA
           <mandatoryConform/>
         </command>
       </commands>
-    </cluster>
-    <cluster id="0x0090" name="Electrical Power Measurement" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
-      <optionalConform/>
     </cluster>
     <cluster id="0x0406" name="Occupancy Sensing" side="client">
       <optionalConform/>

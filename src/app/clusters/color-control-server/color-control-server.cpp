@@ -19,14 +19,13 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <tracing/macros.h>
 
-#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif
 
@@ -60,7 +59,7 @@ constexpr uint8_t kExecuteIfOff = 1;
 } // namespace app
 } // namespace chip
 
-#if defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
@@ -109,14 +108,14 @@ public:
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kXy))
         {
             uint16_t xValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::CurrentX::Get(endpoint, &xValue))
+            if (Status::Success != Attributes::CurrentX::Get(endpoint, &xValue))
             {
                 xValue = 0x616B; // Default X value according to spec
             }
             AddAttributeValuePair(pairs, Attributes::CurrentX::Id, xValue, attributeCount);
 
             uint16_t yValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::CurrentY::Get(endpoint, &yValue))
+            if (Status::Success != Attributes::CurrentY::Get(endpoint, &yValue))
             {
                 yValue = 0x607D; // Default Y value according to spec
             }
@@ -133,7 +132,7 @@ public:
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kHueAndSaturation))
         {
             uint8_t saturationValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::CurrentSaturation::Get(endpoint, &saturationValue))
+            if (Status::Success != Attributes::CurrentSaturation::Get(endpoint, &saturationValue))
             {
                 saturationValue = 0x00;
             }
@@ -143,21 +142,21 @@ public:
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorLoop))
         {
             uint8_t loopActiveValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorLoopActive::Get(endpoint, &loopActiveValue))
+            if (Status::Success != Attributes::ColorLoopActive::Get(endpoint, &loopActiveValue))
             {
                 loopActiveValue = 0x00;
             }
             AddAttributeValuePair(pairs, Attributes::ColorLoopActive::Id, loopActiveValue, attributeCount);
 
             uint8_t loopDirectionValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue))
+            if (Status::Success != Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue))
             {
                 loopDirectionValue = 0x00;
             }
             AddAttributeValuePair(pairs, Attributes::ColorLoopDirection::Id, loopDirectionValue, attributeCount);
 
             uint16_t loopTimeValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorLoopTime::Get(endpoint, &loopTimeValue))
+            if (Status::Success != Attributes::ColorLoopTime::Get(endpoint, &loopTimeValue))
             {
                 loopTimeValue = 0x0019; // Default loop time value according to spec
             }
@@ -167,7 +166,7 @@ public:
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorTemperature))
         {
             uint16_t temperatureValue;
-            if (EMBER_ZCL_STATUS_SUCCESS != Attributes::ColorTemperatureMireds::Get(endpoint, &temperatureValue))
+            if (Status::Success != Attributes::ColorTemperatureMireds::Get(endpoint, &temperatureValue))
             {
                 temperatureValue = 0x00FA; // Default temperature value according to spec
             }
@@ -175,7 +174,7 @@ public:
         }
 
         uint8_t modeValue;
-        if (EMBER_ZCL_STATUS_SUCCESS != Attributes::EnhancedColorMode::Get(endpoint, &modeValue))
+        if (Status::Success != Attributes::EnhancedColorMode::Get(endpoint, &modeValue))
         {
             modeValue = ColorControl::EnhancedColorMode::kCurrentXAndCurrentY; // Default mode value according to spec
         }
@@ -206,19 +205,19 @@ public:
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
         VerifyOrReturnError(attributeCount <= kColorControlScenableAttributesCount, CHIP_ERROR_BUFFER_TOO_SMALL);
         // Retrieve the buffers for different modes
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
         ColorControlServer::ColorHueTransitionState * colorHueTransitionState =
             ColorControlServer::Instance().getColorHueTransitionState(endpoint);
         ColorControlServer::Color16uTransitionState * colorSaturationTransitionState =
             ColorControlServer::Instance().getSaturationTransitionState(endpoint);
 #endif
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
         ColorControlServer::Color16uTransitionState * colorXTransitionState =
             ColorControlServer::Instance().getXTransitionState(endpoint);
         ColorControlServer::Color16uTransitionState * colorYTransitionState =
             ColorControlServer::Instance().getYTransitionState(endpoint);
 #endif
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
         ColorControlServer::Color16uTransitionState * colorTempTransitionState =
             ColorControlServer::Instance().getTempTransitionState(endpoint);
 #endif
@@ -319,29 +318,29 @@ public:
             switch (targetColorMode)
             {
             case ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation:
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 ColorControlServer::Instance().moveToSaturation(static_cast<uint8_t>(colorSaturationTransitionState->finalValue),
                                                                 transitionTime10th, endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 break;
             case ColorControl::EnhancedColorMode::kCurrentXAndCurrentY:
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
                 ColorControlServer::Instance().moveToColor(colorXTransitionState->finalValue, colorYTransitionState->finalValue,
                                                            transitionTime10th, endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
                 break;
             case ColorControl::EnhancedColorMode::kColorTemperature:
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
                 ColorControlServer::Instance().moveToColorTemp(
                     endpoint, static_cast<uint16_t>(colorTempTransitionState->finalValue), transitionTime10th);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
                 break;
             case ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation:
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 ColorControlServer::Instance().moveToHueAndSaturation(
                     colorHueTransitionState->finalEnhancedHue, static_cast<uint8_t>(colorSaturationTransitionState->finalValue),
                     transitionTime10th, true, endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 break;
             default:
                 return CHIP_ERROR_INVALID_ARGUMENT;
@@ -381,7 +380,7 @@ private:
     }
 };
 static DefaultColorControlSceneHandler sColorControlSceneHandler;
-#endif // defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 /**********************************************************
  * Matter timer scheduling glue logic
@@ -435,18 +434,18 @@ ColorControlServer & ColorControlServer::Instance()
 chip::scenes::SceneHandler * ColorControlServer::GetSceneHandler()
 {
 
-#if defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sColorControlSceneHandler;
 #else
     return nullptr;
-#endif // defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 bool ColorControlServer::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;
-    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == Status::Success);
 
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
@@ -470,7 +469,7 @@ bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, c
     {
         status = stopAllColorTransitions(endpoint);
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
         // Because Hue and Saturation have separate transitions and can be kicked separately,
         // a new command specific to Hue could resume an old unfinished Saturation transition. Or vice versa.
         // Init both transition states on stop command to prevent that.
@@ -481,7 +480,7 @@ bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, c
             initHueTransitionState(endpoint, hueState, false /*isEnhancedHue don't care*/);
             initSaturationTransitionState(endpoint, saturationState);
         }
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
     }
 
     commandObj->AddStatus(commandPath, status);
@@ -666,7 +665,7 @@ uint16_t ColorControlServer::computeTransitionTimeFromStateAndRate(ColorControlS
 EmberEventControl * ColorControlServer::getEventControl(EndpointId endpoint)
 {
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     EmberEventControl * event = nullptr;
 
     if (index < ArraySize(eventControls))
@@ -785,7 +784,7 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
     return false;
 }
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 /**
  * @brief Returns ColorHueTransititionState associated to an endpoint
@@ -796,7 +795,7 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
 ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTransitionState(EndpointId endpoint)
 {
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     ColorHueTransitionState * state = nullptr;
 
     if (index < ArraySize(colorHueTransitionStates))
@@ -815,7 +814,7 @@ ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTra
 ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationTransitionState(EndpointId endpoint)
 {
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     Color16uTransitionState * state = nullptr;
 
     if (index < ArraySize(colorSatTransitionStates))
@@ -1611,9 +1610,9 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
         return true;
     }
     Status status = moveToHueAndSaturation(hue, saturation, transitionTime, isEnhanced, commandPath.mEndpointId);
-#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
-#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -1819,9 +1818,9 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
         return true;
     }
     Status status = moveToSaturation(commandData.saturation, commandData.transitionTime, commandPath.mEndpointId);
-#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
-#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -2005,9 +2004,9 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
     }
 
 exit:
-#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -2070,9 +2069,9 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     computePwmFromHsv(endpoint);
 }
 
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 /**
  * @brief Returns Color16uTransitionState for X color associated to an endpoint
@@ -2083,7 +2082,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
 ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransitionState(EndpointId endpoint)
 {
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorXtransitionStates))
@@ -2103,7 +2102,7 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransition
 ColorControlServer::Color16uTransitionState * ColorControlServer::getYTransitionState(EndpointId endpoint)
 {
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorYtransitionStates))
@@ -2215,9 +2214,9 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     }
 
     Status status = moveToColor(commandData.colorX, commandData.colorY, commandData.transitionTime, commandPath.mEndpointId);
-#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
-#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -2423,9 +2422,9 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     computePwmFromXy(endpoint);
 }
 
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 /**
  * @brief Get the Temp Transition State object associated to the endpoint
  *
@@ -2435,7 +2434,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
 ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransitionState(EndpointId endpoint)
 {
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, MATTER_DM_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorTempTransitionStates))
@@ -2509,11 +2508,11 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
 uint16_t ColorControlServer::getTemperatureCoupleToLevelMin(EndpointId endpoint)
 {
     uint16_t colorTemperatureCoupleToLevelMin;
-    EmberAfStatus status;
+    Status status;
 
     status = Attributes::CoupleColorTempToLevelMinMireds::Get(endpoint, &colorTemperatureCoupleToLevelMin);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Status::Success)
     {
         // Not less than the physical min.
         Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &colorTemperatureCoupleToLevelMin);
@@ -2552,14 +2551,14 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
 
     // Initialize startUpColorTempMireds to "maintain previous value" value null
     app::DataModel::Nullable<uint16_t> startUpColorTemp;
-    EmberAfStatus status = Attributes::StartUpColorTemperatureMireds::Get(endpoint, startUpColorTemp);
+    Status status = Attributes::StartUpColorTemperatureMireds::Get(endpoint, startUpColorTemp);
 
-    if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpColorTemp.IsNull())
+    if (status == Status::Success && !startUpColorTemp.IsNull())
     {
         uint16_t updatedColorTemp = MAX_TEMPERATURE_VALUE;
         status                    = Attributes::ColorTemperatureMireds::Get(endpoint, &updatedColorTemp);
 
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
+        if (status == Status::Success)
         {
             uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
             Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
@@ -2576,7 +2575,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                 updatedColorTemp = startUpColorTemp.Value();
                 status           = Attributes::ColorTemperatureMireds::Set(endpoint, updatedColorTemp);
 
-                if (status == EMBER_ZCL_STATUS_SUCCESS)
+                if (status == Status::Success)
                 {
                     // Set ColorMode attributes to reflect ColorTemperature.
                     uint8_t updateColorMode = ColorControl::EnhancedColorMode::kColorTemperature;
@@ -2607,7 +2606,7 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
         // Check whether our color temperature has actually changed.  If not, do
         // nothing, and wait for it to change.
         uint16_t currentColorTemp;
-        if (Attributes::ColorTemperatureMireds::Get(endpoint, &currentColorTemp) != EMBER_ZCL_STATUS_SUCCESS)
+        if (Attributes::ColorTemperatureMireds::Get(endpoint, &currentColorTemp) != Status::Success)
         {
             // Why can't we read our attribute?
             return;
@@ -2760,9 +2759,9 @@ bool ColorControlServer::moveToColorTempCommand(app::CommandHandler * commandObj
     }
 
     Status status = moveToColorTemp(commandPath.mEndpointId, commandData.colorTemperatureMireds, commandData.transitionTime);
-#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
-#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     commandObj->AddStatus(commandPath, status);
     return true;
 }
@@ -2906,9 +2905,9 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
     if (colorMode == ColorControl::EnhancedColorMode::kColorTemperature)
     {
         app::DataModel::Nullable<uint8_t> currentLevel;
-        EmberAfStatus status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
+        Status status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS || currentLevel.IsNull())
+        if (status != Status::Success || currentLevel.IsNull())
         {
             currentLevel.SetNonNull((uint8_t) 0x7F);
         }
@@ -2943,13 +2942,13 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
     }
 }
 
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 bool emberAfColorControlClusterMoveHueCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::MoveHue::DecodableType & commandData)
@@ -3046,9 +3045,9 @@ bool emberAfColorControlClusterColorLoopSetCallback(app::CommandHandler * comman
     return ColorControlServer::Instance().colorLoopCommand(commandObj, commandPath, commandData);
 }
 
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 bool emberAfColorControlClusterMoveToColorCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                    const Commands::MoveToColor::DecodableType & commandData)
@@ -3068,9 +3067,9 @@ bool emberAfColorControlClusterStepColorCallback(app::CommandHandler * commandOb
     return ColorControlServer::Instance().stepColorCommand(commandObj, commandPath, commandData);
 }
 
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 bool emberAfColorControlClusterMoveToColorTemperatureCallback(app::CommandHandler * commandObj,
                                                               const app::ConcreteCommandPath & commandPath,
@@ -3098,7 +3097,7 @@ void emberAfPluginLevelControlCoupledColorTempChangeCallback(EndpointId endpoint
     ColorControlServer::Instance().levelControlColorTempChangeCommand(endpoint);
 }
 
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 bool emberAfColorControlClusterStopMoveStepCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::StopMoveStep::DecodableType & commandData)
@@ -3109,14 +3108,14 @@ bool emberAfColorControlClusterStopMoveStepCallback(app::CommandHandler * comman
 
 void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
 {
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     ColorControlServer::Instance().startUpColorTempCommand(endpoint);
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-#if defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     // Registers Scene handlers for the color control cluster on the server
     app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(
         endpoint, ColorControlServer::Instance().GetSceneHandler());
-#endif // defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 void MatterColorControlClusterServerShutdownCallback(EndpointId endpoint)
@@ -3125,7 +3124,7 @@ void MatterColorControlClusterServerShutdownCallback(EndpointId endpoint)
     ColorControlServer::Instance().cancelEndpointTimerCallback(endpoint);
 }
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 /**
  * @brief Callback for temperature update when timer is finished
  *
@@ -3135,9 +3134,9 @@ void emberAfPluginColorControlServerTempTransitionEventHandler(EndpointId endpoi
 {
     ColorControlServer::Instance().updateTempCommand(endpoint);
 }
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 /**
  * @brief Callback for color update when timer is finished
  *
@@ -3147,9 +3146,9 @@ void emberAfPluginColorControlServerXyTransitionEventHandler(EndpointId endpoint
 {
     ColorControlServer::Instance().updateXYCommand(endpoint);
 }
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
 
-#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 /**
  * @brief Callback for color hue and saturation update when timer is finished
  *
@@ -3159,6 +3158,6 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(EndpointId endp
 {
     ColorControlServer::Instance().updateHueSatCommand(endpoint);
 }
-#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 void MatterColorControlPluginServerInitCallback() {}

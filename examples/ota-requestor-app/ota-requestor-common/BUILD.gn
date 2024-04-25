@@ -23,9 +23,6 @@ config("config") {
 chip_data_model("ota-requestor-common") {
   zap_file = "ota-requestor-app.zap"
 
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/ota-requestor-app/zap-generated"
-
   deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [ ":config" ]

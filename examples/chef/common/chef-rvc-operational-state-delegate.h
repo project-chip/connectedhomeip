@@ -20,7 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/util/af-enums.h>
+
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {

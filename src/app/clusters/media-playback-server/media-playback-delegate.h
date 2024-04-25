@@ -20,10 +20,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CommandResponseHelper.h>
-#include <app/util/af.h>
-#include <list>
 
 namespace chip {
 namespace app {
@@ -70,7 +68,8 @@ public:
     virtual bool HandleActivateTextTrack(const chip::CharSpan & trackId)                                    = 0;
     virtual bool HandleDeactivateTextTrack()                                                                = 0;
 
-    virtual uint32_t GetFeatureMap(chip::EndpointId endpoint) = 0;
+    virtual uint32_t GetFeatureMap(chip::EndpointId endpoint)      = 0;
+    virtual uint16_t GetClusterRevision(chip::EndpointId endpoint) = 0;
 
     virtual ~Delegate() = default;
 };

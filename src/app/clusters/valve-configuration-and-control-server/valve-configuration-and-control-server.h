@@ -30,6 +30,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BitMask.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -49,7 +50,7 @@ void UpdateAutoCloseTime(uint64_t time);
 inline bool HasFeature(EndpointId ep, Feature feature)
 {
     uint32_t map;
-    bool success = (Attributes::FeatureMap::Get(ep, &map) == EMBER_ZCL_STATUS_SUCCESS);
+    bool success = (Attributes::FeatureMap::Get(ep, &map) == Protocols::InteractionModel::Status::Success);
     return success ? (map & to_underlying(feature)) : false;
 }
 

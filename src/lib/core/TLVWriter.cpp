@@ -15,29 +15,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file implements an encoder for the CHIP TLV (Tag-Length-Value) encoding format.
- *
- */
-
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-#include <lib/core/TLV.h>
-
-#include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPEncoding.h>
-
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/utf8.h>
+#include <lib/core/TLVWriter.h>
 
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
+
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/TLVBackingStore.h>
+#include <lib/core/TLVCommon.h>
+#include <lib/core/TLVReader.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/Constants.h>
+#include <lib/support/logging/TextOnlyLogging.h>
+#include <lib/support/utf8.h>
+#include <system/SystemConfig.h>
 
 // Doxygen is confused by the __attribute__ annotation
 #ifndef DOXYGEN

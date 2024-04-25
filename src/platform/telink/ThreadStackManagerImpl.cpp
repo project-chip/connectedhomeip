@@ -48,25 +48,23 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
 
-    UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
-        const otIp6Address otAddress = ToOpenThreadIP6Address(address);
+    UDPEndPointImplSockets::SetMulticastGroupHandler(
+        [](InterfaceId, const IPAddress & address, UDPEndPointImplSockets::MulticastOperation operation) {
+            const otIp6Address otAddress = ToOpenThreadIP6Address(address);
+            const auto handler = operation == UDPEndPointImplSockets::MulticastOperation::kJoin ? otIp6SubscribeMulticastAddress
+                                                                                                : otIp6UnsubscribeMulticastAddress;
+            otError error;
 
-        ThreadStackMgr().LockThreadStack();
-        const auto otError = otIp6SubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
-        ThreadStackMgr().UnlockThreadStack();
+            ThreadStackMgr().LockThreadStack();
+            error = handler(openthread_get_default_instance(), &otAddress);
+            ThreadStackMgr().UnlockThreadStack();
 
-        return MapOpenThreadError(otError);
-    });
+            return MapOpenThreadError(error);
+        });
 
-    UDPEndPointImplSockets::SetLeaveMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
-        const otIp6Address otAddress = ToOpenThreadIP6Address(address);
-
-        ThreadStackMgr().LockThreadStack();
-        const auto otError = otIp6UnsubscribeMulticastAddress(openthread_get_default_instance(), &otAddress);
-        ThreadStackMgr().UnlockThreadStack();
-
-        return MapOpenThreadError(otError);
-    });
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    k_sem_init(&mSrpClearAllSemaphore, 0, 1);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     return CHIP_NO_ERROR;
 }
@@ -86,6 +84,18 @@ void ThreadStackManagerImpl::_UnlockThreadStack()
 {
     openthread_api_mutex_unlock(openthread_get_default_context());
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+void ThreadStackManagerImpl::_WaitOnSrpClearAllComplete()
+{
+    k_sem_take(&mSrpClearAllSemaphore, K_SECONDS(2));
+}
+
+void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
+{
+    k_sem_give(&mSrpClearAllSemaphore);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 CHIP_ERROR
 ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset & dataset,

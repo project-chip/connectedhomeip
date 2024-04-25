@@ -384,10 +384,10 @@ features can easily be toggled on or off. Here is a short list of options :
 
 ### Enabling test event trigger
 
-`silabs_test_event_trigger_enabled, silabs_test_event_trigger_enable_key`
+`sl_enable_test_event_trigger`
 
     ```
-    The value of silabs_test_event_trigger_enable_key is specific to each device manufacturer
+    The enable the test event trigger, `sl_enable_test_event_trigger` must be true.
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app BRD4164A silabs_test_event_trigger_enabled=true silabs_test_event_trigger_enable_key=\"00112233445566778899aabbccddeeff\"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/smoke-co-alarm-app/silabs ./out/smoke-co-alarm-app BRD4164A sl_enable_test_event_trigger=true
     ```

@@ -25,17 +25,21 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LocalizationConfiguration;
 using namespace chip::app::Clusters::LocalizationConfiguration::Attributes;
+
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -163,9 +167,10 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
 {
     char outBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
     MutableCharSpan activeLocale(outBuf);
-    EmberAfStatus status = ActiveLocale::Get(endpoint, activeLocale);
+    Status status = ActiveLocale::Get(endpoint, activeLocale);
 
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Failed to read ActiveLocale with error: 0x%02x", status));
+    VerifyOrReturn(Status::Success == status,
+                   ChipLogError(Zcl, "Failed to read ActiveLocale with error: 0x%02x", to_underlying(status)));
 
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
 
@@ -204,12 +209,12 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
 
         it->Release();
 
-        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND && validLocaleCached)
         {
             // If initial value is not one of the allowed values, write the valid value it.
             status = ActiveLocale::Set(endpoint, validLocale);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to write active locale with error: 0x%02x", status));
+            VerifyOrReturn(Status::Success == status,
+                           ChipLogError(Zcl, "Failed to write active locale with error: 0x%02x", to_underlying(status)));
         }
     }
 }

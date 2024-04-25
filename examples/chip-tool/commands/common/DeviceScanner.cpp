@@ -55,7 +55,8 @@ CHIP_ERROR DeviceScanner::Stop()
 
 void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
 {
-    auto & commissionData = nodeData.commissionData;
+    VerifyOrReturn(nodeData.Is<CommissionNodeData>());
+    auto & commissionData = nodeData.Get<CommissionNodeData>();
 
     auto discriminator = commissionData.longDiscriminator;
     auto vendorId      = static_cast<VendorId>(commissionData.vendorId);
@@ -64,7 +65,7 @@ void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
     ChipLogProgress(chipTool, "OnNodeDiscovered (MDNS): discriminator: %u, vendorId: %u, productId: %u", discriminator, vendorId,
                     productId);
 
-    auto & resolutionData = nodeData.resolutionData;
+    const CommonResolutionData & resolutionData = commissionData;
 
     auto & instanceData  = mDiscoveredResults[commissionData.instanceName];
     auto & interfaceData = instanceData[resolutionData.interfaceId.GetPlatformInterface()];
@@ -76,7 +77,7 @@ void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
         interfaceData.push_back(result);
     }
 
-    nodeData.LogDetail();
+    commissionData.LogDetail();
 }
 
 void DeviceScanner::OnBrowseAdd(chip::Dnssd::DnssdService service)
@@ -218,7 +219,7 @@ void DeviceScanner::Log() const
     auto resultsCount = mDiscoveredResults.size();
     VerifyOrReturn(resultsCount > 0, ChipLogProgress(chipTool, "No device discovered."));
 
-    uint16_t index = 0;
+    [[maybe_unused]] uint16_t index = 0;
     for (auto & instance : mDiscoveredResults)
     {
         ChipLogProgress(chipTool, "Instance Name: %s ", instance.first.c_str());

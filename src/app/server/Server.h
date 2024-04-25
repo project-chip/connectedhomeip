@@ -369,6 +369,18 @@ public:
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     app::ICDManager & GetICDManager() { return mICDManager; }
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    /**
+     * @brief Function to determine if a Check-In message would be sent at Boot up
+     *
+     * @param aFabricIndex client fabric index
+     * @param subjectID client subject ID
+     * @return true Check-In message would be sent on boot up.
+     * @return false Device has a persisted subscription with the client. See CHIP_CONFIG_PERSIST_SUBSCRIPTIONS.
+     */
+    bool ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, NodeId subjectID);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**
@@ -609,7 +621,7 @@ private:
     FabricTable mFabrics;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     // specifically, the commissioner declaration message (sent by commissioner to commissionee)
     UdcTransportMgr * mUdcTransportMgr = nullptr;

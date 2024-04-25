@@ -22,6 +22,7 @@
 #include "ConversionUtils.h"
 #include "JNIDACProvider.h"
 
+#include <app/data-model/ListLargeSystemExtensions.h>
 #include <app/server/Server.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -32,7 +33,6 @@
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CHIPJNIError.h>
-#include <lib/support/CHIPListUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
@@ -372,7 +372,7 @@ JNI_METHOD(jboolean, sendCommissioningRequest)(JNIEnv * env, jobject, jobject jD
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "JNI_METHOD sendCommissioningRequest called");
 
-    chip::Dnssd::DiscoveredNodeData commissioner;
+    chip::Dnssd::CommissionNodeData commissioner;
     CHIP_ERROR err = convertJDiscoveredNodeDataToCppDiscoveredNodeData(jDiscoveredNodeData, commissioner);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(AppServer,
@@ -860,6 +860,36 @@ JNI_METHOD(jboolean, onOff_1toggle)
         &endpoint, [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(OnOff_Toggle).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.OnOff_Toggle failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+exit:
+    return (err == CHIP_NO_ERROR);
+}
+
+JNI_METHOD(jboolean, messages_1presentMessages)
+(JNIEnv * env, jobject, jobject contentApp, jstring messageText, jobject jResponseHandler)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(AppServer, "JNI_METHOD messages_presentMessages called");
+    const char * nativeMessageText = env->GetStringUTFChars(messageText, 0);
+
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(Messages_PresentMessagesRequest).SetUp(env, jResponseHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = CastingServer::GetInstance()->Messages_PresentMessagesRequest(&endpoint, nativeMessageText, [](CHIP_ERROR err) {
+        TvCastingAppJNIMgr().getMediaCommandResponseHandler(Messages_PresentMessagesRequest).Handle(err);
+    });
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "CastingServer.Messages_PresentMessagesRequest failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    env->ReleaseStringUTFChars(messageText, nativeMessageText);
 
 exit:
     return (err == CHIP_NO_ERROR);

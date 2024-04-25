@@ -48,7 +48,7 @@ public:
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return PairingSession::GetRemoteMRPConfig(); }
 
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, System::PacketBufferTLVReader & tlvReader)
     {
@@ -70,8 +70,7 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite,
                    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite,
-                   PairingSession::EncodeSessionParameters(TLV::ContextTag(1), MakeOptional(config), writer) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, PairingSession::EncodeSessionParameters(TLV::ContextTag(1), config, writer) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.Finalize(&buf) == CHIP_NO_ERROR);

@@ -16,17 +16,15 @@
  */
 
 #include "DeviceCallbacks.h"
-#include <DeviceEnergyManagementManager.h>
-#include <EVSEManufacturerImpl.h>
-#include <EnergyEvseManager.h>
-#include <EnergyManagementManager.h>
-#include <device-energy-management-modes.h>
-#include <energy-evse-modes.h>
+#include <EnergyEvseMain.h>
 
 #include "esp_log.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
+#if CONFIG_ENABLE_SNTP_TIME_SYNC
+#include <time/TimeSync.h>
+#endif
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
 #else
@@ -68,20 +66,12 @@
 #include <tracing/registry.h>
 #endif
 
-#define ENERGY_EVSE_ENDPOINT 1
-
 using namespace ::chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
-
-static std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
-static std::unique_ptr<EnergyEvseManager> gEvseInstance;
-static std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
-static std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
-static std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
@@ -121,233 +111,16 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 } // namespace
 
-EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
-{
-    return gEvseManufacturer.get();
-}
-
-/*
- *  @brief  Creates a Delegate and Instance for DEM
- *
- * The Instance is a container around the Delegate, so
- * create the Delegate first, then wrap it in the Instance
- * Then call the Instance->Init() to register the attribute and command handlers
- */
-CHIP_ERROR DeviceEnergyManagementInit()
-{
-    if (gDEMDelegate || gDEMInstance)
-    {
-        ESP_LOGE(TAG, "DEM Instance or Delegate already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    gDEMDelegate = std::make_unique<DeviceEnergyManagementDelegate>();
-    if (!gDEMDelegate)
-    {
-        ESP_LOGE(TAG, "Failed to allocate memory for DeviceEnergyManagementDelegate");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* Manufacturer may optionally not support all features, commands & attributes */
-    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(
-        EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate,
-        BitMask<DeviceEnergyManagement::Feature, uint32_t>(
-            DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
-            DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
-            DeviceEnergyManagement::Feature::kPausable));
-
-    if (!gDEMInstance)
-    {
-        ESP_LOGE(TAG, "Failed to allocate memory for DeviceEnergyManagementManager");
-        gDEMDelegate.reset();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    CHIP_ERROR err = gDEMInstance->Init(); /* Register Attribute & Command handlers */
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Init failed on gDEMInstance, err:%" CHIP_ERROR_FORMAT, err.Format());
-        gDEMInstance.reset();
-        gDEMDelegate.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceEnergyManagementShutdown()
-{
-    /* Do this in the order Instance first, then delegate
-     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
-     */
-    if (gDEMInstance)
-    {
-        /* deregister attribute & command handlers */
-        gDEMInstance->Shutdown();
-        gDEMInstance.reset();
-    }
-    if (gDEMDelegate)
-    {
-        gDEMDelegate.reset();
-    }
-    return CHIP_NO_ERROR;
-}
-
-/*
- *  @brief  Creates a Delegate and Instance for EVSE cluster
- *
- * The Instance is a container around the Delegate, so
- * create the Delegate first, then wrap it in the Instance
- * Then call the Instance->Init() to register the attribute and command handlers
- */
-CHIP_ERROR EnergyEvseInit()
-{
-    CHIP_ERROR err;
-
-    if (gEvseDelegate || gEvseInstance)
-    {
-        ESP_LOGE(TAG, "EVSE Instance or Delegate already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    gEvseDelegate = std::make_unique<EnergyEvseDelegate>();
-    if (!gEvseDelegate)
-    {
-        ESP_LOGE(TAG, "Failed to allocate memory for EnergyEvseDelegate");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* Manufacturer may optionally not support all features, commands & attributes */
-    gEvseInstance = std::make_unique<EnergyEvseManager>(
-        EndpointId(ENERGY_EVSE_ENDPOINT), *gEvseDelegate,
-        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kPlugAndCharge,
-                                               EnergyEvse::Feature::kRfid, EnergyEvse::Feature::kSoCReporting,
-                                               EnergyEvse::Feature::kV2x),
-        BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
-                                                          EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
-                                                          EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
-        BitMask<EnergyEvse::OptionalCommands, uint32_t>(EnergyEvse::OptionalCommands::kSupportsStartDiagnostics));
-
-    if (!gEvseInstance)
-    {
-        ESP_LOGE(TAG, "Failed to allocate memory for EnergyEvseManager");
-        gEvseDelegate.reset();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    err = gEvseInstance->Init(); /* Register Attribute & Command handlers */
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Init failed on gEvseInstance, err:%" CHIP_ERROR_FORMAT, err.Format());
-        gEvseInstance.reset();
-        gEvseDelegate.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR EnergyEvseShutdown()
-{
-    /* Do this in the order Instance first, then delegate
-     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
-     */
-    if (gEvseInstance)
-    {
-        /* deregister attribute & command handlers */
-        gEvseInstance->Shutdown();
-        gEvseInstance.reset();
-    }
-
-    if (gEvseDelegate)
-    {
-        gEvseDelegate.reset();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-/*
- *  @brief  Creates a EVSEManufacturer class to hold the EVSE & DEM clusters
- *
- * The Instance is a container around the Delegate, so
- * create the Delegate first, then wrap it in the Instance
- * Then call the Instance->Init() to register the attribute and command handlers
- */
-CHIP_ERROR EVSEManufacturerInit()
-{
-    CHIP_ERROR err;
-
-    if (gEvseManufacturer)
-    {
-        ESP_LOGE(TAG, "EvseManufacturer already exist.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    /* Now create EVSEManufacturer */
-    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get());
-    if (!gEvseManufacturer)
-    {
-        ESP_LOGE(TAG, "Failed to allocate memory for EvseManufacturer");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* Call Manufacturer specific init */
-    err = gEvseManufacturer->Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Init failed on gEvseManufacturer, err:%" CHIP_ERROR_FORMAT, err.Format());
-        gEvseManufacturer.reset();
-        return err;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR EVSEManufacturerShutdown()
-{
-    if (gEvseManufacturer)
-    {
-        /* Shutdown the EVSEManufacturer */
-        gEvseManufacturer->Shutdown();
-        gEvseManufacturer.reset();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 void ApplicationInit()
 {
-    if (DeviceEnergyManagementInit() != CHIP_NO_ERROR)
-    {
-        return;
-    }
-
-    if (EnergyEvseInit() != CHIP_NO_ERROR)
-    {
-        DeviceEnergyManagementShutdown();
-        return;
-    }
-
-    if (EVSEManufacturerInit() != CHIP_NO_ERROR)
-    {
-        DeviceEnergyManagementShutdown();
-        EnergyEvseShutdown();
-        return;
-    }
+    ESP_LOGD(TAG, "Energy Management App: ApplicationInit()");
+    EvseApplicationInit();
 }
 
 void ApplicationShutdown()
 {
     ESP_LOGD(TAG, "Energy Management App: ApplicationShutdown()");
-
-    /* Shutdown in reverse order that they were created */
-    EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */
-    EnergyEvseShutdown();             /* Free the EnergyEvse */
-    DeviceEnergyManagementShutdown(); /* Free the DEM */
-
-    Clusters::DeviceEnergyManagementMode::Shutdown();
-    Clusters::EnergyEvseMode::Shutdown();
+    EvseApplicationShutdown();
 }
 
 static void InitServer(intptr_t context)
@@ -356,7 +129,8 @@ static void InitServer(intptr_t context)
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
-    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND
+                            // Initialize device attestation config
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
     esp_insights_config_t config = {
         .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
@@ -374,8 +148,15 @@ static void InitServer(intptr_t context)
     Tracing::Register(backend);
 #endif
 
-    // Application code should always be initialised after the initialisation of server.
+    // Application code should always be initialised after the initialisation of
+    // server.
     ApplicationInit();
+
+#if CONFIG_ENABLE_SNTP_TIME_SYNC
+    const char kNtpServerUrl[]             = "pool.ntp.org";
+    const uint16_t kSyncNtpTimeIntervalDay = 1;
+    chip::Esp32TimeSync::Init(kNtpServerUrl, kSyncNtpTimeIntervalDay);
+#endif
 }
 
 extern "C" void app_main()

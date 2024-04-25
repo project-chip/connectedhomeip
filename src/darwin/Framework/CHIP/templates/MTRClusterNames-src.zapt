@@ -1,0 +1,89 @@
+{{> header excludeZapComment=true}}
+
+
+#import <Matter/MTRClusterNames.h>
+
+// @implementation MTRClusterAttributeIDType
+
+#pragma mark - Clusters IDs
+
+NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
+{
+    NSString * result = nil;
+    
+    switch (clusterID) {
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+        case MTRClusterIDType{{>cluster}}ID:
+            result = @"{{>cluster}}";
+            break;
+{{/if}}
+{{/zcl_clusters}}
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
+            break;
+    }
+    
+    return result;
+}
+
+
+#pragma mark - Attributes IDs
+
+NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType attributeID)
+{
+    NSString * result = nil;
+
+    switch (clusterID) {
+
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+        case MTRClusterIDType{{>cluster}}ID:
+
+            switch (attributeID) {
+
+{{/if}}
+
+{{#*inline "attributeIDs"}}
+{{#zcl_attributes_server}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+{{#first}}
+{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) isForIds=true)}}
+// Cluster {{> cluster}} attributes
+{{/if}}
+{{/first}}
+{{#if (and (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
+           (or clusterRef
+               (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)))}}
+            case MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID:
+                result = @"{{>attribute}}";
+                break;
+
+{{/if}}
+{{/zcl_attributes_server}}
+{{/inline}}
+
+{{> attributeIDs clusterName=label}}
+
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+            default:
+                result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
+        }
+{{/if}}
+
+{{/zcl_clusters}}
+        default:
+           result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
+           break;
+        }
+
+    return result;
+}
+
+// @end

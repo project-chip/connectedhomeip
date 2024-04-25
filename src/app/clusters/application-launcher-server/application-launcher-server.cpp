@@ -29,12 +29,15 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
+
+#include <string>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
@@ -49,7 +52,7 @@ using namespace chip::AppPlatform;
 using namespace chip::Uint8;
 
 static constexpr size_t kApplicationLauncherDelegateTableSize =
-    EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kApplicationLauncherDelegateTableSize <= kEmberInvalidEndpointIndex, "ApplicationLauncher Delegate table size error");
 
 // -----------------------------------------------------------------------------
@@ -77,7 +80,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogProgress(Zcl, "ApplicationLauncher NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id,
-                                                       EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kApplicationLauncherDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -100,7 +103,7 @@ namespace ApplicationLauncher {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id,
-                                                       EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
+                                                       MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kApplicationLauncherDelegateTableSize)
     {
@@ -116,8 +119,8 @@ bool HasFeature(chip::EndpointId endpoint, Feature feature)
     bool hasFeature     = false;
     uint32_t featureMap = 0;
 
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    Status status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (Status::Success == status)
     {
         hasFeature = (featureMap & chip::to_underlying(feature));
     }

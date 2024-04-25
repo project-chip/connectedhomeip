@@ -46,7 +46,7 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return static_cast<uint16_t>(ICDConfigurationData::GetInstance().GetIdleModeDurationSec());
+    return std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
@@ -134,7 +134,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
 
     MoveToState(HandlerState::CanStartReporting);
 
-    ObjectList<AttributePathParams> * attributePath = mpAttributePathList;
+    SingleLinkedListNode<AttributePathParams> * attributePath = mpAttributePathList;
     while (attributePath)
     {
         mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(attributePath->mValue);
@@ -821,6 +821,7 @@ void ReadHandler::PersistSubscription()
     auto * subscriptionResumptionStorage = mManagementCallback.GetInteractionModelEngine()->GetSubscriptionResumptionStorage();
     VerifyOrReturn(subscriptionResumptionStorage != nullptr);
 
+    // TODO(#31873): We need to store the CAT information to enable better interactions with ICDs
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
                                                                          .mFabricIndex    = GetAccessingFabricIndex(),
                                                                          .mSubscriptionId = mSubscriptionId,

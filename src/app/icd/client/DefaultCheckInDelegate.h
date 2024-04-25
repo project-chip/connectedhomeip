@@ -24,18 +24,21 @@
 namespace chip {
 namespace app {
 
-using namespace std;
+class InteractionModelEngine;
 
 /// Callbacks for check in protocol
 class DefaultCheckInDelegate : public CheckInDelegate
 {
 public:
     virtual ~DefaultCheckInDelegate() {}
-    CHIP_ERROR Init(ICDClientStorage * storage);
+    CHIP_ERROR Init(ICDClientStorage * storage, InteractionModelEngine * engine);
     void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
+    RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
+    void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
 private:
-    ICDClientStorage * mpStorage = nullptr;
+    ICDClientStorage * mpStorage        = nullptr;
+    InteractionModelEngine * mpImEngine = nullptr;
 };
 
 } // namespace app

@@ -31,11 +31,10 @@
 #include <lwip/tcpip.h>
 #endif
 
-extern "C" void xPortResetHeapMinimumEverFreeHeapSize(void);
-
 #include <openthread/platform/entropy.h>
-
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+
+#include "fsl_component_mem_manager.h"
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
@@ -50,31 +49,31 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-    size_t freeHeapSize;
+    auto freeHeapSize = static_cast<uint32_t>(MEM_GetFreeHeapSize());
+    currentHeapFree   = static_cast<uint64_t>(freeHeapSize);
 
-    freeHeapSize    = xPortGetFreeHeapSize();
-    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-    size_t freeHeapSize;
-    size_t usedHeapSize;
+    auto freeHeapSize = static_cast<uint32_t>(MEM_GetFreeHeapSize());
+    currentHeapUsed   = static_cast<uint64_t>(MinimalHeapSize_c - freeHeapSize);
 
-    freeHeapSize = xPortGetFreeHeapSize();
-    usedHeapSize = MinimalHeapSize_c - freeHeapSize;
-
-    currentHeapUsed = static_cast<uint64_t>(usedHeapSize);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-    size_t highWatermarkHeapSize;
+    currentHeapHighWatermark = static_cast<uint64_t>(MinimalHeapSize_c - MEM_GetFreeHeapSizeLowWaterMark());
 
-    highWatermarkHeapSize    = MinimalHeapSize_c - xPortGetMinimumEverFreeHeapSize();
-    currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    MEM_ResetFreeHeapSizeLowWaterMark();
+
     return CHIP_NO_ERROR;
 }
 
@@ -100,8 +99,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
         {
             ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
 
-            strncpy(thread->NameBuf, taskStatusArray[x].pcTaskName, kMaxThreadNameLength - 1);
-            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
             thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
             thread->id = taskStatusArray[x].xTaskNumber;
 

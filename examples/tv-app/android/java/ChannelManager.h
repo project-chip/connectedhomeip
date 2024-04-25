@@ -19,6 +19,7 @@
 
 #include <app/clusters/channel-server/channel-server.h>
 #include <jni.h>
+#include <lib/support/JniReferences.h>
 
 using chip::CharSpan;
 using chip::app::AttributeValueEncoder;
@@ -64,9 +65,10 @@ public:
                                    const chip::ByteSpan & data) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+    uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
 private:
-    jobject mChannelManagerObject      = nullptr;
+    chip::JniGlobalReference mChannelManagerObject;
     jmethodID mGetChannelListMethod    = nullptr;
     jmethodID mGetLineupMethod         = nullptr;
     jmethodID mGetCurrentChannelMethod = nullptr;
@@ -80,5 +82,6 @@ private:
     jmethodID mCancelRecordProgramMethod = nullptr;
 
     // TODO: set this based upon meta data from app
-    uint32_t mDynamicEndpointFeatureMap = 3;
+    static constexpr uint32_t kEndpointFeatureMap = 3;
+    static constexpr uint16_t kClusterRevision    = 2;
 };

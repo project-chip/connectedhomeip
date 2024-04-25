@@ -18,7 +18,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
@@ -26,10 +25,6 @@
 #include <platform/webos/NetworkCommissioningDriver.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
-
-#include <nlbyteorder.hpp>
-#include <nlio-byteorder.hpp>
-#include <nlio.hpp>
 
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
@@ -531,12 +526,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 {
     // TODO: Remove Weave legacy APIs
     return CHIP_ERROR_NOT_IMPLEMENTED;

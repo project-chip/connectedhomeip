@@ -28,14 +28,25 @@ namespace Internal {
 class LockSettingsStorage : ZephyrConfig
 {
 public:
-    static const ZephyrConfig::Key kConfigKey_LockUser;
-    static const ZephyrConfig::Key kConfigKey_LockUserName;
-    static const ZephyrConfig::Key kConfigKey_UserCredentials;
-    static const ZephyrConfig::Key kConfigKey_WeekDaySchedules;
-    static const ZephyrConfig::Key kConfigKey_YearDaySchedules;
-    static const ZephyrConfig::Key kConfigKey_HolidaySchedules;
-    static const char * kConfigKey_Credential[kNumCredentialTypes];
-    static const char * kConfigKey_CredentialData[kNumCredentialTypes];
+    static const char * kConfigKey_LockUser[APP_MAX_USERS];
+    static const char * kConfigKey_LockUserName[APP_MAX_USERS];
+    static const char * kConfigKey_UserCredentials[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_WeekDaySchedules[APP_MAX_USERS][APP_MAX_WEEKDAY_SCHEDULE_PER_USER];
+    static const char * kConfigKey_YearDaySchedules[APP_MAX_USERS][APP_MAX_YEARDAY_SCHEDULE_PER_USER];
+    static const char * kConfigKey_HolidaySchedules[APP_MAX_HOLYDAY_SCHEDULE_PER_USER];
+
+    static const char * kConfigKey_CredentialPin[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_CredentialFace[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_CredentialFingerprint[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_CredentialFingervein[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_CredentialRfid[APP_MAX_CREDENTIAL];
+
+    static const char * kConfigKey_CredentialData[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_CredentialDataPin[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_CredentialDataFace[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_CredentialDataFingerprint[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_CredentialDataFingerVein[APP_MAX_CREDENTIAL];
+    static const char * kConfigKey_CredentialDataRfid[APP_MAX_CREDENTIAL];
 };
 } // namespace Internal
 } // namespace DeviceLayer

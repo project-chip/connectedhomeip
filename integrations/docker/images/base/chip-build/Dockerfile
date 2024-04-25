@@ -144,7 +144,6 @@ RUN set -x \
     click \
     coloredlogs \
     cxxfilt \
-    flake8 \
     future \
     ghapi \
     mobly \
@@ -152,6 +151,7 @@ RUN set -x \
     portpicker \
     pygit \
     PyGithub \
+    ruff \
     tabulate \
     && : # last line
 

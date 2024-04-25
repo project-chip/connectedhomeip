@@ -18,15 +18,18 @@
 
 #include "AppTask.h"
 #include "Device.h"
+#include "PWMManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/support/ZclString.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
-const struct pwm_dt_spec sPwmRgbSpecBlueLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
+bool sTurnedOn;
+uint8_t sLevel;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -36,8 +39,8 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                       const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId);
 CHIP_ERROR RemoveDeviceEndpoint(Device * dev);
 void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSensor::Changed_t itemChangedMask);
-EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId, uint8_t * buffer,
-                                                 uint16_t maxReadLength);
+Protocols::InteractionModel::Status HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId,
+                                                                       uint8_t * buffer, uint16_t maxReadLength);
 
 static const int kNodeLabelSize = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
@@ -189,19 +192,19 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
         if (NULL == gDevices[index])
         {
             gDevices[index] = dev;
-            EmberAfStatus ret;
+            CHIP_ERROR err;
             while (true)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
-                ret =
+                err =
                     emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
-                if (ret == EMBER_ZCL_STATUS_SUCCESS)
+                if (err == CHIP_NO_ERROR)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
                                     gCurrentEndpointId, index);
                     return index;
                 }
-                else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
+                else if (err != CHIP_ERROR_ENDPOINT_EXISTS)
                 {
                     return -1;
                 }
@@ -224,20 +227,19 @@ CHIP_ERROR RemoveDeviceEndpoint(Device * dev)
     {
         if (gDevices[index] == dev)
         {
-            EndpointId ep   = emberAfClearDynamicEndpoint(index);
-            gDevices[index] = NULL;
-            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
-            UNUSED_VAR(ep);
+            [[maybe_unused]] EndpointId ep = emberAfClearDynamicEndpoint(index);
+            gDevices[index]                = NULL;
+            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
             return CHIP_NO_ERROR;
         }
     }
     return CHIP_ERROR_INTERNAL;
 }
 
-EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer,
-                                                    uint16_t maxReadLength)
+Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::AttributeId attributeId,
+                                                                          uint8_t * buffer, uint16_t maxReadLength)
 {
     using namespace chip::app::Clusters::BridgedDeviceBasicInformation::Attributes;
     ChipLogProgress(DeviceLayer, "HandleReadBridgedDeviceBasicAttribute: attrId=%" PRIu32 ", maxReadLength=%u", attributeId,
@@ -264,13 +266,14 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else
     {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Protocols::InteractionModel::Status::Failure;
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
-EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+Protocols::InteractionModel::Status HandleReadOnOffAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer,
+                                                             uint16_t maxReadLength)
 {
     ChipLogProgress(DeviceLayer, "HandleReadOnOffAttribute: attrId=%" PRIu32 ", maxReadLength=%u", attributeId, maxReadLength);
 
@@ -285,24 +288,25 @@ EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attribute
     }
     else
     {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Protocols::InteractionModel::Status::Failure;
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
-EmberAfStatus HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer)
+Protocols::InteractionModel::Status HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer)
 {
     ChipLogProgress(DeviceLayer, "HandleWriteOnOffAttribute: attrId=%" PRIu32, attributeId);
 
-    ReturnErrorCodeIf((attributeId != Clusters::OnOff::Attributes::OnOff::Id) || (!dev->IsReachable()), EMBER_ZCL_STATUS_FAILURE);
+    ReturnErrorCodeIf((attributeId != Clusters::OnOff::Attributes::OnOff::Id) || (!dev->IsReachable()),
+                      Protocols::InteractionModel::Status::Failure);
     dev->SetOnOff(*buffer == 1);
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
-EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength)
+Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                         const EmberAfAttributeMetadata * attributeMetadata,
+                                                                         uint8_t * buffer, uint16_t maxReadLength)
 {
     using namespace Clusters;
 
@@ -327,11 +331,12 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         }
     }
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return Protocols::InteractionModel::Status::Failure;
 }
 
-EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                          const EmberAfAttributeMetadata * attributeMetadata,
+                                                                          uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -345,7 +350,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
         }
     }
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return Protocols::InteractionModel::Status::Failure;
 }
 
 namespace {
@@ -392,29 +397,32 @@ bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj
 
 CHIP_ERROR AppTask::Init(void)
 {
-    // Init lighting manager
-    uint8_t minLightLevel = kDefaultMinLevel;
-    Clusters::LevelControl::Attributes::MinLevel::Get(kExampleEndpointId, &minLightLevel);
-
-    uint8_t maxLightLevel = kDefaultMaxLevel;
-    Clusters::LevelControl::Attributes::MaxLevel::Get(kExampleEndpointId, &maxLightLevel);
-
-    // Initialize PWM LED
-    CHIP_ERROR err = sAppTask.mPwmRgbBlueLed.Init(&sPwmRgbSpecBlueLed, minLightLevel, maxLightLevel, maxLightLevel);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Blue RGB PWM Device Init fail");
-        return err;
-    }
-
-    sAppTask.mPwmRgbBlueLed.SetCallbacks(ActionInitiated, ActionCompleted, nullptr);
-
-#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(LightingActionEventHandler);
-#endif
     InitCommonParts();
 
-    memset(gDevices, 0, sizeof(gDevices));
+    Protocols::InteractionModel::Status status;
+
+    app::DataModel::Nullable<uint8_t> level;
+    // Read brightness value
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(kExampleEndpointId, level);
+    if (status == Protocols::InteractionModel::Status::Success && !level.IsNull())
+    {
+        sLevel = level.Value();
+    }
+
+    bool isOn;
+    // Read storedValue on/off value
+    status = Clusters::OnOff::Attributes::OnOff::Get(1, &isOn);
+    if (status == Protocols::InteractionModel::Status::Success)
+    {
+        sTurnedOn = isOn;
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, sTurnedOn);
+    }
+
+    for (size_t i = 0; i < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; i++)
+    {
+        gDevices[i] = nullptr;
+    }
 
     gLight1.SetReachable(true);
     gLight2.SetReachable(true);
@@ -488,8 +496,8 @@ void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSenso
     }
 }
 
-EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId, uint8_t * buffer,
-                                                 uint16_t maxReadLength)
+Protocols::InteractionModel::Status HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId,
+                                                                       uint8_t * buffer, uint16_t maxReadLength)
 {
     using namespace Clusters::TemperatureMeasurement::Attributes;
 
@@ -520,86 +528,46 @@ EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::A
     }
     else
     {
-        return EMBER_ZCL_STATUS_FAILURE;
+        return Protocols::InteractionModel::Status::Failure;
     }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
-    PWMDevice::Action_t action = PWMDevice::INVALID_ACTION;
-    int32_t actor              = 0;
+    Action_t action = INVALID_ACTION;
+    int32_t actor   = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Lighting)
     {
-        action = static_cast<PWMDevice::Action_t>(aEvent->LightingEvent.Action);
+        action = static_cast<Action_t>(aEvent->LightingEvent.Action);
         actor  = aEvent->LightingEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = sAppTask.mPwmRgbBlueLed.IsTurnedOn() ? PWMDevice::OFF_ACTION : PWMDevice::ON_ACTION;
-        actor  = AppEvent::kEventType_Button;
-    }
+        sTurnedOn = !sTurnedOn;
 
-    if (action != PWMDevice::INVALID_ACTION && (!sAppTask.mPwmRgbBlueLed.InitiateAction(action, actor, NULL)))
-    {
-        LOG_INF("Action is in progress or active");
-    }
-}
-
-void AppTask::ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor)
-{
-    if (aAction == PWMDevice::ON_ACTION)
-    {
-        LOG_DBG("ON_ACTION initiated");
-    }
-    else if (aAction == PWMDevice::OFF_ACTION)
-    {
-        LOG_DBG("OFF_ACTION initiated");
-    }
-    else if (aAction == PWMDevice::LEVEL_ACTION)
-    {
-        LOG_DBG("LEVEL_ACTION initiated");
-    }
-}
-
-void AppTask::ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor)
-{
-    if (aAction == PWMDevice::ON_ACTION)
-    {
-        LOG_DBG("ON_ACTION completed");
-    }
-    else if (aAction == PWMDevice::OFF_ACTION)
-    {
-        LOG_DBG("OFF_ACTION completed");
-    }
-    else if (aAction == PWMDevice::LEVEL_ACTION)
-    {
-        LOG_DBG("LEVEL_ACTION completed");
-    }
-
-    if (aActor == AppEvent::kEventType_Button)
-    {
-        sAppTask.UpdateClusterState();
+        PwmManager::getInstance().setPwm(PwmManager::EAppPwm_Red, sTurnedOn);
+        GetAppTask().UpdateClusterState();
     }
 }
 
 void AppTask::UpdateClusterState(void)
 {
-    bool isTurnedOn = sAppTask.mPwmRgbBlueLed.IsTurnedOn();
+    bool isTurnedOn = sTurnedOn;
 
     // write the new on/off value
-    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);
+    Protocols::InteractionModel::Status status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update OnOff fail: %x", status);
+        LOG_ERR("Update OnOff fail: %x", to_underlying(status));
     }
-    uint8_t setLevel = sAppTask.mPwmRgbBlueLed.GetLevel();
+    uint8_t setLevel = sLevel;
     status           = Clusters::LevelControl::Attributes::CurrentLevel::Set(kExampleEndpointId, setLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
-        LOG_ERR("Update CurrentLevel fail: %x", status);
+        LOG_ERR("Update CurrentLevel fail: %x", to_underlying(status));
     }
 }

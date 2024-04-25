@@ -1905,6 +1905,30 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: DISHM.S.C01.Tx
 
+    #
+    # Microwave Oven Mode Cluster
+    #
+    - label:
+          "Does the device implement the Microwave Oven Mode cluster as a server"
+      id: MWOM.S
+
+    #
+    # Microwave Oven Control Cluster
+    #
+    - label:
+          "Does the device implement the Microwave Oven Control cluster as a
+          server"
+      id: MWOCTRL.S
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the power as a number feature"
+      id: MWOCTRL.S.F00
+
+    - label: "Does the device support the power number limits feature"
+      id: MWOCTRL.S.F02
+
     # Descriptor Cluster TestPlan
     - label: "Does the device implement the Descriptor cluster as a server?"
       id: DESC.S
@@ -3604,6 +3628,9 @@ PICS:
     - label: "Indicates that node is configured for test event triggers."
       id: DGGEN.S.C00.Rsp
 
+    - label: "Indicates cluster supports Payload Test Request."
+      id: DGGEN.S.C03.Rsp
+
     #
     # server / Events
     #
@@ -3624,6 +3651,13 @@ PICS:
 
     - label: "Indicates the reason that caused the device to reboot start-up."
       id: DGGEN.S.E03
+
+    #
+    # server / features
+    #
+    - label:
+          "Support specific commands needed for extended Data Model features."
+      id: DGGEN.S.F00
 
     #
     # client / attributes
@@ -4632,6 +4666,21 @@ PICS:
       id: MEDIAPLAYBACK.S.C0b.Rsp
 
     - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActivateAudioTrack command?"
+      id: MEDIAPLAYBACK.S.C0c.Rsp
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActivateTextTrack command?"
+      id: MEDIAPLAYBACK.S.C0d.Rsp
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          DeactivateTextTrack command?"
+      id: MEDIAPLAYBACK.S.C0e.Rsp
+
+    - label:
           "Does the DUT support the Audio Output server cluster, SelectOutput
           command?"
       id: AUDIOOUTPUT.S.C00.Rsp
@@ -5245,6 +5294,9 @@ PICS:
     - label: "Device has Deadfront behaviour"
       id: OO.S.F01
 
+    - label: "Device has OffOnly feature"
+      id: OO.S.F02
+
     #
     # server / manually
     #
@@ -5781,7 +5833,7 @@ PICS:
     - label: "Write all supported optional attributes"
       id: RH.C.AO-WRITE
 
-    # Scenes Cluster Test Plan
+    # Scenes Management Cluster Test Plan
     - label: "Does the device implement the Scenes cluster as a server?"
       id: S.S
 
@@ -5869,11 +5921,6 @@ PICS:
 
     - label: "Does the device implement sending the CopyScene command?"
       id: S.C.C40.Tx
-
-    - label:
-          "Does the device process the TransitionTime parameter of the
-          RecallScene command?"
-      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
 
     #
     # client / manually
@@ -8829,6 +8876,94 @@ PICS:
           command?"
       id: OPSTATE.S.C04.Tx
 
+    #
+    #Oven Operational State
+    #
+    - label:
+          "Does the device implement the Operational State cluster as a server?"
+      id: OVENOPSTATE.S
+
+    - label:
+          "Does the device implement the Operational State cluster as a client?"
+      id: OVENOPSTATE.C
+
+    #ManuallyControlled
+
+    - label: "Does the DUT support testing the Stopped(0x00) operational state"
+      id: OVENOPSTATE.S.M.ST_STOPPED
+
+    - label: "Does the DUT support testing the Running(0x01) operational state"
+      id: OVENOPSTATE.S.M.ST_RUNNING
+
+    - label: "Does the DUT support testing the Paused(0x02) operational state"
+      id: OVENOPSTATE.S.M.ST_PAUSED
+
+    - label: "Does the DUT support testing the Error(0x03) operational state?"
+      id: OVENOPSTATE.S.M.ST_ERROR
+
+    - label: "Does the DUT support testing the NoError(0x00) error state?"
+      id: OVENOPSTATE.S.M.ERR_NO_ERROR
+
+    - label:
+          "Does the DUT support testing the UnableToStartOrResume(0x01) error
+          state?"
+      id: OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
+
+    - label:
+          "Does the DUT support testing the UnableToCompleteOperation(0x02)
+          error state?"
+      id: OVENOPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION
+
+    - label:
+          "Does the DUT support testing the CommandInvalidInState(0x03) error
+          state?"
+      id: OVENOPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
+
+    #Server Attributes
+    - label: "Does the device implement the PhaseList attribute?"
+      id: OVENOPSTATE.S.A0000
+
+    - label: "Does the device implement the CurrentPhase attribute?"
+      id: OVENOPSTATE.S.A0001
+
+    - label: "Does the device implement the CountdownTime attribute?"
+      id: OVENOPSTATE.S.A0002
+
+    - label: "Does the device implement the OperationalStateList attribute?"
+      id: OVENOPSTATE.S.A0003
+
+    - label: "Does the device implement the OperationalState attribute?"
+      id: OVENOPSTATE.S.A0004
+
+    - label: "Does the device implement the OperationalError attribute?"
+      id: OVENOPSTATE.S.A0005
+    #Events Generated
+
+    - label: "Does the device generate the OperationalError event?"
+      id: OVENOPSTATE.S.E00
+
+    - label: "Does the device generate the OperationCompltion event?"
+      id: OVENOPSTATE.S.E01
+
+    #Server Commands Received
+    - label: "Does the device implement receiving the Pause command?"
+      id: OVENOPSTATE.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Stop command?"
+      id: OVENOPSTATE.S.C01.Rsp
+
+    - label: "Does the device implement receiving the Start command?"
+      id: OVENOPSTATE.S.C02.Rsp
+
+    - label: "Does the device implement receiving the Resume command?"
+      id: OVENOPSTATE.S.C03.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement generating the OperationalCommandResponse
+          command?"
+      id: OVENOPSTATE.S.C04.Tx
+
     # Smoke CO Alarm Cluster Test Plan
     - label: "Does the device implement the SMOKECO cluster as a server?"
       id: SMOKECO.S
@@ -9044,6 +9179,9 @@ PICS:
 
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
 
     - label:
           "Id of mode the device will fail to transition to, given its current
@@ -9947,3 +10085,114 @@ PICS:
       #  Commands generated
     - label: "Does the device implement sending the GetTargetsResponse command?"
       id: EEVSE.S.C00.Tx
+
+    # Energy EVSE Mode Cluster
+    # server / attributes
+    - label: "Does the device implement the Energy EVSE cluster as a server?"
+      id: EEVSEM.S
+
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: EEVSEM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: EEVSEM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: EEVSEM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: EEVSEM.S.A0003
+
+      #  Commands received
+    - label: "Does the device implement sending the ChangeToMode command?"
+      id: EEVSEM.S.C00.Rsp
+
+      #  Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: EEVSEM.S.C01.Tx
+
+      #  Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: EEVSEM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+
+      #Feature
+    - label: "Does the DUT(server) support the Hue/Saturation feature?"
+      id: EEVSEM.S.F00
+
+    #
+    # Device Energy Management Mode Cluster
+    # server / attributes
+
+    - label: "Does the device implement the DEMM cluster as a server?"
+      id: DEMM.S
+
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: DEMM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: DEMM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: DEMM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: DEMM.S.A0003
+
+      #  Commands received
+    - label: "Does the device implement sending the ChangeToMode command?"
+      id: DEMM.S.C00.Rsp
+
+      #  Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: DEMM.S.C01.Tx
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: DEMM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: DEMM.S.M.CAN_MANUALLY_CONTROLLED
+
+      #  Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: EEVSEM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
+
+    #
+    # Power Topology Cluster
+    #
+    - label: "Does the device implement the Power Topology Cluster as a server?"
+      id: PWRTL.S
+
+    #  Features
+
+    - label:
+          "Does the associated endpoint provide or consume power for the entire
+          node?"
+      id: PWRTL.S.F00
+
+    - label:
+          "Does the associated endpoint provide or consume power for itself and
+          its child endpoints?"
+      id: PWRTL.S.F01
+
+    - label:
+          "Does the associated endpoint provide or consume power for a provided
+          set of endpoints?"
+      id: PWRTL.S.F02
+
+    - label: "Can the provided set of endpoints change?"
+      id: PWRTL.S.F03
+
+    #Server attributes
+    - label: "Does the device implement the AvailableEndpoints attribute?"
+      id: PWRTL.S.A0000
+
+    - label: "Does the device implement the ActiveEndpoints attribute?"
+      id: PWRTL.S.A0001

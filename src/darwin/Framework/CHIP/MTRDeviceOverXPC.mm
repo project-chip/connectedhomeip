@@ -139,6 +139,16 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                      queue:(dispatch_queue_t)queue
                 completion:(MTRDeviceResponseHandler)completion
 {
+    [self readAttributePaths:attributePaths eventPaths:eventPaths params:params includeDataVersion:NO queue:queue completion:completion];
+}
+
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+        includeDataVersion:(BOOL)includeDataVersion
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion
+{
     if (attributePaths == nil || eventPaths != nil) {
         MTR_LOG_ERROR("MTRBaseDevice doesn't support reading event paths over XPC");
         dispatch_async(queue, ^{
@@ -415,6 +425,38 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
     dispatch_async(queue, ^{
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]);
     });
+}
+
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    MTR_LOG_DEBUG("Downloading log ...");
+
+    __auto_type workBlock = ^(MTRDeviceControllerXPCProxyHandle * _Nullable handle, NSError * _Nullable error) {
+        if (error != nil) {
+            completion(nil, error);
+            return;
+        }
+
+        [handle.proxy downloadLogWithController:self.controllerID
+                                         nodeId:self.nodeID
+                                           type:type
+                                        timeout:timeout
+                                     completion:^(NSString * _Nullable url, NSError * _Nullable error) {
+                                         dispatch_async(queue, ^{
+                                             MTR_LOG_DEBUG("Download log");
+                                             completion([NSURL URLWithString:url], error);
+                                             // The following captures the proxy handle in the closure so that the
+                                             // handle won't be released prior to block call.
+                                             __auto_type handleRetainer = handle;
+                                             (void) handleRetainer;
+                                         });
+                                     }];
+    };
+
+    [self fetchProxyHandleWithQueue:queue completion:workBlock];
 }
 
 - (void)fetchProxyHandleWithQueue:(dispatch_queue_t)queue completion:(MTRFetchProxyHandleCompletion)completion

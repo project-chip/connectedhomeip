@@ -19,6 +19,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -78,7 +79,7 @@ public:
     enum MRPMode
     {
         kDefault = 1, // This adopts the default MRP values for idle/active as per the spec.
-                      //      i.e IDLE = 4s, ACTIVE = 300ms
+                      //      i.e IDLE = 500ms, ACTIVE = 300ms
 
         kResponsive = 2, // This adopts values that are better suited for loopback tests that
                          // don't actually go over a network interface, and are tuned much lower
@@ -141,8 +142,10 @@ public:
 
     CHIP_ERROR CreateSessionBobToAlice(); // Creates PASE session
     CHIP_ERROR CreateCASESessionBobToAlice();
+    CHIP_ERROR CreateCASESessionBobToAlice(const CATValues & cats);
     CHIP_ERROR CreateSessionAliceToBob(); // Creates PASE session
     CHIP_ERROR CreateCASESessionAliceToBob();
+    CHIP_ERROR CreateCASESessionAliceToBob(const CATValues & cats);
     CHIP_ERROR CreateSessionBobToFriends(); // Creates PASE session
     CHIP_ERROR CreatePASESessionCharlieToDavid();
     CHIP_ERROR CreatePASESessionDavidToCharlie();
