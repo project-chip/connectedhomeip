@@ -104,7 +104,7 @@ public:
     AutoCompleteInvokeResponder(InvokeResponder * writer) : mWriter(writer) {}
     ~AutoCompleteInvokeResponder()
     {
-        if (!mCompleted)
+        if (mCompleteState != CompleteState::kComplete)
         {
             mWriter->Complete(Protocols::InteractionModel::Status::Failure);
         }
@@ -123,7 +123,11 @@ public:
     /// Use this only in conjunction with the other Raw* calls
     CHIP_ERROR RawFlushPendingReplies()
     {
-        mCompleted = false;
+        // allow a flush if we never called it (this may not be reasonable, however
+        // we accept an early flush) or if flush is expected
+        VerifyOrReturnError((mCompleteState == CompleteState::kNeverCalled) || (mCompleteState == CompleteState::kFlushExpected),
+                            CHIP_ERROR_INCORRECT_STATE);
+        mCompleteState = CompleteState::kFlushed;
         return mWriter->FlushPendingResponses();
     }
 
@@ -132,24 +136,32 @@ public:
     /// Use this in conjunction with the other Raw* calls
     CHIP_ERROR RawComplete(StatusIB status)
     {
-        VerifyOrReturnError(!mCompleted, CHIP_ERROR_INCORRECT_STATE);
-        // Mark completed to not allow calling complete again unless we flush pending replies.
-        // This is to prevent a Complete or  Send from working once RawComplete was already called
-        // as we generally do not know the undelying state.
-        mCompleted = true;
-        return mWriter->Complete(status);
+        VerifyOrReturnError((mCompleteState == CompleteState::kNeverCalled) || (mCompleteState == CompleteState::kFlushed),
+                            CHIP_ERROR_INCORRECT_STATE);
+        CHIP_ERROR err = mWriter->Complete(status);
+        if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) && (mCompleteState == CompleteState::kNeverCalled))
+        {
+            mCompleteState = CompleteState::kFlushExpected;
+        }
+        else
+        {
+            mCompleteState = CompleteState::kComplete;
+        }
+        return err;
     }
 
     /// Complete the given command.
     ///
     /// Automatically handles retries for sending.
+    /// Cannot be called after Raw* methods are used.
     ///
     /// Any error returned by this are final and not retriable
     /// as a retry for CHIP_ERROR_BUFFER_TOO_SMALL is already built in.
     CHIP_ERROR Complete(StatusIB status)
     {
-        VerifyOrReturnError(!mCompleted, CHIP_ERROR_INCORRECT_STATE);
-        mCompleted     = true;
+        VerifyOrReturnError(mCompleteState == CompleteState::kNeverCalled, CHIP_ERROR_INCORRECT_STATE);
+        // this is a final complete, including retry handling
+        mCompleteState     = CompleteState::kComplete;
         CHIP_ERROR err = mWriter->Complete(status);
 
         if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -166,14 +178,16 @@ public:
     ///
     /// This version of the send has built-in RETRY and handles
     /// Flush/Complete automatically.
+    /// Cannot be called after Raw* methods are used.
     ///
     /// Any error returned by this are final and not retriable
     /// as a retry for CHIP_ERROR_BUFFER_TOO_SMALL is already built in.
     template <typename ReplyData>
     CHIP_ERROR Send(const ReplyData & data)
     {
-        VerifyOrReturnError(!mCompleted, CHIP_ERROR_INCORRECT_STATE);
-        mCompleted     = true;
+        VerifyOrReturnError(mCompleteState == CompleteState::kNeverCalled, CHIP_ERROR_INCORRECT_STATE);
+        // this is a final complete, including retry handling
+        mCompleteState     = CompleteState::kComplete;
         CHIP_ERROR err = data.Encode(ResponseEncoder(ReplyData::GetCommandId()));
         if (err != CHIP_ERROR_BUFFER_TOO_SMALL)
         {
@@ -207,15 +221,33 @@ public:
     }
 
 private:
+    // Contract says that complete may only be called twice:
+    //   - initial complete
+    //   - again after a `Flush`
+    // The states here expect we are in:
+    //
+    //    +----------------------------Flush---------|
+    //    |                                          v
+    //  NEVER --Complete--> F_EXPECTED --Flush--> FLUSHED --Complete--> COMPLETE
+    //             |                                                    ^
+    //             +-------------(success or permanent errror)----------|
+    enum class CompleteState
+    {
+        kNeverCalled,
+        kFlushExpected,
+        kFlushed,
+        kComplete,
+    };
+
     InvokeResponder * mWriter;
-    bool mCompleted = false;
+    CompleteState mCompleteState = CompleteState::kNeverCalled;
 };
 
 enum ReplyAsyncFlags
 {
     // Some commmands that are expensive to process (e.g. crypto).
     // Implementations may choose to send an ack on the message right away to
-    // avoid MRP retransmits. 
+    // avoid MRP retransmits.
     kSlowCommandHandling = 0x0001,
 };
 
