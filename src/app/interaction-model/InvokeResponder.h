@@ -46,8 +46,8 @@ namespace InteractionModel {
 ///         In that case, the response data will be rolled back and only the status
 ///         will be encoded.
 ///
-/// Creating a response MUST be retried at most once, if and only if `Complete`
-/// returns CHIP_ERROR_BUFFER_TOO_SMALL:
+/// Creating a response MAY be retried at most once, if and only if `Complete`
+/// returns CHIP_ERROR_BUFFER_TOO_SMALL. Retry attempts MUST not exceed 1:
 ///   - FlushPendingResponses MUST be called to make as much buffer space as possible
 ///     available for encoding
 ///   - The response encoding (including `ResponseEncoder` usage and calling Complete)
