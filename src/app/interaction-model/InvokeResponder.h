@@ -30,7 +30,7 @@ namespace InteractionModel {
 /// matter protocol) and is responsible for constructing its corresponding
 /// response (i.e. a InvokeResponseIB within the matter protocol)
 ///
-/// Invoke responses MUST contain exacltly ONE of:
+/// Invoke responses MUST contain exactly ONE of:
 ///   - response data (accessed via `ResponseEncoder`)
 ///   - A status, which may be success or failure, both of which may
 ///     contain a cluster-specific error code.
