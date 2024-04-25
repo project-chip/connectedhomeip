@@ -3021,7 +3021,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqualObjects(originalCommandPath, decodedCommandPath);
 }
 
-#ifdef DEBUG
 - (void)test033_TestMTRDeviceDeviceConfigurationChanged
 {
     // Ensure the test starts with clean slate.
@@ -3063,7 +3062,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssert(attributeReportsReceived > 0);
         for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
             MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
-            XCTAssert(attributePath != nil);
+            XCTAssertNotNil(attributePath);
 
             XCTAssert(attributePath.cluster.unsignedLongValue == MTRClusterDescriptorID);
             XCTAssert(attributePath.attribute.unsignedLongValue == MTRClusterDescriptorAttributePartsListID);

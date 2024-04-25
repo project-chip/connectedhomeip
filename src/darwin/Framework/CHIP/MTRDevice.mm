@@ -372,9 +372,8 @@ static NSString * const sAttributesKey = @"attributes";
     NSDate * _Nullable _lastSubscriptionFailureTime;
     MTRDeviceConnectivityMonitor * _connectivityMonitor;
 
-    // This boolean keeps track of any device configuration changes received in an attribute report
-    // and when the report ends, we notify the delegate. Device configuration changes include parts list,
-    // server list, device type list, accepted commands list, attribute list, cluster revision and feature map updates.
+    // This boolean keeps track of any device configuration changes received in an attribute report.
+    // If this is true when the report ends, we notify the delegate.
     BOOL _deviceConfigurationChanged;
 }
 
@@ -1128,7 +1127,7 @@ static NSString * const sAttributesKey = @"attributes";
         case MTRClusterDescriptorAttributeClusterRevisionID:
         case MTRClusterDescriptorAttributeFeatureMapID: {
             // If changes are detected, note that the device configuration has changed.
-            NSDictionary * cachedAttributeDataValue = [self _cachedAttributeValueForPath:attributePath];
+            MTRDeviceDataValueDictionary cachedAttributeDataValue = [self _cachedAttributeValueForPath:attributePath];
             if (cachedAttributeDataValue != nil && ![self _attributeDataValue:attribute[MTRDataKey] isEqualToDataValue:cachedAttributeDataValue]) {
                 _deviceConfigurationChanged = YES;
                 break;

@@ -429,7 +429,7 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
  *
  * This is called when the MTRDevice object detects a change in the device configuration.
  *
- * The intention is that after this is called, the client should re-enumerate the device topology.
+ * The intention is that this is called whenever any of the things that usually don't change about a device might have changed.
  */
 - (void)deviceConfigurationChanged:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
