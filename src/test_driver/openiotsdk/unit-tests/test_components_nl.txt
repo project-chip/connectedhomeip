@@ -1,6 +1,5 @@
 AppTests
 BDXTests
-ChipCryptoTests
 CredentialsTest
 DataModelTests
 InetLayerTests
@@ -9,5 +8,5 @@ RawTransportTests
 RetransmitTests
 SecureChannelTests
 SetupPayloadTestsNL
-SupportTests
+SupportTestsNL
 UserDirectedCommissioningTests
