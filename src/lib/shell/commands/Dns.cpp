@@ -115,25 +115,24 @@ public:
 
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
-        if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval.Value());
+        if (retryInterval.has_value())
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", *retryInterval);
 
         retryInterval = nodeData.GetMrpRetryIntervalActive();
 
-        if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
+        if (retryInterval.has_value())
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", *retryInterval);
 
-        if (nodeData.GetMrpRetryActiveThreshold().HasValue())
+        if (nodeData.GetMrpRetryActiveThreshold().has_value())
         {
             streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n",
-                            nodeData.GetMrpRetryActiveThreshold().Value());
+                            *nodeData.GetMrpRetryActiveThreshold());
         }
         streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.supportsTcp ? "yes" : "no");
 
-        if (nodeData.isICDOperatingAsLIT.HasValue())
+        if (nodeData.isICDOperatingAsLIT.has_value())
         {
-            streamer_printf(streamer_get(), "   ICD is operating as a: %s\r\n",
-                            nodeData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+            streamer_printf(streamer_get(), "   ICD is operating as a: %s\r\n", *nodeData.isICDOperatingAsLIT ? "LIT" : "SIT");
         }
         streamer_printf(streamer_get(), "   IP addresses:\r\n");
         for (size_t i = 0; i < nodeData.numIPs; i++)
