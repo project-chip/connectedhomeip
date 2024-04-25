@@ -19,9 +19,9 @@ chip_test_suite("tests") {
   ]
 }
 
-chip_test_suite_using_nltest("nl_tests") {
+chip_test_suite_using_nltest("tests_nltest") {
   # Renamed ouput during the transition away from nltest
-  output_name = "nl_libSecureChannelTests"
+  output_name = "libSecureChannelTestsNL"
 
   test_sources = [
     "TestCASESession.cpp",
