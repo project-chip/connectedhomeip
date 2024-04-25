@@ -189,7 +189,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         break;
     case ServiceNameType::kCommissioner:
     case ServiceNameType::kCommissionable:
-        mSpecificResolutionData.Set<DnssdNodeData>();
+        mSpecificResolutionData.Set<CommissionNodeData>();
 
         {
             // Commission addresses start with instance name
@@ -199,10 +199,10 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
-            Platform::CopyString(mSpecificResolutionData.Get<DnssdNodeData>().instanceName, nameCopy.Value());
+            Platform::CopyString(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, nameCopy.Value());
         }
 
-        LogFoundCommissionSrvRecord(mSpecificResolutionData.Get<DnssdNodeData>().instanceName, mTargetHostName.Get());
+        LogFoundCommissionSrvRecord(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, mTargetHostName.Get());
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -306,7 +306,7 @@ CHIP_ERROR IncrementalResolver::OnTxtRecord(const ResourceData & data, BytesRang
 
     if (IsActiveBrowseParse())
     {
-        TxtParser<DnssdNodeData> delegate(mSpecificResolutionData.Get<DnssdNodeData>());
+        TxtParser<CommissionNodeData> delegate(mSpecificResolutionData.Get<CommissionNodeData>());
         if (!ParseTxtRecord(data.GetData(), &delegate))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -347,8 +347,11 @@ CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 
     IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
-    outputData.resolutionData = mCommonResolutionData;
-    outputData.nodeData       = mSpecificResolutionData.Get<DnssdNodeData>();
+    outputData.Set<CommissionNodeData>();
+    CommissionNodeData & nodeData         = outputData.Get<CommissionNodeData>();
+    nodeData                              = mSpecificResolutionData.Get<CommissionNodeData>();
+    CommonResolutionData & resolutionData = nodeData;
+    resolutionData                        = mCommonResolutionData;
 
     ResetToInactive();
 
