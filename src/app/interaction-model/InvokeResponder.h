@@ -259,11 +259,19 @@ public:
     // reply with no data
     CHIP_ERROR Reply(StatusIB status) { return this->Reply().Complete(status); }
 
-    // Send a reply "NOW" to the given invoke
+    // Enqueue the content of the reply at this point in time (rather than Async sending it).
+    //
+    // Implementations will often batch several replies into one packet for batch commands,
+    // so it will be implementation-specific on when the actual reply packet is
+    // sent.
     virtual AutoCompleteInvokeResponder Reply() = 0;
 
     // Reply "later" to the command. This allows async processing. A reply will be forced
     // when the returned InvokeReply is destroyed.
+    //
+    // NOTE: Each InvokeReply is associated with a separate `CommandDataIB` within batch
+    //       commands. When replying asynchronously, each InvokeReply will set the response
+    //       data for the given commandpath/ref only.
     virtual std::unique_ptr<InvokeReply> ReplyAsync(BitFlags<ReplyAsyncFlags> flags) = 0;
 };
 
