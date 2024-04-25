@@ -55,7 +55,7 @@ Type ConvertDefaultValueToWorkingValue(const EmberAfDefaultAttributeValue & defa
 template <typename Type>
 void CapAttributeID(AttributeValuePairType & aVPair, const EmberAfAttributeMetadata * metadata)
 {
-    using IntType     = app::NumericAttributeTraits<Type, CHIP_CONFIG_BIG_ENDIAN_TARGET>;
+    using IntType     = app::NumericAttributeTraits<Type>;
     using WorkingType = typename IntType::WorkingType;
 
     WorkingType maxValue;
