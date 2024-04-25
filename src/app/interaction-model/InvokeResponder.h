@@ -304,6 +304,10 @@ public:
     // NOTE: Each InvokeReply is associated with a separate `CommandDataIB` within batch
     //       commands. When replying asynchronously, each InvokeReply will set the response
     //       data for the given commandpath/ref only.
+    //
+    // IF empty pointer is returned, insufficient memory to reply async is available and
+    // this should be handled (e.g. by returning an error to the handler/replying with
+    // an errorcode synchronously).
     virtual std::unique_ptr<InvokeReply> ReplyAsync(BitFlags<ReplyAsyncFlags> flags) = 0;
 };
 
