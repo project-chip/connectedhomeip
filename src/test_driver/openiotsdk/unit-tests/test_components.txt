@@ -8,4 +8,5 @@ MdnsTests
 PlatformTests
 SystemLayerTests
 TestShell
+TransportLayerTests
 SetupPayloadTests
