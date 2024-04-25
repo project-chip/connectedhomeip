@@ -20,6 +20,7 @@ import io
 import logging
 import re
 import sys
+import traceback
 from typing import Dict
 
 import fastcore  # type: ignore
@@ -163,8 +164,13 @@ class SizeContext:
         for i in required_artifact_ids:
             blob = self.gh.download_artifact(i)
             if blob:
-                self.db.add_sizes_from_zipfile(io.BytesIO(blob),
-                                               {'artifact': i})
+                try:
+                    self.db.add_sizes_from_zipfile(io.BytesIO(blob),
+                                                   {'artifact': i})
+                except Exception:
+                    # Report in case the zipfile is invalid, however do not fail
+                    # all the rest (behave as if artifact download has failed)
+                    traceback.print_last()
 
     def read_inputs(self):
         """Read size report from github and/or local files."""
