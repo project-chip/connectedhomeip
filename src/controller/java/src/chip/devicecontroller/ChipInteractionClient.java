@@ -37,7 +37,8 @@ public class ChipInteractionClient {
       boolean keepSubscriptions,
       boolean isFabricFiltered,
       int imTimeoutMs,
-      @Nullable Long eventMin);
+      @Nullable Long eventMin,
+      boolean isPeerICD);
 
   static native void read(
       long deviceControllerPtr,

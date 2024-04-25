@@ -2041,6 +2041,19 @@ JNI_METHOD(void, shutdownCommissioning)
     wrapper->Shutdown();
 }
 
+JNI_METHOD(jlong, getRemoteDeviceId)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
+{
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return static_cast<jlong>(chip::kUndefinedNodeId);
+    }
+
+    return static_cast<jlong>(chipDevice->GetDeviceId());
+}
+
 JNI_METHOD(jbyteArray, getAttestationChallenge)
 (JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
 {

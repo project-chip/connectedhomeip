@@ -545,6 +545,10 @@ public class ChipDeviceController {
     return removeKeySet(deviceControllerPtr, keySetId);
   }
 
+  public long getRemoteDeviceId(long devicePtr) {
+    return getRemoteDeviceId(deviceControllerPtr, devicePtr);
+  }
+
   public void onConnectDeviceComplete() {
     completionListener.onConnectDeviceComplete();
   }
@@ -746,6 +750,15 @@ public class ChipDeviceController {
     return getICDClientInfo(deviceControllerPtr, getFabricIndex(deviceControllerPtr));
   }
 
+  public boolean isPeerICDClient(long deviceId) {
+    List<ICDClientInfo> clientInfo = getICDClientInfo();
+    if (clientInfo == null) {
+      return false;
+    }
+
+    return clientInfo.stream().anyMatch(info -> info.getPeerNodeId() == deviceId);
+  }
+
   /**
    * Returns the ICD Client Information
    *
@@ -838,7 +851,8 @@ public class ChipDeviceController {
         false,
         false,
         imTimeoutMs,
-        null);
+        null,
+        isPeerICDClient(getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -876,7 +890,8 @@ public class ChipDeviceController {
         false,
         false,
         imTimeoutMs,
-        null);
+        null,
+        isPeerICDClient(getRemoteDeviceId(devicePtr)));
   }
 
   public void subscribeToEventPath(
@@ -902,7 +917,8 @@ public class ChipDeviceController {
         false,
         false,
         imTimeoutMs,
-        eventMin);
+        eventMin,
+        isPeerICDClient(getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -936,7 +952,8 @@ public class ChipDeviceController {
         keepSubscriptions,
         isFabricFiltered,
         imTimeoutMs,
-        null);
+        null,
+        isPeerICDClient(getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -988,7 +1005,8 @@ public class ChipDeviceController {
         keepSubscriptions,
         isFabricFiltered,
         imTimeoutMs,
-        null);
+        null,
+        isPeerICDClient(getRemoteDeviceId(devicePtr)));
   }
 
   public void subscribeToPath(
@@ -1019,7 +1037,41 @@ public class ChipDeviceController {
         keepSubscriptions,
         isFabricFiltered,
         imTimeoutMs,
-        eventMin);
+        eventMin,
+        isPeerICDClient(getRemoteDeviceId(devicePtr)));
+  }
+
+  public void subscribeToPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ResubscriptionAttemptCallback resubscriptionAttemptCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval,
+      boolean keepSubscriptions,
+      boolean isFabricFiltered,
+      int imTimeoutMs,
+      @Nullable Long eventMin,
+      @Nullable Boolean isPeerLIT) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(
+            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
+    ChipInteractionClient.subscribe(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        eventPaths,
+        null,
+        minInterval,
+        maxInterval,
+        keepSubscriptions,
+        isFabricFiltered,
+        imTimeoutMs,
+        eventMin,
+        isPeerLIT != null ? isPeerLIT : isPeerICDClient(getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -1533,6 +1585,8 @@ public class ChipDeviceController {
   private native int getFabricIndex(long deviceControllerPtr);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
+
+  private native long getRemoteDeviceId(long deviceControllerPtr, long devicePtr);
 
   static {
     System.loadLibrary("CHIPController");

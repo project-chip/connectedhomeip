@@ -214,7 +214,8 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
           request.maxInterval.seconds.toInt(),
           request.keepSubscriptions,
           request.fabricFiltered,
-          CHIP_IM_TIMEOUT_MS
+          CHIP_IM_TIMEOUT_MS,
+          false
         )
 
         awaitClose { logger.log(Level.FINE, "Closing flow") }
@@ -232,7 +233,8 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
     maxInterval: Int,
     keepSubscriptions: Boolean,
     isFabricFiltered: Boolean,
-    imTimeoutMs: Int
+    imTimeoutMs: Int,
+    isPeerLIT: Boolean
   )
 
   override suspend fun read(request: ReadRequest): ReadResponse {
