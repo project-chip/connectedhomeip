@@ -70,8 +70,10 @@ constexpr uint8_t kKeyBuffer2b[] = {
 // Taken from the ICDManager Implementation
 enum class ICDTestEventTriggerEvent : uint64_t
 {
-    kAddActiveModeReq    = 0x0046'0000'00000001,
-    kRemoveActiveModeReq = 0x0046'0000'00000002,
+    kAddActiveModeReq            = 0x0046'0000'00000001,
+    kRemoveActiveModeReq         = 0x0046'0000'00000002,
+    kInvalidateHalfCounterValues = 0x0046'0000'00000003,
+    kInvalidateAllCounterValues  = 0x0046'0000'00000004,
 };
 
 class TestICDStateObserver : public app::ICDStateObserver
@@ -742,6 +744,40 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
     }
 
+    static void TestHandleTestEventTriggerInvalidateHalfCounterValues(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        constexpr uint32_t startValue    = 1;
+        constexpr uint32_t expectedValue = 2147483648;
+
+        // Set starting value for test
+        ICDConfigurationData::GetInstance().GetICDCounter().SetValue(startValue);
+
+        // Trigger ICD kInvalidateHalfCounterValues event
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateHalfCounterValues));
+
+        // Validate counter has the expected value
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().GetValue() == expectedValue);
+    }
+
+    static void TestHandleTestEventTriggerInvalidateAllCounterValues(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        constexpr uint32_t startValue    = 105;
+        constexpr uint32_t expectedValue = 104;
+
+        // Set starting value for test
+        ICDConfigurationData::GetInstance().GetICDCounter().SetValue(startValue);
+
+        // Trigger ICD kInvalidateHalfCounterValues event
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateAllCounterValues));
+
+        // Validate counter has the expected value
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().GetValue() == expectedValue);
+    }
+
     /**
      * @brief Test verifies when OnEnterIdleMode is called during normal operations.
      *        Without the ActiveMode timer being extended
@@ -1083,6 +1119,10 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
     NL_TEST_DEF("TestShouldCheckInMsgsBeSentAtActiveModeFunction", TestICDManager::TestShouldCheckInMsgsBeSentAtActiveModeFunction),
     NL_TEST_DEF("TestHandleTestEventTriggerActiveModeReq", TestICDManager::TestHandleTestEventTriggerActiveModeReq),
+    NL_TEST_DEF("TestHandleTestEventTriggerInvalidateHalfCounterValues",
+                TestICDManager::TestHandleTestEventTriggerInvalidateHalfCounterValues),
+    NL_TEST_DEF("TestHandleTestEventTriggerInvalidateAllCounterValues",
+                TestICDManager::TestHandleTestEventTriggerInvalidateAllCounterValues),
     NL_TEST_DEF("TestICDStateObserverOnEnterIdleModeActiveModeDuration",
                 TestICDManager::TestICDStateObserverOnEnterIdleModeActiveModeDuration),
     NL_TEST_DEF("TestICDStateObserverOnEnterIdleModeActiveModeThreshold",

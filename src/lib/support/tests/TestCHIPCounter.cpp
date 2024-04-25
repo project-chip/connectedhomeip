@@ -16,82 +16,43 @@
  *    limitations under the License.
  */
 
-#include <nlunit-test.h>
-
+#include <gtest/gtest.h>
 #include <lib/support/CHIPCounter.h>
-#include <lib/support/UnitTestRegistration.h>
 
-static void CheckStartWithZero(nlTestSuite * inSuite, void * inContext)
+using namespace chip;
+
+TEST(TestCHIPCounter, TestStartWithZero)
 {
-    chip::MonotonicallyIncreasingCounter<uint64_t> counter;
-    NL_TEST_ASSERT(inSuite, counter.GetValue() == 0);
+    MonotonicallyIncreasingCounter<uint64_t> counter;
+    EXPECT_EQ(counter.GetValue(), 0ULL);
 }
 
-static void CheckInitialize(nlTestSuite * inSuite, void * inContext)
+TEST(TestCHIPCounter, TestInitialize)
 {
-    chip::MonotonicallyIncreasingCounter<uint64_t> counter;
+    MonotonicallyIncreasingCounter<uint64_t> counter;
 
-    NL_TEST_ASSERT(inSuite, counter.Init(4321) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, counter.GetValue() == 4321);
+    EXPECT_EQ(counter.Init(4321), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 4321ULL);
 }
 
-static void CheckAdvance(nlTestSuite * inSuite, void * inContext)
+TEST(TestCHIPCounter, TestAdvance)
 {
-    chip::MonotonicallyIncreasingCounter<uint64_t> counter;
+    MonotonicallyIncreasingCounter<uint64_t> counter;
 
-    NL_TEST_ASSERT(inSuite, counter.Init(22) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, counter.GetValue() == 22);
-    NL_TEST_ASSERT(inSuite, counter.Advance() == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, counter.GetValue() == 23);
-    NL_TEST_ASSERT(inSuite, counter.Advance() == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, counter.GetValue() == 24);
+    EXPECT_EQ(counter.Init(22), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 22ULL);
+    EXPECT_EQ(counter.Advance(), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 23ULL);
+    EXPECT_EQ(counter.Advance(), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 24ULL);
 }
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-static const nlTest sTests[] =
+TEST(TestCHIPCounter, TestSetValue)
 {
-    NL_TEST_DEF("Start with zero", CheckStartWithZero),
-    NL_TEST_DEF("Can initialize",  CheckInitialize),
-    NL_TEST_DEF("Can Advance",     CheckAdvance),
-    NL_TEST_SENTINEL()
-};
-// clang-format on
+    MonotonicallyIncreasingCounter<uint64_t> counter;
+    constexpr uint64_t newValue = 9876;
 
-/**
- *  Set up the test suite.
- */
-static int TestSetup(void * inContext)
-{
-    return (SUCCESS);
+    EXPECT_EQ(counter.Init(5736), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.SetValue(newValue), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), newValue);
 }
-
-/**
- *  Tear down the test suite.
- */
-static int TestTeardown(void * inContext)
-{
-    return (SUCCESS);
-}
-
-int TestCHIPCounter()
-{
-    // clang-format off
-    nlTestSuite theSuite = {
-        "chip-counter",
-        &sTests[0],
-        TestSetup,
-        TestTeardown
-    };
-    // clang-format on
-
-    // Run test suite against one context.
-    nlTestRunner(&theSuite, nullptr);
-
-    return nlTestRunnerStats(&theSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestCHIPCounter)

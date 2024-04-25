@@ -110,6 +110,45 @@ public:
         return MonotonicallyIncreasingCounter<T>::Init(startValue);
     }
 
+    CHIP_ERROR SetValue(T value) override
+    {
+        VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mKey.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
+        // Calculate previous Epoch from value
+        T previousEpoch = value - (value % mEpoch);
+
+#if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
+        if constexpr (std::is_same_v<decltype(previousEpoch), uint64_t>)
+        {
+            ChipLogDetail(EventLogging,
+                          "PersistedCounter::SetValue() newValue 0x" ChipLogFormatX64 " previousEpoch 0x" ChipLogFormatX64,
+                          ChipLogValueX64(value), ChipLogValueX64(previousEpoch));
+        }
+        else if (std::is_same_v<decltype(previousEpoch), uint32_t>)
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::SetValue() newValue 0x%" PRIx32 " previousEpoch 0x%" PRIx32,
+                          static_cast<uint32_t>(value), static_cast<uint32_t>(previousEpoch));
+        }
+#endif
+
+        // Set next Epoch value
+        ReturnErrorOnFailure(PersistNextEpochStart(previousEpoch + mEpoch));
+
+        // Set new mCounterValue
+        ReturnErrorOnFailure(MonotonicallyIncreasingCounter<T>::SetValue(value));
+
+        // Advancing the epoch should have ensured that the current value is valid
+        VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() + mEpoch >= mNextEpoch, CHIP_ERROR_INTERNAL);
+
+        // Previous check did not take into consideration that the counter value can be equal to the max counter value or rollover.
+        // TODO(#...): PersistedCounter allows rollover so this check is incorrect. We need a Counter class that adequatly manages
+        //             rollover behavior for counters that cannot rollover.
+        // VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() < mNextEpoch, CHIP_ERROR_INTERNAL);
+
+        return CHIP_NO_ERROR;
+    }
+
     /**
      *  @brief
      *  Increment the counter and write to persisted storage if we've completed
@@ -130,9 +169,15 @@ public:
             // Ensure that a new starting point is persisted.
             ReturnErrorOnFailure(PersistNextEpochStart(mNextEpoch + mEpoch));
 
-            // Advancing the epoch should have ensured that the current value
-            // is valid
-            VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() < mNextEpoch, CHIP_ERROR_INTERNAL);
+            // Advancing the epoch should have ensured that the current value is valid
+            VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() + mEpoch == mNextEpoch, CHIP_ERROR_INTERNAL);
+
+            // Previous check did not take into consideration that the counter value can be equal to the max counter value or
+            // rollover.
+            // TODO(#...): PersistedCounter allows rollover so this check is incorrect. We need a Counter class that adequatly
+            // manages
+            //             rollover behavior for counters that cannot rollover.
+            // VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() < mNextEpoch, CHIP_ERROR_INTERNAL);
         }
         return CHIP_NO_ERROR;
     }
