@@ -413,10 +413,6 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
-        if (_cppCommissioner == nullptr) {
-            [self checkForStartError:CHIP_ERROR_NO_MEMORY logMsg:kErrorCommissionerInit];
-            return;
-        }
 
         // nocBuffer might not be used, but if it is it needs to live
         // long enough (until after we are done using
@@ -949,22 +945,14 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     if (prefetchedClusterData) {
         if (prefetchedClusterData.count) {
-            [deviceToReturn setClusterData:prefetchedClusterData];
+            [deviceToReturn setPersistedClusterData:prefetchedClusterData];
         }
     } else {
-#if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
-        // Load persisted attributes if they exist.
-        NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
-        MTR_LOG_INFO("Loaded %lu attributes from storage for %@", static_cast<unsigned long>(attributesFromCache.count), deviceToReturn);
-        if (attributesFromCache.count) {
-            [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
-        }
-#endif
         // Load persisted cluster data if they exist.
         NSDictionary * clusterData = [_controllerDataStore getStoredClusterDataForNodeID:nodeID];
         MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), deviceToReturn);
         if (clusterData.count) {
-            [deviceToReturn setClusterData:clusterData];
+            [deviceToReturn setPersistedClusterData:clusterData];
         }
     }
 
@@ -1370,6 +1358,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     return @(_cppCommissioner->GetCompressedFabricId());
+}
+
+- (NSNumber * _Nullable)syncGetCompressedFabricID
+{
+    return [self syncRunOnWorkQueueWithReturnValue:^NSNumber * {
+        return [self compressedFabricID];
+    } error:nil];
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable

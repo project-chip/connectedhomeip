@@ -17,9 +17,11 @@
 
 package com.matter.casting.core;
 
+import chip.devicecontroller.ChipClusters;
 import com.matter.casting.support.DeviceTypeStruct;
 import java.util.List;
 
+/** This represents an Endpoint on a CastingPlayer e.g. a Speaker or a Matter Content App */
 public interface Endpoint {
   int getId();
 
@@ -29,5 +31,9 @@ public interface Endpoint {
 
   List<DeviceTypeStruct> getDeviceTypeList();
 
+  /** Get an instance of a cluster based on its Class */
+  <T extends ChipClusters.BaseChipCluster> T getCluster(Class<T> clusterClass);
+
+  /** Get the CastingPlayer that this Endpoint is a part of. */
   CastingPlayer getCastingPlayer();
 }

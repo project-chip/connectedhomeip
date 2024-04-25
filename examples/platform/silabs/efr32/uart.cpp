@@ -301,7 +301,7 @@ void USART_IRQHandler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcess();
-#elif !defined(PW_RPC_ENABLED)
+#elif !defined(PW_RPC_ENABLED) && !defined(SL_WIFI)
     otSysEventSignalPending();
 #endif
 
@@ -442,7 +442,7 @@ void uartMainLoop(void * args)
     {
 
         osStatus_t eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, osWaitForever);
-        while (eventReceived == pdTRUE)
+        while (eventReceived == osOK)
         {
             uartSendBytes(workBuffer.data, workBuffer.length);
             eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);

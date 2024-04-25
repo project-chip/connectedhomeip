@@ -49,7 +49,7 @@
 #endif
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <transport/raw/BLE.h>
 #endif
 
@@ -169,7 +169,7 @@ public:
     {
         auto count = mRefCount++;
         VerifyOrDie(count < std::numeric_limits<decltype(count)>::max()); // overflow
-        VerifyOrDie(!IsShutdown());                                       // avoid zombie
+        VerifyOrDie(!IsShutDown());                                       // avoid zombie
         return this;
     };
 
@@ -197,7 +197,7 @@ public:
             mGroupDataProvider != nullptr && mReportScheduler != nullptr && mTimerDelegate != nullptr &&
             mSessionKeystore != nullptr && mSessionResumptionStorage != nullptr && mBDXTransferServer != nullptr;
     };
-    bool IsShutdown() { return mHaveShutDown; }
+    bool IsShutDown() { return mHaveShutDown; }
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
     Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() const { return mTCPEndPointManager; };

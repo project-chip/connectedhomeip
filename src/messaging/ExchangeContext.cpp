@@ -322,6 +322,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     SetAutoRequestAck(session->AllowsMRP());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // TODO(#33075) : Add check for group context to not a req since it serves no purpose
     app::ICDNotifier::GetInstance().NotifyActiveRequestNotification(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
 #endif
 
@@ -341,6 +342,7 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // TODO(#33075) : Add check for group context to not a req since it serves no purpose
     app::ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 

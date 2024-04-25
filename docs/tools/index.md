@@ -28,7 +28,6 @@ Source files for these tools are located at `scripts/tools`.
 
 ../scripts/tools/memory/README
 ../scripts/tools/spake2p/README
-../src/tools/interop/idt/README
 
 ```
 

@@ -72,9 +72,10 @@ using namespace ::chip::app::Clusters::DoorLock;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
-
+#if (LED_ENABLE == 1)
 static LED_Handle sAppRedHandle;
 static LED_Handle sAppGreenHandle;
+#endif
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 

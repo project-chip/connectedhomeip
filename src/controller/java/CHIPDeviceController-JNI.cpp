@@ -37,7 +37,7 @@
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
 #include <atomic>
-#include <ble/BleUUID.h>
+#include <ble/Ble.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/java/GroupDeviceProxy.h>
