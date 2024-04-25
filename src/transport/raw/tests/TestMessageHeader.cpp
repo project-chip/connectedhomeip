@@ -517,7 +517,7 @@ TEST(TestMessageHeader, TestMsgExtensionsDecode)
     PayloadHeader payloadHeader;
     uint16_t decodeSize;
 
-    EXPECT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+    ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
 
     for (const auto & testEntry : theTestVectorMsgExtensions)
     {
@@ -529,6 +529,8 @@ TEST(TestMessageHeader, TestMsgExtensionsDecode)
         EXPECT_EQ(payloadHeader.Decode(msg->Start() + decodeSize, msg->DataLength(), &decodeSize), CHIP_NO_ERROR);
         EXPECT_EQ(decodeSize, testEntry.appPayloadOffset);
     }
+
+    chip::Platform::MemoryShutdown();
 }
 
 } // namespace
