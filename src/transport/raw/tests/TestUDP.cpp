@@ -78,6 +78,7 @@ class TestUDP : public ::testing::Test
 {
 protected:
     TestUDP() { inContext = new TestContext(); }
+    ~TestUDP() { delete inContext; }
     void SetUp() { ASSERT_EQ(inContext->Init(), CHIP_NO_ERROR); }
     void TearDown() { inContext->Shutdown(); }
     TestContext * inContext;
