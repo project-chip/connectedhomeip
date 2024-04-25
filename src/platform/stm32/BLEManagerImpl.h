@@ -23,15 +23,16 @@
 
 #pragma once
 
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #include "FreeRTOS.h"
-#include "app_ble.h"
-#include "app_matter.h"
 #include "timers.h"
+#include "app_matter.h"
+#include "app_ble.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,6 +47,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
+
 
 private:
     // ===== Members that implement the BLEManager internal interface.
@@ -129,10 +131,10 @@ private:
     CHIP_ERROR MapBLEError(int bleErr) const;
     /* Callbacks from BLE stack*/
     static void HandleGAPConnect(void);
-    static void HandleGAPDisconnect(uint16_t * connid);
-    static void HandleRXCharWrite(BLE_Matter_RX * aMessage);
-    static void HandleTXCharCCCDWrite(BLE_Matter_TXCharCCCD * aMessage);
-    static void HandleAck(uint16_t * connid);
+    static void HandleGAPDisconnect(uint16_t *connid);
+    static void HandleRXCharWrite(BLE_Matter_RX *aMessage);
+    static void HandleTXCharCCCDWrite(BLE_Matter_TXCharCCCD *aMessage);
+    static void HandleAck(uint16_t *connid);
 
     static void DriveBLEState(intptr_t arg);
 
@@ -140,6 +142,7 @@ private:
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     static void CancelBleAdvTimeoutTimer(void);
     static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
+
 };
 
 /**
@@ -159,10 +162,11 @@ inline BLEManager & BLEMgr()
  * Internal components should use this to access features of the BLEManager object
  * that are specific to the stm32 platforms.
  */
-inline BLEManagerImpl & BLEMgrImpl(void)
+inline BLEManagerImpl  & BLEMgrImpl(void)
 {
     return BLEManagerImpl::sInstance;
 }
+
 
 inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {

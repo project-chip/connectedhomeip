@@ -19,20 +19,18 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32_lpm_if.h"
-#include "app_conf.h"
 #include "stm32_lpm.h"
+#include "app_conf.h"
 /* USER CODE BEGIN include */
 
 /* USER CODE END include */
 
 /* Exported variables --------------------------------------------------------*/
-const struct UTIL_LPM_Driver_s UTIL_PowerDriver = {
-    PWR_EnterSleepMode, PWR_ExitSleepMode,
+const struct UTIL_LPM_Driver_s UTIL_PowerDriver = { PWR_EnterSleepMode, PWR_ExitSleepMode,
 
-    PWR_EnterStopMode,  PWR_ExitStopMode,
+PWR_EnterStopMode, PWR_ExitStopMode,
 
-    PWR_EnterOffMode,   PWR_ExitOffMode,
-};
+PWR_EnterOffMode, PWR_ExitOffMode, };
 
 /* Private function prototypes -----------------------------------------------*/
 static void Switch_On_HSI(void);
@@ -64,8 +62,7 @@ static void ExitLowPower(void);
  * @param none
  * @retval none
  */
-void PWR_EnterOffMode(void)
-{
+void PWR_EnterOffMode(void) {
     /* USER CODE BEGIN PWR_EnterOffMode_1 */
 
     /* USER CODE END PWR_EnterOffMode_1 */
@@ -89,15 +86,15 @@ void PWR_EnterOffMode(void)
      */
     LL_PWR_ClearFlag_WU();
 
-    LL_PWR_SetPowerMode(LL_PWR_MODE_STANDBY);
+    LL_PWR_SetPowerMode( LL_PWR_MODE_STANDBY);
 
     LL_LPM_EnableDeepSleep(); /**< Set SLEEPDEEP bit of Cortex System Control Register */
 
     /**
      * This option is used to ensure that store operations are completed
      */
-#if defined(__CC_ARM)
-    __force_stores();
+#if defined ( __CC_ARM)
+  __force_stores( );
 #endif
 
     __WFI();
@@ -113,8 +110,7 @@ void PWR_EnterOffMode(void)
  * @param none
  * @retval none
  */
-void PWR_ExitOffMode(void)
-{
+void PWR_ExitOffMode(void) {
     /* USER CODE BEGIN PWR_ExitOffMode_1 */
 
     /* USER CODE END PWR_ExitOffMode_1 */
@@ -131,8 +127,7 @@ void PWR_ExitOffMode(void)
  * @param none
  * @retval none
  */
-void PWR_EnterStopMode(void)
-{
+void PWR_EnterStopMode(void) {
     /* USER CODE BEGIN PWR_EnterStopMode_1 */
 
     /* USER CODE END PWR_EnterStopMode_1 */
@@ -141,8 +136,8 @@ void PWR_EnterStopMode(void)
      * the systick shall be disabled otherwise the cpu may crash when moving out from stop mode
      *
      * When in production, the HAL_DBGMCU_EnableDBGStopMode() is not called so that the device can reach best power consumption
-     * However, the systick should be disabled anyway to avoid the case when it is about to expire at the same time the device
-     * enters stop mode ( this will abort the Stop Mode entry ).
+     * However, the systick should be disabled anyway to avoid the case when it is about to expire at the same time the device enters
+     * stop mode ( this will abort the Stop Mode entry ).
      */
     HAL_SuspendTick();
 
@@ -154,15 +149,15 @@ void PWR_EnterStopMode(void)
     /************************************************************************************
      * ENTER STOP MODE
      ***********************************************************************************/
-    LL_PWR_SetPowerMode(LL_PWR_MODE_STOP2);
+    LL_PWR_SetPowerMode( LL_PWR_MODE_STOP2);
 
     LL_LPM_EnableDeepSleep(); /**< Set SLEEPDEEP bit of Cortex System Control Register */
 
     /**
      * This option is used to ensure that store operations are completed
      */
-#if defined(__CC_ARM)
-    __force_stores();
+#if defined ( __CC_ARM)
+  __force_stores( );
 #endif
 
     __WFI();
@@ -179,8 +174,7 @@ void PWR_EnterStopMode(void)
  * @param none
  * @retval none
  */
-void PWR_ExitStopMode(void)
-{
+void PWR_ExitStopMode(void) {
     /* USER CODE BEGIN PWR_ExitStopMode_1 */
 
     /* USER CODE END PWR_ExitStopMode_1 */
@@ -202,8 +196,7 @@ void PWR_ExitStopMode(void)
  * @param none
  * @retval none
  */
-void PWR_EnterSleepMode(void)
-{
+void PWR_EnterSleepMode(void) {
     /* USER CODE BEGIN PWR_EnterSleepMode_1 */
 
     /* USER CODE END PWR_EnterSleepMode_1 */
@@ -218,8 +211,8 @@ void PWR_EnterSleepMode(void)
     /**
      * This option is used to ensure that store operations are completed
      */
-#if defined(__CC_ARM)
-    __force_stores();
+#if defined ( __CC_ARM)
+  __force_stores();
 #endif
 
     __WFI();
@@ -235,8 +228,7 @@ void PWR_EnterSleepMode(void)
  * @param none
  * @retval none
  */
-void PWR_ExitSleepMode(void)
-{
+void PWR_ExitSleepMode(void) {
     /* USER CODE BEGIN PWR_ExitSleepMode_1 */
 
     /* USER CODE END PWR_ExitSleepMode_1 */
@@ -257,32 +249,27 @@ void PWR_ExitSleepMode(void)
  * @param none
  * @retval none
  */
-static void EnterLowPower(void)
-{
+static void EnterLowPower(void) {
     /**
      * This function is called from CRITICAL SECTION
      */
 
-    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID))
+    while (LL_HSEM_1StepLock( HSEM, CFG_HW_RCC_SEMID))
         ;
 
-    if (!LL_HSEM_1StepLock(HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID))
-    {
-        if (LL_PWR_IsActiveFlag_C2DS() || LL_PWR_IsActiveFlag_C2SB())
-        {
+    if (!LL_HSEM_1StepLock( HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID)) {
+        if (LL_PWR_IsActiveFlag_C2DS() || LL_PWR_IsActiveFlag_C2SB()) {
             /* Release ENTRY_STOP_MODE semaphore */
-            LL_HSEM_ReleaseLock(HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID, 0);
+            LL_HSEM_ReleaseLock( HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID, 0);
 
             Switch_On_HSI();
         }
-    }
-    else
-    {
+    } else {
         Switch_On_HSI();
     }
 
     /* Release RCC semaphore */
-    LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, 0);
+    LL_HSEM_ReleaseLock( HSEM, CFG_HW_RCC_SEMID, 0);
 
     return;
 }
@@ -292,16 +279,14 @@ static void EnterLowPower(void)
  * @param none
  * @retval none
  */
-static void ExitLowPower(void)
-{
+static void ExitLowPower(void) {
     /* Release ENTRY_STOP_MODE semaphore */
-    LL_HSEM_ReleaseLock(HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID, 0);
+    LL_HSEM_ReleaseLock( HSEM, CFG_HW_ENTRY_STOP_MODE_SEMID, 0);
 
-    while (LL_HSEM_1StepLock(HSEM, CFG_HW_RCC_SEMID))
+    while (LL_HSEM_1StepLock( HSEM, CFG_HW_RCC_SEMID))
         ;
 
-    if (LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_HSI)
-    {
+    if (LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_HSI) {
         /* Restore the clock configuration of the application in this user section */
         /* USER CODE BEGIN ExitLowPower_1 */
         LL_RCC_HSE_Enable();
@@ -312,9 +297,7 @@ static void ExitLowPower(void)
         while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSE)
             ;
         /* USER CODE END ExitLowPower_1 */
-    }
-    else
-    {
+    } else {
         /* If the application is not running on HSE restore the clock configuration in this user section */
         /* USER CODE BEGIN ExitLowPower_2 */
 
@@ -322,7 +305,7 @@ static void ExitLowPower(void)
     }
 
     /* Release RCC semaphore */
-    LL_HSEM_ReleaseLock(HSEM, CFG_HW_RCC_SEMID, 0);
+    LL_HSEM_ReleaseLock( HSEM, CFG_HW_RCC_SEMID, 0);
 
     return;
 }
@@ -332,12 +315,11 @@ static void ExitLowPower(void)
  * @param none
  * @retval none
  */
-static void Switch_On_HSI(void)
-{
+static void Switch_On_HSI(void) {
     LL_RCC_HSI_Enable();
     while (!LL_RCC_HSI_IsReady())
         ;
-    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);
+    LL_RCC_SetSysClkSource( LL_RCC_SYS_CLKSOURCE_HSI);
     LL_RCC_SetSMPSClockSource(LL_RCC_SMPS_CLKSOURCE_HSI);
     while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI)
         ;
@@ -347,3 +329,4 @@ static void Switch_On_HSI(void)
 /* USER CODE BEGIN Private_Functions */
 
 /* USER CODE END Private_Functions */
+

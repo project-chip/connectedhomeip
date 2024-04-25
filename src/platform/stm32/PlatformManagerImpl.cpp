@@ -23,73 +23,55 @@
  */
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/CommissionableDataProvider.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/stm32/DiagnosticDataProviderImpl.h>
+#include <platform/CommissionableDataProvider.h>
+
 
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
-extern "C" int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_t * olen);
+
+extern "C" int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     System::Clock::InitClock_RealTime();
-    chip::Crypto::add_entropy_source(mbedtls_hardware_poll, NULL, 16);
-    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
-    return CHIP_NO_ERROR;
+	chip::Crypto::add_entropy_source(mbedtls_hardware_poll, NULL, 16);
+	ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
+	return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::_RunEventLoop(void)
 {
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
+	Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_RunEventLoop();
 }
 
-void PlatformManagerImpl::_Shutdown()
+CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
-    uint64_t upTime = 0;
-
-    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
-    {
-        uint32_t totalOperationalHours = 0;
-
-        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
-        {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
-        }
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
-    }
-
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
 
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+	return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
 
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+	return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
 
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+	return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)

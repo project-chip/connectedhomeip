@@ -16,15 +16,16 @@
  *    limitations under the License.
  */
 
-#ifndef MIDDLEWARES_MATTER_PLATFORM_STM32WB_KEYVALUESTOREMANAGERIMPL_H_
-#define MIDDLEWARES_MATTER_PLATFORM_STM32WB_KEYVALUESTOREMANAGERIMPL_H_
+#ifndef MIDDLEWARES_MATTER_PLATFORM_STM32_KEYVALUESTOREMANAGERIMPL_H_
+#define MIDDLEWARES_MATTER_PLATFORM_STM32_KEYVALUESTOREMANAGERIMPL_H_
+
 
 #pragma once
 
 #include <platform/KeyValueStoreManager.h>
 
-#include "flash_wb.h"
 #include "stm_logging.h"
+#include "flash_wb.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -32,9 +33,9 @@ namespace PersistedStorage {
 
 class KeyValueStoreManagerImpl : public KeyValueStoreManager
 {
-    // Allow the KeyValueStoreManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend class KeyValueStoreManager;
+	// Allow the KeyValueStoreManager interface class to delegate method calls to
+	// the implementation methods provided by this class.
+	friend class KeyValueStoreManager;
 
 public:
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset);
@@ -44,6 +45,7 @@ public:
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
     CHIP_ERROR _PrintError(NVM_StatusTypeDef err);
+
 
 private:
     // ===== Members for internal use by the following friends.
@@ -75,8 +77,13 @@ inline KeyValueStoreManagerImpl & KeyValueStoreMgrImpl(void)
     return KeyValueStoreManagerImpl::sInstance;
 }
 
+
 } // namespace PersistedStorage
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif /* MIDDLEWARES_MATTER_PLATFORM_STM32WB_KEYVALUESTOREMANAGERIMPL_H_ */
+
+
+
+
+#endif /* MIDDLEWARES_MATTER_PLATFORM_STM32_KEYVALUESTOREMANAGERIMPL_H_ */

@@ -33,13 +33,14 @@ namespace DeviceLayer {
  * Concrete implementation of the ConfigurationManager singleton object for the platform.
  */
 
-// class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
-//                                     public Internal::STM32Config
+//class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+ //                                     public Internal::STM32Config
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::STM32Config>
 {
 public:
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
+
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -66,6 +67,7 @@ private:
     CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
     CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
     void RunConfigUnitTest(void) override;
+    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override;
 
     // ===== Private members reserved for use by this class only.
 

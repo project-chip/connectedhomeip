@@ -1,4 +1,3 @@
-
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
@@ -19,17 +18,16 @@
  */
 /* USER CODE END Header */
 
+#include <string.h>
 #include "main.h"
 #include "stm32wbxx_hal.h"
 #include "stm32wbxx_ll_hsem.h"
-#include <string.h>
 
-int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_t * olen);
+int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen);
 
-int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_t * olen)
-{
+int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen) {
     HAL_StatusTypeDef status = HAL_OK;
-    uint32_t random_number   = 0;
+    uint32_t random_number = 0;
     /**
      * Static random Address
      * The two upper bits shall be set to 1
@@ -49,8 +47,7 @@ int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_
     while (!LL_RCC_HSI48_IsReady())
         ;
 
-    if (HAL_RNG_GenerateRandomNumber(&hrng, &random_number) != HAL_OK)
-    {
+    if (HAL_RNG_GenerateRandomNumber(&hrng, &random_number) != HAL_OK) {
     }
 
     /* Disable HSI48 oscillator */
@@ -64,8 +61,7 @@ int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_
     ((void) data);
     *olen = 0;
 
-    if ((len < sizeof(uint32_t)) || (HAL_OK != status))
-    {
+    if ((len < sizeof(uint32_t)) || (HAL_OK != status)) {
         return 0;
     }
 
@@ -74,3 +70,4 @@ int mbedtls_hardware_poll(void * data, unsigned char * output, size_t len, size_
 
     return 0;
 }
+

@@ -76,8 +76,8 @@ public:
     void SendThreadmsg();
 
     CHIP_ERROR SetThreadEnabled(bool val);
-
 protected:
+
     CHIP_ERROR _StartThreadTask();
 
     void _ProcessThreadActivity();

@@ -17,23 +17,19 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "flash_driver.h"
 #include "app_common.h"
 #include "main.h"
+#include "flash_driver.h"
 #include "shci.h"
 #include "utilities_conf.h"
 
 /* Private typedef -----------------------------------------------------------*/
-typedef enum
-{
-    SEM_LOCK_SUCCESSFUL,
-    SEM_LOCK_BUSY,
+typedef enum {
+    SEM_LOCK_SUCCESSFUL, SEM_LOCK_BUSY,
 } SemStatus_t;
 
-typedef enum
-{
-    FLASH_ERASE,
-    FLASH_WRITE,
+typedef enum {
+    FLASH_ERASE, FLASH_WRITE,
 } FlashOperationType_t;
 
 /* Private defines -----------------------------------------------------------*/
@@ -41,11 +37,10 @@ typedef enum
 /* Private variables ---------------------------------------------------------*/
 /* Global variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
-static SingleFlashOperationStatus_t ProcessSingleFlashOperation(FlashOperationType_t FlashOperationType,
-                                                                uint32_t SectorNumberOrDestAddress, uint64_t Data);
+static SingleFlashOperationStatus_t ProcessSingleFlashOperation(
+        FlashOperationType_t FlashOperationType, uint32_t SectorNumberOrDestAddress, uint64_t Data);
 /* Public functions ----------------------------------------------------------*/
-uint32_t FD_EraseSectors(uint32_t FirstSector, uint32_t NbrOfSectors)
-{
+uint32_t FD_EraseSectors(uint32_t FirstSector, uint32_t NbrOfSectors) {
     uint32_t loop_flash;
     uint32_t return_value;
     SingleFlashOperationStatus_t single_flash_operation_status;
@@ -68,18 +63,16 @@ uint32_t FD_EraseSectors(uint32_t FirstSector, uint32_t NbrOfSectors)
      */
     SHCI_C2_FLASH_EraseActivity(ERASE_ACTIVITY_ON);
 
-    for (loop_flash = 0; (loop_flash < NbrOfSectors) && (single_flash_operation_status == SINGLE_FLASH_OPERATION_DONE);
-         loop_flash++)
-    {
+    for (loop_flash = 0;
+            (loop_flash < NbrOfSectors)
+                    && (single_flash_operation_status == SINGLE_FLASH_OPERATION_DONE);
+            loop_flash++) {
         single_flash_operation_status = FD_EraseSingleSector(FirstSector + loop_flash);
     }
 
-    if (single_flash_operation_status != SINGLE_FLASH_OPERATION_DONE)
-    {
+    if (single_flash_operation_status != SINGLE_FLASH_OPERATION_DONE) {
         return_value = NbrOfSectors - loop_flash + 1;
-    }
-    else
-    {
+    } else {
         /**
          *  Notify the CPU2 there will be no request anymore to erase the flash
          *  On reception of this command, the CPU2 will disables the BLE timing protection versus flash erase processing
@@ -100,8 +93,7 @@ uint32_t FD_EraseSectors(uint32_t FirstSector, uint32_t NbrOfSectors)
     return return_value;
 }
 
-uint32_t FD_WriteData(uint32_t DestAddress, uint64_t * pSrcBuffer, uint32_t NbrOfData)
-{
+uint32_t FD_WriteData(uint32_t DestAddress, uint64_t *pSrcBuffer, uint32_t NbrOfData) {
     uint32_t loop_flash;
     uint32_t return_value;
     SingleFlashOperationStatus_t single_flash_operation_status;
@@ -116,17 +108,17 @@ uint32_t FD_WriteData(uint32_t DestAddress, uint64_t * pSrcBuffer, uint32_t NbrO
 
     HAL_FLASH_Unlock();
 
-    for (loop_flash = 0; (loop_flash < NbrOfData) && (single_flash_operation_status == SINGLE_FLASH_OPERATION_DONE); loop_flash++)
-    {
-        single_flash_operation_status = FD_WriteSingleData(DestAddress + (8 * loop_flash), *(pSrcBuffer + loop_flash));
+    for (loop_flash = 0;
+            (loop_flash < NbrOfData)
+                    && (single_flash_operation_status == SINGLE_FLASH_OPERATION_DONE);
+            loop_flash++) {
+        single_flash_operation_status = FD_WriteSingleData(DestAddress + (8 * loop_flash),
+                *(pSrcBuffer + loop_flash));
     }
 
-    if (single_flash_operation_status != SINGLE_FLASH_OPERATION_DONE)
-    {
+    if (single_flash_operation_status != SINGLE_FLASH_OPERATION_DONE) {
         return_value = NbrOfData - loop_flash + 1;
-    }
-    else
-    {
+    } else {
         HAL_FLASH_Lock();
 
         /**
@@ -140,8 +132,7 @@ uint32_t FD_WriteData(uint32_t DestAddress, uint64_t * pSrcBuffer, uint32_t NbrO
     return return_value;
 }
 
-SingleFlashOperationStatus_t FD_EraseSingleSector(uint32_t SectorNumber)
-{
+SingleFlashOperationStatus_t FD_EraseSingleSector(uint32_t SectorNumber) {
     SingleFlashOperationStatus_t return_value;
 
     /* The last parameter is unused in that case and set to 0 */
@@ -150,8 +141,7 @@ SingleFlashOperationStatus_t FD_EraseSingleSector(uint32_t SectorNumber)
     return return_value;
 }
 
-SingleFlashOperationStatus_t FD_WriteSingleData(uint32_t DestAddress, uint64_t Data)
-{
+SingleFlashOperationStatus_t FD_WriteSingleData(uint32_t DestAddress, uint64_t Data) {
     SingleFlashOperationStatus_t return_value;
 
     return_value = ProcessSingleFlashOperation(FLASH_WRITE, DestAddress, Data);
@@ -164,9 +154,8 @@ SingleFlashOperationStatus_t FD_WriteSingleData(uint32_t DestAddress, uint64_t D
  * LOCAL FUNCTIONS
  *
  *************************************************************/
-static SingleFlashOperationStatus_t ProcessSingleFlashOperation(FlashOperationType_t FlashOperationType,
-                                                                uint32_t SectorNumberOrDestAddress, uint64_t Data)
-{
+static SingleFlashOperationStatus_t ProcessSingleFlashOperation(
+        FlashOperationType_t FlashOperationType, uint32_t SectorNumberOrDestAddress, uint64_t Data) {
     SemStatus_t cpu1_sem_status;
     SemStatus_t cpu2_sem_status;
     WaitedSemStatus_t waited_sem_status;
@@ -178,11 +167,10 @@ static SingleFlashOperationStatus_t ProcessSingleFlashOperation(FlashOperationTy
     waited_sem_status = WAITED_SEM_FREE;
 
     p_erase_init.TypeErase = FLASH_TYPEERASE_PAGES;
-    p_erase_init.NbPages   = 1;
-    p_erase_init.Page      = SectorNumberOrDestAddress;
+    p_erase_init.NbPages = 1;
+    p_erase_init.Page = SectorNumberOrDestAddress;
 
-    do
-    {
+    do {
         /**
          * When the PESD bit mechanism is used by CPU2 to protect its timing, the PESD bit should be polled here.
          * If the PESD is set, the CPU1 will be stalled when reading literals from an ISR that may occur after
@@ -204,9 +192,9 @@ static SingleFlashOperationStatus_t ProcessSingleFlashOperation(FlashOperationTy
          *  Trying to access the flash during that time stalls the CPU.
          *  The only way for CPU1 to disallow flash processing is to take CFG_HW_BLOCK_FLASH_REQ_BY_CPU1_SEMID.
          */
-        cpu1_sem_status = (SemStatus_t) LL_HSEM_GetStatus(HSEM, CFG_HW_BLOCK_FLASH_REQ_BY_CPU1_SEMID);
-        if (cpu1_sem_status == SEM_LOCK_SUCCESSFUL)
-        {
+        cpu1_sem_status = (SemStatus_t) LL_HSEM_GetStatus(HSEM,
+                CFG_HW_BLOCK_FLASH_REQ_BY_CPU1_SEMID);
+        if (cpu1_sem_status == SEM_LOCK_SUCCESSFUL) {
             /**
              *  Check now if the CPU2 disallows flash processing to protect its timing.
              *  If the semaphore is locked, the CPU2 does not allow flash processing
@@ -218,22 +206,20 @@ static SingleFlashOperationStatus_t ProcessSingleFlashOperation(FlashOperationTy
              *  The protection by semaphore is enabled on CPU2 side with the command SHCI_C2_SetFlashActivityControl()
              *
              */
-            cpu2_sem_status = (SemStatus_t) LL_HSEM_1StepLock(HSEM, CFG_HW_BLOCK_FLASH_REQ_BY_CPU2_SEMID);
-            if (cpu2_sem_status == SEM_LOCK_SUCCESSFUL)
-            {
+            cpu2_sem_status = (SemStatus_t) LL_HSEM_1StepLock(HSEM,
+                    CFG_HW_BLOCK_FLASH_REQ_BY_CPU2_SEMID);
+            if (cpu2_sem_status == SEM_LOCK_SUCCESSFUL) {
                 /**
                  * When CFG_HW_BLOCK_FLASH_REQ_BY_CPU2_SEMID is taken, it is allowed to only erase one sector or
                  * write one single 64bits data
                  * When either several sectors need to be erased or several 64bits data need to be written,
                  * the application shall first exit from the critical section and try again.
                  */
-                if (FlashOperationType == FLASH_ERASE)
-                {
+                if (FlashOperationType == FLASH_ERASE) {
                     HAL_FLASHEx_Erase(&p_erase_init, &page_error);
-                }
-                else
-                {
-                    HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, SectorNumberOrDestAddress, Data);
+                } else {
+                    HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, SectorNumberOrDestAddress,
+                            Data);
                 }
                 /**
                  *  Release the semaphore to give the opportunity to CPU2 to protect its timing versus the next flash operation
@@ -247,24 +233,21 @@ static SingleFlashOperationStatus_t ProcessSingleFlashOperation(FlashOperationTy
 
         UTILS_EXIT_CRITICAL_SECTION();
 
-        if (cpu1_sem_status != SEM_LOCK_SUCCESSFUL)
-        {
+        if (cpu1_sem_status != SEM_LOCK_SUCCESSFUL) {
             /**
              * To avoid looping in ProcessSingleFlashOperation(), FD_WaitForSemAvailable() should implement a mechanism to
              * continue only when CFG_HW_BLOCK_FLASH_REQ_BY_CPU1_SEMID is free
              */
             waited_sem_status = FD_WaitForSemAvailable(WAIT_FOR_SEM_BLOCK_FLASH_REQ_BY_CPU1);
-        }
-        else if (cpu2_sem_status != SEM_LOCK_SUCCESSFUL)
-        {
+        } else if (cpu2_sem_status != SEM_LOCK_SUCCESSFUL) {
             /**
              * To avoid looping in ProcessSingleFlashOperation(), FD_WaitForSemAvailable() should implement a mechanism to
              * continue only when CFG_HW_BLOCK_FLASH_REQ_BY_CPU2_SEMID is free
              */
             waited_sem_status = FD_WaitForSemAvailable(WAIT_FOR_SEM_BLOCK_FLASH_REQ_BY_CPU2);
         }
-    } while (((cpu2_sem_status != SEM_LOCK_SUCCESSFUL) || (cpu1_sem_status != SEM_LOCK_SUCCESSFUL)) &&
-             (waited_sem_status != WAITED_SEM_BUSY));
+    } while (((cpu2_sem_status != SEM_LOCK_SUCCESSFUL) || (cpu1_sem_status != SEM_LOCK_SUCCESSFUL))
+            && (waited_sem_status != WAITED_SEM_BUSY));
 
     /**
      * In most BLE application, the flash should not be blocked by the CPU2 longer than FLASH_TIMEOUT_VALUE (1000ms)
@@ -280,16 +263,13 @@ static SingleFlashOperationStatus_t ProcessSingleFlashOperation(FlashOperationTy
     while (__HAL_FLASH_GET_FLAG(FLASH_FLAG_CFGBSY))
         ;
 
-    if (waited_sem_status != WAITED_SEM_BUSY)
-    {
+    if (waited_sem_status != WAITED_SEM_BUSY) {
         /**
          * The flash processing has been done. It has not been checked whether it has been successful or not.
          * The only commitment is that it is possible to request a new flash processing
          */
         return_status = SINGLE_FLASH_OPERATION_DONE;
-    }
-    else
-    {
+    } else {
         /**
          * The flash processing has not been executed due to timing protection from either the CPU1 or the CPU2.
          * This status is reported up to the user that should retry after checking that each CPU do not
@@ -306,8 +286,7 @@ static SingleFlashOperationStatus_t ProcessSingleFlashOperation(FlashOperationTy
  * WEAK FUNCTIONS
  *
  *************************************************************/
-__WEAK WaitedSemStatus_t FD_WaitForSemAvailable(WaitedSemId_t WaitedSemId)
-{
+__WEAK WaitedSemStatus_t FD_WaitForSemAvailable(WaitedSemId_t WaitedSemId) {
     /**
      * The timing protection is enabled by either CPU1 or CPU2. It should be decided here if the driver shall
      * keep trying to erase/write the flash until successful or if it shall exit and report to the user that the action
@@ -320,3 +299,4 @@ __WEAK WaitedSemStatus_t FD_WaitForSemAvailable(WaitedSemId_t WaitedSemId)
      */
     return WAITED_SEM_BUSY;
 }
+
