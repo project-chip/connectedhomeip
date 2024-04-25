@@ -156,7 +156,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    void _Shutdown() {}
+    void _Shutdown();
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -232,6 +232,7 @@ private:
         kFastAdvertisingEnabled   = 0x0200, /**< The application has enabled fast advertising. */
         kUseCustomDeviceName      = 0x0400, /**< The application has configured a custom BLE device name. */
         kAdvertisingRefreshNeeded = 0x0800, /**< The advertising configuration/state in ESP BLE layer needs to be updated. */
+        kExtAdvertisingEnabled    = 0x1000, /**< The application has enabled Extended BLE announcement. */
     };
 
     enum
@@ -296,15 +297,12 @@ private:
 
     void DriveBLEState(void);
     CHIP_ERROR InitESPBleLayer(void);
+    void DeinitESPBleLayer(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
-
-    static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
-        System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
-    System::Clock::Timestamp mAdvertiseStartTime;
-
-    static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
-    void HandleFastAdvertisementTimer();
+    void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
+    void CancelBleAdvTimeoutTimer(void);
+    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
 
 #if CONFIG_BT_BLUEDROID_ENABLED
     void HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
@@ -330,6 +328,9 @@ private:
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
 
 #elif CONFIG_BT_NIMBLE_ENABLED
+    CHIP_ERROR DeinitBLE();
+    static void ClaimBLEMemory(System::Layer *, void *);
+
     void HandleRXCharRead(struct ble_gatt_char_context * param);
     void HandleRXCharWrite(struct ble_gatt_char_context * param);
     void HandleTXCharWrite(struct ble_gatt_char_context * param);

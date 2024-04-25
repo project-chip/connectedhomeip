@@ -116,47 +116,12 @@ static size_t hex_string_to_binary(const char * hex_string, uint8_t * buf, size_
 
 void Esp32AppServer::DeInitBLEIfCommissioned(void)
 {
-#if CONFIG_BT_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+#ifdef CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0)
     {
-        esp_err_t err = ESP_OK;
-
-#if CONFIG_BT_NIMBLE_ENABLED
-        if (!ble_hs_is_enabled())
-        {
-            ESP_LOGI(TAG, "BLE already deinited");
-            return;
-        }
-        if (nimble_port_stop() != 0)
-        {
-            ESP_LOGE(TAG, "nimble_port_stop() failed");
-            return;
-        }
-        vTaskDelay(100);
-        nimble_port_deinit();
-
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-        err = esp_nimble_hci_and_controller_deinit();
-#endif
-#endif /* CONFIG_BT_NIMBLE_ENABLED */
-
-#if CONFIG_IDF_TARGET_ESP32
-        err |= esp_bt_mem_release(ESP_BT_MODE_BTDM);
-#elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32H2 ||          \
-    CONFIG_IDF_TARGET_ESP32C6
-        err |= esp_bt_mem_release(ESP_BT_MODE_BLE);
-#endif
-
-        if (err != ESP_OK)
-        {
-            ESP_LOGE(TAG, "BLE deinit failed");
-        }
-        else
-        {
-            ESP_LOGI(TAG, "BLE deinit successful and memory reclaimed");
-        }
+        chip::DeviceLayer::Internal::BLEMgr().Shutdown();
     }
-#endif /* CONFIG_BT_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
+#endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
 }
 
 void Esp32AppServer::Init(AppDelegate * sAppDelegate)
@@ -167,7 +132,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     if (hex_string_to_binary(CONFIG_TEST_EVENT_TRIGGER_ENABLE_KEY, sTestEventTriggerEnableKey,
                              sizeof(sTestEventTriggerEnableKey)) == 0)
     {
-        ESP_LOGE(TAG, "Failed to convert the EnableKey string to octstr type value");
+        ChipLogError(DeviceLayer, "Failed to convert the EnableKey string to octstr type value");
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
     }
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
@@ -194,7 +159,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
     {
-        ESP_LOGI(TAG, "Thread has been provisioned, publish the dns service now");
+        ChipLogProgress(DeviceLayer, "Thread has been provisioned, publish the dns service now");
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif
