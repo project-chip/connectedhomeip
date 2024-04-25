@@ -133,6 +133,9 @@ public:
     CHIP_ERROR RawComplete(StatusIB status)
     {
         VerifyOrReturnError(!mCompleted, CHIP_ERROR_INCORRECT_STATE);
+        // Mark completed to not allow calling complete again unless we flush pending replies.
+        // This is to prevent a Complete or  Send from working once RawComplete was already called
+        // as we generally do not know the undelying state.
         mCompleted = true;
         return mWriter->Complete(status);
     }
