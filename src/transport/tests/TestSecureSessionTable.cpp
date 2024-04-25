@@ -43,7 +43,7 @@ public:
     // with various scenarios based on the existing set of sessions in the table
     // and a provided session eviction hint
     //
-    static void ValidateSessionSorting(void * inContext);
+    static void ValidateSessionSorting(Platform::UniquePtr<TestSecureSessionTable> * inContext);
 
 private:
     struct SessionParameters
@@ -144,9 +144,9 @@ protected:
     Platform::UniquePtr<TestSecureSessionTable> mTestSecureSessionTable;
 };
 
-void TestSecureSessionTable::ValidateSessionSorting(void * inContext)
+void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecureSessionTable> * inContext)
 {
-    Platform::UniquePtr<TestSecureSessionTable> & _this = *static_cast<Platform::UniquePtr<TestSecureSessionTable> *>(inContext);
+    Platform::UniquePtr<TestSecureSessionTable> & _this = *inContext;
 
     //
     // This validates basic eviction. The table is full of sessions from Fabric1 from the same
