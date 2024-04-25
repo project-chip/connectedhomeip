@@ -262,7 +262,7 @@ private:
     //    |                                          v
     //  NEVER --Complete--> F_EXPECTED --Flush--> FLUSHED --Complete--> COMPLETE
     //             |                                                    ^
-    //             +-------------(success or permanent errror)----------|
+    //             +-------------(success or permanent error)-----------|
     enum class CompleteState
     {
         kNeverCalled,
