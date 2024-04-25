@@ -229,9 +229,6 @@ public:
     void * mAppState                 = nullptr;
     BleLayerDelegate * mBleTransport = nullptr;
 
-    typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
-    BleConnectionReceivedFunct OnChipBleConnectReceived;
-
     // Public functions:
     BleLayer();
 
