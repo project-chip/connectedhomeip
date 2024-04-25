@@ -56,13 +56,13 @@ def main(filename, classname, test):
     '''
     try:
         module = importlib.import_module(Path(os.path.basename(filename)).stem)
-    except ModuleNotFoundError as e:
+    except ModuleNotFoundError:
         logging.error(f'Unable to load python module from {filename}. Please ensure this is a valid python file path')
         return -1
 
     try:
         test_class = getattr(module, classname)
-    except AttributeError as e:
+    except AttributeError:
         logging.error(f'Unable to load the test class {classname}. Please ensure this class is implemented in {filename}')
         return -1
 
