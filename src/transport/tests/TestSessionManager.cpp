@@ -774,8 +774,8 @@ TEST_F(TestSessionManager, SessionAllocationTest)
         {
             constexpr int maxOffset = 100;
             handles[h]              = sessionManager.AllocateSession(
-                             Transport::SecureSession::Type::kPASE,
-                             ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
+                Transport::SecureSession::Type::kPASE,
+                ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
             EXPECT_TRUE(handles[h].HasValue());
             sessionIds[h] = handles[h].Value()->AsSecureSession()->GetLocalSessionId();
             RandomSessionIdAllocatorOffset(sessionManager, maxOffset);
