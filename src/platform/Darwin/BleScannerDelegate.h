@@ -24,16 +24,25 @@
 namespace chip {
 namespace DeviceLayer {
 
+enum class BleScanMode
+{
+    kDefault = 0,
+    kPreWarm,
+};
+
 class DLL_EXPORT BleScannerDelegate
 {
 public:
     virtual ~BleScannerDelegate() {}
 
     // Called when a scan result is available.
-    virtual void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+    virtual void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBLEDeviceIdentificationInfo & info) {}
 
     // Called when a scan result is not available anymore.
-    virtual void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) = 0;
+    virtual void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) {}
+
+    // Called when the scan has been stopped
+    virtual void OnBleScanStopped() {}
 };
 
 } // namespace DeviceLayer

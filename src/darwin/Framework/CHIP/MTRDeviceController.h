@@ -178,16 +178,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                         error:(NSError * __autoreleasing *)error
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
-/**
- * Optionally pre-warm the controller for setting up a commissioning session.
- * This may be called before setupCommissioningSessionWithPayload if it's known
- * that a commissioning attempt will soon take place but the commissioning
- * payload is not known yet.
- *
- * For example this may do a BLE scan in advance so results are ready earlier
- * once the discriminator is known.
- */
-- (void)preWarmCommissioningSession MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+- (void)preWarmCommissioningSession MTR_NEWLY_DEPRECATED("-[MTRDeviceControllerFactory preWarmCommissioningSession]"); // MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered
