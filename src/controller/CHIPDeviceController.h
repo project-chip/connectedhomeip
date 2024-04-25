@@ -412,7 +412,7 @@ protected:
 
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
-    Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
+    Dnssd::CommissionNodeData mCommissionableNodes[kMaxCommissionableNodes];
     DeviceControllerSystemState * mSystemState = nullptr;
 
     ControllerDeviceInitParams GetControllerDeviceInitParams();
@@ -730,7 +730,7 @@ public:
      *   Should be called on main loop thread.
      * @return const DiscoveredNodeData* info about the selected device. May be nullptr if no information has been returned yet.
      */
-    const Dnssd::DiscoveredNodeData * GetDiscoveredDevice(int idx);
+    const Dnssd::CommissionNodeData * GetDiscoveredDevice(int idx);
 
     /**
      * @brief
