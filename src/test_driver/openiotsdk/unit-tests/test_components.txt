@@ -6,6 +6,7 @@ MinimalMdnsRespondersTests
 CoreTests
 MdnsTests
 PlatformTests
+RetransmitTests
 SystemLayerTests
 TestShell
 SetupPayloadTests
