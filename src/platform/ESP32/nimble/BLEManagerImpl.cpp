@@ -200,11 +200,6 @@ void BLEManagerImpl::ConnectDevice(const ble_addr_t & addr, uint16_t timeout)
         ChipLogError(Ble, "Failed to connect to rc=%d", rc);
     }
 }
-
-void HandleIncomingBleConnection(BLEEndPoint * bleEP)
-{
-    ChipLogProgress(DeviceLayer, "CHIPoBLE connection received");
-}
 #endif
 
 CHIP_ERROR BLEManagerImpl::_Init()
@@ -237,12 +232,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral);
     mFlags.Set(Flags::kFastAdvertisingEnabled, !mIsCentral);
-    OnChipBleConnectReceived = HandleIncomingBleConnection;
 #else
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-
 #endif
+
     mNumGAPCons = 0;
     memset(reinterpret_cast<void *>(mCons), 0, sizeof(mCons));
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
@@ -265,10 +259,6 @@ void BLEManagerImpl::_Shutdown()
     // selectively setting kGATTServiceStarted flag, in order to notify the state machine to stop the CHIPoBLE GATT service
     mFlags.ClearAll().Set(Flags::kGATTServiceStarted);
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-    OnChipBleConnectReceived = nullptr;
-#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
