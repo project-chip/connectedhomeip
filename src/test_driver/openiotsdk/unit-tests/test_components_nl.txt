@@ -7,4 +7,3 @@ SecureChannelTests
 SetupPayloadTestsNL
 SupportTestsNL
 TransportLayerTests
-UserDirectedCommissioningTests
