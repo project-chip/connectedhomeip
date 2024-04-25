@@ -4,11 +4,11 @@ This document describes how to build below Linux examples with the NXP embedded
 Linux Yocto SDK and then run the output executable files on the **NXP i.MX 8M**
 **Mini EVK** development board.
 
--   [CHIP Linux All-clusters Example](../../examples/all-clusters-app/linux/README.md)
--   [CHIP Linux Lighting Example](../../examples/lighting-app/linux/README.md)
+-   [CHIP Linux All-clusters Example](../../../examples/all-clusters-app/linux/README.md)
+-   [CHIP Linux Lighting Example](../../../examples/lighting-app/linux/README.md)
 -   [CHIP Linux Thermostat Example](https://github.com/project-chip/connectedhomeip/tree/master/examples/thermostat/linux)
--   [CHIP Linux CHIP-tool Example](../../examples/chip-tool/README.md)
--   [CHIP Linux OTA-provider Example](../../examples/ota-provider-app/linux/README.md)
+-   [CHIP Linux CHIP-tool Example](../../../examples/chip-tool/README.md)
+-   [CHIP Linux OTA-provider Example](../../../examples/ota-provider-app/linux/README.md)
 
 This document has been tested on:
 
@@ -234,8 +234,8 @@ Thermostat-app is used as an example below.
 
     In order to test the CHIP protocol functions, another device on the same
     network is needed to run the
-    [ChipDeviceController](../../src/controller/python) tool to communicate with
-    the **i.MX 8M Mini EVK**.
+    [ChipDeviceController](../../../src/controller/python) tool to communicate
+    with the **i.MX 8M Mini EVK**.
 
     The ChipDeviceController can be a laptop / workstation. Bluetooth
     functionality is mandatory on this device.
@@ -252,7 +252,7 @@ Thermostat-app is used as an example below.
     -   Boot up Ubuntu on the Raspberry Pi
     -   Clone this connectedhomeip project
     -   Follow Python ChipDeviceController
-        [README.md](../../src/controller/python/README.md) document. Refer to
+        [README.md](../../../src/controller/python/README.md) document. Refer to
         the "Building and installing" part to build the tool.
 
 -   Running
@@ -283,7 +283,7 @@ Thermostat-app is used as an example below.
               /home/root/thermostat-app --ble-device 0 --wifi  # The bluetooth device used is hci0 and support wifi network
               ```
 
-    -   Run [ChipDeviceController](../../src/controller/python) on the
+    -   Run [ChipDeviceController](../../../src/controller/python) on the
         controller device to communicate with **i.MX 8M Mini EVK** running the
         example.
 

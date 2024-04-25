@@ -1,8 +1,8 @@
 # Commissioning NXP K32W using Android CHIPTool
 
 This article describes how to use
-[CHIPTool](../../examples/android/CHIPTool/README.md) for Android smartphones to
-commission an NXP K32W061 DK6 running
+[CHIPTool](../../../examples/android/CHIPTool/README.md) for Android smartphones
+to commission an NXP K32W061 DK6 running
 [NXP K32W Light Example Application](#building-and-programming-nxp-k32w-light-example-application)
 onto a CHIP-enabled Thread network.
 
@@ -47,7 +47,7 @@ The following diagram shows the connectivity between network components required
 to allow communication between devices running the CHIPTool and Light
 applications:
 
-![nxp_hw_connectivity](../../examples/platform/nxp/k32w/k32w0/doc/images/nxp_hw_connectivity.JPG)
+![nxp_hw_connectivity](../../../examples/platform/nxp/k32w/k32w0/doc/images/nxp_hw_connectivity.JPG)
 
 <hr>
 
@@ -348,7 +348,7 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 ## Building and programming NXP K32W Light Example Application
 
 See
-[NXP K32W Light Example Application README](../../examples/lighting-app/nxp/k32w/k32w0/README.md)
+[NXP K32W Light Example Application README](../../../examples/lighting-app/nxp/k32w/k32w0/README.md)
 to learn how to build and program the light example onto an K32W061 DK6.
 
 <hr>
@@ -356,7 +356,7 @@ to learn how to build and program the light example onto an K32W061 DK6.
 ## Building and installing Android CHIPTool
 
 To build the CHIPTool application for your smartphone, read
-[Android CHIPTool README](../../examples/android/CHIPTool/README.md).
+[Android CHIPTool README](../../../examples/android/CHIPTool/README.md).
 
 After building, install the application by completing the following steps:
 
@@ -396,7 +396,7 @@ CHIPTool is now ready to be used for commissioning.
 
 3.  Navigate to the _Form_ tab then push the _Form_ button using the default
     parameters:
-    ![nxp_form_nwk](../../examples/platform/nxp/k32w/k32w0/doc/images/form_web.JPG)
+    ![nxp_form_nwk](../../../examples/platform/nxp/k32w/k32w0/doc/images/form_web.JPG)
 
 4.  The message _Form operation is successful_ should be display after a few
     seconds.
@@ -430,7 +430,7 @@ To prepare the accessory device for commissioning, complete the following steps:
 
 1.  Make sure that JP4 and JP7 jumpers are in leftmost position and a mini-USB
     cable is connected between the LPC connector and PC
-    ![nxp_connectors](../../examples/platform/nxp/k32w/k32w0/doc/images/k32w-dk6-connectors.jpg)
+    ![nxp_connectors](../../../examples/platform/nxp/k32w/k32w0/doc/images/k32w-dk6-connectors.jpg)
 
 2.  Use a terminal emulator (e.g.: Putty) to connect to the UART console of the
     accessory device. Use a baudrate of 115200.
@@ -466,14 +466,14 @@ section, complete the following steps:
    progress with scanning, connection, and pairing. At the end of this process,
    the Thread network settings screen appears.
 
-    ![chiptool_main_screen](../../examples/platform/nxp/k32w/k32w0/doc/images/chiptool_main_screen.png)
+    ![chiptool_main_screen](../../../examples/platform/nxp/k32w/k32w0/doc/images/chiptool_main_screen.png)
 
 6. In the Thread network settings screen, use the default settings and tap the
    _SAVE NETWORK_ button to send a Thread provisioning message to the accessory
    device. You will see the "Network provisioning completed" message when the
    accessory device successfully joins the Thread network.
 
-    ![chiptool_credentials](../../examples/platform/nxp/k32w/k32w0/doc/images/thread_credentials.png)
+    ![chiptool_credentials](../../../examples/platform/nxp/k32w/k32w0/doc/images/thread_credentials.png)
 
 <hr>
 
@@ -483,7 +483,7 @@ section, complete the following steps:
    the provisioning is completed successfully and you are connected to the
    device.
 
-    ![on_off_cluster.png](../../examples/platform/nxp/k32w/k32w0/doc/images/on_off_cluster.png)
+    ![on_off_cluster.png](../../../examples/platform/nxp/k32w/k32w0/doc/images/on_off_cluster.png)
 
 2. Verify that the text box on the screen is not empty and contains the IPv6
    address of the accessory device.

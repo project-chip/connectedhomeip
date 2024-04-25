@@ -25,11 +25,18 @@ chip_test_suite("tests") {
   test_sources = [
     "TestBitMask.cpp",
     "TestBufferReader.cpp",
+    "TestBytesToHex.cpp",
     "TestDefer.cpp",
     "TestFixedBufferAllocator.cpp",
     "TestFold.cpp",
     "TestIniEscaping.cpp",
     "TestSafeInt.cpp",
+    "TestSafeString.cpp",
+    "TestScoped.cpp",
+    "TestSpan.cpp",
+    "TestStaticSupportSmartPtr.cpp",
+    "TestTestPersistentStorageDelegate.cpp",
+    "TestUtf8.cpp",
   ]
   sources = []
 
@@ -59,7 +66,6 @@ chip_test_suite_using_nltest("tests_nltest") {
   test_sources = [
     "TestBufferWriter.cpp",
     "TestBytesCircularBuffer.cpp",
-    "TestBytesToHex.cpp",
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
     "TestCHIPMemString.cpp",
@@ -70,21 +76,15 @@ chip_test_suite_using_nltest("tests_nltest") {
     "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
-    "TestSafeString.cpp",
-    "TestScoped.cpp",
     "TestScopedBuffer.cpp",
     "TestSorting.cpp",
-    "TestSpan.cpp",
     "TestStateMachine.cpp",
-    "TestStaticSupportSmartPtr.cpp",
     "TestStringBuilder.cpp",
     "TestStringSplitter.cpp",
-    "TestTestPersistentStorageDelegate.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
     "TestTlvJson.cpp",
     "TestTlvToJson.cpp",
-    "TestUtf8.cpp",
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
