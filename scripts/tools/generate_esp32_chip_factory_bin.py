@@ -394,7 +394,8 @@ def generate_nvs_csv(output_dir, out_csv_filename):
     with open(os.path.join(output_dir, out_csv_filename), 'w') as f:
         f.write(csv_content)
 
-    logging.info('Generated the factory partition csv file : {}'.format(os.path.abspath(os.path.join(output_dir, out_csv_filename))))
+    logging.info('Generated the factory partition csv file : {}'.format(
+        os.path.abspath(os.path.join(output_dir, out_csv_filename))))
 
 
 def generate_nvs_bin(encrypt, size, csv_filename, bin_filename, output_dir):
