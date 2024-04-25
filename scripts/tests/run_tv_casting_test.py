@@ -63,6 +63,7 @@ class ProcessManager:
 
 def dump_temporary_logs_to_console(log_file_path: str):
     """Dump log file to the console; log file will be removed once the function exits."""
+    """Write the entire content of `log_file_path` to the console."""
     print('\nDumping logs from: ', log_file_path)
 
     with open(log_file_path, 'r') as file:
