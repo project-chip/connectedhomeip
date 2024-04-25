@@ -132,7 +132,7 @@ public:
 
         if (nodeData.isICDOperatingAsLIT.has_value())
         {
-            streamer_printf(streamer_get(), "   ICD is operating as a: %s\r\n", (*nodeData.isICDOperatingAsLIT) ? "LIT" : "SIT");
+            streamer_printf(streamer_get(), "   ICD is operating as a: %s\r\n", *(nodeData.isICDOperatingAsLIT) ? "LIT" : "SIT");
         }
         streamer_printf(streamer_get(), "   IP addresses:\r\n");
         for (size_t i = 0; i < nodeData.numIPs; i++)

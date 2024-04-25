@@ -292,7 +292,7 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
 
         if (nodeData.resolutionData.isICDOperatingAsLIT.has_value())
         {
-            result.isICDOperatingAsLIT = *nodeData.resolutionData.isICDOperatingAsLIT;
+            result.isICDOperatingAsLIT = *(nodeData.resolutionData.isICDOperatingAsLIT);
         }
 
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)

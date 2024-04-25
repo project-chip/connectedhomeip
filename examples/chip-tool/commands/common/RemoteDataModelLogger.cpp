@@ -262,7 +262,7 @@ CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::CommissionNodeData & nodeDat
 
     if (resolutionData.isICDOperatingAsLIT.has_value())
     {
-        value["isICDOperatingAsLIT"] = *resolutionData.isICDOperatingAsLIT;
+        value["isICDOperatingAsLIT"] = *(resolutionData.isICDOperatingAsLIT);
     }
 
     Json::Value rootValue;
