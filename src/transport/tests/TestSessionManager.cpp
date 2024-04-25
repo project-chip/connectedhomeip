@@ -954,9 +954,9 @@ TEST_F(TestSessionManager, SessionShiftingTest)
     // 3. alice -> bob: aliceToBobSession, newAliceToBobSession
     sessionManager.GetSecureSessions().NewerSessionAvailable(newAliceToBobSession.Get().Value()->AsSecureSession());
 
-    EXPECT_TRUE(!!aliceToBobSession);
-    EXPECT_TRUE(!!stickyAliceToBobSession);
-    EXPECT_TRUE(!!newAliceToBobSession);
+    EXPECT_TRUE(aliceToBobSession);
+    EXPECT_TRUE(stickyAliceToBobSession);
+    EXPECT_TRUE(newAliceToBobSession);
 
     EXPECT_EQ(stickyAliceToBobSession->AsSecureSession(), session1);
     EXPECT_EQ(bobToAliceSession->AsSecureSession(), session2);
