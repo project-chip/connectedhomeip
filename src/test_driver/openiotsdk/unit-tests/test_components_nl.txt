@@ -1,5 +1,4 @@
 AppTests
-BDXTests
 DataModelTests
 InetLayerTests
 MessagingLayerTests
