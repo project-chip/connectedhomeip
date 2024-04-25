@@ -39,7 +39,7 @@ constexpr char kLocalDot[] = "local.";
 constexpr char kSRPDot[] = "default.service.arpa.";
 
 // The extra time in milliseconds that we will wait for the resolution on the SRP domain to complete.
-constexpr uint16_t kSRPTimeoutInMsec = 3000;
+constexpr uint16_t kSRPTimeoutInMsec = 250;
 
 constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
 constexpr DNSServiceFlags kBrowseFlags          = kDNSServiceFlagsShareConnection;
