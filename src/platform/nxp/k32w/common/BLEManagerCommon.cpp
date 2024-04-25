@@ -1075,6 +1075,10 @@ void BLEManagerCommon::HandleForceDisconnect()
     {
         ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
     }
+
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+    PWR_AllowDeviceToSleep();
+#endif
 }
 
 /*******************************************************************************
