@@ -31,7 +31,6 @@ CHIP_ERROR CheckInCounter::InvalidateHalfCheckInCouterValues()
     uint32_t currentCounterValue = GetValue();
 
     // Double current counter value and update underlying counter storage. CheckInCounter is allowed to rollover.
-    // If current value is 0, set UINT32_MAX / 2 since multiplication will be 0
     uint32_t newCounterValue = currentCounterValue + (UINT32_MAX / 2);
     ReturnErrorOnFailure(SetValue(newCounterValue));
 
