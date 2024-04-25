@@ -3,9 +3,7 @@ ChipCryptoTests
 CredentialsTest
 DataModelTests
 InetLayerTests
-MdnsTests
 MessagingLayerTests
-MinimalMdnsCoreTests
 RawTransportTests
 RetransmitTests
 SecureChannelTests
