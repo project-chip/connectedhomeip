@@ -184,7 +184,7 @@ struct CommonResolutionData
         ChipLogDetail(Discovery, "\tTCP Supported: %d", supportsTcp);
         if (isICDOperatingAsLIT.has_value())
         {
-            ChipLogDetail(Discovery, "\tThe ICD operates in %s", *isICDOperatingAsLIT ? "LIT" : "SIT");
+            ChipLogDetail(Discovery, "\tThe ICD operates in %s", (*isICDOperatingAsLIT) ? "LIT" : "SIT");
         }
         else
         {
