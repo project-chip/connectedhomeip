@@ -760,16 +760,15 @@ CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFi
 
 CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryContext & context)
 {
-    if (!context.GetBrowseIdentifier().HasValue())
+    const auto browseIdentifier = context.GetBrowseIdentifier();
+    if (!browseIdentifier.has_value())
     {
         // No discovery going on.
         return CHIP_NO_ERROR;
     }
 
-    const auto browseIdentifier = context.GetBrowseIdentifier().Value();
     context.ClearBrowseIdentifier();
-
-    return ChipDnssdStopBrowse(browseIdentifier);
+    return ChipDnssdStopBrowse(*browseIdentifier);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)

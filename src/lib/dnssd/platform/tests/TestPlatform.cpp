@@ -52,7 +52,7 @@ OperationalAdvertisingParameters operationalParams2 =
         .SetMac(ByteSpan(kMac))
         .SetPort(CHIP_PORT)
         .EnableIpV4(true)
-        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32, 10_ms16)) // SII and SAI to match below
+        .SetLocalMRPConfig(std::make_optional<ReliableMessageProtocolConfig>(32_ms32, 30_ms32, 10_ms16)) // SII and SAI to match below
         .SetICDModeToAdvertise(ICDModeAdvertise::kSIT);
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
@@ -87,17 +87,17 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetMac(ByteSpan(kMac, sizeof(kMac)))
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
-        .SetVendorId(Optional<uint16_t>(555))
-        .SetDeviceType(Optional<uint32_t>(70000))
+        .SetVendorId(std::make_optional<uint16_t>(555))
+        .SetDeviceType(std::make_optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledBasic)
-        .SetDeviceName(Optional<const char *>("testy-test"))
-        .SetPairingHint(Optional<uint16_t>(3))
-        .SetPairingInstruction(Optional<const char *>("Pair me"))
-        .SetProductId(Optional<uint16_t>(897))
-        .SetRotatingDeviceId(Optional<const char *>("id_that_spins"))
+        .SetDeviceName(std::make_optional<const char *>("testy-test"))
+        .SetPairingHint(std::make_optional<uint16_t>(3))
+        .SetPairingInstruction(std::make_optional<const char *>("Pair me"))
+        .SetProductId(std::make_optional<uint16_t>(897))
+        .SetRotatingDeviceId(std::make_optional<const char *>("id_that_spins"))
         .SetICDModeToAdvertise(ICDModeAdvertise::kSIT)
         // 3600005 is over the max, so this should be adjusted by the platform
-        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
+        .SetLocalMRPConfig(std::make_optional<ReliableMessageProtocolConfig>(3600000_ms32, 3600005_ms32, 65535_ms16));
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
@@ -126,14 +126,14 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetMac(ByteSpan(kMac, sizeof(kMac)))
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
-        .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint32_t>(70000))
+        .SetVendorId(std::make_optional<uint16_t>(555))
+        .SetDeviceType(std::make_optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
-        .SetDeviceName(chip::Optional<const char *>("testy-test"))
-        .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
-        .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"));
+        .SetDeviceName(std::make_optional<const char *>("testy-test"))
+        .SetPairingHint(std::make_optional<uint16_t>(3))
+        .SetPairingInstruction(std::make_optional<const char *>("Pair me"))
+        .SetProductId(std::make_optional<uint16_t>(897))
+        .SetRotatingDeviceId(std::make_optional<const char *>("id_that_spins"));
 
 test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
