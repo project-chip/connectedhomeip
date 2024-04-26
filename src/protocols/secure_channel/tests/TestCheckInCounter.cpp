@@ -48,8 +48,11 @@ void VerifyCheckInCounterValues(uint32_t startValue, uint32_t expectedValue, Che
     // Init Value of the counter is random
     EXPECT_EQ(counter.Init(&storage, chip::DefaultStorageKeyAllocator::IMEventNumber(), 0x10000), CHIP_NO_ERROR);
 
-    // Set startValue
-    EXPECT_EQ(counter.SetValue(startValue), CHIP_NO_ERROR);
+    // Set starting value
+    uint32_t currentValue = counter.GetValue();
+    uint32_t delta        = startValue - currentValue;
+
+    EXPECT_EQ(counter.AdvanceBy(delta), CHIP_NO_ERROR);
     EXPECT_EQ(counter.GetValue(), startValue);
 
     // Test operation
