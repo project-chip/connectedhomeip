@@ -115,7 +115,7 @@ CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t 
 
 template <class T>
 CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t & entriesCount, char * buffer, size_t bufferLen,
-                        const std::optional<T> &value)
+                        const std::optional<T> & value)
 {
     VerifyOrReturnError(value.has_value(), CHIP_NO_ERROR);
     return AddPtrRecord(type, entries, entriesCount, buffer, bufferLen, *value);
