@@ -97,17 +97,21 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
         ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
-        if (dnsSdInfo->GetMrpRetryIntervalIdle().has_value())
+
+        auto idleInterval = dnsSdInfo->GetMrpRetryIntervalIdle();
+        if (idleInterval.has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle()->count());
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", idleInterval->count());
         }
         else
         {
             ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
         }
-        if (dnsSdInfo->GetMrpRetryIntervalActive().has_value())
+
+        auto activeInterval = dnsSdInfo->GetMrpRetryIntervalIdle();
+        if (activeInterval.has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive()->count());
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", activeInterval->count());
         }
         else
         {
