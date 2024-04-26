@@ -196,15 +196,15 @@ CommissionAdvertisingParameters commissionableNodeParamsEnhancedAsICDLIT =
         .SetMac(ByteSpan(kMac, sizeof(kMac)))
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
-        .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint32_t>(70000))
+        .SetVendorId(std::make_optional<uint16_t>(555))
+        .SetDeviceType(std::make_optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
-        .SetDeviceName(chip::Optional<const char *>("testy-test"))
-        .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
-        .SetProductId(chip::Optional<uint16_t>(897))
+        .SetDeviceName(std::make_optional<const char *>("testy-test"))
+        .SetPairingHint(std::make_optional<uint16_t>(3))
+        .SetPairingInstruction(std::make_optional<const char *>("Pair me"))
+        .SetProductId(std::make_optional<uint16_t>(897))
         .SetICDModeToAdvertise(ICDModeAdvertise::kLIT)
-        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600000_ms32, 65535_ms16));
+        .SetLocalMRPConfig(std::make_optional<ReliableMessageProtocolConfig>(3600000_ms32, 3600000_ms32, 65535_ms16));
 // With ICD Operation as LIT, SII key will not be added to the advertisement
 QNamePart txtCommissionableNodeParamsEnhancedAsICDLITParts[] = { "D=22",          "VP=555+897", "CM=2", "DT=70000",
                                                                  "DN=testy-test", "PI=Pair me", "PH=3", "SAI=3600000",
