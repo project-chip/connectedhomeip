@@ -1729,7 +1729,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     if (!otIp6IsAddressUnspecified(&serviceInfo.mHostAddress))
     {
         mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
-        mdnsService.mAddress     = MakeOptional(ToIPAddress(serviceInfo.mHostAddress));
+        mdnsService.mAddress     = std::make_optional(ToIPAddress(serviceInfo.mHostAddress));
     }
 
     // Check if TXT record was included in DNS response.
@@ -1955,7 +1955,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsAddressResolveRes
     error = MapOpenThreadError(otDnsAddressResponseGetAddress(aResponse, 0, &address, nullptr));
     if (error == CHIP_NO_ERROR)
     {
-        dnsResult->mMdnsService.mAddress = MakeOptional(ToIPAddress(address));
+        dnsResult->mMdnsService.mAddress = std::make_optional(ToIPAddress(address));
     }
 
     dnsResult->error = error;
