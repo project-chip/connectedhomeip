@@ -81,11 +81,6 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-void HandleIncomingBleConnection(BLEEndPoint * bleEP)
-{
-    ChipLogProgress(DeviceLayer, "CHIPoBluez con rcvd");
-}
-
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
@@ -98,8 +93,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
-
-    OnChipBleConnectReceived = HandleIncomingBleConnection;
 
     DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 

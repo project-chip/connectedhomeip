@@ -23,25 +23,9 @@ chip_test_suite("tests") {
   output_name = "libSetupPayloadTests"
 
   test_sources = [
+    "TestAdditionalDataPayload.cpp",
     "TestManualCode.cpp",
     "TestQRCode.cpp",
-  ]
-
-  sources = [ "TestHelpers.h" ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
-    "${chip_root}/src/platform",
-    "${chip_root}/src/setup_payload",
-  ]
-}
-
-chip_test_suite_using_nltest("tests_nltest") {
-  output_name = "libSetupPayloadTestsNL"
-
-  test_sources = [
-    "TestAdditionalDataPayload.cpp",
     "TestQRCodeTLV.cpp",
   ]
 
@@ -50,9 +34,7 @@ chip_test_suite_using_nltest("tests_nltest") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }

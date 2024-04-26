@@ -100,7 +100,7 @@ public:
     /// method.
     bool IsActive() const { return mSpecificResolutionData.Valid(); }
 
-    bool IsActiveBrowseParse() const { return mSpecificResolutionData.Is<DnssdNodeData>(); }
+    bool IsActiveBrowseParse() const { return mSpecificResolutionData.Is<CommissionNodeData>(); }
     bool IsActiveOperationalParse() const { return mSpecificResolutionData.Is<OperationalNodeData>(); }
 
     ServiceNameType GetCurrentType() const { return mServiceNameType; }
@@ -185,7 +185,7 @@ private:
     /// Prerequisite: IP address belongs to the right nost name
     CHIP_ERROR OnIpAddress(Inet::InterfaceId interface, const Inet::IPAddress & addr);
 
-    using ParsedRecordSpecificData = Variant<OperationalNodeData, DnssdNodeData>;
+    using ParsedRecordSpecificData = Variant<OperationalNodeData, CommissionNodeData>;
 
     StoredServerName mRecordName;     // Record name for what is parsed (SRV/PTR/TXT)
     StoredServerName mTargetHostName; // `Target` for the SRV record

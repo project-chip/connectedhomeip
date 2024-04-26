@@ -298,6 +298,7 @@ config MBEDTLS_HEAP_SIZE
 
 config CHIP_CRYPTO_PSA
     default y if !CHIP_WIFI
+    imply PSA_WANT_ALG_SPAKE2P_MATTER
 
 if CHIP_CRYPTO_PSA
 
