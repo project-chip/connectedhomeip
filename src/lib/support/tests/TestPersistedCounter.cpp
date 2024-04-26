@@ -194,4 +194,52 @@ TEST(TestPersistedCounter, TestAdvanceByMaxCounterValue)
     EXPECT_EQ(counter.GetValue(), 0ULL);
 }
 
+TEST(TestPersistedCounter, TestAdvanceByRollover)
+{
+    chip::TestPersistentStorageDelegate storage;
+    chip::PersistedCounter<uint64_t> counter;
+
+    uint64_t epoch        = UINT64_MAX / 4;
+    uint64_t currentEpoch = epoch;
+    uint64_t current      = 0;
+    uint64_t storedValue  = 0;
+    uint16_t size         = sizeof(storedValue);
+
+    EXPECT_EQ(counter.Init(&storage, chip::DefaultStorageKeyAllocator::IMEventNumber(), epoch), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), current);
+
+    // Check new Epoch value was persisted
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::IMEventNumber().KeyName(), &storedValue, size),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(sizeof(storedValue), size);
+    storedValue = Encoding::LittleEndian::HostSwap<uint64_t>(storedValue);
+    EXPECT_EQ(currentEpoch, storedValue);
+
+    // Increase counter to update persisted value
+    current += (currentEpoch + 100);
+    EXPECT_EQ(counter.AdvanceBy(currentEpoch + 100), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), current);
+
+    // Check new Epoch value was persisted
+    currentEpoch = (currentEpoch * 2 + 100);
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::IMEventNumber().KeyName(), &storedValue, size),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(sizeof(storedValue), size);
+    storedValue = Encoding::LittleEndian::HostSwap<uint64_t>(storedValue);
+    EXPECT_EQ(currentEpoch, storedValue);
+
+    // Force roll over
+    current += (3 * epoch);
+    EXPECT_EQ(counter.AdvanceBy((3 * epoch)), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), current);
+
+    // Check new Epoch value was persisted
+    currentEpoch = current + epoch;
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::IMEventNumber().KeyName(), &storedValue, size),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(sizeof(storedValue), size);
+    storedValue = Encoding::LittleEndian::HostSwap<uint64_t>(storedValue);
+    EXPECT_EQ(currentEpoch, storedValue);
+}
+
 } // namespace
