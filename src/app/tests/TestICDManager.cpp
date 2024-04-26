@@ -771,7 +771,7 @@ public:
         // Set starting value for test
         ICDConfigurationData::GetInstance().GetICDCounter().SetValue(startValue);
 
-        // Trigger ICD kInvalidateHalfCounterValues event
+        // Trigger ICD kInvalidateAllCounterValues event
         ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateAllCounterValues));
 
         // Validate counter has the expected value

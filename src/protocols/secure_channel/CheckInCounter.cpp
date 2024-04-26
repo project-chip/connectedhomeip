@@ -28,16 +28,16 @@ namespace SecureChannel {
 
 CHIP_ERROR CheckInCounter::InvalidateHalfCheckInCouterValues()
 {
-    // Increases the current counter value by half of its maximum range and update underlying counter storage.
-    // CheckInCounter is allowed to rollover.
+    // Increases the current counter value by half of its maximum range and updates underlying counter storage.
+    // CheckInCounter is allowed to roll over.
     ReturnErrorOnFailure(AdvanceBy((UINT32_MAX / 2)));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CheckInCounter::InvalidateAllCheckInCounterValues()
 {
-    // Increase current counter value by its maximum value to mimick N -> UINT32_MAX -> N-1 to invalidate all Check-In counter
-    // values. CheckInCounter is allowed to rollover.
+    // Increase current counter value by its maximum value to mimic N -> UINT32_MAX -> N-1 to invalidate all Check-In counter
+    // values. CheckInCounter is allowed to roll over.
     ReturnErrorOnFailure(AdvanceBy(UINT32_MAX));
     return CHIP_NO_ERROR;
 }

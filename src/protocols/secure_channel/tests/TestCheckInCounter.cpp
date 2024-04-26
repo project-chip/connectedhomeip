@@ -34,7 +34,7 @@ enum class CheckInCounterOperations : uint8_t
 };
 
 /**
- * @brief Helpter function that validates CheckInCounter value after an operation for configurable input values
+ * @brief Helper function that validates CheckInCounter value after an operation for configurable input values
  *
  * @param startValue Starting value of the Check-In counter
  * @param expectedValue Expected value after the InvalidateHalfCheckInCouterValues call
