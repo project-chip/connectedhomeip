@@ -1803,9 +1803,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchResolve(intptr
     Dnssd::DnssdService & service = dnsResult->mMdnsService;
     Span<Inet::IPAddress> ipAddrs;
 
-    if (service.mAddress.HasValue())
+    if (service.mAddress.has_value())
     {
-        ipAddrs = Span<Inet::IPAddress>(&service.mAddress.Value(), 1);
+        ipAddrs = Span<Inet::IPAddress>(&*service.mAddress, 1);
     }
 
     ThreadStackMgrImpl().mDnsResolveCallback(dnsResult->context, &service, ipAddrs, dnsResult->error);
