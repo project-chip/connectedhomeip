@@ -135,10 +135,11 @@ public:
 
         ReturnErrorOnFailure(MonotonicallyIncreasingCounter<T>::AdvanceBy(value));
 
-        // Since AdvanceBy allows the counter to be increase by an arbitrary value, it is possible that the new counter value is
-        // greater than mNextEpoch + mEpoch. As such, we want to the next Epoch value to be calculate from the new current value.
         if (shouldDoEpochUpdate)
         {
+            // Since AdvanceBy allows the counter to be increase by an arbitrary value, it is possible that the new counter value is
+            // greater than mNextEpoch + mEpoch. As such, we want the next Epoch value to be calculate from the new current
+            // value.
             PersistAndVerifyNextEpochStart(MonotonicallyIncreasingCounter<T>::GetValue());
         }
 
