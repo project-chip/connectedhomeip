@@ -37,7 +37,7 @@ public:
     /**
      * @brief Callback used to let the application generate the new ICD symmetric key
      *
-     * If not implemented by application, it would use Crypto::DRBG_get_bytes at default.
+     * If this calback is not overridden, Crypto::DRBG_get_bytes will be used to generated the key.
      *
      * @param[inout] newKey sensitive data buffer with type Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> 
      * @param[out] CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT
