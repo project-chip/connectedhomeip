@@ -77,3 +77,15 @@ JNI_METHOD(void, extendableInvoke)
         ChipLogError(Controller, "JNI IM Batch Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
+
+JNI_METHOD(jlong, getRemoteDeviceId)
+(JNIEnv * env, jobject self, jlong devicePtr)
+{
+    return getRemoteDeviceId(devicePtr);
+}
+
+JNI_METHOD(jint, getFabricIndex)
+(JNIEnv * env, jobject self, jlong devicePtr)
+{
+    return getFabricIndex(devicePtr);
+}

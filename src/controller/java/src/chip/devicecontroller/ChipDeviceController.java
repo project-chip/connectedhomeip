@@ -750,15 +750,6 @@ public class ChipDeviceController {
     return getICDClientInfo(getFabricIndex(deviceControllerPtr));
   }
 
-  public boolean isPeerICDClient(long deviceId) {
-    List<ICDClientInfo> clientInfo = getICDClientInfo();
-    if (clientInfo == null) {
-      return false;
-    }
-
-    return clientInfo.stream().anyMatch(info -> info.getPeerNodeId() == deviceId);
-  }
-
   /**
    * Returns the ICD Client Information
    *
@@ -852,7 +843,7 @@ public class ChipDeviceController {
         false,
         imTimeoutMs,
         null,
-        isPeerICDClient(getRemoteDeviceId(devicePtr)));
+        ChipICDClient.isPeerICDClient(ChipInteractionClient.getFabricIndex(devicePtr), ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -891,7 +882,7 @@ public class ChipDeviceController {
         false,
         imTimeoutMs,
         null,
-        isPeerICDClient(getRemoteDeviceId(devicePtr)));
+        ChipICDClient.isPeerICDClient(ChipInteractionClient.getFabricIndex(devicePtr), ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   public void subscribeToEventPath(
@@ -918,7 +909,7 @@ public class ChipDeviceController {
         false,
         imTimeoutMs,
         eventMin,
-        isPeerICDClient(getRemoteDeviceId(devicePtr)));
+        ChipICDClient.isPeerICDClient(ChipInteractionClient.getFabricIndex(devicePtr), ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -953,7 +944,7 @@ public class ChipDeviceController {
         isFabricFiltered,
         imTimeoutMs,
         null,
-        isPeerICDClient(getRemoteDeviceId(devicePtr)));
+        ChipICDClient.isPeerICDClient(ChipInteractionClient.getFabricIndex(devicePtr), ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -1006,7 +997,7 @@ public class ChipDeviceController {
         isFabricFiltered,
         imTimeoutMs,
         null,
-        isPeerICDClient(getRemoteDeviceId(devicePtr)));
+        ChipICDClient.isPeerICDClient(ChipInteractionClient.getFabricIndex(devicePtr), ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   public void subscribeToPath(
@@ -1038,7 +1029,7 @@ public class ChipDeviceController {
         isFabricFiltered,
         imTimeoutMs,
         eventMin,
-        isPeerICDClient(getRemoteDeviceId(devicePtr)));
+        ChipICDClient.isPeerICDClient(ChipInteractionClient.getFabricIndex(devicePtr), ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   public void subscribeToPath(
@@ -1071,7 +1062,7 @@ public class ChipDeviceController {
         isFabricFiltered,
         imTimeoutMs,
         eventMin,
-        isPeerLIT != null ? isPeerLIT : isPeerICDClient(getRemoteDeviceId(devicePtr)));
+        isPeerLIT != null ? isPeerLIT : ChipICDClient.isPeerICDClient(ChipInteractionClient.getFabricIndex(devicePtr), ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   /**

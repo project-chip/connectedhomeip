@@ -138,3 +138,15 @@ JNI_METHOD(void, shutdownSubscriptions)
         ChipLogError(Controller, "Failed to shutdown subscriptions with Error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
+
+JNI_METHOD(jlong, getRemoteDeviceId)
+(JNIEnv * env, jobject self, jlong devicePtr)
+{
+    return getRemoteDeviceId(devicePtr);
+}
+
+JNI_METHOD(jint, getFabricIndex)
+(JNIEnv * env, jobject self, jlong devicePtr)
+{
+    return getFabricIndex(devicePtr);
+}

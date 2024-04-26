@@ -21,5 +21,14 @@ package chip.devicecontroller;
 import java.util.List;
 
 public class ChipICDClient {
-    public static native List<ICDClientInfo> getICDClientInfo(int fabricIndex);
+  public static boolean isPeerICDClient(int fabricIndex, long deviceId) {
+    List<ICDClientInfo> clientInfo = getICDClientInfo(fabricIndex);
+    if (clientInfo == null) {
+      return false;
+    }
+
+    return clientInfo.stream().anyMatch(info -> info.getPeerNodeId() == deviceId);
+  }
+
+  public static native List<ICDClientInfo> getICDClientInfo(int fabricIndex);
 }

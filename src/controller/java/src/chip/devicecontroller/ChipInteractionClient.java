@@ -80,4 +80,8 @@ public class ChipInteractionClient {
       @Nullable Integer fabricIndex,
       @Nullable Long peerNodeId,
       @Nullable Long subscriptionId);
+
+  static native long getRemoteDeviceId(long devicePtr);
+
+  static native int getFabricIndex(long devicePtr);
 }

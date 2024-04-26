@@ -807,6 +807,31 @@ exit:
     return err;
 }
 
+jlong getRemoteDeviceId(jlong devicePtr)
+{
+    OperationalDeviceProxy * chipDevice = reinterpret_cast<OperationalDeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return static_cast<jlong>(chip::kUndefinedNodeId);
+    }
+
+    return static_cast<jlong>(chipDevice->GetDeviceId());
+}
+
+jint getFabricIndex(jlong devicePtr)
+{
+    OperationalDeviceProxy * chipDevice = reinterpret_cast<OperationalDeviceProxy *>(devicePtr);
+    if (chipDevice == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return static_cast<jint>(chip::kUndefinedFabricIndex);
+    }
+
+    return static_cast<jint>(chipDevice->GetPeerScopedNodeId().GetFabricIndex());
+}
+
+
 /**
  * Takes objects in attributePathList, converts them to app:AttributePathParams, and appends them to outAttributePathParamsList.
  */

@@ -32,3 +32,6 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
 CHIP_ERROR extendableInvoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElementList,
                             jint timedRequestTimeoutMs, jint imTimeoutMs);
 CHIP_ERROR shutdownSubscriptions(JNIEnv * env, jlong handle, jobject fabricIndex, jobject peerNodeId, jobject subscriptionId);
+
+jlong getRemoteDeviceId(jlong devicePtr);
+jint getFabricIndex(jlong devicePtr);
