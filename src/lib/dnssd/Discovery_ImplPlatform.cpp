@@ -72,7 +72,7 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         discoveryContext->Retain();
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
 
-        auto ipAddress = services[i].mAddress;
+        auto & ipAddress = services[i].mAddress;
 
         // Check if SRV, TXT and AAAA records were received in DNS responses
         if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value())
