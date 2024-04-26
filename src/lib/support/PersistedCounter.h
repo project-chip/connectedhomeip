@@ -104,7 +104,7 @@ public:
         }
 #endif
 
-        ReturnErrorOnFailure(PersistNextEpochStart(startValue + aEpoch));
+        ReturnErrorOnFailure(PersistNextEpochStart(static_cast<T>(startValue + aEpoch)));
 
         // This will set the starting value, after which we're ready.
         return MonotonicallyIncreasingCounter<T>::Init(startValue);
@@ -145,7 +145,7 @@ private:
         {
             // Value advanced past the previously persisted "start point".
             // Ensure that a new starting point is persisted.
-            ReturnErrorOnFailure(PersistNextEpochStart(refEpoch + mEpoch));
+            ReturnErrorOnFailure(PersistNextEpochStart(static_cast<T>(refEpoch + mEpoch)));
 
             // Advancing the epoch should have ensured that the current value is valid
             VerifyOrReturnError(static_cast<T>(MonotonicallyIncreasingCounter<T>::GetValue() + mEpoch) == mNextEpoch,

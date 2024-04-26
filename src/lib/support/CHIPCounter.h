@@ -121,7 +121,7 @@ public:
      */
     CHIP_ERROR AdvanceBy(T value) override
     {
-        mCounterValue += value;
+        mCounterValue = static_cast<T>(mCounterValue + value);
         return CHIP_NO_ERROR;
     }
 
