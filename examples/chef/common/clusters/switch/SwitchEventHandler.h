@@ -32,47 +32,46 @@ namespace Switch {
 class SwitchEventHandler
 {
 public:
-    SwitchEventHandler(EndpointId endpoint):mEndpointId(endpoint){};
+    SwitchEventHandler() {};
 
     /**
      * Should be called when the latching switch is moved to a new position.
      */
-    void OnSwitchLatched(uint8_t newPosition);
+    void OnSwitchLatched(EndpointId endpointId, uint8_t newPosition);
 
     /**
      * Should be called when the momentary switch starts to be pressed.
      */
-    void OnSwitchInitialPressed(uint8_t newPosition);
+    void OnInitialPress(EndpointId endpointId, uint8_t newPosition);
 
     /**
      * Should be called when the momentary switch has been pressed for a "long" time.
      */
-    void OnSwitchLongPressed(uint8_t newPosition);
+    void OnLongPress(EndpointId endpointId, uint8_t newPosition);
 
     /**
      * Should be called when the momentary switch has been released.
      */
-    void OnSwitchShortReleased(uint8_t previousPosition);
+    void OnShortRelease(EndpointId endpointId, uint8_t previousPosition);
 
     /**
      * Should be called when the momentary switch has been released after having been pressed for a long time.
      */
-    void OnSwitchLongReleased(uint8_t previousPosition);
+    void OnLongRelease(EndpointId endpointId, uint8_t previousPosition);
 
     /**
      * Should be called to indicate how many times the momentary switch has been pressed in a multi-press
      * sequence, during that sequence.
      */
-    void OnSwitchMultiPressOngoing(uint8_t newPosition, uint8_t count);
+    void OnMultiPressOngoing(EndpointId endpointId, uint8_t newPosition, uint8_t count);
 
     /**
      * Should be called to indicate how many times the momentary switch has been pressed in a multi-press
      * sequence, after it has been detected that the sequence has ended.
      */
-    void OnSwitchMultiPressComplete(uint8_t previousPosition, uint8_t count);
+    void OnMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uint8_t count);
 
 private:
-    EndpointId mEndpointId;
 };
 
 
@@ -80,11 +79,3 @@ private:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-
-
-//class AllClustersCommandDelegate : public NamedPipeCommandDelegate
-//{
-//public:
-//    void OnEventCommandReceived(const char * json) override;
-//};

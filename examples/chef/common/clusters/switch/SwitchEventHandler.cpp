@@ -31,61 +31,61 @@ using namespace chip::app::Clusters::Switch;
 using namespace chip::DeviceLayer;
 
 
-void SwitchEventHandler::OnSwitchLatched(uint8_t newPosition)
+void SwitchEventHandler::OnSwitchLatched(EndpointId endpointId, uint8_t newPosition)
 {
     ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);
 
-    Clusters::SwitchServer::Instance().OnSwitchLatch(mEndpointId, newPosition);
+    Clusters::SwitchServer::Instance().OnSwitchLatch(endpointId, newPosition);
 }
 
-void SwitchEventHandler::OnSwitchInitialPressed(uint8_t newPosition)
+void SwitchEventHandler::OnInitialPress(EndpointId endpointId, uint8_t newPosition)
 {
     ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
 
-    Clusters::SwitchServer::Instance().OnInitialPress(mEndpointId, newPosition);
+    Clusters::SwitchServer::Instance().OnInitialPress(endpointId, newPosition);
 }
 
-void SwitchEventHandler::OnSwitchLongPressed(uint8_t newPosition)
+void SwitchEventHandler::OnLongPress(EndpointId endpointId, uint8_t newPosition)
 {
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
 
-    Clusters::SwitchServer::Instance().OnLongPress(mEndpointId, newPosition);
+    Clusters::SwitchServer::Instance().OnLongPress(endpointId, newPosition);
 }
 
-void SwitchEventHandler::OnSwitchShortReleased(uint8_t previousPosition)
+void SwitchEventHandler::OnShortRelease(EndpointId endpointId, uint8_t previousPosition)
 {
     ChipLogDetail(NotSpecified, "The the previous value of the CurrentPosition when the momentary switch has been released:%d",
                   previousPosition);
 
-    Clusters::SwitchServer::Instance().OnShortRelease(mEndpointId, previousPosition);
+    Clusters::SwitchServer::Instance().OnShortRelease(endpointId, previousPosition);
 }
 
-void SwitchEventHandler::OnSwitchLongReleased(uint8_t previousPosition)
+void SwitchEventHandler::OnLongRelease(EndpointId endpointId, uint8_t previousPosition)
 {
     ChipLogDetail(NotSpecified,
                   "The the previous value of the CurrentPosition when the momentary switch has been released after having been "
                   "pressed for a long time:%d",
                   previousPosition);
 
-    Clusters::SwitchServer::Instance().OnLongRelease(mEndpointId, previousPosition);
+    Clusters::SwitchServer::Instance().OnLongRelease(endpointId, previousPosition);
 }
 
-void SwitchEventHandler::OnSwitchMultiPressOngoing(uint8_t newPosition, uint8_t count)
+void SwitchEventHandler::OnMultiPressOngoing(EndpointId endpointId, uint8_t newPosition, uint8_t count)
 {
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed in a multi-press sequence:%d",
                   newPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
-    Clusters::SwitchServer::Instance().OnMultiPressOngoing(mEndpointId, newPosition, count);
+    Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpointId, newPosition, count);
 }
 
-void SwitchEventHandler::OnSwitchMultiPressComplete(uint8_t previousPosition, uint8_t count)
+void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t previousPosition, uint8_t count)
 {
     ChipLogDetail(NotSpecified, "The previous position when the momentary switch has been pressed in a multi-press sequence:%d",
                   previousPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
-    Clusters::SwitchServer::Instance().OnMultiPressComplete(mEndpointId, previousPosition, count);
+    Clusters::SwitchServer::Instance().OnMultiPressComplete(endpointId, previousPosition, count);
 }
 
 

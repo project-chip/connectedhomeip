@@ -19,12 +19,12 @@ message Action {
   optional uint32 arg3          = 6; // 3rd attribute
 }
 
-message ActionsWrite {
+message ActionsRequest {
   uint32 endpoint_id = 1;
   uint32 cluster_id = 2;
-  repeated Action actions = 3; // Actions including Attribute Write / Event / Command 
+  repeated Action actions       = 3; // Actions including Attribute Write / Event / Command 
 }
 
 service Actions {
-  rpc Set(ActionsWrite) returns (pw.protobuf.Empty){}
+  rpc Set(ActionsRequest) returns (pw.protobuf.Empty){}
 }

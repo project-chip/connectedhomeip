@@ -37,29 +37,105 @@ using namespace chip::app;
 class SwitchActionsDelegate: public chip::app::ActionsDelegate
 {
 public:
-    SwitchActionsDelegate(EndpointId endpointId, ClusterId clusterId, SwitchEventHandler *eventHandler): ActionsDelegate(endpointId, clusterId), mEventHandler(eventHandler){};
+    SwitchActionsDelegate(ClusterId clusterId, SwitchEventHandler *eventHandler): ActionsDelegate(clusterId), mEventHandler(eventHandler){};
     ~SwitchActionsDelegate() override {};
 
-    void AttributeWriteHandler(chip::AttributeId attributeId, std::vector<uint32_t>args) override;
-    void EventHandler(chip::EventId eventId, std::vector<uint32_t>args) override;
+    void AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t>args) override;
+    void EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t>args) override;
 
 
 private:
     SwitchEventHandler *mEventHandler;
 };
 
-void SwitchActionsDelegate::AttributeWriteHandler(chip::AttributeId attributeId, std::vector<uint32_t>args)
+void SwitchActionsDelegate::AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t>args)
 {
+    if (args.empty()) {
+        // TODO: error
+        return;
+    }
 
+    switch (attributeId) {
+    case Switch::Attributes::NumberOfPositions::Id:
+        {
+            uint8_t data = static_cast<uint8_t>(args[0]);
+            app::Clusters::Switch::Attributes::NumberOfPositions::Set(endpointId, data);
+        }
+        break;
+    case Switch::Attributes::CurrentPosition::Id:
+        {
+            uint8_t data = static_cast<uint8_t>(args[0]);
+            app::Clusters::Switch::Attributes::CurrentPosition::Set(endpointId, data);
+        }
+        break;
+    case Switch::Attributes::MultiPressMax::Id:
+        {
+            uint8_t data = static_cast<uint8_t>(args[0]);
+            app::Clusters::Switch::Attributes::MultiPressMax::Set(endpointId, data);
+        }
+        break;
+    default:
+        break;
+    }
 }
 
-void SwitchActionsDelegate::EventHandler(chip::EventId eventId, std::vector<uint32_t>args)
+void SwitchActionsDelegate::EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t>args)
 {
+    if (args.empty()) {
+        // TODO: error
+        return;
+    }
     switch (eventId) {
     case Events::SwitchLatched::Id:
         {
             uint8_t newPosition = static_cast<uint8_t>(args[0]);
-            mEventHandler->OnSwitchLatched(newPosition);
+            mEventHandler->OnSwitchLatched(endpointId, newPosition);
+        }
+        break;
+    case Events::InitialPress::Id:
+        {
+            uint8_t newPosition = static_cast<uint8_t>(args[0]);
+            mEventHandler->OnInitialPress(endpointId, newPosition);
+        }
+        break;
+    case Events::LongPress::Id:
+        {
+            uint8_t newPosition = static_cast<uint8_t>(args[0]);
+            mEventHandler->OnLongPress(endpointId, newPosition);
+        }
+        break;
+    case Events::ShortRelease::Id:
+        {
+            uint8_t previousPosition = static_cast<uint8_t>(args[0]);
+            mEventHandler->OnShortRelease(endpointId, previousPosition);
+        }
+        break;
+    case Events::LongRelease::Id:
+        {
+            uint8_t previousPosition = static_cast<uint8_t>(args[0]);
+            mEventHandler->OnLongRelease(endpointId, previousPosition);
+        }
+        break;
+    case Events::MultiPressOngoing::Id:
+        {
+            if (args.size() < 2) {
+                // TODO: error
+                return;
+            }
+            uint8_t newPosition = static_cast<uint8_t>(args[0]);
+            uint8_t currentNumberOfPressesCounted = static_cast<uint8_t>(args[1]);
+            mEventHandler->OnMultiPressOngoing(endpointId, newPosition, currentNumberOfPressesCounted);
+        }
+        break;
+    case Events::MultiPressComplete::Id:
+        {
+            if (args.size() < 2) {
+                // TODO: error
+                return;
+            }
+            uint8_t previousPosition = static_cast<uint8_t>(args[0]);
+            uint8_t totalNumberOfPressesCounted = static_cast<uint8_t>(args[1]);
+            mEventHandler->OnMultiPressComplete(endpointId, previousPosition, totalNumberOfPressesCounted);
         }
         break;
     default:
@@ -71,7 +147,7 @@ void emberAfSwitchClusterInitCallback(EndpointId endpointId)
 {
     ChipLogProgress(Zcl, "Chef: emberAfSwitchClusterInitCallback");
 printf("\033[44m %s, %d, Switch::ID=%u \033[0m \n", __func__, __LINE__, Switch::Id);
-    ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, new SwitchActionsDelegate(endpointId, Clusters::Switch::Id, new SwitchEventHandler(endpointId)));
+    ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, new SwitchActionsDelegate(Clusters::Switch::Id, new SwitchEventHandler()));
 }
 
 

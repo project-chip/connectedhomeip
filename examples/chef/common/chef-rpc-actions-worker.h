@@ -30,18 +30,16 @@ namespace app {
 
 class ActionsDelegate
 {
-
 public:
-    ActionsDelegate(EndpointId endpoint, ClusterId cluster): mEndpointId(endpoint), mClusterId(cluster) { };
+    ActionsDelegate(ClusterId clusterId): mClusterId(clusterId) { };
 
     virtual ~ActionsDelegate() = default;
 
-    virtual void AttributeWriteHandler(chip::AttributeId attributeId, std::vector<uint32_t>args) {};
-    virtual void CommandHandler(chip::CommandId commandId, std::vector<uint32_t>args) {};
-    virtual void EventHandler(chip::EventId eventId, std::vector<uint32_t>args) {};
+    virtual void AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t>args) {};
+    virtual void CommandHandler(chip::EndpointId endpointId, chip::CommandId commandId, std::vector<uint32_t>args) {};
+    virtual void EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t>args) {};
 
 protected:
-    EndpointId mEndpointId;
     ClusterId mClusterId;
 };
 
@@ -65,7 +63,7 @@ public:
     ChefRpcActionsWorker();
 
     bool EnqueueAction(ActionTask task);
-    ActionTask PopActionQueue();
+    void ProcessActionQueue();
     void RegisterRpcActionsDelegate(ClusterId clusterId, ActionsDelegate * delegate);
 
  private:

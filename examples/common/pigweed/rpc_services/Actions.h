@@ -42,25 +42,24 @@ public:
         Event = 2,
     };
 
-    ::pw::Status Set( const chip_rpc_ActionsWrite & request, ::pw_protobuf_Empty & response)
+    ::pw::Status Set( const chip_rpc_ActionsRequest & request, ::pw_protobuf_Empty & response)
     {
+        DeviceLayer::StackLock lock;
 printf("\033[41m %s, %d, request.endpoint_id=%d, request.cluster_id=%d \033[0m \n", __func__, __LINE__, request.endpoint_id, request.cluster_id);
 
-        Type type = Type::Attribute;
-        uint32_t delayMs = 0;
-        uint32_t actionId = 0;
-        std::vector<uint32_t> args;
-        mActionsSubscribeCallback(request.endpoint_id, request.cluster_id, static_cast<uint8_t>(type), delayMs, actionId, args);
+//        for (const auto& action: request.actions) {
+        for (int i = 0; i < request.actions_count; i++) {
+            chip_rpc_Action action = request.actions[i];
+            std::vector<uint32_t> args;
+            if (action.has_arg1) args.push_back(action.arg1);
+            if (action.has_arg2) args.push_back(action.arg2);
+            if (action.has_arg3) args.push_back(action.arg3);
+printf("\033[41m %s, %d, action i=%d, type=%u, delayMs=%u, actionId=%u, arg1=0x%x, arg2=0x%x, arg3=0x%x  \033[0m \n", __func__, __LINE__, i, action.type, action.delayMs, action.actionId, action.has_arg1? action.arg1 : 0xffffffff, action.has_arg2? action.arg2 : 0xffffffff, action.has_arg3? action.arg3 : 0xffffffff);
+            mActionsSubscribeCallback(request.endpoint_id, request.cluster_id, static_cast<uint8_t>(action.type), action.delayMs, action.actionId, args);
+        } 
 
         return pw::OkStatus();
     }
-
-//    struct Action {
-//        Type type;
-//        uint32_t delayMs;
-//        uint32_t actionId;
-//        std::vector<uint32_t> args;
-//    };
 
     using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args); 
 

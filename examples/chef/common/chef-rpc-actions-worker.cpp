@@ -47,39 +47,10 @@ ActionsDelegate * RpcFindActionsDelegate(ClusterId clusterId)
 
 static void RpcActionsTaskCallback(System::Layer * systemLayer, void * data)
 {
-    ActionTask task = ChefRpcActionsWorker::Instance().PopActionQueue();
+    ChefRpcActionsWorker * worker = (ChefRpcActionsWorker *)data;
+printf("\033[44m %s , %d \033[0m \n", __func__, __LINE__);
 
-printf("\033[41m %s , %d, endpointId=%d, clusterId=%d \033[0m \n", __func__, __LINE__, task.endpointId, task.clusterId);
-
-    ActionsDelegate * delegate = RpcFindActionsDelegate(task.clusterId);
-    if ( nullptr == delegate ) {
-      // TBD: Error cluster not registered
-        return;
-    }
-
-    ActionType type = static_cast<ActionType>(task.type);
-
-    switch (type) {
-    case ActionType::WRITE_ATTRIBUTE:
-    {
-        delegate->AttributeWriteHandler(static_cast<chip::AttributeId>(task.actionId), task.args);
-    }
-    break; 
-    case ActionType::RUN_COMMAND:
-    {
-        delegate->CommandHandler(static_cast<chip::CommandId>(task.actionId), task.args);
-    }
-    break; 
-    case ActionType::EMIT_EVENT:
-    {
-        delegate->EventHandler(static_cast<chip::EventId>(task.actionId), task.args);
-    }
-        break; 
-    default:
-        break;
-    }
-    // TBD: insert the queue t ActionHandler's queue
-//    delete queue;
+    worker->ProcessActionQueue();
 }
 
 bool ChefRpcActionsCallback(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args)
@@ -98,18 +69,57 @@ bool ChefRpcActionsWorker::EnqueueAction(ActionTask task)
         kickTimer = true;   // kick timer when the first task is adding to the queue
     }
     if (kickTimer) {
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(10), RpcActionsTaskCallback, this);
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(task.delayMs), RpcActionsTaskCallback, this);
     }
     return true;
 }
 
-ActionTask ChefRpcActionsWorker::PopActionQueue()
+void ChefRpcActionsWorker::ProcessActionQueue()
 {
-    // assert !queue.empty()
+//    delete queue;
     ActionTask task = queue.front();
     queue.pop();
 
-    return task;
+printf("\033[41m %s , %d, endpointId=%d, clusterId=%d \033[0m \n", __func__, __LINE__, task.endpointId, task.clusterId);
+
+    ActionsDelegate * delegate = RpcFindActionsDelegate(task.clusterId);
+    if ( nullptr == delegate ) {
+printf("\033[41m %s , %d, Cannot run action due to not finding delegate: endpointId=%d, clusterId=%d \033[0m \n", __func__, __LINE__, task.endpointId, task.clusterId);
+    } else {
+        ActionType type = static_cast<ActionType>(task.type);
+
+        switch (type) {
+        case ActionType::WRITE_ATTRIBUTE:
+        {
+printf("\033[41m %s , %d, Writing Attribute: %d, args size=%lu \033[0m \n", __func__, __LINE__, task.actionId, task.args.size());
+            delegate->AttributeWriteHandler(task.endpointId, static_cast<chip::AttributeId>(task.actionId), task.args);
+        }
+        break; 
+        case ActionType::RUN_COMMAND:
+        {
+printf("\033[41m %s , %d, Running Command: %d, args size=%lu \033[0m \n", __func__, __LINE__, task.actionId, task.args.size());
+            delegate->CommandHandler(task.endpointId, static_cast<chip::CommandId>(task.actionId), task.args);
+        }
+        break; 
+        case ActionType::EMIT_EVENT:
+        {
+printf("\033[41m %s , %d, Emitting Event: %d, args size=%lu \033[0m \n", __func__, __LINE__, task.actionId, task.args.size());
+            delegate->EventHandler(task.endpointId, static_cast<chip::EventId>(task.actionId), task.args);
+        }
+        break; 
+        default:
+            break;
+        }
+    }
+
+    if (queue.empty()) {
+        // Return due to no extra queue item to run. 
+        return;
+    }
+
+    // Run next task
+    task = queue.front();
+    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(task.delayMs), RpcActionsTaskCallback, this);
 }
 
 void ChefRpcActionsWorker::RegisterRpcActionsDelegate(ClusterId clusterId, ActionsDelegate * delegate)
