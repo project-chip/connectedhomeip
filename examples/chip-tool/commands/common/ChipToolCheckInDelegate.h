@@ -37,7 +37,7 @@ public:
      * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
      *                         node that sent the check-in message.
      */
-    virtual void OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo);
+    virtual void OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo) = 0;
 };
 
 class ChipToolCheckInDelegate : public chip::app::CheckInDelegate
