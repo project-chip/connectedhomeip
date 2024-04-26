@@ -64,10 +64,19 @@ TEST(TestPersistedCounter, TestkWriteNextCounterStart)
     chip::TestPersistentStorageDelegate storage;
     chip::PersistedCounter<uint64_t> counter;
 
-    // When initializing the first time out of the box, we should have
-    // a count of 0.
+    uint64_t storedValue = 0;
+    uint16_t size        = sizeof(storedValue);
+
+    // When initializing the first time out of the box, we should have a count of 0.
     EXPECT_EQ(counter.Init(&storage, chip::DefaultStorageKeyAllocator::IMEventNumber(), 0x10000), CHIP_NO_ERROR);
     EXPECT_EQ(counter.GetValue(), 0ULL);
+
+    // Check new Epoch value was persisted
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::IMEventNumber().KeyName(), &storedValue, size),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(sizeof(storedValue), size);
+    storedValue = Encoding::LittleEndian::HostSwap<uint64_t>(storedValue);
+    EXPECT_EQ(0x10000ULL, storedValue);
 
     // Verify that we write out the next starting counter value after
     // we've exhausted the counter's range.
@@ -77,14 +86,60 @@ TEST(TestPersistedCounter, TestkWriteNextCounterStart)
     }
     EXPECT_EQ(counter.GetValue(), 0x10000ULL);
 
+    // Check new Epoch value was persisted
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::IMEventNumber().KeyName(), &storedValue, size),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(sizeof(storedValue), size);
+    storedValue = Encoding::LittleEndian::HostSwap<uint64_t>(storedValue);
+    EXPECT_EQ(0x20000ULL, storedValue);
+
     for (int32_t i = 0; i < 0x10000; i++)
     {
         EXPECT_EQ(counter.Advance(), CHIP_NO_ERROR);
     }
     EXPECT_EQ(counter.GetValue(), 0x20000ULL);
+
+    // Check new Epoch value was persisted
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::IMEventNumber().KeyName(), &storedValue, size),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(sizeof(storedValue), size);
+    storedValue = Encoding::LittleEndian::HostSwap<uint64_t>(storedValue);
+    EXPECT_EQ(0x30000ULL, storedValue);
 }
 
-TEST(TestPersistedCounter, TestSetValue)
+TEST(TestPersistedCounter, TestAdvanceMaxCounterValue)
+{
+    chip::TestPersistentStorageDelegate storage;
+    chip::PersistedCounter<uint8_t> counter;
+
+    uint8_t storedValue = 0;
+    uint16_t size       = sizeof(storedValue);
+
+    // When initializing the first time out of the box, we should have a count of 0.
+    EXPECT_EQ(counter.Init(&storage, chip::DefaultStorageKeyAllocator::IMEventNumber(), 1), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 0);
+
+    for (uint16_t i = 0; i < UINT8_MAX; i++)
+    {
+        // Make sure we can increment to max value without error
+        EXPECT_EQ(counter.Advance(), CHIP_NO_ERROR);
+    }
+    EXPECT_EQ(counter.GetValue(), 255);
+
+    // Check new Epoch value was persisted
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::IMEventNumber().KeyName(), &storedValue, size),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(sizeof(storedValue), size);
+    storedValue = Encoding::LittleEndian::HostSwap<uint8_t>(storedValue);
+
+    EXPECT_EQ(storedValue, 0);
+
+    // Increment one more step to make sure counter continues to increment
+    EXPECT_EQ(counter.Advance(), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 0);
+}
+
+TEST(TestPersistedCounter, TestAdvanceBy)
 {
     chip::TestPersistentStorageDelegate storage;
     chip::PersistedCounter<uint64_t> counter;
@@ -92,7 +147,7 @@ TEST(TestPersistedCounter, TestSetValue)
     // Test values
     constexpr uint64_t startingEpochValue = 65535;
     constexpr uint64_t newValue           = 2 * startingEpochValue + 156;
-    constexpr uint64_t newEpochValue      = 3 * startingEpochValue;
+    constexpr uint64_t newEpochValue      = newValue + startingEpochValue;
     uint64_t storedValue                  = 0;
     uint16_t size                         = sizeof(storedValue);
 
@@ -101,7 +156,7 @@ TEST(TestPersistedCounter, TestSetValue)
     EXPECT_EQ(counter.GetValue(), 0ULL);
 
     // Set New value
-    EXPECT_EQ(counter.SetValue(newValue), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.AdvanceBy(newValue), CHIP_NO_ERROR);
     EXPECT_EQ(counter.GetValue(), newValue);
 
     // Check new Epoch value was persisted
@@ -111,6 +166,32 @@ TEST(TestPersistedCounter, TestSetValue)
     storedValue = Encoding::LittleEndian::HostSwap<uint64_t>(storedValue);
 
     EXPECT_EQ(newEpochValue, storedValue);
+}
+
+TEST(TestPersistedCounter, TestAdvanceByMaxCounterValue)
+{
+    chip::TestPersistentStorageDelegate storage;
+    chip::PersistedCounter<uint64_t> counter;
+
+    uint64_t storedValue = 0;
+    uint16_t size        = sizeof(storedValue);
+
+    EXPECT_EQ(counter.Init(&storage, chip::DefaultStorageKeyAllocator::IMEventNumber(), 1ULL), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 0ULL);
+
+    EXPECT_EQ(counter.AdvanceBy(UINT64_MAX), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), UINT64_MAX);
+
+    // Check new Epoch value was persisted
+    EXPECT_EQ(storage.SyncGetKeyValue(chip::DefaultStorageKeyAllocator::IMEventNumber().KeyName(), &storedValue, size),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(sizeof(storedValue), size);
+    storedValue = Encoding::LittleEndian::HostSwap<uint64_t>(storedValue);
+    EXPECT_EQ(0ULL, storedValue);
+
+    // Increment one more step to make sure counter continues to increment
+    EXPECT_EQ(counter.AdvanceBy(1ULL), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 0ULL);
 }
 
 } // namespace

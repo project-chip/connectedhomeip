@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 #include <lib/support/CHIPCounter.h>
+#include <stdint.h>
 
 using namespace chip;
 
@@ -47,12 +48,31 @@ TEST(TestCHIPCounter, TestAdvance)
     EXPECT_EQ(counter.GetValue(), 24ULL);
 }
 
-TEST(TestCHIPCounter, TestSetValue)
+TEST(TestCHIPCounter, TestAdvanceWithRollover)
 {
     MonotonicallyIncreasingCounter<uint64_t> counter;
-    constexpr uint64_t newValue = 9876;
+    EXPECT_EQ(counter.Init(UINT64_MAX), CHIP_NO_ERROR);
 
-    EXPECT_EQ(counter.Init(5736), CHIP_NO_ERROR);
-    EXPECT_EQ(counter.SetValue(newValue), CHIP_NO_ERROR);
-    EXPECT_EQ(counter.GetValue(), newValue);
+    EXPECT_EQ(counter.Advance(), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 0ULL);
+}
+
+TEST(TestCHIPCounter, AdvanceBy)
+{
+    MonotonicallyIncreasingCounter<uint64_t> counter;
+    constexpr uint64_t step = 9876;
+    uint64_t expectedValue  = step;
+
+    EXPECT_EQ(counter.Init(0), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.AdvanceBy(step), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), expectedValue);
+
+    expectedValue += step;
+    EXPECT_EQ(counter.AdvanceBy(step), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), expectedValue);
+
+    // Force rollover
+    expectedValue += UINT64_MAX;
+    EXPECT_EQ(counter.AdvanceBy(UINT64_MAX), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), expectedValue);
 }

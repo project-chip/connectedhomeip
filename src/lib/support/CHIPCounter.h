@@ -52,20 +52,20 @@ public:
     virtual CHIP_ERROR Advance() = 0;
 
     /**
+     * @brief Advances the current counter value by N
+     *
+     * @param value value of N
+     *
+     * @return A CHIP error code if anything failed, CHIP_NO_ERROR otherwise.
+     */
+    virtual CHIP_ERROR AdvanceBy(T value) = 0;
+
+    /**
      *  @brief Get the current value of the counter.
      *
      *  @return The current value of the counter.
      */
     virtual T GetValue() = 0;
-
-    /**
-     * @brief Set counter to a new value
-     *
-     * @param value new counter value
-     *
-     * @return CHIP_ERROR A CHIP error code if anything failed, CHIP_NO_ERROR otherwise.
-     */
-    virtual CHIP_ERROR SetValue(T value) = 0;
 };
 
 /**
@@ -113,24 +113,24 @@ public:
     }
 
     /**
+     * @brief Advances the current counter value by N
+     *
+     * @param value value of N
+     *
+     * @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
+     */
+    CHIP_ERROR AdvanceBy(T value) override
+    {
+        mCounterValue += value;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      *  @brief Get the current value of the counter.
      *
      *  @return The current value of the counter.
      */
     T GetValue() override { return mCounterValue; }
-
-    /**
-     * @brief Set counter to a new value
-     *
-     * @param value new counter value
-     *
-     * @return CHIP_ERROR A CHIP error code if anything failed, CHIP_NO_ERROR otherwise.
-     */
-    CHIP_ERROR SetValue(T value) override
-    {
-        mCounterValue = value;
-        return CHIP_NO_ERROR;
-    }
 
 protected:
     T mCounterValue;
