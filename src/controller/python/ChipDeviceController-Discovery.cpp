@@ -124,17 +124,23 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         jsonVal["deviceName"]         = dnsSdInfo->deviceName;
         jsonVal["pairingInstruction"] = dnsSdInfo->pairingInstruction;
         jsonVal["pairingHint"]        = dnsSdInfo->pairingHint;
-        if (dnsSdInfo->GetMrpRetryIntervalIdle().has_value())
+
+        auto idleInterval = dnsSdInfo->GetMrpRetryIntervalIdle();
+        if (idleInterval.has_value())
         {
-            jsonVal["mrpRetryIntervalIdle"] = dnsSdInfo->GetMrpRetryIntervalIdle()->count();
+            jsonVal["mrpRetryIntervalIdle"] = idleInterval->count();
         }
-        if (dnsSdInfo->GetMrpRetryIntervalActive().has_value())
+
+        auto activeInterval = dnsSdInfo->GetMrpRetryIntervalActive();
+        if (activeInterval.has_value())
         {
-            jsonVal["mrpRetryIntervalActive"] = dnsSdInfo->GetMrpRetryIntervalActive()->count();
+            jsonVal["mrpRetryIntervalActive"] = activeInterval->count();
         }
-        if (dnsSdInfo->GetMrpRetryActiveThreshold().has_value())
+
+        auto activeThreshold = dnsSdInfo->GetMrpRetryActiveThreshold();
+        if (activeThreshold.has_value())
         {
-            jsonVal["mrpRetryActiveThreshold"] = dnsSdInfo->GetMrpRetryActiveThreshold()->count();
+            jsonVal["mrpRetryActiveThreshold"] = activeThreshold->count();
         }
         jsonVal["supportsTcp"] = dnsSdInfo->supportsTcp;
         {
@@ -188,22 +194,28 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
         ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
-        if (dnsSdInfo->GetMrpRetryIntervalIdle().has_value())
+
+        
+        auto idleInterval =  dnsSdInfo->GetMrpRetryIntervalIdle();
+        if (idleInterval.has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", dnsSdInfo->GetMrpRetryIntervalIdle()->count());
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", idleInterval->count());
         }
         else
         {
             ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
         }
-        if (dnsSdInfo->GetMrpRetryIntervalActive().has_value())
+
+        auto activeInterval =  dnsSdInfo->GetMrpRetryIntervalActive();
+        if (activeInterval.has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", dnsSdInfo->GetMrpRetryIntervalActive()->count());
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", activeInterval->count());
         }
         else
         {
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
+
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
         if (dnsSdInfo->isICDOperatingAsLIT.has_value())
         {
