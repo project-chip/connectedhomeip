@@ -159,14 +159,11 @@ private:
 
 /////////////////////////// Init test
 
-class TestTCP : public ::testing::Test
+class TestTCP : public ::testing::Test, public chip::Test::IOContext
 {
 protected:
-    TestTCP() { inContext = new TestContext(); }
-    ~TestTCP() { delete inContext; }
-    void SetUp() { ASSERT_EQ(inContext->Init(), CHIP_NO_ERROR); }
-    void TearDown() { inContext->Shutdown(); }
-    TestContext * inContext;
+    void SetUp() { ASSERT_EQ(this->Init(), CHIP_NO_ERROR); }
+    void TearDown() { this->Shutdown(); }
 };
 
 void CheckSimpleInitTest(TestContext * ctx, Inet::IPAddressType type)
@@ -191,27 +188,27 @@ void CheckMessageTest(TestContext * ctx, const IPAddress & addr)
 #if INET_CONFIG_ENABLE_IPV4
 TEST_F(TestTCP, CheckSimpleInitTest4)
 {
-    CheckSimpleInitTest(inContext, IPAddressType::kIPv4);
+    CheckSimpleInitTest(this, IPAddressType::kIPv4);
 }
 
 TEST_F(TestTCP, CheckMessageTest4)
 {
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
-    CheckMessageTest(inContext, addr);
+    CheckMessageTest(this, addr);
 }
 #endif
 
 TEST_F(TestTCP, CheckSimpleInitTest6)
 {
-    CheckSimpleInitTest(inContext, IPAddressType::kIPv6);
+    CheckSimpleInitTest(this, IPAddressType::kIPv6);
 }
 
 TEST_F(TestTCP, CheckMessageTest6)
 {
     IPAddress addr;
     IPAddress::FromString("::1", addr);
-    CheckMessageTest(inContext, addr);
+    CheckMessageTest(this, addr);
 }
 
 // Generates a packet buffer or a chain of packet buffers for a single message.
@@ -445,5 +442,5 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(TestContext * ctx)
 
 TEST_F(TestTCP, CheckProcessReceivedBuffer)
 {
-    chip::Transport::TCPTest::CheckProcessReceivedBuffer(inContext);
+    chip::Transport::TCPTest::CheckProcessReceivedBuffer(this);
 }
