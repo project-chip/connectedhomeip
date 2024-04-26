@@ -116,7 +116,7 @@ TEST(TestPersistedCounter, TestAdvanceMaxCounterValue)
     uint16_t size       = sizeof(storedValue);
 
     // When initializing the first time out of the box, we should have a count of 0.
-    EXPECT_EQ(counter.Init(&storage, chip::DefaultStorageKeyAllocator::IMEventNumber(), 1), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.Init(&storage, chip::DefaultStorageKeyAllocator::IMEventNumber(), 1U), CHIP_NO_ERROR);
     EXPECT_EQ(counter.GetValue(), 0);
 
     for (uint16_t i = 0; i < UINT8_MAX; i++)
