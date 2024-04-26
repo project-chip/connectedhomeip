@@ -68,11 +68,6 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-void HandleIncomingBleConnection(BLEEndPoint * bleEP)
-{
-    ChipLogProgress(DeviceLayer, "con rcvd");
-}
-
 void BLEManagerImpl::InitConnectionData()
 {
     /* Initialize Hashmap */
@@ -114,8 +109,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
-
-    OnChipBleConnectReceived = HandleIncomingBleConnection;
 
     ret = MainLoop::Instance().Init(_BleInitialize);
     VerifyOrExit(ret != false, err = CHIP_ERROR_INTERNAL);

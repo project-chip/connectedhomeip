@@ -657,6 +657,8 @@ public:
 #endif
     }
 
+    bool operator==(const PacketBufferHandle & aOther) const { return mBuffer == aOther.mBuffer; }
+
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // For use via LwIPPacketBufferView only.
@@ -684,8 +686,7 @@ private:
     }
 
     PacketBuffer * Get() const { return mBuffer; }
-
-    bool operator==(const PacketBufferHandle & aOther) const { return mBuffer == aOther.mBuffer; }
+    PacketBuffer * GetNext() const { return static_cast<PacketBuffer *>(mBuffer->next); }
 
 #if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHTSIZE
     void InternalRightSize();

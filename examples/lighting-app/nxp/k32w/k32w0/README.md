@@ -323,7 +323,7 @@ Please use the following build args:
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 
 There are factory data generated binaries available in
 examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.

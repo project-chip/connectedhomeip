@@ -118,8 +118,7 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
-    mServiceMode             = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
-    OnChipBleConnectReceived = HandleIncomingBleConnection;
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     err = CreateEventHandler();
     return err;
@@ -365,11 +364,6 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 {
     /* Unsupported on TI peripheral device implementation */
     return false;
-}
-
-void BLEManagerImpl::HandleIncomingBleConnection(BLEEndPoint * bleEP)
-{
-    BLEMGR_LOG("BLEMGR: HandleIncomingBleConnection");
 }
 
 // ===== Helper Members that implement the Low level BLE Stack behavior.

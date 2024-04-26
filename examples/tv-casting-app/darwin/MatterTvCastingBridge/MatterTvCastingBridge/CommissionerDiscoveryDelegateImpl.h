@@ -61,10 +61,10 @@ public:
         }
     }
 
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+    void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
     {
         ChipLogProgress(AppServer, "CommissionerDiscoveryDelegateImpl().OnDiscoveredDevice() called");
-        __block const chip::Dnssd::DiscoveredNodeData cppNodeData = nodeData;
+        __block const chip::Dnssd::CommissionNodeData cppNodeData = nodeData;
         dispatch_async(mClientQueue, ^{
             DiscoveredNodeData * objCDiscoveredNodeData = [ConversionUtils convertToObjCDiscoveredNodeDataFrom:&cppNodeData];
             mDiscoveredCommissioners.push_back(objCDiscoveredNodeData); // add to the list of discovered commissioners
