@@ -123,10 +123,11 @@ public:
         if (retryInterval.has_value())
             streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", *retryInterval);
 
-        if (nodeData.GetMrpRetryActiveThreshold().has_value())
+        auto activeThreshold = nodeData.GetMrpRetryActiveThreshold();
+
+        if (activeThreshold.has_value())
         {
-            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n",
-                            *nodeData.GetMrpRetryActiveThreshold());
+            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n", *activeThreshold);
         }
         streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.supportsTcp ? "yes" : "no");
 
