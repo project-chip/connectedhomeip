@@ -1016,7 +1016,10 @@ void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
 
         VerifyOrReturn(err == ESP_OK, ChipLogError(DeviceLayer, "BLE deinit failed"));
         ChipLogProgress(DeviceLayer, "BLE deinit successful and memory reclaimed");
-        // TODO: post an event when ble is deinitialized and memory is added to heap
+
+        ChipDeviceEvent event;
+        event.Type = DeviceEventType::kBLEDeinitialized;
+        VerifyOrDo(CHIP_NO_ERROR == PlatformMgr().PostEvent(&event), ChipLogError(DeviceLayer, "Failed to post BLE deinit event"));
     }
 }
 
