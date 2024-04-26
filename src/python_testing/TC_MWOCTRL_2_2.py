@@ -39,16 +39,25 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
     def steps_TC_MWOCTRL_2_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read the PowerSetting attribute"),
-            TestStep(3, "Send the SetCookingParameters command"),
-            TestStep(4, "Read and verify the PowerSetting attribute"),
-            TestStep(5, "Cause constraint error response"),
+            TestStep(2, "Set MinPowerValue variable"),
+            TestStep(3, "Read the MinPower attribute"),
+            TestStep(4, "Set the MaxPowerValue variable"),
+            TestStep(5, "Read the MaxPower attribute"),
+            TestStep(6, "Set the PowerStepValue variable"),
+            TestStep(7, "Read the PowerStep attribute"),
+            TestStep(8, "Read the PowerSetting attribute"),
+            TestStep(9, "Send the SetCookingParameters command"),
+            TestStep(10, "Read and verify the PowerSetting attribute"),
+            TestStep(11, "Set the PowerSetting attribute to the minimum value"),
+            TestStep(12, "Set the PowerSetting attribute to the maximum value"),
+            TestStep(13, "Cause constraint error response"),
         ]
         return steps
 
     def pics_TC_MWOCTRL_2_2(self) -> list[str]:
         pics = [
             "MWOCTRL.S",
+            "MWOCTRL.S.F00",
         ]
         return pics
 
@@ -63,40 +72,78 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         features = Clusters.MicrowaveOvenControl.Bitmaps.Feature
         commands = Clusters.Objects.MicrowaveOvenControl.Commands
 
-        feature_map = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-
-        only_pwrnum_supported = feature_map == features.kPowerAsNumber
-
-        if not only_pwrnum_supported:
-            logging.info("More than PWRNUM is supported so skipping remaining test steps")
+        if not feature_map & features.kPowerAsNumber:
+            logging.info("PWRNUM is not supported so skipping remaining test steps")
             self.skip_all_remaining_steps(2)
             return
 
-        logging.info("Only the PWRNUM feature is supported so continuing with remaining test steps")
+        logging.info("The PWRNUM feature is supported so continuing with remaining test steps")
+
         self.step(2)
-        powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerSetting)
-        asserts.assert_greater_equal(powerValue, 10, "PowerSetting is less than 10")
-        asserts.assert_less_equal(powerValue, 100, "PowerSetting is greater than 100")
-        asserts.assert_true(powerValue % 10 == 0, "PowerSetting is not a multiple of 10")
+        minPowerValue = 10
 
         self.step(3)
-        newPowerValue = (powerValue+10) % 100
+        if self.pics_guard(self.check_pics("MWOCTRL.S.F02")):
+            minPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinPower)
+            logging.info("MinPower is %s" % minPowerValue)
+            asserts.assert_true(minPowerValue >= 1, "MinPower is less than 1")
+
+        self.step(4)
+        maxPowerValue = 100
+
+        self.step(5)
+        if self.pics_guard(self.check_pics("MWOCTRL.S.F02")):
+            maxPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxPower)
+            logging.info("MaxPower is %s" % maxPowerValue)
+            asserts.assert_true(maxPowerValue >= minPowerValue, "MaxPower is less than MinPower")
+            asserts.assert_true(maxPowerValue <= 100, "MaxPower is greater than 100")
+
+        self.step(6)
+        powerStepValue = 10
+
+        self.step(7)
+        if self.pics_guard(self.check_pics("MWOCTRL.S.F02")):
+            powerStepValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerStep)
+            logging.info("PowerStep is %s" % powerStepValue)
+            asserts.assert_true(powerStepValue >= 1, "PowerStep is less than 1")
+            asserts.assert_true(powerStepValue <= maxPowerValue, "PowerStep is greater than MaxPower")
+
+        self.step(8)
+        powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerSetting)
+        asserts.assert_greater_equal(powerValue, minPowerValue, "PowerSetting is less than the minimum.")
+        asserts.assert_less_equal(powerValue, maxPowerValue, "PowerSetting is greater than the maxium")
+        asserts.assert_true((powerValue-minPowerValue) % powerStepValue == 0, "PowerSetting is not a multiple of power step")
+
+        self.step(9)
+        newPowerValue = (powerValue-minPowerValue) % (maxPowerValue-minPowerValue)+powerStepValue+minPowerValue
         try:
             await self.send_single_cmd(cmd=commands.SetCookingParameters(powerSetting=newPowerValue), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        self.step(4)
+        self.step(10)
         powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerSetting)
         asserts.assert_true(powerValue == newPowerValue, "PowerSetting was not correctly set")
 
-        self.step(5)
-        newPowerValue = 125
+        self.step(11)
+        try:
+            await self.send_single_cmd(cmd=commands.SetCookingParameters(powerSetting=minPowerValue), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unable to set power value to minimum")
+
+        self.step(12)
+        try:
+            await self.send_single_cmd(cmd=commands.SetCookingParameters(powerSetting=maxPowerValue), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unable to set power value to maximum")
+
+        self.step(13)
+        newPowerValue = maxPowerValue+1
         try:
             await self.send_single_cmd(cmd=commands.SetCookingParameters(powerSetting=newPowerValue), endpoint=endpoint)
             asserts.assert_fail("Expected an exception but received none.")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different error.")
+            asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different response.")
 
 
 if __name__ == "__main__":
