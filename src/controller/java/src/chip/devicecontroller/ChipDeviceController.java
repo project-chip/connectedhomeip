@@ -545,10 +545,6 @@ public class ChipDeviceController {
     return removeKeySet(deviceControllerPtr, keySetId);
   }
 
-  public long getRemoteDeviceId(long devicePtr) {
-    return getRemoteDeviceId(deviceControllerPtr, devicePtr);
-  }
-
   public void onConnectDeviceComplete() {
     completionListener.onConnectDeviceComplete();
   }
@@ -1590,8 +1586,6 @@ public class ChipDeviceController {
   private native int getFabricIndex(long deviceControllerPtr);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
-
-  private native long getRemoteDeviceId(long deviceControllerPtr, long devicePtr);
 
   static {
     System.loadLibrary("CHIPController");
