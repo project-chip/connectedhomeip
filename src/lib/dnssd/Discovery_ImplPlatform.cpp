@@ -176,7 +176,7 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, std::optional<ui
                               : CopyTextRecordValue(buffer, bufferLen, *value1);
 }
 
-CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const std::optional<ReliableMessageProtocolConfig> optional,
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const std::optional<ReliableMessageProtocolConfig> & optional,
                                TxtFieldKey key)
 {
     VerifyOrReturnError((key == TxtFieldKey::kSessionIdleInterval || key == TxtFieldKey::kSessionActiveInterval ||

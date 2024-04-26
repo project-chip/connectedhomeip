@@ -226,7 +226,7 @@ private:
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
                                    char ** txtFields, size_t & numTxtFields)
     {
-        const auto optionalMrp = params.GetLocalMRPConfig();
+        const auto & optionalMrp = params.GetLocalMRPConfig();
 
         if (optionalMrp.has_value())
         {
