@@ -672,8 +672,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     if (params.GetVendorId().has_value())
     {
-        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                           DiscoveryFilter(DiscoveryFilterType::kVendorId, *params.GetVendorId()));
+        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *params.GetVendorId()));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
