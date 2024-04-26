@@ -56,9 +56,9 @@ public:
     CHIP_ERROR InvalidateHalfCheckInCouterValues();
 
     /**
-     * @brief Invalidates all the Check-In counter values. After this function is called, the new Check-In counter value will be equal to current
-     *        value minus 1 (with rollover) to mimic N -> UINT32_MAX -> N-1. Next time a Check-In message is sent, 1 is added to
-     *        the current value which will be an invalid counter value.
+     * @brief Invalidates all the Check-In counter values. After this function is called, the new Check-In counter value will be
+     *        equal to current value minus 1 (with rollover) to mimic N -> UINT32_MAX -> N-1. Next time a Check-In message is sent,
+     *        1 is added to the current value which will be an invalid counter value.
      *
      * @return CHIP_ERROR Any error returned by a write to persisted storage.
      */
