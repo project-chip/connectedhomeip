@@ -43,7 +43,7 @@ public:
      * @param[out] CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT
      *                        CHIP_ERROR_INTERNAL
      */
-    virtual CHIP_ERROR OnCreateRefreshKey(RefreshKeySender::RefreshKeyBuffer & newKey);
+    virtual CHIP_ERROR GenerateRefreshKey(RefreshKeySender::RefreshKeyBuffer & newKey);
     RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
     void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
