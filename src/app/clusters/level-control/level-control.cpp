@@ -970,18 +970,56 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
         goto send_default_response;
     }
 
+    // Always validate the rate parameter received. A rate of 0 is invalid.
     if (!rate.IsNull() && (rate.Value() == 0))
     {
-        // Move at a rate of zero is no move at all. Immediately succeed without touching anything.
-        ChipLogProgress(Zcl, "Immediate success due to move rate of 0 (would move at no rate).");
-        status = Status::Success;
+        // Providing rate of 0 is not allowed.
+        status = Status::InvalidCommand;
         goto send_default_response;
     }
+
+    uint8_t eventDuration; // use this local var so state->eventDurationMs is only set once the command is validated.
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
+    // If the Rate field is null, the device should move at the default move rate, if available,
+    // Otherwise, move as fast as possible
+    if (rate.IsNull())
+    {
+        app::DataModel::Nullable<uint8_t> defaultMoveRate;
+        status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
+        if (status != Status::Success || defaultMoveRate.IsNull())
+        {
+            ChipLogProgress(Zcl, "ERR: reading default move rate %x", to_underlying(status));
+            eventDuration = FASTEST_TRANSITION_TIME_MS;
+        }
+        else
+        {
+            // The defaultMoveRate cannot be 0
+            if (defaultMoveRate.Value() == 0)
+            {
+                status = Status::InvalidCommand;
+                goto send_default_response;
+            }
+            // Already checked that defaultMoveRate.Value() != 0.
+            eventDuration = static_cast<uint8_t>(MILLISECOND_TICKS_PER_SECOND / defaultMoveRate.Value());
+        }
+    }
+    else
+    {
+        // Already confirmed rate.Value() != 0.
+        eventDuration = static_cast<uint8_t>(MILLISECOND_TICKS_PER_SECOND / rate.Value());
+    }
+#else
+    // Transition/rate is not supported so always use fastest transition time and ignore
+    // both the provided transition time as well as OnOffTransitionTime.
+    ChipLogProgress(Zcl, "Device does not support transition, ignoring rate");
+    eventDuration = FASTEST_TRANSITION_TIME_MS;
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
 
     // Cancel any currently active command before fiddling with the state.
     cancelEndpointTimerCallback(endpoint);
 
-    status = Attributes::CurrentLevel::Get(endpoint, currentLevel);
+    state->eventDurationMs = eventDuration;
+    status                 = Attributes::CurrentLevel::Get(endpoint, currentLevel);
     if (status != Status::Success)
     {
         ChipLogProgress(Zcl, "ERR: reading current level %x", to_underlying(status));
@@ -1033,41 +1071,6 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
             goto send_default_response;
         }
     }
-
-#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
-    // If the Rate field is null, the device should move at the default move rate, if available,
-    // Otherwise, move as fast as possible
-    if (rate.IsNull())
-    {
-        app::DataModel::Nullable<uint8_t> defaultMoveRate;
-        status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
-        if (status != Status::Success || defaultMoveRate.IsNull())
-        {
-            ChipLogProgress(Zcl, "ERR: reading default move rate %x", to_underlying(status));
-            state->eventDurationMs = FASTEST_TRANSITION_TIME_MS;
-        }
-        else
-        {
-            // nonsensical case, means "don't move", so we're done
-            if (defaultMoveRate.Value() == 0)
-            {
-                status = Status::Success;
-                goto send_default_response;
-            }
-            // Already checked that defaultMoveRate.Value() != 0.
-            state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / defaultMoveRate.Value();
-        }
-    }
-    else
-    {
-        state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / std::max(static_cast<uint8_t>(1u), rate.Value());
-    }
-#else
-    // Transition/rate is not supported so always use fastest transition time and ignore
-    // both the provided transition time as well as OnOffTransitionTime.
-    ChipLogProgress(Zcl, "Device does not support transition, ignoring rate");
-    state->eventDurationMs = FASTEST_TRANSITION_TIME_MS;
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
 
     state->transitionTimeMs = difference * state->eventDurationMs;
     state->elapsedTimeMs    = 0;
