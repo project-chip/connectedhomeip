@@ -40,7 +40,7 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
 }
 
-CHIP_ERROR DefaultCheckInDelegate::OnCreateRefreshKey(RefreshKeySender::RefreshKeyBuffer & newKey)
+CHIP_ERROR DefaultCheckInDelegate::GenerateRefreshKey(RefreshKeySender::RefreshKeyBuffer & newKey)
 {
     return Crypto::DRBG_get_bytes(newKey.Bytes(), newKey.Capacity());
 }
@@ -49,7 +49,7 @@ RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     RefreshKeySender::RefreshKeyBuffer newKey;
-    err = CreateSymmetricKey(newKey);
+    err = GenerateRefreshKey(newKey);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Generation of new key failed: %" CHIP_ERROR_FORMAT, err.Format());
