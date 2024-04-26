@@ -52,7 +52,7 @@ TEST(TestPrivateHeap, TestSingleHeapAllocAndFree)
 
     EXPECT_EQ(nullptr, allocator.HeapAlloc(17)); // insufficient size
     void * ptr = allocator.HeapAlloc(16);
-    EXPECT_NE(nullptr, ptr);
+    ASSERT_NE(nullptr, ptr);
     EXPECT_EQ(nullptr, allocator.HeapAlloc(1)); // insufficient size
     memset(ptr, 0xab, 16);
     allocator.HeapFree(ptr);
@@ -61,7 +61,7 @@ TEST(TestPrivateHeap, TestSingleHeapAllocAndFree)
     for (size_t i = 1; i < 17; ++i)
     {
         ptr = allocator.HeapAlloc(i);
-        EXPECT_NE(nullptr, ptr);
+        ASSERT_NE(nullptr, ptr);
         EXPECT_EQ(nullptr, allocator.HeapAlloc(17 - i)); // insufficient size
         allocator.HeapFree(ptr);
     }
@@ -74,12 +74,12 @@ TEST(TestPrivateHeap, TestSplitHeapAllocAndFree)
     // <HDR-FREE> 96 <HDR-END>
 
     void * p1 = allocator.HeapAlloc(30);
-    EXPECT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p1);
     // allocator state:
     // <HDR-IN_USE> 32 <HRD-FREE> 48 <HDR-END>
 
     void * p2 = allocator.HeapAlloc(4);
-    EXPECT_NE(nullptr, p2);
+    ASSERT_NE(nullptr, p2);
     // allocator state:
     // <HDR-IN_USE> 32 <HRD-IN_USE> 8 <HDR-FREE> 24 <HDR-END>
 
@@ -92,7 +92,7 @@ TEST(TestPrivateHeap, TestSplitHeapAllocAndFree)
     // <HDR-FREE> 96 <HDR-END>
 
     p1 = allocator.HeapAlloc(90);
-    EXPECT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
@@ -103,8 +103,8 @@ TEST(TestPrivateHeap, TestFreeMergeNext)
     void * p1 = allocator.HeapAlloc(16);
     void * p2 = allocator.HeapAlloc(16);
 
-    EXPECT_NE(nullptr, p1);
-    EXPECT_NE(nullptr, p2);
+    ASSERT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p2);
     EXPECT_EQ(nullptr, allocator.HeapAlloc(1));
 
     memset(p1, 0xab, 16);
@@ -115,7 +115,7 @@ TEST(TestPrivateHeap, TestFreeMergeNext)
     allocator.HeapFree(p2);
 
     p1 = allocator.HeapAlloc(3 * 16);
-    EXPECT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
@@ -126,8 +126,8 @@ TEST(TestPrivateHeap, TestFreeMergePrevious)
     void * p1 = allocator.HeapAlloc(16);
     void * p2 = allocator.HeapAlloc(16);
 
-    EXPECT_NE(nullptr, p1);
-    EXPECT_NE(nullptr, p2);
+    ASSERT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p2);
     EXPECT_EQ(nullptr, allocator.HeapAlloc(1));
 
     memset(p1, 0xab, 16);
@@ -137,7 +137,7 @@ TEST(TestPrivateHeap, TestFreeMergePrevious)
     allocator.HeapFree(p2);
     allocator.HeapFree(p1);
     p1 = allocator.HeapAlloc(3 * 16);
-    EXPECT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
@@ -150,9 +150,9 @@ TEST(TestPrivateHeap, TestFreeMergePreviousAndNext)
     void * p2 = allocator.HeapAlloc(16);
     void * p3 = allocator.HeapAlloc(16);
 
-    EXPECT_NE(nullptr, p1);
-    EXPECT_NE(nullptr, p2);
-    EXPECT_NE(nullptr, p3);
+    ASSERT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p2);
+    ASSERT_NE(nullptr, p3);
     EXPECT_EQ(nullptr, allocator.HeapAlloc(1));
 
     memset(p1, 0xab, 16);
@@ -167,7 +167,7 @@ TEST(TestPrivateHeap, TestFreeMergePreviousAndNext)
     // Freeing p2 makes enoug space
     allocator.HeapFree(p2);
     p1 = allocator.HeapAlloc(5 * 16);
-    EXPECT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
@@ -183,18 +183,18 @@ TEST(TestPrivateHeap, TestMultipleMerge)
     void * p5 = allocator.HeapAlloc(7 * kBlockHeaderSize); // uses up 8 blocks
     void * p6 = allocator.HeapAlloc(2 * kBlockHeaderSize); // uses up 2 (last given)
 
-    EXPECT_NE(nullptr, p1);
-    EXPECT_NE(nullptr, p2);
-    EXPECT_NE(nullptr, p3);
-    EXPECT_NE(nullptr, p4);
-    EXPECT_NE(nullptr, p5);
-    EXPECT_NE(nullptr, p6);
+    ASSERT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p2);
+    ASSERT_NE(nullptr, p3);
+    ASSERT_NE(nullptr, p4);
+    ASSERT_NE(nullptr, p5);
+    ASSERT_NE(nullptr, p6);
 
     allocator.HeapFree(p3);
     allocator.HeapFree(p4);
     // 10 blocks available (9 from p3 without HDR and 2 from p4 + HDR)
     p3 = allocator.HeapAlloc(10 * kBlockHeaderSize);
-    EXPECT_NE(nullptr, p3);
+    ASSERT_NE(nullptr, p3);
     EXPECT_EQ(nullptr, allocator.HeapAlloc(1)); // full
 
     allocator.HeapFree(p6);
@@ -204,7 +204,7 @@ TEST(TestPrivateHeap, TestMultipleMerge)
     allocator.HeapFree(p1);
 
     p1 = allocator.HeapAlloc(30 * kBlockHeaderSize);
-    EXPECT_NE(nullptr, p1);
+    ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
@@ -217,7 +217,7 @@ TEST(TestPrivateHeap, TestForwardFreeAndRealloc)
     for (auto & ptr : ptrs)
     {
         ptr = allocator.HeapAlloc(kBlockHeaderSize);
-        EXPECT_NE(nullptr, ptr);
+        ASSERT_NE(nullptr, ptr);
         memset(ptr, 0xab, kBlockHeaderSize);
     }
 
@@ -231,7 +231,7 @@ TEST(TestPrivateHeap, TestForwardFreeAndRealloc)
         allocator.HeapFree(ptrs[i]);
 
         ptrs[0] = allocator.HeapAlloc((1 + 2 * i) * kBlockHeaderSize);
-        EXPECT_NE(nullptr, ptrs[0]);
+        ASSERT_NE(nullptr, ptrs[0]);
     }
     allocator.HeapFree(ptrs[0]);
 }
@@ -245,7 +245,7 @@ TEST(TestPrivateHeap, TestBackwardFreeAndRealloc)
     for (auto & ptr : ptrs)
     {
         ptr = allocator.HeapAlloc(kBlockHeaderSize);
-        EXPECT_NE(nullptr, ptr);
+        ASSERT_NE(nullptr, ptr);
         memset(ptr, 0xab, kBlockHeaderSize);
     }
 
@@ -259,7 +259,7 @@ TEST(TestPrivateHeap, TestBackwardFreeAndRealloc)
         allocator.HeapFree(ptrs[kNumBlocks - i - 1]);
 
         ptrs[kNumBlocks - 1] = allocator.HeapAlloc((1 + 2 * i) * kBlockHeaderSize);
-        EXPECT_NE(nullptr, ptrs[kNumBlocks - 1]);
+        ASSERT_NE(nullptr, ptrs[kNumBlocks - 1]);
     }
     allocator.HeapFree(ptrs[kNumBlocks - 1]);
 }
@@ -297,7 +297,7 @@ TEST(TestPrivateHeap, TestRealloc)
     PrivateHeapAllocator<6 * 16> allocator;
 
     void * p1 = allocator.HeapRealloc(nullptr, 16); // malloc basically
-    EXPECT_NE(p1, nullptr);
+    ASSERT_NE(p1, nullptr);
 
     FillKnownPattern(p1, 16, 11);
 
@@ -311,7 +311,7 @@ TEST(TestPrivateHeap, TestRealloc)
 
     FillKnownPattern(p1, 16, 33);
     p2 = allocator.HeapRealloc(p1, 32); // resize, does not fit. This frees p1
-    EXPECT_NE(p2, nullptr);
+    ASSERT_NE(p2, nullptr);
     EXPECT_NE(p2, p1); // new reallocation occurred
     EXPECT_TRUE(IsKnownPattern(p2, 16, 33));
 
@@ -333,7 +333,7 @@ TEST(TestPrivateHeap, TestRealloc)
     allocator.HeapFree(p1);
 
     p3 = allocator.HeapAlloc(48); // above free should have made sufficient space
-    EXPECT_NE(p3, nullptr);
+    ASSERT_NE(p3, nullptr);
     allocator.HeapFree(p3);
 }
 
