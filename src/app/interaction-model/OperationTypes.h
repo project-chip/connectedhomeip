@@ -38,7 +38,12 @@ enum class OperationFlags : uint32_t
 struct OperationRequest
 {
     OperationFlags operationFlags;
-    chip::Access::SubjectDescriptor subjectDescriptor; // Current authentication data
+
+    /// Current authentication data EXCEPT for internal requests
+    ///
+    /// Internal requests WILL use a default descriptor, so will generally
+    /// have no accessing fabricIndex or authMode/subject
+    chip::Access::SubjectDescriptor subjectDescriptor;
 };
 
 enum class ReadFlags : uint32_t
