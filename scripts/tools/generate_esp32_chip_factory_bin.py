@@ -382,7 +382,7 @@ def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
         f.write(public_number_y.to_bytes(32, byteorder='big'))
 
 
-def generate_nvs_csv(out_csv_filename):
+def generate_nvs_csv(output_dir, out_csv_filename):
     csv_content = 'key,type,encoding,value\n'
     csv_content += 'chip-factory,namespace,,\n'
 
@@ -391,10 +391,11 @@ def generate_nvs_csv(out_csv_filename):
             continue
         csv_content += f"{k},{v['type']},{v['encoding']},{v['value']}\n"
 
-    with open(out_csv_filename, 'w') as f:
+    with open(os.path.join(output_dir, out_csv_filename), 'w') as f:
         f.write(csv_content)
 
-    logging.info('Generated the factory partition csv file : {}'.format(os.path.abspath(out_csv_filename)))
+    logging.info('Generated the factory partition csv file : {}'.format(
+        os.path.abspath(os.path.join(output_dir, out_csv_filename))))
 
 
 def generate_nvs_bin(encrypt, size, csv_filename, bin_filename, output_dir):
@@ -412,13 +413,13 @@ def generate_nvs_bin(encrypt, size, csv_filename, bin_filename, output_dir):
         nvs_partition_gen.generate(nvs_args)
 
 
-def print_flashing_help(encrypt, bin_filename):
+def print_flashing_help(encrypt, output_dir,  bin_filename):
     logging.info('Run below command to flash {}'.format(bin_filename))
-    logging.info('esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) {}'.format(os.path.join(os.getcwd(), bin_filename)))
+    logging.info('esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) {}'.format(os.path.join(os.getcwd(), output_dir, bin_filename)))
     if (encrypt):
         logging.info('Run below command to flash {}'.format(NVS_KEY_PARTITION_BIN))
         logging.info('esptool.py -p (PORT) write_flash --encrypt (NVS_KEY_PARTITION_ADDR) {}'.format(
-            os.path.join(os.getcwd(), 'keys', NVS_KEY_PARTITION_BIN)))
+            os.path.join(os.getcwd(), output_dir, 'keys', NVS_KEY_PARTITION_BIN)))
 
 
 def clean_up():
@@ -478,7 +479,7 @@ def get_args():
                         help='Encrypt the factory parititon NVS binary')
     parser.add_argument('--no-bin', action='store_false', dest='generate_bin',
                         help='Do not generate the factory partition binary')
-    parser.add_argument('--output_dir', type=str, default='bin', help='Created image output file path')
+    parser.add_argument('--output_dir', type=str, default='out', help='Created image output file path')
 
     parser.add_argument('-cf', '--commissioning-flow', type=any_base_int, default=0,
                         help='Device commissioning flow, 0:Standard, 1:User-Intent, 2:Custom. \
@@ -506,10 +507,10 @@ def set_up_factory_data(args):
 
 
 def generate_factory_partiton_binary(args):
-    generate_nvs_csv(FACTORY_PARTITION_CSV)
+    generate_nvs_csv(args.output_dir, FACTORY_PARTITION_CSV)
     if args.generate_bin:
         generate_nvs_bin(args.encrypt, args.size, FACTORY_PARTITION_CSV, FACTORY_PARTITION_BIN, args.output_dir)
-        print_flashing_help(args.encrypt, FACTORY_PARTITION_BIN)
+        print_flashing_help(args.encrypt, args.output_dir, FACTORY_PARTITION_BIN)
     clean_up()
 
 
