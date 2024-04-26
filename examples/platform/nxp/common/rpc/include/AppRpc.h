@@ -19,14 +19,38 @@
 
 #include <lib/core/CHIPError.h>
 
+#if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
+#include "pigweed/rpc_services/Button.h"
+#endif
+
 namespace chip::NXP::App::Rpc {
 
 /**
- * @brief Initialization of RPC-related code.
+ * @brief Initialization of RPC-related board code.
  *
- * For example, enabling clock for UART interface.
+ * For example, enabling clock for UART interface
+ * and initializing board pins.
  *
  */
 CHIP_ERROR Init();
+
+#if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
+/**
+ * @brief Rebooting the device.
+ *
+ * RPC implementation will delegate reboot procedure to this function.
+ *
+ */
+void Reboot();
+#endif
+
+#if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
+/**
+ * @brief Handles button events.
+ *
+ * RPC implementation will delegate handling events to this function.
+ */
+void ButtonHandler(const chip_rpc_ButtonEvent & request);
+#endif
 
 } // namespace chip::NXP::App::Rpc
