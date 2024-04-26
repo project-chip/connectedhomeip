@@ -32,6 +32,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <limits>
 
 namespace chip {
 
@@ -131,7 +132,7 @@ public:
         // 2- Increasing the current counter by value would cause a roll over. This would cause the current value to be < to the
         //    mNextEpoch so we force an update.
         bool shouldDoEpochUpdate = ((MonotonicallyIncreasingCounter<T>::GetValue() + value) >= mNextEpoch) ||
-            (MonotonicallyIncreasingCounter<T>::GetValue() > INT_MAX - value);
+            (MonotonicallyIncreasingCounter<T>::GetValue() > std::numeric_limits<T>::max() - value);
 
         ReturnErrorOnFailure(MonotonicallyIncreasingCounter<T>::AdvanceBy(value));
 
