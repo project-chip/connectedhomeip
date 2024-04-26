@@ -113,10 +113,10 @@ CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t 
 
 template <class T>
 CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t & entriesCount, char * buffer, size_t bufferLen,
-                        chip::Optional<T> value)
+                        std::optional<T> value)
 {
-    VerifyOrReturnError(value.HasValue(), CHIP_NO_ERROR);
-    return AddPtrRecord(type, entries, entriesCount, buffer, bufferLen, value.Value());
+    VerifyOrReturnError(value.has_value(), CHIP_NO_ERROR);
+    return AddPtrRecord(type, entries, entriesCount, buffer, bufferLen, *value);
 }
 
 CHIP_ERROR ENFORCE_FORMAT(4, 5)
@@ -161,36 +161,36 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, CommissioningMod
 }
 
 template <class T>
-CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<T> value)
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, std::optional<T> value)
 {
-    VerifyOrReturnError(value.HasValue(), CHIP_ERROR_UNINITIALIZED);
-    return CopyTextRecordValue(buffer, bufferLen, value.Value());
+    VerifyOrReturnError(value.has_value(), CHIP_ERROR_UNINITIALIZED);
+    return CopyTextRecordValue(buffer, bufferLen, *value);
 }
 
-CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<uint16_t> value1, chip::Optional<uint16_t> value2)
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, std::optional<uint16_t> value1, std::optional<uint16_t> value2)
 {
-    VerifyOrReturnError(value1.HasValue(), CHIP_ERROR_UNINITIALIZED);
-    return value2.HasValue() ? CopyTextRecordValue(buffer, bufferLen, value1.Value(), value2.Value())
-                             : CopyTextRecordValue(buffer, bufferLen, value1.Value());
+    VerifyOrReturnError(value1.has_value(), CHIP_ERROR_UNINITIALIZED);
+    return value2.has_value() ? CopyTextRecordValue(buffer, bufferLen, *value1, *value2)
+                              : CopyTextRecordValue(buffer, bufferLen, *value1);
 }
 
-CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Optional<ReliableMessageProtocolConfig> optional,
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const std::optional<ReliableMessageProtocolConfig> optional,
                                TxtFieldKey key)
 {
     VerifyOrReturnError((key == TxtFieldKey::kSessionIdleInterval || key == TxtFieldKey::kSessionActiveInterval ||
                          key == TxtFieldKey::kSessionActiveThreshold),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(optional.has_value(), CHIP_ERROR_UNINITIALIZED);
 
     CHIP_ERROR err;
     if (key == TxtFieldKey::kSessionActiveThreshold)
     {
-        err = CopyTextRecordValue(buffer, bufferLen, optional.Value().mActiveThresholdTime.count());
+        err = CopyTextRecordValue(buffer, bufferLen, optional->mActiveThresholdTime.count());
     }
     else
     {
         bool isIdle        = (key == TxtFieldKey::kSessionIdleInterval);
-        auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
+        auto retryInterval = isIdle ? optional->mIdleRetransTimeout : optional->mActiveRetransTimeout;
         if (retryInterval > kMaxRetryInterval)
         {
             ChipLogProgress(Discovery, "MRP retry interval %s value exceeds allowed range of 1 hour, using maximum available",
@@ -254,7 +254,7 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         return CopyTextRecordValue(buffer, bufferLen, params.GetCommissioningMode());
     case TxtFieldKey::kCommissionerPasscode:
         return CopyTextRecordValue(buffer, bufferLen,
-                                   static_cast<uint16_t>(params.GetCommissionerPasscodeSupported().ValueOr(false) ? 1 : 0));
+                                   static_cast<uint16_t>(params.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0));
     default:
         return CopyTxtRecord(key, buffer, bufferLen, static_cast<BaseAdvertisingParams<CommissionAdvertisingParameters>>(params));
     }
