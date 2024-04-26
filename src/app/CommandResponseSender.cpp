@@ -138,6 +138,11 @@ Status CommandResponseSender::CommandExists(const ConcreteCommandPath & aCommand
     return mpCommandHandlerCallback->CommandExists(aCommandPath);
 }
 
+uint32_t CommandResponseSender::GetInteractionModelEngineGeneration() const {
+    VerifyOrReturnValue(mpCommandHandlerCallback, 0);
+    return mpCommandHandlerCallback->GetInteractionModelEngineGeneration();
+}
+
 CHIP_ERROR CommandResponseSender::SendCommandResponse()
 {
     VerifyOrReturnError(HasMoreToSend(), CHIP_ERROR_INCORRECT_STATE);

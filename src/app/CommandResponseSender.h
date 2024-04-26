@@ -66,6 +66,8 @@ public:
 
     Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
+    uint32_t GetInteractionModelEngineGeneration() const override;
+
     /**
      * Gets the inner exchange context object, without ownership.
      *
