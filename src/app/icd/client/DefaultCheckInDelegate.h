@@ -20,6 +20,7 @@
 
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
+#include <app/icd/client/RefreshKeySender.h>
 
 namespace chip {
 namespace app {

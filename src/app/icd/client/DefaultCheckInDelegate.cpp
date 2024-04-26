@@ -16,7 +16,6 @@
  */
 
 #include <app/icd/client/DefaultCheckInDelegate.h>
-#include <app/icd/client/RefreshKeySender.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
