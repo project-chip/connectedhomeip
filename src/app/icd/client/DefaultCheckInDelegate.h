@@ -35,7 +35,7 @@ public:
     void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
 
     /**
-     * @brief Callback used to let the application to generate the new ICD symmetric key
+     * @brief Callback used to let the application generate the new ICD symmetric key
      *
      * If not implemented by application, it would use Crypto::DRBG_get_bytes at default.
      *
