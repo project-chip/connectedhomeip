@@ -33,6 +33,17 @@ public:
     virtual ~DefaultCheckInDelegate() {}
     CHIP_ERROR Init(ICDClientStorage * storage, InteractionModelEngine * engine);
     void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
+
+    /**
+     * @brief Callback used to let the application to generate the new ICD symmetric key
+     *
+     * If not implemented by application, it would use Crypto::DRBG_get_bytes at default.
+     *
+     * @param[inout] newKey sensitive data buffer with type Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> 
+     * @param[out] CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT
+     *                        CHIP_ERROR_INTERNAL
+     */
+    virtual CHIP_ERROR OnCreateRefreshKey(RefreshKeySender::RefreshKeyBuffer & newKey);
     RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
     void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
