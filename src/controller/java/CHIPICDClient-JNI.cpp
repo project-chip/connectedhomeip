@@ -22,9 +22,9 @@
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipICDClient_##METHOD_NAME
 
-JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jint jFabricIndex) 
+JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jint jFabricIndex)
 {
     chip::DeviceLayer::StackLock lock;
 
-    return getICDClientInfo(env, "chip/devicecontroller/ICDClientInfo", jFabricIndex);    
+    return getICDClientInfo(env, "chip/devicecontroller/ICDClientInfo", jFabricIndex);
 }
