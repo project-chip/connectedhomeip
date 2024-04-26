@@ -82,6 +82,7 @@ chip_test_suite_using_nltest("tests_nltest") {
     "TestJsonToTlvToJson.cpp",
     "TestPersistedCounter.cpp",
     "TestPool.cpp",
+    "TestStateMachine.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTlvJson.cpp",
     "TestTlvToJson.cpp",
