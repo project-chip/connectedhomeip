@@ -72,14 +72,16 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         discoveryContext->Retain();
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
 
+        auto ipAddress = services[i].mAddress;
+
         // Check if SRV, TXT and AAAA records were received in DNS responses
-        if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !services[i].mAddress.has_value())
+        if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value())
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
         }
         else
         {
-            Inet::IPAddress * address = &(*services[i].mAddress);
+            Inet::IPAddress * address = &(*ipAddress);
             HandleNodeResolve(context, &services[i], Span<Inet::IPAddress>(address, 1), error);
         }
     }
