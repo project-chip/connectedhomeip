@@ -527,7 +527,7 @@
     workItem3.readyHandler = sleep1ReadyHandler;
     [workQueue enqueueWorkItem:workItem3 descriptionWithFormat:@"work item %d", 3];
 
-    // This is the item after the first 3, and should onl execute when one of them finished
+    // This is the item after the first 3, and should only execute when one of them finished
     XCTestExpectation * lastWorkItemWaitedExpectation = [self expectationWithDescription:@"Last work item waited properly"];
     MTRAsyncWorkItem * workItemLast = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     workItemLast.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
