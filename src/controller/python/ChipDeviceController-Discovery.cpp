@@ -195,8 +195,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
         ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
         ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
 
-        
-        auto idleInterval =  dnsSdInfo->GetMrpRetryIntervalIdle();
+        auto idleInterval = dnsSdInfo->GetMrpRetryIntervalIdle();
         if (idleInterval.has_value())
         {
             ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", idleInterval->count());
@@ -206,7 +205,7 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
             ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
         }
 
-        auto activeInterval =  dnsSdInfo->GetMrpRetryIntervalActive();
+        auto activeInterval = dnsSdInfo->GetMrpRetryIntervalActive();
         if (activeInterval.has_value())
         {
             ChipLogProgress(Discovery, "\tMrp Interval active\t%u", activeInterval->count());
