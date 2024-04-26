@@ -80,12 +80,12 @@ public:
     virtual EndpointId FirstEndpoint()                 = 0;
     virtual EndpointId NextEndpoint(EndpointId before) = 0;
 
-    virtual ClusterEntry FirstCluster(EndpointId endpoint)                         = 0;
-    virtual ClusterEntry NextCluster(const ConcreteClusterPath & before)           = 0;
+    virtual ClusterEntry FirstCluster(EndpointId endpoint)                              = 0;
+    virtual ClusterEntry NextCluster(const ConcreteClusterPath & before)                = 0;
     virtual std::optional<ClusterInfo> GetClusterInfo(const ConcreteClusterPath & path) = 0;
 
-    virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)           = 0;
-    virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)           = 0;
+    virtual AttributeEntry FirstAttribute(const ConcreteClusterPath & cluster)                = 0;
+    virtual AttributeEntry NextAttribute(const ConcreteAttributePath & before)                = 0;
     virtual std::optional<AttributeInfo> GetAttributeInfo(const ConcreteAttributePath & path) = 0;
 };
 
