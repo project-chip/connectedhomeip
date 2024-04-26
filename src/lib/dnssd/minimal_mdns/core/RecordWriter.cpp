@@ -87,7 +87,7 @@ RecordWriter & RecordWriter::WriteQName(const SerializedQNameIterator & qname)
     {
         std::optional<uint16_t> offset = FindPreviousName(copy);
 
-        if (offset.HasValue())
+        if (offset.has_value())
         {
             // Pointer to offset: set the highest 2 bits
             // We guarantee that offsets saved are <= kMaxReuseOffset
