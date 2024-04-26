@@ -23,6 +23,7 @@
 #include <lib/support/BitFlags.h>
 
 #include <cstdint>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -39,11 +40,10 @@ struct OperationRequest
 {
     OperationFlags operationFlags;
 
-    /// Current authentication data EXCEPT for internal requests
-    ///
-    /// Internal requests WILL use a default descriptor, so will generally
-    /// have no accessing fabricIndex or authMode/subject
-    chip::Access::SubjectDescriptor subjectDescriptor;
+    /// Current authentication data EXCEPT for internal requests.
+    ///  - Non-internal requests MUST have this set.
+    ///  - operationFlags.Has(OperationFlags::kInternal) MUST NOT have this set
+    std::optional<chip::Access::SubjectDescriptor> subjectDescriptor;
 };
 
 enum class ReadFlags : uint32_t
