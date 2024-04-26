@@ -108,7 +108,7 @@ public:
         mTcpSupported = tcpSupported;
         return *reinterpret_cast<Derived *>(this);
     }
-    std::optional<bool> GetTcpSupported() const { return mTcpSupported; }
+    const std::optional<bool> & GetTcpSupported() const { return mTcpSupported; }
 
     Derived & SetICDModeToAdvertise(ICDModeAdvertise operatingMode)
     {
@@ -181,14 +181,14 @@ public:
         mVendorId = vendorId;
         return *this;
     }
-    std::optional<uint16_t> GetVendorId() const { return mVendorId; }
+    const std::optional<uint16_t> & GetVendorId() const { return mVendorId; }
 
     CommissionAdvertisingParameters & SetProductId(std::optional<uint16_t> productId)
     {
         mProductId = productId;
         return *this;
     }
-    std::optional<uint16_t> GetProductId() const { return mProductId; }
+    const std::optional<uint16_t> & GetProductId() const { return mProductId; }
 
     CommissionAdvertisingParameters & SetCommissioningMode(CommissioningMode mode)
     {
@@ -202,7 +202,7 @@ public:
         mDeviceType = deviceType;
         return *this;
     }
-    std::optional<uint32_t> GetDeviceType() const { return mDeviceType; }
+    const std::optional<uint32_t> & GetDeviceType() const { return mDeviceType; }
 
     CommissionAdvertisingParameters & SetDeviceName(std::optional<const char *> deviceName)
     {
@@ -263,7 +263,7 @@ public:
         mPairingHint = pairingHint;
         return *this;
     }
-    std::optional<uint16_t> GetPairingHint() const { return mPairingHint; }
+    const std::optional<uint16_t> & GetPairingHint() const { return mPairingHint; }
 
     CommissionAdvertisingParameters & SetCommissionAdvertiseMode(CommssionAdvertiseMode mode)
     {
@@ -277,7 +277,7 @@ public:
         mCommissionerPasscodeSupported = commissionerPasscodeSupported;
         return *this;
     }
-    std::optional<bool> GetCommissionerPasscodeSupported() const { return mCommissionerPasscodeSupported; }
+    const std::optional<bool> & GetCommissionerPasscodeSupported() const { return mCommissionerPasscodeSupported; }
 
 private:
     uint8_t mShortDiscriminator          = 0;

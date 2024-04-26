@@ -279,7 +279,7 @@ private:
             }
         }
         {
-            const auto tcpSupported = params.GetTcpSupported();
+            const auto & tcpSupported = params.GetTcpSupported();
             if (tcpSupported.has_value())
             {
                 size_t writtenCharactersNumber =
@@ -674,7 +674,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     }
 
     {
-        const auto vendorId = params.GetVendorId();
+        const auto & vendorId = params.GetVendorId();
         if (vendorId.has_value())
         {
             MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
@@ -694,7 +694,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     }
 
     {
-        const auto deviceType = params.GetDeviceType();
+        const auto & deviceType = params.GetDeviceType();
         if (deviceType.has_value())
         {
             MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
@@ -820,8 +820,8 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
 
     char txtVidPid[chip::Dnssd::kKeyVendorProductMaxLength + 4];
     {
-        const auto productId = params.GetProductId();
-        const auto vendorId  = params.GetVendorId();
+        const auto & productId = params.GetProductId();
+        const auto & vendorId  = params.GetVendorId();
         if (productId.has_value() && vendorId.has_value())
         {
             snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d+%d", *vendorId, *productId);
@@ -836,7 +836,7 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
 
     char txtDeviceType[chip::Dnssd::kKeyDeviceTypeMaxLength + 4];
     {
-        const auto deviceType = params.GetDeviceType();
+        const auto & deviceType = params.GetDeviceType();
         if (deviceType.has_value())
         {
             snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%" PRIu32, *deviceType);
@@ -885,7 +885,7 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         }
 
         {
-            const auto pairingHint = params.GetPairingHint();
+            const auto & pairingHint = params.GetPairingHint();
             if (pairingHint.has_value())
             {
                 snprintf(txtPairingHint, sizeof(txtPairingHint), "PH=%d", *pairingHint);
