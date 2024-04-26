@@ -747,7 +747,7 @@ public class ChipDeviceController {
   }
 
   public List<ICDClientInfo> getICDClientInfo() {
-    return getICDClientInfo(deviceControllerPtr, getFabricIndex(deviceControllerPtr));
+    return getICDClientInfo(getFabricIndex(deviceControllerPtr));
   }
 
   public boolean isPeerICDClient(long deviceId) {
@@ -765,7 +765,7 @@ public class ChipDeviceController {
    * @param fabricIndex the fabric index to check
    */
   public List<ICDClientInfo> getICDClientInfo(int fabricIndex) {
-    return getICDClientInfo(deviceControllerPtr, fabricIndex);
+    return ChipICDClient.getICDClientInfo(fabricIndex);
   }
 
   /* Shuts down all active subscriptions. */
@@ -1577,8 +1577,6 @@ public class ChipDeviceController {
 
   private native void updateCommissioningICDRegistrationInfo(
       long deviceControllerPtr, ICDRegistrationInfo icdRegistrationInfo);
-
-  private native List<ICDClientInfo> getICDClientInfo(long deviceControllerPtr, long fabricIndex);
 
   private native long onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
