@@ -28,7 +28,7 @@
 
 chip::app::DefaultICDClientStorage sICDClientStorage;
 
-jobject getICDClientInfo(JNIEnv *env, const char * icdClientInfoSign, jint jFabricIndex)
+jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFabricIndex)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -69,13 +69,15 @@ jobject getICDClientInfo(JNIEnv *env, const char * icdClientInfoSign, jint jFabr
             continue;
         }
 
-        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.aes_key_handle.As<chip::Crypto::Symmetric128BitsKeyByteArray>(),
+        err = chip::JniReferences::GetInstance().N2J_ByteArray(env,
+                                                               info.aes_key_handle.As<chip::Crypto::Symmetric128BitsKeyByteArray>(),
                                                                chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdAesKey);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogError(Controller, "ICD AES KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
 
-        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.hmac_key_handle.As<chip::Crypto::Symmetric128BitsKeyByteArray>(),
-                                                               chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdHmacKey);
+        err = chip::JniReferences::GetInstance().N2J_ByteArray(
+            env, info.hmac_key_handle.As<chip::Crypto::Symmetric128BitsKeyByteArray>(),
+            chip::Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdHmacKey);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogError(Controller, "ICD HMAC KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -89,6 +91,9 @@ jobject getICDClientInfo(JNIEnv *env, const char * icdClientInfoSign, jint jFabr
     }
 
     return jInfo;
- }
+}
 
-chip::app::DefaultICDClientStorage * getICDClientStorage() { return &sICDClientStorage; }
+chip::app::DefaultICDClientStorage * getICDClientStorage()
+{
+    return &sICDClientStorage;
+}

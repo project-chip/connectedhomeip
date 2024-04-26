@@ -831,7 +831,6 @@ jint getFabricIndex(jlong devicePtr)
     return static_cast<jint>(chipDevice->GetPeerScopedNodeId().GetFabricIndex());
 }
 
-
 /**
  * Takes objects in attributePathList, converts them to app:AttributePathParams, and appends them to outAttributePathParamsList.
  */

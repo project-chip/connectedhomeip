@@ -19,8 +19,7 @@
 
 #include <platform/PlatformManager.h>
 
-#define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
-    extern "C" JNIEXPORT RETURN JNICALL Java_matter_controller_MatterICDClientImpl_##METHOD_NAME
+#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_matter_controller_MatterICDClientImpl_##METHOD_NAME
 
 JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jint jFabricIndex)
 {

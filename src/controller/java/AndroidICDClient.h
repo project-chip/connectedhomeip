@@ -24,9 +24,9 @@
 
 #pragma once
 
-#include <lib/support/JniReferences.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
+#include <lib/support/JniReferences.h>
 
-jobject getICDClientInfo(JNIEnv *env, const char * icdClientInfoSign, jint jFabricIndex);
+jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFabricIndex);
 
 chip::app::DefaultICDClientStorage * getICDClientStorage();
