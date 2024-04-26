@@ -350,7 +350,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
     else
     {
-        advertiseParameters.SetCommissionerPasscodeSupported(Optional<bool>(true));
+        advertiseParameters.SetCommissionerPasscodeSupported(std::make_optional<bool>(true));
     }
 #endif
 
