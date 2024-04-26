@@ -46,14 +46,14 @@ test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetInstanceName("BEEFBEEFF00DF00D-1111222233334444")
                                           .SetHostName(host)
                                           .AddSubtype("_IBEEFBEEFF00DF00D");
-OperationalAdvertisingParameters operationalParams2 =
-    OperationalAdvertisingParameters()
-        .SetPeerId(kPeerId2)
-        .SetMac(ByteSpan(kMac))
-        .SetPort(CHIP_PORT)
-        .EnableIpV4(true)
-        .SetLocalMRPConfig(std::make_optional<ReliableMessageProtocolConfig>(32_ms32, 30_ms32, 10_ms16)) // SII and SAI to match below
-        .SetICDModeToAdvertise(ICDModeAdvertise::kSIT);
+OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingParameters()
+                                                          .SetPeerId(kPeerId2)
+                                                          .SetMac(ByteSpan(kMac))
+                                                          .SetPort(CHIP_PORT)
+                                                          .EnableIpV4(true)
+                                                          .SetLocalMRPConfig(std::make_optional<ReliableMessageProtocolConfig>(
+                                                              32_ms32, 30_ms32, 10_ms16)) // SII and SAI to match below
+                                                          .SetICDModeToAdvertise(ICDModeAdvertise::kSIT);
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")

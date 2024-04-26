@@ -18,7 +18,6 @@
 #pragma once
 
 #include <cstddef>
-#include <cstddef>
 #include <optional>
 
 #include <lib/core/PeerId.h>
