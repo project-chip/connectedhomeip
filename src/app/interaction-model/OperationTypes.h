@@ -82,7 +82,7 @@ struct InvokeRequest : OperationRequest
 {
     ConcreteCommandPath path;
     Optional<GroupId> groupRequestId; // set if and only if this was a group request
-    BitFlags<InvokeFlags> writeFlags;
+    BitFlags<InvokeFlags> invokeFlags;
 };
 
 } // namespace InteractionModel

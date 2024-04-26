@@ -24,7 +24,7 @@ namespace chip {
 namespace app {
 namespace InteractionModel {
 
-/// Actual provided data for data models to interface with the interaction model environment
+/// Data provided to data models in order to interface with the interaction model environment.
 struct InteractionModelActions
 {
     Events * events;
