@@ -149,6 +149,9 @@ public:
 
     const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
+    /**
+     * The accessing fabric index for this read or subscribe interaction.
+     */
     FabricIndex AccessingFabricIndex() const { return GetSubjectDescriptor().fabricIndex; }
 
     /**

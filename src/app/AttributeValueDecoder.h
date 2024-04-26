@@ -54,9 +54,15 @@ public:
 
     bool TriedDecode() const { return mTriedDecode; }
 
-    const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
+    /**
+     * The accessing fabric index for this write interaction.
+     */
+    FabricIndex AccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
 
-    FabricIndex AccessingFabricIndex() const { return GetSubjectDescriptor().fabricIndex; }
+    /**
+     * The accessing subject descriptor for this write interaction.
+     */
+    const Access::SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
 private:
     TLV::TLVReader & mReader;
