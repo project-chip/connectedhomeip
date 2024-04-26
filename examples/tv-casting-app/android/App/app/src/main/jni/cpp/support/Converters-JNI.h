@@ -29,6 +29,8 @@ namespace matter {
 namespace casting {
 namespace support {
 
+jobject convertLongFromCppToJava(jlong value);
+
 jobject convertMatterErrorFromCppToJava(CHIP_ERROR inErr);
 
 /**

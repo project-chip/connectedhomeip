@@ -298,7 +298,7 @@ public:
         return GetCurrent();
     }
 
-    bool operator==(const ConstFabricIterator & other)
+    bool operator==(const ConstFabricIterator & other) const
     {
         if (IsAtEnd())
         {
@@ -308,7 +308,7 @@ public:
         // Pending entry does not participate in finding this.
         return (mStart == other.mStart) && (mIndex == other.mIndex) && (mMaxSize == other.mMaxSize);
     }
-    bool operator!=(const ConstFabricIterator & other) { return !(*this == other); }
+    bool operator!=(const ConstFabricIterator & other) const { return !(*this == other); }
 
     bool IsAtEnd() const { return (mIndex == mMaxSize); }
 

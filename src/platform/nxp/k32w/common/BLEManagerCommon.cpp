@@ -32,7 +32,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 
 #include "board.h"
 #include "gatt_db_app_interface.h"

@@ -24,6 +24,7 @@
  *
  */
 
+#define _CHIP_BLE_BLE_H
 #include <ble/BleUUID.h>
 
 #include <gtest/gtest.h>

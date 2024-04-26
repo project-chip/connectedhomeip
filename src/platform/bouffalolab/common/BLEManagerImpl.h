@@ -20,7 +20,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/conn.h>

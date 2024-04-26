@@ -17,12 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x005F" />
-    <field name="PowerAsNumber"       mask="0x01" />
-    <field name="PowerInWatts"        mask="0x02" />
-    <field name="PowerNumberLimits"   mask="0x04" />
-  </bitmap>
 
   <cluster apiMaturity="provisional">
     <name>Microwave Oven Control</name>
@@ -32,6 +26,21 @@ limitations under the License.
     <define>MICROWAVE_OVEN_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <features>
+      <feature bit="0" code="PWRNUM" name="PowerAsNumber" summary="Power is specified as a unitless number or a percentage">
+        <optionalConform choice="a"/>
+      </feature>
+      <feature bit="1" code="WATTS" name="PowerInWatts" summary="Power is specified in Watts">
+        <optionalConform choice="a"/>
+      </feature>
+      <feature bit="2" code="PWRLMTS" name="PowerNumberLimits" summary="Supports the limit attributes used with the PWRNUM feature">
+        <optionalConform>
+          <feature name="PWRNUM"/>
+        </optionalConform>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="COOK_TIME"           type="elapsed_s" default="30"  writable="false" optional="false">CookTime</attribute>
     <attribute side="server" code="0x0001" define="MAX_COOK_TIME"       type="elapsed_s"               writable="false" optional="false" min="1" max="86400">MaxCookTime</attribute>
     <attribute side="server" code="0x0002" define="POWER_SETTING"       type="int8u"     default="100" writable="false" optional="true">PowerSetting</attribute>

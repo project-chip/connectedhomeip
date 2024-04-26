@@ -61,14 +61,14 @@ static app::Clusters::NetworkCommissioning::Instance
     sEthernetNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
 #endif
 
-#if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
+#if CONFIG_TEST_EVENT_TRIGGER_ENABLED
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
 #endif
 } // namespace
 
-#if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
+#if CONFIG_TEST_EVENT_TRIGGER_ENABLED
 static int hex_digit_to_int(char hex)
 {
     if ('A' <= hex && hex <= 'F')
@@ -107,68 +107,35 @@ static size_t hex_string_to_binary(const char * hex_string, uint8_t * buf, size_
 
     return buf_size;
 }
-#endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
+#endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED
 
 void Esp32AppServer::DeInitBLEIfCommissioned(void)
 {
-#if CONFIG_BT_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+#ifdef CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0)
     {
-        esp_err_t err = ESP_OK;
-
-#if CONFIG_BT_NIMBLE_ENABLED
-        if (!ble_hs_is_enabled())
-        {
-            ESP_LOGI(TAG, "BLE already deinited");
-            return;
-        }
-        if (nimble_port_stop() != 0)
-        {
-            ESP_LOGE(TAG, "nimble_port_stop() failed");
-            return;
-        }
-        vTaskDelay(100);
-        nimble_port_deinit();
-
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-        err = esp_nimble_hci_and_controller_deinit();
-#endif
-#endif /* CONFIG_BT_NIMBLE_ENABLED */
-
-#if CONFIG_IDF_TARGET_ESP32
-        err |= esp_bt_mem_release(ESP_BT_MODE_BTDM);
-#elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32H2 ||          \
-    CONFIG_IDF_TARGET_ESP32C6
-        err |= esp_bt_mem_release(ESP_BT_MODE_BLE);
-#endif
-
-        if (err != ESP_OK)
-        {
-            ESP_LOGE(TAG, "BLE deinit failed");
-        }
-        else
-        {
-            ESP_LOGI(TAG, "BLE deinit successful and memory reclaimed");
-        }
+        chip::DeviceLayer::Internal::BLEMgr().Shutdown();
     }
-#endif /* CONFIG_BT_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
+#endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
 }
 
 void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-#if CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
+#if CONFIG_TEST_EVENT_TRIGGER_ENABLED
     if (hex_string_to_binary(CONFIG_TEST_EVENT_TRIGGER_ENABLE_KEY, sTestEventTriggerEnableKey,
                              sizeof(sTestEventTriggerEnableKey)) == 0)
     {
-        ESP_LOGE(TAG, "Failed to convert the EnableKey string to octstr type value");
+        ChipLogError(DeviceLayer, "Failed to convert the EnableKey string to octstr type value");
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
     }
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
-    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+#if CONFIG_ENABLE_OTA_REQUESTOR
+    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+#endif
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -188,7 +155,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
     {
-        ESP_LOGI(TAG, "Thread has been provisioned, publish the dns service now");
+        ChipLogProgress(DeviceLayer, "Thread has been provisioned, publish the dns service now");
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif

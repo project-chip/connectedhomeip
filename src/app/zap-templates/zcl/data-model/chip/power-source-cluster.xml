@@ -24,6 +24,25 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node.</description>
+
+    <features>
+      <feature bit="0" code="WIRED" name="Wired" summary="A wired power source">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="BAT" name="Battery" summary="A battery power source">
+        <optionalConform/>
+      </feature>
+      <feature bit="2" code="RECHG" name="Rechargeable" summary="A rechargeable battery power source">
+        <optionalConform>
+          <feature name="BAT"/>
+        </optionalConform>
+      </feature>
+      <feature bit="3" code="REPLC" name="Replaceable" summary="A replaceable battery power source">
+        <optionalConform>
+          <feature name="BAT"/>
+        </optionalConform>
+      </feature>
+    </features>
     
     <attribute side="server" code="0x0000" define="POWER_SOURCE_STATUS" type="PowerSourceStatusEnum" writable="false">Status</attribute>
     <attribute side="server" code="0x0001" define="POWER_SOURCE_ORDER" type="int8u" min="0x00" max="0xFF" writable="false">Order</attribute>
@@ -80,13 +99,6 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x002F"/>
-    <field name="Wired" mask="0x1"/>
-    <field name="Battery" mask="0x2"/>
-    <field name="Rechargeable" mask="0x4"/>
-    <field name="Replaceable" mask="0x8"/>
-  </bitmap>
 
   <enum name="WiredFaultEnum" type="enum8">
     <cluster code="0x002F"/>
