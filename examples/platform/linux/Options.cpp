@@ -84,6 +84,16 @@ enum
     kCommissionerOption_FabricID                        = 0x1020,
     kTraceTo                                            = 0x1021,
     kOptionSimulateNoInternalTime                       = 0x1022,
+#if defined(PW_RPC_ENABLED)
+    kOptionRpcServerPort = 0x1023,
+#endif
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    kDeviceOption_SubscriptionCapacity = 0x1024,
+#endif
+    kDeviceOption_WiFiSupports5g = 0x1025,
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    kDeviceOption_SubscriptionResumptionRetryIntervalSec = 0x1026,
+#endif
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -138,6 +148,13 @@ OptionDef sDeviceOptionDefs[] = {
     { "trace-to", kArgumentRequired, kTraceTo },
 #endif
     { "simulate-no-internal-time", kNoArgument, kOptionSimulateNoInternalTime },
+#if defined(PW_RPC_ENABLED)
+    { "rpc-server-port", kArgumentRequired, kOptionRpcServerPort },
+#endif
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    { "subscription-capacity", kArgumentRequired, kDeviceOption_SubscriptionCapacity },
+    { "subscription-resumption-retry-interval", kArgumentRequired, kDeviceOption_SubscriptionResumptionRetryIntervalSec },
+#endif
     {}
 };
 
@@ -254,6 +271,16 @@ const char * sDeviceOptionHelp =
 #endif
     "  --simulate-no-internal-time\n"
     "       Time cluster does not use internal platform time\n"
+#if defined(PW_RPC_ENABLED)
+    "  --rpc-server-port\n"
+    "       Start RPC server on specified port\n"
+#endif
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    "  --subscription-capacity\n"
+    "       Max number of subscriptions the device will allow\n"
+    "  --subscription-resumption-retry-interval\n"
+    "       subscription timeout resumption retry interval in seconds\n"
+#endif
     "\n";
 
 bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
@@ -507,6 +534,19 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kOptionSimulateNoInternalTime:
         LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime = true;
         break;
+#if defined(PW_RPC_ENABLED)
+    case kOptionRpcServerPort:
+        LinuxDeviceOptions::GetInstance().rpcServerPort = static_cast<uint16_t>(atoi(aValue));
+        break;
+#endif
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    case kDeviceOption_SubscriptionCapacity:
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(atoi(aValue));
+        break;
+    case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
+        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(atoi(aValue));
+        break;
+#endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;

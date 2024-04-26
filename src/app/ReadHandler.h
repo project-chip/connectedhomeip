@@ -38,6 +38,7 @@
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
 #include <app/OperationalSessionSetup.h>
+#include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <app/SubscriptionResumptionStorage.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
@@ -253,6 +254,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     *
+     *  @brief Initialize a ReadHandler for a resumed subsciption
+     *
+     *  Used after the SubscriptionResumptionSessionEstablisher establishs the CASE session
+     */
+    void OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionSessionEstablisher & sessionEstablisher);
+#endif
+
 private:
     PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
     EventNumber & GetEventMin() { return mEventMin; }
@@ -301,18 +312,6 @@ private:
      *
      */
     void OnInitialRequest(System::PacketBufferHandle && aPayload);
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    /**
-     *
-     *  @brief Resume a persisted subscription
-     *
-     *  Used after ReadHandler(ManagementCallback & apCallback). This will start a CASE session
-     *  with the subscriber if one doesn't already exist, and send full priming report when connected.
-     */
-    void ResumeSubscription(CASESessionManager & caseSessionManager,
-                            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
-#endif
 
     /**
      *  Send ReportData to initiator
@@ -485,11 +484,6 @@ private:
     /// @param aFlag Flag to clear
     void ClearStateFlag(ReadHandlerFlags aFlag);
 
-    // Helpers for continuing the subscription resumption
-    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                      const SessionHandle & sessionHandle);
-    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
-
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 
     // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
@@ -571,12 +565,6 @@ private:
 
     // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
     Observer * mObserver = nullptr;
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // Callbacks to handle server-initiated session success/failure
-    chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
-    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
-#endif
 };
 } // namespace app
 } // namespace chip

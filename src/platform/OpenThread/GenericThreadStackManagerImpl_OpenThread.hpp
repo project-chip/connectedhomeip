@@ -94,6 +94,29 @@ void initNetworkCommissioningThreadDriver(void)
 #endif
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+CHIP_ERROR ReadDomainNameComponent(const char *& in, char * out, size_t outSize)
+{
+    const char * dotPos = strchr(in, '.');
+    VerifyOrReturnError(dotPos != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const size_t componentSize = static_cast<size_t>(dotPos - in);
+    VerifyOrReturnError(componentSize < outSize, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(out, in, componentSize);
+    out[componentSize] = '\0';
+    in += componentSize + 1;
+
+    return CHIP_NO_ERROR;
+}
+
+template <size_t N>
+CHIP_ERROR ReadDomainNameComponent(const char *& in, char (&out)[N])
+{
+    return ReadDomainNameComponent(in, out, N);
+}
+#endif
+
 NetworkCommissioning::otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter;
 } // namespace
 
@@ -135,6 +158,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ProcessThreadActivity
 template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveRouteToAddress(const Inet::IPAddress & destAddr)
 {
+    VerifyOrReturnValue(mOTInst, false);
     bool res = false;
 
     // Lock OpenThread
@@ -228,6 +252,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadEnabled(void)
 {
+    VerifyOrReturnValue(mOTInst, false);
     otDeviceRole curRole;
 
     Impl()->LockThreadStack();
@@ -240,6 +265,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadEnabled(void)
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadEnabled(bool val)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     otError otErr = OT_ERROR_NONE;
 
     Impl()->LockThreadStack();
@@ -274,6 +300,7 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvision(ByteSpan netInfo)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     otError otErr = OT_ERROR_FAILED;
     otOperationalDatasetTlvs tlvs;
 
@@ -300,6 +327,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
 template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned(void)
 {
+    VerifyOrReturnValue(mOTInst, false);
     bool provisioned;
 
     Impl()->LockThreadStack();
@@ -312,6 +340,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadProvisioned(v
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvision(Thread::OperationalDataset & dataset)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(Impl()->IsThreadProvisioned(), CHIP_ERROR_INCORRECT_STATE);
     otOperationalDatasetTlvs datasetTlv;
 
@@ -331,6 +360,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadProvis
 template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void)
 {
+    VerifyOrReturnValue(mOTInst, false);
     otDeviceRole curRole;
 
     Impl()->LockThreadStack();
@@ -375,6 +405,7 @@ template <class ImplClass>
 CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error = CHIP_NO_ERROR;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     otLinkModeConfig linkMode;
@@ -483,6 +514,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 template <class ImplClass>
 ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadDeviceType(void)
 {
+    VerifyOrReturnValue(mOTInst, ConnectivityManager::kThreadDeviceType_NotSupported);
     ConnectivityManager::ThreadDeviceType deviceType;
 
     Impl()->LockThreadStack();
@@ -515,6 +547,7 @@ template <class ImplClass>
 CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err = CHIP_NO_ERROR;
     otLinkModeConfig linkMode;
 
@@ -603,6 +636,7 @@ exit:
 template <class ImplClass>
 bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveMeshConnectivity(void)
 {
+    VerifyOrReturnValue(mOTInst, false);
     bool res;
     otDeviceRole curRole;
 
@@ -651,6 +685,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveMeshConnectivity(
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadStatsCounters(void)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err = CHIP_NO_ERROR;
     otError otErr;
     otOperationalDataset activeDataset;
@@ -745,6 +780,7 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyMinimal(void)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_PROGRESS_LOGGING
@@ -813,6 +849,7 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyFull()
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_PROGRESS_LOGGING
@@ -982,6 +1019,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary802154MACAddress(uint8_t * buf)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     const otExtAddress * extendedAddr = otLinkGetExtendedAddress(mOTInst);
     memcpy(buf, extendedAddr, sizeof(otExtAddress));
     return CHIP_NO_ERROR;
@@ -990,6 +1028,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     const otNetifAddress * otAddresses = otIp6GetUnicastAddresses(mOTInst);
 
     // Look only for the global unicast addresses, not internally assigned by Thread.
@@ -1671,6 +1710,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(uint32_t & buf)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     Impl()->LockThreadStack();
     buf = otLinkGetPollPeriod(mOTInst);
     Impl()->UnlockThreadStack();
@@ -1758,6 +1798,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoL
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err = CHIP_NO_ERROR;
     Impl()->LockThreadStack();
 
@@ -1799,6 +1840,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo(void)
 {
+    VerifyOrReturn(mOTInst);
     ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
     Impl()->LockThreadStack();
     otThreadSetEnabled(mOTInst, false);
@@ -1831,6 +1873,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otErr
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_JoinerStart(void)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     Impl()->LockThreadStack();
@@ -1880,6 +1923,7 @@ exit:
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
 {
+    VerifyOrReturn(mOTInst);
     // Thread is not enabled, then we are not trying to connect to the network.
     VerifyOrReturn(ThreadStackMgrImpl().IsThreadEnabled() && mpStatusChangeCallback != nullptr);
 
@@ -2275,6 +2319,7 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ClearSrpHost(const char * aHostName)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     Impl()->LockThreadStack();
@@ -2317,29 +2362,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 {
     char protocol[chip::Dnssd::kDnssdProtocolTextMaxSize + 1];
 
-    if (strchr(serviceType, '.') == nullptr)
-        return CHIP_ERROR_INVALID_ARGUMENT;
-
-    // Extract from the <type>.<protocol>.<domain-name>. the <type> part.
-    size_t substringSize = strchr(serviceType, '.') - serviceType;
-    if (substringSize >= ArraySize(mdnsService.mType))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    Platform::CopyString(mdnsService.mType, substringSize + 1, serviceType);
-
-    // Extract from the <type>.<protocol>.<domain-name>. the <protocol> part.
-    const char * protocolSubstringStart = serviceType + substringSize + 1;
-
-    if (strchr(protocolSubstringStart, '.') == nullptr)
-        return CHIP_ERROR_INVALID_ARGUMENT;
-
-    substringSize = strchr(protocolSubstringStart, '.') - protocolSubstringStart;
-    if (substringSize >= ArraySize(protocol))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    Platform::CopyString(protocol, substringSize + 1, protocolSubstringStart);
+    ReturnErrorOnFailure(ReadDomainNameComponent(serviceType, mdnsService.mType));
+    ReturnErrorOnFailure(ReadDomainNameComponent(serviceType, protocol));
 
     if (strncmp(protocol, "_udp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {
@@ -2354,24 +2378,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUnknown;
     }
 
+    mdnsService.mInterface     = Inet::InterfaceId::Null();
+    mdnsService.mSubTypeSize   = 0;
+    mdnsService.mTextEntrySize = 0;
+
     // Check if SRV record was included in DNS response.
-    if (error != OT_ERROR_NOT_FOUND)
+    // If not, return partial information about the service and exit early.
+    if (error != OT_ERROR_NONE)
     {
-        if (strchr(serviceInfo.mHostNameBuffer, '.') == nullptr)
-            return CHIP_ERROR_INVALID_ARGUMENT;
-
-        // Extract from the <hostname>.<domain-name>. the <hostname> part.
-        substringSize = strchr(serviceInfo.mHostNameBuffer, '.') - serviceInfo.mHostNameBuffer;
-        if (substringSize >= ArraySize(mdnsService.mHostName))
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        Platform::CopyString(mdnsService.mHostName, substringSize + 1, serviceInfo.mHostNameBuffer);
-
-        mdnsService.mPort = serviceInfo.mPort;
+        return CHIP_NO_ERROR;
     }
 
-    mdnsService.mInterface = Inet::InterfaceId::Null();
+    const char * host = serviceInfo.mHostNameBuffer;
+    ReturnErrorOnFailure(ReadDomainNameComponent(host, mdnsService.mHostName));
+    mdnsService.mPort = serviceInfo.mPort;
 
     // Check if AAAA record was included in DNS response.
 
@@ -2414,6 +2434,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ResolveAddress(intptr_t context, otDnsAddressCallback callback)
 {
+    VerifyOrReturnError(ThreadStackMgrImpl().OTInstance(), CHIP_ERROR_INCORRECT_STATE);
     DnsResult * dnsResult = reinterpret_cast<DnsResult *>(context);
 
     ThreadStackMgrImpl().LockThreadStack();
@@ -2568,6 +2589,7 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback,
                                                                            void * aContext)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     Impl()->LockThreadStack();
@@ -2678,6 +2700,7 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsResolve(const char * aServiceName, const char * aInstanceName,
                                                                             DnsResolveCallback aCallback, void * aContext)
 {
+    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     Impl()->LockThreadStack();

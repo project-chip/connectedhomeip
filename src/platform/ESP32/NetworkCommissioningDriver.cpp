@@ -345,6 +345,10 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         mpScanCallback = nullptr;
         return;
     }
+
+    // Since this is the dynamic memory allocation, restrict it to a configured limit
+    ap_number = std::min(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_MAX_SCAN_NETWORKS_RESULTS), ap_number);
+
     std::unique_ptr<wifi_ap_record_t[]> ap_buffer_ptr(new wifi_ap_record_t[ap_number]);
     if (ap_buffer_ptr == NULL)
     {

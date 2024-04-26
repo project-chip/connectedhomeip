@@ -18,19 +18,19 @@
 
 import argparse
 import base64
-import enum
 import logging
 import os
 import sys
 from types import SimpleNamespace
 
 import cryptography.x509
-from bitarray import bitarray
-from bitarray.util import ba2int
+from esp_secure_cert.tlv_format import generate_partition_ds, generate_partition_no_ds, tlv_priv_key_t, tlv_priv_key_type_t
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
 from spake2p import generate_verifier  # noqa: E402 isort:skip
+sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
+from generate_setup_payload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
 
 if os.getenv('IDF_PATH'):
     sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
@@ -47,10 +47,11 @@ INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
 
 TOOLS = {}
 
-
 FACTORY_PARTITION_CSV = 'nvs_partition.csv'
 FACTORY_PARTITION_BIN = 'factory_partition.bin'
 NVS_KEY_PARTITION_BIN = 'nvs_key_partition.bin'
+ESP_SECURE_CERT_PARTITION_BIN = 'esp_secure_cert_partititon.bin'
+ONBOARDING_DATA_FILE = 'onboarding_codes.csv'
 
 FACTORY_DATA = {
     # CommissionableDataProvider
@@ -148,50 +149,7 @@ FACTORY_DATA = {
         'encoding': 'hex2bin',
         'value': None,
     },
-    # DeviceInfoProvider
-    'cal-types': {
-        'type': 'data',
-        'encoding': 'u32',
-        'value': None,
-    },
-    'locale-sz': {
-        'type': 'data',
-        'encoding': 'u32',
-        'value': None,
-    },
-
-    # Other device info provider keys are dynamically generated
-    # in the respective functions.
 }
-
-
-class CalendarTypes(enum.Enum):
-    Buddhist = 0
-    Chinese = 1
-    Coptic = 2
-    Ethiopian = 3
-    Gregorian = 4
-    Hebrew = 5
-    Indian = 6
-    Islamic = 7
-    Japanese = 8
-    Korean = 9
-    Persian = 10
-    Taiwanese = 11
-
-
-# Supported Calendar types is stored as a bit array in one uint32_t.
-def calendar_types_to_uint32(calendar_types):
-    result = bitarray(32, endian='little')
-    result.setall(0)
-    for calendar_type in calendar_types:
-        try:
-            result[CalendarTypes[calendar_type].value] = 1
-        except KeyError:
-            logging.error('Unknown calendar type: %s', calendar_type)
-            logging.error('Supported calendar types: %s', ', '.join(CalendarTypes.__members__))
-            sys.exit(1)
-    return ba2int(result)
 
 
 def ishex(s):
@@ -200,31 +158,6 @@ def ishex(s):
         return True
     except ValueError:
         return False
-
-# get_fixed_label_dict() converts the list of strings to per endpoint dictionaries.
-# example input  : ['0/orientation/up', '1/orientation/down', '2/orientation/down']
-# example output : {'0': [{'orientation': 'up'}], '1': [{'orientation': 'down'}], '2': [{'orientation': 'down'}]}
-
-
-def get_fixed_label_dict(fixed_labels):
-    fl_dict = {}
-    for fl in fixed_labels:
-        _l = fl.split('/')
-
-        if len(_l) != 3:
-            logging.error('Invalid fixed label: %s', fl)
-            sys.exit(1)
-
-        if not (ishex(_l[0]) and (len(_l[1]) > 0 and len(_l[1]) < 16) and (len(_l[2]) > 0 and len(_l[2]) < 16)):
-            logging.error('Invalid fixed label: %s', fl)
-            sys.exit(1)
-
-        if _l[0] not in fl_dict.keys():
-            fl_dict[_l[0]] = list()
-
-        fl_dict[_l[0]].append({_l[1]: _l[2]})
-
-    return fl_dict
 
 # get_supported_modes_dict() converts the list of strings to per endpoint dictionaries.
 # example with semantic tags
@@ -315,17 +248,41 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['iteration-count']['value'] = spake2p_params['Iteration Count']
         FACTORY_DATA['salt']['value'] = spake2p_params['Salt']
         FACTORY_DATA['verifier']['value'] = spake2p_params['Verifier']
+    if not args.dac_in_secure_cert:
+        if args.dac_cert:
+            FACTORY_DATA['dac-cert']['value'] = os.path.abspath(args.dac_cert)
+        if args.pai_cert:
+            FACTORY_DATA['pai-cert']['value'] = os.path.abspath(args.pai_cert)
+        if args.dac_key:
+            FACTORY_DATA['dac-key']['value'] = os.path.abspath('dac_raw_privkey.bin')
+            FACTORY_DATA['dac-pub-key']['value'] = os.path.abspath('dac_raw_pubkey.bin')
+    else:
+        # esp secure cert partition
+        secure_cert_partition_file_path = os.path.join(args.output_dir, ESP_SECURE_CERT_PARTITION_BIN)
+        if args.ds_peripheral:
+            if args.target != "esp32h2":
+                logging.error("DS peripheral is only supported for esp32h2 target")
+                exit(1)
+            if args.efuse_key_id == -1:
+                logging.error("--efuse-key-id <value> is required when -ds or --ds-peripheral option is used")
+                exit(1)
+            priv_key = tlv_priv_key_t(key_type=tlv_priv_key_type_t.ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY,
+                                      key_path=args.dac_key, key_pass=None)
+            # priv_key_len is in bits
+            priv_key.priv_key_len = 256
+            priv_key.efuse_key_id = args.efuse_key_id
+            generate_partition_ds(priv_key=priv_key, device_cert=args.dac_cert,
+                                  ca_cert=args.pai_cert, idf_target=args.target,
+                                  op_file=secure_cert_partition_file_path)
+        else:
+            priv_key = tlv_priv_key_t(key_type=tlv_priv_key_type_t.ESP_SECURE_CERT_DEFAULT_FORMAT_KEY,
+                                      key_path=args.dac_key, key_pass=None)
+            generate_partition_no_ds(priv_key=priv_key, device_cert=args.dac_cert,
+                                     ca_cert=args.pai_cert, idf_target=args.target,
+                                     op_file=secure_cert_partition_file_path)
 
-    if args.dac_cert:
-        FACTORY_DATA['dac-cert']['value'] = os.path.abspath(args.dac_cert)
-    if args.pai_cert:
-        FACTORY_DATA['pai-cert']['value'] = os.path.abspath(args.pai_cert)
     if args.cd:
         FACTORY_DATA['cert-dclrn']['value'] = os.path.abspath(args.cd)
-    if args.dac_key:
-        FACTORY_DATA['dac-key']['value'] = os.path.abspath('dac_raw_privkey.bin')
-        FACTORY_DATA['dac-pub-key']['value'] = os.path.abspath('dac_raw_pubkey.bin')
-
     if args.serial_num:
         FACTORY_DATA['serial-num']['value'] = args.serial_num
     if args.rd_id_uid:
@@ -344,52 +301,6 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['hardware-ver']['value'] = args.hw_ver
     if args.hw_ver_str:
         FACTORY_DATA['hw-ver-str']['value'] = args.hw_ver_str
-
-    if args.calendar_types:
-        FACTORY_DATA['cal-types']['value'] = calendar_types_to_uint32(args.calendar_types)
-
-    # Supported locale is stored as multiple entries, key format: "locale/<index>, example key: "locale/0"
-    if args.locales:
-        FACTORY_DATA['locale-sz']['value'] = len(args.locales)
-
-        for i in range(len(args.locales)):
-            _locale = {
-                'type': 'data',
-                'encoding': 'string',
-                'value': args.locales[i]
-            }
-            FACTORY_DATA.update({'locale/{:x}'.format(i): _locale})
-
-    # Each endpoint can contains the fixed lables
-    #  - fl-sz/<index>     : number of fixed labels for the endpoint
-    #  - fl-k/<ep>/<index> : fixed label key for the endpoint and index
-    #  - fl-v/<ep>/<index> : fixed label value for the endpoint and index
-    if args.fixed_labels:
-        dict = get_fixed_label_dict(args.fixed_labels)
-        for key in dict.keys():
-            _sz = {
-                'type': 'data',
-                'encoding': 'u32',
-                'value': len(dict[key])
-            }
-            FACTORY_DATA.update({'fl-sz/{:x}'.format(int(key)): _sz})
-
-            for i in range(len(dict[key])):
-                entry = dict[key][i]
-
-                _label_key = {
-                    'type': 'data',
-                    'encoding': 'string',
-                    'value': list(entry.keys())[0]
-                }
-                _label_value = {
-                    'type': 'data',
-                    'encoding': 'string',
-                    'value': list(entry.values())[0]
-                }
-
-                FACTORY_DATA.update({'fl-k/{:x}/{:x}'.format(int(key), i): _label_key})
-                FACTORY_DATA.update({'fl-v/{:x}/{:x}'.format(int(key), i): _label_value})
 
     # SupportedModes are stored as multiple entries
     #  - sm-sz/<ep>                 : number of supported modes for the endpoint
@@ -486,9 +397,9 @@ def generate_nvs_csv(out_csv_filename):
     logging.info('Generated the factory partition csv file : {}'.format(os.path.abspath(out_csv_filename)))
 
 
-def generate_nvs_bin(encrypt, size, csv_filename, bin_filename):
+def generate_nvs_bin(encrypt, size, csv_filename, bin_filename, output_dir):
     nvs_args = SimpleNamespace(version=2,
-                               outdir=os.getcwd(),
+                               outdir=output_dir,
                                input=csv_filename,
                                output=bin_filename,
                                size=hex(size))
@@ -517,7 +428,8 @@ def clean_up():
         os.remove(FACTORY_DATA['dac-key']['value'])
 
 
-def main():
+def get_args():
+
     def any_base_int(s): return int(s, 0)
 
     parser = argparse.ArgumentParser(description='Chip Factory NVS binary generator tool')
@@ -534,6 +446,14 @@ def main():
     parser.add_argument('--pai-cert', help='The path to the PAI certificate in der format')
     parser.add_argument('--cd', help='The path to the certificate declaration der format')
 
+    # Options for esp_secure_cert_partition
+    parser.add_argument('--dac-in-secure-cert', action="store_true",
+                        help='Store DAC in secure cert partition. By default, DAC is stored in nvs factory partition.')
+    parser.add_argument('-ds', '--ds-peripheral', action="store_true",
+                        help='Use DS Peripheral in generating secure cert partition.')
+    parser.add_argument('--efuse-key-id', type=int, choices=range(0, 6), default=-1,
+                        help='Provide the efuse key_id which contains/will contain HMAC_KEY, default is 1')
+
     # These will be used by DeviceInstanceInfoProvider
     parser.add_argument('--vendor-id', type=any_base_int, help='Vendor id')
     parser.add_argument('--vendor-name', help='Vendor name')
@@ -547,25 +467,31 @@ def main():
                         help=('128-bit unique identifier for generating rotating device identifier, '
                               'provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"'))
 
-    # These will be used by DeviceInfoProvider
-    parser.add_argument('--calendar-types', nargs='+',
-                        help=('List of supported calendar types.\nSupported Calendar Types: Buddhist, Chinese, Coptic, Ethiopian, '
-                              'Gregorian, Hebrew, Indian, Islamic, Japanese, Korean, Persian, Taiwanese'))
-    parser.add_argument('--locales', nargs='+', help='List of supported locales, Language Tag as defined by BCP47, eg. en-US en-GB')
-    parser.add_argument('--fixed-labels', nargs='+',
-                        help='List of fixed labels, eg: "0/orientation/up" "1/orientation/down" "2/orientation/down"')
     parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
                         help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
+    parser.add_argument('--target', default='esp32',
+                        help='The platform type of device. eg: one of esp32, esp32c3, etc.')
     parser.add_argument('-e', '--encrypt', action='store_true',
                         help='Encrypt the factory parititon NVS binary')
     parser.add_argument('--no-bin', action='store_false', dest='generate_bin',
                         help='Do not generate the factory partition binary')
+    parser.add_argument('--output_dir', type=str, default='bin', help='Created image output file path')
+
+    parser.add_argument('-cf', '--commissioning-flow', type=any_base_int, default=0,
+                        help='Device commissioning flow, 0:Standard, 1:User-Intent, 2:Custom. \
+                                          Default is 0.', choices=[0, 1, 2])
+    parser.add_argument('-dm', '--discovery-mode', type=any_base_int, default=1,
+                        help='Commissionable device discovery networking technology. \
+                                         0:WiFi-SoftAP, 1:BLE, 2:On-network. Default is BLE.', choices=[0, 1, 2])
     parser.set_defaults(generate_bin=True)
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def set_up_factory_data(args):
     validate_args(args)
 
     if args.passcode is not None:
@@ -575,16 +501,49 @@ def main():
 
     populate_factory_data(args, spake2p_params)
 
-    if args.dac_key:
+    if args.dac_key and not args.dac_in_secure_cert:
         gen_raw_ec_keypair_from_der(args.dac_key, FACTORY_DATA['dac-pub-key']['value'], FACTORY_DATA['dac-key']['value'])
 
+
+def generate_factory_partiton_binary(args):
     generate_nvs_csv(FACTORY_PARTITION_CSV)
-
     if args.generate_bin:
-        generate_nvs_bin(args.encrypt, args.size, FACTORY_PARTITION_CSV, FACTORY_PARTITION_BIN)
+        generate_nvs_bin(args.encrypt, args.size, FACTORY_PARTITION_CSV, FACTORY_PARTITION_BIN, args.output_dir)
         print_flashing_help(args.encrypt, FACTORY_PARTITION_BIN)
-
     clean_up()
+
+
+def set_up_out_dirs(args):
+    os.makedirs(args.output_dir, exist_ok=True)
+
+
+def generate_onboarding_data(args):
+    if (args.vendor_id and args.product_id):
+        payloads = SetupPayload(args.discriminator, args.passcode, args.discovery_mode, CommissioningFlow(args.commissioning_flow),
+                                args.vendor_id, args.product_id)
+    else:
+        payloads = SetupPayload(args.discriminator, args.passcode, args.discovery_mode, CommissioningFlow(args.commissioning_flow))
+
+    chip_qrcode = payloads.generate_qrcode()
+    chip_manualcode = payloads.generate_manualcode()
+
+    logging.info('Generated QR code: ' + chip_qrcode)
+    logging.info('Generated manual code: ' + chip_manualcode)
+
+    csv_data = 'qrcode,manualcode\n'
+    csv_data += chip_qrcode + ',' + chip_manualcode + '\n'
+
+    with open(os.path.join(args.output_dir, ONBOARDING_DATA_FILE), 'w') as f:
+        f.write(csv_data)
+
+
+def main():
+    args = get_args()
+    set_up_out_dirs(args)
+    set_up_factory_data(args)
+    generate_factory_partiton_binary(args)
+    if (args.discriminator and args.passcode):
+        generate_onboarding_data(args)
 
 
 if __name__ == "__main__":

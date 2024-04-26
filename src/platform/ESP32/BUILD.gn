@@ -128,6 +128,9 @@ static_library("ESP32") {
         "WiFiDnssdImpl.h",
       ]
     }
+    if (chip_mdns == "minimal") {
+      sources += [ "ESP32EndpointQueueFilter.h" ]
+    }
     if (chip_enable_route_hook) {
       sources += [
         "route_hook/ESP32RouteHook.c",
@@ -179,6 +182,8 @@ static_library("ESP32") {
     sources += [
       "ESP32DeviceInfoProvider.cpp",
       "ESP32DeviceInfoProvider.h",
+      "StaticESP32DeviceInfoProvider.cpp",
+      "StaticESP32DeviceInfoProvider.h",
     ]
   }
 
