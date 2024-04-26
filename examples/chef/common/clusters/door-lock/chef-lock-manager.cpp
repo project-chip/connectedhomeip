@@ -20,9 +20,8 @@
 #ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #include "chef-lock-manager.h"
 
-#include <iostream>
 #include <algorithm>
-
+#include <iostream>
 
 using chip::to_underlying;
 
