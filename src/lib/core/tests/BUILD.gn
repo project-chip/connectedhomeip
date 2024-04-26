@@ -24,6 +24,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestCATValues.cpp",
     "TestCHIPCallback.cpp",
+    "TestCHIPError.cpp",
     "TestCHIPErrorStr.cpp",
     "TestOTAImageHeader.cpp",
     "TestOptional.cpp",
