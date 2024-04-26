@@ -226,7 +226,7 @@ private:
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
                                    char ** txtFields, size_t & numTxtFields)
     {
-        auto optionalMrp = params.GetLocalMRPConfig();
+        const auto optionalMrp = params.GetLocalMRPConfig();
 
         if (optionalMrp.has_value())
         {
@@ -278,10 +278,11 @@ private:
                 txtFields[numTxtFields++] = storage.sessionActiveThresholdBuf;
             }
         }
-        if (params.GetTcpSupported().has_value())
+        const auto tcpSupported = params.GetTcpSupported();
+        if (tcpSupported.has_value())
         {
-            size_t writtenCharactersNumber = static_cast<size_t>(
-                snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", *params.GetTcpSupported()));
+            size_t writtenCharactersNumber =
+                static_cast<size_t>(snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", *tcpSupported));
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.tcpSupportedBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.tcpSupportedBuf;
@@ -670,9 +671,10 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
     }
 
-    if (params.GetVendorId().has_value())
+    const auto vendorId = params.GetVendorId();
+    if (vendorId.has_value())
     {
-        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *params.GetVendorId()));
+        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
@@ -687,10 +689,10 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
     }
 
-    if (params.GetDeviceType().has_value())
+    const auto deviceType = params.GetDeviceType();
+    if (deviceType.has_value())
     {
-        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                           DiscoveryFilter(DiscoveryFilterType::kDeviceType, *params.GetDeviceType()));
+        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
@@ -811,28 +813,34 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
                                                                                            : &mQueryResponderAllocatorCommissioner;
 
     char txtVidPid[chip::Dnssd::kKeyVendorProductMaxLength + 4];
-    if (params.GetProductId().has_value() && params.GetVendorId().has_value())
+
+    const auto productId = params.GetProductId();
+    const auto vendorId  = params.GetVendorId();
+
+    if (productId.has_value() && vendorId.has_value())
     {
-        snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d+%d", *params.GetVendorId(), *params.GetProductId());
+        snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d+%d", *vendorId, *productId);
         txtFields[numTxtFields++] = txtVidPid;
     }
-    else if (params.GetVendorId().has_value())
+    else if (vendorId.has_value())
     {
-        snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d", *params.GetVendorId());
+        snprintf(txtVidPid, sizeof(txtVidPid), "VP=%d", *vendorId);
         txtFields[numTxtFields++] = txtVidPid;
     }
 
     char txtDeviceType[chip::Dnssd::kKeyDeviceTypeMaxLength + 4];
-    if (params.GetDeviceType().has_value())
+    const auto deviceType = params.GetDeviceType();
+    if (deviceType.has_value())
     {
-        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%" PRIu32, *params.GetDeviceType());
+        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%" PRIu32, *deviceType);
         txtFields[numTxtFields++] = txtDeviceType;
     }
 
     char txtDeviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 4];
-    if (params.GetDeviceName().has_value())
+    const auto deviceName = params.GetDeviceName();
+    if (deviceName.has_value())
     {
-        snprintf(txtDeviceName, sizeof(txtDeviceName), "DN=%s", *params.GetDeviceName());
+        snprintf(txtDeviceName, sizeof(txtDeviceName), "DN=%s", *deviceName);
         txtFields[numTxtFields++] = txtDeviceName;
     }
     CommonTxtEntryStorage commonStorage;
@@ -857,21 +865,24 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", static_cast<int>(params.GetCommissioningMode()));
         txtFields[numTxtFields++] = txtCommissioningMode;
 
-        if (params.GetRotatingDeviceId().has_value())
+        const auto rotatingDeviceId = params.GetRotatingDeviceId();
+        if (rotatingDeviceId.has_value())
         {
-            snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", *params.GetRotatingDeviceId());
+            snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", *rotatingDeviceId);
             txtFields[numTxtFields++] = txtRotatingDeviceId;
         }
 
-        if (params.GetPairingHint().has_value())
+        const auto pairingHint = params.GetPairingHint();
+        if (pairingHint.has_value())
         {
-            snprintf(txtPairingHint, sizeof(txtPairingHint), "PH=%d", *params.GetPairingHint());
+            snprintf(txtPairingHint, sizeof(txtPairingHint), "PH=%d", *pairingHint);
             txtFields[numTxtFields++] = txtPairingHint;
         }
 
-        if (params.GetPairingInstruction().has_value())
+        const auto pairingInstruction = params.GetPairingInstruction();
+        if (pairingInstruction.has_value())
         {
-            snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", *params.GetPairingInstruction());
+            snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", *pairingInstruction);
             txtFields[numTxtFields++] = txtPairingInstr;
         }
     }
