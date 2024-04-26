@@ -3,8 +3,7 @@
     "matter": {
         "instance_info": {
             "vendor_id": 4169,
-            "product_id": 32773,
-            "manufacturing_date": "0000-00-00"
+            "product_id": 32773
         },
         "commissionable_data": {
             "discriminator": 3841,

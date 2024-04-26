@@ -2,6 +2,7 @@ import os
 import random
 import base64
 import importlib
+import datetime
 import modules.util as _util
 import modules.tools as _tools
 import modules.device as _dev
@@ -113,6 +114,11 @@ class ProvisionManager:
             raise ValueError("Missing vendor ID")
         if(args.int(ID.kProductId) is None):
             raise ValueError("Missing product ID")
+
+        # Manufacturing Date
+        mdate = args.get(ID.kManufacturingDate)
+        if mdate.value is None:
+            mdate.set("{:%Y-%m-%d}".format(datetime.date.today()))
 
         # Credentials
         creds = _creds.Credentials(paths, args)
