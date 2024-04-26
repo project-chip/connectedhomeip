@@ -24,22 +24,6 @@
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
 
-class CheckInCompleteCallback
-{
-public:
-    virtual ~CheckInCompleteCallback() {}
-
-    /**
-     * @brief Callback used to let the application know that a check-in message was received and validated.
-     *
-     * The callback will be executed in CHIP main loop. Implementations should avoid blocking operations in this callback.
-     *
-     * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
-     *                         node that sent the check-in message.
-     */
-    virtual void OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo) = 0;
-};
-
 class ChipToolCheckInDelegate : public chip::app::CheckInDelegate
 {
 public:
@@ -50,25 +34,7 @@ public:
                                                      chip::app::ICDClientStorage * clientStorage) override;
     void OnKeyRefreshDone(chip::app::RefreshKeySender * refreshKeySender, CHIP_ERROR error) override;
 
-    /**
-     * @brief Sets a callback for when the Check-In processing completes.
-     *
-     * This method does not consider the race condition that the callback is changed during OnCheckInComplete.
-     *
-     * @param[in] handler - A pointer to the CheckInCompleteCallback to register.
-     */
-    void SetOnCheckInCompleteCallback(CheckInCompleteCallback * handler);
-
-    /**
-     * @brief Unsets the callback for when the Check-In processing completes.
-     *
-     * This method does not consider the race condition that the callback is changed during OnCheckInComplete.
-     */
-    void UnsetOnCheckInCompleteCallback();
-
 private:
     chip::app::ICDClientStorage * mpStorage        = nullptr;
     chip::app::InteractionModelEngine * mpImEngine = nullptr;
-
-    CheckInCompleteCallback * mpCheckInCompleteCallbacks;
 };

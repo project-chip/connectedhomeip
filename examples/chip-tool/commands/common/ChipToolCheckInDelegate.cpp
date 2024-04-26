@@ -40,10 +40,6 @@ void ChipToolCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo
     ChipLogProgress(
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
-    if (mpCheckInCompleteCallbacks != nullptr)
-    {
-        mpCheckInCompleteCallbacks->OnCheckInComplete(clientInfo);
-    }
 }
 
 RefreshKeySender * ChipToolCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
@@ -77,14 +73,4 @@ void ChipToolCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySend
         Platform::Delete(refreshKeySender);
         refreshKeySender = nullptr;
     }
-}
-
-void ChipToolCheckInDelegate::SetOnCheckInCompleteCallback(CheckInCompleteCallback * handler)
-{
-    mpCheckInCompleteCallbacks = handler;
-}
-
-void ChipToolCheckInDelegate::UnsetOnCheckInCompleteCallback()
-{
-    mpCheckInCompleteCallbacks = nullptr;
 }

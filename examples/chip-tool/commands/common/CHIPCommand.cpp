@@ -655,12 +655,3 @@ void CHIPCommand::ExecuteDeferredCleanups(intptr_t ignored)
     sDeferredCleanups.clear();
 }
 
-void CHIPCommand::SetOnCheckInCompleteCallback(CheckInCompleteCallback * handler)
-{
-    sCheckInDelegate.SetOnCheckInCompleteCallback(handler);
-}
-
-void CHIPCommand::UnsetOnCheckInCompleteCallback()
-{
-    sCheckInDelegate.UnsetOnCheckInCompleteCallback();
-}

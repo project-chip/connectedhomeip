@@ -180,10 +180,6 @@ protected:
 
     ChipDeviceCommissioner & GetCommissioner(std::string identity);
 
-    static void SetOnCheckInCompleteCallback(CheckInCompleteCallback * handler);
-
-    static void UnsetOnCheckInCompleteCallback();
-
 private:
     CHIP_ERROR MaybeSetUpStack();
     void MaybeTearDownStack();
