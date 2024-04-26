@@ -206,7 +206,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                        .SetMac(mac)
                                        .SetPort(GetSecuredPort())
                                        .SetInterfaceId(GetInterfaceId())
-                                       .SetLocalMRPConfig(GetLocalMRPConfig())
+                                       .SetLocalMRPConfig(GetLocalMRPConfig().std_optional())
                                        .EnableIpV4(true);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -251,7 +251,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     }
     else
     {
-        advertiseParameters.SetVendorId(chip::Optional<uint16_t>::Value(value));
+        advertiseParameters.SetVendorId(std::make_optional<uint16_t>(value));
     }
 
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(value) != CHIP_NO_ERROR)
@@ -260,23 +260,23 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     }
     else
     {
-        advertiseParameters.SetProductId(chip::Optional<uint16_t>::Value(value));
+        advertiseParameters.SetProductId(std::make_optional<uint16_t>(value));
     }
 
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
         DeviceLayer::ConfigurationMgr().GetDeviceTypeId(val32) == CHIP_NO_ERROR)
     {
-        advertiseParameters.SetDeviceType(chip::Optional<uint32_t>::Value(val32));
+        advertiseParameters.SetDeviceType(std::make_optional<uint32_t>(val32));
     }
 
     char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 1];
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() &&
         DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) == CHIP_NO_ERROR)
     {
-        advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
+        advertiseParameters.SetDeviceName(std::make_optional<const char *>(deviceName));
     }
 
-    advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig());
+    advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig().std_optional());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     AddICDKeyToAdvertisement(advertiseParameters);
@@ -303,7 +303,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
         char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
         ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
-        advertiseParameters.SetRotatingDeviceId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
+        advertiseParameters.SetRotatingDeviceId(std::make_optional<const char *>(rotatingDeviceIdHexBuffer));
 #endif
 
         if (!HaveOperationalCredentials())
@@ -314,7 +314,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
             }
             else
             {
-                advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+                advertiseParameters.SetPairingHint(std::make_optional<uint16_t>(value));
             }
 
             if (DeviceLayer::ConfigurationMgr().GetInitialPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
@@ -323,7 +323,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
             }
             else
             {
-                advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
+                advertiseParameters.SetPairingInstruction(std::make_optional<const char *>(pairingInst));
             }
         }
         else
@@ -334,7 +334,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
             }
             else
             {
-                advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+                advertiseParameters.SetPairingHint(std::make_optional<uint16_t>(value));
             }
 
             if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
@@ -343,7 +343,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
             }
             else
             {
-                advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
+                advertiseParameters.SetPairingInstruction(std::make_optional<const char *>(pairingInst));
             }
         }
     }
@@ -357,10 +357,10 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
     ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u",
-                    advertiseParameters.GetVendorId().ValueOr(0), advertiseParameters.GetProductId().ValueOr(0),
+                    advertiseParameters.GetVendorId().value_or(0), advertiseParameters.GetProductId().value_or(0),
                     advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
                     to_underlying(advertiseParameters.GetCommissioningMode()),
-                    advertiseParameters.GetCommissionerPasscodeSupported().ValueOr(false) ? 1 : 0);
+                    advertiseParameters.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0);
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
