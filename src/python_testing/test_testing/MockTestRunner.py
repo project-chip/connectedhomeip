@@ -37,9 +37,9 @@ class AsyncMock(MagicMock):
 
 
 class MockTestRunner():
-    def __init__(self, filename: str, classname: str, test: str):
+    def __init__(self, filename: str, classname: str, test: str, endpoint: int):
         self.config = MatterTestConfig(
-            tests=[test], endpoint=1, dut_node_ids=[1])
+            tests=[test], endpoint=endpoint, dut_node_ids=[1])
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
             nodeId=self.config.controller_node_id,

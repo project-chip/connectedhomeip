@@ -135,12 +135,19 @@ Complete the following steps:
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
 
-#### Enable experimental Bluetooth support in BlueZ
+#### Enable experimental Bluetooth support and disable battery plugin in BlueZ
 
 The Matter application on Linux uses BlueZ to communicate with the Bluetooth
 controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
 the features required by the Matter application by default. To enable these
 features, you need to enable experimental Bluetooth support in BlueZ.
+
+Also disable the battery plugin from BlueZ, because iOS devices advertises a
+battery service via BLE, which requires pairing if accessed. BlueZ includes a
+battery plugin by default which tries to connect to the battery service. The
+authentication fails, because in this case no BLE pairing has been done. If the
+BlueZ battery plugin is not disabled, the BLE connection will be terminated
+during the Matter commissioning process.
 
 1. Edit the `bluetooth.service` unit by running the following command:
 
@@ -153,7 +160,7 @@ features, you need to enable experimental Bluetooth support in BlueZ.
     ```ini
     [Service]
     ExecStart=
-    ExecStart=/usr/lib/bluetooth/bluetoothd -E
+    ExecStart=/usr/lib/bluetooth/bluetoothd -E -P battery
     ```
 
 1. Restart the Bluetooth service by running the following command:
@@ -199,22 +206,27 @@ permanently, you need to make the following changes:
 
 ## Installing ZAP tool
 
-`bootstrap.sh` will download a compatible ZAP tool version and set it up in
-`$PATH`. If you want to install or use a different version of the tool, you may
-download one from the ZAP project's
-[Releases](https://github.com/project-chip/zap/releases) page.
+For platforms defined in [`scripts/setup/zap.json`](/scripts/setup/zap.json),
+`bootstrap.sh` will download a compatible ZAP tool version from CIPD and set it
+up in `$PATH`.
 
-### Linux ARM
+ZAP releases are copied to CIPD by an automated bot. You can check if a release
+was copied by looking at tags created for
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/zap)
+in various platforms.
 
-Zap does not provide binary releases for arm. Rosetta solves this for Darwin,
-however for linux arm you will have to use a local ZAP, generally through
-setting `$ZAP_DEVELOPMENT_PATH` (see the section `Which zap to use` below).
+### Custom ZAP
+
+If you want to install or use a different version of the tool, you may download
+one from the [ZAP releases](https://github.com/project-chip/zap/releases) or
+build it from source.
 
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
-so you can download a compatible version from the zap project
-[Releases](https://github.com/project-chip/zap/releases). To checkout as source
-code the corresponding tag should exist in the zap
-[repository tags](https://github.com/project-chip/zap/tags) list.
+so you can refer to it to find a compatible version. The version is also
+maintained at [`scripts/setup/zap.version`](/scripts/setup/zap.version).
+
+To check out as source code, the corresponding tag should exist in the
+[ZAP repository tags](https://github.com/project-chip/zap/tags) list.
 
 Example commands:
 

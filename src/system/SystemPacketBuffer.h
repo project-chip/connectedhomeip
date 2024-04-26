@@ -44,8 +44,6 @@
 #include <lwip/pbuf.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-class PacketBufferTest;
-
 namespace chip {
 namespace System {
 
@@ -392,7 +390,7 @@ private:
     const uint8_t * ReserveStart() const;
 
     friend class PacketBufferHandle;
-    friend class ::PacketBufferTest;
+    friend class TestSystemPacketBuffer;
 };
 
 static_assert(sizeof(pbuf) == sizeof(PacketBuffer), "PacketBuffer must not have additional members");
@@ -659,6 +657,8 @@ public:
 #endif
     }
 
+    bool operator==(const PacketBufferHandle & aOther) const { return mBuffer == aOther.mBuffer; }
+
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // For use via LwIPPacketBufferView only.
@@ -686,8 +686,7 @@ private:
     }
 
     PacketBuffer * Get() const { return mBuffer; }
-
-    bool operator==(const PacketBufferHandle & aOther) { return mBuffer == aOther.mBuffer; }
+    PacketBuffer * GetNext() const { return static_cast<PacketBuffer *>(mBuffer->next); }
 
 #if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHTSIZE
     void InternalRightSize();
@@ -696,7 +695,7 @@ private:
     PacketBuffer * mBuffer;
 
     friend class PacketBuffer;
-    friend class ::PacketBufferTest;
+    friend class TestSystemPacketBuffer;
 };
 
 inline void PacketBuffer::SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead)

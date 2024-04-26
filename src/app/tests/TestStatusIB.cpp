@@ -113,6 +113,44 @@ void TestStatusIBErrorToString(nlTestSuite * aSuite, void * aContext)
 }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 
+void TestStatusIBEqualityOperator(nlTestSuite * aSuite, void * /*aContext*/)
+{
+    // Equality against self is true.
+    StatusIB one;
+    NL_TEST_ASSERT(aSuite, one == one);
+
+    // Default constructors are equal.
+    NL_TEST_ASSERT(aSuite, one == StatusIB());
+
+    // Different imStatus is not equal.
+    StatusIB with_imstatus(Status::Failure);
+    NL_TEST_ASSERT(aSuite, one != with_imstatus);
+
+    // Same imStatus are equal.
+    NL_TEST_ASSERT(aSuite, with_imstatus == StatusIB(Status::Failure));
+
+    // Same imStatus but different clusterStatus are not equal.
+    StatusIB with_cluster_status(Status::Failure, /*clusterStatus=*/2);
+    NL_TEST_ASSERT(aSuite, with_imstatus != with_cluster_status);
+
+    // Different imStatus but same clusterStatus are not equal.
+    NL_TEST_ASSERT(aSuite, with_cluster_status != StatusIB(Status::Success, /*clusterStatus=*/2));
+
+    // Same imStatus and clusterStatus are equal.
+    NL_TEST_ASSERT(aSuite, with_cluster_status == StatusIB(Status::Failure, /*clusterStatus=*/2));
+
+    // From same CHIP_ERROR are equal.
+    StatusIB invalid_argument(CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(aSuite, invalid_argument == StatusIB(CHIP_ERROR_INVALID_ARGUMENT));
+
+    // Different CHIP_ERROR are equal if they are not from kIMClusterStatus or
+    // kIMGlobalStatus.
+    NL_TEST_ASSERT(aSuite, invalid_argument == StatusIB(CHIP_ERROR_INCORRECT_STATE));
+
+    // Error never equals NO_ERROR
+    NL_TEST_ASSERT(aSuite, invalid_argument != StatusIB(CHIP_NO_ERROR));
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -120,6 +158,7 @@ const nlTest sTests[] =
 #if !CHIP_CONFIG_SHORT_ERROR_STR
     NL_TEST_DEF("StatusIBErrorToString", TestStatusIBErrorToString),
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
+    NL_TEST_DEF("StatusIBEqualityOperator", TestStatusIBEqualityOperator),
     NL_TEST_SENTINEL()
 };
 // clang-format on

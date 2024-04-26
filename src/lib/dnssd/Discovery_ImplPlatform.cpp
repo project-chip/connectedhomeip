@@ -51,7 +51,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     DiscoveredNodeData nodeData;
     result->ToDiscoveredNodeData(addresses, nodeData);
 
-    nodeData.LogDetail();
+    nodeData.Get<CommissionNodeData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
     discoveryContext->Release();
 }
@@ -339,37 +339,37 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
 
 void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
 {
-    auto & resolutionData = nodeData.resolutionData;
-    auto & commissionData = nodeData.nodeData;
+    nodeData.Set<CommissionNodeData>();
+    auto & discoveredData = nodeData.Get<CommissionNodeData>();
 
-    Platform::CopyString(resolutionData.hostName, mHostName);
-    Platform::CopyString(commissionData.instanceName, mName);
+    Platform::CopyString(discoveredData.hostName, mHostName);
+    Platform::CopyString(discoveredData.instanceName, mName);
 
     IPAddressSorter::Sort(addresses, mInterface);
 
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
-        if (addressesFound == ArraySize(resolutionData.ipAddress))
+        if (addressesFound == ArraySize(discoveredData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
             break;
         }
-        resolutionData.ipAddress[addressesFound] = ip;
+        discoveredData.ipAddress[addressesFound] = ip;
         ++addressesFound;
     }
 
-    resolutionData.interfaceId = mInterface;
-    resolutionData.numIPs      = addressesFound;
-    resolutionData.port        = mPort;
+    discoveredData.interfaceId = mInterface;
+    discoveredData.numIPs      = addressesFound;
+    discoveredData.port        = mPort;
 
     for (size_t i = 0; i < mTextEntrySize; ++i)
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
         ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, resolutionData);
-        FillNodeDataFromTxt(key, val, commissionData);
+        FillNodeDataFromTxt(key, val, discoveredData);
+        FillNodeDataFromTxt(key, val, discoveredData);
     }
 }
 

@@ -56,13 +56,14 @@ public:
     char deviceName[chip::Dnssd::kMaxDeviceNameLen + 1]                    = {};
     char hostName[chip::Dnssd::kHostNameMaxLength + 1]                     = {};
     char instanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
-    unsigned int numIPs; // number of valid IP addresses
+    unsigned int numIPs; // Number of valid IP addresses
     chip::Inet::IPAddress ipAddresses[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
     chip::Inet::InterfaceId interfaceId;
     uint16_t port;
     uint16_t productId;
     uint16_t vendorId;
     uint32_t deviceType;
+    bool supportsCommissionerGeneratedPasscode;
 
     chip::NodeId nodeId           = 0;
     chip::FabricIndex fabricIndex = 0;
@@ -181,6 +182,8 @@ public:
     uint16_t GetVendorId() const { return mAttributes.vendorId; }
 
     uint32_t GetDeviceType() const { return mAttributes.deviceType; }
+
+    bool GetSupportsCommissionerGeneratedPasscode() const { return mAttributes.supportsCommissionerGeneratedPasscode; }
 
     chip::NodeId GetNodeId() const { return mAttributes.nodeId; }
 

@@ -37,8 +37,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
-
 enum class BleScanState : uint8_t
 {
     kNotScanning,
