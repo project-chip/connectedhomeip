@@ -58,12 +58,7 @@ RefreshKeySender * ChipToolCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & c
         return nullptr;
     }
 
-    auto refreshKeySender = Platform::New<RefreshKeySender>(this, clientInfo, clientStorage, mpImEngine, newKey);
-    if (refreshKeySender == nullptr)
-    {
-        return nullptr;
-    }
-    return refreshKeySender;
+    return Platform::New<RefreshKeySender>(this, clientInfo, clientStorage, mpImEngine, newKey);
 }
 
 void ChipToolCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error)
