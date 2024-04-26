@@ -96,7 +96,7 @@ public:
      * @param session     Reference to the secure session that will be initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) const = 0;
+    virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParams.GetMRPConfig(); }
     const SessionParameters & GetRemoteSessionParameters() const { return mRemoteSessionParams; }

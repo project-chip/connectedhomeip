@@ -146,7 +146,7 @@ public:
      * @param session     Reference to the secure session that will be initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) override;
 
     //// UnsolicitedMessageHandler Implementation ////
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
