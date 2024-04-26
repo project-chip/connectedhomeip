@@ -134,8 +134,8 @@ TEST_F(TestSessionManager, CheckSimpleInitTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager,
-                                  &deviceStorage, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 }
 
 TEST_F(TestSessionManager, CheckMessageTest)
@@ -163,8 +163,8 @@ TEST_F(TestSessionManager, CheckMessageTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager,
-                                  &deviceStorage, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     sessionManager.SetMessageDelegate(&callback);
 
@@ -267,8 +267,8 @@ TEST_F(TestSessionManager, SendEncryptedPacketTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager,
-                                  &deviceStorage, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     sessionManager.SetMessageDelegate(&callback);
 
@@ -356,8 +356,8 @@ TEST_F(TestSessionManager, SendBadEncryptedPacketTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager,
-                                  &deviceStorage, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     sessionManager.SetMessageDelegate(&callback);
 
@@ -483,8 +483,8 @@ TEST_F(TestSessionManager, SendPacketWithOldCounterTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager,
-                                  &deviceStorage, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     sessionManager.SetMessageDelegate(&callback);
 
@@ -586,8 +586,8 @@ TEST_F(TestSessionManager, SendPacketWithTooOldCounterTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager,
-                                  &deviceStorage, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
     sessionManager.SetMessageDelegate(&callback);
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
@@ -691,8 +691,8 @@ TEST_F(TestSessionManager, SessionAllocationTest)
     SessionManager sessionManager;
 
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &messageCounterManager,
-                                  &deviceStorage1, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &messageCounterManager, &deviceStorage1,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     // Allocate a session.
     uint16_t sessionId1;
@@ -729,8 +729,8 @@ TEST_F(TestSessionManager, SessionAllocationTest)
     sessionManager.~SessionManager();
     new (&sessionManager) SessionManager();
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &messageCounterManager,
-                                  &deviceStorage2, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &messageCounterManager, &deviceStorage2,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     // Allocate a single session so we know what random id we are starting at.
     {
@@ -771,8 +771,8 @@ TEST_F(TestSessionManager, SessionAllocationTest)
         {
             constexpr int maxOffset = 100;
             handles[h]              = sessionManager.AllocateSession(
-                Transport::SecureSession::Type::kPASE,
-                ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
+                             Transport::SecureSession::Type::kPASE,
+                             ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
             EXPECT_TRUE(handles[h].HasValue());
             sessionIds[h] = handles[h].Value()->AsSecureSession()->GetLocalSessionId();
             RandomSessionIdAllocatorOffset(sessionManager, maxOffset);
@@ -827,8 +827,8 @@ TEST_F(TestSessionManager, SessionCounterExhaustedTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager,
-                                  &deviceStorage, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
@@ -903,8 +903,8 @@ TEST_F(TestSessionManager, SessionShiftingTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &messageCounterManager,
-                                  &deviceStorage, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
@@ -980,8 +980,8 @@ TEST_F(TestSessionManager, TestFindSecureSessionForNode)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &messageCounterManager,
-                                  &deviceStorage, &fabricTableHolder.GetFabricTable(), sessionKeystore));
+              sessionManager.Init(&this->GetSystemLayer(), &this->GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
