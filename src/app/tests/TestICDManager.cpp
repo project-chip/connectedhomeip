@@ -751,8 +751,12 @@ public:
         constexpr uint32_t startValue    = 1;
         constexpr uint32_t expectedValue = 2147483648;
 
-        // Set starting value for test
-        ICDConfigurationData::GetInstance().GetICDCounter().SetValue(startValue);
+        // Set starting value
+        uint32_t currentValue = ICDConfigurationData::GetInstance().GetICDCounter().GetValue();
+        uint32_t delta        = startValue - currentValue;
+
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().AdvanceBy(delta) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().GetValue() == startValue);
 
         // Trigger ICD kInvalidateHalfCounterValues event
         ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateHalfCounterValues));
@@ -768,8 +772,12 @@ public:
         constexpr uint32_t startValue    = 105;
         constexpr uint32_t expectedValue = 104;
 
-        // Set starting value for test
-        ICDConfigurationData::GetInstance().GetICDCounter().SetValue(startValue);
+        // Set starting value
+        uint32_t currentValue = ICDConfigurationData::GetInstance().GetICDCounter().GetValue();
+        uint32_t delta        = startValue - currentValue;
+
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().AdvanceBy(delta) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().GetValue() == startValue);
 
         // Trigger ICD kInvalidateAllCounterValues event
         ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateAllCounterValues));
