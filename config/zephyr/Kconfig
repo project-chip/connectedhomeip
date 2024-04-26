@@ -309,7 +309,8 @@ config CHIP_PROJECT_CONFIG
 
 config CHIP_ENABLE_DNSSD_SRP
 	bool "OpenThread Service Registration Protocol"
-	default y if NET_L2_OPENTHREAD
+	default y
+	depends on NET_L2_OPENTHREAD
 	imply OPENTHREAD_ECDSA
 	imply OPENTHREAD_SRP_CLIENT
 	help
@@ -318,7 +319,8 @@ config CHIP_ENABLE_DNSSD_SRP
 
 config CHIP_ENABLE_DNS_CLIENT
 	bool "OpenThread DNS client"
-	default y if NET_L2_OPENTHREAD
+	default y
+	depends on NET_L2_OPENTHREAD
 	imply OPENTHREAD_DNS_CLIENT
 	help
 	  Enables using the OpenThread DNS client for the Matter service discovery.
@@ -413,6 +415,7 @@ config CHIP_THREAD_SSED
 
 config CHIP_OPENTHREAD_CONFIG
 	string "Custom OpenThread configuration file"
+	depends on NET_L2_OPENTHREAD
 	help
 	  Provides a path to an OpenThread configuration file. The path can be
 	  either absolute or relative to the application directory. When this option
