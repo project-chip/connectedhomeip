@@ -19,10 +19,10 @@
 
 #include <cstdint>
 #include <cstring>
+#include <optional>
 
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/support/BytesToHex.h>
@@ -91,10 +91,10 @@ struct CommonResolutionData
     uint16_t port                         = 0;
     char hostName[kHostNameMaxLength + 1] = {};
     bool supportsTcp                      = false;
-    Optional<bool> isICDOperatingAsLIT;
-    Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
-    Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
-    Optional<System::Clock::Milliseconds16> mrpRetryActiveThreshold;
+    std::optional<bool> isICDOperatingAsLIT;
+    std::optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
+    std::optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
+    std::optional<System::Clock::Milliseconds16> mrpRetryActiveThreshold;
 
     CommonResolutionData() { Reset(); }
 
@@ -103,21 +103,21 @@ struct CommonResolutionData
     ReliableMessageProtocolConfig GetRemoteMRPConfig() const
     {
         const ReliableMessageProtocolConfig defaultConfig = GetDefaultMRPConfig();
-        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(defaultConfig.mIdleRetransTimeout),
-                                             GetMrpRetryIntervalActive().ValueOr(defaultConfig.mActiveRetransTimeout),
-                                             GetMrpRetryActiveThreshold().ValueOr(defaultConfig.mActiveThresholdTime));
+        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().value_or(defaultConfig.mIdleRetransTimeout),
+                                             GetMrpRetryIntervalActive().value_or(defaultConfig.mActiveRetransTimeout),
+                                             GetMrpRetryActiveThreshold().value_or(defaultConfig.mActiveThresholdTime));
     }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
-    Optional<System::Clock::Milliseconds16> GetMrpRetryActiveThreshold() const { return mrpRetryActiveThreshold; }
+    std::optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
+    std::optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
+    std::optional<System::Clock::Milliseconds16> GetMrpRetryActiveThreshold() const { return mrpRetryActiveThreshold; }
 
     bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
     {
         // If either session interval (Idle - SII, Active - SAI) has a value and that value is greater
         // than the value passed to this function, then the peer device will be treated as if it is
         // a Sleepy End Device (SED)
-        return (mrpRetryIntervalIdle.HasValue() && (mrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
-            (mrpRetryIntervalActive.HasValue() && (mrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout));
+        return (mrpRetryIntervalIdle.has_value() && (*mrpRetryIntervalIdle > defaultMRPConfig->mIdleRetransTimeout)) ||
+            (mrpRetryIntervalActive.has_value() && (*mrpRetryIntervalActive > defaultMRPConfig->mActiveRetransTimeout));
     }
 
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
@@ -125,10 +125,10 @@ struct CommonResolutionData
     void Reset()
     {
         memset(hostName, 0, sizeof(hostName));
-        mrpRetryIntervalIdle    = NullOptional;
-        mrpRetryIntervalActive  = NullOptional;
-        mrpRetryActiveThreshold = NullOptional;
-        isICDOperatingAsLIT     = NullOptional;
+        mrpRetryIntervalIdle    = std::nullopt;
+        mrpRetryIntervalActive  = std::nullopt;
+        mrpRetryActiveThreshold = std::nullopt;
+        isICDOperatingAsLIT     = std::nullopt;
         numIPs                  = 0;
         port                    = 0;
         supportsTcp             = false;
@@ -157,34 +157,34 @@ struct CommonResolutionData
         {
             ChipLogDetail(Discovery, "\tPort: %u", port);
         }
-        if (mrpRetryIntervalIdle.HasValue())
+        if (mrpRetryIntervalIdle.has_value())
         {
-            ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle.Value().count());
+            ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle->count());
         }
         else
         {
             ChipLogDetail(Discovery, "\tMrp Interval idle: not present");
         }
-        if (mrpRetryIntervalActive.HasValue())
+        if (mrpRetryIntervalActive.has_value())
         {
-            ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive.Value().count());
+            ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive->count());
         }
         else
         {
             ChipLogDetail(Discovery, "\tMrp Interval active: not present");
         }
-        if (mrpRetryActiveThreshold.HasValue())
+        if (mrpRetryActiveThreshold.has_value())
         {
-            ChipLogDetail(Discovery, "\tMrp Active Threshold: %u ms", mrpRetryActiveThreshold.Value().count());
+            ChipLogDetail(Discovery, "\tMrp Active Threshold: %u ms", mrpRetryActiveThreshold->count());
         }
         else
         {
             ChipLogDetail(Discovery, "\tMrp Active Threshold: not present");
         }
         ChipLogDetail(Discovery, "\tTCP Supported: %d", supportsTcp);
-        if (isICDOperatingAsLIT.HasValue())
+        if (isICDOperatingAsLIT.has_value())
         {
-            ChipLogDetail(Discovery, "\tThe ICD operates in %s", isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+            ChipLogDetail(Discovery, "\tThe ICD operates in %s", *isICDOperatingAsLIT ? "LIT" : "SIT");
         }
         else
         {

@@ -620,14 +620,14 @@ SetUpCodePairerParameters::SetUpCodePairerParameters(const Dnssd::CommonResoluti
     auto & ip = data.ipAddress[index];
     SetPeerAddress(Transport::PeerAddress::UDP(ip, data.port, ip.IsIPv6LinkLocal() ? data.interfaceId : Inet::InterfaceId::Null()));
 
-    if (data.mrpRetryIntervalIdle.HasValue())
+    if (data.mrpRetryIntervalIdle.has_value())
     {
-        SetIdleInterval(data.mrpRetryIntervalIdle.Value());
+        SetIdleInterval(*data.mrpRetryIntervalIdle);
     }
 
-    if (data.mrpRetryIntervalActive.HasValue())
+    if (data.mrpRetryIntervalActive.has_value())
     {
-        SetActiveInterval(data.mrpRetryIntervalActive.Value());
+        SetActiveInterval(*data.mrpRetryIntervalActive);
     }
 }
 
