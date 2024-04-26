@@ -196,7 +196,7 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
     {
         /* We must assume that the ssid is handled as a NULL-terminated string.
            Note that the mScanSsidBuffer is initialized with zeros. */
-        VerifyOrReturnError(ssid.size() < sizeof(mScanParams), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(ssid.size() < sizeof(mScanSsidBuffer), CHIP_ERROR_INVALID_ARGUMENT);
         memcpy(mScanSsidBuffer, ssid.data(), ssid.size());
         mScanSsidBuffer[ssid.size()] = 0; // indicate the end of ssid string
         mScanParams.ssids[0]         = mScanSsidBuffer;
