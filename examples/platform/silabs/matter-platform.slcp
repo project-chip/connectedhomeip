@@ -28,8 +28,6 @@ include:
   - {path: app.h}
   - {path: reset_util.h}
 sdk: {id: gecko_sdk, version: 4.3.1}
-sdk_extension:
-  - { id: wiseconnect3_sdk, version: 3.1.3 }
 toolchain_settings: []
 
 component:
@@ -68,26 +66,6 @@ component:
 - {id: ot_psa_crypto}
 - {id: bluetooth_crypto}
 - {id: iostream_rtt}
-- { id: cpp_support }
-- { id: sl_system }
-- { id: freertos }
-- { id: sleeptimer }
-- { id: brd4338a, from: wiseconnect3_sdk }
-- { id: wiseconnect3_common, from: wiseconnect3_sdk }
-- { id: si917_memory_default_config, from: wiseconnect3_sdk }
-- { id: timer_ulp_component, from: wiseconnect3_sdk }
-- { id: ulp_timers_instance, instance: [ timer0 ], from: wiseconnect3_sdk }
-- { id: sl_si91x_led_917, instance: [ led0, led1 ],  from: wiseconnect3_sdk }
-- { id: sl_si91x_button_917, instance: [ btn0 ], from: wiseconnect3_sdk }
-- { id: si91x_debug, from: wiseconnect3_sdk }
-- { id: wifi, from: wiseconnect3_sdk }
-- { id: sl_si91x_basic_buffers, from: wiseconnect3_sdk }
-- { id: sl_si91x_internal_stack, from: wiseconnect3_sdk }
-- { id: network_manager, from: wiseconnect3_sdk }
-- { id: basic_network_config_manager, from: wiseconnect3_sdk }
-- { id: wifi_resources, from: wiseconnect3_sdk }
-- { id: si91x_support, from: wiseconnect3_sdk }
-- { id: console, from: wiseconnect3_sdk }
 # Necessary componenets for ot coap cert lib
 # - {id: mbedtls_dtls} # Requried by COAP lib
 # - {id: mbedtls_tls_server} # Requried by COAP lib
