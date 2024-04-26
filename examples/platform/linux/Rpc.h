@@ -18,18 +18,44 @@
 
 #pragma once
 
+// #if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+// #include "../../common/pigweed/rpc_services/Actions.h"
+// #endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+
+#include <vector>
+#include <queue>
+ 
 namespace chip {
 namespace rpc {
 
-struct EventsRequest {
-    EndpointId endpointId;
-    ClusterId clusterId;
-    std::string events;
+enum class ActionType : uint8_t
+{
+  WRITE_ATTRIBUTE         = 0x00, // Write an cluster Attribute
+  RUN_COMMAND             = 0x01, // Run a cluster Command
+  EMIT_EVENT              = 0x02, // Emit a cluster Events
 };
 
-using AppEventsHandler = void (*)(intptr_t ctx, struct EventsRequest * data);
+struct ActionTask {
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    enum ActionType type;       // Aligned with Storage buf
+    uint32_t delayMs;
+    uint32_t actionId;
+    std::vector<uint32_t> args;
+    ActionTask(chip::EndpointId e, chip::ClusterId c,
+           ActionType t, uint32_t d, uint32_t i, std::vector<uint32_t> a): endpointId(e), clusterId(c), type(t), delayMs(d), actionId(i), args(a) {}; 
+    ~ActionTask() {};
+};
 
-void __attribute__ ((unused)) RpcRegisterAppEventsHandler(ClusterId clusterId, chip::rpc::AppEventsHandler eventsCallback, intptr_t ctx);
+class ActionsSubscriber {
+public:
+    ActionsSubscriber() = default;
+    virtual ~ActionsSubscriber() = default;
+    virtual bool publishAction(ActionTask task) = 0;
+private:
+};
+
+void RegisterActionsSubscriber(ActionsSubscriber * subscriber);
 
 int Init(uint16_t rpcServerPort);
 

@@ -42,66 +42,43 @@
 #include "pigweed/rpc_services/Device.h"
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 
-#if defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
-#include "pigweed/rpc_services/Event.h"
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+#include "pigweed/rpc_services/Actions.h"
 namespace chip {
 namespace rpc {
 
-struct EventsCallback {
-    chip::rpc::AppEventsHandler eventsCallback;
-    intptr_t eventsCallbackCtx;
-};
+ActionsSubscriber * gActionsSubscriber = nullptr;
 
-static std::map<ClusterId, struct EventsCallback *> gEventsCallbackMap {};  
-
-struct EventsCallback * RpcFindEventsCallback(ClusterId clusterId)
+void RegisterActionsSubscriber(ActionsSubscriber * subscriber)
 {
-    if (gEventsCallbackMap.find(clusterId) != gEventsCallbackMap.end()) {
-        return gEventsCallbackMap[clusterId];
-    }
-
-    return nullptr;
+    gActionsSubscriber = subscriber;
 }
 
-void __attribute__ ((unused)) RpcRegisterAppEventsHandler(ClusterId clusterId, chip::rpc::AppEventsHandler eventsCallback, intptr_t ctx) 
+void RpcActionsDispatch(EndpointId endpointId, ClusterId clusterId, std::queue<Actions::Action> rpcActions) 
 {
-    if ( nullptr == RpcFindEventsCallback(clusterId) ) {
-        // Register new EventsCallback
-        gEventsCallbackMap[clusterId] = new EventsCallback{eventsCallback, ctx};
-        return;
+    ChipLogProgress(NotSpecified, "Receiving the Rpc Actions to be dispatched, endpointId=0x%x, clusterId=0x%x, rpcActions count=%lu", endpointId, clusterId, rpcActions.size());
+//    std::queue<ActionTask> * queue = new std::queue<ActionTask>();
+printf("\033[41m %s , %d, rpcActions.type=%u, rpcAction.delayMs = %d \033[0m \n", __func__, __LINE__, to_underlying(rpcActions.front().type), rpcActions.front().delayMs);
+
+    for (; !rpcActions.empty();) {
+        Actions::Action action = rpcActions.front();
+
+        // Since application cannot diretly include Actions.h, so the event is relayed by Rpc.cpp to the subscriber
+        ActionTask task(endpointId, clusterId, static_cast<chip::rpc::ActionType>(to_underlying(action.type)), action.delayMs, action.actionId, action.args);
+
+        if (nullptr != gActionsSubscriber) {
+            gActionsSubscriber->publishAction(task);
+        }
+        // TBD: insert to Device Queue
+
+        rpcActions.pop();
     }
-        
-    // TBD: print already registered
-}
-
-using namespace chip::rpc;
-void RpcEventsAsyncDispatcher(intptr_t arg) 
-{
-    struct EventsRequest * data = reinterpret_cast<struct EventsRequest *>(arg);
-printf("\033[41m %s , %d, endpoint=%d, clusterId=%d, events=%s \033[0m \n", __func__, __LINE__, data->endpointId, data->clusterId, data->events.c_str());
-
-    struct EventsCallback * eventsCallbackRecord = RpcFindEventsCallback(data->clusterId);
-    if ( nullptr == eventsCallbackRecord ) {
-        // TBD: Error cluster not registered
-        return;
-    }
-   
-    eventsCallbackRecord->eventsCallback(eventsCallbackRecord->eventsCallbackCtx, data);
-
-    delete data;
-}
-
-void RpcEventsSubscriber(EndpointId endpoint, ClusterId clusterId, std::string events) 
-{
-    struct EventsRequest * data = new EventsRequest{endpoint, clusterId, events};
-printf("\033[41m %s , %d \033[0m \n", __func__, __LINE__);
-    DeviceLayer::PlatformMgr().ScheduleWork(RpcEventsAsyncDispatcher, reinterpret_cast<intptr_t>(data));
 
 }	
 
 } // rpc
 } // chip
-#endif // defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 #include "pigweed/rpc_services/Lighting.h"
@@ -149,9 +126,9 @@ Descriptor descriptor_service;
 Device device_service;
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 
-#if defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
-Event event_service;
-#endif // defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+Actions actions_service;
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 Lighting lighting_service;
@@ -163,6 +140,11 @@ pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 
 void RegisterServices(pw::rpc::Server & server)
 {
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+    server.RegisterService(actions_service);
+    actions_service.RegisterActionsSubscriber(RpcActionsDispatch);
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
     server.RegisterService(attributes_service);
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -178,11 +160,6 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
     server.RegisterService(device_service);
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
-
-#if defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
-    server.RegisterService(event_service);
-    event_service.RegisterEventsSubscriber(RpcEventsSubscriber);
-#endif // defined(PW_RPC_EVENT_SERVICE) && PW_RPC_EVENT_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
     server.RegisterService(lighting_service);

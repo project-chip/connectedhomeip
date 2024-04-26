@@ -23,7 +23,7 @@
 #include <platform/PlatformManager.h>
 #include "SwitchEventHandler.h"
 
-#include "Rpc.h"
+#include "chef-rpc-actions-worker.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -32,36 +32,46 @@ using namespace chip::app::Clusters::Switch;
 using namespace chip::DeviceLayer;
 
 using namespace chip::rpc;
+using namespace chip::app;
 
-static std::map<int, SwitchEventHandler *> gSwitchEventHandlers{};
-
-SwitchEventHandler * GetSwitchEventHandler(EndpointId endpointId)
+class SwitchActionsDelegate: public chip::app::ActionsDelegate
 {
-    if (gSwitchEventHandlers.find(endpointId) == gSwitchEventHandlers.end()) {
-        return nullptr;
-    }
+public:
+    SwitchActionsDelegate(EndpointId endpointId, ClusterId clusterId, SwitchEventHandler *eventHandler): ActionsDelegate(endpointId, clusterId), mEventHandler(eventHandler){};
+    ~SwitchActionsDelegate() override {};
 
-    return gSwitchEventHandlers[endpointId];
+    void AttributeWriteHandler(chip::AttributeId attributeId, std::vector<uint32_t>args) override;
+    void EventHandler(chip::EventId eventId, std::vector<uint32_t>args) override;
+
+
+private:
+    SwitchEventHandler *mEventHandler;
+};
+
+void SwitchActionsDelegate::AttributeWriteHandler(chip::AttributeId attributeId, std::vector<uint32_t>args)
+{
+
 }
 
-void SwitchManagerEventHandler(intptr_t ctx, struct EventsRequest * data)
+void SwitchActionsDelegate::EventHandler(chip::EventId eventId, std::vector<uint32_t>args)
 {
-    SwitchEventHandler * handler = GetSwitchEventHandler(data->endpointId);
-
-    if (nullptr == handler) {
-        // TODO: Error
-        return;
+    switch (eventId) {
+    case Events::SwitchLatched::Id:
+        {
+            uint8_t newPosition = static_cast<uint8_t>(args[0]);
+            mEventHandler->OnSwitchLatched(newPosition);
+        }
+        break;
+    default:
+        break;
     }
-    // Parse data->events
-    // According to data->events, to dispatch events
-}
+};
 
-void emberAfSwitchClusterInitCallback(EndpointId endpoint)
+void emberAfSwitchClusterInitCallback(EndpointId endpointId)
 {
     ChipLogProgress(Zcl, "Chef: emberAfSwitchClusterInitCallback");
-    gSwitchEventHandlers[endpoint] = new SwitchEventHandler(endpoint);
 printf("\033[44m %s, %d, Switch::ID=%u \033[0m \n", __func__, __LINE__, Switch::Id);
-    RpcRegisterAppEventsHandler( Switch::Id, SwitchManagerEventHandler, reinterpret_cast<intptr_t>(&gSwitchEventHandlers));
+    ActionsDelegate::RegisterRpcActionsDelegate(Clusters::Switch::Id, new SwitchActionsDelegate(endpointId, Clusters::Switch::Id, new SwitchEventHandler(endpointId)));
 }
 
 
