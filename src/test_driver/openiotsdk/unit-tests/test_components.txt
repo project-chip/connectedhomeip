@@ -14,3 +14,4 @@ RetransmitTests
 TestShell
 SetupPayloadTests
 SupportTests
+UserDirectedCommissioningTests

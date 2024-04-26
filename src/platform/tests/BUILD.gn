@@ -78,7 +78,6 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
       #
       sources = [
         "TestCHIPoBLEStackMgr.cpp",
-        "TestCHIPoBLEStackMgr.h",
         "TestCHIPoBLEStackMgrDriver.cpp",
       ]
       tests = [ "TestCHIPoBLEStackMgr" ]

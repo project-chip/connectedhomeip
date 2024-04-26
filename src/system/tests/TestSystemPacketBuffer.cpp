@@ -469,13 +469,13 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetDataLength)
                     {
                         EXPECT_EQ(config_2.handle->len, (config_2.end_buffer - config_2.payload_ptr));
                         EXPECT_EQ(config_2.handle->tot_len, (config_2.end_buffer - config_2.payload_ptr));
-                        EXPECT_EQ(config_2.handle->next, nullptr);
+                        EXPECT_EQ(config_2.handle.GetNext(), nullptr);
                     }
                     else
                     {
                         EXPECT_EQ(config_2.handle->len, length);
                         EXPECT_EQ(config_2.handle->tot_len, length);
-                        EXPECT_EQ(config_2.handle->next, nullptr);
+                        EXPECT_EQ(config_2.handle.GetNext(), nullptr);
                     }
                 }
                 else
@@ -487,7 +487,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetDataLength)
                     {
                         EXPECT_EQ(config_2.handle->len, (config_2.end_buffer - config_2.payload_ptr));
                         EXPECT_EQ(config_2.handle->tot_len, (config_2.end_buffer - config_2.payload_ptr));
-                        EXPECT_EQ(config_2.handle->next, nullptr);
+                        EXPECT_EQ(config_2.handle.GetNext(), nullptr);
 
                         EXPECT_EQ(config_1.handle->tot_len,
                                   (config_1.init_len + static_cast<int32_t>(config_2.end_buffer - config_2.payload_ptr) -
@@ -497,7 +497,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckSetDataLength)
                     {
                         EXPECT_EQ(config_2.handle->len, length);
                         EXPECT_EQ(config_2.handle->tot_len, length);
-                        EXPECT_EQ(config_2.handle->next, nullptr);
+                        EXPECT_EQ(config_2.handle.GetNext(), nullptr);
 
                         EXPECT_EQ(config_1.handle->tot_len,
                                   (config_1.init_len + static_cast<int32_t>(length) - static_cast<int32_t>(config_2.init_len)));
@@ -632,9 +632,9 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckAddToEnd)
                 EXPECT_EQ(config_3.handle->ref, 1); // config_3.handle
 
                 EXPECT_EQ(config_1.handle->tot_len, (config_1.init_len + config_2.init_len));
-                EXPECT_EQ(config_1.handle->next, config_2.handle.Get());
-                EXPECT_EQ(config_2.handle->next, nullptr);
-                EXPECT_EQ(config_3.handle->next, nullptr);
+                EXPECT_EQ(config_1.handle.GetNext(), config_2.handle.Get());
+                EXPECT_EQ(config_2.handle.GetNext(), nullptr);
+                EXPECT_EQ(config_3.handle.GetNext(), nullptr);
 
                 config_1.handle->AddToEnd(config_3.handle.Retain());
                 EXPECT_EQ(config_1.handle->ref, 1); // config_1.handle
@@ -642,9 +642,9 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckAddToEnd)
                 EXPECT_EQ(config_3.handle->ref, 2); // config_3.handle and config_2.handle->next
 
                 EXPECT_EQ(config_1.handle->tot_len, (config_1.init_len + config_2.init_len + config_3.init_len));
-                EXPECT_EQ(config_1.handle->next, config_2.handle.Get());
-                EXPECT_EQ(config_2.handle->next, config_3.handle.Get());
-                EXPECT_EQ(config_3.handle->next, nullptr);
+                EXPECT_EQ(config_1.handle.GetNext(), config_2.handle.Get());
+                EXPECT_EQ(config_2.handle.GetNext(), config_3.handle.Get());
+                EXPECT_EQ(config_3.handle.GetNext(), nullptr);
 
                 config_1.handle = nullptr;
                 config_2.handle = nullptr;
@@ -703,7 +703,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckPopHead)
             const PacketBufferHandle popped = config_1.handle.PopHead();
 
             EXPECT_EQ(config_1.handle, config_2.handle);
-            EXPECT_EQ(config_1.handle->next, nullptr);
+            EXPECT_EQ(config_1.handle.GetNext(), nullptr);
             EXPECT_EQ(config_1.handle->tot_len, config_1.init_len);
         }
     }
@@ -786,7 +786,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckCompactHead)
                     {
                         EXPECT_EQ(config_1.handle->len, config_1.handle->MaxDataLength());
                         EXPECT_EQ(buffer_2->len, config_1.handle->tot_len - config_1.handle->MaxDataLength());
-                        EXPECT_EQ(config_1.handle->next, buffer_2);
+                        EXPECT_EQ(config_1.handle.GetNext(), buffer_2);
                         EXPECT_EQ(config_1.handle->ref, 2);
                         EXPECT_EQ(buffer_2->ref, 1);
                     }
@@ -796,13 +796,13 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckCompactHead)
                         if (data_length_1 >= config_1.handle->MaxDataLength() && data_length_2 == 0)
                         {
                             /* make sure the second buffer is not freed */
-                            EXPECT_EQ(config_1.handle->next, buffer_2);
+                            EXPECT_EQ(config_1.handle.GetNext(), buffer_2);
                             EXPECT_EQ(buffer_2->ref, 1);
                         }
                         else
                         {
                             /* make sure the second buffer is freed */
-                            EXPECT_EQ(config_1.handle->next, nullptr);
+                            EXPECT_EQ(config_1.handle.GetNext(), nullptr);
                             buffer_2 = nullptr;
                         }
                     }
@@ -1263,7 +1263,7 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckFree)
                     // Verify that head ref count is decremented.
                     EXPECT_EQ(config_1.handle->ref, initial_refs_1 - 1);
                     // Verify that chain is maintained.
-                    EXPECT_EQ(config_1.handle->next, config_2.handle.Get());
+                    EXPECT_EQ(config_1.handle.GetNext(), config_2.handle.Get());
                     // Verify that chained buffer ref count has not changed.
                     EXPECT_EQ(config_2.handle->ref, initial_refs_2);
                 }
