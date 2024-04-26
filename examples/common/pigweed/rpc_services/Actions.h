@@ -36,35 +36,38 @@ namespace rpc {
 class Actions final : public pw_rpc::nanopb::Actions::Service<Actions>
 {
 public:
-    ::pw::Status Set( const chip_rpc_ActionsWrite & request, ::pw_protobuf_Empty & response)
-    {
-printf("\033[41m %s, %d, request.endpoint_id=%d, request.cluster_id=%d \033[0m \n", __func__, __LINE__, request.endpoint_id, request.cluster_id);
-
-        std::queue<Action> actionQueue;
-        mActionsSubscriber(request.endpoint_id, request.cluster_id, actionQueue);
-
-        return pw::OkStatus();
-    }
-
     enum class Type: uint8_t {
         Attribute = 0,
         Command = 1,
         Event = 2,
     };
 
-    struct Action {
-        Type type;
-        uint32_t delayMs;
-        uint32_t actionId;
+    ::pw::Status Set( const chip_rpc_ActionsWrite & request, ::pw_protobuf_Empty & response)
+    {
+printf("\033[41m %s, %d, request.endpoint_id=%d, request.cluster_id=%d \033[0m \n", __func__, __LINE__, request.endpoint_id, request.cluster_id);
+
+        Type type = Type::Attribute;
+        uint32_t delayMs = 0;
+        uint32_t actionId = 0;
         std::vector<uint32_t> args;
-    };
+        mActionsSubscribeCallback(request.endpoint_id, request.cluster_id, static_cast<uint8_t>(type), delayMs, actionId, args);
 
-    using RpcActionsSubscriber = void (*)(EndpointId endpointId, ClusterId clusterId, std::queue<Action>); 
+        return pw::OkStatus();
+    }
 
-    void RegisterActionsSubscriber(RpcActionsSubscriber subscriber) { mActionsSubscriber = subscriber; };
+//    struct Action {
+//        Type type;
+//        uint32_t delayMs;
+//        uint32_t actionId;
+//        std::vector<uint32_t> args;
+//    };
+
+    using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args); 
+
+    void SubscribeActions(RpcActionsSubscribeCallback subscriber) { mActionsSubscribeCallback = subscriber; };
 
 private:
-    RpcActionsSubscriber mActionsSubscriber;
+    RpcActionsSubscribeCallback mActionsSubscribeCallback;
 
 };
 

@@ -40,24 +40,39 @@ public:
     virtual void CommandHandler(chip::CommandId commandId, std::vector<uint32_t>args) {};
     virtual void EventHandler(chip::EventId eventId, std::vector<uint32_t>args) {};
 
-    static void RegisterRpcActionsDelegate(ClusterId clusterId, ActionsDelegate * delegate);
-
 protected:
     EndpointId mEndpointId;
     ClusterId mClusterId;
 };
 
+struct ActionTask {
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    chip::rpc::ActionType type;       // Aligned with Storage buf
+    uint32_t delayMs;
+    uint32_t actionId;
+    std::vector<uint32_t> args;
+    ActionTask(chip::EndpointId e, chip::ClusterId c,
+           chip::rpc::ActionType t, uint32_t d, uint32_t i, std::vector<uint32_t> a): endpointId(e), clusterId(c), type(t), delayMs(d), actionId(i), args(a) {};
+    ~ActionTask() {};
+};
+
+class ChefRpcActionsWorker
+{
+public:
+    static ChefRpcActionsWorker& Instance(); 
+
+    ChefRpcActionsWorker();
+
+    bool EnqueueAction(ActionTask task);
+    ActionTask PopActionQueue();
+    void RegisterRpcActionsDelegate(ClusterId clusterId, ActionsDelegate * delegate);
+
+ private:
+    std::queue<ActionTask> queue;
+};
+
+
 } // namespace app
 } // namespace chip
 
-class ChefRpcActionsWorker: public chip::rpc::ActionsSubscriber
-{
-public:
-    ChefRpcActionsWorker() = default;
-    ~ChefRpcActionsWorker() override {};
-    bool publishAction(chip::rpc::ActionTask task) override;
-
-private:
-    std::queue<chip::rpc::ActionTask> queue;
-
-};

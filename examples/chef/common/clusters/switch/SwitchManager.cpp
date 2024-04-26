@@ -71,7 +71,7 @@ void emberAfSwitchClusterInitCallback(EndpointId endpointId)
 {
     ChipLogProgress(Zcl, "Chef: emberAfSwitchClusterInitCallback");
 printf("\033[44m %s, %d, Switch::ID=%u \033[0m \n", __func__, __LINE__, Switch::Id);
-    ActionsDelegate::RegisterRpcActionsDelegate(Clusters::Switch::Id, new SwitchActionsDelegate(endpointId, Clusters::Switch::Id, new SwitchEventHandler(endpointId)));
+    ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, new SwitchActionsDelegate(endpointId, Clusters::Switch::Id, new SwitchEventHandler(endpointId)));
 }
 
 

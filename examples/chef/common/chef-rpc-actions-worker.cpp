@@ -36,33 +36,7 @@ using namespace chip::rpc;
 
 static std::map<ClusterId, ActionsDelegate *> gActionsDelegateMap {};  
 
-static void RpcActionsTaskCallback(System::Layer * systemLayer, void * data)
-{
-//printf("\033[41m %s , %d, endpointId=%d, clusterId=%d \033[0m \n", __func__, __LINE__, queue->endpointId, queue->clusterId);
-
-//    struct ActionsDelegate * delegate = RpcFindActionsDelegate(queue->clusterId);
-//    if ( nullptr == delegate ) {
-        // TBD: Error cluster not registered
-//        return;
-//    }
-
-    // TBD: insert the queue t ActionHandler's queue
-//    delete queue;
-}
-
-bool ChefRpcActionsWorker::publishAction(chip::rpc::ActionTask task)
-{
-    bool kickTimer = queue.size() == 0;
-
-    queue.push(task);
-
-    if (kickTimer) {
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(10), RpcActionsTaskCallback, this);
-    }
-    return true;
-}
-
-struct ActionsDelegate * RpcFindActionsDelegate(ClusterId clusterId)
+ActionsDelegate * RpcFindActionsDelegate(ClusterId clusterId)
 {
     if (gActionsDelegateMap.find(clusterId) != gActionsDelegateMap.end()) {
         return gActionsDelegateMap[clusterId];
@@ -71,13 +45,91 @@ struct ActionsDelegate * RpcFindActionsDelegate(ClusterId clusterId)
     return nullptr;
 }
 
+static void RpcActionsTaskCallback(System::Layer * systemLayer, void * data)
+{
+    ActionTask task = ChefRpcActionsWorker::Instance().PopActionQueue();
 
-void ActionsDelegate::RegisterRpcActionsDelegate(ClusterId clusterId, ActionsDelegate * delegate)
+printf("\033[41m %s , %d, endpointId=%d, clusterId=%d \033[0m \n", __func__, __LINE__, task.endpointId, task.clusterId);
+
+    ActionsDelegate * delegate = RpcFindActionsDelegate(task.clusterId);
+    if ( nullptr == delegate ) {
+      // TBD: Error cluster not registered
+        return;
+    }
+
+    ActionType type = static_cast<ActionType>(task.type);
+
+    switch (type) {
+    case ActionType::WRITE_ATTRIBUTE:
+    {
+        delegate->AttributeWriteHandler(static_cast<chip::AttributeId>(task.actionId), task.args);
+    }
+    break; 
+    case ActionType::RUN_COMMAND:
+    {
+        delegate->CommandHandler(static_cast<chip::CommandId>(task.actionId), task.args);
+    }
+    break; 
+    case ActionType::EMIT_EVENT:
+    {
+        delegate->EventHandler(static_cast<chip::EventId>(task.actionId), task.args);
+    }
+        break; 
+    default:
+        break;
+    }
+    // TBD: insert the queue t ActionHandler's queue
+//    delete queue;
+}
+
+bool ChefRpcActionsCallback(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args)
+{
+    ActionTask task(endpointId, clusterId, static_cast<ActionType>(type), delayMs, actionId, args);
+    // TBD: Stack lock
+    return ChefRpcActionsWorker::Instance().EnqueueAction(task);
+}
+
+bool ChefRpcActionsWorker::EnqueueAction(ActionTask task)
+{
+    bool kickTimer = false;
+
+    if (queue.empty()) {
+        queue.push(task);
+        kickTimer = true;   // kick timer when the first task is adding to the queue
+    }
+    if (kickTimer) {
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(10), RpcActionsTaskCallback, this);
+    }
+    return true;
+}
+
+ActionTask ChefRpcActionsWorker::PopActionQueue()
+{
+    // assert !queue.empty()
+    ActionTask task = queue.front();
+    queue.pop();
+
+    return task;
+}
+
+void ChefRpcActionsWorker::RegisterRpcActionsDelegate(ClusterId clusterId, ActionsDelegate * delegate)
 {
     if ( nullptr == RpcFindActionsDelegate(clusterId) ) {
         gActionsDelegateMap[clusterId] = delegate;
         return;
     }
-        
     // TBD: print already registered
 }
+
+ChefRpcActionsWorker::ChefRpcActionsWorker()
+{
+    chip::rpc::SubscribeActions(ChefRpcActionsCallback);
+}
+
+static ChefRpcActionsWorker instance;
+
+ChefRpcActionsWorker & ChefRpcActionsWorker::Instance()
+{
+    return instance;
+}
+

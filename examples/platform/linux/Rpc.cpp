@@ -44,40 +44,6 @@
 
 #if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 #include "pigweed/rpc_services/Actions.h"
-namespace chip {
-namespace rpc {
-
-ActionsSubscriber * gActionsSubscriber = nullptr;
-
-void RegisterActionsSubscriber(ActionsSubscriber * subscriber)
-{
-    gActionsSubscriber = subscriber;
-}
-
-void RpcActionsDispatch(EndpointId endpointId, ClusterId clusterId, std::queue<Actions::Action> rpcActions) 
-{
-    ChipLogProgress(NotSpecified, "Receiving the Rpc Actions to be dispatched, endpointId=0x%x, clusterId=0x%x, rpcActions count=%lu", endpointId, clusterId, rpcActions.size());
-//    std::queue<ActionTask> * queue = new std::queue<ActionTask>();
-printf("\033[41m %s , %d, rpcActions.type=%u, rpcAction.delayMs = %d \033[0m \n", __func__, __LINE__, to_underlying(rpcActions.front().type), rpcActions.front().delayMs);
-
-    for (; !rpcActions.empty();) {
-        Actions::Action action = rpcActions.front();
-
-        // Since application cannot diretly include Actions.h, so the event is relayed by Rpc.cpp to the subscriber
-        ActionTask task(endpointId, clusterId, static_cast<chip::rpc::ActionType>(to_underlying(action.type)), action.delayMs, action.actionId, action.args);
-
-        if (nullptr != gActionsSubscriber) {
-            gActionsSubscriber->publishAction(task);
-        }
-        // TBD: insert to Device Queue
-
-        rpcActions.pop();
-    }
-
-}	
-
-} // rpc
-} // chip
 #endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
@@ -142,7 +108,6 @@ void RegisterServices(pw::rpc::Server & server)
 {
 #if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
     server.RegisterService(actions_service);
-    actions_service.RegisterActionsSubscriber(RpcActionsDispatch);
 #endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -172,6 +137,13 @@ void RegisterServices(pw::rpc::Server & server)
 }
 
 } // namespace
+
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+void SubscribeActions(RpcActionsSubscribeCallback subscriber)
+{
+    actions_service.SubscribeActions(subscriber);
+}
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 
 void RunRpcService()
 {

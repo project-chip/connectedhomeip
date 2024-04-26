@@ -35,27 +35,9 @@ enum class ActionType : uint8_t
   EMIT_EVENT              = 0x02, // Emit a cluster Events
 };
 
-struct ActionTask {
-    chip::EndpointId endpointId;
-    chip::ClusterId clusterId;
-    enum ActionType type;       // Aligned with Storage buf
-    uint32_t delayMs;
-    uint32_t actionId;
-    std::vector<uint32_t> args;
-    ActionTask(chip::EndpointId e, chip::ClusterId c,
-           ActionType t, uint32_t d, uint32_t i, std::vector<uint32_t> a): endpointId(e), clusterId(c), type(t), delayMs(d), actionId(i), args(a) {}; 
-    ~ActionTask() {};
-};
+using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args); 
 
-class ActionsSubscriber {
-public:
-    ActionsSubscriber() = default;
-    virtual ~ActionsSubscriber() = default;
-    virtual bool publishAction(ActionTask task) = 0;
-private:
-};
-
-void RegisterActionsSubscriber(ActionsSubscriber * subscriber);
+void SubscribeActions(RpcActionsSubscribeCallback subscriber);
 
 int Init(uint16_t rpcServerPort);
 
