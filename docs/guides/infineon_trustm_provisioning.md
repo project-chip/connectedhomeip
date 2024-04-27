@@ -46,7 +46,7 @@ $ ./matter_test_provisioning.sh
 
 _Note:_
 
-_By running this example matter_test_provisioning.sh, the steps shown below are
+_By running this example `matter_test_provisioning.sh`, the steps shown below are
 executed:_
 
 _Step1: Extract the public key from the Infineon pre-provisioned
