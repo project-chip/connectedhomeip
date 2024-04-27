@@ -465,7 +465,7 @@ CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeI
 
 void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 {
-    System::Clock::Timestamp baseTimeout = System::Clock::Milliseconds64(0);
+    System::Clock::Timeout baseTimeout = System::Clock::Timeout(0);
 
     // Check if we have received at least one application-level message
     if (entry.ec->HasReceivedAtLeastOneMessage())
@@ -480,8 +480,8 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
         baseTimeout = entry.ec->GetSessionHandle()->GetMRPBaseTimeout();
     }
 
-    System::Clock::Timestamp backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
-    entry.nextRetransTime            = System::SystemClock().GetMonotonicTimestamp() + backoff;
+    System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
+    entry.nextRetransTime          = System::SystemClock().GetMonotonicTimestamp() + backoff;
 }
 
 #if CHIP_CONFIG_TEST
