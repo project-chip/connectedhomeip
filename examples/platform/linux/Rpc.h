@@ -18,10 +18,6 @@
 
 #pragma once
 
-// #if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
-// #include "../../common/pigweed/rpc_services/Actions.h"
-// #endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
-
 #include <vector>
 #include <queue>
  

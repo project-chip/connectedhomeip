@@ -25,8 +25,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <map>
 
-//#include <Actions.h>
-
 using chip::app::DataModel::Nullable;
 
 using namespace chip;
@@ -65,9 +63,11 @@ bool ChefRpcActionsWorker::EnqueueAction(ActionTask task)
     bool kickTimer = false;
 
     if (queue.empty()) {
-        queue.push(task);
         kickTimer = true;   // kick timer when the first task is adding to the queue
     }
+
+    queue.push(task);
+
     if (kickTimer) {
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(task.delayMs), RpcActionsTaskCallback, this);
     }
@@ -76,7 +76,7 @@ bool ChefRpcActionsWorker::EnqueueAction(ActionTask task)
 
 void ChefRpcActionsWorker::ProcessActionQueue()
 {
-//    delete queue;
+    // Dequeue the first item
     ActionTask task = queue.front();
     queue.pop();
 
@@ -113,22 +113,23 @@ printf("\033[41m %s , %d, Emitting Event: %d, args size=%lu \033[0m \n", __func_
     }
 
     if (queue.empty()) {
-        // Return due to no extra queue item to run. 
+        // Return due to no more actions in queue
         return;
     }
 
-    // Run next task
+    // Run next action
     task = queue.front();
+printf("\033[44m %s , %d, next action: endpointId=%d, clusterId=%d, delayMs=%d \033[0m \n", __func__, __LINE__, task.endpointId, task.clusterId, task.delayMs);
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(task.delayMs), RpcActionsTaskCallback, this);
 }
 
 void ChefRpcActionsWorker::RegisterRpcActionsDelegate(ClusterId clusterId, ActionsDelegate * delegate)
 {
+    // Register by cluster
     if ( nullptr == RpcFindActionsDelegate(clusterId) ) {
         gActionsDelegateMap[clusterId] = delegate;
         return;
     }
-    // TBD: print already registered
 }
 
 ChefRpcActionsWorker::ChefRpcActionsWorker()
