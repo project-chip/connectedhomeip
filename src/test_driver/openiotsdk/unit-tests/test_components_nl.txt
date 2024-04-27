@@ -1,12 +1,8 @@
 AppTests
-BDXTests
 DataModelTests
 InetLayerTests
 MessagingLayerTests
 RawTransportTests
-RetransmitTests
-SecureChannelTests
-SetupPayloadTestsNL
+SecureChannelTestsNL
 SupportTestsNL
 TransportLayerTests
-UserDirectedCommissioningTests

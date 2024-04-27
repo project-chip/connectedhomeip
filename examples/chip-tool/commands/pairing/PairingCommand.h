@@ -201,7 +201,7 @@ public:
     void OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedActiveDuration) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
 
     /////////// DeviceAttestationDelegate /////////
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;

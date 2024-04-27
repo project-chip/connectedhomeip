@@ -31,7 +31,7 @@ public:
     }
 
     /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    void OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData) override;
 
     /////////// CHIPCommand Interface /////////
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }

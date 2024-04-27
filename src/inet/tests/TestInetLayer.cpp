@@ -565,7 +565,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, CHIP_ERROR aError
     }
 }
 
-static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len) {}
+static void HandleTCPDataSent(TCPEndPoint * aEndPoint, size_t len) {}
 
 static CHIP_ERROR HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle && aBuffer)
 {

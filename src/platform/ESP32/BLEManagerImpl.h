@@ -79,8 +79,6 @@ namespace DeviceLayer {
 namespace Internal {
 
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
-
 enum class BleScanState : uint8_t
 {
     kNotScanning,

@@ -1,6 +1,7 @@
 accesstest
 SystemLayerTests
 ASN1Tests
+BDXTests
 MinimalMdnsCoreTests
 ChipCryptoTests
 MinimalMdnsRecordsTests
@@ -9,6 +10,9 @@ CoreTests
 MdnsTests
 CredentialsTest
 PlatformTests
+RetransmitTests
 TestShell
 SetupPayloadTests
 SupportTests
+UserDirectedCommissioningTests
+SecureChannelTests

@@ -30,8 +30,10 @@
 namespace {
 enum class ICDTestEventTriggerEvent : uint64_t
 {
-    kAddActiveModeReq    = 0x0046'0000'00000001,
-    kRemoveActiveModeReq = 0x0046'0000'00000002,
+    kAddActiveModeReq            = 0x0046'0000'00000001,
+    kRemoveActiveModeReq         = 0x0046'0000'00000002,
+    kInvalidateHalfCounterValues = 0x0046'0000'00000003,
+    kInvalidateAllCounterValues  = 0x0046'0000'00000004,
 };
 } // namespace
 
@@ -666,6 +668,14 @@ CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
     case ICDTestEventTriggerEvent::kRemoveActiveModeReq:
         SetKeepActiveModeRequirements(KeepActiveFlag::kTestEventTriggerActiveMode, false);
         break;
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    case ICDTestEventTriggerEvent::kInvalidateHalfCounterValues:
+        err = ICDConfigurationData::GetInstance().GetICDCounter().InvalidateHalfCheckInCouterValues();
+        break;
+    case ICDTestEventTriggerEvent::kInvalidateAllCounterValues:
+        err = ICDConfigurationData::GetInstance().GetICDCounter().InvalidateAllCheckInCounterValues();
+        break;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     default:
         err = CHIP_ERROR_INVALID_ARGUMENT;
         break;

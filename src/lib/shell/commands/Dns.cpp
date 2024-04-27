@@ -83,61 +83,66 @@ public:
 
     AddressResolve::NodeLookupHandle & Handle() { return mSelfHandle; }
 
-    void OnNodeDiscovered(const Dnssd::DiscoveredNodeData & nodeData) override
+    void OnNodeDiscovered(const Dnssd::DiscoveredNodeData & discNodeData) override
     {
-        if (!nodeData.resolutionData.IsValid())
+        if (!discNodeData.Is<Dnssd::CommissionNodeData>())
+        {
+            streamer_printf(streamer_get(), "DNS browse failed - not commission type node \r\n");
+            return;
+        }
+
+        Dnssd::CommissionNodeData nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+        if (!nodeData.IsValid())
         {
             streamer_printf(streamer_get(), "DNS browse failed - not found valid services \r\n");
             return;
         }
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1];
-        Encoding::BytesToUppercaseHexString(nodeData.nodeData.rotatingId, nodeData.nodeData.rotatingIdLen, rotatingId,
-                                            sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
 
         streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
-        streamer_printf(streamer_get(), "   Node Type: %u\r\n", nodeData.nodeType);
-        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.resolutionData.hostName);
-        streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.nodeData.vendorId);
-        streamer_printf(streamer_get(), "   Product ID: %u\r\n", nodeData.nodeData.productId);
-        streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.nodeData.longDiscriminator);
-        streamer_printf(streamer_get(), "   Device type: %u\r\n", nodeData.nodeData.deviceType);
-        streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.nodeData.deviceName);
-        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n", static_cast<int>(nodeData.nodeData.commissioningMode));
-        streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.nodeData.pairingHint);
-        streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.nodeData.pairingInstruction);
+        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
+        streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.vendorId);
+        streamer_printf(streamer_get(), "   Product ID: %u\r\n", nodeData.productId);
+        streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.longDiscriminator);
+        streamer_printf(streamer_get(), "   Device type: %u\r\n", nodeData.deviceType);
+        streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.deviceName);
+        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n", static_cast<int>(nodeData.commissioningMode));
+        streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.pairingHint);
+        streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.pairingInstruction);
         streamer_printf(streamer_get(), "   Rotating ID %s\r\n", rotatingId);
 
-        auto retryInterval = nodeData.resolutionData.GetMrpRetryIntervalIdle();
+        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
-        if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval.Value());
+        if (retryInterval.has_value())
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", *retryInterval);
 
-        retryInterval = nodeData.resolutionData.GetMrpRetryIntervalActive();
+        retryInterval = nodeData.GetMrpRetryIntervalActive();
 
-        if (retryInterval.HasValue())
-            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
+        if (retryInterval.has_value())
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", *retryInterval);
 
-        if (nodeData.resolutionData.GetMrpRetryActiveThreshold().HasValue())
+        auto activeThreshold = nodeData.GetMrpRetryActiveThreshold();
+
+        if (activeThreshold.has_value())
         {
-            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n",
-                            nodeData.resolutionData.GetMrpRetryActiveThreshold().Value());
+            streamer_printf(streamer_get(), "   MRP retry active threshold time: %" PRIu32 "ms\r\n", *activeThreshold);
         }
-        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
+        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.supportsTcp ? "yes" : "no");
 
-        if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
+        if (nodeData.isICDOperatingAsLIT.has_value())
         {
-            streamer_printf(streamer_get(), "   ICD is operating as a: %s\r\n",
-                            nodeData.resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+            streamer_printf(streamer_get(), "   ICD is operating as a: %s\r\n", *(nodeData.isICDOperatingAsLIT) ? "LIT" : "SIT");
         }
         streamer_printf(streamer_get(), "   IP addresses:\r\n");
-        for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
+        for (size_t i = 0; i < nodeData.numIPs; i++)
         {
-            streamer_printf(streamer_get(), "      %s\r\n", nodeData.resolutionData.ipAddress[i].ToString(ipAddressBuf));
+            streamer_printf(streamer_get(), "      %s\r\n", nodeData.ipAddress[i].ToString(ipAddressBuf));
         }
-        if (nodeData.resolutionData.port > 0)
+        if (nodeData.port > 0)
         {
-            streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.resolutionData.port);
+            streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.port);
         }
     }
 

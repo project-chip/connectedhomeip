@@ -34,6 +34,7 @@
 #include <ble/Ble.h>
 #endif
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -200,11 +201,6 @@ void BLEManagerImpl::ConnectDevice(const ble_addr_t & addr, uint16_t timeout)
         ChipLogError(Ble, "Failed to connect to rc=%d", rc);
     }
 }
-
-void HandleIncomingBleConnection(BLEEndPoint * bleEP)
-{
-    ChipLogProgress(DeviceLayer, "CHIPoBLE connection received");
-}
 #endif
 
 CHIP_ERROR BLEManagerImpl::_Init()
@@ -237,12 +233,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral);
     mFlags.Set(Flags::kFastAdvertisingEnabled, !mIsCentral);
-    OnChipBleConnectReceived = HandleIncomingBleConnection;
 #else
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-
 #endif
+
     mNumGAPCons = 0;
     memset(reinterpret_cast<void *>(mCons), 0, sizeof(mCons));
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
@@ -265,10 +260,6 @@ void BLEManagerImpl::_Shutdown()
     // selectively setting kGATTServiceStarted flag, in order to notify the state machine to stop the CHIPoBLE GATT service
     mFlags.ClearAll().Set(Flags::kGATTServiceStarted);
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-    OnChipBleConnectReceived = nullptr;
-#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
@@ -611,7 +602,11 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     ESP_LOGD(TAG, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, data->DataLength());
 
-    om = ble_hs_mbuf_from_flat(data->Start(), data->DataLength());
+    // For BLE, the buffer is capped at UINT16_MAX. Nevertheless, have a verify
+    // check before the cast to uint16_t.
+    VerifyOrExit(CanCastTo<uint16_t>(data->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+
+    om = ble_hs_mbuf_from_flat(data->Start(), static_cast<uint16_t>(data->DataLength()));
     if (om == NULL)
     {
         ChipLogError(DeviceLayer, "ble_hs_mbuf_from_flat failed:");

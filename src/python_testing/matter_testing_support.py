@@ -684,10 +684,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             in order using self.step(number), where number is the test_plan_number
             from each TestStep.
         '''
-        steps = self._get_defined_test_steps(test)
+        steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def _get_defined_test_steps(self, test: str) -> list[TestStep]:
+    def get_defined_test_steps(self, test: str) -> list[TestStep]:
         steps_name = 'steps_' + test[5:]
         try:
             fn = getattr(self, steps_name)
@@ -781,7 +781,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
-            steps = self._get_defined_test_steps(test_name)
+            steps = self.get_defined_test_steps(test_name)
             num_steps = 1 if steps is None else len(steps)
             filename = inspect.getfile(self.__class__)
             desc = self.get_test_desc(test_name)
@@ -977,7 +977,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
-        steps = self._get_defined_test_steps(record.test_name)
+        steps = self.get_defined_test_steps(record.test_name)
         if steps is None:
             # if we don't have a list of steps, assume they were all run
             all_steps_run = True
