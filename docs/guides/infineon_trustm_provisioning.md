@@ -46,8 +46,8 @@ $ ./matter_test_provisioning.sh
 
 _Note:_
 
-_By running this example `matter_test_provisioning.sh`, the steps shown below are
-executed:_
+_By running this example `matter_test_provisioning.sh`, the steps shown below
+are executed:_
 
 _Step1: Extract the public key from the Infineon pre-provisioned
 Certificate(0xE0E0) using openssl command._
