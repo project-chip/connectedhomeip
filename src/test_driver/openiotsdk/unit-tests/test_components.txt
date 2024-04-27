@@ -12,6 +12,7 @@ CredentialsTest
 PlatformTests
 RetransmitTests
 TestShell
+TracingTests
 SetupPayloadTests
 SupportTests
 UserDirectedCommissioningTests
