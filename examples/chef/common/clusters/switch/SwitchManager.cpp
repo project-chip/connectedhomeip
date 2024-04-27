@@ -20,6 +20,7 @@
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 #include "SwitchEventHandler.h"
 
@@ -143,11 +144,73 @@ void SwitchActionsDelegate::EventHandler(chip::EndpointId endpointId, chip::Even
     }
 };
 
+// Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
+constexpr const uint8_t kNamespaceCommonLevel = 5;
+// Common Number Namespace: 5, tag 0 (Low)
+constexpr const uint8_t kTagCommonLow = 0;
+// Common Number Namespace: 5, tag 1 (Medium)
+constexpr const uint8_t kTagCommonMedium = 1;
+// Common Number Namespace: 5, tag 2 (High)
+constexpr const uint8_t kTagCommonHigh = 2;
+
+constexpr const uint8_t kNamespaceCommonNumber = 7;
+// Common Number Namespace: 7, tag 0 (Zero)
+constexpr const uint8_t kTagCommonZero = 0;
+// Common Number Namespace: 7, tag 1 (One)
+constexpr const uint8_t kTagCommonOne = 1;
+// Common Number Namespace: 7, tag 2 (Two)
+constexpr const uint8_t kTagCommonTwo = 2;
+
+constexpr const uint8_t kNamespacePosition = 8;
+// Common Position Namespace: 8, tag: 0 (Left)
+constexpr const uint8_t kTagPositionLeft = 0;
+// Common Position Namespace: 8, tag: 1 (Right)
+constexpr const uint8_t kTagPositionRight = 1;
+// Common Position Namespace: 8, tag: 2 (Top)
+constexpr const uint8_t kTagPositionTop = 2;
+// Common Position Namespace: 8, tag: 3 (Bottom)
+constexpr const uint8_t kTagPositionBottom                                 = 3;
+// Common Position Namespace: 8, tag: 4 (Middle)
+constexpr const uint8_t kTagPositionMiddle                                 = 4;
+// Common Position Namespace: 8, tag: 5 (Row)
+constexpr const uint8_t kTagPositionRow                                 = 5;
+// Common Position Namespace: 8, tag: 6 (Column)
+constexpr const uint8_t kTagPositionColumn                              = 6;
+
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gLatchingSwitch[] = {
+    { .namespaceID = kNamespaceCommonLevel, 
+        .tag = kTagCommonLow, 
+        .label = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
+                    { chip::app::DataModel::MakeNullable(chip::CharSpan("Low", 3)) })},
+    { .namespaceID = kNamespaceCommonLevel, 
+        .tag = kTagCommonMedium, 
+        .label = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
+                    { chip::app::DataModel::MakeNullable(chip::CharSpan("Medium", 6)) })},
+    { .namespaceID = kNamespaceCommonLevel, 
+        .tag = kTagCommonHigh,
+        .label = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
+                    { chip::app::DataModel::MakeNullable(chip::CharSpan("High", 4)) })}
+};
+
+#if 0
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp0TagList[] = {
+    { .namespaceID = kNamespaceCommonNumber, .tag = kTagCommonZero }, { .namespaceID = kNamespacePosition, .tag = kTagPositionBottom }
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp1TagList[] = {
+    { .namespaceID = kNamespaceCommon, .tag = kTagCommonOne }, { .namespaceID = kNamespacePosition, .tag = kTagPositionLeft }
+};
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
+    { .namespaceID = kNamespaceCommon, .tag = kTagCommonTwo }, { .namespaceID = kNamespacePosition, .tag = kTagPositionRight }
+};
+#endif
+
+
 void emberAfSwitchClusterInitCallback(EndpointId endpointId)
 {
     ChipLogProgress(Zcl, "Chef: emberAfSwitchClusterInitCallback");
 printf("\033[44m %s, %d, Switch::ID=%u \033[0m \n", __func__, __LINE__, Switch::Id);
     ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, new SwitchActionsDelegate(Clusters::Switch::Id, new SwitchEventHandler()));
+    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gLatchingSwitch));
 }
 
 

@@ -1425,6 +1425,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
+  device type ma_powersource = 17, version 1;
   device type ma_genericswitch = 15, version 1;
 
 
@@ -1447,6 +1448,7 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
