@@ -178,7 +178,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                         error:(NSError * __autoreleasing *)error
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
-- (void)preWarmCommissioningSession MTR_NEWLY_DEPRECATED("-[MTRDeviceControllerFactory preWarmCommissioningSession]"); // MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+- (void)preWarmCommissioningSession MTR_NEWLY_DEPRECATED("-[MTRDeviceControllerFactory preWarmCommissioningSession]") MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered

@@ -184,7 +184,8 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * if it is known that a commissioning attempt will soon take place, but the commissioning
  * payload is not known yet.
  *
- * The controller factory must be running for pre-warming to take place.
+ * The controller factory must be running for pre-warming to take place.  Pre-warming can take place
+ * before any controllers are started.
  */
 - (void)preWarmCommissioningSession MTR_NEWLY_AVAILABLE;
 
