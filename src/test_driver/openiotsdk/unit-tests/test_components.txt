@@ -9,6 +9,7 @@ MinimalMdnsRespondersTests
 CoreTests
 MdnsTests
 CredentialsTest
+DataModelTests
 PlatformTests
 RetransmitTests
 TestShell
