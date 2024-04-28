@@ -163,11 +163,9 @@ namespace DeviceLayer {
 
         void BleConnectionDelegateImpl::StartScan(BleScannerDelegate * delegate, BleScanMode mode)
         {
-            // A null delegate is only allowed in PreWarm mode
-            bool prewarm = (mode == BleScanMode::kPreWarm);
-            VerifyOrDie(delegate != nullptr || prewarm);
             assertChipStackLockedByCurrentThread();
 
+            bool prewarm = (mode == BleScanMode::kPreWarm);
             ChipLogProgress(Ble, "ConnectionDelegate StartScan (%s)", (prewarm ? "pre-warm" : "default"));
 
             if (!bleWorkQueue) {
@@ -177,6 +175,8 @@ namespace DeviceLayer {
             dispatch_async(bleWorkQueue, ^{
                 // Pre-warming is best-effort, don't cancel an ongoing scan or connection attempt
                 if (prewarm && ble) {
+                    // TODO: Once we get rid of the separate BLE queue we can just return CHIP_ERROR_BUSY.
+                    // That will also allow these cases to be distinguished in our metric.
                     ChipLogProgress(Ble, "Not starting pre-warm scan, an operation is already in progress");
                     if (delegate) {
                         dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{

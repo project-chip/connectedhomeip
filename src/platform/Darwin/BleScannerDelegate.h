@@ -26,7 +26,11 @@ namespace DeviceLayer {
 
 enum class BleScanMode
 {
+    /// Scan continues until stopped.
+    /// Replaces existing BLE operation.
     kDefault = 0,
+    /// Scan stops automatically after some time.
+    /// Does not replace an existing BLE operation.
     kPreWarm,
 };
 
