@@ -81,8 +81,8 @@ TEST_F(TestTLVPacketBufferBackingStore, BasicEncodeDecode)
     // Array start/end is 2 bytes.  Each entry is also 2 bytes: control +
     // value.  So 8 bytes total.
     EXPECT_FALSE(buffer->HasChainedBuffer());
-    EXPECT_EQ(buffer->TotalLength(), 8);
-    EXPECT_EQ(buffer->DataLength(), 8);
+    EXPECT_EQ(buffer->TotalLength(), static_cast<size_t>(8));
+    EXPECT_EQ(buffer->DataLength(), static_cast<size_t>(8));
 
     PacketBufferTLVReader reader;
     reader.Init(std::move(buffer));
@@ -163,7 +163,7 @@ TEST_F(TestTLVPacketBufferBackingStore, MultiBufferEncode)
     constexpr size_t totalSize = 2009;
     EXPECT_TRUE(buffer->HasChainedBuffer());
     EXPECT_EQ(buffer->TotalLength(), totalSize);
-    EXPECT_EQ(buffer->DataLength(), 2);
+    EXPECT_EQ(buffer->DataLength(), static_cast<size_t>(2));
     auto nextBuffer = buffer->Next();
     EXPECT_TRUE(nextBuffer->HasChainedBuffer());
     EXPECT_EQ(nextBuffer->TotalLength(), totalSize - 2);

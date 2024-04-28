@@ -16,3 +16,4 @@ TracingTests
 SetupPayloadTests
 SupportTests
 UserDirectedCommissioningTests
+SecureChannelTests
