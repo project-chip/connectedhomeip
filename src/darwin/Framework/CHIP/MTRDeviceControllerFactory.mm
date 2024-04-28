@@ -172,7 +172,8 @@ MTR_DIRECT_MEMBERS
     os_unfair_lock _serverEndpointsLock; // Protects access to _serverEndpoints.
 
     class final : public DeviceLayer::BleScannerDelegate {
-        void OnBleScanStopped() override {
+        void OnBleScanStopped() override
+        {
             [MTRDeviceControllerFactory.sharedInstance preWarmCommissioningSessionDone];
         }
     } _preWarmingDelegate;
