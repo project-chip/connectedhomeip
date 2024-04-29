@@ -215,7 +215,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMINIMAL_STACK_SIZE (1024) /* Number of words to use for Idle and Timer stacks */
 #else                                   // For EFR32
 #define configMINIMAL_STACK_SIZE (320)  /* Number of words to use for Idle and Timer stacks */
-#endif // SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED
+#endif                                  // SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED
 #ifdef HEAP_MONITORING
 #define configMAX_TASK_NAME_LEN (24)
 #else
