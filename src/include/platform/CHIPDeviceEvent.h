@@ -239,6 +239,11 @@ enum PublicEventTypes
      * sending messages to other nodes.
      */
     kServerReady,
+
+    /**
+     * Signals that BLE is deinitialized.
+     */
+    kBLEDeinitialized,
 };
 
 /**
