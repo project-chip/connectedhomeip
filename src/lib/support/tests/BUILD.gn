@@ -55,7 +55,6 @@ chip_test_suite("tests") {
     "TestTlvJson.cpp",
     "TestTlvToJson.cpp",
     "TestUtf8.cpp",
-    "TestUtf8.cpp",
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
