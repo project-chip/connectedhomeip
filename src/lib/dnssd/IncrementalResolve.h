@@ -157,7 +157,6 @@ public:
     /// it was parsed so far.
     CHIP_ERROR Take(DiscoveredNodeData & outputData);
 
-
     /// Take the current value of the object and clear it once returned.
     ///
     /// Object must be in `IsActiveOperationalParse()` for this to succeed.
@@ -175,7 +174,7 @@ public:
 
 private:
     template <class type>
-    CHIP_ERROR Set(DiscoveredNodeData &output);
+    CHIP_ERROR Set(DiscoveredNodeData & output);
     /// Notify that a PTR record can be parsed.
     ///
     /// Input data MUST have GetType() == QType::TXT

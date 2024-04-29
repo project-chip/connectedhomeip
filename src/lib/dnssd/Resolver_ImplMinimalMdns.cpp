@@ -459,7 +459,8 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             {
                 DiscoveredNodeData nodeData;
                 err = resolver->Take(nodeData);
-                if (!nodeData.Is<OperationalNodeData>()) {
+                if (!nodeData.Is<OperationalNodeData>())
+                {
                     err = CHIP_ERROR_INVALID_ARGUMENT;
                 }
                 if (err != CHIP_NO_ERROR)
@@ -469,7 +470,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
                 if (mDiscoveryContext != nullptr && err == CHIP_NO_ERROR)
                 {
                     mDiscoveryContext->OnNodeDiscovered(nodeData);
-                    auto opNodeData = nodeData.Get<OperationalNodeData>();
+                    auto opNodeData                  = nodeData.Get<OperationalNodeData>();
                     nodeResolvedData.resolutionData  = static_cast<CommonResolutionData>(opNodeData);
                     nodeResolvedData.operationalData = opNodeData;
                 }
