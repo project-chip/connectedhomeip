@@ -37,7 +37,7 @@ enum class CheckInCounterOperations : uint8_t
  * @brief Helper function that validates CheckInCounter value after an operation for configurable input values
  *
  * @param startValue Starting value of the Check-In counter
- * @param expectedValue Expected value after the InvalidateHalfCheckInCouterValues call
+ * @param expectedValue Expected value after the InvalidateHalfCheckInCounterValues call
  */
 void VerifyCheckInCounterValues(uint32_t startValue, uint32_t expectedValue, CheckInCounterOperations operation)
 {
@@ -60,7 +60,7 @@ void VerifyCheckInCounterValues(uint32_t startValue, uint32_t expectedValue, Che
     switch (operation)
     {
     case CheckInCounterOperations::kInvalidateHalf: {
-        EXPECT_EQ(counter.InvalidateHalfCheckInCouterValues(), CHIP_NO_ERROR);
+        EXPECT_EQ(counter.InvalidateHalfCheckInCounterValues(), CHIP_NO_ERROR);
         break;
     }
     case CheckInCounterOperations::kInvalidateAll: {

@@ -74,7 +74,7 @@ public:
     };
 
     /**
-     * @brief This enum class represents to all ICDStateObserver callbacks available from the
+     * @brief This enum class represents all ICDStateObserver callbacks available from the
      *        mStateObserverPool for the ICDManager.
      *
      *        EnterActiveMode, TransitionToIdle and EnterIdleMode will always be called as a trio in the same order.
@@ -85,12 +85,12 @@ public:
      *         When this event is called, the ICD is still in ActiveMode.
      *        If the ActiveMode timer is increased due to the TransitionToIdle event, the event will not be called a second time in
      *        a given cycle.
-     *        OnEnterIdleMode will always the third when the ICD has transitioned to IdleMode.
+     *        OnEnterIdleMode will always the third event and indictats that the ICD has transitioned to IdleMode.
      *
      *        The ICDModeChange event can occur independently from the EnterActiveMode, TransitionToIdle and EnterIdleMode.
-     *        It will typpically hapen at the ICDManager init when a client is already registered with the ICD before the
-     *        OnEnterIdleMode event or when a client send a register command after the OnEnterActiveMode event. Nothing prevents the
-     *        ICDModeChange event to happen multiple times per cycle or while the ICD is in IdleMode.
+     *        It will typpically happen at the ICDManager init when a client is already registered with the ICD before the
+     *        OnEnterIdleMode event or when a client sends a register command after the OnEnterActiveMode event. Nothing prevents
+     *        the ICDModeChange event from happening multiple times per cycle or while the ICD is in IdleMode.
      *
      *        See src/app/icd/server/ICDStateObserver.h for more information on the APIs each event triggers
      */

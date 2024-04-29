@@ -26,7 +26,7 @@ namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
-CHIP_ERROR CheckInCounter::InvalidateHalfCheckInCouterValues()
+CHIP_ERROR CheckInCounter::InvalidateHalfCheckInCounterValues()
 {
     // Increases the current counter value by half of its maximum range and updates underlying counter storage.
     // CheckInCounter is allowed to roll over.

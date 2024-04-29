@@ -53,7 +53,7 @@ public:
      *
      * @return CHIP_ERROR Any error returned by a write to persisted storage.
      */
-    CHIP_ERROR InvalidateHalfCheckInCouterValues();
+    CHIP_ERROR InvalidateHalfCheckInCounterValues();
 
     /**
      * @brief Invalidates all the Check-In counter values. After this function is called, the new Check-In counter value will be
