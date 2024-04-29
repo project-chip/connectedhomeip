@@ -878,7 +878,7 @@ class ChipDeviceControllerBase():
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # In that case the Future has already been set it will return immediately
-        if (timeoutMs):
+        if timeoutMs:
             timeout = float(timeoutMs) / 1000
             await asyncio.wait_for(future, timeout=timeout)
         else:
