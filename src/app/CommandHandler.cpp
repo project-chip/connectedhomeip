@@ -776,14 +776,14 @@ CommandHandler * CommandHandler::Handle::Get()
     // Not safe to work with CommandHandler in parallel with other Matter work.
     assertChipStackLockedByCurrentThread();
 
-    return (mpHandler != nullptr && mImEngineGeneration == mpHandler->mpCallback->GetInteractionModelEngineGeneration()) ? mpHandler : nullptr;
+    return (mpHandler != nullptr && mImEngineGeneration == mpHandler->GetCommandHandlerGeneration()) ? mpHandler : nullptr;
 }
 
 void CommandHandler::Handle::Release()
 {
     if (mpHandler != nullptr)
     {
-        if (mImEngineGeneration == mpHandler->mpCallback->GetInteractionModelEngineGeneration())
+        if (mImEngineGeneration == mpHandler->GetCommandHandlerGeneration())
         {
             mpHandler->DecrementHoldOff();
         }
@@ -798,7 +798,7 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
     {
         handle->IncrementHoldOff();
         mpHandler = handle;
-        mImEngineGeneration    = mpHandler->mpCallback->GetInteractionModelEngineGeneration();
+        mImEngineGeneration    = mpHandler->GetCommandHandlerGeneration();
     }
 }
 
@@ -883,6 +883,12 @@ void CommandHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "Command handler moving to [%10.10s]", GetStateStr());
+}
+
+
+uint32_t CommandHandler::GetCommandHandlerGeneration() const {
+    VerifyOrReturnValue(mpCallback != nullptr, 0);
+    return mpCallback->GetCommandHandlerGeneration();
 }
 
 #if CHIP_WITH_NLFAULTINJECTION

@@ -316,7 +316,7 @@ public:
 
     void ResetCounter() { onFinalCalledTimes = 0; }
 
-    uint32_t GetInteractionModelEngineGeneration() const { return chip::app::InteractionModelEngine::GetInstance()->GetInteractionModelEngineGeneration(); }
+    uint32_t GetCommandHandlerGeneration() const { return chip::app::InteractionModelEngine::GetInstance()->GetCommandHandlerGeneration(); }
 
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;

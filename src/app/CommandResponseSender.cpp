@@ -138,9 +138,9 @@ Status CommandResponseSender::CommandExists(const ConcreteCommandPath & aCommand
     return mpCommandHandlerCallback->CommandExists(aCommandPath);
 }
 
-uint32_t CommandResponseSender::GetInteractionModelEngineGeneration() const {
+uint32_t CommandResponseSender::GetCommandHandlerGeneration() const {
     VerifyOrReturnValue(mpCommandHandlerCallback, 0);
-    return mpCommandHandlerCallback->GetInteractionModelEngineGeneration();
+    return mpCommandHandlerCallback->GetCommandHandlerGeneration();
 }
 
 CHIP_ERROR CommandResponseSender::SendCommandResponse()

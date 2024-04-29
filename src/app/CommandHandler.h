@@ -87,10 +87,10 @@ public:
         virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
 
         /*
-         * Get the generation number of the InteractionModelEngine. A CommandHandler::Handle is valid iff
-         * its number is equals to the InteractionModelEngine's one.
+         * Get the generation number of the CommandHandler. A CommandHandler::Handle is valid iff
+         * its number is equals to the return of this call.
          */
-        virtual uint32_t GetInteractionModelEngineGeneration() const = 0;
+        virtual uint32_t GetCommandHandlerGeneration() const = 0;
     };
 
     /**
@@ -677,6 +677,8 @@ private:
     CommandPathRegistry & GetCommandPathRegistry() const { return *mCommandPathRegistry; }
 
     size_t MaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
+
+    uint32_t GetCommandHandlerGeneration() const;
 
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 

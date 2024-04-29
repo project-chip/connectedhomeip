@@ -196,7 +196,7 @@ public:
      * The generation number of this InteractionModelEngine, the number is updated during Init() and Shundown().
      * An CommandHandler::Handle is valid iff. its number equals to this one.
      */
-    uint32_t GetInteractionModelEngineGeneration() const override { return mMagic; }
+    uint32_t GetCommandHandlerGeneration() const override { return mMagic; }
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
