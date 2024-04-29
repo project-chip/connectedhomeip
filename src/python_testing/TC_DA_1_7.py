@@ -113,7 +113,7 @@ class TC_DA_1_7(MatterBaseTest):
         self.allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
         self.post_cert_test = self.user_params.get("post_cert_test", False)
 
-    def expected_number_of_DUTs() -> int:
+    def expected_number_of_DUTs(self) -> int:
         return 1 if (self.allow_sdk_dac or self.post_cert_test) else 2
 
     def steps_one_dut(self, DUT: int) -> List[TestStep]:
@@ -156,7 +156,7 @@ class TC_DA_1_7(MatterBaseTest):
         if self.matter_test_config.manual_code:
             num += 1
 
-        if num != expected_num:
+        if num != self.expected_number_of_DUTs():
             if self.allow_sdk_dac:
                 msg = "The allow_sdk_dac flag is only for use in CI. When using this test in CI, please specify a single discriminator, manual-code or qr-code-content"
             elif self.post_cert_test:
