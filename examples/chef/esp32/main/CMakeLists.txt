@@ -118,7 +118,6 @@ endif (CONFIG_ENABLE_PW_RPC)
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CHIP_SHELL_DIR}/shell_common/include"
                       "${PRIV_INCLUDE_DIRS_LIST}"
-                      PRIV_REQUIRES chip nvs_flash bt console mbedtls QRCode tft screen-framework spidriver
                       SRC_DIRS ${SRC_DIRS_LIST})
 
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
