@@ -282,4 +282,65 @@
     XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:@"35191106788" error:NULL]);
 }
 
+- (void)testSecureCodingRoundtrip
+{
+    NSError * error;
+    NSMutableArray<MTRSetupPayload *> * payloads = [[NSMutableArray alloc] init];
+    for (NSString * string in @[
+             @"34970112332",
+             @"641286075300001000016",
+             @"MT:M5L90MP500K64J00000",
+             @"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"
+         ]) {
+        MTRSetupPayload * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:string error:&error];
+        XCTAssertNotNil(payload, @"Error: %@", error);
+        [payloads addObject:payload];
+    }
+
+    // Also test some other payloads that don't have a valid QR / MPC representation
+    [payloads addObject:[[MTRSetupPayload alloc] init]];
+    [payloads addObject:[[MTRSetupPayload alloc] initWithSetupPasscode:@22222222 discriminator:@42]];
+
+    for (MTRSetupPayload * payload in payloads) {
+        NSData * data = [NSKeyedArchiver archivedDataWithRootObject:payload requiringSecureCoding:YES error:&error];
+        XCTAssertNotNil(data, @"Error: %@", error);
+        MTRSetupPayload * decoded = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRSetupPayload.class fromData:data error:&error];
+        XCTAssertNotNil(decoded, @"Error: %@", error);
+
+        XCTAssertEqualObjects(decoded.version, payload.version);
+        XCTAssertEqualObjects(decoded.vendorID, payload.vendorID);
+        XCTAssertEqualObjects(decoded.productID, payload.productID);
+        XCTAssertEqual(decoded.commissioningFlow, payload.commissioningFlow);
+        XCTAssertEqual(decoded.discoveryCapabilities, payload.discoveryCapabilities);
+        XCTAssertEqual(decoded.hasShortDiscriminator, payload.hasShortDiscriminator);
+        XCTAssertEqualObjects(decoded.discriminator, payload.discriminator);
+        XCTAssertEqualObjects(decoded.setupPasscode, payload.setupPasscode);
+        XCTAssertEqualObjects(decoded.serialNumber, payload.serialNumber);
+
+        NSArray<MTROptionalQRCodeInfo *> * payloadVDs = [payload getAllOptionalVendorData:&error];
+        XCTAssertNotNil(payloadVDs, @"Error: %@", error);
+        NSArray<MTROptionalQRCodeInfo *> * decodedVDs = [decoded getAllOptionalVendorData:&error];
+        XCTAssertNotNil(decodedVDs, @"Error: %@", error);
+
+#if 0 // TODO: Encode / decode optional vendor data
+      // MTROptionalQRCodeInfo does not implement isEqual (yet)
+        XCTAssertEqual(decodedVDs.count, payloadVDs.count);
+        for (int i = 0; i < decodedVDs.count; i++){
+            MTROptionalQRCodeInfo * decodedVD = decodedVDs[i];
+            MTROptionalQRCodeInfo * payloadVD = payloadVDs[i];
+            XCTAssertEqual(decodedVD.type, payloadVD.type);
+            XCTAssertEqualObjects(decodedVD.tag, payloadVD.tag);
+            XCTAssertEqualObjects(decodedVD.integerValue, payloadVD.integerValue);
+            XCTAssertEqualObjects(decodedVD.stringValue, payloadVD.stringValue);
+        }
+#endif
+
+        // Note that we can't necessarily expect the manualEntryCode and qrCode strings
+        // we generate here to match the original string, but we should get the same
+        // output from the decoded and original objects.
+        XCTAssertEqualObjects([decoded qrCodeString:NULL], [payload qrCodeString:NULL]);
+        XCTAssertEqualObjects(decoded.manualEntryCode, payload.manualEntryCode);
+    }
+}
+
 @end
