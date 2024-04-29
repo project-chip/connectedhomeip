@@ -217,7 +217,7 @@ public class ChipClusters {
         long attributeId,
         int minInterval,
         int maxInterval) {
-      ReportCallbackJni jniCallback = new ReportCallbackJni(callback, callback, null);
+      ReportCallbackJni jniCallback = new ReportCallbackJni(callback, callback, callback);
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
       int fabricIndex = ChipInteractionClient.getFabricIndex(devicePtr);
       long deviceId = ChipInteractionClient.getRemoteDeviceId(devicePtr);
@@ -252,7 +252,7 @@ public class ChipClusters {
     }
   }
 
-  abstract static class ReportCallbackImpl implements ReportCallback, SubscriptionEstablishedCallback {
+  abstract static class ReportCallbackImpl implements ReportCallback, SubscriptionEstablishedCallback, ResubscriptionAttemptCallback {
     private BaseAttributeCallback callback;
     private ChipAttributePath path;
 
@@ -309,6 +309,9 @@ public class ChipClusters {
     public void onSubscriptionEstablished(long subscriptionId) {
       callback.onSubscriptionEstablished(subscriptionId);
     }
+
+    @Override
+    public void onResubscriptionAttempt(long terminationCause, long nextResubscribeIntervalMsec) {}
 
     public abstract void onSuccess(byte[] tlv);
   }
@@ -553,6 +556,7 @@ public class ChipClusters {
           public void onSuccess(byte[] tlv) {
             {%- set encodable = attribute.definition | asEncodable(typeLookup) %}
             {{encode_value_without_optional(cluster, encodable, 0)}} value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
           }
         }, {{attribute.definition.name | constcase}}_ATTRIBUTE_ID, minInterval, maxInterval);
     }

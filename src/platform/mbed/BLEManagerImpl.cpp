@@ -32,6 +32,7 @@
 
 #include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/internal/BLEManager.h>
@@ -984,6 +985,9 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     ble::GattServer & gatt_server = ble::BLE::Instance().gattServer();
     ble::attribute_handle_t att_handle;
 
+    // For BLE, the buffer is capped at UINT16_MAX.
+    VerifyOrExit(CanCastTo<uint16_t>(pBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+
     // No need to do anything fancy here. Only 3 handles are used in this impl.
     if (UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX))
     {
@@ -1007,7 +1011,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                   "(connHandle=%d, attHandle=%d, data_len=%u)",
                   conId, att_handle, pBuf->DataLength());
 
-    mbed_err = gatt_server.write(att_handle, pBuf->Start(), pBuf->DataLength(), false);
+    mbed_err = gatt_server.write(att_handle, pBuf->Start(), static_cast<uint16_t>(pBuf->DataLength()), false);
     VerifyOrExit(mbed_err == BLE_ERROR_NONE, err = CHIP_ERROR(chip::ChipError::Range::kOS, mbed_err));
 
 exit:
