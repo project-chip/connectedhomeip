@@ -109,15 +109,12 @@ class TC_DA_1_7(MatterBaseTest):
                 --discriminator 12 34 --passcode 20202021 20202021 --bool-arg allow_sdk_dac:true"
     '''
 
-    def expected_number_of_DUTs(self):
-        # For real tests, we require more than one DUT
-        # On the CI, this doesn't make sense to do since all the examples use the same DAC
-        # To specify more than 1 DUT, use a list of discriminators and passcodes
-        allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
-        post_cert_test = self.user_params.get("post_cert_test", False)
-        if allow_sdk_dac or post_cert_test:
-            return 1
-        return 2
+    def setup_class(self):
+        self.allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
+        self.post_cert_test = self.user_params.get("post_cert_test", False)
+
+    def expected_number_of_DUTs() -> int:
+        return 1 if (self.allow_sdk_dac or self.post_cert_test) else 2
 
     def steps_one_dut(self, DUT: int) -> List[TestStep]:
         return [TestStep(f'{DUT}', f'Test DUT{DUT} DAC chain as follows:'),
@@ -158,8 +155,16 @@ class TC_DA_1_7(MatterBaseTest):
             num += 1
         if self.matter_test_config.manual_code:
             num += 1
-        asserts.assert_equal(num, self.expected_number_of_DUTs(),
-                             "Unexpected number of devices specified - this test expects two DUTs at cert, one device for CI")
+
+        if num != expected_num:
+            if self.allow_sdk_dac:
+                msg = "The allow_sdk_dac flag is only for use in CI. When using this test in CI, please specify a single discriminator, manual-code or qr-code-content"
+            elif self.post_cert_test:
+                msg = "The post_cert_test flag is only for use post-certification. When using this flag, please specify a single discriminator, manual-code or qr-code-content"
+            else:
+                msg = "This test requires two devices for use at certification. Please specify two device discriminators ex. --discriminator 1234 5678"
+            asserts.fail(msg)
+
         pk = []
         # Commissioning - already done.
         self.step(0)
