@@ -1025,11 +1025,11 @@ void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
 
 CHIP_ERROR BLEManagerImpl::DeinitBLE()
 {
+    esp_err_t err = ESP_OK;
     VerifyOrReturnError(ble_hs_is_enabled(), CHIP_ERROR_INCORRECT_STATE, ChipLogProgress(DeviceLayer, "BLE already deinited"));
     VerifyOrReturnError(0 == nimble_port_stop(), MapBLEError(ESP_FAIL), ChipLogError(DeviceLayer, "nimble_port_stop() failed"));
 
-    esp_err_t err = nimble_port_deinit();
-    VerifyOrReturnError(err == ESP_OK, MapBLEError(err));
+    nimble_port_deinit();
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
     err = esp_nimble_hci_and_controller_deinit();
