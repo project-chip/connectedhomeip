@@ -183,7 +183,7 @@ MTR_DIRECT_MEMBERS
             if (error) {
                 *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidArgument userInfo:nil];
             }
-            return @[];
+            return nil;
         }
         [allOptionalData addObject:info];
     }
