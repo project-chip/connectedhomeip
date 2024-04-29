@@ -278,6 +278,7 @@ template("siwx917_sdk") {
     if (use_wstk_leds) {
       defines += [
         "ENABLE_WSTK_LEDS",
+
         # TODO: remove this when it is added to the board config from wifi sdk
         "SL_CATALOG_SIMPLE_LED_LED1_PRESENT",
       ]
