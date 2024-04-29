@@ -204,12 +204,12 @@ CHIP_ERROR LogIssueNOCChain(const char * noc, const char * icac, const char * rc
     return gDelegate->LogJSON(valueStr.c_str());
 }
 
-CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::DiscoveredNodeData & nodeData)
+CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::CommissionNodeData & nodeData)
 {
     VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
 
-    auto & resolutionData = nodeData.resolutionData;
-    auto & commissionData = nodeData.nodeData;
+    auto & commissionData = nodeData;
+    auto & resolutionData = commissionData;
 
     if (!chip::CanCastTo<uint8_t>(resolutionData.numIPs))
     {
@@ -245,24 +245,24 @@ CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::DiscoveredNodeData & nodeDat
     value["port"]               = resolutionData.port;
     value["numIPs"]             = static_cast<uint8_t>(resolutionData.numIPs);
 
-    if (resolutionData.mrpRetryIntervalIdle.HasValue())
+    if (resolutionData.mrpRetryIntervalIdle.has_value())
     {
-        value["mrpRetryIntervalIdle"] = resolutionData.mrpRetryIntervalIdle.Value().count();
+        value["mrpRetryIntervalIdle"] = resolutionData.mrpRetryIntervalIdle->count();
     }
 
-    if (resolutionData.mrpRetryIntervalActive.HasValue())
+    if (resolutionData.mrpRetryIntervalActive.has_value())
     {
-        value["mrpRetryIntervalActive"] = resolutionData.mrpRetryIntervalActive.Value().count();
+        value["mrpRetryIntervalActive"] = resolutionData.mrpRetryIntervalActive->count();
     }
 
-    if (resolutionData.mrpRetryActiveThreshold.HasValue())
+    if (resolutionData.mrpRetryActiveThreshold.has_value())
     {
-        value["mrpRetryActiveThreshold"] = resolutionData.mrpRetryActiveThreshold.Value().count();
+        value["mrpRetryActiveThreshold"] = resolutionData.mrpRetryActiveThreshold->count();
     }
 
-    if (resolutionData.isICDOperatingAsLIT.HasValue())
+    if (resolutionData.isICDOperatingAsLIT.has_value())
     {
-        value["isICDOperatingAsLIT"] = resolutionData.isICDOperatingAsLIT.Value();
+        value["isICDOperatingAsLIT"] = *(resolutionData.isICDOperatingAsLIT);
     }
 
     Json::Value rootValue;

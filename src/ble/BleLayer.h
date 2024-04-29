@@ -229,9 +229,6 @@ public:
     void * mAppState                 = nullptr;
     BleLayerDelegate * mBleTransport = nullptr;
 
-    typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
-    BleConnectionReceivedFunct OnChipBleConnectReceived;
-
     // Public functions:
     BleLayer();
 
@@ -301,10 +298,6 @@ public:
 
     /// Call when an outstanding GATT indication receives a positive receipt confirmation.
     bool HandleIndicationConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
-
-    /// Call when a GATT read request is received.
-    bool HandleReadReceived(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                            const ChipBleUUID * charId);
 
     /**< Platform must call this function when any previous operation undertaken by the BleLayer via BleAdapter
      *   fails, such as a characteristic write request or subscribe attempt, or when a BLE connection is closed.

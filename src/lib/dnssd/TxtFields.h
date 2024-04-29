@@ -192,7 +192,7 @@ constexpr size_t ValSize(TxtFieldKey key)
 }
 
 void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonResolutionData & nodeData);
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, DnssdNodeData & nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommissionNodeData & nodeData);
 
 } // namespace Dnssd
 } // namespace chip
