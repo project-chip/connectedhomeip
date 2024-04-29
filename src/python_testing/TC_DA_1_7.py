@@ -176,9 +176,6 @@ class TC_DA_1_7(MatterBaseTest):
         asserts.assert_equal(len(pk), len(set(pk)), "Found matching public keys in different DUTs")
 
     async def single_DUT(self, dut_index: int, dut_node_id: int) -> bytes:
-        # Option to allow SDK roots (skip step 4 check 2)
-        allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
-
         logging.info("Pre-condition: load all PAAs SKIDs")
         conf = self.matter_test_config
         paa_by_skid = load_all_paa(conf.paa_trust_store_path)
@@ -223,7 +220,7 @@ class TC_DA_1_7(MatterBaseTest):
         logging.info("Validated PAI signature against PAA")
 
         logging.info("DUT {} Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs".format(dut_index))
-        if allow_sdk_dac:
+        if self.allow_sdk_dac:
             logging.warning("===> TEST STEP SKIPPED: Allowing SDK DACs!")
         else:
             for candidate in FORBIDDEN_AKID:
