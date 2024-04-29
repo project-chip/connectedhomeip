@@ -182,6 +182,7 @@ Status OtaRequestorServerGetUpdateState(chip::EndpointId endpointId, OTAUpdateSt
 Status OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t> value)
 {
     Status status = Status::Success;
+
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
     for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
     {
