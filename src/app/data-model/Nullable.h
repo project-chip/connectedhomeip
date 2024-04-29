@@ -62,10 +62,10 @@ struct Nullable : protected std::optional<T>
         return std::optional<T>::emplace(std::forward<Args>(args)...);
     }
 
-    template <typename Arg>
-    constexpr auto ValueOr(Arg && arg) const
+    template <typename... Args>
+    constexpr auto ValueOr(Args &&... args) const
     {
-        return std::optional<T>::value_or(std::forward<Arg>(arg));
+        return std::optional<T>::value_or(std::forward<Args>(args)...);
     }
 
     inline constexpr const T & Value() const { return std::optional<T>::value(); }
