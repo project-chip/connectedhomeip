@@ -275,4 +275,11 @@
     XCTAssert(payload.manualEntryCode != nil || [payload qrCodeString:NULL] != nil);
 }
 
+- (void)test23357 // https://github.com/project-chip/connectedhomeip/pull/23357
+{
+    // Should return nil for invalid payloads (e.g. invalid passcode "@11111111")
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:@"MT:-24J042C00KMSP0Z800" error:NULL]);
+    XCTAssertNil([MTRSetupPayload setupPayloadWithOnboardingPayload:@"35191106788" error:NULL]);
+}
+
 @end
