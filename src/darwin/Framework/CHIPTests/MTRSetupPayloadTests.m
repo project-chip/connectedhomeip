@@ -267,4 +267,12 @@
     XCTAssertEqualObjects(newPayload.serialNumber, serialNumber);
 }
 
+- (void)test31129 // https://github.com/project-chip/connectedhomeip/issues/31129
+{
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@99999998 discriminator:@3840];
+    XCTAssertNotNil(payload);
+    // The payload should be representable in at least one of manual or QR format.
+    XCTAssert(payload.manualEntryCode != nil || [payload qrCodeString:NULL] != nil);
+}
+
 @end
