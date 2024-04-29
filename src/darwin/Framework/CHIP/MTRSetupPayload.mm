@@ -245,6 +245,26 @@
     return payload;
 }
 
+- (NSString *)description
+{
+    NSMutableArray<NSString *> * capabilities = [NSMutableArray array];
+    if (self.discoveryCapabilities & MTRDiscoveryCapabilitiesSoftAP) {
+        [capabilities addObject:@"SoftAP"];
+    }
+    if (self.discoveryCapabilities & MTRDiscoveryCapabilitiesBLE) {
+        [capabilities addObject:@"BLE"];
+    }
+    if (self.discoveryCapabilities & MTRDiscoveryCapabilitiesOnNetwork) {
+        [capabilities addObject:@"OnNetwork"];
+    }
+    if (capabilities.count == 0) {
+        [capabilities addObject:@"Unknown"];
+    }
+
+    return [NSString stringWithFormat:@"<MTRSetupPayload: discriminator=0x%x hasShortDiscriminator=%@ discoveryCapabilities=%@>",
+                     self.discriminator.unsignedIntValue, self.hasShortDiscriminator ? @"YES" : @"NO", [capabilities componentsJoinedByString:@"|"]];
+}
+
 #pragma mark - NSSecureCoding
 
 static NSString * const MTRSetupPayloadCodingKeyVersion = @"MTRSP.ck.version";
