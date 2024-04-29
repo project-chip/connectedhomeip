@@ -19,6 +19,7 @@
 
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 
+#include <list>
 #include <string>
 
 class TargetNavigatorManager : public chip::app::Clusters::TargetNavigator::Delegate

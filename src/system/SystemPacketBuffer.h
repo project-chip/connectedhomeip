@@ -54,11 +54,11 @@ struct pbuf
 {
     struct pbuf * next;
     void * payload;
-    uint16_t tot_len;
-    uint16_t len;
+    size_t tot_len;
+    size_t len;
     uint16_t ref;
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
-    uint16_t alloc_size;
+    size_t alloc_size;
 #endif
 };
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -112,9 +112,9 @@ class DLL_EXPORT PacketBuffer : private pbuf
 private:
     // The effective size of the packet buffer structure.
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr uint16_t kStructureSize = LWIP_MEM_ALIGN_SIZE(sizeof(struct ::pbuf));
+    static constexpr size_t kStructureSize = LWIP_MEM_ALIGN_SIZE(sizeof(struct ::pbuf));
 #else  // CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr uint16_t kStructureSize         = CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::pbuf), 4u);
+    static constexpr size_t kStructureSize         = CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::pbuf), 4u);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 public:
@@ -122,9 +122,9 @@ public:
      * The maximum size buffer an application can allocate with no protocol header reserve.
      */
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr uint16_t kMaxSizeWithoutReserve = LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE);
+    static constexpr size_t kMaxSizeWithoutReserve = LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE);
 #else
-    static constexpr uint16_t kMaxSizeWithoutReserve = CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX;
+    static constexpr size_t kMaxSizeWithoutReserve = CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX;
 #endif
 
     /**
@@ -136,7 +136,7 @@ public:
     /**
      * The maximum size buffer an application can allocate with the default protocol header reserve.
      */
-    static constexpr uint16_t kMaxSize = kMaxSizeWithoutReserve - kDefaultHeaderReserve;
+    static constexpr size_t kMaxSize = kMaxSizeWithoutReserve - kDefaultHeaderReserve;
 
     /**
      * Return the size of the allocation including the reserved and payload data spaces but not including space
@@ -146,7 +146,7 @@ public:
      *
      *  @return     size of the allocation
      */
-    uint16_t AllocSize() const
+    size_t AllocSize() const
     {
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
         return kMaxSizeWithoutReserve;
@@ -189,7 +189,7 @@ public:
      *
      *  @return length, in bytes (current payload length).
      */
-    uint16_t DataLength() const { return this->len; }
+    size_t DataLength() const { return this->len; }
 
     /**
      * Set the length, in bytes, of data in a packet buffer, adjusting total length accordingly.
@@ -204,29 +204,29 @@ public:
      *  @param[in,out] aChainHead - the head of the buffer chain the current buffer belongs to.  May be \c nullptr if the current
      *      buffer is the head of the buffer chain.
      */
-    void SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead);
-    void SetDataLength(uint16_t aNewLen) { SetDataLength(aNewLen, nullptr); }
+    void SetDataLength(size_t aNewLen, const PacketBufferHandle & aChainHead);
+    void SetDataLength(size_t aNewLen) { SetDataLength(aNewLen, nullptr); }
 
     /**
      * Get the total length of packet data in the buffer chain.
      *
      *  @return total length, in octets.
      */
-    uint16_t TotalLength() const { return this->tot_len; }
+    size_t TotalLength() const { return this->tot_len; }
 
     /**
      * Get the maximum amount, in bytes, of data that will fit in the buffer given the current start position and buffer size.
      *
      *  @return number of bytes that fits in the buffer given the current start position.
      */
-    uint16_t MaxDataLength() const;
+    size_t MaxDataLength() const;
 
     /**
      * Get the number of bytes of data that can be added to the current buffer given the current start position and data length.
      *
      *  @return the length, in bytes, of data that will fit in the current buffer given the current start position and data length.
      */
-    uint16_t AvailableDataLength() const;
+    size_t AvailableDataLength() const;
 
     /**
      * Get the number of bytes within the current buffer between the start of the buffer and the current data start position.
@@ -272,7 +272,7 @@ public:
      *
      *  @param[in] aConsumeLength - number of bytes to consume from the current buffer.
      */
-    void ConsumeHead(uint16_t aConsumeLength);
+    void ConsumeHead(size_t aConsumeLength);
 
     /**
      * Ensure the buffer has at least the specified amount of reserved space.
@@ -377,9 +377,9 @@ private:
     static PacketBuffer * FreeHead(PacketBuffer * aPacket);
 
     PacketBuffer * ChainedBuffer() const { return static_cast<PacketBuffer *>(this->next); }
-    PacketBuffer * Consume(uint16_t aConsumeLength);
+    PacketBuffer * Consume(size_t aConsumeLength);
     void Clear();
-    void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
+    void SetDataLength(size_t aNewLen, PacketBuffer * aChainHead);
 
     /**
      * Get a pointer to the start of the reserved space (which comes before the
@@ -540,7 +540,7 @@ public:
      *
      *  @param[in] aConsumeLength - number of bytes to consume from the current chain.
      */
-    void Consume(uint16_t aConsumeLength) { mBuffer = mBuffer->Consume(aConsumeLength); }
+    void Consume(size_t aConsumeLength) { mBuffer = mBuffer->Consume(aConsumeLength); }
 
     /**
      * Copy the given buffer to a right-sized buffer if applicable.
@@ -628,7 +628,7 @@ public:
      *
      *  @return     On success, a PacketBufferHandle to the allocated buffer. On fail, \c nullptr.
      */
-    static PacketBufferHandle NewWithData(const void * aData, size_t aDataSize, uint16_t aAdditionalSize = 0,
+    static PacketBufferHandle NewWithData(const void * aData, size_t aDataSize, size_t aAdditionalSize = 0,
                                           uint16_t aReservedSize = PacketBuffer::kDefaultHeaderReserve);
 
     /**
@@ -698,7 +698,7 @@ private:
     friend class TestSystemPacketBuffer;
 };
 
-inline void PacketBuffer::SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead)
+inline void PacketBuffer::SetDataLength(size_t aNewLen, const PacketBufferHandle & aChainHead)
 {
     SetDataLength(aNewLen, aChainHead.mBuffer);
 }

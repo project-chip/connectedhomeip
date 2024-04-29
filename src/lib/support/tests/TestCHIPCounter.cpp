@@ -16,32 +16,65 @@
  *    limitations under the License.
  */
 
+#include <stdint.h>
+
 #include <gtest/gtest.h>
 
 #include <lib/support/CHIPCounter.h>
 
-TEST(TestCHIPCounter, TestCheckStartWithZero)
+using namespace chip;
+
+TEST(TestCHIPCounter, TestStartWithZero)
 {
-    chip::MonotonicallyIncreasingCounter<uint64_t> counter;
-    EXPECT_EQ(counter.GetValue(), 0u);
+    MonotonicallyIncreasingCounter<uint64_t> counter;
+    EXPECT_EQ(counter.GetValue(), 0ULL);
 }
 
-TEST(TestCHIPCounter, TestCheckInitialize)
+TEST(TestCHIPCounter, TestInitialize)
 {
-    chip::MonotonicallyIncreasingCounter<uint64_t> counter;
+    MonotonicallyIncreasingCounter<uint64_t> counter;
 
     EXPECT_EQ(counter.Init(4321), CHIP_NO_ERROR);
-    EXPECT_EQ(counter.GetValue(), 4321u);
+    EXPECT_EQ(counter.GetValue(), 4321ULL);
 }
 
-TEST(TestCHIPCounter, TestCheckAdvance)
+TEST(TestCHIPCounter, TestAdvance)
 {
-    chip::MonotonicallyIncreasingCounter<uint64_t> counter;
+    MonotonicallyIncreasingCounter<uint64_t> counter;
 
     EXPECT_EQ(counter.Init(22), CHIP_NO_ERROR);
-    EXPECT_EQ(counter.GetValue(), 22u);
+    EXPECT_EQ(counter.GetValue(), 22ULL);
     EXPECT_EQ(counter.Advance(), CHIP_NO_ERROR);
-    EXPECT_EQ(counter.GetValue(), 23u);
+    EXPECT_EQ(counter.GetValue(), 23ULL);
     EXPECT_EQ(counter.Advance(), CHIP_NO_ERROR);
-    EXPECT_EQ(counter.GetValue(), 24u);
+    EXPECT_EQ(counter.GetValue(), 24ULL);
+}
+
+TEST(TestCHIPCounter, TestAdvanceWithRollover)
+{
+    MonotonicallyIncreasingCounter<uint64_t> counter;
+    EXPECT_EQ(counter.Init(UINT64_MAX), CHIP_NO_ERROR);
+
+    EXPECT_EQ(counter.Advance(), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), 0ULL);
+}
+
+TEST(TestCHIPCounter, AdvanceBy)
+{
+    MonotonicallyIncreasingCounter<uint64_t> counter;
+    constexpr uint64_t step = 9876;
+    uint64_t expectedValue  = step;
+
+    EXPECT_EQ(counter.Init(0), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.AdvanceBy(step), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), expectedValue);
+
+    expectedValue += step;
+    EXPECT_EQ(counter.AdvanceBy(step), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), expectedValue);
+
+    // Force rollover
+    expectedValue += UINT64_MAX;
+    EXPECT_EQ(counter.AdvanceBy(UINT64_MAX), CHIP_NO_ERROR);
+    EXPECT_EQ(counter.GetValue(), expectedValue);
 }
