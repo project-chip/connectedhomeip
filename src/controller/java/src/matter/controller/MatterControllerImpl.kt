@@ -205,8 +205,8 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
             resubscriptionAttemptHandler
           )
 
-        // val fabricIndex = getFabricIndex(devicePtr)
-        // val deviceId = getRemoteDeviceId(devicePtr)
+        val fabricIndex = getFabricIndex(devicePtr)
+        val deviceId = getRemoteDeviceId(devicePtr)
         subscribe(
           deviceControllerPtr,
           reportCallbackJni.getJniHandle(),
