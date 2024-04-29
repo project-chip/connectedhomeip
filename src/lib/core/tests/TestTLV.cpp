@@ -269,12 +269,12 @@ void TestDupBytes(TLVReader & reader, Tag tag, const uint8_t * expectedVal, uint
     chip::Platform::MemoryFree(val);
 }
 
-void TestBufferContents(const System::PacketBufferHandle & buffer, const uint8_t * expectedVal, uint32_t expectedLen)
+void TestBufferContents(const System::PacketBufferHandle & buffer, const uint8_t * expectedVal, size_t expectedLen)
 {
     System::PacketBufferHandle buf = buffer.Retain();
     while (!buf.IsNull())
     {
-        uint16_t len = buf->DataLength();
+        size_t len = buf->DataLength();
         EXPECT_LE(len, expectedLen);
 
         EXPECT_EQ(memcmp(buf->Start(), expectedVal, len), 0);
@@ -859,8 +859,7 @@ void WriteEncoding3(TLVWriter & writer)
         TLVWriter writer1;
 
         err = writer.OpenContainer(ProfileTag(TestProfile_1, 1), kTLVType_Structure, writer1);
-        if (err != CHIP_NO_ERROR)
-            EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
         err = writer1.PutBoolean(ProfileTag(TestProfile_2, 2), false);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -2979,8 +2978,8 @@ TEST_F(TestTLV, CheckBufferOverflow)
     System::PacketBufferTLVReader reader;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
-    uint16_t maxDataLen            = buf->MaxDataLength();
-    uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
+    uint32_t maxDataLen            = static_cast<uint32_t>(buf->MaxDataLength());
+    uint32_t reserve = static_cast<uint32_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
     // Repeatedly write and read a TLV encoding to a chain of PacketBuffers. Use progressively larger
     // and larger amounts of space in the first buffer to force the encoding to overlap the

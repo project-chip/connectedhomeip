@@ -42,14 +42,12 @@ config CHIP_WIFI
 
 config CHIP_QSPI_NOR
 	bool "Enable QSPI NOR feature set"
+	imply NORDIC_QSPI_NOR
 	help
 	  Enables QSPI NOR flash with a set of options for configuring pages and
 	  buffer sizes.
 
 if CHIP_QSPI_NOR
-
-config NORDIC_QSPI_NOR
-	default y
 
 config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
 	default 16

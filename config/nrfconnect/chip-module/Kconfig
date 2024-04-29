@@ -302,4 +302,9 @@ config CHIP_FACTORY_RESET_ON_KEY_MIGRATION_FAILURE
 	  Perform factory reset of the device if the operational key for Fabric has not been migrated
 	  properly to PSA ITS storage.
 
+config CHIP_PERSISTENT_SUBSCRIPTIONS
+	default n
+	# selecting experimental for this feature since there is an issue with multiple controllers.
+	select EXPERIMENTAL
+
 endif # CHIP

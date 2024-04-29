@@ -477,7 +477,7 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
     mFabricsTable             = fabricTable;
     mRole                     = CryptoContext::SessionRole::kResponder;
     mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig           = mrpLocalConfig.ValueOr(GetDefaultMRPConfig());
+    mLocalMRPConfig           = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
     ChipLogDetail(SecureChannel, "Allocated SecureSession (%p) - waiting for Sigma1 msg",
                   mSecureSessionHolder.Get().Value()->AsSecureSession());
@@ -525,7 +525,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mFabricsTable             = fabricTable;
     mFabricIndex              = fabricInfo->GetFabricIndex();
     mSessionResumptionStorage = sessionResumptionStorage;
-    mLocalMRPConfig           = mrpLocalConfig.ValueOr(GetDefaultMRPConfig());
+    mLocalMRPConfig           = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
     mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedSigma1ProcessingTime);
     mPeerNodeId  = peerScopedNodeId.GetNodeId();
@@ -571,7 +571,7 @@ void CASESession::AbortPendingEstablish(CHIP_ERROR err)
     NotifySessionEstablishmentError(err, state);
 }
 
-CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
+CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session)
 {
     switch (mState)
     {
@@ -708,7 +708,8 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(4), mEphemeralKey->Pubkey(), static_cast<uint32_t>(mEphemeralKey->Pubkey().Length())));
 
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriter));
+    VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
 
     // Try to find persistent session, and resume it.
     bool resuming = false;
@@ -955,7 +956,8 @@ CHIP_ERROR CASESession::SendSigma2Resume()
 
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId().Value()));
 
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(4), mLocalMRPConfig, tlvWriter));
+    VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(4), mLocalMRPConfig.Value(), tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg_R2_resume));
@@ -1091,7 +1093,8 @@ CHIP_ERROR CASESession::SendSigma2()
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),
                                                 static_cast<uint32_t>(msg_r2_signed_enc_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES)));
 
-    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriterMsg2));
+    VerifyOrReturnError(mLocalMRPConfig.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriterMsg2));
 
     ReturnErrorOnFailure(tlvWriterMsg2.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriterMsg2.Finalize(&msg_R2));
@@ -1579,8 +1582,8 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     TLV::TLVReader decryptedDataTlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
-    const uint8_t * buf   = msg->Start();
-    const uint16_t bufLen = msg->DataLength();
+    const uint8_t * buf = msg->Start();
+    const size_t bufLen = msg->DataLength();
 
     constexpr size_t kCaseOverheadForFutureTbeData = 128;
 
