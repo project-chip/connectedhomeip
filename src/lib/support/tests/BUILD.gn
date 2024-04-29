@@ -29,11 +29,16 @@ chip_test_suite("tests") {
     "TestBytesCircularBuffer.cpp",
     "TestBytesToHex.cpp",
     "TestCHIPCounter.cpp",
+    "TestCHIPMem.cpp",
+    "TestCHIPMemString.cpp",
     "TestDefer.cpp",
     "TestErrorStr.cpp",
     "TestFixedBufferAllocator.cpp",
     "TestFold.cpp",
     "TestIniEscaping.cpp",
+    "TestIntrusiveList.cpp",
+    "TestJsonToTlv.cpp",
+    "TestJsonToTlvToJson.cpp",
     "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
@@ -48,8 +53,11 @@ chip_test_suite("tests") {
     "TestStringSplitter.cpp",
     "TestTestPersistentStorageDelegate.cpp",
     "TestTimeUtils.cpp",
+    "TestTlvJson.cpp",
+    "TestTlvToJson.cpp",
     "TestUtf8.cpp",
     "TestVariant.cpp",
+    "TestZclString.cpp",
   ]
   sources = []
 
@@ -77,16 +85,8 @@ chip_test_suite_using_nltest("tests_nltest") {
   output_name = "libSupportTestsNL"
 
   test_sources = [
-    "TestCHIPMem.cpp",
-    "TestCHIPMemString.cpp",
-    "TestIntrusiveList.cpp",
-    "TestJsonToTlv.cpp",
-    "TestJsonToTlvToJson.cpp",
     "TestStateMachine.cpp",
     "TestThreadOperationalDataset.cpp",
-    "TestTlvJson.cpp",
-    "TestTlvToJson.cpp",
-    "TestZclString.cpp",
   ]
   sources = []
 

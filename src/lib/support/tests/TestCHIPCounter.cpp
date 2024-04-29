@@ -16,9 +16,11 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <lib/support/CHIPCounter.h>
 #include <stdint.h>
+
+#include <gtest/gtest.h>
+
+#include <lib/support/CHIPCounter.h>
 
 using namespace chip;
 
