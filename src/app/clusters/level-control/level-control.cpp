@@ -993,7 +993,7 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
         }
         else
         {
-            // The defaultMoveRate cannot be 0
+            // Error out if DefaultMoveRate is equal to 0
             if (defaultMoveRate.Value() == 0)
             {
                 status = Status::InvalidCommand;
