@@ -2277,7 +2277,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
 
     if (rateX == 0 && rateY == 0)
     {
-        commandObj->AddStatus(commandPath, Status::Success);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
