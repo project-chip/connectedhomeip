@@ -85,7 +85,7 @@ public:
      *         When this event is called, the ICD is still in ActiveMode.
      *        If the ActiveMode timer is increased due to the TransitionToIdle event, the event will not be called a second time in
      *        a given cycle.
-     *        OnEnterIdleMode will always the third event and indictats that the ICD has transitioned to IdleMode.
+     *        OnEnterIdleMode will always the third event and indicates that the ICD has transitioned to IdleMode.
      *
      *        The ICDModeChange event can occur independently from the EnterActiveMode, TransitionToIdle and EnterIdleMode.
      *        It will typpically happen at the ICDManager init when a client is already registered with the ICD before the
