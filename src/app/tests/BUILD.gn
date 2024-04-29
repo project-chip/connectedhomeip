@@ -36,7 +36,8 @@ static_library("helpers") {
 
   deps = [
     "${chip_root}/src/access",
-    "${chip_root}/src/app",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app:timer-delegates",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/transport/raw/tests:helpers",
@@ -218,16 +219,6 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/lib/support:testing_nlunit",
     "${nlunit_test_root}:nlunit-test",
   ]
-
-  if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd/server:manager" ]
-
-    test_sources += [ "TestICDManager.cpp" ]
-  }
-
-  if (chip_enable_icd_checkin) {
-    test_sources += [ "TestICDMonitoringTable.cpp" ]
-  }
 
   if (chip_device_platform != "android") {
     test_sources += [

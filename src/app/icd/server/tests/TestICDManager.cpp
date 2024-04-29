@@ -15,14 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/EventManagement.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>
-#include <app/tests/AppTestContext.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -30,10 +29,9 @@
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
 #include <system/SystemLayerImpl.h>
-
-#include <crypto/DefaultSessionKeystore.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -119,16 +117,19 @@ private:
     bool mHasPersistedSubscription = false;
 };
 
-class TestContext : public chip::Test::AppContext
+class TestContext : public chip::Test::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
     CHIP_ERROR SetUpTestSuite() override
     {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUpTestSuite());
+        ReturnErrorOnFailure(LoopbackMessagingContext::SetUpTestSuite());
+        ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
+
         DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
         mRealClock = &chip::System::SystemClock();
         System::Clock::Internal::SetSystemClockForTesting(&mMockClock);
+
         return CHIP_NO_ERROR;
     }
 
@@ -137,16 +138,20 @@ public:
     {
         System::Clock::Internal::SetSystemClockForTesting(mRealClock);
         DeviceLayer::SetSystemLayerForTesting(nullptr);
-        chip::Test::AppContext::TearDownTestSuite();
+
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+        LoopbackMessagingContext::TearDownTestSuite();
     }
 
     // Performs setup for each individual test in the test suite
     CHIP_ERROR SetUp() override
     {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+        ReturnErrorOnFailure(LoopbackMessagingContext::SetUp());
+
         mICDStateObserver.ResetAll();
         mICDManager.RegisterObserver(&mICDStateObserver);
         mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider);
+
         return CHIP_NO_ERROR;
     }
 
@@ -154,7 +159,7 @@ public:
     void TearDown() override
     {
         mICDManager.Shutdown();
-        chip::Test::AppContext::TearDown();
+        LoopbackMessagingContext::TearDown();
     }
 
     System::Clock::Internal::MockClock mMockClock;
