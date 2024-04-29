@@ -23,9 +23,11 @@
 #include <app/tests/AppTestContext.h>
 #include <controller/WriteInteraction.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/UnitTestContext.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
-#include <gtest/gtest.h>
+#include <nlunit-test.h>
 #include <protocols/interaction_model/Constants.h>
 
 using TestContext = chip::Test::AppContext;
@@ -183,31 +185,25 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
 namespace {
 
-class TestWrite : public ::testing::Test, public TestContext
+class TestWriteInteraction
 {
-protected:
-    //+++++ don't need these if we're just calling the parent's version
-    // void SetUp() override
-    // {
-    //     TestContext::SetUp();
-    // }
-    // void TearDown() override
-    // {
-    //     TestContext::TearDown();
-    // }
-    // void SetUpTestSuite() override
-    // {
-    //     TestContext::SetUpTestSuite();
-    // }
-    // void TearDownTestSuite() override
-    // {
-    //     TestContext::TearDownTestSuite();
-    // }
+public:
+    TestWriteInteraction() {}
+
+    static void TestDataResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestDataResponseWithAcceptedDataVersion(nlTestSuite * apSuite, void * apContext);
+    static void TestDataResponseWithRejectedDataVersion(nlTestSuite * apSuite, void * apContext);
+    static void TestAttributeError(nlTestSuite * apSuite, void * apContext);
+    static void TestFabricScopedAttributeWithoutFabricIndex(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteTimeout(nlTestSuite * apSuite, void * apContext);
+    static void TestMultipleSuccessResponses(nlTestSuite * apSuite, void * apContext);
+    static void TestMultipleFailureResponses(nlTestSuite * apSuite, void * apContext);
 };
 
-TEST_F(TestWrite, TestDataResponse)
+void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apContext)
 {
-    auto sessionHandle      = GetSessionBobToAlice();
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
     Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
@@ -236,16 +232,17 @@ TEST_F(TestWrite, TestDataResponse)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
-    DrainAndServiceIO();
+    ctx.DrainAndServiceIO();
 
-    EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
-    EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0);
+    NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
+void TestWriteInteraction::TestDataResponseWithAcceptedDataVersion(nlTestSuite * apSuite, void * apContext)
 {
-    auto sessionHandle      = GetSessionBobToAlice();
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
     Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
@@ -276,16 +273,17 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
-    DrainAndServiceIO();
+    ctx.DrainAndServiceIO();
 
-    EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
-    EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0);
+    NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
+void TestWriteInteraction::TestDataResponseWithRejectedDataVersion(nlTestSuite * apSuite, void * apContext)
 {
-    auto sessionHandle      = GetSessionBobToAlice();
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
     Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
@@ -315,16 +313,17 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
-    DrainAndServiceIO();
+    ctx.DrainAndServiceIO();
 
-    EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
-    EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0);
+    NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-TEST_F(TestWrite, TestAttributeError)
+void TestWriteInteraction::TestAttributeError(nlTestSuite * apSuite, void * apContext)
 {
-    auto sessionHandle      = GetSessionBobToAlice();
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Attributes::ListStructOctetString::TypeInfo::Type value;
     Structs::TestListStructOctet::Type valueBuf[4];
@@ -346,25 +345,25 @@ TEST_F(TestWrite, TestAttributeError)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    //auto onFailureCb = [apSuite, &onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {//+++++
-    auto onFailureCb = [&onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {//+++++
-        EXPECT_NE(attributePath, nullptr);
+    auto onFailureCb = [apSuite, &onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite, attributePath != nullptr);
         onFailureCbInvoked = true;
     };
 
     Controller::WriteAttribute<Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId, value, onSuccessCb,
-                                                                            onFailureCb);//++++ CB has new params now
+                                                                            onFailureCb);
 
-    DrainAndServiceIO();
+    ctx.DrainAndServiceIO();
 
-    EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
-    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0);
+    NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-TEST_F(TestWrite, TestFabricScopedAttributeWithoutFabricIndex)
+void TestWriteInteraction::TestFabricScopedAttributeWithoutFabricIndex(nlTestSuite * apSuite, void * apContext)
 {
-    auto sessionHandle      = GetSessionBobToAlice();
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
     Clusters::UnitTesting::Structs::TestFabricScoped::Type valueBuf[4];
     Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo::Type value;
@@ -384,25 +383,25 @@ TEST_F(TestWrite, TestFabricScopedAttributeWithoutFabricIndex)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    //auto onFailureCb = [&onFailureCbInvoked, &apSuite](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {//+++++
-    auto onFailureCb = [&onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {//+++++
-        EXPECT_EQ(aError, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
+    auto onFailureCb = [&onFailureCbInvoked, &apSuite](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
         onFailureCbInvoked = true;
     };
 
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
-        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);//++++ CB has new params now
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
-    DrainAndServiceIO();
+    ctx.DrainAndServiceIO();
 
-    EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
-    EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0);
+    NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-TEST_F(TestWrite, TestMultipleSuccessResponses)
+void TestWriteInteraction::TestMultipleSuccessResponses(nlTestSuite * apSuite, void * apContext)
 {
-    auto sessionHandle  = GetSessionBobToAlice();
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
@@ -419,17 +418,18 @@ TEST_F(TestWrite, TestMultipleSuccessResponses)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
                                                                                            onSuccessCb, onFailureCb);
 
-    DrainAndServiceIO();
+    ctx.DrainAndServiceIO();
 
-    EXPECT_EQ(successCalls, 1);
-    EXPECT_EQ(failureCalls, 0);
-    EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0);
+    NL_TEST_ASSERT(apSuite, successCalls == 1);
+    NL_TEST_ASSERT(apSuite, failureCalls == 0);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-TEST_F(TestWrite, TestMultipleFailureResponses)
+void TestWriteInteraction::TestMultipleFailureResponses(nlTestSuite * apSuite, void * apContext)
 {
-    auto sessionHandle  = GetSessionBobToAlice();
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
     size_t successCalls = 0;
     size_t failureCalls = 0;
 
@@ -446,21 +446,40 @@ TEST_F(TestWrite, TestMultipleFailureResponses)
     chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
                                                                                            onSuccessCb, onFailureCb);
 
-    DrainAndServiceIO();
+    ctx.DrainAndServiceIO();
 
-    EXPECT_EQ(successCalls, 0);
-    EXPECT_EQ(failureCalls, 1);
-    EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
-    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0);
+    NL_TEST_ASSERT(apSuite, successCalls == 0);
+    NL_TEST_ASSERT(apSuite, failureCalls == 1);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-// nlTestSuite sSuite = {  //++++
-//     "TestWrite",
-//     &sTests[0],
-//     TestContext::nlTestSetUpTestSuite,
-//     TestContext::nlTestTearDownTestSuite,
-//     TestContext::nlTestSetUp,
-//     TestContext::nlTestTearDown,
-// };
+const nlTest sTests[] = {
+    NL_TEST_DEF("TestDataResponse", TestWriteInteraction::TestDataResponse),
+    NL_TEST_DEF("TestDataResponseWithAcceptedDataVersion", TestWriteInteraction::TestDataResponseWithAcceptedDataVersion),
+    NL_TEST_DEF("TestDataResponseWithRejectedDataVersion", TestWriteInteraction::TestDataResponseWithRejectedDataVersion),
+    NL_TEST_DEF("TestAttributeError", TestWriteInteraction::TestAttributeError),
+    NL_TEST_DEF("TestWriteFabricScopedAttributeWithoutFabricIndex",
+                TestWriteInteraction::TestFabricScopedAttributeWithoutFabricIndex),
+    NL_TEST_DEF("TestMultipleSuccessResponses", TestWriteInteraction::TestMultipleSuccessResponses),
+    NL_TEST_DEF("TestMultipleFailureResponses", TestWriteInteraction::TestMultipleFailureResponses),
+    NL_TEST_SENTINEL(),
+};
+
+nlTestSuite sSuite = {
+    "TestWrite",
+    &sTests[0],
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
+};
 
 } // namespace
+
+int TestWriteInteractionTest()
+{
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
+}
+
+CHIP_REGISTER_TEST_SUITE(TestWriteInteractionTest)

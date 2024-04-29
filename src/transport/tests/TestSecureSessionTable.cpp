@@ -35,8 +35,21 @@
 namespace chip {
 namespace Transport {
 
-class TestSecureSessionTable
+class TestSecureSessionTable : public ::testing::Test
 {
+protected:
+    void SetUp()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        //++++ mTestSecureSessionTable = chip::Platform::MakeUnique<TestSecureSessionTable>();
+    }
+    void TearDown()
+    {
+        //++++ mTestSecureSessionTable.reset();
+        chip::Platform::MemoryShutdown();
+    }
+    //++++ Platform::UniquePtr<TestSecureSessionTable> mTestSecureSessionTable;
+
 public:
     //
     // This test specifically validates eviction of sessions in the session table
@@ -128,26 +141,8 @@ void TestSecureSessionTable::CreateSessionTable(std::vector<SessionParameters> &
     }
 }
 
-class SecureSessionTableTest : public ::testing::Test
+TEST_F(TestSecureSessionTable, ValidateSessionSorting)
 {
-protected:
-    void SetUp()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        mTestSecureSessionTable = chip::Platform::MakeUnique<chip::Transport::TestSecureSessionTable>();
-    }
-    void TearDown()
-    {
-        mTestSecureSessionTable.reset();
-        chip::Platform::MemoryShutdown();
-    }
-    Platform::UniquePtr<TestSecureSessionTable> mTestSecureSessionTable;
-};
-
-void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecureSessionTable> * inContext)
-{
-    Platform::UniquePtr<TestSecureSessionTable> & _this = *inContext;
-
     //
     // This validates basic eviction. The table is full of sessions from Fabric1 from the same
     // Node (2). Eviction should select the oldest session in the table (with timestamp 1) and evict that
@@ -164,8 +159,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 4);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 4);
     }
 
     //
@@ -186,8 +181,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric2), sessionParamList, 4);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric2), sessionParamList, 4);
     }
 
     //
@@ -212,8 +207,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 1);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 1);
     }
 
     //
@@ -238,8 +233,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 3);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 3);
     }
 
     //
@@ -264,8 +259,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 4);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(2, kFabric1), sessionParamList, 4);
     }
 
     //
@@ -287,8 +282,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 2);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 2);
     }
 
     //
@@ -315,8 +310,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kDefunct },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
     }
 
     //
@@ -349,8 +344,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(3), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
     }
 
     //
@@ -375,8 +370,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 2);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 2);
     }
 
     //
@@ -402,8 +397,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 0);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 0);
     }
 
     //
@@ -424,8 +419,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(4, kFabric1), sessionParamList, 2);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(4, kFabric1), sessionParamList, 2);
     }
 
     //
@@ -444,8 +439,8 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(4, kFabric3), sessionParamList, 4);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(4, kFabric3), sessionParamList, 4);
     }
 
     //
@@ -466,14 +461,9 @@ void TestSecureSessionTable::ValidateSessionSorting(Platform::UniquePtr<TestSecu
             { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
         };
 
-        _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(4, kFabric3), sessionParamList, 5);
+        CreateSessionTable(sessionParamList);
+        AllocateSession(ScopedNodeId(4, kFabric3), sessionParamList, 5);
     }
-}
-
-TEST_F(SecureSessionTableTest, ValidateSessionSorting)
-{
-    TestSecureSessionTable::ValidateSessionSorting(&mTestSecureSessionTable);
 }
 
 } // namespace Transport

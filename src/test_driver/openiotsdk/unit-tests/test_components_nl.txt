@@ -1,4 +1,5 @@
 AppTests
+DataModelTests
 InetLayerTests
 MessagingLayerTests
 RawTransportTests
