@@ -13,20 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-// module headers
-#import "MTRSetupPayload.h"
 
-// additional includes
-#import "MTRError.h"
-
-// system dependencies
+#import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
-@interface MTRSetupPayloadSerializerTests : XCTestCase
+@interface MTRSetupPayloadInitializationTests : XCTestCase
 
 @end
 
-@implementation MTRSetupPayloadSerializerTests
+@implementation MTRSetupPayloadInitializationTests
+
+- (BOOL)shouldRelaunchBeforeRunningTest
+{
+    // By having xctest restart the process before each test case we
+    // ensure that the relevant MTRSetupPayload code paths correctly
+    // call chip::Platform::MemoryInit().
+    // Tests that are not specifically designed to test this should
+    // be added to MTRSetupPayloadTests to avoid this extra overhead.
+    return YES;
+}
 
 - (void)testSetupPayloadBasicQRCodeSerialize
 {
@@ -49,6 +54,4 @@
     XCTAssertEqualObjects(qrCode, @"MT:-24J06.H14BK9C7R900");
 }
 
-// Make sure to not add any tests that involve parsing setup payloads to this
-// file.  Those should go in MTRSetupPayloadParserTests.m.
 @end

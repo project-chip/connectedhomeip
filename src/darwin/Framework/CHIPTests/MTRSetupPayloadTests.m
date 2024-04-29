@@ -1,6 +1,3 @@
-//
-//  MTRSetupPayloadParserTests.m
-//  MTRQRCodeReaderTests
 /**
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -17,20 +14,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-// module headers
-#import "MTRSetupPayload.h"
 
-// additional includes
-#import "MTRError.h"
-
-// system dependencies
+#import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
-@interface MTRSetupPayloadParserTests : XCTestCase
+@interface MTRSetupPayloadTests : XCTestCase
 
 @end
 
-@implementation MTRSetupPayloadParserTests
+@implementation MTRSetupPayloadTests
 
 - (void)testOnboardingPayloadParser_Manual_NoError
 {
