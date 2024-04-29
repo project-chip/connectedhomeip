@@ -268,7 +268,8 @@ TEST(TestActiveResolveAttempts, TestLRU)
         std::optional<ActiveResolveAttempts::ScheduledAttempt> s = attempts.NextScheduled();
         while (s.has_value())
         {
-            EXPECT_NE(s.value().ResolveData().peerId.GetNodeId(), 9999u);
+            // NOLINTNEXTLINE(bugprone-unchecked-optional-access): this is checked in the while loop
+            EXPECT_NE(s->ResolveData().peerId.GetNodeId(), 9999u);
             s = attempts.NextScheduled();
         }
     }
