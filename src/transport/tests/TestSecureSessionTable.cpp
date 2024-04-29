@@ -466,5 +466,11 @@ TEST_F(TestSecureSessionTable, ValidateSessionSorting)
     }
 }
 
+//+++++ removed this and changed _this->Create _this->Allocate to remove this.
+// TEST_F(SecureSessionTableTest, ValidateSessionSorting)
+// {
+//     TestSecureSessionTable::ValidateSessionSorting(&mTestSecureSessionTable);
+// }
+
 } // namespace Transport
 } // namespace chip
