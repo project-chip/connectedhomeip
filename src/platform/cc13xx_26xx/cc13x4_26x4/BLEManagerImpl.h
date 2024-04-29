@@ -317,8 +317,6 @@ private:
     void ClearPendingBLEParamUpdate(uint16_t connHandle);
     void UpdateBLERPA(void);
 
-    static void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
-
     /* Static helper function */
     static void EventHandler(void * arg);
     static CHIP_ERROR DriveBLEState(void);

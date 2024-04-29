@@ -70,6 +70,7 @@
 - (uint16_t)vendorId;
 - (uint16_t)productId;
 - (uint32_t)deviceType;
+- (bool)supportsCommissionerGeneratedPasscode;
 - (NSArray * _Nonnull)ipAddresses;
 
 /**

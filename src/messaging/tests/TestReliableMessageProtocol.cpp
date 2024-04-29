@@ -50,6 +50,10 @@
 #include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
+#if CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
+
 namespace {
 
 using namespace chip;
@@ -75,6 +79,9 @@ public:
     // Performs setup for each individual test in the test suite
     CHIP_ERROR SetUp() override
     {
+#if CHIP_CRYPTO_PSA
+        ReturnErrorOnFailure(psa_crypto_init() == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+#endif
         ReturnErrorOnFailure(chip::Test::LoopbackMessagingContext::SetUp());
         GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));

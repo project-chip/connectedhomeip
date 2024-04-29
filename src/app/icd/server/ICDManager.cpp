@@ -30,8 +30,10 @@
 namespace {
 enum class ICDTestEventTriggerEvent : uint64_t
 {
-    kAddActiveModeReq    = 0x0046'0000'00000001,
-    kRemoveActiveModeReq = 0x0046'0000'00000002,
+    kAddActiveModeReq            = 0x0046'0000'00000001,
+    kRemoveActiveModeReq         = 0x0046'0000'00000002,
+    kInvalidateHalfCounterValues = 0x0046'0000'00000003,
+    kInvalidateAllCounterValues  = 0x0046'0000'00000004,
 };
 } // namespace
 
@@ -378,12 +380,13 @@ void ICDManager::UpdateICDMode()
     if (ICDConfigurationData::GetInstance().GetICDMode() != tempMode)
     {
         ICDConfigurationData::GetInstance().SetICDMode(tempMode);
-        postObserverEvent(ObserverEventType::ICDModeChange);
 
         // Can't use attribute accessors/Attributes::OperatingMode::Set in unit tests
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
         Attributes::OperatingMode::Set(kRootEndpointId, static_cast<OperatingModeEnum>(tempMode));
 #endif
+
+        postObserverEvent(ObserverEventType::ICDModeChange);
     }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
@@ -433,6 +436,8 @@ void ICDManager::UpdateOperationState(OperationalState state)
         {
             ChipLogError(AppServer, "Failed to set Slow Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
         }
+
+        postObserverEvent(ObserverEventType::EnterIdleMode);
     }
     else if (state == OperationalState::ActiveMode)
     {
@@ -447,7 +452,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
 
             if (activeModeDuration == kZero && !mKeepActiveFlags.HasAny())
             {
-                // A Network Activity triggered the active mode and activeModeDuration is 0.
+                // Network Activity triggered the active mode and activeModeDuration is 0.
                 // Stay active for at least Active Mode Threshold.
                 activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
             }
@@ -455,9 +460,14 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().StartTimer(activeModeDuration, OnActiveModeDone, this);
 
             Milliseconds32 activeModeJitterInterval = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
+            // TODO(#33074): Edge case when we transition to IdleMode with this condition being true
+            // (activeModeDuration == kZero && !mKeepActiveFlags.HasAny())
             activeModeJitterInterval =
                 (activeModeDuration >= activeModeJitterInterval) ? activeModeDuration - activeModeJitterInterval : kZero;
 
+            // Reset this flag when we enter ActiveMode to avoid having a feedback loop that keeps us indefinitly in
+            // ActiveMode.
+            mTransitionToIdleCalled = false;
             DeviceLayer::SystemLayer().StartTimer(activeModeJitterInterval, OnTransitionToIdle, this);
 
             CHIP_ERROR err =
@@ -504,10 +514,6 @@ void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
     ICDManager * pICDManager = reinterpret_cast<ICDManager *>(appState);
     pICDManager->UpdateOperationState(OperationalState::ActiveMode);
-
-    // We only reset this flag when idle mode is complete to avoid re-triggering the check when an event brings us back to active,
-    // which could cause a loop.
-    pICDManager->mTransitionToIdleCalled = false;
 }
 
 void ICDManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
@@ -532,10 +538,10 @@ void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
 }
 
 /* ICDListener functions. */
+
 void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
 {
     assertChipStackLockedByCurrentThread();
-
     VerifyOrReturn(request < KeepActiveFlagsValues::kInvalidFlag);
 
     if (request.Has(KeepActiveFlag::kExchangeContextOpen))
@@ -560,7 +566,6 @@ void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
 void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
 {
     assertChipStackLockedByCurrentThread();
-
     VerifyOrReturn(request < KeepActiveFlagsValues::kInvalidFlag);
 
     if (request.Has(KeepActiveFlag::kExchangeContextOpen))
@@ -663,6 +668,14 @@ CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
     case ICDTestEventTriggerEvent::kRemoveActiveModeReq:
         SetKeepActiveModeRequirements(KeepActiveFlag::kTestEventTriggerActiveMode, false);
         break;
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    case ICDTestEventTriggerEvent::kInvalidateHalfCounterValues:
+        err = ICDConfigurationData::GetInstance().GetICDCounter().InvalidateHalfCheckInCouterValues();
+        break;
+    case ICDTestEventTriggerEvent::kInvalidateAllCounterValues:
+        err = ICDConfigurationData::GetInstance().GetICDCounter().InvalidateAllCheckInCounterValues();
+        break;
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     default:
         err = CHIP_ERROR_INVALID_ARGUMENT;
         break;
@@ -695,6 +708,10 @@ void ICDManager::postObserverEvent(ObserverEventType event)
         {
         case ObserverEventType::EnterActiveMode: {
             obs->mObserver->OnEnterActiveMode();
+            return Loop::Continue;
+        }
+        case ObserverEventType::EnterIdleMode: {
+            obs->mObserver->OnEnterIdleMode();
             return Loop::Continue;
         }
         case ObserverEventType::TransitionToIdle: {

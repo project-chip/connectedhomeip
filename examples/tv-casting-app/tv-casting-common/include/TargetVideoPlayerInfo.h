@@ -85,7 +85,7 @@ public:
     const char * GetHostName() const { return mHostName; }
     size_t GetNumIPs() const { return mNumIPs; }
     const chip::Inet::IPAddress * GetIpAddresses() const { return mIpAddress; }
-    bool IsSameAs(const chip::Dnssd::DiscoveredNodeData * discoveredNodeData);
+    bool IsSameAs(const chip::Dnssd::CommissionNodeData * discoveredNodeData);
     bool IsSameAs(const char * hostName, const char * deviceName, size_t numIPs, const chip::Inet::IPAddress * ipAddresses);
 
     uint16_t GetPort() const { return mPort; }

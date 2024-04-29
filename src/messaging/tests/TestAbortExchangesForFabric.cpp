@@ -37,6 +37,10 @@
 #include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
+#if CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
+
 namespace {
 
 using namespace chip;
@@ -45,7 +49,17 @@ using namespace chip::System;
 using namespace chip::System::Clock::Literals;
 using namespace chip::Protocols;
 
-using TestContext = Test::LoopbackMessagingContext;
+struct TestContext : Test::LoopbackMessagingContext
+{
+    virtual CHIP_ERROR SetUp()
+    {
+#if CHIP_CRYPTO_PSA
+        ReturnErrorOnFailure(psa_crypto_init() == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+#endif
+        ReturnErrorOnFailure(chip::Test::LoopbackMessagingContext::SetUp());
+        return CHIP_NO_ERROR;
+    }
+};
 
 class MockAppDelegate : public ExchangeDelegate
 {
