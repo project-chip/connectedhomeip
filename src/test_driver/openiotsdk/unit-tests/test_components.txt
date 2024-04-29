@@ -15,3 +15,4 @@ TestShell
 SetupPayloadTests
 SupportTests
 UserDirectedCommissioningTests
+SecureChannelTests

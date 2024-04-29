@@ -34,6 +34,7 @@
 #include <ble/Ble.h>
 #endif
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -601,7 +602,11 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     ESP_LOGD(TAG, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, data->DataLength());
 
-    om = ble_hs_mbuf_from_flat(data->Start(), data->DataLength());
+    // For BLE, the buffer is capped at UINT16_MAX. Nevertheless, have a verify
+    // check before the cast to uint16_t.
+    VerifyOrExit(CanCastTo<uint16_t>(data->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+
+    om = ble_hs_mbuf_from_flat(data->Start(), static_cast<uint16_t>(data->DataLength()));
     if (om == NULL)
     {
         ChipLogError(DeviceLayer, "ble_hs_mbuf_from_flat failed:");
@@ -1016,17 +1021,20 @@ void BLEManagerImpl::ClaimBLEMemory(System::Layer *, void *)
 
         VerifyOrReturn(err == ESP_OK, ChipLogError(DeviceLayer, "BLE deinit failed"));
         ChipLogProgress(DeviceLayer, "BLE deinit successful and memory reclaimed");
-        // TODO: post an event when ble is deinitialized and memory is added to heap
+
+        ChipDeviceEvent event;
+        event.Type = DeviceEventType::kBLEDeinitialized;
+        VerifyOrDo(CHIP_NO_ERROR == PlatformMgr().PostEvent(&event), ChipLogError(DeviceLayer, "Failed to post BLE deinit event"));
     }
 }
 
 CHIP_ERROR BLEManagerImpl::DeinitBLE()
 {
+    esp_err_t err = ESP_OK;
     VerifyOrReturnError(ble_hs_is_enabled(), CHIP_ERROR_INCORRECT_STATE, ChipLogProgress(DeviceLayer, "BLE already deinited"));
     VerifyOrReturnError(0 == nimble_port_stop(), MapBLEError(ESP_FAIL), ChipLogError(DeviceLayer, "nimble_port_stop() failed"));
 
-    esp_err_t err = nimble_port_deinit();
-    VerifyOrReturnError(err == ESP_OK, MapBLEError(err));
+    nimble_port_deinit();
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
     err = esp_nimble_hci_and_controller_deinit();
