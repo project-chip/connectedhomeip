@@ -787,8 +787,16 @@ class ChipDeviceControllerBase():
 
         return self._Cluster
 
-    def GetConnectedDeviceSync(self, nodeid, allowPASE=True, timeoutMs: int = None):
-        ''' Returns DeviceProxyWrapper upon success.'''
+    def GetConnectedDeviceSync(self, nodeid, allowPASE: bool = True, timeoutMs: int = None):
+        ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
+
+        nodeId: Target's Node ID
+        allowPASE: Get a device proxy of a device being commissioned.
+        timeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+
+        Returns:
+            - DeviceProxyWrapper on success
+        '''
         self.CheckIsActive()
 
         returnDevice = c_void_p(None)
@@ -836,8 +844,16 @@ class ChipDeviceControllerBase():
 
         return DeviceProxyWrapper(returnDevice, self._dmLib)
 
-    async def GetConnectedDevice(self, nodeid, allowPASE=True, timeoutMs: int = None):
-        ''' Returns DeviceProxyWrapper upon success.'''
+    async def GetConnectedDevice(self, nodeid, allowPASE: bool = True, timeoutMs: int = None):
+        ''' Gets an OperationalDeviceProxy or CommissioneeDeviceProxy for the specified Node.
+
+        nodeId: Target's Node ID
+        allowPASE: Get a device proxy of a device being commissioned.
+        timeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+
+        Returns:
+            - DeviceProxyWrapper on success
+        '''
         self.CheckIsActive()
 
         if allowPASE:
