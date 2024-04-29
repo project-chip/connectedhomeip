@@ -1,7 +1,6 @@
 AppTests
-DataModelTests
 InetLayerTests
 MessagingLayerTests
 RawTransportTests
-SecureChannelTests
+SecureChannelTestsNL
 SupportTestsNL

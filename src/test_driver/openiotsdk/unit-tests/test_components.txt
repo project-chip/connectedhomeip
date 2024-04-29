@@ -9,10 +9,13 @@ MinimalMdnsRespondersTests
 CoreTests
 MdnsTests
 CredentialsTest
+DataModelTests
 PlatformTests
 RetransmitTests
 TestShell
 TransportLayerTests
+TracingTests
 SetupPayloadTests
 SupportTests
 UserDirectedCommissioningTests
+SecureChannelTests

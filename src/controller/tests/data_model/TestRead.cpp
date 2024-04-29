@@ -28,11 +28,9 @@
 #include <app/util/mock/Functions.h>
 #include <controller/ReadInteraction.h>
 #include <lib/core/ErrorStr.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 #include <protocols/interaction_model/Constants.h>
 
 using TestContext = chip::Test::AppContext;
