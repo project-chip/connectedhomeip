@@ -344,7 +344,7 @@ CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const I
     return CHIP_NO_ERROR;
 }
 
-template <class NodeType> 
+template <class NodeType>
 CHIP_ERROR IncrementalResolver::Set(DiscoveredNodeData &output)
 {
     VerifyOrReturnError(mSpecificResolutionData.Is<NodeType>(), CHIP_ERROR_INCORRECT_STATE);
@@ -362,7 +362,7 @@ CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 
     IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
-    
+
     if (IsActiveCommissionParse())
     {
         ReturnErrorOnFailure(Set<CommissionNodeData>(outputData));

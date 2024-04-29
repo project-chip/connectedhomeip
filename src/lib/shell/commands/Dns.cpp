@@ -104,14 +104,14 @@ public:
             return;
         }
 
-        if (discNodeData.Is<Dnssd::OperationalNodeData>()) 
+        if (discNodeData.Is<Dnssd::OperationalNodeData>())
         {
             LogOperationalNodeDiscovered(discNodeData.Get<Dnssd::OperationalNodeData>());
             return;
-        } 
+        }
 
         auto nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
-         
+
         if (!nodeData.IsValid())
         {
             streamer_printf(streamer_get(), "DNS browse failed - not found valid services \r\n");
