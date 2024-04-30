@@ -29,6 +29,9 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
     
 jobs:
+    await-fast-ci:
+        uses: ./.github/workflows/await-fast-ci.yaml
+        
     asr:
         name: ASR
 
