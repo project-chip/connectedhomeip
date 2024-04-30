@@ -1387,7 +1387,8 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
 
     VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
-    // check moveMode before any operation is done on the transition states
+    // check moveMode and rate before any operation is done on the transition states
+    // rate value is ignored if the MoveMode is stop
     if (moveMode == HueMoveMode::kUnknownEnumValue || (rate == 0 && moveMode != HueMoveMode::kStop))
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
@@ -1669,8 +1670,8 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
     VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
-    // Confirm validity of the step mode received
-    if (stepMode == HueStepMode::kUnknownEnumValue)
+    // Confirm validity of the step mode and step size received
+    if (stepMode == HueStepMode::kUnknownEnumValue || stepSize == 0)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -1756,7 +1757,8 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
-    // check moveMode before any operation is done on the transition states
+    // check moveMode and rate before any operation is done on the transition states
+    // rate value is ignored if the MoveMode is stop
     if (moveMode == SaturationMoveMode::kUnknownEnumValue || (rate == 0 && moveMode != SaturationMoveMode::kStop))
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
@@ -1867,8 +1869,8 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
-    // Confirm validity of the step mode received
-    if (stepMode == SaturationStepMode::kUnknownEnumValue)
+    // Confirm validity of the step mode and step size received
+    if (stepMode == SaturationStepMode::kUnknownEnumValue || stepSize == 0)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -2263,6 +2265,12 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     VerifyOrExit(colorXTransitionState != nullptr, status = Status::UnsupportedEndpoint);
     VerifyOrExit(colorYTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
+    if (rateX == 0 && rateY == 0)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
         commandObj->AddStatus(commandPath, Status::Success);
@@ -2274,12 +2282,6 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
-
-    if (rateX == 0 && rateY == 0)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
 
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, ColorControl::EnhancedColorMode::kCurrentXAndCurrentY);
@@ -2363,6 +2365,12 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
 
     VerifyOrExit(colorXTransitionState != nullptr, status = Status::UnsupportedEndpoint);
     VerifyOrExit(colorYTransitionState != nullptr, status = Status::UnsupportedEndpoint);
+
+    if (stepX == 0 && stepY == 0)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -2693,7 +2701,8 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrExit(colorTempTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
-    // check moveMode before any operation is done on the transition states
+    // check moveMode and rate before any operation is done on the transition states
+    // rate value is ignored if the MoveMode is stop
     if (moveMode == HueMoveMode::kUnknownEnumValue || (rate == 0 && moveMode != HueMoveMode::kStop))
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
@@ -2815,8 +2824,8 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrExit(colorTempTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
-    // Confirm validity of the step mode received
-    if (stepMode == HueStepMode::kUnknownEnumValue)
+    // Confirm validity of the step mode and step size received
+    if (stepMode == HueStepMode::kUnknownEnumValue || stepSize == 0)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
