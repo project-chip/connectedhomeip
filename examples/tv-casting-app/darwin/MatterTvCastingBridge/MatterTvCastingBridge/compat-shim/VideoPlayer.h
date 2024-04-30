@@ -15,9 +15,12 @@
  *    limitations under the License.
  */
 
+#import "../MCCastingPlayer.h"
+
 #ifndef VideoPlayer_h
 #define VideoPlayer_h
 
+__attribute__((deprecated("Use the APIs described in /examples/tv-casting-app/APIs.md instead.")))
 @interface VideoPlayer : NSObject
 
 @property uint64_t nodeId;
@@ -72,6 +75,10 @@
                           port:(uint16_t)port
                     MACAddress:(NSString *)MACAddress
               lastDiscoveredMs:(uint64_t)lastDiscoveredMs;
+
+- (instancetype)initWithCastingPlayer:(MCCastingPlayer *)castingPlayer;
+
+- (MCCastingPlayer *)getCastingPlayer;
 
 @end
 

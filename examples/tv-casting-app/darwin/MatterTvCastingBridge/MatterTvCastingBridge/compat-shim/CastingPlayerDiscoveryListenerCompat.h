@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2024 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,15 +15,20 @@
  *    limitations under the License.
  */
 
+#import "DiscoveredNodeData.h"
+
 #import <Foundation/Foundation.h>
 
-#ifndef MCObserver_h
-#define MCObserver_h
+#ifndef CastingPlayerDiscoveryListenerCompat_h
+#define CastingPlayerDiscoveryListenerCompat_h
 
-@protocol MCObserver
+__attribute__((deprecated("Use the APIs described in /examples/tv-casting-app/APIs.md instead.")))
+@interface CastingPlayerDiscoveryListenerCompat : NSObject
 
-- (void)attribute:(NSObject * _Nonnull)sender valueDidChange:(NSValue * _Nullable)value oldValue:(NSValue * _Nullable)oldValue;
++ (void)addObservers:(dispatch_queue_t _Nonnull)clientQueue discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData * _Nonnull))discoveredCommissionerHandler;
+
++ (void)removeObservers;
 
 @end
 
-#endif /* MCObserver_h */
+#endif /* CastingPlayerDiscoveryListenerCompat_h */

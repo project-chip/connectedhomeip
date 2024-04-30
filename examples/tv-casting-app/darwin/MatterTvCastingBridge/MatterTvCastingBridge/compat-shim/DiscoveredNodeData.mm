@@ -18,11 +18,15 @@
 #import <Foundation/Foundation.h>
 
 #import "DiscoveredNodeData.h"
+#import "VideoPlayer.h"
+
 #include <lib/dnssd/Resolver.h>
 
 @interface DiscoveredNodeData ()
 
 @property (nonatomic) VideoPlayer * connectableVideoPlayer;
+
+@property (nonatomic) MCCastingPlayer * castingPlayer;
 
 @end
 
@@ -39,14 +43,27 @@
     return self;
 }
 
+- (instancetype)initWithCastingPlayer:(MCCastingPlayer *)castingPlayer
+{
+    self = [super init];
+    if (self) {
+        _castingPlayer = castingPlayer;
+        _deviceType = castingPlayer.deviceType;
+        _vendorId = castingPlayer.vendorId;
+        _productId = castingPlayer.productId;
+        _deviceName = castingPlayer.deviceName;
+        _instanceName = castingPlayer.instanceName;
+        _hostName = castingPlayer.hostName;
+        _numIPs = castingPlayer.ipAddresses.count;
+        _ipAddresses = [castingPlayer.ipAddresses mutableCopy];
+        _connectableVideoPlayer = [[VideoPlayer alloc] initWithCastingPlayer:castingPlayer];
+    }
+    return self;
+}
+
 - (NSString *)description
 {
-    if ([self isPreCommissioned]) {
-        return [NSString
-            stringWithFormat:@"%@ with Product ID: %d and Vendor ID: %d [Pre-Commissioned]", _deviceName, _productId, _vendorId];
-    } else {
-        return [NSString stringWithFormat:@"%@ with Product ID: %d and Vendor ID: %d", _deviceName, _productId, _vendorId];
-    }
+    return [NSString stringWithFormat:@"%@ with Product ID: %d and Vendor ID: %d", _deviceName, _productId, _vendorId];
 }
 
 - (BOOL)isEqualToDiscoveredNodeData:(DiscoveredNodeData *)other
@@ -88,12 +105,20 @@
 
 - (bool)isPreCommissioned
 {
-    return _connectableVideoPlayer != nil;
+    // Returning false will make the compat shim call the openBasicCommissioningWindow API every time.
+    // The shim will internally handle selecting the commissioning path or simply re-establish
+    // CASE (if the player nodeId/fabricIndex were found in the cache)
+    return false;
 }
 
 - (VideoPlayer *)getConnectableVideoPlayer
 {
     return _connectableVideoPlayer;
+}
+
+- (MCCastingPlayer *)getCastingPlayer
+{
+    return _castingPlayer;
 }
 
 @end

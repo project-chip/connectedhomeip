@@ -18,6 +18,7 @@
 
 import SwiftUI
 
+@available(*, deprecated, message: "Refer to MCConnectionExampleView")
 struct CommissioningView: View {
     var selectedCommissioner: DiscoveredNodeData?
     
@@ -30,30 +31,24 @@ struct CommissioningView: View {
     var body: some View {
         VStack(alignment: .leading) {
             if(viewModel.commisisoningWindowOpened == true) {
-                Text("Commissioning window opened.").padding()
+                Text("Onboarding payload for Commissioning if needed:").padding()
                 
-                Text("Onboarding PIN: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPayload().setupPasscode)!))
+                Text("Passcode: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPayload().setupPasscode)!))
                     .border(Color.blue, width: 1)
                     .padding()
                 Text("Discriminator: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPayload().setupDiscriminator)!))
                     .border(Color.blue, width: 1)
                     .padding()
 
-                if(self.selectedCommissioner != nil)
+                if(viewModel.udcRequestSent == true)
                 {
-                    if(viewModel.udcRequestSent == true)
-                    {
-                        Text("Complete commissioning on " + (selectedCommissioner?.deviceName)!)
-                            .padding()
-                    }
-                    else if(viewModel.udcRequestSent == false) {
-                        Text("Could not send user directed commissioning request to " + (selectedCommissioner?.deviceName)! + "! Complete commissioning manually!")
-                            .foregroundColor(Color.red)
-                            .padding()
-                    }
+                    Text("Complete commissioning on " + (selectedCommissioner?.deviceName)!)
+                        .padding()
                 }
-                else{
-                    Text("Complete commissioning with a commissioner manually!").padding()
+                else if(viewModel.udcRequestSent == false) {
+                    Text("Could not send user directed commissioning request to " + (selectedCommissioner?.deviceName)!)
+                        .foregroundColor(Color.red)
+                        .padding()
                 }
             }
             else if(viewModel.commisisoningWindowOpened == false) {

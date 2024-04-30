@@ -30,14 +30,14 @@ class CommissionerDiscoveryViewModel: ObservableObject {
         if let castingServerBridge = CastingServerBridge.getSharedInstance()
         {
             castingServerBridge.discoverCommissioners(DispatchQueue.main,
-                discoveryRequestSentHandler:  { (result: Bool) -> () in
-                    self.discoveryRequestStatus = result
+                discoveryRequestSentHandler:  { (result: MatterError) -> () in
+                    self.discoveryRequestStatus = (result == MATTER_NO_ERROR)
                 },
                 discoveredCommissionerHandler: { (commissioner: DiscoveredNodeData) -> () in
                     self.Log.info("discoveredCommissionerHandler called with \(commissioner)")
                     if(self.commissioners.contains(commissioner))
                     {
-                        var index = self.commissioners.firstIndex(of: commissioner)
+                        let index = self.commissioners.firstIndex(of: commissioner)
                         self.commissioners[index!] = commissioner
                         self.Log.info("Updating previously discovered commissioner \(commissioner.description)")
                     }
@@ -51,38 +51,6 @@ class CommissionerDiscoveryViewModel: ObservableObject {
                     }
                 }
             )
-        }
-        
-        /* Deprecated usage
-         Task {
-            try? await Task.sleep(nanoseconds: 5_000_000_000)  // Wait for commissioners to respond
-            updateCommissioners()
-        }*/
-    }
-    
-    private func updateCommissioners() {
-        if let castingServerBridge = CastingServerBridge.getSharedInstance()
-        {
-            var i: Int32 = 0
-            var commissioner: DiscoveredNodeData?;
-            repeat {
-                castingServerBridge.getDiscoveredCommissioner(i, clientQueue: DispatchQueue.main, discoveredCommissionerHandler: { (result: DiscoveredNodeData?) -> () in
-                    commissioner = result;
-                    if(commissioner != nil){
-                        if(self.commissioners.contains(commissioner!))
-                        {
-                            var index = self.commissioners.firstIndex(of: commissioner!)
-                            self.commissioners[index!] = commissioner!
-                            self.Log.info("Updating previously discovered commissioner \(commissioner!.description)")
-                        }
-                        else
-                        {
-                            self.commissioners.append(commissioner!)
-                        }
-                    }
-                })
-                i += 1
-            } while(commissioner != nil)
         }
     }
 }

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +15,22 @@
  *    limitations under the License.
  */
 
+#import "MCDataSource.h"
+
+#import "AppParameters.h"
+
 #import <Foundation/Foundation.h>
 
-#import "DeviceAttestationCredentialsHolder.h"
-#import "OnboardingPayload.h"
+#ifndef DataSourceCompat_h
+#define DataSourceCompat_h
 
-#ifndef AppParameters_h
-#define AppParameters_h
+__attribute__((deprecated("Use the APIs described in /examples/tv-casting-app/APIs.md instead.")))
+@interface DataSourceCompat : NSObject<MCDataSource>
 
-@interface AppParameters : NSObject
-
-@property NSData * rotatingDeviceIdUniqueId;
-
-@property OnboardingPayload * onboardingPayload;
-
-@property uint32_t spake2pIterationCount;
-
-@property NSData * spake2pSaltBase64;
-
-@property NSData * spake2pVerifierBase64;
+- (instancetype)initWithClientQueue:(dispatch_queue_t)clientQueue;
+- (void)setAppParameters:(AppParameters *)appParameters;
+- (void)setDacHolder:(DeviceAttestationCredentialsHolder *)dacHolder;
 
 @end
 
-#endif /* AppParameters_h */
+#endif /* DataSourceCompat_h */

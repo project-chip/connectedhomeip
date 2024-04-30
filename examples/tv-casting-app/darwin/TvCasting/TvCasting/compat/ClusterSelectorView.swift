@@ -17,6 +17,7 @@
 
 import SwiftUI
 
+@available(*, deprecated, message: "Refer to MCActionSelectorView")
 struct ClusterSelectorView: View {
     var body: some View {
         VStack(alignment: .leading) {

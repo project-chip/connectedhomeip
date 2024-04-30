@@ -17,7 +17,14 @@
 
 #import <Foundation/Foundation.h>
 
+#import "ContentApp.h"
 #import "VideoPlayer.h"
+
+@interface VideoPlayer ()
+
+@property (nonatomic) MCCastingPlayer * castingPlayer;
+
+@end
 
 @implementation VideoPlayer
 
@@ -63,8 +70,33 @@
     return self;
 }
 
+- (instancetype)initWithCastingPlayer:(MCCastingPlayer *)castingPlayer
+{
+    if (self = [super init]) {
+        _castingPlayer = castingPlayer;
+        _deviceName = castingPlayer.deviceName;
+        _vendorId = castingPlayer.vendorId;
+        _productId = castingPlayer.productId;
+        _deviceType = castingPlayer.deviceType;
+        _hostName = castingPlayer.hostName;
+        _instanceName = castingPlayer.instanceName;
+        _contentApps = [NSMutableArray new];
+        NSArray<MCEndpoint *> * endpoints = castingPlayer.endpoints;
+        for (MCEndpoint * endpoint in endpoints) {
+            [_contentApps addObject:[[ContentApp alloc] initWithEndpoint:endpoint]];
+        }
+        _isInitialized = true;
+    }
+    return self;
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"%@ with Product ID: %d, Vendor ID: %d", _deviceName, _productId, _vendorId];
+}
+
+- (MCCastingPlayer *)getCastingPlayer
+{
+    return _castingPlayer;
 }
 @end
