@@ -56,7 +56,7 @@ if (stm32_board == "STM32WB5MM-DK") {
 stm32_sdk("sdk") {
 
   include_dirs = [
-    #"${chip_root}/src/platform/stm32",
+    "${chip_root}/src/platform/stm32",
     "${examples_plat_dir}",
     "${stm32_project_dir}/include/STM32WB5",
     "${chip_root}/src/lib",
@@ -99,6 +99,7 @@ stm32_executable("lighting_app") {
       "${stm32_board_src}/STM32_WPAN/App/app_matter.c",
       "${stm32_board_src}/STM32_WPAN/App/app_thread.c",
       "${stm32_board_src}/STM32_WPAN/App/custom_stm.c",
+      #"${stm32_board_src}/STM32_WPAN/Target/hw_ipcc.c",
       "${stm32_board_src}/Src/app_entry.cpp",
       "${stm32_board_src}/Src/main.cpp",
       "${stm32_board_src}/Src/ota.cpp",

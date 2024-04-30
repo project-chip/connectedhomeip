@@ -667,7 +667,7 @@ typedef enum
 #define PRODUCT_NAME "Dimmable Light" 
 #define VENDOR_NAME "STMicroelectronics"
 #define HARDWARE_VERSION "STM32WB5MM-DK"
-#define MATTER_SDK_VERSION "1.1"
+#define MATTER_SDK_VERSION "github CSA"
 
 /******************************************************************************
  * Matter Factory data
