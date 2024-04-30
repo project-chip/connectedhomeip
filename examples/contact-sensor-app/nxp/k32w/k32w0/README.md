@@ -348,7 +348,7 @@ Please use the following build args:
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp/nxp_manufacturing_flow.md).
 
 There are factory data generated binaries available in
 examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.
@@ -559,10 +559,10 @@ This is the list of all supported partitions:
     00 -----------------> 0x00 Bootable flag
     00 -----------------> 0x00 Image type (0x00 = SSBL)
 
-004000000f020101: Application partition
+00400000c9040101: Application partition
 
     00400000 -----------> 0x00004000 Start Address
-    0f02 ---------------> 0x020f Number of 512-bytes pages
+    c904 ---------------> 0x04c9 Number of 512-bytes pages
     01 -----------------> 0x01 Bootable flag
     01 -----------------> 0x01 Image type (0x01 = Application)
 

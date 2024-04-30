@@ -43,7 +43,7 @@
                            outTargetVideoPlayerInfo:(TargetVideoPlayerInfo &)outTargetVideoPlayerInfo;
 
 + (CHIP_ERROR)convertToCppDiscoveredNodeDataFrom:(DiscoveredNodeData * _Nonnull)objCDiscoveredNodeData
-                           outDiscoveredNodeData:(chip::Dnssd::DiscoveredNodeData &)outDiscoveredNodeData;
+                           outDiscoveredNodeData:(chip::Dnssd::CommissionNodeData &)outDiscoveredNodeData;
 
 /**
  * @brief C++ to Objective C converters
@@ -51,7 +51,7 @@
 + (ContentApp * _Nonnull)convertToObjCContentAppFrom:(TargetEndpointInfo * _Nonnull)cppTargetEndpointInfo;
 
 + (DiscoveredNodeData * _Nonnull)convertToObjCDiscoveredNodeDataFrom:
-    (const chip::Dnssd::DiscoveredNodeData * _Nonnull)cppDiscoveredNodedata;
+    (const chip::Dnssd::CommissionNodeData * _Nonnull)cppDiscoveredNodedata;
 
 + (VideoPlayer * _Nonnull)convertToObjCVideoPlayerFrom:(TargetVideoPlayerInfo * _Nonnull)cppTargetVideoPlayerInfo;
 

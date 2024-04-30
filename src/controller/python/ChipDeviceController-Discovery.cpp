@@ -40,7 +40,7 @@ bool pychip_DeviceController_HasDiscoveredCommissionableNode(Controller::DeviceC
 {
     for (int i = 0; i < devCtrl->GetMaxCommissionableNodesSupported(); ++i)
     {
-        const Dnssd::DiscoveredNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(i);
+        const Dnssd::CommissionNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(i);
         if (dnsSdInfo == nullptr)
         {
             continue;
@@ -101,7 +101,7 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
 
     for (int i = 0; i < devCtrl->GetMaxCommissionableNodesSupported(); ++i)
     {
-        const Dnssd::DiscoveredNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(i);
+        const Dnssd::CommissionNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(i);
         if (dnsSdInfo == nullptr)
         {
             continue;
@@ -110,49 +110,54 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         Json::Value jsonVal;
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen, rotatingId,
-                                            sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
-        jsonVal["instanceName"]       = dnsSdInfo->nodeData.instanceName;
-        jsonVal["hostName"]           = dnsSdInfo->resolutionData.hostName;
-        jsonVal["port"]               = dnsSdInfo->resolutionData.port;
-        jsonVal["longDiscriminator"]  = dnsSdInfo->nodeData.longDiscriminator;
-        jsonVal["vendorId"]           = dnsSdInfo->nodeData.vendorId;
-        jsonVal["productId"]          = dnsSdInfo->nodeData.productId;
-        jsonVal["commissioningMode"]  = dnsSdInfo->nodeData.commissioningMode;
-        jsonVal["deviceType"]         = dnsSdInfo->nodeData.deviceType;
-        jsonVal["deviceName"]         = dnsSdInfo->nodeData.deviceName;
-        jsonVal["pairingInstruction"] = dnsSdInfo->nodeData.pairingInstruction;
-        jsonVal["pairingHint"]        = dnsSdInfo->nodeData.pairingHint;
-        if (dnsSdInfo->resolutionData.GetMrpRetryIntervalIdle().HasValue())
+        jsonVal["instanceName"]       = dnsSdInfo->instanceName;
+        jsonVal["hostName"]           = dnsSdInfo->hostName;
+        jsonVal["port"]               = dnsSdInfo->port;
+        jsonVal["longDiscriminator"]  = dnsSdInfo->longDiscriminator;
+        jsonVal["vendorId"]           = dnsSdInfo->vendorId;
+        jsonVal["productId"]          = dnsSdInfo->productId;
+        jsonVal["commissioningMode"]  = dnsSdInfo->commissioningMode;
+        jsonVal["deviceType"]         = dnsSdInfo->deviceType;
+        jsonVal["deviceName"]         = dnsSdInfo->deviceName;
+        jsonVal["pairingInstruction"] = dnsSdInfo->pairingInstruction;
+        jsonVal["pairingHint"]        = dnsSdInfo->pairingHint;
+
+        auto idleInterval = dnsSdInfo->GetMrpRetryIntervalIdle();
+        if (idleInterval.has_value())
         {
-            jsonVal["mrpRetryIntervalIdle"] = dnsSdInfo->resolutionData.GetMrpRetryIntervalIdle().Value().count();
+            jsonVal["mrpRetryIntervalIdle"] = idleInterval->count();
         }
-        if (dnsSdInfo->resolutionData.GetMrpRetryIntervalActive().HasValue())
+
+        auto activeInterval = dnsSdInfo->GetMrpRetryIntervalActive();
+        if (activeInterval.has_value())
         {
-            jsonVal["mrpRetryIntervalActive"] = dnsSdInfo->resolutionData.GetMrpRetryIntervalActive().Value().count();
+            jsonVal["mrpRetryIntervalActive"] = activeInterval->count();
         }
-        if (dnsSdInfo->resolutionData.GetMrpRetryActiveThreshold().HasValue())
+
+        auto activeThreshold = dnsSdInfo->GetMrpRetryActiveThreshold();
+        if (activeThreshold.has_value())
         {
-            jsonVal["mrpRetryActiveThreshold"] = dnsSdInfo->resolutionData.GetMrpRetryActiveThreshold().Value().count();
+            jsonVal["mrpRetryActiveThreshold"] = activeThreshold->count();
         }
-        jsonVal["supportsTcp"] = dnsSdInfo->resolutionData.supportsTcp;
+        jsonVal["supportsTcp"] = dnsSdInfo->supportsTcp;
         {
             Json::Value addresses;
-            for (unsigned j = 0; j < dnsSdInfo->resolutionData.numIPs; ++j)
+            for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
             {
                 char buf[Inet::IPAddress::kMaxStringLength];
-                dnsSdInfo->resolutionData.ipAddress[j].ToString(buf);
+                dnsSdInfo->ipAddress[j].ToString(buf);
                 addresses[j] = buf;
             }
             jsonVal["addresses"] = addresses;
         }
-        if (dnsSdInfo->resolutionData.isICDOperatingAsLIT.HasValue())
+        if (dnsSdInfo->isICDOperatingAsLIT.has_value())
         {
-            jsonVal["isICDOperatingAsLIT"] = dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value();
+            jsonVal["isICDOperatingAsLIT"] = *(dnsSdInfo->isICDOperatingAsLIT);
         }
-        if (dnsSdInfo->nodeData.rotatingIdLen > 0)
+        if (dnsSdInfo->rotatingIdLen > 0)
         {
             jsonVal["rotatingId"] = rotatingId;
         }
@@ -168,56 +173,57 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
 {
     for (int i = 0; i < devCtrl->GetMaxCommissionableNodesSupported(); ++i)
     {
-        const Dnssd::DiscoveredNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(i);
+        const Dnssd::CommissionNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(i);
         if (dnsSdInfo == nullptr)
         {
             continue;
         }
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->nodeData.rotatingId, dnsSdInfo->nodeData.rotatingIdLen, rotatingId,
-                                            sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
-        ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->nodeData.instanceName);
-        ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->resolutionData.hostName);
-        ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->resolutionData.port);
-        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->nodeData.longDiscriminator);
-        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->nodeData.vendorId);
-        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->nodeData.productId);
-        ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->nodeData.commissioningMode);
-        ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->nodeData.deviceType);
-        ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->nodeData.deviceName);
+        ChipLogProgress(Discovery, "\tInstance name:\t\t%s", dnsSdInfo->instanceName);
+        ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
+        ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->port);
+        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
+        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);
+        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->productId);
+        ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->commissioningMode);
+        ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->deviceType);
+        ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->deviceName);
         ChipLogProgress(Discovery, "\tRotating Id\t\t%s", rotatingId);
-        ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->nodeData.pairingInstruction);
-        ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->nodeData.pairingHint);
-        if (dnsSdInfo->resolutionData.GetMrpRetryIntervalIdle().HasValue())
+        ChipLogProgress(Discovery, "\tPairing Instruction\t%s", dnsSdInfo->pairingInstruction);
+        ChipLogProgress(Discovery, "\tPairing Hint\t\t%u", dnsSdInfo->pairingHint);
+
+        auto idleInterval = dnsSdInfo->GetMrpRetryIntervalIdle();
+        if (idleInterval.has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u",
-                            dnsSdInfo->resolutionData.GetMrpRetryIntervalIdle().Value().count());
+            ChipLogProgress(Discovery, "\tMrp Interval idle\t%u", idleInterval->count());
         }
         else
         {
             ChipLogProgress(Discovery, "\tMrp Interval idle\tNot present");
         }
-        if (dnsSdInfo->resolutionData.GetMrpRetryIntervalActive().HasValue())
+
+        auto activeInterval = dnsSdInfo->GetMrpRetryIntervalActive();
+        if (activeInterval.has_value())
         {
-            ChipLogProgress(Discovery, "\tMrp Interval active\t%u",
-                            dnsSdInfo->resolutionData.GetMrpRetryIntervalActive().Value().count());
+            ChipLogProgress(Discovery, "\tMrp Interval active\t%u", activeInterval->count());
         }
         else
         {
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
-        ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->resolutionData.supportsTcp);
-        if (dnsSdInfo->resolutionData.isICDOperatingAsLIT.HasValue())
+
+        ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->supportsTcp);
+        if (dnsSdInfo->isICDOperatingAsLIT.has_value())
         {
-            ChipLogProgress(Discovery, "\tICD is operating as a\t%s",
-                            dnsSdInfo->resolutionData.isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+            ChipLogProgress(Discovery, "\tICD is operating as a\t%s", *(dnsSdInfo->isICDOperatingAsLIT) ? "LIT" : "SIT");
         }
-        for (unsigned j = 0; j < dnsSdInfo->resolutionData.numIPs; ++j)
+        for (unsigned j = 0; j < dnsSdInfo->numIPs; ++j)
         {
             char buf[Inet::IPAddress::kMaxStringLength];
-            dnsSdInfo->resolutionData.ipAddress[j].ToString(buf);
+            dnsSdInfo->ipAddress[j].ToString(buf);
             ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
         }
     }
@@ -226,13 +232,13 @@ void pychip_DeviceController_PrintDiscoveredDevices(Controller::DeviceCommission
 bool pychip_DeviceController_GetIPForDiscoveredDevice(Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len)
 {
-    const Dnssd::DiscoveredNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(idx);
+    const Dnssd::CommissionNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(idx);
     if (dnsSdInfo == nullptr)
     {
         return false;
     }
     // TODO(cecille): Select which one we actually want.
-    if (dnsSdInfo->resolutionData.ipAddress[0].ToString(addrStr, len) == addrStr)
+    if (dnsSdInfo->ipAddress[0].ToString(addrStr, len) == addrStr)
     {
         return true;
     }

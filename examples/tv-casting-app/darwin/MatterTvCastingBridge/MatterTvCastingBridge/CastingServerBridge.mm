@@ -456,7 +456,7 @@
                              block:^{
                                  chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
                                  DiscoveredNodeData * commissioner = nil;
-                                 const chip::Dnssd::DiscoveredNodeData * cppDiscoveredNodeData
+                                 const chip::Dnssd::CommissionNodeData * cppDiscoveredNodeData
                                      = CastingServer::GetInstance()->GetDiscoveredCommissioner(
                                          index, associatedConnectableVideoPlayer);
                                  if (cppDiscoveredNodeData != nullptr) {
@@ -530,7 +530,7 @@
                              block:^{
                                  bool udcRequestStatus;
 
-                                 chip::Dnssd::DiscoveredNodeData cppCommissioner;
+                                 chip::Dnssd::CommissionNodeData cppCommissioner;
                                  if ([ConversionUtils convertToCppDiscoveredNodeDataFrom:commissioner
                                                                    outDiscoveredNodeData:cppCommissioner]
                                      != CHIP_NO_ERROR) {

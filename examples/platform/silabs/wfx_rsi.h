@@ -17,6 +17,7 @@
 #pragma once
 
 #include <event_groups.h>
+#include <wfx_host_events.h>
 
 #ifndef RSI_BLE_ENABLE
 #define RSI_BLE_ENABLE (1)
@@ -69,11 +70,6 @@ typedef struct WfxEvent_s
     void * eventData; // event data TODO: confirm needed
 } WfxEvent_t;
 
-/// WfxPostEvent
-/// @brief Allows to allocate an event to the WFX task event queue from outside of sl_wifi_if.c
-/// @param event The event that will be allocated to the event queue
-void WfxPostEvent(WfxEvent_t * event);
-
 typedef struct wfx_rsi_s
 {
     // TODO: Change tp WfxEventType_e once the event queue is implemented
@@ -124,6 +120,11 @@ int32_t wfx_rsi_power_save(rsi_power_save_profile_mode_t sl_si91x_ble_state, sl_
 int32_t wfx_rsi_power_save();
 #endif /* SLI_SI917 */
 #endif /* SL_ICD_ENABLED */
+
+/// WfxPostEvent
+/// @brief Allows to allocate an event to the WFX task event queue from outside of sl_wifi_if.c
+/// @param event The event that will be allocated to the event queue
+void WfxPostEvent(WfxEvent_t * event);
 #ifdef __cplusplus
 }
 #endif

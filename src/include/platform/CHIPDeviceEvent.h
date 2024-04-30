@@ -245,6 +245,11 @@ enum PublicEventTypes
      * sending messages to other nodes.
      */
     kServerReady,
+
+    /**
+     * Signals that BLE is deinitialized.
+     */
+    kBLEDeinitialized,
 };
 
 /**
@@ -530,7 +535,6 @@ struct ChipDeviceEvent final
         } OtaStateChanged;
     };
 
-    void Clear() { memset(this, 0, sizeof(*this)); }
     bool IsPublic() const { return DeviceEventType::IsPublic(Type); }
     bool IsInternal() const { return DeviceEventType::IsInternal(Type); }
     bool IsPlatformSpecific() const { return DeviceEventType::IsPlatformSpecific(Type); }

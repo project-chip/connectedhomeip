@@ -1706,7 +1706,7 @@ CHIP_ERROR DeviceCommissioner::StopCommissionableDiscovery()
     return mDNSResolver.StopDiscovery();
 }
 
-const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
+const Dnssd::CommissionNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
 {
     return GetDiscoveredNode(idx);
 }

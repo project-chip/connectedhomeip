@@ -307,9 +307,8 @@ TEST(TestIncrementalResolve, TestParseOperational)
     EXPECT_EQ(nodeData.resolutionData.numIPs, 1u);
     EXPECT_EQ(nodeData.resolutionData.port, 0x1234);
     EXPECT_FALSE(nodeData.resolutionData.supportsTcp);
-    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
-    EXPECT_TRUE(nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
-    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalIdle().Value(), chip::System::Clock::Milliseconds32(23));
+    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalActive().has_value());
+    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalIdle(), std::make_optional(chip::System::Clock::Milliseconds32(23)));
 
     Inet::IPAddress addr;
     EXPECT_TRUE(Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
@@ -385,28 +384,30 @@ TEST(TestIncrementalResolve, TestParseCommissionable)
     EXPECT_FALSE(resolver.GetMissingRequiredInformation().HasAny());
 
     // At this point taking value should work. Once taken, the resolver is reset.
-    DiscoveredNodeData nodeData;
-    EXPECT_EQ(resolver.Take(nodeData), CHIP_NO_ERROR);
+    DiscoveredNodeData discoveredNodeData;
+    EXPECT_TRUE(resolver.Take(discoveredNodeData) == CHIP_NO_ERROR);
     EXPECT_FALSE(resolver.IsActive());
 
+    EXPECT_TRUE(discoveredNodeData.Is<CommissionNodeData>());
+    CommissionNodeData nodeData = discoveredNodeData.Get<CommissionNodeData>();
+
     // validate data as it was passed in
-    EXPECT_EQ(nodeData.resolutionData.numIPs, 2u);
-    EXPECT_EQ(nodeData.resolutionData.port, 0x1234);
-    EXPECT_FALSE(nodeData.resolutionData.supportsTcp);
-    EXPECT_TRUE(nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
-    EXPECT_EQ(nodeData.resolutionData.GetMrpRetryIntervalActive().Value(), chip::System::Clock::Milliseconds32(321));
-    EXPECT_FALSE(nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    EXPECT_EQ(nodeData.numIPs, 2u);
+    EXPECT_EQ(nodeData.port, 0x1234);
+    EXPECT_FALSE(nodeData.supportsTcp);
+    EXPECT_EQ(nodeData.GetMrpRetryIntervalActive(), std::make_optional(chip::System::Clock::Milliseconds32(321)));
+    EXPECT_FALSE(nodeData.GetMrpRetryIntervalIdle().has_value());
 
     Inet::IPAddress addr;
     EXPECT_TRUE(Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
-    EXPECT_EQ(nodeData.resolutionData.ipAddress[0], addr);
+    EXPECT_EQ(nodeData.ipAddress[0], addr);
     EXPECT_TRUE(Inet::IPAddress::FromString("fe80::f0f1:f2f3:f4f5:1234", addr));
-    EXPECT_EQ(nodeData.resolutionData.ipAddress[1], addr);
+    EXPECT_EQ(nodeData.ipAddress[1], addr);
 
     // parsed txt data for discovered nodes
-    EXPECT_EQ(nodeData.nodeData.longDiscriminator, 22345);
-    EXPECT_EQ(nodeData.nodeData.vendorId, 321);
-    EXPECT_EQ(nodeData.nodeData.productId, 654);
-    EXPECT_STREQ(nodeData.nodeData.deviceName, "mytest");
+    EXPECT_EQ(nodeData.longDiscriminator, 22345);
+    EXPECT_EQ(nodeData.vendorId, 321);
+    EXPECT_EQ(nodeData.productId, 654);
+    EXPECT_STREQ(nodeData.deviceName, "mytest");
 }
 } // namespace

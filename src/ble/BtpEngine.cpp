@@ -34,6 +34,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -282,7 +283,7 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
         // mRxFragmentSize may be smaller than the characteristic size.  Make sure
         // we're not truncating to a data length smaller than what we have already consumed.
         VerifyOrExit(reader.OctetsRead() <= mRxFragmentSize, err = BLE_ERROR_REASSEMBLER_INCORRECT_STATE);
-        data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
+        data->SetDataLength(chip::min(data->DataLength(), static_cast<size_t>(mRxFragmentSize)));
 
         // Now mark the bytes we consumed as consumed.
         data->ConsumeHead(static_cast<uint16_t>(reader.OctetsRead()));
@@ -346,11 +347,12 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
     if (rx_flags.Has(HeaderFlags::kEndMessage))
     {
         // Trim remainder, if any, of the received packet buffer based on sender-specified length of reassembled message.
-        int padding = mRxBuf->DataLength() - mRxLength;
+        VerifyOrExit(CanCastTo<uint16_t>(mRxBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+        int padding = static_cast<uint16_t>(mRxBuf->DataLength()) - mRxLength;
 
         if (padding > 0)
         {
-            mRxBuf->SetDataLength(mRxLength);
+            mRxBuf->SetDataLength(static_cast<size_t>(mRxLength));
         }
 
         // Ensure all received fragments add up to sender-specified total message size.
@@ -375,7 +377,7 @@ exit:
         }
         if (!mRxBuf.IsNull())
         {
-            ChipLogError(Ble, "With rx buf data length = %u", mRxBuf->DataLength());
+            ChipLogError(Ble, "With rx buf data length = %u", static_cast<unsigned>(mRxBuf->DataLength()));
         }
         LogState();
 
@@ -426,9 +428,10 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
             return false;
         }
 
-        mTxBuf    = std::move(data);
-        mTxState  = kState_InProgress;
-        mTxLength = mTxBuf->DataLength();
+        mTxBuf   = std::move(data);
+        mTxState = kState_InProgress;
+        VerifyOrReturnError(CanCastTo<uint16_t>(mTxBuf->DataLength()), false);
+        mTxLength = static_cast<uint16_t>(mTxBuf->DataLength());
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send whole message:");
         PrintBufDebug(mTxBuf);
