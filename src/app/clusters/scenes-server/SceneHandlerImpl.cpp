@@ -34,15 +34,16 @@ using AttributeValuePairType = app::Clusters::ScenesManagement::Structs::Attribu
 /// @param EmberAfDefaultAttributeValue & defaultValue
 /// @return Value converted to the given working type
 template <typename Type>
-Type ConvertDefaultValueToWorkingValue(const EmberAfDefaultAttributeValue & defaultValue)
+typename app::NumericAttributeTraits<Type>::WorkingType
+ConvertDefaultValueToWorkingValue(const EmberAfDefaultAttributeValue & defaultValue)
 {
-    if (sizeof(Type) <= 2)
+    if (sizeof(typename app::NumericAttributeTraits<Type>::WorkingType) <= 2)
     {
-        return static_cast<Type>(defaultValue.defaultValue);
+        return static_cast<typename app::NumericAttributeTraits<Type>::WorkingType>(defaultValue.defaultValue);
     }
 
-    Type sValue = 0;
-    memcpy(&sValue, defaultValue.ptrToDefaultValue, sizeof(Type));
+    typename app::NumericAttributeTraits<Type>::StorageType sValue;
+    memcpy(&sValue, defaultValue.ptrToDefaultValue, sizeof(sValue));
     return app::NumericAttributeTraits<Type>::StorageToWorking(sValue);
 }
 
@@ -60,57 +61,67 @@ void CapAttributeID(AttributeValuePairType & aVPair, const EmberAfAttributeMetad
 
     WorkingType maxValue;
 
-    if (metadata->IsBoolean())
-    {
-        aVPair.attributeValue = aVPair.attributeValue ? 1 : 0;
-        return;
-    }
-
     // Check if the attribute type is signed
     if (metadata->IsSignedIntegerAttribute())
     {
+        // We use emberAfAttributeSize for cases like INT24S, INT40S, INT48S, INT56S where numeric_limits<WorkingType>::max()
+        // wouldn't work
         maxValue = static_cast<WorkingType>((1ULL << (emberAfAttributeSize(metadata) * 8 - 1)) - 1);
     }
     else
     {
+        // We use emberAfAttributeSize for cases like INT24U, INT40U, INT48U, INT56U where numeric_limits<WorkingType>::max()
+        // wouldn't work
         maxValue = static_cast<WorkingType>((1ULL << (emberAfAttributeSize(metadata) * 8)) - 1);
+    }
+
+    // Ensure that the metadata's signedness matches the working type's signedness
+    VerifyOrDie(metadata->IsSignedIntegerAttribute() == std::is_signed<WorkingType>::value);
+
+    if (metadata->IsBoolean())
+    {
+        // Caping the value to 1 in case values greater than 1 are set
+        aVPair.attributeValue = aVPair.attributeValue ? 1 : 0;
+        return;
     }
 
     // Check metadata for min and max values
     if (metadata->HasMinMax())
     {
         const EmberAfAttributeMinMaxValue * minMaxValue = metadata->defaultValue.ptrToMinMaxValue;
-        WorkingType minVal                              = ConvertDefaultValueToWorkingValue<WorkingType>(minMaxValue->minValue);
-        WorkingType maxVal                              = ConvertDefaultValueToWorkingValue<WorkingType>(minMaxValue->maxValue);
+        WorkingType rangeMin                            = ConvertDefaultValueToWorkingValue<Type>(minMaxValue->minValue);
+        WorkingType rangeMax                            = ConvertDefaultValueToWorkingValue<Type>(minMaxValue->maxValue);
 
         // Cap based on minimum value
-        if (minVal > static_cast<WorkingType>(aVPair.attributeValue))
+        if (rangeMin > static_cast<WorkingType>(aVPair.attributeValue))
         {
-            aVPair.attributeValue = static_cast<std::make_unsigned_t<WorkingType>>(minVal);
+            aVPair.attributeValue = static_cast<std::make_unsigned_t<WorkingType>>(rangeMin);
             // We assume the max is >= min therefore we can return
             return;
         }
 
         // Adjust maxValue if greater than the meta data's max value
-        if (maxVal < maxValue)
+        if (rangeMax < static_cast<WorkingType>(aVPair.attributeValue))
         {
-            maxValue = maxVal;
+            maxValue = rangeMax;
         }
     }
 
-    // Cap based on maximum value
-    if (metadata->IsSignedIntegerAttribute())
+    // Cap based on type-enforced maximum value (and minnimum for signed types)
+    if constexpr (std::is_signed<WorkingType>::value)
     {
-        if (static_cast<int64_t>(aVPair.attributeValue) > static_cast<int64_t>(maxValue))
+        // Cap on max value, check for comparison to the WorkingType size and check for overflow
+        if (static_cast<WorkingType>(aVPair.attributeValue) > maxValue || aVPair.attributeValue & ~static_cast<uint64_t>(maxValue))
         {
+            // We treat overflows as > Max value since the wrong type is being used and we cannot determine the actual value
             aVPair.attributeValue = static_cast<std::make_unsigned_t<WorkingType>>(maxValue);
         }
     }
     else
     {
-        if (aVPair.attributeValue > static_cast<uint64_t>(maxValue))
+        if (aVPair.attributeValue > maxValue)
         {
-            aVPair.attributeValue = static_cast<std::make_unsigned_t<WorkingType>>(maxValue);
+            aVPair.attributeValue = maxValue;
         }
     }
 }
