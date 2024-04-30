@@ -30,6 +30,7 @@ env:
     
 jobs:
     await-fast-ci:
+        name: Wait For Fast CI to Pass
         uses: ./.github/workflows/await-fast-ci.yaml
         
     asr:
