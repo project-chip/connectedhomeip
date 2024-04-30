@@ -27,4 +27,4 @@ jobs:
     steps:
       - name: Review Spell Check Completion Status
         run: |
-          gh run list -R project-chip/connectedhomeip -c "${{ github.event.pull_request.head.sha }}"
+          gh run list -R project-chip/connectedhomeip -c ${{ github.event.pull_request.head.sha }} -L 500
