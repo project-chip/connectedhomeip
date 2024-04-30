@@ -330,24 +330,29 @@ bool SetUpCodePairer::IdIsPresent(uint16_t vendorOrProductID)
     return vendorOrProductID != kNotAvailable;
 }
 
-bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const
+bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & discNodeData) const
 {
-    if (nodeData.nodeData.commissioningMode == 0)
+    if (!discNodeData.Is<Dnssd::CommissionNodeData>())
+    {
+        return false;
+    }
+
+    const Dnssd::CommissionNodeData & nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+    if (nodeData.commissioningMode == 0)
     {
         ChipLogProgress(Controller, "Discovered device does not have an open commissioning window.");
         return false;
     }
 
     // The advertisement may not include a vendor id.
-    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.nodeData.vendorId) && mPayloadVendorID != nodeData.nodeData.vendorId)
+    if (IdIsPresent(mPayloadVendorID) && IdIsPresent(nodeData.vendorId) && mPayloadVendorID != nodeData.vendorId)
     {
         ChipLogProgress(Controller, "Discovered device does not match our vendor id.");
         return false;
     }
 
     // The advertisement may not include a product id.
-    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.nodeData.productId) &&
-        mPayloadProductID != nodeData.nodeData.productId)
+    if (IdIsPresent(mPayloadProductID) && IdIsPresent(nodeData.productId) && mPayloadProductID != nodeData.productId)
     {
         ChipLogProgress(Controller, "Discovered device does not match our product id.");
         return false;
@@ -357,10 +362,10 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     switch (mCurrentFilter.type)
     {
     case Dnssd::DiscoveryFilterType::kShortDiscriminator:
-        discriminatorMatches = (((nodeData.nodeData.longDiscriminator >> 8) & 0x0F) == mCurrentFilter.code);
+        discriminatorMatches = (((nodeData.longDiscriminator >> 8) & 0x0F) == mCurrentFilter.code);
         break;
     case Dnssd::DiscoveryFilterType::kLongDiscriminator:
-        discriminatorMatches = (nodeData.nodeData.longDiscriminator == mCurrentFilter.code);
+        discriminatorMatches = (nodeData.longDiscriminator == mCurrentFilter.code);
         break;
     default:
         ChipLogError(Controller, "Unknown filter type; all matches will fail");
@@ -382,7 +387,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
 
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
-    NotifyCommissionableDeviceDiscovered(nodeData.resolutionData);
+    NotifyCommissionableDeviceDiscovered(nodeData.Get<Dnssd::CommissionNodeData>());
 }
 
 void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonResolutionData & resolutionData)
@@ -528,7 +533,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
 
     if (CHIP_NO_ERROR == error)
     {
-        ChipLogProgress(Controller, "Pairing with commissionee successful, stopping discovery");
+        ChipLogProgress(Controller, "PASE session established with commissionee. Stopping discovery.");
         ResetDiscoveryState();
         mRemoteId = kUndefinedNodeId;
         if (pairingDelegate != nullptr)
@@ -615,14 +620,14 @@ SetUpCodePairerParameters::SetUpCodePairerParameters(const Dnssd::CommonResoluti
     auto & ip = data.ipAddress[index];
     SetPeerAddress(Transport::PeerAddress::UDP(ip, data.port, ip.IsIPv6LinkLocal() ? data.interfaceId : Inet::InterfaceId::Null()));
 
-    if (data.mrpRetryIntervalIdle.HasValue())
+    if (data.mrpRetryIntervalIdle.has_value())
     {
-        SetIdleInterval(data.mrpRetryIntervalIdle.Value());
+        SetIdleInterval(*data.mrpRetryIntervalIdle);
     }
 
-    if (data.mrpRetryIntervalActive.HasValue())
+    if (data.mrpRetryIntervalActive.has_value())
     {
-        SetActiveInterval(data.mrpRetryIntervalActive.Value());
+        SetActiveInterval(*data.mrpRetryIntervalActive);
     }
 }
 

@@ -64,6 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
+- (void)unitTestClearClusterData;
 @end
 #endif
 

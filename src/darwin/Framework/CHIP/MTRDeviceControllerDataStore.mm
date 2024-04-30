@@ -753,6 +753,18 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     return clusterDataToReturn;
 }
 
+- (nullable MTRDeviceClusterData *)getStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
+{
+    // Don't bother checking our indices here, since this will only be called
+    // when the consumer knows that we're supposed to have data for this cluster
+    // path.
+    __block MTRDeviceClusterData * clusterDataToReturn = nil;
+    dispatch_sync(_storageDelegateQueue, ^{
+        clusterDataToReturn = [self _fetchClusterDataForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
+    });
+    return clusterDataToReturn;
+}
+
 // Utility for constructing dictionary of nodeID to cluster data from dictionary of storage keys
 - (nullable NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> *)_getClusterDataFromSecureLocalValues:(NSDictionary<NSString *, id> *)secureLocalValues
 {

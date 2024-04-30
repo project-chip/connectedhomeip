@@ -156,28 +156,24 @@ bool PlatformManagerImpl::IsWorkQueueCurrentQueue() const
     return dispatch_get_specific(this) == this;
 }
 
-CHIP_ERROR PlatformManagerImpl::StartBleScan(BleScannerDelegate * delegate)
+CHIP_ERROR PlatformManagerImpl::StartBleScan(BleScannerDelegate * delegate, BleScanMode mode)
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    ReturnErrorOnFailureWithMetric(kMetricBLEScan, Internal::BLEMgrImpl().StartScan(delegate));
-#endif // CONFIG_NETWORK_LAYER_BLE
+    ReturnErrorOnFailureWithMetric(kMetricBLEScan, Internal::BLEMgrImpl().StartScan(delegate, mode));
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CONFIG_NETWORK_LAYER_BLE
 }
 
 CHIP_ERROR PlatformManagerImpl::StopBleScan()
 {
 #if CONFIG_NETWORK_LAYER_BLE
     ReturnErrorOnFailureWithMetric(kMetricBLEScan, Internal::BLEMgrImpl().StopScan());
-#endif // CONFIG_NETWORK_LAYER_BLE
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::PrepareCommissioning()
-{
-#if CONFIG_NETWORK_LAYER_BLE
-    ReturnErrorOnFailureWithMetric(kMetricBLEStartPreWarmScan, Internal::BLEMgrImpl().StartScan());
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CONFIG_NETWORK_LAYER_BLE
-    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

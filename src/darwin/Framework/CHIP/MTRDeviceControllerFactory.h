@@ -177,6 +177,18 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error;
 
+/**
+ * If possible, pre-warm the Matter stack for setting up a commissioning session.
+ *
+ * This may be called before -[MTRDeviceController setupCommissioningSessionWithPayload:]
+ * if it is known that a commissioning attempt will soon take place, but the commissioning
+ * payload is not known yet.
+ *
+ * The controller factory must be running for pre-warming to take place.  Pre-warming can take place
+ * before any controllers are started.
+ */
+- (void)preWarmCommissioningSession MTR_NEWLY_AVAILABLE;
+
 @end
 
 /**

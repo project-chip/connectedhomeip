@@ -51,11 +51,14 @@ source_set("android_chip_im_jni") {
     "AndroidConnectionFailureExceptions.h",
     "AndroidControllerExceptions.cpp",
     "AndroidControllerExceptions.h",
+    "AndroidICDClient.cpp",
+    "AndroidICDClient.h",
     "AndroidInteractionClient.cpp",
     "AndroidInteractionClient.h",
     "BaseCHIPCluster-JNI.cpp",
     "CHIPAttributeTLVValueDecoder.h",
     "CHIPEventTLVValueDecoder.h",
+    "CHIPICDClient-JNI.cpp",
     "CHIPInteractionClient-JNI.cpp",
     "CHIPInteractionClient-JNI.h",
   ]
@@ -70,6 +73,7 @@ source_set("android_chip_im_jni") {
   }
 
   deps = [
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
@@ -136,6 +140,7 @@ shared_library("jni") {
     "DeviceAttestationDelegateBridge.h",
     "GroupDeviceProxy.h",
     "MatterCallbacks-JNI.cpp",
+    "MatterICDClient-JNI.cpp",
     "MatterInteractionClient-JNI.cpp",
   ]
 
@@ -431,12 +436,14 @@ kotlin_library("kotlin_matter_controller") {
   sources = [
     "src/matter/controller/CompletionListenerAdapter.kt",
     "src/matter/controller/ControllerParams.kt",
+    "src/matter/controller/ICDClientInfo.kt",
     "src/matter/controller/InteractionClient.kt",
     "src/matter/controller/InvokeCallback.kt",
     "src/matter/controller/InvokeCallbackJni.kt",
     "src/matter/controller/MatterController.kt",
     "src/matter/controller/MatterControllerException.kt",
     "src/matter/controller/MatterControllerImpl.kt",
+    "src/matter/controller/MatterICDClientImpl.kt",
     "src/matter/controller/Messages.kt",
     "src/matter/controller/OperationalKeyConfig.kt",
     "src/matter/controller/ReportCallback.kt",
@@ -499,10 +506,12 @@ android_library("android_chip_im") {
   sources = [
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/ChipICDClient.java",
     "src/chip/devicecontroller/ChipInteractionClient.java",
     "src/chip/devicecontroller/ExtendableInvokeCallback.java",
     "src/chip/devicecontroller/ExtendableInvokeCallbackJni.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
+    "src/chip/devicecontroller/ICDClientInfo.java",
     "src/chip/devicecontroller/InvokeCallback.java",
     "src/chip/devicecontroller/InvokeCallbackJni.java",
     "src/chip/devicecontroller/ReportCallback.java",
@@ -600,7 +609,6 @@ android_library("java") {
     "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
     "src/chip/devicecontroller/ICDCheckInDelegate.java",
     "src/chip/devicecontroller/ICDCheckInDelegateWrapper.java",
-    "src/chip/devicecontroller/ICDClientInfo.java",
     "src/chip/devicecontroller/ICDDeviceInfo.java",
     "src/chip/devicecontroller/ICDRegistrationInfo.java",
     "src/chip/devicecontroller/KeypairDelegate.java",

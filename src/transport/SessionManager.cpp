@@ -929,7 +929,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
     // Extract MIC from the end of the message.
     uint8_t * data     = msg->Start();
-    uint16_t len       = msg->DataLength();
+    size_t len         = msg->DataLength();
     uint16_t footerLen = partialPacketHeader.MICTagLength();
     VerifyOrReturn(footerLen <= len);
 

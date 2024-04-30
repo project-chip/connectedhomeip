@@ -50,6 +50,10 @@
 #include <app/icd/server/ICDConfigurationData.h> // nogncheck
 #endif
 
+#if CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
+
 namespace {
 
 using namespace chip;
@@ -75,6 +79,9 @@ public:
     // Performs setup for each individual test in the test suite
     CHIP_ERROR SetUp() override
     {
+#if CHIP_CRYPTO_PSA
+        ReturnErrorOnFailure(psa_crypto_init() == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+#endif
         ReturnErrorOnFailure(chip::Test::LoopbackMessagingContext::SetUp());
         GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
@@ -225,92 +232,97 @@ struct BackoffComplianceTestVector
     System::Clock::Timeout backoffMax;
 };
 
-struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
-    {
-        .sendCount   = 0,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(330),
-        .backoffMax  = System::Clock::Timeout(413),
-    },
-    {
-        .sendCount   = 1,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(330),
-        .backoffMax  = System::Clock::Timeout(413),
-    },
-    {
-        .sendCount   = 2,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(528),
-        .backoffMax  = System::Clock::Timeout(660),
-    },
-    {
-        .sendCount   = 3,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(844),
-        .backoffMax  = System::Clock::Timeout(1057),
-    },
-    {
-        .sendCount   = 4,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(1351),
-        .backoffMax  = System::Clock::Timeout(1690),
-    },
-    {
-        .sendCount   = 5,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(2162),
-        .backoffMax  = System::Clock::Timeout(2704),
-    },
-    {
-        .sendCount   = 6,
-        .backoffBase = System::Clock::Timeout(300),
-        .backoffMin  = System::Clock::Timeout(2162),
-        .backoffMax  = System::Clock::Timeout(2704),
-    },
-    {
-        .sendCount   = 0,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(4400),
-        .backoffMax  = System::Clock::Timeout(5500),
-    },
-    {
-        .sendCount   = 1,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(4400),
-        .backoffMax  = System::Clock::Timeout(5500),
-    },
-    {
-        .sendCount   = 2,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(7040),
-        .backoffMax  = System::Clock::Timeout(8800),
-    },
-    {
-        .sendCount   = 3,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(11264),
-        .backoffMax  = System::Clock::Timeout(14081),
-    },
-    {
-        .sendCount   = 4,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(18022),
-        .backoffMax  = System::Clock::Timeout(22529),
-    },
-    {
-        .sendCount   = 5,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(28835),
-        .backoffMax  = System::Clock::Timeout(36045),
-    },
-    {
-        .sendCount   = 6,
-        .backoffBase = System::Clock::Timeout(4000),
-        .backoffMin  = System::Clock::Timeout(28835),
-        .backoffMax  = System::Clock::Timeout(36045),
-    },
-};
+struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = { {
+                                                                            .sendCount   = 0,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(330),
+                                                                            .backoffMax  = System::Clock::Timeout(413),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 1,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(330),
+                                                                            .backoffMax  = System::Clock::Timeout(413),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 2,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(528),
+                                                                            .backoffMax  = System::Clock::Timeout(661),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 3,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(844),
+                                                                            .backoffMax  = System::Clock::Timeout(1057),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 4,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(1351),
+                                                                            .backoffMax  = System::Clock::Timeout(1691),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 5,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(2162),
+                                                                            .backoffMax  = System::Clock::Timeout(2705),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 6,
+                                                                            .backoffBase = System::Clock::Timeout(300),
+                                                                            .backoffMin  = System::Clock::Timeout(2162),
+                                                                            .backoffMax  = System::Clock::Timeout(2705),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 0,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(4400),
+                                                                            .backoffMax  = System::Clock::Timeout(5503),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 1,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(4400),
+                                                                            .backoffMax  = System::Clock::Timeout(5503),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 2,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(7040),
+                                                                            .backoffMax  = System::Clock::Timeout(8805),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 3,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(11264),
+                                                                            .backoffMax  = System::Clock::Timeout(14088),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 4,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(18022),
+                                                                            .backoffMax  = System::Clock::Timeout(22541),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 5,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(28835),
+                                                                            .backoffMax  = System::Clock::Timeout(36065),
+                                                                        },
+                                                                        {
+                                                                            .sendCount   = 6,
+                                                                            .backoffBase = System::Clock::Timeout(4000),
+                                                                            .backoffMin  = System::Clock::Timeout(28835),
+                                                                            .backoffMax  = System::Clock::Timeout(36065),
+                                                                        },
+                                                                        {
+                                                                            // test theoretical worst-case 1-hour interval
+                                                                            .sendCount   = 4,
+                                                                            .backoffBase = System::Clock::Timeout(3'600'000),
+                                                                            .backoffMin  = System::Clock::Timeout(16'220'160),
+                                                                            .backoffMax  = System::Clock::Timeout(20'286'001),
+                                                                        } };
 
 } // namespace
 

@@ -79,8 +79,6 @@ namespace DeviceLayer {
 namespace Internal {
 
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
-
 enum class BleScanState : uint8_t
 {
     kNotScanning,
@@ -157,7 +155,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    void _Shutdown() {}
+    void _Shutdown();
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -298,6 +296,7 @@ private:
 
     void DriveBLEState(void);
     CHIP_ERROR InitESPBleLayer(void);
+    void DeinitESPBleLayer(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
     void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
@@ -328,6 +327,9 @@ private:
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
 
 #elif CONFIG_BT_NIMBLE_ENABLED
+    CHIP_ERROR DeinitBLE();
+    static void ClaimBLEMemory(System::Layer *, void *);
+
     void HandleRXCharRead(struct ble_gatt_char_context * param);
     void HandleRXCharWrite(struct ble_gatt_char_context * param);
     void HandleTXCharWrite(struct ble_gatt_char_context * param);

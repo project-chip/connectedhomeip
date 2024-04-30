@@ -93,7 +93,11 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
 
 void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 {
-    MTR_LOG_DEFAULT("DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
+    if (error == CHIP_NO_ERROR) {
+        MTR_LOG_DEFAULT("MTRDeviceControllerDelegate PASE session establishment succeeded.");
+    } else {
+        MTR_LOG_ERROR("MTRDeviceControllerDelegate PASE session establishment failed: %" CHIP_ERROR_FORMAT, error.Format());
+    }
     MATTER_LOG_METRIC_END(kMetricSetupPASESession, error);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;

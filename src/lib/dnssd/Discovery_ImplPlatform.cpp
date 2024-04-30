@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <cstdint>
 #include <lib/dnssd/Discovery_ImplPlatform.h>
 
 #include <inttypes.h>
@@ -51,7 +52,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     DiscoveredNodeData nodeData;
     result->ToDiscoveredNodeData(addresses, nodeData);
 
-    nodeData.LogDetail();
+    nodeData.Get<CommissionNodeData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
     discoveryContext->Release();
 }
@@ -72,14 +73,16 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         discoveryContext->Retain();
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
 
+        auto & ipAddress = services[i].mAddress;
+
         // Check if SRV, TXT and AAAA records were received in DNS responses
-        if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !services[i].mAddress.HasValue())
+        if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value())
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
         }
         else
         {
-            Inet::IPAddress * address = &(services[i].mAddress.Value());
+            Inet::IPAddress * address = &(*ipAddress);
             HandleNodeResolve(context, &services[i], Span<Inet::IPAddress>(address, 1), error);
         }
     }
@@ -113,10 +116,10 @@ CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t 
 
 template <class T>
 CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t & entriesCount, char * buffer, size_t bufferLen,
-                        chip::Optional<T> value)
+                        const std::optional<T> & value)
 {
-    VerifyOrReturnError(value.HasValue(), CHIP_NO_ERROR);
-    return AddPtrRecord(type, entries, entriesCount, buffer, bufferLen, value.Value());
+    VerifyOrReturnError(value.has_value(), CHIP_NO_ERROR);
+    return AddPtrRecord(type, entries, entriesCount, buffer, bufferLen, *value);
 }
 
 CHIP_ERROR ENFORCE_FORMAT(4, 5)
@@ -161,36 +164,36 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, CommissioningMod
 }
 
 template <class T>
-CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<T> value)
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, std::optional<T> value)
 {
-    VerifyOrReturnError(value.HasValue(), CHIP_ERROR_UNINITIALIZED);
-    return CopyTextRecordValue(buffer, bufferLen, value.Value());
+    VerifyOrReturnError(value.has_value(), CHIP_ERROR_UNINITIALIZED);
+    return CopyTextRecordValue(buffer, bufferLen, *value);
 }
 
-CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<uint16_t> value1, chip::Optional<uint16_t> value2)
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, std::optional<uint16_t> value1, std::optional<uint16_t> value2)
 {
-    VerifyOrReturnError(value1.HasValue(), CHIP_ERROR_UNINITIALIZED);
-    return value2.HasValue() ? CopyTextRecordValue(buffer, bufferLen, value1.Value(), value2.Value())
-                             : CopyTextRecordValue(buffer, bufferLen, value1.Value());
+    VerifyOrReturnError(value1.has_value(), CHIP_ERROR_UNINITIALIZED);
+    return value2.has_value() ? CopyTextRecordValue(buffer, bufferLen, *value1, *value2)
+                              : CopyTextRecordValue(buffer, bufferLen, *value1);
 }
 
-CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Optional<ReliableMessageProtocolConfig> optional,
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const std::optional<ReliableMessageProtocolConfig> & optional,
                                TxtFieldKey key)
 {
     VerifyOrReturnError((key == TxtFieldKey::kSessionIdleInterval || key == TxtFieldKey::kSessionActiveInterval ||
                          key == TxtFieldKey::kSessionActiveThreshold),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_UNINITIALIZED);
+    VerifyOrReturnError(optional.has_value(), CHIP_ERROR_UNINITIALIZED);
 
     CHIP_ERROR err;
     if (key == TxtFieldKey::kSessionActiveThreshold)
     {
-        err = CopyTextRecordValue(buffer, bufferLen, optional.Value().mActiveThresholdTime.count());
+        err = CopyTextRecordValue(buffer, bufferLen, optional->mActiveThresholdTime.count());
     }
     else
     {
         bool isIdle        = (key == TxtFieldKey::kSessionIdleInterval);
-        auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
+        auto retryInterval = isIdle ? optional->mIdleRetransTimeout : optional->mActiveRetransTimeout;
         if (retryInterval > kMaxRetryInterval)
         {
             ChipLogProgress(Discovery, "MRP retry interval %s value exceeds allowed range of 1 hour, using maximum available",
@@ -254,7 +257,7 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         return CopyTextRecordValue(buffer, bufferLen, params.GetCommissioningMode());
     case TxtFieldKey::kCommissionerPasscode:
         return CopyTextRecordValue(buffer, bufferLen,
-                                   static_cast<uint16_t>(params.GetCommissionerPasscodeSupported().ValueOr(false) ? 1 : 0));
+                                   static_cast<uint16_t>(params.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0));
     default:
         return CopyTxtRecord(key, buffer, bufferLen, static_cast<BaseAdvertisingParams<CommissionAdvertisingParameters>>(params));
     }
@@ -339,37 +342,37 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
 
 void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
 {
-    auto & resolutionData = nodeData.resolutionData;
-    auto & commissionData = nodeData.nodeData;
+    nodeData.Set<CommissionNodeData>();
+    auto & discoveredData = nodeData.Get<CommissionNodeData>();
 
-    Platform::CopyString(resolutionData.hostName, mHostName);
-    Platform::CopyString(commissionData.instanceName, mName);
+    Platform::CopyString(discoveredData.hostName, mHostName);
+    Platform::CopyString(discoveredData.instanceName, mName);
 
     IPAddressSorter::Sort(addresses, mInterface);
 
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
-        if (addressesFound == ArraySize(resolutionData.ipAddress))
+        if (addressesFound == ArraySize(discoveredData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
             break;
         }
-        resolutionData.ipAddress[addressesFound] = ip;
+        discoveredData.ipAddress[addressesFound] = ip;
         ++addressesFound;
     }
 
-    resolutionData.interfaceId = mInterface;
-    resolutionData.numIPs      = addressesFound;
-    resolutionData.port        = mPort;
+    discoveredData.interfaceId = mInterface;
+    discoveredData.numIPs      = addressesFound;
+    discoveredData.port        = mPort;
 
     for (size_t i = 0; i < mTextEntrySize; ++i)
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
         ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, resolutionData);
-        FillNodeDataFromTxt(key, val, commissionData);
+        FillNodeDataFromTxt(key, val, discoveredData);
+        FillNodeDataFromTxt(key, val, discoveredData);
     }
 }
 
@@ -760,16 +763,15 @@ CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFi
 
 CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryContext & context)
 {
-    if (!context.GetBrowseIdentifier().HasValue())
+    const std::optional<intptr_t> browseIdentifier = context.GetBrowseIdentifier();
+    if (!browseIdentifier.has_value())
     {
         // No discovery going on.
         return CHIP_NO_ERROR;
     }
 
-    const auto browseIdentifier = context.GetBrowseIdentifier().Value();
     context.ClearBrowseIdentifier();
-
-    return ChipDnssdStopBrowse(browseIdentifier);
+    return ChipDnssdStopBrowse(*browseIdentifier);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)

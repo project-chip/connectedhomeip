@@ -86,7 +86,6 @@ if (chip_build_tests) {
         chip_device_platform != "efr32") {
       tests += [
         "${chip_root}/src/setup_payload/tests",
-        "${chip_root}/src/setup_payload/tests:tests_nltest",
         "${chip_root}/src/transport/raw/tests",
       ]
     }
@@ -98,7 +97,9 @@ if (chip_build_tests) {
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",
+        "${chip_root}/src/lib/support/tests:tests_nltest",
         "${chip_root}/src/protocols/secure_channel/tests",
+        "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
         "${chip_root}/src/system/tests",
         "${chip_root}/src/transport/tests",
       ]

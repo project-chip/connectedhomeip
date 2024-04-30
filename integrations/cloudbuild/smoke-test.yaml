@@ -66,7 +66,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:47"
+    - name: "ghcr.io/project-chip/chip-build-vscode:49"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
