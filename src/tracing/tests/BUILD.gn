@@ -22,7 +22,6 @@ import("${chip_root}/src/tracing/tracing_args.gni")
 if (matter_enable_tracing_support && matter_trace_config == "multiplexed") {
   chip_test_suite("tests") {
     output_name = "libTracingTests"
-    asdfl;jjasdfljasdflkjasdf
 
     test_sources = [
       "TestMetricEvents.cpp",
