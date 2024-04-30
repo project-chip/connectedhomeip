@@ -17,6 +17,9 @@ name: Wait For Fast CI to Pass
 on:
   workflow_call:
 
+env:
+  GH_TOKEN: ${{ github.token }}
+
 jobs:
   wait-for-spell-check:
     name: Wait For Spell Check
