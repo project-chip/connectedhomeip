@@ -950,14 +950,21 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
                         app::DataModel::Nullable<uint8_t> rate, chip::Optional<BitMask<OptionsBitmap>> optionsMask,
                         chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
 {
+    Status status;
+    uint8_t difference;
+    EmberAfLevelControlState * state;
+    app::DataModel::Nullable<uint8_t> currentLevel;
+
     EndpointId endpoint = commandPath.mEndpointId;
     CommandId commandId = commandPath.mCommandId;
+    // Validate the received rate and moveMode first.
+    if ((!rate.IsNull() && (rate.Value() == 0)) || moveMode == MoveModeEnum::kUnknownEnumValue)
+    {
+        status = Status::InvalidCommand;
+        goto send_default_response;
+    }
 
-    EmberAfLevelControlState * state = getState(endpoint);
-    Status status;
-    app::DataModel::Nullable<uint8_t> currentLevel;
-    uint8_t difference;
-
+    state = getState(endpoint);
     if (state == nullptr)
     {
         status = Status::Failure;
@@ -967,14 +974,6 @@ static void moveHandler(app::CommandHandler * commandObj, const app::ConcreteCom
     if (!shouldExecuteIfOff(endpoint, commandId, optionsMask, optionsOverride))
     {
         status = Status::Success;
-        goto send_default_response;
-    }
-
-    // Always validate the rate parameter received. A rate of 0 is invalid.
-    if (!rate.IsNull() && (rate.Value() == 0))
-    {
-        // Providing rate of 0 is not allowed.
-        status = Status::InvalidCommand;
         goto send_default_response;
     }
 
@@ -1092,14 +1091,22 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
                         uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTimeDs,
                         chip::Optional<BitMask<OptionsBitmap>> optionsMask, chip::Optional<BitMask<OptionsBitmap>> optionsOverride)
 {
-    EndpointId endpoint = commandPath.mEndpointId;
-    CommandId commandId = commandPath.mCommandId;
-
-    EmberAfLevelControlState * state = getState(endpoint);
     Status status;
+    EmberAfLevelControlState * state;
     app::DataModel::Nullable<uint8_t> currentLevel;
+
+    EndpointId endpoint    = commandPath.mEndpointId;
+    CommandId commandId    = commandPath.mCommandId;
     uint8_t actualStepSize = stepSize;
 
+    // Validate the received stepSize and stepMode first.
+    if (stepSize == 0 || stepMode == StepModeEnum::kUnknownEnumValue)
+    {
+        status = Status::InvalidCommand;
+        goto send_default_response;
+    }
+
+    state = getState(endpoint);
     if (state == nullptr)
     {
         status = Status::Failure;
@@ -1161,6 +1168,7 @@ static void stepHandler(app::CommandHandler * commandObj, const app::ConcreteCom
         }
         break;
     default:
+        // Should never happen as it is verified at function entry.
         status = Status::InvalidCommand;
         goto send_default_response;
     }
