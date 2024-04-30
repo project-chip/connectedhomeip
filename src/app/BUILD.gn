@@ -150,18 +150,6 @@ source_set("test-event-trigger") {
   sources = [ "TestEventTriggerDelegate.h" ]
 }
 
-source_set("timer-delegates") {
-  sources = [
-    "TimerDelegates.cpp",
-    "TimerDelegates.h",
-  ]
-
-  public_deps = [
-    ":interaction-model",
-    "${chip_root}/src/system",
-  ]
-}
-
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
 # which in tern depens on the interaction-model.
 # Using source_set prevents the unit test to build correctly.
@@ -338,6 +326,8 @@ static_library("app") {
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
+    "TimerDelegates.cpp",
+    "TimerDelegates.h",
     "WriteHandler.cpp",
 
     # TODO: the following items cannot be included due to interaction-model circularity
@@ -355,7 +345,6 @@ static_library("app") {
     ":constants",
     ":global-attributes",
     ":interaction-model",
-    ":timer-delegates",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/util:callbacks",

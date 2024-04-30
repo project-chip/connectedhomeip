@@ -16,3 +16,4 @@ SetupPayloadTests
 SupportTests
 UserDirectedCommissioningTests
 SecureChannelTests
+ICDServerTests

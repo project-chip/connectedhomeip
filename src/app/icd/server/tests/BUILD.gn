@@ -26,6 +26,7 @@ chip_test_suite_using_nltest("tests_nltest") {
 
   public_deps = [
     "${chip_root}/src/app/icd/server:manager",
+    "${chip_root}/src/app/icd/server:monitoring-table",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/lib/support:testing_nlunit",

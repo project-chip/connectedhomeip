@@ -19,6 +19,7 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
+#include <app/icd/server/ICDMonitoringTable.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <crypto/DefaultSessionKeystore.h>
@@ -658,6 +659,7 @@ public:
         NL_TEST_ASSERT(aSuite, stayActivePromisedMs == 20000);
     }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     static void TestShouldCheckInMsgsBeSentAtActiveModeFunction(nlTestSuite * aSuite, void * aContext)
@@ -728,6 +730,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11));
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     static void TestHandleTestEventTriggerActiveModeReq(nlTestSuite * aSuite, void * aContext)
     {
@@ -1122,27 +1125,29 @@ namespace {
 static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDModeDurations", TestICDManager::TestICDModeDurations),
     NL_TEST_DEF("TestOnSubscriptionReport", TestICDManager::TestOnSubscriptionReport),
-    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub",
-                TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub),
+    NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
+    NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
+    NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
     NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithActiveSub",
                 TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithActiveSub),
-    NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
-    NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
-    NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
-    NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
+    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub",
+                TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub),
     NL_TEST_DEF("TestShouldCheckInMsgsBeSentAtActiveModeFunction", TestICDManager::TestShouldCheckInMsgsBeSentAtActiveModeFunction),
-    NL_TEST_DEF("TestHandleTestEventTriggerActiveModeReq", TestICDManager::TestHandleTestEventTriggerActiveModeReq),
     NL_TEST_DEF("TestHandleTestEventTriggerInvalidateHalfCounterValues",
                 TestICDManager::TestHandleTestEventTriggerInvalidateHalfCounterValues),
     NL_TEST_DEF("TestHandleTestEventTriggerInvalidateAllCounterValues",
                 TestICDManager::TestHandleTestEventTriggerInvalidateAllCounterValues),
+    NL_TEST_DEF("TestICDStateObserverOnICDModeChange", TestICDManager::TestICDStateObserverOnICDModeChange),
+    NL_TEST_DEF("TestICDStateObserverOnICDModeChangeOnInit", TestICDManager::TestICDStateObserverOnICDModeChangeOnInit),
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+    NL_TEST_DEF("TestHandleTestEventTriggerActiveModeReq", TestICDManager::TestHandleTestEventTriggerActiveModeReq),
     NL_TEST_DEF("TestICDStateObserverOnEnterIdleModeActiveModeDuration",
                 TestICDManager::TestICDStateObserverOnEnterIdleModeActiveModeDuration),
     NL_TEST_DEF("TestICDStateObserverOnEnterIdleModeActiveModeThreshold",
                 TestICDManager::TestICDStateObserverOnEnterIdleModeActiveModeThreshold),
     NL_TEST_DEF("TestICDStateObserverOnEnterActiveMode", TestICDManager::TestICDStateObserverOnEnterActiveMode),
-    NL_TEST_DEF("TestICDStateObserverOnICDModeChange", TestICDManager::TestICDStateObserverOnICDModeChange),
-    NL_TEST_DEF("TestICDStateObserverOnICDModeChangeOnInit", TestICDManager::TestICDStateObserverOnICDModeChangeOnInit),
     NL_TEST_DEF("TestICDStateObserverOnTransitionToIdleModeGreaterActiveModeDuration",
                 TestICDManager::TestICDStateObserverOnTransitionToIdleModeGreaterActiveModeDuration),
     NL_TEST_DEF("TestICDStateObserverOnTransitionToIdleModeEqualActiveModeDuration",
