@@ -644,6 +644,8 @@ HomePods
 hostapd
 hostname
 href
+HSM
+hsm
 HTTPS
 HW
 hwadr
@@ -895,6 +897,7 @@ MoveWithOnOff
 MPSL
 MRP
 MTD
+MTR
 MTU
 Multiband
 Multicast
@@ -958,6 +961,7 @@ objcopy
 OccupancySensing
 OctetString
 OECORE
+OID
 ol
 Onboarding
 onboardingcodes
@@ -979,6 +983,7 @@ openweave
 OperationalCredentials
 operationalDataset
 opkg
+OPTIGA
 optionMask
 optionOverride
 optionsMask
@@ -1406,6 +1411,7 @@ transitionTime
 TransportMgrBase
 TriggerEffect
 TRNG
+trustm
 TrustedRootCertificates
 tsan
 TSG

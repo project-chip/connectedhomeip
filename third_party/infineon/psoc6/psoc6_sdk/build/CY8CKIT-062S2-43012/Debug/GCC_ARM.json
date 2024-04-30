@@ -220,7 +220,11 @@
         "-DCOMPONENT_SOFTFP",
         "-DCOMPONENT_WICED_BLE",
         "-DDEBUG",
-        "-DCY_SUPPORTS_DEVICE_VALIDATION"
+        "-DCY_SUPPORTS_DEVICE_VALIDATION",
+        "-DCY_CRYPTO_HAL_DISABLE",
+        "-DCOMPONENT_SECURE_SOCKETS",
+        "-DCOMPONENT_PSOC6_FREERTOS",
+        "-DOPTIGA_LIB_EXTERNAL=<optiga_lib_config_mtb.h>"
     ],
     "c_source": [
         "./libs/abstraction-rtos/source/cy_worker_thread.c",
