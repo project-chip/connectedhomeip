@@ -226,9 +226,8 @@ private:
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
                                    char ** txtFields, size_t & numTxtFields)
     {
-        const auto & optionalMrp = params.GetLocalMRPConfig();
 
-        if (optionalMrp.has_value())
+        if (const auto & optionalMrp = params.GetLocalMRPConfig(); optionalMrp.has_value())
         {
             auto mrp = *optionalMrp;
 
@@ -278,17 +277,16 @@ private:
                 txtFields[numTxtFields++] = storage.sessionActiveThresholdBuf;
             }
         }
+
+        if (const auto & tcpSupported = params.GetTcpSupported(); tcpSupported.has_value())
         {
-            const auto & tcpSupported = params.GetTcpSupported();
-            if (tcpSupported.has_value())
-            {
-                size_t writtenCharactersNumber =
-                    static_cast<size_t>(snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", *tcpSupported));
-                VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.tcpSupportedBuf)),
-                                    CHIP_ERROR_INVALID_STRING_LENGTH);
-                txtFields[numTxtFields++] = storage.tcpSupportedBuf;
-            }
+            size_t writtenCharactersNumber =
+                static_cast<size_t>(snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", *tcpSupported));
+            VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.tcpSupportedBuf)),
+                                CHIP_ERROR_INVALID_STRING_LENGTH);
+            txtFields[numTxtFields++] = storage.tcpSupportedBuf;
         }
+
         if (params.GetICDModeToAdvertise() != ICDModeAdvertise::kNone)
         {
             size_t writtenCharactersNumber =
@@ -673,43 +671,37 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
     }
 
+    if (const auto & vendorId = params.GetVendorId(); vendorId.has_value())
     {
-        const auto & vendorId = params.GetVendorId();
-        if (vendorId.has_value())
-        {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
-            FullQName vendorServiceName =
-                allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-            ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
+        FullQName vendorServiceName =
+            allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
+        ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
-            if (!allocator->AddResponder<PtrResponder>(vendorServiceName, instanceName)
-                     .SetReportAdditional(instanceName)
-                     .SetReportInServiceListing(true)
-                     .IsValid())
-            {
-                ChipLogError(Discovery, "Failed to add vendor PTR record mDNS responder");
-                return CHIP_ERROR_NO_MEMORY;
-            }
+        if (!allocator->AddResponder<PtrResponder>(vendorServiceName, instanceName)
+                 .SetReportAdditional(instanceName)
+                 .SetReportInServiceListing(true)
+                 .IsValid())
+        {
+            ChipLogError(Discovery, "Failed to add vendor PTR record mDNS responder");
+            return CHIP_ERROR_NO_MEMORY;
         }
     }
 
+    if (const auto & deviceType = params.GetDeviceType(); deviceType.has_value())
     {
-        const auto & deviceType = params.GetDeviceType();
-        if (deviceType.has_value())
-        {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
-            FullQName vendorServiceName =
-                allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
-            ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
+        FullQName vendorServiceName =
+            allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
+        ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
-            if (!allocator->AddResponder<PtrResponder>(vendorServiceName, instanceName)
-                     .SetReportAdditional(instanceName)
-                     .SetReportInServiceListing(true)
-                     .IsValid())
-            {
-                ChipLogError(Discovery, "Failed to add device type PTR record mDNS responder");
-                return CHIP_ERROR_NO_MEMORY;
-            }
+        if (!allocator->AddResponder<PtrResponder>(vendorServiceName, instanceName)
+                 .SetReportAdditional(instanceName)
+                 .SetReportInServiceListing(true)
+                 .IsValid())
+        {
+            ChipLogError(Discovery, "Failed to add device type PTR record mDNS responder");
+            return CHIP_ERROR_NO_MEMORY;
         }
     }
 
@@ -835,23 +827,17 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
     }
 
     char txtDeviceType[chip::Dnssd::kKeyDeviceTypeMaxLength + 4];
+    if (const auto & deviceType = params.GetDeviceType(); deviceType.has_value())
     {
-        const auto & deviceType = params.GetDeviceType();
-        if (deviceType.has_value())
-        {
-            snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%" PRIu32, *deviceType);
-            txtFields[numTxtFields++] = txtDeviceType;
-        }
+        snprintf(txtDeviceType, sizeof(txtDeviceType), "DT=%" PRIu32, *deviceType);
+        txtFields[numTxtFields++] = txtDeviceType;
     }
 
     char txtDeviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 4];
+    if (const auto & deviceName = params.GetDeviceName(); deviceName.has_value())
     {
-        const auto deviceName = params.GetDeviceName();
-        if (deviceName.has_value())
-        {
-            snprintf(txtDeviceName, sizeof(txtDeviceName), "DN=%s", *deviceName);
-            txtFields[numTxtFields++] = txtDeviceName;
-        }
+        snprintf(txtDeviceName, sizeof(txtDeviceName), "DN=%s", *deviceName);
+        txtFields[numTxtFields++] = txtDeviceName;
     }
     CommonTxtEntryStorage commonStorage;
     AddCommonTxtEntries<CommissionAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
@@ -875,31 +861,22 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", static_cast<int>(params.GetCommissioningMode()));
         txtFields[numTxtFields++] = txtCommissioningMode;
 
+        if (const auto rotatingDeviceId = params.GetRotatingDeviceId(); rotatingDeviceId.has_value())
         {
-            const auto rotatingDeviceId = params.GetRotatingDeviceId();
-            if (rotatingDeviceId.has_value())
-            {
-                snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", *rotatingDeviceId);
-                txtFields[numTxtFields++] = txtRotatingDeviceId;
-            }
+            snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", *rotatingDeviceId);
+            txtFields[numTxtFields++] = txtRotatingDeviceId;
         }
 
+        if (const auto & pairingHint = params.GetPairingHint(); pairingHint.has_value())
         {
-            const auto & pairingHint = params.GetPairingHint();
-            if (pairingHint.has_value())
-            {
-                snprintf(txtPairingHint, sizeof(txtPairingHint), "PH=%d", *pairingHint);
-                txtFields[numTxtFields++] = txtPairingHint;
-            }
+            snprintf(txtPairingHint, sizeof(txtPairingHint), "PH=%d", *pairingHint);
+            txtFields[numTxtFields++] = txtPairingHint;
         }
 
+        if (const auto pairingInstruction = params.GetPairingInstruction(); pairingInstruction.has_value())
         {
-            const auto pairingInstruction = params.GetPairingInstruction();
-            if (pairingInstruction.has_value())
-            {
-                snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", *pairingInstruction);
-                txtFields[numTxtFields++] = txtPairingInstr;
-            }
+            snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", *pairingInstruction);
+            txtFields[numTxtFields++] = txtPairingInstr;
         }
     }
     else
