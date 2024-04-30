@@ -2469,9 +2469,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 }
 
-- (BOOL)_isAttributeAffectingDeviceConfigurationChanged:(MTRAttributePath *)attributePath
+- (BOOL)_attributeAffectsDeviceConfiguration:(MTRAttributePath *)attributePath
 {
-    // Check for attributes in the descriptor cluster that affect device configuration changed.
+    // Check for attributes in the descriptor cluster that affect device configuration.
     if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID) {
         switch (attributePath.attribute.unsignedLongValue) {
         case MTRAttributeIDTypeClusterDescriptorAttributePartsListID:
@@ -2482,7 +2482,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
 
-    // Check for global attributes that affect device configuration changed.
+    // Check for global attributes that affect device configuration.
     switch (attributePath.attribute.unsignedLongValue) {
     case MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID:
     case MTRAttributeIDTypeGlobalAttributeAttributeListID:

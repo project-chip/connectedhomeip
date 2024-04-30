@@ -1574,10 +1574,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [resubscriptionGotReportsExpectation fulfill];
     };
 
-    // Set the onDeviceConfigurationChanged callback but do nothing. We shouldn't be called.
-    __block BOOL wasOnDeviceConfigurationChangedCallbackCalled = false;
+    // Make sure there are no device configuration changed notifications during this test.
+    // There is nothing changing about the server that would lead to those.
+    __block BOOL wasOnDeviceConfigurationChangedCallbackCalled = NO;
     delegate.onDeviceConfigurationChanged = ^() {
-        wasOnDeviceConfigurationChangedCallbackCalled = true;
+        wasOnDeviceConfigurationChangedCallbackCalled = YES;
     };
 
     // reset the onAttributeDataReceived to validate the following resubscribe test
@@ -3052,8 +3053,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqualObjects(originalCommandPath, decodedCommandPath);
 }
 
-// Helper API to test if changes in an attribute with a path specified by endpointId, clusterId and attributeId affect
-// device configuration changed for a given MTRDevice. This API creates a fake attribute report for the given attribute path
+// Helper API to test if changes in an attribute with a path specified by endpointId, clusterId and attributeId trigger
+// device configuration changed callbacks for a given MTRDevice. This API creates a fake attribute report for the given attribute path
 // and injects it into MTRDevice to exercise and test the delegate's device configuration changed callback.
 + (void)runTestDeviceConfigurationChangedForAttribute:(MTRAttributeIDType)attributeId
                                             clusterId:(MTRClusterIDType)clusterId
@@ -3093,17 +3094,17 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
             XCTAssertNotNil(attributePath);
 
-            XCTAssert(attributePath.cluster.unsignedLongValue == clusterId);
-            XCTAssert(attributePath.attribute.unsignedLongValue == attributeId);
+            XCTAssertEqualObjects(attributePath.cluster, @(clusterId));
+            XCTAssertEqualObjects(attributePath.attribute, @(attributeId));
 
             NSDictionary * data = attributeDict[MTRDataKey];
             XCTAssertNotNil(data);
-            XCTAssert([data[MTRDataVersionKey] isEqualToNumber:dataVersion]);
+            XCTAssertEqualObjects(data[MTRDataVersionKey], dataVersion);
 
             NSArray<NSNumber *> * dataValue = data[MTRValueKey];
             XCTAssertNotNil(dataValue);
             XCTAssertNotNil(testDataValue);
-            XCTAssert([dataValue isEqual:testDataValue]);
+            XCTAssertEqualObjects(dataValue, testDataValue);
             [gotAttributeReportExpectation fulfill];
         }
     };
@@ -3187,13 +3188,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 switch (attributePath.attribute.unsignedLongValue) {
                 case MTRAttributeIDTypeGlobalAttributeAttributeListID: {
                     dataVersionForAttributeList = data[MTRDataVersionKey];
-                    ;
                     XCTAssertNotNil(dataVersionForAttributeList);
                     break;
                 }
                 case MTRAttributeIDTypeGlobalAttributeClusterRevisionID: {
                     dataVersionForClusterRevision = data[MTRDataVersionKey];
-                    ;
                     XCTAssertNotNil(dataVersionForClusterRevision);
                     break;
                 }
@@ -3202,7 +3201,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 NSDictionary * data = attributeDict[MTRDataKey];
                 XCTAssertNotNil(data);
                 dataVersionForAcceptedCommandList = data[MTRDataVersionKey];
-                ;
                 XCTAssertNotNil(dataVersionForAcceptedCommandList);
             } else if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeGroupsID && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
                 NSDictionary * data = attributeDict[MTRDataKey];
