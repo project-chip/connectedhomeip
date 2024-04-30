@@ -23,4 +23,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Review Spell Check Completion Status
-        run: echo To Do
+        run: |
+          gh run list
