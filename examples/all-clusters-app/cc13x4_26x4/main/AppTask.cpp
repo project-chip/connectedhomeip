@@ -20,10 +20,10 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include <app/server/Server.h>
-#include <app/util/af.h>
 
 #include "FreeRTOS.h"
 #include "Globals.h"
+#include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <examples/platform/cc13x4_26x4/CC13X4_26X4DeviceAttestationCreds.h>
 
@@ -40,8 +40,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 
-#ifdef AUTO_PRINT_METRICS
-#include <platform/cc13x2_26x2/DiagnosticDataProviderImpl.h>
+#if AUTO_PRINT_METRICS
+// #include <platform/cc13xx_26xx/DiagnosticDataProviderImpl.h>
 #endif
 #include <app/server/OnboardingCodesUtil.h>
 
@@ -54,12 +54,6 @@
 #define APP_TASK_STACK_SIZE (5000)
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
-
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
-#define LED_ENABLE 0
-#else
-#define LED_ENABLE 1
-#endif
 #define BUTTON_ENABLE 1
 
 using namespace ::chip;
@@ -68,7 +62,6 @@ using namespace ::chip::DeviceLayer;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
-
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 static DeviceInfoProviderImpl sExampleDeviceInfoProvider;

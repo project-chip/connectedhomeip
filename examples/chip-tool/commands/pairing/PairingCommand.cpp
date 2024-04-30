@@ -28,6 +28,8 @@
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
+#include <string>
+
 using namespace ::chip;
 using namespace ::chip::Controller;
 
@@ -477,12 +479,12 @@ void PairingCommand::OnICDStayActiveComplete(NodeId deviceId, uint32_t promisedA
                     ChipLogValueX64(deviceId), promisedActiveDuration);
 }
 
-void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::CommissionNodeData & nodeData)
 {
     // Ignore nodes with closed commissioning window
-    VerifyOrReturn(nodeData.commissionData.commissioningMode != 0);
+    VerifyOrReturn(nodeData.commissioningMode != 0);
 
-    auto & resolutionData = nodeData.resolutionData;
+    auto & resolutionData = nodeData;
 
     const uint16_t port = resolutionData.port;
     char buf[chip::Inet::IPAddress::kMaxStringLength];

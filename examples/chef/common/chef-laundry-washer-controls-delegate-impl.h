@@ -20,7 +20,6 @@
 
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-delegate.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
-#include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
 

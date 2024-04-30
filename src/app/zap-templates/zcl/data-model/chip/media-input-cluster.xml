@@ -26,6 +26,12 @@ limitations under the License.
 
     <description>This cluster provides an interface for controlling the Input Selector on a media device such as a TV.</description>
 
+    <features>
+      <feature bit="0" code="NU" name="NameUpdates" summary="Supports updates to the input names">
+        <optionalConform/>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST"          type="array" entryType="InputInfoStruct" length="254"           writable="false" optional="false">InputList</attribute>
     <attribute side="server" code="0x0001" define="MEDIA_INPUT_CURRENT_INPUT" type="int8u" default="0x00"              min="0x00" max="0xFF"  writable="false" optional="false">CurrentInput</attribute>
 
@@ -75,9 +81,5 @@ limitations under the License.
     <item name="Other" value="0x0B"/>
   </enum>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0507"/>
-    <field name="NameUpdates" mask="0x1"/>
-  </bitmap>
 
 </configurator>

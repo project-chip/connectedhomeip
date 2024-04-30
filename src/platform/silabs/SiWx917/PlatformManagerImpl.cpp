@@ -41,6 +41,8 @@
 #include "AppConfig.h"
 #include "FreeRTOS.h"
 
+using namespace chip::DeviceLayer::Internal;
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -111,32 +113,30 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
+    // Start timer to increment TotalOperationalHours every hour
+    SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
+
 exit:
     return err;
 }
 
-void PlatformManagerImpl::_Shutdown()
+void PlatformManagerImpl::UpdateOperationalHours(System::Layer * systemLayer, void * appState)
 {
-    uint64_t upTime = 0;
+    uint32_t totalOperationalHours = 0;
 
-    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
     {
-        uint32_t totalOperationalHours = 0;
-
-        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
-        {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
-        }
+        ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + 1);
     }
     else
     {
-        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+        ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
     }
 
+    SystemLayer().StartTimer(System::Clock::Seconds32(kSecondsPerHour), UpdateOperationalHours, NULL);
+}
+void PlatformManagerImpl::_Shutdown()
+{
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION

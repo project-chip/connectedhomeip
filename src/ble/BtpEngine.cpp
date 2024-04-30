@@ -25,18 +25,20 @@
  *
  */
 
-#include <ble/BleConfig.h>
+#define _CHIP_BLE_BLE_H
+#include "BtpEngine.h"
 
-#if CONFIG_NETWORK_LAYER_BLE
+#include <utility>
 
-#include <ble/BtpEngine.h>
-#if CHIP_ENABLE_CHIPOBLE_TEST
-#include <ble/BtpEngineTest.h>
-#endif
-
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
+
+#include "BleError.h"
 
 // Define below to enable extremely verbose BLE-specific debug logging.
 #undef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
@@ -93,10 +95,6 @@ CHIP_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
     mTxPacketCount         = 0;
     mTxNewestUnackedSeqNum = 0;
     mTxOldestUnackedSeqNum = 0;
-#if CHIP_ENABLE_CHIPOBLE_TEST
-    mTxPacketType = kType_Data; // Default BtpEngine Data packet
-    mRxPacketType = kType_Data; // Default BtpEngine Data packet
-#endif
 
     if (expect_first_ack)
     {
@@ -143,25 +141,6 @@ SequenceNumber_t BtpEngine::GetAndRecordRxAckSeqNum()
 
     return ret;
 }
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-bool BtpEngine::IsCommandPacket(const PacketBufferHandle & p)
-{
-    if (p.IsNull())
-    {
-        return false;
-    }
-
-    BitFlags<HeaderFlags> rx_flags;
-    Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
-    CHIP_ERROR err = reader.Read8(rx_flags.RawStorage()).StatusCode();
-    if (err != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-    return rx_flags.Has(HeaderFlags::kCommandMessage);
-}
-#endif // CHIP_ENABLE_CHIPOBLE_TEST
 
 bool BtpEngine::HasUnackedData() const
 {
@@ -271,12 +250,6 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
         // Get header flags, always in first byte.
         err = reader.Read8(rx_flags.RawStorage()).StatusCode();
         SuccessOrExit(err);
-#if CHIP_ENABLE_CHIPOBLE_TEST
-        if (rx_flags.Has(HeaderFlags::kCommandMessage))
-            SetRxPacketType(kType_Control);
-        else
-            SetRxPacketType(kType_Data);
-#endif
 
         didReceiveAck = rx_flags.Has(HeaderFlags::kFragmentAck);
 
@@ -307,10 +280,10 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
         }
 
         // Truncate the incoming fragment length by the mRxFragmentSize as the negotiated
-        // mRxFragnentSize may be smaller than the characteristic size.  Make sure
+        // mRxFragmentSize may be smaller than the characteristic size.  Make sure
         // we're not truncating to a data length smaller than what we have already consumed.
         VerifyOrExit(reader.OctetsRead() <= mRxFragmentSize, err = BLE_ERROR_REASSEMBLER_INCORRECT_STATE);
-        data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
+        data->SetDataLength(chip::min(data->DataLength(), static_cast<size_t>(mRxFragmentSize)));
 
         // Now mark the bytes we consumed as consumed.
         data->ConsumeHead(static_cast<uint16_t>(reader.OctetsRead()));
@@ -374,11 +347,12 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
     if (rx_flags.Has(HeaderFlags::kEndMessage))
     {
         // Trim remainder, if any, of the received packet buffer based on sender-specified length of reassembled message.
-        int padding = mRxBuf->DataLength() - mRxLength;
+        VerifyOrExit(CanCastTo<uint16_t>(mRxBuf->DataLength()), err = CHIP_ERROR_MESSAGE_TOO_LONG);
+        int padding = static_cast<uint16_t>(mRxBuf->DataLength()) - mRxLength;
 
         if (padding > 0)
         {
-            mRxBuf->SetDataLength(mRxLength);
+            mRxBuf->SetDataLength(static_cast<size_t>(mRxLength));
         }
 
         // Ensure all received fragments add up to sender-specified total message size.
@@ -403,7 +377,7 @@ exit:
         }
         if (!mRxBuf.IsNull())
         {
-            ChipLogError(Ble, "With rx buf data length = %u", mRxBuf->DataLength());
+            ChipLogError(Ble, "With rx buf data length = %u", static_cast<unsigned>(mRxBuf->DataLength()));
         }
         LogState();
 
@@ -454,9 +428,10 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
             return false;
         }
 
-        mTxBuf    = std::move(data);
-        mTxState  = kState_InProgress;
-        mTxLength = mTxBuf->DataLength();
+        mTxBuf   = std::move(data);
+        mTxState = kState_InProgress;
+        VerifyOrReturnError(CanCastTo<uint16_t>(mTxBuf->DataLength()), false);
+        mTxLength = static_cast<uint16_t>(mTxBuf->DataLength());
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send whole message:");
         PrintBufDebug(mTxBuf);
@@ -482,11 +457,6 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         mTxBuf->SetStart(characteristic);
         uint8_t cursor = 1; // first position past header flags byte
         BitFlags<HeaderFlags> headerFlags(HeaderFlags::kStartMessage);
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-        if (TxPacketType() == kType_Control)
-            headerFlags.Set(HeaderFlags::kCommandMessage);
-#endif
 
         if (send_ack)
         {
@@ -535,11 +505,6 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         uint8_t cursor = 1; // first position past header flags byte
 
         BitFlags<HeaderFlags> headerFlags(HeaderFlags::kContinueMessage);
-
-#if CHIP_ENABLE_CHIPOBLE_TEST
-        if (TxPacketType() == kType_Control)
-            headerFlags.Set(HeaderFlags::kCommandMessage);
-#endif
 
         if (send_ack)
         {
@@ -618,5 +583,3 @@ void BtpEngine::LogStateDebug() const
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* CONFIG_NETWORK_LAYER_BLE */

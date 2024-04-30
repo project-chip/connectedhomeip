@@ -32,7 +32,7 @@
 
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>
-#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
@@ -79,9 +79,10 @@ using namespace chip::app::Clusters;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
-
+#if (LED_ENABLE == 1)
 static LED_Handle sAppRedHandle;
 static LED_Handle sAppGreenHandle;
+#endif
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 

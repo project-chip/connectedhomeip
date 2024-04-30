@@ -304,7 +304,7 @@ CHIP_ERROR IncrementalResolver::OnTxtRecord(const ResourceData & data, BytesRang
         }
     }
 
-    if (IsActiveCommissionParse())
+    if (IsActiveBrowseParse())
     {
         TxtParser<CommissionNodeData> delegate(mSpecificResolutionData.Get<CommissionNodeData>());
         if (!ParseTxtRecord(data.GetData(), &delegate))
@@ -343,12 +343,15 @@ CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const I
 
 CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 {
-    VerifyOrReturnError(IsActiveCommissionParse(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsActiveBrowseParse(), CHIP_ERROR_INCORRECT_STATE);
 
     IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
-    outputData.resolutionData = mCommonResolutionData;
-    outputData.commissionData = mSpecificResolutionData.Get<CommissionNodeData>();
+    outputData.Set<CommissionNodeData>();
+    CommissionNodeData & nodeData         = outputData.Get<CommissionNodeData>();
+    nodeData                              = mSpecificResolutionData.Get<CommissionNodeData>();
+    CommonResolutionData & resolutionData = nodeData;
+    resolutionData                        = mCommonResolutionData;
 
     ResetToInactive();
 

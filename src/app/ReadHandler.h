@@ -25,9 +25,9 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/AttributePathParams.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CASESessionManager.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventManagement.h>

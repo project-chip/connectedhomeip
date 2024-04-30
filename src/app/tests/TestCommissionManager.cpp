@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/TestEventTriggerDelegate.h>
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -100,6 +101,8 @@ void InitializeChip(nlTestSuite * suite)
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
     initParams.reportScheduler = &sReportScheduler;
+    static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     err = chip::Server::GetInstance().Init(initParams);
 
@@ -236,7 +239,7 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     NL_TEST_ASSERT(suite, !sAdminVendorIdDirty);
 
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds16(1);
+    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds32(1);
     constexpr uint16_t kTimeoutMs              = 1000;
     constexpr unsigned kSleepPadding           = 100;
     commissionMgr.OverrideMinCommissioningTimeout(kTimeoutSeconds);

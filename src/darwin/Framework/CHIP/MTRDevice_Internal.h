@@ -30,16 +30,17 @@ typedef NSDictionary<NSString *, id> * MTRDeviceDataValueDictionary;
 
 typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 
-// Whether to store attributes by cluster instead of as individual entries for each attribute
-#define MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER 1
-
 /**
- * Information about a cluster, currently is just data version
+ * Information about a cluster: data version and known attribute values.
  */
 MTR_TESTABLE
 @interface MTRDeviceClusterData : NSObject <NSSecureCoding, NSCopying>
-@property (nonatomic) NSNumber * dataVersion;
-@property (nonatomic) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
+@property (nonatomic, nullable) NSNumber * dataVersion;
+@property (nonatomic, readonly) NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * attributes; // attributeID => data-value dictionary
+
+- (void)storeValue:(MTRDeviceDataValueDictionary _Nullable)value forAttribute:(NSNumber *)attribute;
+
+- (nullable instancetype)initWithDataVersion:(NSNumber * _Nullable)dataVersion attributes:(NSDictionary<NSNumber *, MTRDeviceDataValueDictionary> * _Nullable)attributes;
 @end
 
 @interface MTRDevice ()
@@ -81,14 +82,13 @@ MTR_TESTABLE
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 
-// Method to insert attribute values
-//   attributeValues : array of response-value dictionaries with non-null MTRAttributePathKey value
-//   reportChanges : if set to YES, attribute reports will also sent to the delegate if new values are different
-- (void)setAttributeValues:(NSArray<NSDictionary *> *)attributeValues reportChanges:(BOOL)reportChanges;
+// Method to insert persisted cluster data
+//   Contains data version information and attribute values.
+- (void)setPersistedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
 
-// Method to insert cluster data
-//   Currently contains data version information
-- (void)setClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData;
+#ifdef DEBUG
+- (NSUInteger)unitTestAttributeCount;
+#endif
 
 @end
 

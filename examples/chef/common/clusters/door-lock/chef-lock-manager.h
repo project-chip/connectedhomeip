@@ -20,9 +20,9 @@
 
 #include "chef-lock-endpoint.h"
 #include <app/clusters/door-lock-server/door-lock-server.h>
-#include <cstdint>
 
-#include <app/util/af.h>
+#include <cstdint>
+#include <vector>
 
 class LockManager
 {

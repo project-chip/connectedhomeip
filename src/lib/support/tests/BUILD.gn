@@ -15,10 +15,11 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libSupportTests"
 
   test_sources = [
@@ -39,7 +40,6 @@ chip_test_suite_using_nltest("tests") {
     "TestJsonToTlv.cpp",
     "TestJsonToTlvToJson.cpp",
     "TestPersistedCounter.cpp",
-    "TestPool.cpp",
     "TestPrivateHeap.cpp",
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
@@ -47,18 +47,46 @@ chip_test_suite_using_nltest("tests") {
     "TestScopedBuffer.cpp",
     "TestSorting.cpp",
     "TestSpan.cpp",
-    "TestStateMachine.cpp",
     "TestStaticSupportSmartPtr.cpp",
     "TestStringBuilder.cpp",
     "TestStringSplitter.cpp",
     "TestTestPersistentStorageDelegate.cpp",
-    "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
     "TestTlvJson.cpp",
     "TestTlvToJson.cpp",
     "TestUtf8.cpp",
     "TestVariant.cpp",
     "TestZclString.cpp",
+  ]
+  sources = []
+
+  cflags = [
+    "-Wconversion",
+
+    # TODO(#21255): work-around for SimpleStateMachine constructor issue.
+    "-Wno-uninitialized",
+
+    # TestStringSplitter intentionally validates string overflows.
+    "-Wno-stringop-truncation",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:static-support",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform",
+  ]
+}
+
+chip_test_suite_using_nltest("tests_nltest") {
+  output_name = "libSupportTestsNL"
+
+  test_sources = [
+    "TestPool.cpp",
+    "TestStateMachine.cpp",
+    "TestThreadOperationalDataset.cpp",
   ]
   sources = []
 

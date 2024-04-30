@@ -23,7 +23,8 @@
 
 #include <gtest/gtest.h>
 
-namespace {
+namespace chip {
+namespace Access {
 
 using namespace chip;
 using namespace chip::Access;
@@ -2189,4 +2190,5 @@ TEST_F(TestAccessControl, TestUpdateEntry)
     }
 }
 
-} // namespace
+} // namespace Access
+} // namespace chip

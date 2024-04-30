@@ -25,7 +25,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
-#include <app/util/af.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 /**

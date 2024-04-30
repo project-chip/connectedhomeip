@@ -15,12 +15,7 @@
  *    limitations under the License.
  */
 #import <Matter/MTRDefines.h>
-
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerParameters.h>
-#else
-#import "MTRDeviceControllerParameters_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #import "MTRDeviceController_Internal.h"
 
@@ -78,6 +73,7 @@
 
 #include <atomic>
 #include <dns_sd.h>
+#include <string>
 
 #import <os/lock.h>
 
@@ -90,7 +86,6 @@ static NSString * const kErrorPairingInit = @"Init failure while creating a pair
 static NSString * const kErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
-static NSString * const kErrorPreWarmCommissioning = @"Failure while trying to pre-warm the commissioning process";
 static NSString * const kErrorOpenPairingWindow = @"Open Pairing Window failed";
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
 static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
@@ -138,25 +133,15 @@ using namespace chip::Tracing::DarwinFramework;
 {
     if (![parameters isKindOfClass:MTRDeviceControllerParameters.class]) {
         MTR_LOG_ERROR("Unsupported type of MTRDeviceControllerAbstractParameters: %@", parameters);
-
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
         }
         return nil;
     }
+    auto * controllerParameters = static_cast<MTRDeviceControllerParameters *>(parameters);
 
-    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
-    if (!factory.isRunning) {
-        auto * params = [[MTRDeviceControllerFactoryParams alloc] initWithoutStorage];
-
-        if (![factory startControllerFactory:params error:error]) {
-            return nil;
-        }
-    }
-
-    auto * parametersForFactory = static_cast<MTRDeviceControllerParameters *>(parameters);
-
-    return [factory initializeController:self withParameters:parametersForFactory error:error];
+    // MTRDeviceControllerFactory will auto-start in per-controller-storage mode if necessary
+    return [MTRDeviceControllerFactory.sharedInstance initializeController:self withParameters:controllerParameters error:error];
 }
 
 - (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
@@ -178,11 +163,9 @@ using namespace chip::Tracing::DarwinFramework;
             }
 
             id<MTRDeviceControllerStorageDelegate> storageDelegateToUse = storageDelegate;
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
             if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
                 storageDelegateToUse = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:storageDelegate];
             }
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
             _controllerDataStore = [[MTRDeviceControllerDataStore alloc] initWithController:self
                                                                             storageDelegate:storageDelegateToUse
                                                                        storageDelegateQueue:storageDelegateQueue];
@@ -190,7 +173,6 @@ using namespace chip::Tracing::DarwinFramework;
                 return nil;
             }
         } else {
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
             if (MTRDeviceControllerLocalTestStorage.localTestStorageEnabled) {
                 dispatch_queue_t localTestStorageQueue = dispatch_queue_create("org.csa-iot.matter.framework.devicecontroller.localteststorage", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
                 MTRDeviceControllerLocalTestStorage * localTestStorage = [[MTRDeviceControllerLocalTestStorage alloc] initWithPassThroughStorage:nil];
@@ -201,7 +183,6 @@ using namespace chip::Tracing::DarwinFramework;
                     return nil;
                 }
             }
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
         }
 
         // Ensure the otaProviderDelegate, if any, is valid.
@@ -431,10 +412,6 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
-        if (_cppCommissioner == nullptr) {
-            [self checkForStartError:CHIP_ERROR_NO_MEMORY logMsg:kErrorCommissionerInit];
-            return;
-        }
 
         // nocBuffer might not be used, but if it is it needs to live
         // long enough (until after we are done using
@@ -508,11 +485,15 @@ using namespace chip::Tracing::DarwinFramework;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
         commissionerParams.enableServerInteractions = startupParams.advertiseOperational;
-        // We don't want to remove things from the fabric table on controller
-        // shutdown, since our controller setup depends on being able to fetch
-        // fabric information for the relevant fabric indices on controller
-        // bring-up.
+
+        // We never want plain "removal" from the fabric table since this leaves
+        // the in-memory state out of sync with what's in storage. In per-controller
+        // storage mode, have the controller delete itself from the fabric table on shutdown.
+        // In factory storage mode we need to keep fabric information around so we can
+        // start another controller on that existing fabric at a later time.
         commissionerParams.removeFromFabricTableOnShutdown = false;
+        commissionerParams.deleteFromFabricTableOnShutdown = (startupParams.storageDelegate != nil);
+
         commissionerParams.permitMultiControllerFabrics = startupParams.allowMultipleControllersPerFabric;
 
         // Set up our attestation verifier.  Assume we want to use the default
@@ -565,7 +546,7 @@ using namespace chip::Tracing::DarwinFramework;
         }
 
         errorCode = chip::Credentials::SetSingleIpkEpochKey(
-            _factory.groupData, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
+            _factory.groupDataProvider, fabricIdx, _operationalCredentialsDelegate->GetIPK(), compressedId);
         if ([self checkForStartError:errorCode logMsg:kErrorIPKInit]) {
             return;
         }
@@ -588,6 +569,20 @@ using namespace chip::Tracing::DarwinFramework;
         MTR_LOG_ERROR("operationalCertificateIssuer and operationalCertificateIssuerQueue must both be nil or both be non-nil");
         [self cleanupAfterStartup];
         return NO;
+    }
+
+    if (_controllerDataStore) {
+        // If the storage delegate supports the bulk read API, then a dictionary of nodeID => cluster data dictionary would be passed to the handler. Otherwise this would be a no-op, and stored attributes for MTRDevice objects will be loaded lazily in -deviceForNodeID:.
+        [_controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
+            MTR_LOG_INFO("Loaded attribute values for %lu nodes from storage for controller uuid %@", static_cast<unsigned long>(clusterDataByNode.count), self->_uniqueIdentifier);
+
+            std::lock_guard lock(self->_deviceMapLock);
+            for (NSNumber * nodeID in clusterDataByNode) {
+                NSDictionary * clusterData = clusterDataByNode[nodeID];
+                MTRDevice * device = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:clusterData];
+                MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), device);
+            }
+        }];
     }
 
     return YES;
@@ -900,15 +895,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)preWarmCommissioningSession
 {
-    auto block = ^{
-        auto errorCode = chip::DeviceLayer::PlatformMgrImpl().PrepareCommissioning();
-        MATTER_LOG_METRIC(kMetricPreWarmCommissioning, errorCode);
-
-        // The checkForError is just so it logs
-        [MTRDeviceController checkForError:errorCode logMsg:kErrorPreWarmCommissioning error:nil];
-    };
-
-    [self syncRunOnWorkQueue:block error:nil];
+    [_factory preWarmCommissioningSession];
 }
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
@@ -933,34 +920,42 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return [[MTRBaseDevice alloc] initWithNodeID:nodeID controller:self];
 }
 
+// If prefetchedClusterData is not provided, load attributes individually from controller data store
+- (MTRDevice *)_setupDeviceForNodeID:(NSNumber *)nodeID prefetchedClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)prefetchedClusterData
+{
+    os_unfair_lock_assert_owner(&_deviceMapLock);
+
+    MTRDevice * deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
+    // If we're not running, don't add the device to our map.  That would
+    // create a cycle that nothing would break.  Just return the device,
+    // which will be in exactly the state it would be in if it were created
+    // while we were running and then we got shut down.
+    if ([self isRunning]) {
+        _nodeIDToDeviceMap[nodeID] = deviceToReturn;
+    }
+
+    if (prefetchedClusterData) {
+        if (prefetchedClusterData.count) {
+            [deviceToReturn setPersistedClusterData:prefetchedClusterData];
+        }
+    } else {
+        // Load persisted cluster data if they exist.
+        NSDictionary * clusterData = [_controllerDataStore getStoredClusterDataForNodeID:nodeID];
+        MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), deviceToReturn);
+        if (clusterData.count) {
+            [deviceToReturn setPersistedClusterData:clusterData];
+        }
+    }
+
+    return deviceToReturn;
+}
+
 - (MTRDevice *)deviceForNodeID:(NSNumber *)nodeID
 {
     std::lock_guard lock(_deviceMapLock);
     MTRDevice * deviceToReturn = _nodeIDToDeviceMap[nodeID];
     if (!deviceToReturn) {
-        deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
-        // If we're not running, don't add the device to our map.  That would
-        // create a cycle that nothing would break.  Just return the device,
-        // which will be in exactly the state it would be in if it were created
-        // while we were running and then we got shut down.
-        if ([self isRunning]) {
-            _nodeIDToDeviceMap[nodeID] = deviceToReturn;
-        }
-
-#if !MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
-        // Load persisted attributes if they exist.
-        NSArray * attributesFromCache = [_controllerDataStore getStoredAttributesForNodeID:nodeID];
-        MTR_LOG_INFO("Loaded %lu attributes from storage for %@", static_cast<unsigned long>(attributesFromCache.count), deviceToReturn);
-        if (attributesFromCache.count) {
-            [deviceToReturn setAttributeValues:attributesFromCache reportChanges:NO];
-        }
-#endif
-        // Load persisted cluster data if they exist.
-        NSDictionary * clusterData = [_controllerDataStore getStoredClusterDataForNodeID:nodeID];
-        MTR_LOG_INFO("Loaded %lu cluster data from storage for %@", static_cast<unsigned long>(clusterData.count), deviceToReturn);
-        if (clusterData.count) {
-            [deviceToReturn setClusterData:clusterData];
-        }
+        deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
     }
 
     return deviceToReturn;
@@ -978,6 +973,18 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, nodeID.unsignedLongLongValue);
     }
 }
+
+#ifdef DEBUG
+- (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
+{
+    std::lock_guard lock(_deviceMapLock);
+    NSMutableDictionary<NSNumber *, NSNumber *> * deviceAttributeCounts = [NSMutableDictionary dictionary];
+    for (NSNumber * nodeID in _nodeIDToDeviceMap) {
+        deviceAttributeCounts[nodeID] = @([_nodeIDToDeviceMap[nodeID] unitTestAttributeCount]);
+    }
+    return deviceAttributeCounts;
+}
+#endif
 
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
@@ -1210,7 +1217,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             connectionBridge->connect(commissioner, nodeID);
         }
         errorHandler:^(NSError * error) {
-            completion(nullptr, chip::NullOptional, error);
+            completion(nullptr, chip::NullOptional, error, nil);
         }];
 }
 
@@ -1221,20 +1228,20 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             chip::CommissioneeDeviceProxy * deviceProxy;
             CHIP_ERROR err = commissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
             if (err != CHIP_NO_ERROR) {
-                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err]);
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err], nil);
                 return;
             }
 
             chip::Optional<chip::SessionHandle> session = deviceProxy->GetSecureSession();
             if (!session.HasValue() || !session.Value()->AsSecureSession()->IsPASESession()) {
-                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
                 return;
             }
 
-            completion(deviceProxy->GetExchangeManager(), session, nil);
+            completion(deviceProxy->GetExchangeManager(), session, nil, nil);
         }
         errorHandler:^(NSError * error) {
-            completion(nullptr, chip::NullOptional, error);
+            completion(nullptr, chip::NullOptional, error, nil);
         }];
 }
 
@@ -1342,6 +1349,13 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     }
 
     return @(_cppCommissioner->GetCompressedFabricId());
+}
+
+- (NSNumber * _Nullable)syncGetCompressedFabricID
+{
+    return [self syncRunOnWorkQueueWithReturnValue:^NSNumber * {
+        return [self compressedFabricID];
+    } error:nil];
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
@@ -1614,7 +1628,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // that we are running.
     [self getSessionForNode:deviceID
                  completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                      // Create an MTRBaseDevice for the node id involved, now that our
                      // CASE session is primed.  We don't actually care about the session
                      // information here.

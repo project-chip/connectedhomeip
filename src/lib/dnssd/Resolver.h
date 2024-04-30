@@ -78,12 +78,12 @@ public:
     void ClearBrowseIdentifier() { mBrowseIdentifier.ClearValue(); }
     const Optional<intptr_t> & GetBrowseIdentifier() const { return mBrowseIdentifier; }
 
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
+    void SetDiscoveryDelegate(DiscoverNodeDelegate * delegate) { mDelegate = delegate; }
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData)
     {
-        if (mCommissioningDelegate != nullptr)
+        if (mDelegate != nullptr)
         {
-            mCommissioningDelegate->OnNodeDiscovered(nodeData);
+            mDelegate->OnNodeDiscovered(nodeData);
         }
         else
         {
@@ -92,7 +92,7 @@ public:
     }
 
 private:
-    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
+    DiscoverNodeDelegate * mDelegate = nullptr;
     Optional<intptr_t> mBrowseIdentifier;
 };
 
@@ -168,31 +168,19 @@ public:
     virtual void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) = 0;
 
     /**
-     * Finds all commissionable nodes matching the given filter.
+     * Finds all nodes of given type matching the given filter.
      *
      * Whenever a new matching node is found, the node information is passed to
-     * the `OnNodeDiscovered` method of the commissioning delegate configured
+     * the `OnNodeDiscovered` method of the discovery delegate configured
      * in the context object.
      *
      * This method is expected to increase the reference count of the context
      * object for as long as it takes to complete the discovery request.
      */
-    virtual CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) = 0;
+    virtual CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) = 0;
 
     /**
-     * Finds all commissioner nodes matching the given filter.
-     *
-     * Whenever a new matching node is found, the node information is passed to
-     * the `OnNodeDiscovered` method of the commissioning delegate configured
-     * in the context object.
-     *
-     * This method is expected to increase the reference count of the context
-     * object for as long as it takes to complete the discovery request.
-     */
-    virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) = 0;
-
-    /**
-     * Stop discovery (of commissionable or commissioner nodes).
+     * Stop discovery (of all node types).
      *
      * Some back ends may not support stopping discovery, so consumers should
      * not assume they will stop getting callbacks after calling this.

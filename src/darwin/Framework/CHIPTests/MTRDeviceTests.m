@@ -119,18 +119,14 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 @implementation MTRDeviceTests
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 static BOOL slocalTestStorageEnabledBeforeUnitTest;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 + (void)setUp
 {
     XCTestExpectation * pairingExpectation = [[XCTestExpectation alloc] initWithDescription:@"Pairing Complete"];
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
     slocalTestStorageEnabledBeforeUnitTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
     MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = YES;
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
@@ -181,13 +177,11 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 {
     ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), nil, kTimeoutInSeconds);
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
     // Restore testing setting to previous state, and remove all persisted attributes
     MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = slocalTestStorageEnabledBeforeUnitTest;
-    [sController.controllerDataStore clearAllStoredAttributes];
-    NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedAttributesAfterClear.count, 0);
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
@@ -1352,9 +1346,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 - (void)test017_TestMTRDeviceBasics
 {
     // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
-    [sController.controllerDataStore clearAllStoredAttributes];
-    NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedAttributesAfterClear.count, 0);
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -1496,16 +1490,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * onTimeWriteSuccess = [self expectationWithDescription:@"OnTime write success"];
     XCTestExpectation * onTimePreviousValue = [self expectationWithDescription:@"OnTime previous value"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
-        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
-            MTRAttributePath * path = attributeReponseValue[MTRAttributePathKey];
+        for (NSDictionary<NSString *, id> * attributeResponseValue in data) {
+            MTRAttributePath * path = attributeResponseValue[MTRAttributePathKey];
             if (path.cluster.unsignedIntValue == MTRClusterIDTypeOnOffID && path.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOnOffAttributeOnTimeID) {
-                NSDictionary * dataValue = attributeReponseValue[MTRDataKey];
+                NSDictionary * dataValue = attributeResponseValue[MTRDataKey];
                 NSNumber * onTimeValue = dataValue[MTRValueKey];
                 if (onTimeValue && (onTimeValue.unsignedIntValue == testOnTimeValue)) {
                     [onTimeWriteSuccess fulfill];
                 }
 
-                NSDictionary * previousDataValue = attributeReponseValue[MTRPreviousDataKey];
+                NSDictionary * previousDataValue = attributeResponseValue[MTRPreviousDataKey];
                 NSNumber * previousOnTimeValue = previousDataValue[MTRValueKey];
                 if (previousOnTimeValue) {
                     [onTimePreviousValue fulfill];
@@ -1523,17 +1517,35 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [self waitForExpectations:@[ onTimeWriteSuccess, onTimePreviousValue ] timeout:10];
 
+    __auto_type getOnOffValue = ^{
+        return [device readAttributeWithEndpointID:@(1)
+                                         clusterID:@(MTRClusterIDTypeOnOffID)
+                                       attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)
+                                            params:nil];
+    };
+    __auto_type * onOffValue = getOnOffValue();
+
+    [device unitTestClearClusterData];
+
+    // Test that we can still get the value (will get paged in from storage).
+    XCTAssertEqualObjects(getOnOffValue(), onOffValue);
+
     // Test if errors are properly received
+    // TODO: We might stop reporting these altogether from MTRDevice, and then
+    // this test will need updating.
+    __auto_type * readThroughForUnknownAttributesParams = [[MTRReadParams alloc] init];
+    readThroughForUnknownAttributesParams.assumeUnknownAttributesReportable = NO;
     XCTestExpectation * attributeReportErrorExpectation = [self expectationWithDescription:@"Attribute read error"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
-        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
-            if (attributeReponseValue[MTRErrorKey]) {
+        for (NSDictionary<NSString *, id> * attributeResponseValue in data) {
+            if (attributeResponseValue[MTRErrorKey]) {
                 [attributeReportErrorExpectation fulfill];
             }
         }
     };
+
     // use the nonexistent attribute and expect read error
-    [device readAttributeWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID params:nil];
+    [device readAttributeWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID params:readThroughForUnknownAttributesParams];
     [self waitForExpectations:@[ attributeReportErrorExpectation ] timeout:10];
 
     // Resubscription test setup
@@ -2569,6 +2581,71 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif // MTR_ENABLE_PROVISIONAL
 }
 
+- (void)test029_MTRDeviceWriteCoalescing
+{
+    // Ensure the test starts with clean slate, even with MTRDeviceControllerLocalTestStorage enabled
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Given reachable state becomes true before underlying OnSubscriptionEstablished callback, this expectation is necessary but
+    // not sufficient as a mark to the end of reports
+    XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.onReportEnd = ^() {
+        [gotReportsExpectation fulfill];
+    };
+    // Skip reports for expected values so we actually have some idea of what
+    // the server is reporting.
+    delegate.skipExpectedValuesForWrite = YES;
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ gotReportsExpectation ] timeout:60];
+
+    delegate.onReportEnd = nil;
+
+    uint16_t testOnTimeValue = 10;
+    XCTestExpectation * onTimeWriteSuccess = [self expectationWithDescription:@"OnTime write success"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * attributeResponseValue in data) {
+            MTRAttributePath * path = attributeResponseValue[MTRAttributePathKey];
+            if (path.cluster.unsignedIntValue == MTRClusterIDTypeOnOffID && path.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOnOffAttributeOnTimeID) {
+                NSDictionary * dataValue = attributeResponseValue[MTRDataKey];
+                NSNumber * onTimeValue = dataValue[MTRValueKey];
+                if ([onTimeValue isEqual:@(testOnTimeValue + 4)]) {
+                    [onTimeWriteSuccess fulfill];
+                } else {
+                    // The first write we did might get reported, but none of
+                    // the other ones should be.
+                    XCTAssertEqualObjects(onTimeValue, @(testOnTimeValue + 1));
+                }
+            }
+        }
+    };
+
+    __auto_type writeOnTimeValue = ^(uint16_t value) {
+        NSDictionary * writeValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(value) };
+        [device writeAttributeWithEndpointID:@(1)
+                                   clusterID:@(MTRClusterIDTypeOnOffID)
+                                 attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
+                                       value:writeValue
+                       expectedValueInterval:@(0)
+                           timedWriteTimeout:nil];
+    };
+
+    writeOnTimeValue(testOnTimeValue + 1);
+    writeOnTimeValue(testOnTimeValue + 2);
+    writeOnTimeValue(testOnTimeValue + 3);
+    writeOnTimeValue(testOnTimeValue + 4);
+
+    [self waitForExpectations:@[ onTimeWriteSuccess ] timeout:10];
+}
+
 - (void)test900_SubscribeAllAttributes
 {
     MTRBaseDevice * device = GetConnectedDevice();
@@ -2839,7 +2916,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertEqualObjects(cluster.endpointID, @(0));
 }
 
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 - (void)test031_MTRDeviceAttributeCacheLocalTestStorage
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -2847,9 +2923,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // First start with clean slate by removing the MTRDevice and clearing the persisted cache
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
     [sController removeDevice:device];
-    [sController.controllerDataStore clearAllStoredAttributes];
-    NSArray * storedAttributesAfterClear = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
-    XCTAssertEqual(storedAttributesAfterClear.count, 0);
+    [sController.controllerDataStore clearAllStoredClusterData];
+    NSDictionary * storedClusterDataAfterClear = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    XCTAssertEqual(storedClusterDataAfterClear.count, 0);
 
     // Now recreate device and get subscription primed
     device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
@@ -2871,13 +2947,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     NSUInteger attributesReportedWithFirstSubscription = [device unitTestAttributesReportedSinceLastCheck];
 
-#if MTRDEVICE_ATTRIBUTE_CACHE_STORE_ATTRIBUTES_BY_CLUSTER
     NSDictionary * dataStoreClusterDataAfterFirstSubscription = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
     XCTAssertTrue(dataStoreClusterDataAfterFirstSubscription.count > 0);
-#else
-    NSArray * dataStoreValuesAfterFirstSubscription = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
-    XCTAssertTrue(dataStoreValuesAfterFirstSubscription.count > 0);
-#endif
 
     // Now remove device, resubscribe, and see that it succeeds
     [sController removeDevice:device];
@@ -2908,11 +2979,59 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // 2) Some attributes do change on resubscribe
     //   * With all-clusts-app as of 2024-02-10, out of 1287 persisted attributes, still 450 attributes were reported with filter
     // And so conservatively, assert that data version filters save at least 300 entries.
-    NSArray * dataStoreValuesAfterSecondSubscription = [sController.controllerDataStore getStoredAttributesForNodeID:@(kDeviceId)];
-    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreValuesAfterSecondSubscription.count - attributesReportedWithSecondSubscription;
+    NSDictionary * storedClusterDataAfterSecondSubscription = [sController.controllerDataStore getStoredClusterDataForNodeID:@(kDeviceId)];
+    NSUInteger dataStoreAttributeCountAfterSecondSubscription = 0;
+    for (NSNumber * clusterID in storedClusterDataAfterSecondSubscription) {
+        MTRDeviceClusterData * clusterData = storedClusterDataAfterSecondSubscription[clusterID];
+        dataStoreAttributeCountAfterSecondSubscription += clusterData.attributes.count;
+    }
+    NSUInteger storedAttributeCountDifferenceFromMTRDeviceReport = dataStoreAttributeCountAfterSecondSubscription - attributesReportedWithSecondSubscription;
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
+- (void)test032_MTRPathClassesEncoding
+{
+    NSError * encodeError;
+    NSData * encodedData;
+    NSError * decodeError;
+    id decodedValue;
+
+    // Test attribute path encode / decode
+    MTRAttributePath * originalAttributePath = [MTRAttributePath attributePathWithEndpointID:@(101) clusterID:@(102) attributeID:@(103)];
+    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalAttributePath requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError);
+
+    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRAttributePath class]] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError);
+    XCTAssertTrue([decodedValue isKindOfClass:[MTRAttributePath class]]);
+
+    MTRAttributePath * decodedAttributePath = decodedValue;
+    XCTAssertEqualObjects(originalAttributePath, decodedAttributePath);
+
+    // Test event path encode / decode
+    MTREventPath * originalEventPath = [MTREventPath eventPathWithEndpointID:@(201) clusterID:@(202) eventID:@(203)];
+    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalEventPath requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError);
+
+    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTREventPath class]] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError);
+    XCTAssertTrue([decodedValue isKindOfClass:[MTREventPath class]]);
+
+    MTREventPath * decodedEventPath = decodedValue;
+    XCTAssertEqualObjects(originalEventPath, decodedEventPath);
+
+    // Test command path encode / decode
+    MTRCommandPath * originalCommandPath = [MTRCommandPath commandPathWithEndpointID:@(301) clusterID:@(302) commandID:@(303)];
+    encodedData = [NSKeyedArchiver archivedDataWithRootObject:originalCommandPath requiringSecureCoding:YES error:&encodeError];
+    XCTAssertNil(encodeError);
+
+    decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:[MTRCommandPath class]] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodeError);
+    XCTAssertTrue([decodedValue isKindOfClass:[MTRCommandPath class]]);
+
+    MTRCommandPath * decodedCommandPath = decodedValue;
+    XCTAssertEqualObjects(originalCommandPath, decodedCommandPath);
+}
 
 @end
 

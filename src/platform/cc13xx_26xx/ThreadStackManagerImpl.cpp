@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides an implementation of the ThreadStackManager object for
- *          CC13X2_26X2 platforms using the Texas Instruments SDK and the
+ *          CC13XX_26XX platforms using the Texas Instruments SDK and the
  *          OpenThread stack.
  *
  */

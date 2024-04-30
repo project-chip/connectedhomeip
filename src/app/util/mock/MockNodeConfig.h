@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/attribute-type.h>
 #include <app/util/af-types.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -28,10 +29,35 @@
 namespace chip {
 namespace Test {
 
+namespace internal {
+
+constexpr EmberAfAttributeMetadata DefaultAttributeMetadata(chip::AttributeId id)
+{
+    return EmberAfAttributeMetadata{
+        .defaultValue  = EmberAfDefaultOrMinMaxAttributeValue(static_cast<uint32_t>(0)),
+        .attributeId   = id,
+        .size          = 4,
+        .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
+        .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    };
+}
+
+} // namespace internal
+
 struct MockAttributeConfig
 {
-    MockAttributeConfig(AttributeId aId) : id(aId) {}
+    MockAttributeConfig(AttributeId aId) : id(aId), attributeMetaData(internal::DefaultAttributeMetadata(aId)) {}
+    MockAttributeConfig(AttributeId aId, EmberAfAttributeType type,
+                        EmberAfAttributeMask mask = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE) :
+        id(aId),
+        attributeMetaData(internal::DefaultAttributeMetadata(aId))
+    {
+        attributeMetaData.attributeType = type;
+        attributeMetaData.mask          = mask;
+    }
+
     const AttributeId id;
+    EmberAfAttributeMetadata attributeMetaData;
 };
 
 struct MockEventConfig
@@ -45,6 +71,10 @@ struct MockClusterConfig
     MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes = {},
                       std::initializer_list<MockEventConfig> aEvents = {});
 
+    // Cluster-config is self-referential: mEmberCluster.attributes references  mAttributeMetaData.data()
+    MockClusterConfig(const MockClusterConfig & other);
+    MockClusterConfig & operator=(const MockClusterConfig &) = delete;
+
     const MockAttributeConfig * attributeById(AttributeId attributeId, ptrdiff_t * outIndex = nullptr) const;
     const EmberAfCluster * emberCluster() const { return &mEmberCluster; }
 
@@ -55,11 +85,16 @@ struct MockClusterConfig
 private:
     EmberAfCluster mEmberCluster;
     std::vector<EventId> mEmberEventList;
+    std::vector<EmberAfAttributeMetadata> mAttributeMetaData;
 };
 
 struct MockEndpointConfig
 {
     MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {});
+
+    // Endpoint-config is self-referential: mEmberEndpoint.clusters references  mEmberClusters.data()
+    MockEndpointConfig(const MockEndpointConfig & other);
+    MockEndpointConfig & operator=(const MockEndpointConfig &) = delete;
 
     const MockClusterConfig * clusterById(ClusterId clusterId, ptrdiff_t * outIndex = nullptr) const;
     const EmberAfEndpointType * emberEndpoint() const { return &mEmberEndpoint; }
