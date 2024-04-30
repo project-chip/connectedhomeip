@@ -861,7 +861,7 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", static_cast<int>(params.GetCommissioningMode()));
         txtFields[numTxtFields++] = txtCommissioningMode;
 
-        if (const auto rotatingDeviceId = params.GetRotatingDeviceId(); rotatingDeviceId.has_value())
+        if (const auto & rotatingDeviceId = params.GetRotatingDeviceId(); rotatingDeviceId.has_value())
         {
             snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", *rotatingDeviceId);
             txtFields[numTxtFields++] = txtRotatingDeviceId;
@@ -873,7 +873,7 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
             txtFields[numTxtFields++] = txtPairingHint;
         }
 
-        if (const auto pairingInstruction = params.GetPairingInstruction(); pairingInstruction.has_value())
+        if (const auto & pairingInstruction = params.GetPairingInstruction(); pairingInstruction.has_value())
         {
             snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", *pairingInstruction);
             txtFields[numTxtFields++] = txtPairingInstr;
