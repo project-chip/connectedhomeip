@@ -20,9 +20,11 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+#include <app/icd/server/ICDServerConfig.h>
+
 #if SILABS_LOG_ENABLED
 #include "silabs_utils.h"
-#endif
+#endif // SILABS_LOG_ENABLED
 
 // TODO add includes ?
 extern "C" {
@@ -33,12 +35,11 @@ extern "C" {
 #include "sl_si91x_button_pin_config.h"
 #include "sl_si91x_led.h"
 #include "sl_si91x_led_config.h"
-void soc_pll_config(void);
-}
 
-#if SILABS_LOG_ENABLED
-#include "silabs_utils.h"
-#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
+void soc_pll_config(void);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+}
 
 #ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
 #include "SEGGER_SYSVIEW.h"
@@ -47,11 +48,12 @@ void soc_pll_config(void);
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
-#if SL_ICD_ENABLED
 namespace {
+uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 bool btn0_pressed = false;
-}
 #endif /* SL_ICD_ENABLED */
+} // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
 SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
@@ -63,10 +65,10 @@ CHIP_ERROR SilabsPlatform::Init(void)
     // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
     NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
 
-#ifndef SL_ICD_ENABLED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
     // Configuration the clock rate
     soc_pll_config();
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();
@@ -143,6 +145,10 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
         return;
     }
 
+    if (btn < SL_SI91x_BUTTON_COUNT)
+    {
+        sButtonStates[btn] = btnAction;
+    }
     Silabs::GetPlatform().mButtonCallback(btn, btnAction);
 }
 }

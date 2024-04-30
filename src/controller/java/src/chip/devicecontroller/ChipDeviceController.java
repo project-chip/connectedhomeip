@@ -743,7 +743,7 @@ public class ChipDeviceController {
   }
 
   public List<ICDClientInfo> getICDClientInfo() {
-    return getICDClientInfo(deviceControllerPtr, getFabricIndex(deviceControllerPtr));
+    return getICDClientInfo(getFabricIndex(deviceControllerPtr));
   }
 
   /**
@@ -752,7 +752,7 @@ public class ChipDeviceController {
    * @param fabricIndex the fabric index to check
    */
   public List<ICDClientInfo> getICDClientInfo(int fabricIndex) {
-    return getICDClientInfo(deviceControllerPtr, fabricIndex);
+    return ChipICDClient.getICDClientInfo(fabricIndex);
   }
 
   /* Shuts down all active subscriptions. */
@@ -838,7 +838,10 @@ public class ChipDeviceController {
         false,
         false,
         imTimeoutMs,
-        null);
+        null,
+        ChipICDClient.isPeerICDClient(
+            ChipInteractionClient.getFabricIndex(devicePtr),
+            ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -876,7 +879,10 @@ public class ChipDeviceController {
         false,
         false,
         imTimeoutMs,
-        null);
+        null,
+        ChipICDClient.isPeerICDClient(
+            ChipInteractionClient.getFabricIndex(devicePtr),
+            ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   public void subscribeToEventPath(
@@ -902,7 +908,10 @@ public class ChipDeviceController {
         false,
         false,
         imTimeoutMs,
-        eventMin);
+        eventMin,
+        ChipICDClient.isPeerICDClient(
+            ChipInteractionClient.getFabricIndex(devicePtr),
+            ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -936,7 +945,10 @@ public class ChipDeviceController {
         keepSubscriptions,
         isFabricFiltered,
         imTimeoutMs,
-        null);
+        null,
+        ChipICDClient.isPeerICDClient(
+            ChipInteractionClient.getFabricIndex(devicePtr),
+            ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -988,7 +1000,10 @@ public class ChipDeviceController {
         keepSubscriptions,
         isFabricFiltered,
         imTimeoutMs,
-        null);
+        null,
+        ChipICDClient.isPeerICDClient(
+            ChipInteractionClient.getFabricIndex(devicePtr),
+            ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   public void subscribeToPath(
@@ -1019,7 +1034,47 @@ public class ChipDeviceController {
         keepSubscriptions,
         isFabricFiltered,
         imTimeoutMs,
-        eventMin);
+        eventMin,
+        ChipICDClient.isPeerICDClient(
+            ChipInteractionClient.getFabricIndex(devicePtr),
+            ChipInteractionClient.getRemoteDeviceId(devicePtr)));
+  }
+
+  public void subscribeToPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ResubscriptionAttemptCallback resubscriptionAttemptCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval,
+      boolean keepSubscriptions,
+      boolean isFabricFiltered,
+      int imTimeoutMs,
+      @Nullable Long eventMin,
+      @Nullable Boolean isPeerLIT) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(
+            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
+    ChipInteractionClient.subscribe(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        eventPaths,
+        null,
+        minInterval,
+        maxInterval,
+        keepSubscriptions,
+        isFabricFiltered,
+        imTimeoutMs,
+        eventMin,
+        isPeerLIT != null
+            ? isPeerLIT
+            : ChipICDClient.isPeerICDClient(
+                ChipInteractionClient.getFabricIndex(devicePtr),
+                ChipInteractionClient.getRemoteDeviceId(devicePtr)));
   }
 
   /**
@@ -1525,8 +1580,6 @@ public class ChipDeviceController {
 
   private native void updateCommissioningICDRegistrationInfo(
       long deviceControllerPtr, ICDRegistrationInfo icdRegistrationInfo);
-
-  private native List<ICDClientInfo> getICDClientInfo(long deviceControllerPtr, long fabricIndex);
 
   private native long onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
