@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#gh run list -R project-chip/connectedhomeip -c ${{ github.event.pull_request.head.sha }} -L 500
 
 name: Wait For Fast CI to Pass
 
@@ -21,10 +22,10 @@ env:
   GH_TOKEN: ${{ github.token }}
 
 jobs:
-  wait-for-spell-check:
-    name: Wait For Spell Check
+  wait-for-labeler:
+    name: Wait For Label Triage
     runs-on: ubuntu-latest
     steps:
       - name: Review Spell Check Completion Status
         run: |
-          gh run list -R project-chip/connectedhomeip -c ${{ github.event.pull_request.head.sha }} -L 500
+          gh pr checks
