@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <cstdint>
 #include <lib/dnssd/Discovery_ImplPlatform.h>
 
 #include <inttypes.h>
@@ -762,7 +763,7 @@ CHIP_ERROR DiscoveryImplPlatform::StartDiscovery(DiscoveryType type, DiscoveryFi
 
 CHIP_ERROR DiscoveryImplPlatform::StopDiscovery(DiscoveryContext & context)
 {
-    const auto browseIdentifier = context.GetBrowseIdentifier();
+    const std::optional<intptr_t> browseIdentifier = context.GetBrowseIdentifier();
     if (!browseIdentifier.has_value())
     {
         // No discovery going on.
