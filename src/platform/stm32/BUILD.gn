@@ -72,10 +72,9 @@ static_library("stm32") {
     deps += [ "${chip_root}/src/platform/logging:headers" ]
   }
 
-  public = [ 
+  public = [
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
-
   ]
   public_deps = [
     "${chip_root}/src/crypto",
