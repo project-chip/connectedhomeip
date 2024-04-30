@@ -2392,24 +2392,23 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (BOOL)_isAttributeAffectingDeviceConfigurationChanged:(MTRAttributePath *)attributePath
 {
     // Check for attributes in the descriptor cluster that affect device configuration changed.
-    if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID)
-    {
+    if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID) {
         switch (attributePath.attribute.unsignedLongValue) {
-            case MTRAttributeIDTypeClusterDescriptorAttributePartsListID:
-            case MTRAttributeIDTypeClusterDescriptorAttributeServerListID:
-            case MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID: {
-                return YES;
-            }
+        case MTRAttributeIDTypeClusterDescriptorAttributePartsListID:
+        case MTRAttributeIDTypeClusterDescriptorAttributeServerListID:
+        case MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID: {
+            return YES;
+        }
         }
     }
 
     // Check for global attributes that affect device configuration changed.
     switch (attributePath.attribute.unsignedLongValue) {
-        case MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID:
-        case MTRAttributeIDTypeGlobalAttributeAttributeListID:
-        case MTRAttributeIDTypeGlobalAttributeClusterRevisionID:
-        case MTRAttributeIDTypeGlobalAttributeFeatureMapID:
-            return YES;
+    case MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID:
+    case MTRAttributeIDTypeGlobalAttributeAttributeListID:
+    case MTRAttributeIDTypeGlobalAttributeClusterRevisionID:
+    case MTRAttributeIDTypeGlobalAttributeFeatureMapID:
+        return YES;
     }
     return NO;
 }
