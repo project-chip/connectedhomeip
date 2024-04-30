@@ -10,6 +10,7 @@ CoreTests
 MdnsTests
 CredentialsTest
 PlatformTests
+RawTransportTests
 RetransmitTests
 TestShell
 SetupPayloadTests
