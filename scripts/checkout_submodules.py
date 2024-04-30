@@ -50,6 +50,7 @@ ALL_PLATFORMS = set([
     'genio',
     'openiotsdk',
     'silabs_docker',
+    'python',
 ])
 
 Module = namedtuple('Module', 'name path platforms recursive')
