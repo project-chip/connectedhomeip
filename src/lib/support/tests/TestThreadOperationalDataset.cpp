@@ -14,14 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/support/CHIPMem.h>
-#include <lib/support/ThreadOperationalDataset.h>
-
-// #include <lib/support/UnitTestContext.h>
-// #include <lib/support/UnitTestRegistration.h>
 
 #include <gtest/gtest.h>
-// #include <nlunit-test.h>
+
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 namespace {
 
