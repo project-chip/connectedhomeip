@@ -28,4 +28,4 @@ jobs:
     steps:
       - name: Review Spell Check Completion Status
         run: |
-          gh pr checks
+          gh pr checks -R project-chip/connectedhomeip
