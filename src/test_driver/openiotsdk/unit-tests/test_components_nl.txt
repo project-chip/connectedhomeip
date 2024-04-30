@@ -4,5 +4,4 @@ InetLayerTests
 MessagingLayerTests
 RawTransportTests
 SecureChannelTestsNL
-SupportTestsNL
 TransportLayerTests

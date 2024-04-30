@@ -48,10 +48,12 @@ chip_test_suite("tests") {
     "TestScopedBuffer.cpp",
     "TestSorting.cpp",
     "TestSpan.cpp",
+    "TestStateMachine.cpp",
     "TestStaticSupportSmartPtr.cpp",
     "TestStringBuilder.cpp",
     "TestStringSplitter.cpp",
     "TestTestPersistentStorageDelegate.cpp",
+    "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
     "TestTlvJson.cpp",
     "TestTlvToJson.cpp",
@@ -78,40 +80,5 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
-  ]
-}
-
-chip_test_suite_using_nltest("tests_nltest") {
-  output_name = "libSupportTestsNL"
-
-  test_sources = [
-    "TestStateMachine.cpp",
-    "TestThreadOperationalDataset.cpp",
-  ]
-  sources = []
-
-  if (current_os != "mbed") {
-    test_sources += [ "TestCHIPArgParser.cpp" ]
-  }
-
-  cflags = [
-    "-Wconversion",
-
-    # TODO(#21255): work-around for SimpleStateMachine constructor issue.
-    "-Wno-uninitialized",
-
-    # TestStringSplitter intentionally validates string overflows.
-    "-Wno-stringop-truncation",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support:static-support",
-    "${chip_root}/src/lib/support:testing",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${chip_root}/src/lib/support/jsontlv",
-    "${chip_root}/src/platform",
-    "${nlunit_test_root}:nlunit-test",
   ]
 }
