@@ -70,20 +70,20 @@ extern "C" {
 #define STM32WB5MM_DK_I2C_DeInit BSP_I2C3_DeInit
 #define STM32WB5MM_DK_I2C_ReadReg BSP_I2C3_ReadReg
 #define STM32WB5MM_DK_I2C_WriteReg BSP_I2C3_WriteReg
-  
+
 #define STM32WB5MM_DK_GetTick BSP_GetTick
 
 /*Number of millisecond of audio at each DMA interrupt*/
 #define N_MS_PER_INTERRUPT               (20U)
- 
+
 #define AUDIO_IN_CHANNELS               1
 #define AUDIO_IN_SAMPLING_FREQUENCY     16000
 
 #define AUDIO_CHANNELS_OUT              1
 #define AUDIO_OUT_SAMPLING_FREQUENCY    16000
 
-#define AUDIO_IN_BUFFER_SIZE            DEFAULT_AUDIO_IN_BUFFER_SIZE  
-  
+#define AUDIO_IN_BUFFER_SIZE            DEFAULT_AUDIO_IN_BUFFER_SIZE
+
 #if (AUDIO_IN_SAMPLING_FREQUENCY == 8000)
 #define MAX_DECIMATION_FACTOR 160
 #else

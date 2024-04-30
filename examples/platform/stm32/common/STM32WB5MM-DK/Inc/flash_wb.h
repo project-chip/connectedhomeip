@@ -119,4 +119,3 @@ void NM_ResetFactory(void);
 #endif
 
 #endif /*FLASH_NVM_H */
-

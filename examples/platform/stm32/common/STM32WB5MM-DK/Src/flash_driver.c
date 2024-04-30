@@ -299,4 +299,3 @@ __WEAK WaitedSemStatus_t FD_WaitForSemAvailable(WaitedSemId_t WaitedSemId) {
      */
     return WAITED_SEM_BUSY;
 }
-

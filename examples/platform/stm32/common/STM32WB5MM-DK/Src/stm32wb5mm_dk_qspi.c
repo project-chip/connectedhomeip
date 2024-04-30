@@ -177,7 +177,7 @@ int32_t BSP_QSPI_Init(uint32_t Instance, BSP_QSPI_Init_t *Init)
 int32_t BSP_QSPI_DeInit(uint32_t Instance)
 {
   int32_t ret = BSP_ERROR_NONE;
-  
+
   /* Check if the instance is supported */
   if(Instance >= QSPI_INSTANCES_NUMBER)
   {

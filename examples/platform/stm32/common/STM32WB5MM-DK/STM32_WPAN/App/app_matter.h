@@ -109,4 +109,3 @@ void APP_MATTER_BLE_Set_Ack_After_Indicate_Callback(BLEDAckCallback aCallback);
 #endif
 
 #endif /*__APP_MATTER_H */
-

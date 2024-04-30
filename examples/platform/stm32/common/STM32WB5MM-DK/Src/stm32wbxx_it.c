@@ -172,9 +172,3 @@ void RTC_WKUP_IRQHandler(void)
 {
   HW_TS_RTC_Wakeup_Handler();
 }
-
-
-
-
-
-

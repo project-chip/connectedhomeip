@@ -46,10 +46,10 @@ extern "C" {
       APP_BLE_CONNECTED_SERVER,
       APP_BLE_CONNECTED_CLIENT
     } APP_BLE_ConnStatus_t;
-    
+
 /* USER CODE BEGIN ET */
 
-/* USER CODE END ET */  
+/* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */

@@ -126,4 +126,3 @@ void APP_THREAD_TL_THREAD_INIT(void);
 #endif
 
 #endif /* APP_THREAD_H */
-

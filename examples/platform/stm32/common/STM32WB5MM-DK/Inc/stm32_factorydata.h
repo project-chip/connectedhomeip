@@ -76,4 +76,3 @@ FACTORYDATA_StatusTypeDef FACTORYDATA_GetValue(FACTORYDATA_TagId tag,uint8_t *da
 }
 #endif
 #endif /*STM32_FACTORYDATA_H*/
-

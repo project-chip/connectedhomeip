@@ -55,7 +55,7 @@ extern "C"
  * This enumeration represents log regions.
  *
  */
-typedef enum 
+typedef enum
 {
   APPLI_LOG_REGION_GENERAL                    = 1U,  /* General                 */
   APPLI_LOG_REGION_OPENTHREAD_API             = 2U,  /* OpenThread API          */
@@ -72,4 +72,3 @@ void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, cons
 }
 #endif
 #endif  /* STM_LOGGING_H_ */
-

@@ -119,4 +119,3 @@ static FACTORYDATA_StatusTypeDef Get_TagLocation(FACTORYDATA_TagId tag, uint32_t
 
     return err;
 }
-

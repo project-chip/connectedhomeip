@@ -60,10 +60,10 @@ typedef PACKED_STRUCT
  * - SHCI_C2_DEBUG_OPTIONS_CPU2_STOP_DIS
  * which are used to set following configuration bits:
    * - bit 0:   0: IP BLE core in LP mode    1: IP BLE core in run mode (no LP supported)
-   * - bit 1:   0: CPU2 STOP mode Enable     1: CPU2 STOP mode Disable 
+   * - bit 1:   0: CPU2 STOP mode Enable     1: CPU2 STOP mode Disable
    * - bit [2-7]: bits reserved ( shall be set to 0)
  */
-#define SYS_DBG_CFG1  (SHCI_C2_DEBUG_OPTIONS_IPCORE_LP | SHCI_C2_DEBUG_OPTIONS_CPU2_STOP_EN) 
+#define SYS_DBG_CFG1  (SHCI_C2_DEBUG_OPTIONS_IPCORE_LP | SHCI_C2_DEBUG_OPTIONS_CPU2_STOP_EN)
 /* USER CODE END PD */
 
 /* Private macros ------------------------------------------------------------*/
@@ -138,8 +138,8 @@ static const APPD_GpioConfig_t aGpioConfigList[GPIO_CFG_NBR_OF_FEATURES] =
     { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* IPCC_BLE_LLD_ACK_TX - Set on Entry / Reset on Exit */
 /* From v1.9.0 */
     { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* BLE_ASYNCH_EVENT_NACKED - Set on Entry / Reset on Exit */
-/* From v1.17.0 */   
-    { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* DYNAMIC CONCURRENT - RTSM_SFTIMER_IRQ */            
+/* From v1.17.0 */
+    { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* DYNAMIC CONCURRENT - RTSM_SFTIMER_IRQ */
     { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* DYNAMIC CONCURRENT - RTSM_COMPC_WRAP */
     { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* DYNAMIC CONCURRENT - RTSM_SWITCH_RADIO */
     { GPIOA, LL_GPIO_PIN_0, 0, 0},  /* DYNAMIC CONCURRENT - RTSM_PROG_SFTIMER */
@@ -286,7 +286,7 @@ static void APPD_SetCPU2GpioConfig( void )
     HAL_GPIO_Init(GPIOC, &gpio_config);
     HAL_GPIO_WritePin(GPIOC, gpioc_pin_list, GPIO_PIN_RESET);
   }
-  
+
 /* USER CODE END APPD_SetCPU2GpioConfig */
   return;
 }

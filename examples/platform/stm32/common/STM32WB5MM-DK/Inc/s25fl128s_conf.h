@@ -75,4 +75,3 @@ extern "C" {
 #endif
 
 #endif /* S25FL128S_CONF_H */
-

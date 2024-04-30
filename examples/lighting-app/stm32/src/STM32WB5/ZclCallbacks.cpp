@@ -44,4 +44,3 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath &a
 
 void emberAfOnOffClusterInitCallback(EndpointId endpoint) {
 }
-

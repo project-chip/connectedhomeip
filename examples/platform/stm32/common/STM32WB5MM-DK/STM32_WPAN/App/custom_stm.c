@@ -239,4 +239,3 @@ static SVCCTL_EvtAckStatus_t Matter_Event_Handler(void *Event) {
 
 	return (return_value);
 }/* end SVCCTL_EvtAckStatus_t */
-

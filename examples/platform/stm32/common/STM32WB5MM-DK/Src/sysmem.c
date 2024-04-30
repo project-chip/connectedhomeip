@@ -55,4 +55,3 @@ void* _sbrk(int incr)
 
 	return (void*) prev_heap_end;
 }
-

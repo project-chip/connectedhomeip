@@ -678,4 +678,3 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs) {
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

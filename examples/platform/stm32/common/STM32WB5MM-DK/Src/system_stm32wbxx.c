@@ -97,9 +97,9 @@
   #define HSI_VALUE    (16000000UL) /*!< Value of the Internal oscillator in Hz*/
 #endif /* HSI_VALUE */
 
-#if !defined  (LSI_VALUE) 
+#if !defined  (LSI_VALUE)
  #define LSI_VALUE  (32000UL)       /*!< Value of LSI in Hz*/
-#endif /* LSI_VALUE */ 
+#endif /* LSI_VALUE */
 
 #if !defined  (LSE_VALUE)
   #define LSE_VALUE    (32768UL)    /*!< Value of LSE in Hz*/

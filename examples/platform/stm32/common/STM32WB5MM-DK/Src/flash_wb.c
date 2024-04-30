@@ -334,4 +334,3 @@ static NVM_StatusTypeDef flash_write(uint8_t *PtKeyFree, uint8_t *key, uint8_t *
     }
     return NVM_WRITE_FAILED;
 }
-

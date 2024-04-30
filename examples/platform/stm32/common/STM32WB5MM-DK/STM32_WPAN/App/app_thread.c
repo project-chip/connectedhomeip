@@ -141,7 +141,7 @@ void APP_THREAD_Init_Dyn_1( void )
 
   /* Create the different FreeRTOS tasks requested to run this Thread application*/
   OsTaskMsgM0ToM4Id = osThreadNew(APP_THREAD_FreeRTOSProcessMsgM0ToM4Task, NULL, &ThreadMsgM0ToM4Process_attr);
-  
+
   /* Create binary semaphores for OT command handling */
   OtCmdProcessSem = osSemaphoreNew(1, 1, NULL);
   OtCmdAckSem = osSemaphoreNew(1, 0, NULL);
@@ -293,7 +293,7 @@ static void APP_THREAD_StateNotif(uint32_t NotifFlags, void *pContext)
   UNUSED(pContext);
 
   /* USER CODE BEGIN APP_THREAD_STATENOTIF */
-  
+
   /* USER CODE END APP_THREAD_STATENOTIF */
 
   if ((NotifFlags & (uint32_t)OT_CHANGED_THREAD_ROLE) == (uint32_t)OT_CHANGED_THREAD_ROLE)

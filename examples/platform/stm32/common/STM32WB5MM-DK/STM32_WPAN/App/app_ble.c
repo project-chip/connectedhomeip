@@ -42,7 +42,7 @@
 
 /**
  * security parameters structure
- */ 
+ */
 typedef struct _tSecurityParams
 {
   /**
@@ -65,13 +65,13 @@ typedef struct _tSecurityParams
    * Flag to tell whether OOB data has
    * to be used during the pairing process
    */
-  uint8_t OOB_Data_Present; 
+  uint8_t OOB_Data_Present;
 
   /**
    * OOB data to be used in the pairing process if
    * OOB_Data_Present is set to TRUE
    */
-  uint8_t OOB_Data[16]; 
+  uint8_t OOB_Data[16];
 
   /**
    * this variable indicates whether to use a fixed pin
@@ -79,7 +79,7 @@ typedef struct _tSecurityParams
    * requested to the application during the pairing process
    * 0 implies use fixed pin and 1 implies request for passkey
    */
-  uint8_t Use_Fixed_Pin; 
+  uint8_t Use_Fixed_Pin;
 
   /**
    * minimum encryption key size requirement
@@ -113,15 +113,15 @@ typedef struct _tSecurityParams
 
 /**
  * global context
- * contains the variables common to all 
+ * contains the variables common to all
  * services
- */ 
+ */
 typedef struct _tBLEProfileGlobalContext
 {
 
   /**
    * security requirements of the host
-   */ 
+   */
   tSecurityParams bleSecurityParam;
 
   /**
@@ -131,28 +131,28 @@ typedef struct _tBLEProfileGlobalContext
 
   /**
    * device name characteristic handle
-   */ 
+   */
   uint16_t devNameCharHandle;
 
   /**
    * appearance characteristic handle
-   */ 
+   */
   uint16_t appearanceCharHandle;
 
   /**
    * connection handle of the current active connection
    * When not in connection, the handle is set to 0xFFFF
-   */ 
+   */
   uint16_t connectionHandle;
 
   /**
    * length of the UUID list to be used while advertising
-   */ 
+   */
   uint8_t advtServUUIDlen;
 
   /**
    * the UUID list to be used while advertising
-   */ 
+   */
   uint8_t advtServUUID[100];
 
 }BleGlobalContext_t;
@@ -164,7 +164,7 @@ typedef struct
   uint8_t SwitchOffGPIO_timer_Id;
 }BleApplicationContext_t;
 /* USER CODE BEGIN PTD */
-  
+
 /* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
@@ -198,7 +198,7 @@ static const uint8_t M_bd_addr[BD_ADDR_SIZE_LOCAL] =
 static uint8_t bd_addr_udn[BD_ADDR_SIZE_LOCAL];
 
 /**
-*   Identity root key used to derive IRK and DHK(Legacy) 
+*   Identity root key used to derive IRK and DHK(Legacy)
 */
 static const uint8_t BLE_CFG_IR_VALUE[16] = CFG_BLE_IR;
 
@@ -215,8 +215,8 @@ MATTER_App_Notification_evt_t handleNotification;
 #if L2CAP_REQUEST_NEW_CONN_PARAM != 0
 #define SIZE_TAB_CONN_INT            2
 float tab_conn_interval[SIZE_TAB_CONN_INT] = {50, 1000} ; /* ms */
-uint8_t index_con_int, mutex; 
-#endif 
+uint8_t index_con_int, mutex;
+#endif
 
 /**
  * Advertising Data
@@ -247,7 +247,7 @@ const osThreadAttr_t HciUserEvtProcess_attr = {
   .stack_size   = CFG_HCI_USER_EVT_PROCESS_STACK_SIZE
 };
 
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0) 
+#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 const osThreadAttr_t ConnIntUpdateReqProcess_attr = {
   .name         = CFG_CONN_INT_UPD_REQ_PROCESS_NAME,
   .attr_bits    = CFG_CONN_INT_UPD_REQ_PROCESS_ATTR_BITS,
@@ -267,7 +267,7 @@ static void Ble_Hci_Gap_Gatt_Init(void);
 static const uint8_t* BleGetBdAddress( void );
 static void HciUserEvtProcess(void *argument);
 static void Switch_OFF_GPIO( void );
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)  
+#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 static void ConnIntUpdateReqProcess(void *argument);
 static void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle);
 #endif
@@ -282,7 +282,7 @@ void APP_BLE_Init_Dyn_1( void )
 /* USER CODE BEGIN APP_BLE_Init_1 */
 
 /* USER CODE END APP_BLE_Init_1 */
-  
+
   SHCI_C2_Ble_Init_Cmd_Packet_t ble_init_cmd_packet =
   {
     {{0,0,0}},                          /**< Header unused */
@@ -343,20 +343,20 @@ void APP_BLE_Init_Dyn_1( void )
    * Initialization of the BLE App Context
    */
   BleApplicationContext.Device_Connection_Status = APP_BLE_IDLE;
-  BleApplicationContext.BleApplicationContext_legacy.connectionHandle = 0xFFFF;  
-   
+  BleApplicationContext.BleApplicationContext_legacy.connectionHandle = 0xFFFF;
+
   /**
    * Initialization of ADV - Ad Manufacturer Element - Support OTA Bit Mask
    */
-#if(RADIO_ACTIVITY_EVENT != 0)  
+#if(RADIO_ACTIVITY_EVENT != 0)
   aci_hal_set_radio_activity_mask(0x0006);
-#endif  
-  
+#endif
+
 #if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
   ConnIntUpdateReqProcessId = osThreadNew(ConnIntUpdateReqProcess, NULL, &ConnIntUpdateReqProcess_attr);
-  
-  index_con_int = 0; 
-  mutex = 1; 
+
+  index_con_int = 0;
+  mutex = 1;
 #endif
   /**
    * Initialize Matter  Application
@@ -489,9 +489,9 @@ void APP_BLE_Key_Button1_Action(void)
 
 void APP_BLE_Key_Button2_Action(void)
 {
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )    
+#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0 )
   osThreadFlagsSet(ConnIntUpdateReqProcessId, 1);
-#endif    
+#endif
 }
 
 void APP_BLE_Key_Button3_Action(void)
@@ -530,7 +530,7 @@ static void Ble_Tl_Init( void )
   uint16_t gap_service_handle, gap_dev_name_char_handle, gap_appearance_char_handle;
   const uint8_t *bd_addr;
   uint32_t srd_bd_addr[2];
-  uint16_t appearance[1] = { BLE_CFG_GAP_APPEARANCE }; 
+  uint16_t appearance[1] = { BLE_CFG_GAP_APPEARANCE };
 
   /**
    * Initialize HCI layer
@@ -554,7 +554,7 @@ static void Ble_Tl_Init( void )
   //manuf_data[ sizeof(manuf_data)-3] = bd_addr[2];
   //manuf_data[ sizeof(manuf_data)-2] = bd_addr[1];
   //manuf_data[ sizeof(manuf_data)-1] = bd_addr[0];
-  
+
   /**
    * Static random Address
    * The two upper bits shall be set to 1
@@ -566,10 +566,10 @@ static void Ble_Tl_Init( void )
   aci_hal_write_config_data( CONFIG_DATA_RANDOM_ADDRESS_OFFSET, CONFIG_DATA_RANDOM_ADDRESS_LEN, (uint8_t*)srd_bd_addr );
 
   /**
-   * Write Identity root key used to derive IRK and DHK(Legacy) 
+   * Write Identity root key used to derive IRK and DHK(Legacy)
    */
     aci_hal_write_config_data( CONFIG_DATA_IR_OFFSET, CONFIG_DATA_IR_LEN, (uint8_t*)BLE_CFG_IR_VALUE );
-    
+
    /**
    * Write Encryption root key used to derive LTK and CSRK
    */
@@ -622,7 +622,7 @@ static void Ble_Tl_Init( void )
 /**
    * Initialize Default PHY
    */
-  hci_le_set_default_phy(ALL_PHYS_PREFERENCE,TX_2M_PREFERRED,RX_2M_PREFERRED); 
+  hci_le_set_default_phy(ALL_PHYS_PREFERENCE,TX_2M_PREFERRED,RX_2M_PREFERRED);
 
   /**
    * Initialize IO capability
@@ -669,7 +669,7 @@ void APP_BLE_Adv_Request(APP_BLE_ConnStatus_t New_Status)
 {
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
   uint16_t Min_Inter, Max_Inter;
- 
+
   if (New_Status == APP_BLE_FAST_ADV)
   {
     Min_Inter = AdvIntervalMin;
@@ -837,13 +837,13 @@ static void Switch_OFF_GPIO(){
 /* USER CODE END Switch_OFF_GPIO */
 }
 
-#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)  
+#if(L2CAP_REQUEST_NEW_CONN_PARAM != 0)
 void BLE_SVC_L2CAP_Conn_Update(uint16_t Connection_Handle)
 {
 /* USER CODE BEGIN BLE_SVC_L2CAP_Conn_Update_1 */
 
 /* USER CODE END BLE_SVC_L2CAP_Conn_Update_1 */
-  if(mutex == 1) { 
+  if(mutex == 1) {
     mutex = 0;
     index_con_int = (index_con_int + 1)%SIZE_TAB_CONN_INT;
     uint16_t interval_min = CONN_P(tab_conn_interval[index_con_int]);
@@ -876,7 +876,7 @@ static void ConnIntUpdateReqProcess(void *argument)
   for (;;)
   {
     osThreadFlagsWait(1, osFlagsWaitAny, osWaitForever);
-    if (BleApplicationContext.Device_Connection_Status != APP_BLE_FAST_ADV && 
+    if (BleApplicationContext.Device_Connection_Status != APP_BLE_FAST_ADV &&
         BleApplicationContext.Device_Connection_Status != APP_BLE_IDLE)
     {
       BLE_SVC_L2CAP_Conn_Update(BleApplicationContext.BleApplicationContext_legacy.connectionHandle);
@@ -907,27 +907,27 @@ static void HciUserEvtProcess(void *argument)
 void hci_notify_asynch_evt(void* pdata)
 {
   UNUSED(pdata);
-  
+
   osThreadFlagsSet(HciUserEvtProcessId, 1);
-  
+
   return;
 }
 
 void hci_cmd_resp_release(uint32_t flag)
 {
   UNUSED(flag);
-  
+
   osSemaphoreRelease(SemHciId);
-  
+
   return;
 }
 
 void hci_cmd_resp_wait(uint32_t timeout)
 {
   UNUSED(timeout);
-  
+
   osSemaphoreAcquire(SemHciId, osWaitForever);
-  
+
   return;
 }
 
@@ -936,7 +936,7 @@ static void BLE_UserEvtRx( void * pPayload )
   SVCCTL_UserEvtFlowStatus_t svctl_return_status;
   tHCI_UserEvtRxParam *p_param;
 
-  p_param = (tHCI_UserEvtRxParam *)pPayload; 
+  p_param = (tHCI_UserEvtRxParam *)pPayload;
 
   svctl_return_status = SVCCTL_UserEvtRx((void *)&(p_param->pckt->evtserial));
   if (svctl_return_status != SVCCTL_UserEvtFlowDisable)

@@ -329,4 +329,3 @@ static void Switch_On_HSI(void) {
 /* USER CODE BEGIN Private_Functions */
 
 /* USER CODE END Private_Functions */
-
