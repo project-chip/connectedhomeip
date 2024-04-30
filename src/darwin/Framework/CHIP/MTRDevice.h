@@ -424,10 +424,9 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
 - (void)deviceCachePrimed:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
 /**
- * Notifies delegate when the device configuration changes. Device configuration changes include updates in parts list, device type list,
- * server list, accepted commands list, attribute list, feature map or cluster revision attributes in the descriptor cluster.
- *
  * This is called when the MTRDevice object detects a change in the device configuration.
+ *
+ * Device configuration is a set of functionality implemented by the device.
  *
  * The intention is that this is called whenever any of the things that usually don't change about a device might have changed.
  */

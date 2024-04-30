@@ -1107,41 +1107,9 @@ static NSString * const sAttributesKey = @"attributes";
     }
 }
 
-// When we receive an attribute report, check if there are any changes in parts list, server list, device type list, accepted commands list,
-//  attribute list, cluster revision or feature map attributes of the descriptor cluster. If yes, make a note that the device configuration changed.
-- (void)_noteDeviceConfigurationChanged:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
-{
-    for (NSDictionary<NSString *, id> * attribute in attributeReport) {
-        MTRAttributePath * attributePath = attribute[MTRAttributePathKey];
-
-        if (attributePath.cluster.unsignedLongValue != MTRClusterDescriptorID) {
-            return;
-        }
-
-        switch (attributePath.attribute.unsignedLongValue) {
-        case MTRClusterDescriptorAttributePartsListID:
-        case MTRClusterDescriptorAttributeServerListID:
-        case MTRClusterDescriptorAttributeDeviceTypeListID:
-        case MTRClusterDescriptorAttributeAcceptedCommandListID:
-        case MTRClusterDescriptorAttributeAttributeListID:
-        case MTRClusterDescriptorAttributeClusterRevisionID:
-        case MTRClusterDescriptorAttributeFeatureMapID: {
-            // If changes are detected, note that the device configuration has changed.
-            MTRDeviceDataValueDictionary cachedAttributeDataValue = [self _cachedAttributeValueForPath:attributePath];
-            if (cachedAttributeDataValue != nil && ![self _attributeDataValue:attribute[MTRDataKey] isEqualToDataValue:cachedAttributeDataValue]) {
-                _deviceConfigurationChanged = YES;
-                break;
-            }
-        }
-        }
-    }
-}
-
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     std::lock_guard lock(_lock);
-
-    [self _noteDeviceConfigurationChanged:attributeReport];
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
     [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
@@ -2421,6 +2389,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [_clustersToPersist addObject:clusterPath];
 }
 
+- (BOOL)_isAttributeAffectingDeviceConfigurationChanged:(MTRAttributePath *)attributePath
+{
+    // Check for attributes in the descriptor cluster that affect device configuration changed.
+    if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeDescriptorID)
+    {
+        switch (attributePath.attribute.unsignedLongValue) {
+            case MTRAttributeIDTypeClusterDescriptorAttributePartsListID:
+            case MTRAttributeIDTypeClusterDescriptorAttributeServerListID:
+            case MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID: {
+                return YES;
+            }
+        }
+    }
+
+    // Check for global attributes that affect device configuration changed.
+    switch (attributePath.attribute.unsignedLongValue) {
+        case MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID:
+        case MTRAttributeIDTypeGlobalAttributeAttributeListID:
+        case MTRAttributeIDTypeGlobalAttributeClusterRevisionID:
+        case MTRAttributeIDTypeGlobalAttributeFeatureMapID:
+            return YES;
+    }
+    return NO;
+}
+
 // assume lock is held
 - (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues
 {
@@ -2493,6 +2486,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // when our cached value changes and no expected value exists.
             if (readCacheValueChanged && !expectedValue) {
                 shouldReportAttribute = YES;
+
+                _deviceConfigurationChanged = [self _isAttributeAffectingDeviceConfigurationChanged:attributePath];
+                if (_deviceConfigurationChanged) {
+                    MTR_LOG_INFO("Device configuration changed due to changes in attribute %@", attributePath);
+                }
             }
 
             // Now that we have grabbed previousValue, update our cache with the attribute value.
