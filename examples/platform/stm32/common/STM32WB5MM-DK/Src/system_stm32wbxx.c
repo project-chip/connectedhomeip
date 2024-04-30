@@ -85,25 +85,25 @@
 #include "app_common.h"
 #include "otp.h"
 
-#if !defined  (HSE_VALUE)
-  #define HSE_VALUE    (32000000UL) /*!< Value of the External oscillator in Hz */
-#endif /* HSE_VALUE */
+#if !defined(HSE_VALUE)
+#define HSE_VALUE (32000000UL) /*!< Value of the External oscillator in Hz */
+#endif                         /* HSE_VALUE */
 
-#if !defined  (MSI_VALUE)
-   #define MSI_VALUE    (4000000UL) /*!< Value of the Internal oscillator in Hz*/
-#endif /* MSI_VALUE */
+#if !defined(MSI_VALUE)
+#define MSI_VALUE (4000000UL) /*!< Value of the Internal oscillator in Hz*/
+#endif                        /* MSI_VALUE */
 
-#if !defined  (HSI_VALUE)
-  #define HSI_VALUE    (16000000UL) /*!< Value of the Internal oscillator in Hz*/
-#endif /* HSI_VALUE */
+#if !defined(HSI_VALUE)
+#define HSI_VALUE (16000000UL) /*!< Value of the Internal oscillator in Hz*/
+#endif                         /* HSI_VALUE */
 
-#if !defined  (LSI_VALUE)
- #define LSI_VALUE  (32000UL)       /*!< Value of LSI in Hz*/
-#endif /* LSI_VALUE */
+#if !defined(LSI_VALUE)
+#define LSI_VALUE (32000UL) /*!< Value of LSI in Hz*/
+#endif                      /* LSI_VALUE */
 
-#if !defined  (LSE_VALUE)
-  #define LSE_VALUE    (32768UL)    /*!< Value of LSE in Hz*/
-#endif /* LSE_VALUE */
+#if !defined(LSE_VALUE)
+#define LSE_VALUE (32768UL) /*!< Value of LSE in Hz*/
+#endif                      /* LSE_VALUE */
 
 /**
  * @}
@@ -133,34 +133,42 @@
 #define USER_VECT_TAB_ADDRESS
 #if defined(USER_VECT_TAB_ADDRESS)
 #ifdef CORE_CM0PLUS
- /*!< Uncomment this line for user vector table remap in Sram else user remap
-      will be done in Flash. */
+/*!< Uncomment this line for user vector table remap in Sram else user remap
+     will be done in Flash. */
 /* #define VECT_TAB_SRAM */
 #if defined(VECT_TAB_SRAM)
-#define VECT_TAB_BASE_ADDRESS   SRAM2_BASE      /*!< Vector Table base address field.
-                                                     This value must be a multiple of 0x100. */
-#define VECT_TAB_OFFSET         0x00008000U     /*!< Vector Table base offset field.
-                                                     This value must be a multiple of 0x100. */
+#define VECT_TAB_BASE_ADDRESS                                                                                                      \
+    SRAM2_BASE /*!< Vector Table base address field.                                                                               \
+                    This value must be a multiple of 0x100. */
+#define VECT_TAB_OFFSET                                                                                                            \
+    0x00008000U /*!< Vector Table base offset field.                                                                               \
+                     This value must be a multiple of 0x100. */
 #else
-#define VECT_TAB_BASE_ADDRESS   FLASH_BASE      /*!< Vector Table base address field.
-                                                     This value must be a multiple of 0x100. */
-#define VECT_TAB_OFFSET         0x00020000U        /*!< Vector Table base offset field.
-                                                     This value must be a multiple of 0x100. */
+#define VECT_TAB_BASE_ADDRESS                                                                                                      \
+    FLASH_BASE /*!< Vector Table base address field.                                                                               \
+                    This value must be a multiple of 0x100. */
+#define VECT_TAB_OFFSET                                                                                                            \
+    0x00020000U /*!< Vector Table base offset field.                                                                               \
+                  This value must be a multiple of 0x100. */
 #endif
 #else
 /*!< Uncomment this line for user vector table remap in Sram else user remap
  will be done in Flash. */
 /* #define VECT_TAB_SRAM */
 #if defined(VECT_TAB_SRAM)
-#define VECT_TAB_BASE_ADDRESS   SRAM1_BASE      /*!< Vector Table base address field.
-                                                     This value must be a multiple of 0x200. */
-#define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table base offset field.
-                                                     This value must be a multiple of 0x200. */
+#define VECT_TAB_BASE_ADDRESS                                                                                                      \
+    SRAM1_BASE /*!< Vector Table base address field.                                                                               \
+                    This value must be a multiple of 0x200. */
+#define VECT_TAB_OFFSET                                                                                                            \
+    0x00000000U /*!< Vector Table base offset field.                                                                               \
+                     This value must be a multiple of 0x200. */
 #else
-#define VECT_TAB_BASE_ADDRESS   FLASH_BASE      /*!< Vector Table base address field.
-                                                     This value must be a multiple of 0x200. */
-#define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table base offset field.
-                                                     This value must be a multiple of 0x200. */
+#define VECT_TAB_BASE_ADDRESS                                                                                                      \
+    FLASH_BASE /*!< Vector Table base address field.                                                                               \
+                    This value must be a multiple of 0x200. */
+#define VECT_TAB_OFFSET                                                                                                            \
+    0x00000000U /*!< Vector Table base offset field.                                                                               \
+                     This value must be a multiple of 0x200. */
 #endif
 #endif
 #endif
@@ -186,17 +194,20 @@
  */
 uint32_t SystemCoreClock = 4000000UL; /*CPU1: M4 on MSI clock after startup (4MHz)*/
 
-const uint32_t AHBPrescTable[16UL] = { 1UL, 3UL, 5UL, 1UL, 1UL, 6UL, 10UL, 32UL, 2UL, 4UL, 8UL,
-        16UL, 64UL, 128UL, 256UL, 512UL };
+const uint32_t AHBPrescTable[16UL] = { 1UL, 3UL, 5UL, 1UL, 1UL, 6UL, 10UL, 32UL, 2UL, 4UL, 8UL, 16UL, 64UL, 128UL, 256UL, 512UL };
 
 const uint32_t APBPrescTable[8UL] = { 0UL, 0UL, 0UL, 0UL, 1UL, 2UL, 3UL, 4UL };
 
-const uint32_t MSIRangeTable[16UL] = { 100000UL, 200000UL, 400000UL, 800000UL, 1000000UL, 2000000UL,
-        4000000UL, 8000000UL, 16000000UL, 24000000UL, 32000000UL, 48000000UL, 0UL, 0UL, 0UL, 0UL }; /* 0UL values are incorrect cases */
+const uint32_t MSIRangeTable[16UL] = {
+    100000UL,   200000UL,   400000UL,   800000UL,   1000000UL, 2000000UL, 4000000UL, 8000000UL,
+    16000000UL, 24000000UL, 32000000UL, 48000000UL, 0UL,       0UL,       0UL,       0UL
+}; /* 0UL values are incorrect cases */
 
-#if defined(STM32WB55xx) || defined(STM32WB5Mxx) || defined(STM32WB35xx) || defined (STM32WB15xx)
-const uint32_t SmpsPrescalerTable[4UL][6UL] = { { 1UL, 3UL, 2UL, 2UL, 1UL, 2UL }, { 2UL, 6UL, 4UL,
-        3UL, 2UL, 4UL }, { 4UL, 12UL, 8UL, 6UL, 4UL, 8UL }, { 4UL, 12UL, 8UL, 6UL, 4UL, 8UL } };
+#if defined(STM32WB55xx) || defined(STM32WB5Mxx) || defined(STM32WB35xx) || defined(STM32WB15xx)
+const uint32_t SmpsPrescalerTable[4UL][6UL] = { { 1UL, 3UL, 2UL, 2UL, 1UL, 2UL },
+                                                { 2UL, 6UL, 4UL, 3UL, 2UL, 4UL },
+                                                { 4UL, 12UL, 8UL, 6UL, 4UL, 8UL },
+                                                { 4UL, 12UL, 8UL, 6UL, 4UL, 8UL } };
 #endif
 
 /**
@@ -214,16 +225,16 @@ const uint32_t SmpsPrescalerTable[4UL][6UL] = { { 1UL, 3UL, 2UL, 2UL, 1UL, 2UL }
 /** @addtogroup STM32WBxx_System_Private_Functions
  * @{
  */
- #if (OTA_SUPPORT == 1)
+#if (OTA_SUPPORT == 1)
 #if defined(__ICCARM__)
 extern uint32_t __vector_table;
-#define INTVECT_START ((uint32_t)& __vector_table)
+#define INTVECT_START ((uint32_t) &__vector_table)
 #elif defined(__CC_ARM) || defined(__ARMCC_VERSION)
 extern void * __Vectors;
-#define INTVECT_START ((uint32_t) & __Vectors)
+#define INTVECT_START ((uint32_t) &__Vectors)
 #elif defined(__GNUC__)
-extern void *g_pfnVectors;
-#define INTVECT_START ((uint32_t)& g_pfnVectors)
+extern void * g_pfnVectors;
+#define INTVECT_START ((uint32_t) &g_pfnVectors)
 #endif
 #endif
 
@@ -232,8 +243,9 @@ extern void *g_pfnVectors;
  * @param  None
  * @retval None
  */
-void SystemInit(void) {
-    OTP_ID0_t *p_otp;
+void SystemInit(void)
+{
+    OTP_ID0_t * p_otp;
 
 #if (OTA_SUPPORT == 1)
 #if defined(USER_VECT_TAB_ADDRESS)
@@ -279,8 +291,9 @@ void SystemInit(void) {
     /**
      * Read HSE_Tuning from OTP
      */
-    p_otp = (OTP_ID0_t*) OTP_Read(0);
-    if (p_otp) {
+    p_otp = (OTP_ID0_t *) OTP_Read(0);
+    if (p_otp)
+    {
         LL_RCC_HSE_SetCapacitorTuning(p_otp->hse_tuning);
     }
 
@@ -289,7 +302,7 @@ void SystemInit(void) {
     /**
      * Set FLASH latency to 1WS
      */
-    LL_FLASH_SetLatency( LL_FLASH_LATENCY_1);
+    LL_FLASH_SetLatency(LL_FLASH_LATENCY_1);
     while (LL_FLASH_GetLatency() != LL_FLASH_LATENCY_1)
         ;
 
@@ -299,7 +312,7 @@ void SystemInit(void) {
      */
     while (!LL_RCC_HSE_IsReady())
         ;
-    LL_RCC_SetSysClkSource( LL_RCC_SYS_CLKSOURCE_HSE);
+    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSE);
     while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSE)
         ;
 
@@ -351,7 +364,8 @@ void SystemInit(void) {
  * @param  None
  * @retval None
  */
-void SystemCoreClockUpdate(void) {
+void SystemCoreClockUpdate(void)
+{
     uint32_t tmp, msirange, pllvco, pllr, pllsource, pllm;
 
     /* Get MSI Range frequency--------------------------------------------------*/
@@ -361,7 +375,8 @@ void SystemCoreClockUpdate(void) {
 
     /*SystemCoreClock=HAL_RCC_GetSysClockFreq();*/
     /* Get SYSCLK source -------------------------------------------------------*/
-    switch (RCC->CFGR & RCC_CFGR_SWS) {
+    switch (RCC->CFGR & RCC_CFGR_SWS)
+    {
     case 0x00: /* MSI used as system clock source */
         SystemCoreClock = msirange;
         break;
@@ -380,21 +395,23 @@ void SystemCoreClockUpdate(void) {
          SYSCLK = PLL_VCO / PLLR
          */
         pllsource = (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC);
-        pllm = ((RCC->PLLCFGR & RCC_PLLCFGR_PLLM) >> RCC_PLLCFGR_PLLM_Pos) + 1UL;
+        pllm      = ((RCC->PLLCFGR & RCC_PLLCFGR_PLLM) >> RCC_PLLCFGR_PLLM_Pos) + 1UL;
 
         if (pllsource == 0x02UL) /* HSI used as PLL clock source */
         {
             pllvco = (HSI_VALUE / pllm);
-        } else if (pllsource == 0x03UL) /* HSE used as PLL clock source */
+        }
+        else if (pllsource == 0x03UL) /* HSE used as PLL clock source */
         {
             pllvco = (HSE_VALUE / pllm);
-        } else /* MSI used as PLL clock source */
+        }
+        else /* MSI used as PLL clock source */
         {
             pllvco = (msirange / pllm);
         }
 
         pllvco = pllvco * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> RCC_PLLCFGR_PLLN_Pos);
-        pllr = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLR) >> RCC_PLLCFGR_PLLR_Pos) + 1UL);
+        pllr   = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLR) >> RCC_PLLCFGR_PLLR_Pos) + 1UL);
 
         SystemCoreClock = pllvco / pllr;
         break;
@@ -409,7 +426,6 @@ void SystemCoreClockUpdate(void) {
     tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> RCC_CFGR_HPRE_Pos)];
     /* HCLK clock frequency */
     SystemCoreClock = SystemCoreClock / tmp;
-
 }
 
 /**

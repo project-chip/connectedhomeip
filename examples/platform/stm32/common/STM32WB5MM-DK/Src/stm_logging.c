@@ -27,14 +27,14 @@
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "app_conf.h"
 #include "stm_logging.h"
 
-#define LOG_PARSE_BUFFER_SIZE  256U
+#define LOG_PARSE_BUFFER_SIZE 256U
 
 #define LOG_TIMESTAMP_ENABLE 0
 #define LOG_REGION_ENABLE 1U
@@ -42,17 +42,17 @@
 
 #if (LOG_RTT_COLOR_ENABLE == 1U)
 #define RTT_COLOR_CODE_DEFAULT "\x1b[0m"
-#define RTT_COLOR_CODE_RED     "\x1b[0;91m"
-#define RTT_COLOR_CODE_GREEN   "\x1b[0;92m"
-#define RTT_COLOR_CODE_YELLOW  "\x1b[0;93m"
-#define RTT_COLOR_CODE_CYAN    "\x1b[0;96m"
+#define RTT_COLOR_CODE_RED "\x1b[0;91m"
+#define RTT_COLOR_CODE_GREEN "\x1b[0;92m"
+#define RTT_COLOR_CODE_YELLOW "\x1b[0;93m"
+#define RTT_COLOR_CODE_CYAN "\x1b[0;96m"
 
 #else /* LOG_RTT_COLOR_ENABLE == 1 */
 #define RTT_COLOR_CODE_DEFAULT ""
-#define RTT_COLOR_CODE_RED     ""
-#define RTT_COLOR_CODE_GREEN   ""
-#define RTT_COLOR_CODE_YELLOW  ""
-#define RTT_COLOR_CODE_CYAN    ""
+#define RTT_COLOR_CODE_RED ""
+#define RTT_COLOR_CODE_GREEN ""
+#define RTT_COLOR_CODE_YELLOW ""
+#define RTT_COLOR_CODE_CYAN ""
 #endif /* LOG_RTT_COLOR_ENABLE == 1 */
 
 #if (CFG_DEBUG_TRACE != 0)
@@ -65,10 +65,12 @@
  *
  * @returns  String with a log level color value.
  */
-static inline uint16_t logRegion(char *aLogString, uint16_t aMaxSize, appliLogRegion_t aLogRegion) {
+static inline uint16_t logRegion(char * aLogString, uint16_t aMaxSize, appliLogRegion_t aLogRegion)
+{
     char logRegionString[30U];
 
-    switch (aLogRegion) {
+    switch (aLogRegion)
+    {
     case APPLI_LOG_REGION_GENERAL:
         strcpy(logRegionString, "[M4 APPLICATION]");
         break;
@@ -102,8 +104,10 @@ static inline uint16_t logRegion(char *aLogString, uint16_t aMaxSize, appliLogRe
  *
  * @returns  String with a log level color value.
  */
-static inline const char* levelToString(appliLogLevel_t aLogLevel) {
-    switch (aLogLevel) {
+static inline const char * levelToString(appliLogLevel_t aLogLevel)
+{
+    switch (aLogLevel)
+    {
     case LOG_LEVEL_CRIT:
         return RTT_COLOR_CODE_RED;
 
@@ -130,7 +134,8 @@ static inline const char* levelToString(appliLogLevel_t aLogLevel) {
  *
  * @returns  Number of bytes successfully written to the log buffer.
  */
-static inline uint16_t logLevel(char *aLogString, uint16_t aMaxSize, appliLogLevel_t aLogLevel) {
+static inline uint16_t logLevel(char * aLogString, uint16_t aMaxSize, appliLogLevel_t aLogLevel)
+{
     return snprintf(aLogString, aMaxSize, "%s", levelToString(aLogLevel));
 }
 #endif /* CFG_DEBUG_TRACE */
@@ -145,10 +150,9 @@ static inline uint16_t logLevel(char *aLogString, uint16_t aMaxSize, appliLogLev
  *
  * @returns  Number of bytes successfully written to the log buffer.
  */
-static inline uint16_t logTimestamp(char *aLogString, uint16_t aMaxSize)
+static inline uint16_t logTimestamp(char * aLogString, uint16_t aMaxSize)
 {
-  return snprintf(aLogString, aMaxSize, "%s[%010ld]", RTT_COLOR_CODE_DEFAULT,
-                  otPlatAlarmMilliGetNow());
+    return snprintf(aLogString, aMaxSize, "%s[%010ld]", RTT_COLOR_CODE_DEFAULT, otPlatAlarmMilliGetNow());
 }
 #endif /* LOG_TIMESTAMP_ENABLE */
 
@@ -161,14 +165,14 @@ static inline uint16_t logTimestamp(char *aLogString, uint16_t aMaxSize)
  *
  * @returns  Number of bytes successfully written to the log buffer.
  */
-void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, const char *aFormat,
-        ...) {
+void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, const char * aFormat, ...)
+{
 #if (CFG_DEBUG_TRACE != 0) /* Since the traces are disabled, there is nothing to print */
     uint16_t length = 0;
     char logString[LOG_PARSE_BUFFER_SIZE + 1U];
 
 #if (LOG_TIMESTAMP_ENABLE == 1U)
-  length += logTimestamp(logString, LOG_PARSE_BUFFER_SIZE);
+    length += logTimestamp(logString, LOG_PARSE_BUFFER_SIZE);
 #endif
 
 #if (LOG_RTT_COLOR_ENABLE == 1U)
@@ -190,9 +194,12 @@ void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, cons
     logString[length++] = 0;
     va_end(paramList);
 
-    if (aLogLevel <= APPLI_CONFIG_LOG_LEVEL) {
+    if (aLogLevel <= APPLI_CONFIG_LOG_LEVEL)
+    {
         printf("%s", logString);
-    } else {
+    }
+    else
+    {
         /* Print nothing */
     }
 #endif /* CFG_DEBUG_TRACE */

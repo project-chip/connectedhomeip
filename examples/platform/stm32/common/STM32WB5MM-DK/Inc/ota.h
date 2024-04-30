@@ -25,9 +25,9 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
-#include <platform/stm32/OTAImageProcessorImpl.h>
 #include <platform/stm32/FactoryDataProvider.h>
+#include <platform/stm32/OTAImageProcessorImpl.h>
+#include <stdint.h>
 
 /*! Attribute structure */
 typedef struct

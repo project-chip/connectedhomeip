@@ -29,10 +29,11 @@
 extern "C" {
 #endif
 
-#define EXTERNAL_FLASH_ADDRESS  0x90000000U
-#define OTA_MAX_SIZE 0x100000  // 1 Mbytes
+#define EXTERNAL_FLASH_ADDRESS 0x90000000U
+#define OTA_MAX_SIZE 0x100000 // 1 Mbytes
 
-typedef enum {
+typedef enum
+{
     STM_EXT_FLASH_OK,
     STM_EXT_FLASH_INIT_FAILED,
     STM_EXT_FLASH_WRITE_FAILED,
@@ -48,7 +49,7 @@ typedef enum {
 /**
  * @brief  init ota fw
  */
-STM_OTA_StatusTypeDef STM_EXT_FLASH_Init( void );
+STM_OTA_StatusTypeDef STM_EXT_FLASH_Init(void);
 
 /**
  * @brief  Delete old image in external flash

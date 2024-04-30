@@ -16,106 +16,111 @@
  *    limitations under the License.
  */
 
+#include "flash_wb.h"
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/stm32/STM32Config.h>
-#include "flash_wb.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-
-CHIP_ERROR STM32Config::Init() {
+CHIP_ERROR STM32Config::Init()
+{
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR STM32Config::ReadConfigValueBin(Key key, uint8_t *buf, size_t bufSize, size_t &outLen) {
+CHIP_ERROR STM32Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
+{
 
     uint8_t buffer_key[35] = { 0 };
 
-    sprintf((char*) buffer_key, "Config%i", key);
-    return PrintError(
-            NM_GetKeyValue(buf, (char*) buffer_key, bufSize,
-                    &outLen, SECTOR_SECURE));
+    sprintf((char *) buffer_key, "Config%i", key);
+    return PrintError(NM_GetKeyValue(buf, (char *) buffer_key, bufSize, &outLen, SECTOR_SECURE));
 }
 
-CHIP_ERROR STM32Config::ReadConfigValue(Key key, bool &val) {
-    uint8_t buffer_key[35] = { 0 };
-    size_t Out_Length;
-
-    sprintf((char*) buffer_key, "Config%i", key);
-    return PrintError(
-            NM_GetKeyValue(reinterpret_cast<uint8_t*>(&val), (char*) buffer_key, sizeof(bool),
-                    &Out_Length, SECTOR_SECURE));
-}
-
-CHIP_ERROR STM32Config::ReadConfigValue(Key key, uint32_t &val) {
+CHIP_ERROR STM32Config::ReadConfigValue(Key key, bool & val)
+{
     uint8_t buffer_key[35] = { 0 };
     size_t Out_Length;
 
-    sprintf((char*) buffer_key, "Config%i", key);
+    sprintf((char *) buffer_key, "Config%i", key);
     return PrintError(
-            NM_GetKeyValue(reinterpret_cast<uint8_t*>(&val), (char*) buffer_key, sizeof(uint32_t),
-                    &Out_Length, SECTOR_SECURE));
+        NM_GetKeyValue(reinterpret_cast<uint8_t *>(&val), (char *) buffer_key, sizeof(bool), &Out_Length, SECTOR_SECURE));
 }
 
-CHIP_ERROR STM32Config::ReadConfigValue(Key key, uint64_t &val) {
+CHIP_ERROR STM32Config::ReadConfigValue(Key key, uint32_t & val)
+{
     uint8_t buffer_key[35] = { 0 };
     size_t Out_Length;
 
-    sprintf((char*) buffer_key, "Config%i", key);
+    sprintf((char *) buffer_key, "Config%i", key);
     return PrintError(
-            NM_GetKeyValue(reinterpret_cast<uint8_t*>(&val), (char*) buffer_key, sizeof(uint64_t),
-                    &Out_Length, SECTOR_SECURE));
+        NM_GetKeyValue(reinterpret_cast<uint8_t *>(&val), (char *) buffer_key, sizeof(uint32_t), &Out_Length, SECTOR_SECURE));
 }
 
-CHIP_ERROR STM32Config::ReadConfigValueStr(Key key, char *buf, size_t bufSize, size_t &outLen) {
+CHIP_ERROR STM32Config::ReadConfigValue(Key key, uint64_t & val)
+{
+    uint8_t buffer_key[35] = { 0 };
+    size_t Out_Length;
 
-    return ReadConfigValueBin(key, reinterpret_cast<uint8_t*>(buf), bufSize, outLen);
+    sprintf((char *) buffer_key, "Config%i", key);
+    return PrintError(
+        NM_GetKeyValue(reinterpret_cast<uint8_t *>(&val), (char *) buffer_key, sizeof(uint64_t), &Out_Length, SECTOR_SECURE));
 }
 
-CHIP_ERROR STM32Config::WriteConfigValue(Key key, uint32_t val) {
+CHIP_ERROR STM32Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
+{
+
+    return ReadConfigValueBin(key, reinterpret_cast<uint8_t *>(buf), bufSize, outLen);
+}
+
+CHIP_ERROR STM32Config::WriteConfigValue(Key key, uint32_t val)
+{
     uint8_t buffer_key[35] = { 0 };
     uint8_t buffer_convert[4];
     buffer_convert[0] = val;
-    buffer_convert[1] = val >>  8;
+    buffer_convert[1] = val >> 8;
     buffer_convert[2] = val >> 16;
     buffer_convert[3] = val >> 24;
-    sprintf((char*) buffer_key, "Config%i", key);
-    return PrintError(NM_SetKeyValue((char*)buffer_convert, (char*) buffer_key, sizeof(uint32_t), SECTOR_SECURE));
+    sprintf((char *) buffer_key, "Config%i", key);
+    return PrintError(NM_SetKeyValue((char *) buffer_convert, (char *) buffer_key, sizeof(uint32_t), SECTOR_SECURE));
 }
 
-CHIP_ERROR STM32Config::WriteConfigValueStr(Key key, const char *str) {
+CHIP_ERROR STM32Config::WriteConfigValueStr(Key key, const char * str)
+{
     return WriteConfigValueStr(key, str, (str != NULL) ? strlen(str) : 0);
 }
 
-CHIP_ERROR STM32Config::WriteConfigValueStr(Key key, const char *str, size_t strLen) {
-    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t*>(str), strLen);
+CHIP_ERROR STM32Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
+{
+    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), strLen);
 }
 
-CHIP_ERROR STM32Config::WriteConfigValueBin(Key key, const uint8_t *data, size_t dataLen) {
+CHIP_ERROR STM32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
+{
     uint8_t buffer_key[35] = { 0 };
 
-    sprintf((char*) buffer_key, "Config%i", key);
-    return PrintError(NM_SetKeyValue((char*) data, (char*) buffer_key, dataLen, SECTOR_SECURE));
-
-
+    sprintf((char *) buffer_key, "Config%i", key);
+    return PrintError(NM_SetKeyValue((char *) data, (char *) buffer_key, dataLen, SECTOR_SECURE));
 }
 
-bool STM32Config::ConfigValueExists(Key key) {
+bool STM32Config::ConfigValueExists(Key key)
+{
     return false;
 }
 
-CHIP_ERROR STM32Config::FactoryResetConfig(void) {
+CHIP_ERROR STM32Config::FactoryResetConfig(void)
+{
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-void STM32Config::RunConfigUnitTest(void) {
-}
+void STM32Config::RunConfigUnitTest(void) {}
 
-CHIP_ERROR STM32Config::PrintError(NVM_StatusTypeDef err) {
-    switch (err) {
+CHIP_ERROR STM32Config::PrintError(NVM_StatusTypeDef err)
+{
+    switch (err)
+    {
     case NVM_OK:
         ChipLogDetail(DataManagement, "NVM_OK");
         return CHIP_NO_ERROR;
@@ -159,9 +164,7 @@ CHIP_ERROR STM32Config::PrintError(NVM_StatusTypeDef err) {
     default:
         ChipLogDetail(DataManagement, "NVM_UNKNOWN_ERROR ");
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-
     }
-
 }
 } // namespace Internal
 } // namespace DeviceLayer

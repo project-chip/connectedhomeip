@@ -189,11 +189,17 @@
  */
 #define HIGHWATERMARK 0
 
-#if ( CFG_LPM_SUPPORTED == 1)
+#if (CFG_LPM_SUPPORTED == 1)
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 1 // to enable SED feature
-#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL 200_ms32 // define the default polling period in Active Mode (when communication is ongoing with other Matter devices. Default value 200 ms
-#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL 5000_ms32 // define the default polling Period in Idle Mode (no more communication with the other Matter devices) Default value is 5 seconds
-#define CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD System::Clock::Milliseconds32(4000) // used by Matter to remain active after last exchange with the other Matter devices. By default 4 seconds
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL                                                                                     \
+    200_ms32 // define the default polling period in Active Mode (when communication is ongoing with other Matter devices. Default
+             // value 200 ms
+#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL                                                                                       \
+    5000_ms32 // define the default polling Period in Idle Mode (no more communication with the other Matter devices) Default value
+              // is 5 seconds
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD                                                                                    \
+    System::Clock::Milliseconds32(                                                                                                 \
+        4000) // used by Matter to remain active after last exchange with the other Matter devices. By default 4 seconds
 #endif
 
 #endif /* CHIPPROJECTCONFIG_H */

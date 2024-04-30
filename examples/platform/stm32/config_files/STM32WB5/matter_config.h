@@ -32,9 +32,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#if CHIP_HAVE_CONFIG_H
-//#include <crypto/CryptoBuildConfig.h>
-//#endif // CHIP_HAVE_CONFIG_H
+// #if CHIP_HAVE_CONFIG_H
+// #include <crypto/CryptoBuildConfig.h>
+// #endif // CHIP_HAVE_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -133,15 +133,15 @@ extern "C" {
 #define MBEDTLS_THREADING_ALT
 #define MBEDTLS_THREADING_C
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
-#define  MBEDTLS_PKCS5_C
+#define MBEDTLS_PKCS5_C
 
 #define MBEDTLS_ERROR_C 1
 
-//#include "check_crypto_config.h"
+// #include "check_crypto_config.h"
 #include "mbedtls/check_config.h"
 #include "mbedtls/config_psa.h"
 
-int mbedtls_ssl_safer_memcmp( const void *a, const void *b, size_t n );
+int mbedtls_ssl_safer_memcmp(const void * a, const void * b, size_t n);
 #ifdef __cplusplus
 }
 #endif
