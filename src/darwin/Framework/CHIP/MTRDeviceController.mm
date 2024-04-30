@@ -616,6 +616,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
+    MTR_LOG_DEFAULT("Setting up commissioning session for device ID 0x%016llX with setup payload %@", newNodeID.unsignedLongLongValue, payload);
+
     [[MTRMetricsCollector sharedInstance] resetMetrics];
 
     // Track overall commissioning
@@ -663,6 +665,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                             newNodeID:(NSNumber *)newNodeID
                                                 error:(NSError * __autoreleasing *)error
 {
+    MTR_LOG_DEFAULT("Setting up commissioning session for already-discovered device %@ and device ID 0x%016llX with setup payload %@", discoveredDevice, newNodeID.unsignedLongLongValue, payload);
+
     [[MTRMetricsCollector sharedInstance] resetMetrics];
 
     // Track overall commissioning
@@ -912,7 +916,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    MTRBaseDevice * device = [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    MTR_LOG_DEFAULT("Getting device being commissioned with node ID 0x%016llX: %@ (error: %@)",
+        nodeID.unsignedLongLongValue, device, (error ? *error : nil));
+    return device;
 }
 
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID
