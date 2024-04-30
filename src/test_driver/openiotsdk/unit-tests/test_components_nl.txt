@@ -4,4 +4,3 @@ InetLayerTests
 MessagingLayerTests
 SecureChannelTestsNL
 SupportTestsNL
-TransportLayerTests
