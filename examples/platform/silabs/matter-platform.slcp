@@ -27,7 +27,7 @@ include:
   file_list:
   - {path: app.h}
   - {path: reset_util.h}
-sdk: {id: gecko_sdk, version: 4.3.1}
+sdk: {id: gecko_sdk, version: 4.4.2}
 toolchain_settings: []
 
 component:

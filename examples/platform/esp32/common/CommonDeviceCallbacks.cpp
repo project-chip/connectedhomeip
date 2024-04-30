@@ -41,6 +41,10 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 {
     switch (event->Type)
     {
+    case DeviceEventType::kBLEDeinitialized:
+        ESP_LOGI(TAG, "BLE is deinitialized");
+        break;
+
     case DeviceEventType::kInternetConnectivityChange:
         OnInternetConnectivityChange(event);
         break;
