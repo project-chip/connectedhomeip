@@ -13,15 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/crypto/crypto.gni")
 
 chip_device_platform = "ameba"
 
 lwip_platform = "external"
-
-if (chip_crypto == "") {
-  mbedtls_target = "//mbedtls:mbedtls"
-}
+mbedtls_target = "//mbedtls:mbedtls"
 
 chip_build_tests = false
 chip_inet_config_enable_tun_endpoint = false

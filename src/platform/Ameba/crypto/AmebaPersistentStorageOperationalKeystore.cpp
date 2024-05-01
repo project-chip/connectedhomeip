@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#if CONFIG_ENABLE_AMEBA_CRYPTO
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/CHIPCryptoPALmbedTLS.h>
 #include <crypto/OperationalKeystore.h>
@@ -441,3 +442,5 @@ CHIP_ERROR AmebaPersistentStorageOperationalKeystore::MigrateOpKeypairForFabric(
 }
 
 } // namespace chip
+
+#endif /* CONFIG_ENABLE_AMEBA_CRYPTO */

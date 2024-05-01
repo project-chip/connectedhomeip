@@ -17,6 +17,7 @@
 
 #pragma once
 
+#if CONFIG_ENABLE_AMEBA_CRYPTO
 #include <crypto/OperationalKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPError.h>
@@ -142,3 +143,4 @@ protected:
 };
 
 } // namespace chip
+#endif /* CONFIG_ENABLE_AMEBA_CRYPTO */
