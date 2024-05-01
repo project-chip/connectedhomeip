@@ -287,12 +287,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
       response:
@@ -361,12 +361,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
 
@@ -395,8 +395,8 @@ tests:
           [1708071897.294574][7731:7733] CHIP:TOO:         ClusterID: 6
           [1708071897.294580][7731:7733] CHIP:TOO:         AttributeValueList: 1 entries
           [1708071897.294589][7731:7733] CHIP:TOO:           [1]: {
-          [1708071897.294593][7731:7733] CHIP:TOO:             AttributeID: 1
-          [1708071897.294596][7731:7733] CHIP:TOO:             AttributeValue: 1
+          [1708071897.294593][7731:7733] CHIP:TOO:             AttributeID: 0
+          [1708071897.294596][7731:7733] CHIP:TOO:             ValueUnsigned8: 1
           [1708071897.294599][7731:7733] CHIP:TOO:            }
           [1708071897.294603][7731:7733] CHIP:TOO:        }
           [1708071897.294611][7731:7733] CHIP:TOO:       [2]: {
@@ -404,7 +404,7 @@ tests:
           [1708071897.294621][7731:7733] CHIP:TOO:         AttributeValueList: 1 entries
           [1708071897.294628][7731:7733] CHIP:TOO:           [1]: {
           [1708071897.294633][7731:7733] CHIP:TOO:             AttributeID: 0
-          [1708071897.294636][7731:7733] CHIP:TOO:             AttributeValue: 100
+          [1708071897.294636][7731:7733] CHIP:TOO:             ValueUnsigned8: 100
           [1708071897.294639][7731:7733] CHIP:TOO:            }
           [1708071897.294643][7731:7733] CHIP:TOO:        }
           [1708071897.294647][7731:7733] CHIP:TOO:    }
@@ -543,12 +543,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
 
@@ -599,12 +599,12 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
+                                [{ AttributeID: 0x0000, ValueUnsigned8: 0x64 }],
                         },
                     ]
     - label:
@@ -633,7 +633,7 @@ tests:
           [1707285444.028853][13682:13684] CHIP:TOO:         AttributeValueList: 1 entries
           [1707285444.028882][13682:13684] CHIP:TOO:           [1]: {
           [1707285444.028896][13682:13684] CHIP:TOO:             AttributeID: 16386
-          [1707285444.028913][13682:13684] CHIP:TOO:             AttributeValue: 1
+          [1707285444.028913][13682:13684] CHIP:TOO:             ValueUnsigned16: 1
           [1707285444.028925][13682:13684] CHIP:TOO:            }
           [1707285444.028937][13682:13684] CHIP:TOO:        }
           [1707285444.028950][13682:13684] CHIP:TOO:    }

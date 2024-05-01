@@ -32,7 +32,30 @@ limitations under the License.
   <struct name="AttributeValuePair">
     <cluster code="0x0062"/>
     <item name="AttributeID" type="attrib_id" optional="false"/>
-    <item name="AttributeValue" type="int32u" optional="false"/>
+    <item name="ValueUnsigned8" type="int8u" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueSigned8" type="int8s" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueUnsigned16" type="int16u" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueSigned16" type="int16s" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueUnsigned32" type="int32u" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueSigned32" type="int32s" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueUnsigned64" type="int64u" optional="true">
+      <optionalConform choice="a"/>
+    </item>
+    <item name="ValueSigned64" type="int64s" optional="true">
+      <optionalConform choice="a"/>
+    </item>
   </struct>
 
   <struct name="ExtensionFieldSet">

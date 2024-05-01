@@ -112,21 +112,21 @@ public:
             {
                 xValue = 0x616B; // Default X value according to spec
             }
-            AddAttributeValuePair(pairs, Attributes::CurrentX::Id, xValue, attributeCount);
+            AddAttributeValuePair<uint16_t>(pairs, Attributes::CurrentX::Id, xValue, attributeCount);
 
             uint16_t yValue;
             if (Status::Success != Attributes::CurrentY::Get(endpoint, &yValue))
             {
                 yValue = 0x607D; // Default Y value according to spec
             }
-            AddAttributeValuePair(pairs, Attributes::CurrentY::Id, yValue, attributeCount);
+            AddAttributeValuePair<uint16_t>(pairs, Attributes::CurrentY::Id, yValue, attributeCount);
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kEnhancedHue))
         {
             uint16_t hueValue = 0x0000;
             Attributes::EnhancedCurrentHue::Get(endpoint, &hueValue);
-            AddAttributeValuePair(pairs, Attributes::EnhancedCurrentHue::Id, hueValue, attributeCount);
+            AddAttributeValuePair<uint16_t>(pairs, Attributes::EnhancedCurrentHue::Id, hueValue, attributeCount);
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kHueAndSaturation))
@@ -136,7 +136,7 @@ public:
             {
                 saturationValue = 0x00;
             }
-            AddAttributeValuePair(pairs, Attributes::CurrentSaturation::Id, saturationValue, attributeCount);
+            AddAttributeValuePair<uint8_t>(pairs, Attributes::CurrentSaturation::Id, saturationValue, attributeCount);
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorLoop))
@@ -146,21 +146,21 @@ public:
             {
                 loopActiveValue = 0x00;
             }
-            AddAttributeValuePair(pairs, Attributes::ColorLoopActive::Id, loopActiveValue, attributeCount);
+            AddAttributeValuePair<uint8_t>(pairs, Attributes::ColorLoopActive::Id, loopActiveValue, attributeCount);
 
             uint8_t loopDirectionValue;
             if (Status::Success != Attributes::ColorLoopDirection::Get(endpoint, &loopDirectionValue))
             {
                 loopDirectionValue = 0x00;
             }
-            AddAttributeValuePair(pairs, Attributes::ColorLoopDirection::Id, loopDirectionValue, attributeCount);
+            AddAttributeValuePair<uint8_t>(pairs, Attributes::ColorLoopDirection::Id, loopDirectionValue, attributeCount);
 
             uint16_t loopTimeValue;
             if (Status::Success != Attributes::ColorLoopTime::Get(endpoint, &loopTimeValue))
             {
                 loopTimeValue = 0x0019; // Default loop time value according to spec
             }
-            AddAttributeValuePair(pairs, Attributes::ColorLoopTime::Id, loopTimeValue, attributeCount);
+            AddAttributeValuePair<uint16_t>(pairs, Attributes::ColorLoopTime::Id, loopTimeValue, attributeCount);
         }
 
         if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorTemperature))
@@ -170,7 +170,7 @@ public:
             {
                 temperatureValue = 0x00FA; // Default temperature value according to spec
             }
-            AddAttributeValuePair(pairs, Attributes::ColorTemperatureMireds::Id, temperatureValue, attributeCount);
+            AddAttributeValuePair<uint16_t>(pairs, Attributes::ColorTemperatureMireds::Id, temperatureValue, attributeCount);
         }
 
         uint8_t modeValue;
@@ -178,7 +178,7 @@ public:
         {
             modeValue = ColorControl::EnhancedColorMode::kCurrentXAndCurrentY; // Default mode value according to spec
         }
-        AddAttributeValuePair(pairs, Attributes::EnhancedColorMode::Id, modeValue, attributeCount);
+        AddAttributeValuePair<uint8_t>(pairs, Attributes::EnhancedColorMode::Id, modeValue, attributeCount);
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs, attributeCount);
 
@@ -237,52 +237,76 @@ public:
             case Attributes::CurrentX::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kCurrentXAndCurrentY))
                 {
-                    if (decodePair.attributeValue)
+                    if (decodePair.valueUnsigned16.HasValue())
                         colorXTransitionState->finalValue =
-                            std::min(static_cast<uint16_t>(decodePair.attributeValue), colorXTransitionState->highLimit);
+                            std::min(decodePair.valueUnsigned16.Value(), colorXTransitionState->highLimit);
                 }
                 break;
             case Attributes::CurrentY::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kCurrentXAndCurrentY))
                 {
-                    colorYTransitionState->finalValue =
-                        std::min(static_cast<uint16_t>(decodePair.attributeValue), colorYTransitionState->highLimit);
+                    if (decodePair.valueUnsigned16.HasValue())
+                    {
+                        colorYTransitionState->finalValue =
+                            std::min(decodePair.valueUnsigned16.Value(), colorYTransitionState->highLimit);
+                    }
                 }
                 break;
             case Attributes::EnhancedCurrentHue::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
                 {
-                    colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(decodePair.attributeValue);
+                    if (decodePair.valueUnsigned16.HasValue())
+                    {
+                        colorHueTransitionState->finalEnhancedHue = decodePair.valueUnsigned16.Value();
+                    }
                 }
                 break;
             case Attributes::CurrentSaturation::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation))
                 {
-                    colorSaturationTransitionState->finalValue =
-                        std::min(static_cast<uint16_t>(decodePair.attributeValue), colorSaturationTransitionState->highLimit);
+                    if (decodePair.valueUnsigned16.HasValue())
+                    {
+                        colorSaturationTransitionState->finalValue =
+                            std::min(decodePair.valueUnsigned16.Value(), colorSaturationTransitionState->highLimit);
+                    }
                 }
                 break;
             case Attributes::ColorLoopActive::Id:
-                loopActiveValue = static_cast<uint8_t>(decodePair.attributeValue);
+                if (decodePair.valueUnsigned8.HasValue())
+                {
+                    loopActiveValue = decodePair.valueUnsigned8.Value();
+                }
                 break;
             case Attributes::ColorLoopDirection::Id:
-                loopDirectionValue = static_cast<uint8_t>(decodePair.attributeValue);
+                if (decodePair.valueUnsigned8.HasValue())
+                {
+                    loopDirectionValue = decodePair.valueUnsigned8.Value();
+                }
                 break;
             case Attributes::ColorLoopTime::Id:
-                loopTimeValue = static_cast<uint16_t>(decodePair.attributeValue);
+                if (decodePair.valueUnsigned16.HasValue())
+                {
+                    loopTimeValue = decodePair.valueUnsigned16.Value();
+                }
                 break;
             case Attributes::ColorTemperatureMireds::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kColorTemperature))
                 {
-                    colorTempTransitionState->finalValue =
-                        std::min(static_cast<uint16_t>(decodePair.attributeValue), colorTempTransitionState->highLimit);
+                    if (decodePair.valueUnsigned16.HasValue())
+                    {
+                        colorTempTransitionState->finalValue =
+                            std::min(decodePair.valueUnsigned16.Value(), colorTempTransitionState->highLimit);
+                    }
                 }
                 break;
             case Attributes::EnhancedColorMode::Id:
-                if (decodePair.attributeValue <=
-                    static_cast<uint8_t>(ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
+                if (decodePair.valueUnsigned8.HasValue())
                 {
-                    targetColorMode = static_cast<uint8_t>(decodePair.attributeValue);
+                    if (decodePair.valueUnsigned8.Value() <=
+                        static_cast<uint8_t>(ColorControl::EnhancedColorMode::kEnhancedCurrentHueAndCurrentSaturation))
+                    {
+                        targetColorMode = decodePair.valueUnsigned8.Value();
+                    }
                 }
                 break;
             default:
@@ -371,11 +395,26 @@ private:
         }
     }
 
-    void AddAttributeValuePair(ScenesManagement::Structs::AttributeValuePair::Type * pairs, AttributeId id, uint32_t value,
+    /// AddAttributeValuePair
+    /// @brief Helper function to add an attribute value pair to the attribute value pair array in the color control SceneHandler
+    /// @param pairs list of attribute value pairs
+    /// @param id attribute id
+    /// @param value attribute value
+    /// @param attributeCount number of attributes in the list, incremented by this function, used to keep track of how many
+    /// attributes from the array are being used for the list to encode
+    template <typename Type>
+    void AddAttributeValuePair(ScenesManagement::Structs::AttributeValuePair::Type * pairs, AttributeId id, Type value,
                                size_t & attributeCount)
     {
-        pairs[attributeCount].attributeID    = id;
-        pairs[attributeCount].attributeValue = value;
+        pairs[attributeCount].attributeID = id;
+        if constexpr (sizeof(Type) == sizeof(uint8_t))
+        {
+            pairs[attributeCount].valueUnsigned8.SetValue(value);
+        }
+        else if constexpr (sizeof(Type) == sizeof(uint16_t))
+        {
+            pairs[attributeCount].valueUnsigned16.SetValue(value);
+        }
         attributeCount++;
     }
 };

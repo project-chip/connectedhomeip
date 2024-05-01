@@ -17,16 +17,34 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesManagementClusterAttributeValuePair(val attributeID: ULong, val attributeValue: ULong) {
+class ScenesManagementClusterAttributeValuePair(
+  val attributeID: ULong,
+  val valueUnsigned8: Optional<UInt>,
+  val valueSigned8: Optional<Int>,
+  val valueUnsigned16: Optional<UInt>,
+  val valueSigned16: Optional<Int>,
+  val valueUnsigned32: Optional<ULong>,
+  val valueSigned32: Optional<Long>,
+  val valueUnsigned64: Optional<ULong>,
+  val valueSigned64: Optional<Long>
+) {
   override fun toString(): String = buildString {
     append("ScenesManagementClusterAttributeValuePair {\n")
     append("\tattributeID : $attributeID\n")
-    append("\tattributeValue : $attributeValue\n")
+    append("\tvalueUnsigned8 : $valueUnsigned8\n")
+    append("\tvalueSigned8 : $valueSigned8\n")
+    append("\tvalueUnsigned16 : $valueUnsigned16\n")
+    append("\tvalueSigned16 : $valueSigned16\n")
+    append("\tvalueUnsigned32 : $valueUnsigned32\n")
+    append("\tvalueSigned32 : $valueSigned32\n")
+    append("\tvalueUnsigned64 : $valueUnsigned64\n")
+    append("\tvalueSigned64 : $valueSigned64\n")
     append("}\n")
   }
 
@@ -34,23 +52,118 @@ class ScenesManagementClusterAttributeValuePair(val attributeID: ULong, val attr
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ATTRIBUTE_I_D), attributeID)
-      put(ContextSpecificTag(TAG_ATTRIBUTE_VALUE), attributeValue)
+      if (valueUnsigned8.isPresent) {
+        val optvalueUnsigned8 = valueUnsigned8.get()
+        put(ContextSpecificTag(TAG_VALUE_UNSIGNED8), optvalueUnsigned8)
+      }
+      if (valueSigned8.isPresent) {
+        val optvalueSigned8 = valueSigned8.get()
+        put(ContextSpecificTag(TAG_VALUE_SIGNED8), optvalueSigned8)
+      }
+      if (valueUnsigned16.isPresent) {
+        val optvalueUnsigned16 = valueUnsigned16.get()
+        put(ContextSpecificTag(TAG_VALUE_UNSIGNED16), optvalueUnsigned16)
+      }
+      if (valueSigned16.isPresent) {
+        val optvalueSigned16 = valueSigned16.get()
+        put(ContextSpecificTag(TAG_VALUE_SIGNED16), optvalueSigned16)
+      }
+      if (valueUnsigned32.isPresent) {
+        val optvalueUnsigned32 = valueUnsigned32.get()
+        put(ContextSpecificTag(TAG_VALUE_UNSIGNED32), optvalueUnsigned32)
+      }
+      if (valueSigned32.isPresent) {
+        val optvalueSigned32 = valueSigned32.get()
+        put(ContextSpecificTag(TAG_VALUE_SIGNED32), optvalueSigned32)
+      }
+      if (valueUnsigned64.isPresent) {
+        val optvalueUnsigned64 = valueUnsigned64.get()
+        put(ContextSpecificTag(TAG_VALUE_UNSIGNED64), optvalueUnsigned64)
+      }
+      if (valueSigned64.isPresent) {
+        val optvalueSigned64 = valueSigned64.get()
+        put(ContextSpecificTag(TAG_VALUE_SIGNED64), optvalueSigned64)
+      }
       endStructure()
     }
   }
 
   companion object {
     private const val TAG_ATTRIBUTE_I_D = 0
-    private const val TAG_ATTRIBUTE_VALUE = 1
+    private const val TAG_VALUE_UNSIGNED8 = 1
+    private const val TAG_VALUE_SIGNED8 = 2
+    private const val TAG_VALUE_UNSIGNED16 = 3
+    private const val TAG_VALUE_SIGNED16 = 4
+    private const val TAG_VALUE_UNSIGNED32 = 5
+    private const val TAG_VALUE_SIGNED32 = 6
+    private const val TAG_VALUE_UNSIGNED64 = 7
+    private const val TAG_VALUE_SIGNED64 = 8
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterAttributeValuePair {
       tlvReader.enterStructure(tlvTag)
       val attributeID = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
-      val attributeValue = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_VALUE))
+      val valueUnsigned8 =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE_UNSIGNED8))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_VALUE_UNSIGNED8)))
+        } else {
+          Optional.empty()
+        }
+      val valueSigned8 =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE_SIGNED8))) {
+          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_VALUE_SIGNED8)))
+        } else {
+          Optional.empty()
+        }
+      val valueUnsigned16 =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE_UNSIGNED16))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_VALUE_UNSIGNED16)))
+        } else {
+          Optional.empty()
+        }
+      val valueSigned16 =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE_SIGNED16))) {
+          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_VALUE_SIGNED16)))
+        } else {
+          Optional.empty()
+        }
+      val valueUnsigned32 =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE_UNSIGNED32))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_VALUE_UNSIGNED32)))
+        } else {
+          Optional.empty()
+        }
+      val valueSigned32 =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE_SIGNED32))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_VALUE_SIGNED32)))
+        } else {
+          Optional.empty()
+        }
+      val valueUnsigned64 =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE_UNSIGNED64))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_VALUE_UNSIGNED64)))
+        } else {
+          Optional.empty()
+        }
+      val valueSigned64 =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE_SIGNED64))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_VALUE_SIGNED64)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
-      return ScenesManagementClusterAttributeValuePair(attributeID, attributeValue)
+      return ScenesManagementClusterAttributeValuePair(
+        attributeID,
+        valueUnsigned8,
+        valueSigned8,
+        valueUnsigned16,
+        valueSigned16,
+        valueUnsigned32,
+        valueSigned32,
+        valueUnsigned64,
+        valueSigned64
+      )
     }
   }
 }

@@ -20340,11 +20340,25 @@ class ScenesManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="attributeValue", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="valueUnsigned8", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="valueSigned8", Tag=2, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="valueUnsigned16", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="valueSigned16", Tag=4, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="valueUnsigned32", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="valueSigned32", Tag=6, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="valueUnsigned64", Tag=7, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="valueSigned64", Tag=8, Type=typing.Optional[int]),
                     ])
 
             attributeID: 'uint' = 0
-            attributeValue: 'uint' = 0
+            valueUnsigned8: 'typing.Optional[uint]' = None
+            valueSigned8: 'typing.Optional[int]' = None
+            valueUnsigned16: 'typing.Optional[uint]' = None
+            valueSigned16: 'typing.Optional[int]' = None
+            valueUnsigned32: 'typing.Optional[uint]' = None
+            valueSigned32: 'typing.Optional[int]' = None
+            valueUnsigned64: 'typing.Optional[uint]' = None
+            valueSigned64: 'typing.Optional[int]' = None
 
         @dataclass
         class ExtensionFieldSet(ClusterObject):

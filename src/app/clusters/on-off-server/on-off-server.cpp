@@ -163,8 +163,8 @@ public:
 
         AttributeValuePair pairs[scenableAttributeCount];
 
-        pairs[0].attributeID    = Attributes::OnOff::Id;
-        pairs[0].attributeValue = currentValue;
+        pairs[0].attributeID = Attributes::OnOff::Id;
+        pairs[0].valueUnsigned8.SetValue(currentValue);
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
 
@@ -195,8 +195,8 @@ public:
         {
             auto & decodePair = pair_iterator.GetValue();
             VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorOnFailure(
-                mSceneEndpointStatePairs.InsertPair(OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.attributeValue))));
+            ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(
+                OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.valueUnsigned8.Value()))));
         }
         // Verify that the EFS was completely read
         CHIP_ERROR err = pair_iterator.GetStatus();

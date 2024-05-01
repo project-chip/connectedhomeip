@@ -13074,7 +13074,38 @@ NS_ASSUME_NONNULL_BEGIN
                                 }
                                 auto element_2 = (MTRScenesManagementClusterAttributeValuePair *) element_0.attributeValueList[i_2];
                                 listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
-                                listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
+                                if (element_2.valueUnsigned8 != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned8.Emplace();
+                                    definedValue_4 = element_2.valueUnsigned8.unsignedCharValue;
+                                }
+                                if (element_2.valueSigned8 != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].valueSigned8.Emplace();
+                                    definedValue_4 = element_2.valueSigned8.charValue;
+                                }
+                                if (element_2.valueUnsigned16 != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned16.Emplace();
+                                    definedValue_4 = element_2.valueUnsigned16.unsignedShortValue;
+                                }
+                                if (element_2.valueSigned16 != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].valueSigned16.Emplace();
+                                    definedValue_4 = element_2.valueSigned16.shortValue;
+                                }
+                                if (element_2.valueUnsigned32 != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned32.Emplace();
+                                    definedValue_4 = element_2.valueUnsigned32.unsignedIntValue;
+                                }
+                                if (element_2.valueSigned32 != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].valueSigned32.Emplace();
+                                    definedValue_4 = element_2.valueSigned32.intValue;
+                                }
+                                if (element_2.valueUnsigned64 != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned64.Emplace();
+                                    definedValue_4 = element_2.valueUnsigned64.unsignedLongLongValue;
+                                }
+                                if (element_2.valueSigned64 != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].valueSigned64.Emplace();
+                                    definedValue_4 = element_2.valueSigned64.longLongValue;
+                                }
                             }
                             listHolder_0->mList[i_0].attributeValueList = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
                         } else {
@@ -13434,7 +13465,46 @@ NS_ASSUME_NONNULL_BEGIN
                             MTRScenesManagementClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesManagementClusterAttributeValuePair new];
                             newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
-                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
+                            if (entry_3.valueUnsigned8.HasValue()) {
+                                newElement_3.valueUnsigned8 = [NSNumber numberWithUnsignedChar:entry_3.valueUnsigned8.Value()];
+                            } else {
+                                newElement_3.valueUnsigned8 = nil;
+                            }
+                            if (entry_3.valueSigned8.HasValue()) {
+                                newElement_3.valueSigned8 = [NSNumber numberWithChar:entry_3.valueSigned8.Value()];
+                            } else {
+                                newElement_3.valueSigned8 = nil;
+                            }
+                            if (entry_3.valueUnsigned16.HasValue()) {
+                                newElement_3.valueUnsigned16 = [NSNumber numberWithUnsignedShort:entry_3.valueUnsigned16.Value()];
+                            } else {
+                                newElement_3.valueUnsigned16 = nil;
+                            }
+                            if (entry_3.valueSigned16.HasValue()) {
+                                newElement_3.valueSigned16 = [NSNumber numberWithShort:entry_3.valueSigned16.Value()];
+                            } else {
+                                newElement_3.valueSigned16 = nil;
+                            }
+                            if (entry_3.valueUnsigned32.HasValue()) {
+                                newElement_3.valueUnsigned32 = [NSNumber numberWithUnsignedInt:entry_3.valueUnsigned32.Value()];
+                            } else {
+                                newElement_3.valueUnsigned32 = nil;
+                            }
+                            if (entry_3.valueSigned32.HasValue()) {
+                                newElement_3.valueSigned32 = [NSNumber numberWithInt:entry_3.valueSigned32.Value()];
+                            } else {
+                                newElement_3.valueSigned32 = nil;
+                            }
+                            if (entry_3.valueUnsigned64.HasValue()) {
+                                newElement_3.valueUnsigned64 = [NSNumber numberWithUnsignedLongLong:entry_3.valueUnsigned64.Value()];
+                            } else {
+                                newElement_3.valueUnsigned64 = nil;
+                            }
+                            if (entry_3.valueSigned64.HasValue()) {
+                                newElement_3.valueSigned64 = [NSNumber numberWithLongLong:entry_3.valueSigned64.Value()];
+                            } else {
+                                newElement_3.valueSigned64 = nil;
+                            }
                             [array_3 addObject:newElement_3];
                         }
                         CHIP_ERROR err = iter_3.GetStatus();

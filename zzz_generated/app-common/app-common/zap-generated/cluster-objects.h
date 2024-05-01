@@ -18177,15 +18177,29 @@ namespace Structs {
 namespace AttributeValuePair {
 enum class Fields : uint8_t
 {
-    kAttributeID    = 0,
-    kAttributeValue = 1,
+    kAttributeID     = 0,
+    kValueUnsigned8  = 1,
+    kValueSigned8    = 2,
+    kValueUnsigned16 = 3,
+    kValueSigned16   = 4,
+    kValueUnsigned32 = 5,
+    kValueSigned32   = 6,
+    kValueUnsigned64 = 7,
+    kValueSigned64   = 8,
 };
 
 struct Type
 {
 public:
     chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
-    uint32_t attributeValue       = static_cast<uint32_t>(0);
+    Optional<uint8_t> valueUnsigned8;
+    Optional<int8_t> valueSigned8;
+    Optional<uint16_t> valueUnsigned16;
+    Optional<int16_t> valueSigned16;
+    Optional<uint32_t> valueUnsigned32;
+    Optional<int32_t> valueSigned32;
+    Optional<uint64_t> valueUnsigned64;
+    Optional<int64_t> valueSigned64;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
