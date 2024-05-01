@@ -58,7 +58,8 @@ CommandHandler::CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apC
     }
 }
 
-CommandHandler::~CommandHandler() {
+CommandHandler::~CommandHandler()
+{
     InvalidateHandles();
 }
 
@@ -278,14 +279,16 @@ void CommandHandler::Close()
     }
 }
 
-void CommandHandler::AddToHandleList(Handle* apHandle) {
+void CommandHandler::AddToHandleList(Handle * apHandle)
+{
     apHandle->SetNext(mpHandleList);
     mpHandleList = apHandle;
 }
 
-void CommandHandler::RemoveFromHandleList(Handle* apHandle) {
-        Handle* prev = nullptr;
-    for (Handle* cur = mpHandleList; cur; cur = cur->GetNext())
+void CommandHandler::RemoveFromHandleList(Handle * apHandle)
+{
+    Handle * prev = nullptr;
+    for (Handle * cur = mpHandleList; cur; cur = cur->GetNext())
     {
         if (cur == apHandle)
         {
@@ -302,21 +305,23 @@ void CommandHandler::RemoveFromHandleList(Handle* apHandle) {
         }
         prev = cur;
     }
-    }
+}
 
-    void CommandHandler::InvalidateHandles() {
-        for (Handle* cur = mpHandleList; cur; cur = cur->GetNext()) {
+void CommandHandler::InvalidateHandles()
+{
+    for (Handle * cur = mpHandleList; cur; cur = cur->GetNext())
+    {
         cur->Invalidate();
     }
-    }
+}
 
-void CommandHandler::IncrementHoldOff(Handle* apHandle)
+void CommandHandler::IncrementHoldOff(Handle * apHandle)
 {
     mPendingWork++;
     AddToHandleList(apHandle);
 }
 
-void CommandHandler::DecrementHoldOff(Handle* apHandle)
+void CommandHandler::DecrementHoldOff(Handle * apHandle)
 {
 
     mPendingWork--;
@@ -813,7 +818,8 @@ FabricIndex CommandHandler::GetAccessingFabricIndex() const
     return mpResponder->GetAccessingFabricIndex();
 }
 
-void CommandHandler::Handle::Init(CommandHandler * handle) {
+void CommandHandler::Handle::Init(CommandHandler * handle)
+{
     if (handle != nullptr)
     {
         handle->IncrementHoldOff(this);

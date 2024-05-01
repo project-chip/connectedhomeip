@@ -156,13 +156,13 @@ public:
          * Mechanism for keeping track of a chain of Handle.
          */
         void SetNext(Handle * aNext) { mNext = aNext; }
-        Handle* GetNext() const { return mNext; }
-        void Invalidate() {mpHandler = nullptr;}
+        Handle * GetNext() const { return mNext; }
+        void Invalidate() { mpHandler = nullptr; }
 
-        void Init(CommandHandler* handler);
+        void Init(CommandHandler * handler);
 
         CommandHandler * mpHandler = nullptr;
-        Handle* mNext = nullptr;
+        Handle * mNext             = nullptr;
     };
 
     // Previously we kept adding arguments with default values individually as parameters. This is because there
@@ -207,7 +207,7 @@ public:
      * The call will also invalidate all Handles created for this CommandHandler.
      *
      */
-     ~CommandHandler();
+    ~CommandHandler();
 
     /*
      * Constructor to override the number of supported paths per invoke and command responder.
@@ -543,13 +543,13 @@ private:
      * Users should use CommandHandler::Handle for management the lifespan of the CommandHandler.
      * DefRef should be released in reasonable time, and Close() should only be called when the refcount reached 0.
      */
-    void IncrementHoldOff(Handle* apHandle);
+    void IncrementHoldOff(Handle * apHandle);
 
     /**
      * DecrementHoldOff is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
      * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
      */
-    void DecrementHoldOff(Handle* apHandle);
+    void DecrementHoldOff(Handle * apHandle);
 
     /*
      * Allocates a packet buffer used for encoding an invoke response payload.
@@ -690,9 +690,9 @@ private:
 
     size_t MaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
 
-    void AddToHandleList(Handle* handle);
+    void AddToHandleList(Handle * handle);
 
-    void RemoveFromHandleList(Handle* handle);
+    void RemoveFromHandleList(Handle * handle);
 
     void InvalidateHandles();
 
@@ -702,7 +702,7 @@ private:
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
-    Handle* mpHandleList = nullptr;
+    Handle * mpHandleList                  = nullptr;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
