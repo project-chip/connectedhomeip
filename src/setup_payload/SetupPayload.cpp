@@ -79,7 +79,11 @@ bool PayloadContents::isValidQRCodePayload() const
         return false;
     }
 
-    // Discriminator validity is enforced by the SetupDiscriminator class.
+    // General discriminator validity is enforced by the SetupDiscriminator class, but it can't be short for QR a code.
+    if (discriminator.IsShortDiscriminator())
+    {
+        return false;
+    }
 
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {

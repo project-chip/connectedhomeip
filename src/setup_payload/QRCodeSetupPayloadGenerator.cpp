@@ -173,8 +173,13 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
     VerifyOrReturnError(payload.rendezvousInformation.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Value().Raw(),
                                       kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator.GetLongValue(),
-                                      kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits));
+
+    // If the payload is valid then discriminator will always be long, but we shouldn't die if we're
+    // encoding a short one due to mAllowInvalidPayload being set. Just use the short value in that case.
+    auto const & pd        = payload.discriminator;
+    uint16_t discriminator = (pd.IsShortDiscriminator()) ? pd.GetShortValue() : pd.GetLongValue();
+    ReturnErrorOnFailure(
+        populateBits(bits.data(), offset, discriminator, kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(
         populateBits(bits.data(), offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits));
