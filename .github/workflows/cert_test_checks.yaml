@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Check for common problems in certification tests
+name: Certification test checks
 
 on:
   pull_request:
@@ -21,9 +21,9 @@ on:
 
 jobs:
   check-certification-tests:
-    name: Certification test checks
+    name: Check for common problems in certification tests
     runs-on: ubuntu-latest
-    if: "python scripts/tests/matter_yaml_linter.py"
+    if: "python3 scripts/tests/matter_yaml_linter.py"
     steps:
       - name: Error Message
         run: echo Problems found in certification tests
