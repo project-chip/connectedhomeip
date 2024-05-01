@@ -106,7 +106,8 @@ static bool IsValidCATNumber(id _Nullable value)
 @implementation MTRDeviceControllerDataStore {
     id<MTRDeviceControllerStorageDelegate> _storageDelegate;
     dispatch_queue_t _storageDelegateQueue;
-    MTRDeviceController * _controller;
+    // Controller owns us, so we have to make sure to not keep it alive.
+    __weak MTRDeviceController * _controller;
     // Array of nodes with resumption info, oldest-stored first.
     NSMutableArray<NSNumber *> * _nodesWithResumptionInfo;
 }
@@ -126,7 +127,9 @@ static bool IsValidCATNumber(id _Nullable value)
     __block id resumptionNodeList;
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
-            resumptionNodeList = [_storageDelegate controller:_controller
+            // NOTE: controller, not our weak ref, since we know it's still
+            // valid under this sync dispatch.
+            resumptionNodeList = [_storageDelegate controller:controller
                                                   valueForKey:sResumptionNodeListKey
                                                 securityLevel:MTRStorageSecurityLevelSecure
                                                   sharingType:MTRStorageSharingTypeNotShared];
@@ -154,9 +157,15 @@ static bool IsValidCATNumber(id _Nullable value)
 - (void)fetchAttributeDataForAllDevices:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler
 {
     __block NSDictionary<NSString *, id> * dataStoreSecureLocalValues = nil;
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return;
+    }
+
     dispatch_sync(_storageDelegateQueue, ^{
         if ([self->_storageDelegate respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
-            dataStoreSecureLocalValues = [self->_storageDelegate valuesForController:self->_controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+            dataStoreSecureLocalValues = [self->_storageDelegate valuesForController:controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
         }
     });
 
@@ -177,24 +186,30 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo
 {
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return;
+    }
+
     auto * oldInfo = [self findResumptionInfoByNodeID:resumptionInfo.nodeID];
     dispatch_sync(_storageDelegateQueue, ^{
         if (oldInfo != nil) {
             // Remove old resumption id key.  No need to do that for the
             // node id, because we are about to overwrite it.
-            [_storageDelegate controller:_controller
+            [_storageDelegate controller:controller
                        removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
                            securityLevel:MTRStorageSecurityLevelSecure
                              sharingType:MTRStorageSharingTypeNotShared];
             [_nodesWithResumptionInfo removeObject:resumptionInfo.nodeID];
         }
 
-        [_storageDelegate controller:_controller
+        [_storageDelegate controller:controller
                           storeValue:resumptionInfo
                               forKey:ResumptionByNodeIDKey(resumptionInfo.nodeID)
                        securityLevel:MTRStorageSecurityLevelSecure
                          sharingType:MTRStorageSharingTypeNotShared];
-        [_storageDelegate controller:_controller
+        [_storageDelegate controller:controller
                           storeValue:resumptionInfo
                               forKey:ResumptionByResumptionIDKey(resumptionInfo.resumptionID)
                        securityLevel:MTRStorageSecurityLevelSecure
@@ -202,7 +217,7 @@ static bool IsValidCATNumber(id _Nullable value)
 
         // Update our resumption info node list.
         [_nodesWithResumptionInfo addObject:resumptionInfo.nodeID];
-        [_storageDelegate controller:_controller
+        [_storageDelegate controller:controller
                           storeValue:[_nodesWithResumptionInfo copy]
                               forKey:sResumptionNodeListKey
                        securityLevel:MTRStorageSecurityLevelSecure
@@ -212,17 +227,23 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (void)clearAllResumptionInfo
 {
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return;
+    }
+
     // Can we do less dispatch?  We would need to have a version of
     // _findResumptionInfoWithKey that assumes we are already on the right queue.
     for (NSNumber * nodeID in _nodesWithResumptionInfo) {
         auto * oldInfo = [self findResumptionInfoByNodeID:nodeID];
         if (oldInfo != nil) {
             dispatch_sync(_storageDelegateQueue, ^{
-                [_storageDelegate controller:_controller
+                [_storageDelegate controller:controller
                            removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
                                securityLevel:MTRStorageSecurityLevelSecure
                                  sharingType:MTRStorageSharingTypeNotShared];
-                [_storageDelegate controller:_controller
+                [_storageDelegate controller:controller
                            removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
                                securityLevel:MTRStorageSecurityLevelSecure
                                  sharingType:MTRStorageSharingTypeNotShared];
@@ -235,9 +256,15 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (CHIP_ERROR)storeLastLocallyUsedNOC:(MTRCertificateTLVBytes)noc
 {
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+
     __block BOOL ok;
     dispatch_sync(_storageDelegateQueue, ^{
-        ok = [_storageDelegate controller:_controller
+        ok = [_storageDelegate controller:controller
                                storeValue:noc
                                    forKey:sLastLocallyUsedNOCKey
                             securityLevel:MTRStorageSecurityLevelSecure
@@ -248,10 +275,16 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (MTRCertificateTLVBytes _Nullable)fetchLastLocallyUsedNOC
 {
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return nil;
+    }
+
     __block id data;
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
-            data = [_storageDelegate controller:_controller
+            data = [_storageDelegate controller:controller
                                     valueForKey:sLastLocallyUsedNOCKey
                                   securityLevel:MTRStorageSecurityLevelSecure
                                     sharingType:MTRStorageSharingTypeNotShared];
@@ -271,6 +304,12 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (nullable MTRCASESessionResumptionInfo *)_findResumptionInfoWithKey:(nullable NSString *)key
 {
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return nil;
+    }
+
     // key could be nil if [NSString stringWithFormat] returns nil for some reason.
     if (key == nil) {
         return nil;
@@ -279,7 +318,7 @@ static bool IsValidCATNumber(id _Nullable value)
     __block id resumptionInfo;
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
-            resumptionInfo = [_storageDelegate controller:_controller
+            resumptionInfo = [_storageDelegate controller:controller
                                               valueForKey:key
                                             securityLevel:MTRStorageSecurityLevelSecure
                                               sharingType:MTRStorageSharingTypeNotShared];
@@ -318,9 +357,15 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (id)_fetchAttributeCacheValueForKey:(NSString *)key expectedClass:(Class)expectedClass;
 {
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return nil;
+    }
+
     id data;
     @autoreleasepool {
-        data = [_storageDelegate controller:_controller
+        data = [_storageDelegate controller:controller
                                 valueForKey:key
                               securityLevel:MTRStorageSecurityLevelSecure
                                 sharingType:MTRStorageSharingTypeNotShared];
@@ -338,7 +383,13 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (BOOL)_storeAttributeCacheValue:(id)value forKey:(NSString *)key
 {
-    return [_storageDelegate controller:_controller
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return NO;
+    }
+
+    return [_storageDelegate controller:controller
                              storeValue:value
                                  forKey:key
                           securityLevel:MTRStorageSecurityLevelSecure
@@ -347,7 +398,13 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (BOOL)_bulkStoreAttributeCacheValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values
 {
-    return [_storageDelegate controller:_controller
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return NO;
+    }
+
+    return [_storageDelegate controller:controller
                             storeValues:values
                           securityLevel:MTRStorageSecurityLevelSecure
                             sharingType:MTRStorageSharingTypeNotShared];
@@ -355,7 +412,13 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (BOOL)_removeAttributeCacheValueForKey:(NSString *)key
 {
-    return [_storageDelegate controller:_controller
+    MTRDeviceController * controller = _controller;
+    if (controller == nil) {
+        // Not expected; no way to call delegate without controller.
+        return NO;
+    }
+
+    return [_storageDelegate controller:controller
                       removeValueForKey:key
                           securityLevel:MTRStorageSecurityLevelSecure
                             sharingType:MTRStorageSharingTypeNotShared];
