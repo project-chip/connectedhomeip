@@ -249,4 +249,3 @@ void ApplicationShutdown()
 // No-op function, used to force linking this file,
 // instead of the weak functions from other files
 extern "C" void chef_include_stubs_impl(void) {}
-

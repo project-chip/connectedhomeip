@@ -87,5 +87,3 @@ void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t pre
 
     Clusters::SwitchServer::Instance().OnMultiPressComplete(endpointId, previousPosition, count);
 }
-
-

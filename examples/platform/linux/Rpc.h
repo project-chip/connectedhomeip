@@ -20,7 +20,7 @@
 
 #include <vector>
 #include <queue>
- 
+
 namespace chip {
 namespace rpc {
 
@@ -31,7 +31,7 @@ enum class ActionType : uint8_t
   EMIT_EVENT              = 0x02, // Emit a cluster Events
 };
 
-using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args); 
+using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args);
 
 void SubscribeActions(RpcActionsSubscribeCallback subscriber);
 

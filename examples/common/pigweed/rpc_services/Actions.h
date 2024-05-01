@@ -53,14 +53,14 @@ public:
             if (action.has_arg1) args.push_back(action.arg1);
             if (action.has_arg2) args.push_back(action.arg2);
             if (action.has_arg3) args.push_back(action.arg3);
- 
+
             mActionsSubscribeCallback(request.endpoint_id, request.cluster_id, static_cast<uint8_t>(action.type), action.delayMs, action.actionId, args);
-        } 
+        }
 
         return pw::OkStatus();
     }
 
-    using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args); 
+    using RpcActionsSubscribeCallback = bool (*)(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args);
 
     void SubscribeActions(RpcActionsSubscribeCallback subscriber) { mActionsSubscribeCallback = subscriber; };
 

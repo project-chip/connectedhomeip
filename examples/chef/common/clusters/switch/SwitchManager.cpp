@@ -147,15 +147,15 @@ void SwitchActionsDelegate::EventHandler(chip::EndpointId endpointId, chip::Even
 
 
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gLatchingSwitch[] = {
-    { .namespaceID = kNamespaceCommonLevel, 
-        .tag = kTagCommonLow, 
+    { .namespaceID = kNamespaceCommonLevel,
+        .tag = kTagCommonLow,
         .label = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("Low", 3)) })},
-    { .namespaceID = kNamespaceCommonLevel, 
-        .tag = kTagCommonMedium, 
+    { .namespaceID = kNamespaceCommonLevel,
+        .tag = kTagCommonMedium,
         .label = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("Medium", 6)) })},
-    { .namespaceID = kNamespaceCommonLevel, 
+    { .namespaceID = kNamespaceCommonLevel,
         .tag = kTagCommonHigh,
         .label = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("High", 4)) })}
@@ -168,5 +168,3 @@ void emberAfSwitchClusterInitCallback(EndpointId endpointId)
     ChefRpcActionsWorker::Instance().RegisterRpcActionsDelegate(Clusters::Switch::Id, new SwitchActionsDelegate(Clusters::Switch::Id, new SwitchEventHandler()));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gLatchingSwitch));
 }
-
-

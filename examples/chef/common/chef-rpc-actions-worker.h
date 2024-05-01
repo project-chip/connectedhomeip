@@ -60,7 +60,7 @@ struct ActionTask {
 class ChefRpcActionsWorker
 {
 public:
-    static ChefRpcActionsWorker& Instance(); 
+    static ChefRpcActionsWorker& Instance();
 
     ChefRpcActionsWorker();
 
@@ -75,4 +75,3 @@ public:
 
 } // namespace app
 } // namespace chip
-
