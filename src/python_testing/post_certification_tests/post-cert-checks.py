@@ -340,8 +340,53 @@ def main():
 
         failures = failures_DA_1_2 + failures_DA_1_7 + failures_test_event_trigger + failures_dcl
 
-    print(failures)
-    return 0
+    report = []
+    for failure in failures_DA_1_2:
+        # Check for known failures first
+        # step 6.9 - non-production CD
+        # 9 - not signed by CSA CA
+        # other steps - should have been caught in cert, but we should report none the less
+        if failure.step.startswith('6.9'):
+            report.append('Device is using a non-production certification declaration')
+            continue
+        if failure.step.startswith('9'):
+            report.append('Device is using a certification declaration that was not signed by the CSA CA')
+            continue
+        report.append(f'Device attestation failure: TC-DA-1.2: {failure.step}')
+
+    for failure in failures_DA_1_7:
+        # Notable failures in DA-1.7:
+        # 1.3 - PAI signature does not chain to a PAA in the main net DCL
+        if failure.step.startswith('1.3'):
+            report.append('Device DAC chain does not chain to a PAA in the main net DCL')
+            continue
+        report.append(f'Device attestation failure: TC-DA-1.7: {failure.step}')
+
+    for failure in failures_test_event_trigger:
+        # only one possible failure here
+        report.append('Device has test event triggers enabled in production')
+
+    for failure in failures_dcl:
+        if failure.test == 'test_Vendor':
+            report.append('Device vendor ID is not present in the DCL')
+        elif failure.test == 'test_Model':
+            report.append('Device model is not present in the DCL')
+        elif failure.test == 'test_Compliance':
+            report.append('Device compliance information is not present in the DCL')
+        elif failure.test == 'test_CertifiedModel':
+            report.append('Device certified model is not present in the DCL')
+        else:
+            report.append(f'unknown DCL failure in test {failure.test}: {failure.step}')
+
+    print('\n\n\n')
+    if report:
+        print('TEST FAILED:')
+        for s in report:
+            print(f'\t{s}')
+        return 1
+    else:
+        print('TEST PASSED!')
+        return 0
 
 
 if __name__ == "__main__":
