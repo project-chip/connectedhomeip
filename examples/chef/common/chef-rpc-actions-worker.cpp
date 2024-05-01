@@ -46,7 +46,6 @@ ActionsDelegate * RpcFindActionsDelegate(ClusterId clusterId)
 static void RpcActionsTaskCallback(System::Layer * systemLayer, void * data)
 {
     ChefRpcActionsWorker * worker = (ChefRpcActionsWorker *)data;
-printf("\033[44m %s , %d \033[0m \n", __func__, __LINE__);
 
     worker->ProcessActionQueue();
 }
@@ -117,7 +116,6 @@ void ChefRpcActionsWorker::ProcessActionQueue()
 
     // Run next action
     task = queue.front();
-printf("\033[44m %s, %d, start new timer \033[0m \n", __func__, __LINE__);
     ChipLogProgress(NotSpecified, "StartTimer: endpointId=%d, clusterId=%04lx, eventIdId=%04lx, task.delyMs=%lu",task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId), static_cast<unsigned long>(task.delayMs));
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(task.delayMs), RpcActionsTaskCallback, this);
 }
