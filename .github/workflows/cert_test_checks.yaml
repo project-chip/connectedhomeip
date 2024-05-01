@@ -24,6 +24,12 @@ jobs:
     name: Check for common problems in certification tests
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
       - name: Run checks
         run: |
           ./scripts/run_in_build_env.sh "python3 scripts/tests/matter_yaml_linter.py"
