@@ -49,7 +49,7 @@ from pathlib import Path
 import chip.clusters as Clusters
 import cv2
 import requests
-from mobly import asserts, signals
+from mobly import asserts
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
