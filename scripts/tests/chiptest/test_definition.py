@@ -372,7 +372,7 @@ class TestDefinition:
                     runner.RunSubprocess(python_cmd, name='CHIP_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
-                pairing_cmd = paths.chip_tool_with_python_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]
+                pairing_cmd = paths.chip_tool_with_python_cmd + ['skip-icd-registration', 0, 'pairing', 'code', TEST_NODE_ID, setupCode]
                 test_cmd = paths.chip_tool_with_python_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
                 server_args = ['--server_path', paths.chip_tool[-1]] + \
                     ['--server_arguments', 'interactive server' +

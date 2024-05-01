@@ -66,7 +66,7 @@ public:
                     " If true, the commissioning will continue in case of attestation verification failure.");
         AddArgument("case-auth-tags", 1, UINT32_MAX, &mCASEAuthTags, "The CATs to be encoded in the NOC sent to the commissionee");
         AddArgument("skip-icd-registration", 0, 1, &mSkipICDRegistration,
-                    "Skip registering for check-ins from ICDs during commissioning. Default: false");
+                    "Skip registering for check-ins from ICDs during commissioning. Default: true");
         AddArgument("icd-check-in-nodeid", 0, UINT64_MAX, &mICDCheckInNodeId,
                     "The check-in node id for the ICD, default: node id of the commissioner.");
         AddArgument("icd-monitored-subject", 0, UINT64_MAX, &mICDMonitoredSubject,
