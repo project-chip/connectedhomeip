@@ -26,4 +26,4 @@ jobs:
     steps:
       - name: Run checks
         run: |
-          ./scripts/run_in_build_env.sh "python3 scripts/tests/matter_yaml_linter.py
+          ./scripts/run_in_build_env.sh "python3 scripts/tests/matter_yaml_linter.py"
