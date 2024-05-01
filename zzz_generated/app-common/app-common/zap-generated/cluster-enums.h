@@ -1832,6 +1832,7 @@ enum class StatusCode : uint8_t
 enum class Feature : uint32_t
 {
     kNoFeatures = 0x0,
+    kOnOff = 0x1,
 };
 } // namespace RvcRunMode
 
@@ -1865,6 +1866,7 @@ enum class StatusCode : uint8_t
 enum class Feature : uint32_t
 {
     kNoFeatures = 0x0,
+    kOnOff = 0x1,
 };
 } // namespace RvcCleanMode
 
