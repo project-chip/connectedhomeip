@@ -61,6 +61,10 @@ chip_test_suite("tests") {
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
+  if (current_os != "mbed") {
+    test_sources += [ "TestCHIPArgParser.cpp" ]
+  }
+
   sources = []
 
   cflags = [
