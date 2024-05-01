@@ -5512,7 +5512,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 6;
+  revision 7;
 
   enum ColorLoopAction : enum8 {
     kDeactivate = 0;
@@ -5832,7 +5832,7 @@ cluster ColorControl = 768 {
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
-  revision 6;
+  revision 7;
 
   enum ColorLoopAction : enum8 {
     kDeactivate = 0;
@@ -9177,7 +9177,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
 
     handle command MoveToHue;
     handle command MoveHue;
