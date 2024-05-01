@@ -164,6 +164,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
     async def test_TC_DA_1_2(self):
         is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
+        self.post_cert_test = self.user_params.get("post_cert_test", False)
 
         do_test_over_pase = self.user_params.get("use_pase_only", False)
         if do_test_over_pase:
@@ -312,7 +313,9 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         self.step("6.8")
         asserts.assert_in(version_number, range(0, 65535), "Version number out of range")
         self.step("6.9")
-        if is_ci:
+        if post_cert_test:
+            asserts.assert_equal(certification_type, 2, "Certification declaration is not marked as production.")
+        elif is_ci:
             asserts.assert_in(certification_type, [0, 1, 2], "Certification type is out of range")
         else:
             asserts.assert_in(certification_type, [1, 2], "Certification type is out of range")
