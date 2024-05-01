@@ -248,7 +248,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
     currentHeapUsed = mallocInfo.uordblks;
 
     // Update the maximum heap high watermark if the current heap usage exceeds it.
-    if (currentHeapUsed > maxHeapHighWatermark) {
+    if (currentHeapUsed > maxHeapHighWatermark)
+    {
         maxHeapHighWatermark = currentHeapUsed;
     }
     return CHIP_NO_ERROR;
@@ -269,7 +270,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // the hard disk, called swap space, and free up that page of memory. So it is impossible
     // to know accurately peak physical memory it use.
     // Update the maximum heap high watermark if the current heap usage exceeds it.
-    if (static_cast<ssize_t>(mallocInfo.uordblks) > static_cast<ssize_t>(maxHeapHighWatermark)) {
+    if (static_cast<ssize_t>(mallocInfo.uordblks) > static_cast<ssize_t>(maxHeapHighWatermark))
+    {
         maxHeapHighWatermark = mallocInfo.uordblks;
     }
 
@@ -288,7 +290,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     // On Linux, the write operation is non-op since we always rely on the mallinfo system
     // function to get the current heap memory.
     struct mallinfo mallocInfo = mallinfo();
-    maxHeapHighWatermark =  mallocInfo.uordblks;
+    maxHeapHighWatermark       = mallocInfo.uordblks;
 
     return CHIP_NO_ERROR;
 }
