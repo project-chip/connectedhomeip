@@ -117,7 +117,6 @@ public:
         Handle(const Handle & handle) = delete;
         Handle(Handle && handle)
         {
-            ChipLogDetail(DataManagement, "Handle(Handle && handle)");
             Init(handle.mpHandler);
 
             handle.Release();
@@ -129,7 +128,6 @@ public:
 
         Handle & operator=(Handle && handle)
         {
-            ChipLogDetail(DataManagement, "Handle & operator=(Handle && handle)");
             Release();
             Init(handle.mpHandler);
 
