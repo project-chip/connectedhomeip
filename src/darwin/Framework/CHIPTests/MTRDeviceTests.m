@@ -3082,6 +3082,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * gotAttributeReportExpectation = [testcase expectationWithDescription:@"Attribute report has been received"];
     XCTestExpectation * gotAttributeReportEndExpectation = [testcase expectationWithDescription:@"Attribute report has ended"];
     XCTestExpectation * deviceConfigurationChangedExpectation = [testcase expectationWithDescription:@"Device configuration changed was receieved"];
+    deviceConfigurationChangedExpectation.inverted = !expectConfigurationChanged;
 
     __block unsigned attributeReportsReceived = 0;
     __block NSArray<NSDictionary<NSString *, id> *> * testDataValue = nil;
@@ -3125,19 +3126,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __block BOOL wasOnDeviceConfigurationChangedCallbackCalled = NO;
 
     delegate.onDeviceConfigurationChanged = ^() {
-        if (expectConfigurationChanged) {
             [deviceConfigurationChangedExpectation fulfill];
-        }
         wasOnDeviceConfigurationChangedCallbackCalled = YES;
     };
 
     [device unitTestInjectAttributeReport:attributeReport];
 
-    if (expectConfigurationChanged) {
-        [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
-        XCTAssertTrue(wasOnDeviceConfigurationChangedCallbackCalled);
-    } else {
-        [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation ] timeout:kTimeoutInSeconds];
+    [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
+    if (!expectConfigurationChanged)
+    {
         XCTAssertFalse(wasOnDeviceConfigurationChangedCallbackCalled);
     }
 }
