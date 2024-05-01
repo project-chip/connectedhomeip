@@ -33,18 +33,6 @@
 
 namespace chip {
 
-// Spec 5.1.4.2 CHIPCommon tag numbers are in the range [0x00, 0x7F]
-bool SetupPayload::IsCommonTag(uint8_t tag)
-{
-    return tag < 0x80;
-}
-
-// Spec 5.1.4.1 Manufacture-specific tag numbers are in the range [0x80, 0xFF]
-bool SetupPayload::IsVendorTag(uint8_t tag)
-{
-    return !IsCommonTag(tag);
-}
-
 // Check the Setup Payload for validity
 //
 // `vendor_id` and `product_id` are allowed all of uint16_t
