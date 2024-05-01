@@ -428,7 +428,6 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
  *
  * Device configuration is the set of functionality implemented by the device.
  *
- * The intention is that this is called whenever any of the things that usually don't change about a device might have changed.
  */
 - (void)deviceConfigurationChanged:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
