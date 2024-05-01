@@ -197,7 +197,7 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(c
     case chip::app::Clusters::RvcOperationalState::Attributes::CurrentPhase::Id: {
         uint8_t m                           = static_cast<uint8_t>(buffer[0]);
 	    DataModel::Nullable<uint8_t> aPhase(m);
-        CHIP_ERROR err = gRvcOperationalStateInstance->SetCurrentPhase(aPhase);     
+        CHIP_ERROR err = gRvcOperationalStateInstance->SetCurrentPhase(aPhase);
         if (CHIP_NO_ERROR == err)
         {
             break;
@@ -226,7 +226,7 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(c
     return ret;
 }
 
-chip::Protocols::InteractionModel::Status 
+chip::Protocols::InteractionModel::Status
 chefRvcOperationalStateReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                          uint16_t maxReadLength)

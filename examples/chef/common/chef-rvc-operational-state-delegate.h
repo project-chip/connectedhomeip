@@ -123,7 +123,7 @@ void Shutdown();
 } // namespace app
 } // namespace chip
 
-chip::Protocols::InteractionModel::Status 
+chip::Protocols::InteractionModel::Status
 chefRvcOperationalStateWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                           const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 chip::Protocols::InteractionModel::Status
