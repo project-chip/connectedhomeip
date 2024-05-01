@@ -316,8 +316,6 @@ public:
 
     void ResetCounter() { onFinalCalledTimes = 0; }
 
-    uint32_t GetCommandHandlerGeneration() const { return chip::app::InteractionModelEngine::GetInstance()->GetCommandHandlerGeneration(); }
-
     int onFinalCalledTimes = 0;
 } mockCommandHandlerDelegate;
 

@@ -192,12 +192,6 @@ public:
      */
     WriteHandler * ActiveWriteHandlerAt(unsigned int aIndex);
 
-    /**
-     * The generation number of this InteractionModelEngine, the number is updated during Init() and Shundown().
-     * An CommandHandler::Handle is valid iff. its number equals to this one.
-     */
-    uint32_t GetCommandHandlerGeneration() const override { return mMagic; }
-
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
     reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
@@ -707,10 +701,6 @@ private:
     CASESessionManager * mpCASESessionMgr = nullptr;
 
     SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
-
-    // A magic number for tracking values between stack Shutdown()-s and Init()-s.
-    // An ObjectHandle is valid iff. its magic equals to this one.
-    uint32_t mMagic = 0;
 };
 
 } // namespace app

@@ -45,7 +45,6 @@ public:
     void OnDone(CommandHandler & apCommandObj) {}
     void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & apPayload) {}
     Status CommandExists(const ConcreteCommandPath & aCommandPath) { return Status::Success; }
-    uint32_t GetCommandHandlerGeneration() const { return InteractionModelEngine::GetInstance()->GetCommandHandlerGeneration(); }
 };
 
 DBusInterface::DBusInterface(chip::EndpointId endpointId) : mEndpointId(endpointId)

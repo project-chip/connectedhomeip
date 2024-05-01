@@ -59,9 +59,7 @@ CommandHandler::CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apC
 }
 
 CommandHandler::~CommandHandler() {
-    for (Handle* cur = mpHandlerList; cur; cur = cur->GetNext()) {
-        cur->Invalidate();
-    }
+    InvalidateHandles();
 }
 
 CHIP_ERROR CommandHandler::AllocateBuffer()
@@ -272,9 +270,7 @@ void CommandHandler::Close()
     // reference is the stack shutting down, in which case Close() is not called. So the below check should always pass.
     VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %u unfinished async work items",
                        static_cast<unsigned int>(mPendingWork));
-    for (Handle* cur = mpHandlerList; cur; cur = cur->GetNext()) {
-        cur->Invalidate();
-    }
+    InvalidateHandles();
 
     if (mpCallback)
     {
@@ -282,32 +278,20 @@ void CommandHandler::Close()
     }
 }
 
-void CommandHandler::IncrementHoldOff(Handle* apHandle)
-{
-    ChipLogDetail(DataManagement, "IncrementHoldOff");
-    mPendingWork++;
-    apHandle->SetNext(mpHandlerList);
-    mpHandlerList = apHandle;
+void CommandHandler::AddToHandleList(Handle* apHandle) {
+    apHandle->SetNext(mpHandleList);
+    mpHandleList = apHandle;
 }
 
-void CommandHandler::DecrementHoldOff(Handle* apHandle)
-{
-    mPendingWork--;
-    ChipLogDetail(DataManagement, "Decreasing reference count for CommandHandler, remaining %u",
-                  static_cast<unsigned int>(mPendingWork));
-
-    Handle* prev = nullptr;
-    if (mpHandlerList != nullptr) {
-        ChipLogDetail(DataManagement, "mpHandlerList is not null");} else {ChipLogDetail(DataManagement, "cur is null");}
-    for (Handle* cur = mpHandlerList; cur; cur = cur->GetNext())
+void CommandHandler::RemoveFromHandleList(Handle* apHandle) {
+        Handle* prev = nullptr;
+    for (Handle* cur = mpHandleList; cur; cur = cur->GetNext())
     {
-        if (cur != nullptr) {
-        ChipLogDetail(DataManagement, "cur is not null");} else {ChipLogDetail(DataManagement, "cur is null");}
         if (cur == apHandle)
         {
             if (prev == nullptr)
             {
-                mpHandlerList = cur->GetNext();
+                mpHandleList = cur->GetNext();
             }
             else
             {
@@ -318,7 +302,28 @@ void CommandHandler::DecrementHoldOff(Handle* apHandle)
         }
         prev = cur;
     }
+    }
 
+    void CommandHandler::InvalidateHandles() {
+        for (Handle* cur = mpHandleList; cur; cur = cur->GetNext()) {
+        cur->Invalidate();
+    }
+    }
+
+void CommandHandler::IncrementHoldOff(Handle* apHandle)
+{
+    mPendingWork++;
+    AddToHandleList(apHandle);
+}
+
+void CommandHandler::DecrementHoldOff(Handle* apHandle)
+{
+
+    mPendingWork--;
+    ChipLogDetail(DataManagement, "Decreasing reference count for CommandHandler, remaining %u",
+                  static_cast<unsigned int>(mPendingWork));
+
+    RemoveFromHandleList(apHandle);
 
     if (mPendingWork != 0)
     {
@@ -808,6 +813,14 @@ FabricIndex CommandHandler::GetAccessingFabricIndex() const
     return mpResponder->GetAccessingFabricIndex();
 }
 
+void CommandHandler::Handle::Init(CommandHandler * handle) {
+    if (handle != nullptr)
+    {
+        handle->IncrementHoldOff(this);
+        mpHandler = handle;
+    }
+}
+
 CommandHandler * CommandHandler::Handle::Get()
 {
     // Not safe to work with CommandHandler in parallel with other Matter work.
@@ -827,11 +840,7 @@ void CommandHandler::Handle::Release()
 
 CommandHandler::Handle::Handle(CommandHandler * handle)
 {
-    if (handle != nullptr)
-    {
-        handle->IncrementHoldOff(this);
-        mpHandler = handle;
-    }
+    Init(handle);
 }
 
 CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessageAndPrepareNext()
@@ -915,12 +924,6 @@ void CommandHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "Command handler moving to [%10.10s]", GetStateStr());
-}
-
-
-uint32_t CommandHandler::GetCommandHandlerGeneration() const {
-    VerifyOrReturnValue(mpCallback != nullptr, 0);
-    return mpCallback->GetCommandHandlerGeneration();
 }
 
 #if CHIP_WITH_NLFAULTINJECTION

@@ -85,12 +85,6 @@ public:
          * fails to exist.
          */
         virtual Protocols::InteractionModel::Status CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
-
-        /*
-         * Get the generation number of the CommandHandler. A CommandHandler::Handle is valid iff
-         * its number is equals to the return of this call.
-         */
-        virtual uint32_t GetCommandHandlerGeneration() const = 0;
     };
 
     /**
@@ -123,7 +117,10 @@ public:
         Handle(const Handle & handle) = delete;
         Handle(Handle && handle)
         {
-            mpHandler        = handle.mpHandler;
+            ChipLogDetail(DataManagement, "Handle(Handle && handle)");
+            Init(handle.mpHandler);
+
+            handle.Release();
             handle.mpHandler = nullptr;
         }
         Handle(decltype(nullptr)) {}
@@ -132,8 +129,11 @@ public:
 
         Handle & operator=(Handle && handle)
         {
+            ChipLogDetail(DataManagement, "Handle & operator=(Handle && handle)");
             Release();
-            mpHandler        = handle.mpHandler;
+            Init(handle.mpHandler);
+
+            handle.Release();
             handle.mpHandler = nullptr;
             return *this;
         }
@@ -154,12 +154,14 @@ public:
 
     private:
         friend CommandHandler;
-    /**
-     * Mechanism for keeping track of a chain of Handle.
-     */
+        /**
+         * Mechanism for keeping track of a chain of Handle.
+         */
         void SetNext(Handle * aNext) { mNext = aNext; }
         Handle* GetNext() const { return mNext; }
         void Invalidate() {mpHandler = nullptr;}
+
+        void Init(CommandHandler* handler);
 
         CommandHandler * mpHandler = nullptr;
         Handle* mNext = nullptr;
@@ -472,7 +474,7 @@ private:
      * Tries to add response using lambda. Upon failure to add response, attempts
      * to rollback the InvokeResponseMessage to a known good state. If failure is due
      * to insufficient space in the current InvokeResponseMessage:
-     *  - Finalizes the current InvokeResponsfeMessage.
+     *  - Finalizes the current InvokeResponseMessage.
      *  - Allocates a new InvokeResponseMessage.
      *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
      *
@@ -690,7 +692,11 @@ private:
 
     size_t MaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
 
-    uint32_t GetCommandHandlerGeneration() const;
+    void AddToHandleList(Handle* handle);
+
+    void RemoveFromHandleList(Handle* handle);
+
+    void InvalidateHandles();
 
     bool TestOnlyIsInIdleState() const { return mState == State::Idle; }
 
@@ -698,7 +704,7 @@ private:
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
-    Handle* mpHandlerList = nullptr;
+    Handle* mpHandleList = nullptr;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
