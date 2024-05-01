@@ -53,7 +53,7 @@ private:
 void SwitchActionsDelegate::AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t>args)
 {
     if (args.empty()) {
-        // TODO: error
+        ChipLogError(NotSpecified, "Queue is empty ");
         return;
     }
 
@@ -84,7 +84,7 @@ void SwitchActionsDelegate::AttributeWriteHandler(chip::EndpointId endpointId, c
 void SwitchActionsDelegate::EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t>args)
 {
     if (args.empty()) {
-        // TODO: error
+        ChipLogError(NotSpecified, "Queue is empty ");
         return;
     }
     switch (eventId) {
@@ -121,7 +121,7 @@ void SwitchActionsDelegate::EventHandler(chip::EndpointId endpointId, chip::Even
     case Events::MultiPressOngoing::Id:
         {
             if (args.size() < 2) {
-                // TODO: error
+                ChipLogError(NotSpecified, "MultiPressOngoing to few arguments");
                 return;
             }
             uint8_t newPosition = static_cast<uint8_t>(args[0]);
@@ -132,7 +132,7 @@ void SwitchActionsDelegate::EventHandler(chip::EndpointId endpointId, chip::Even
     case Events::MultiPressComplete::Id:
         {
             if (args.size() < 2) {
-                // TODO: error
+                ChipLogError(NotSpecified, "MultiPressComplete to few arguments");
                 return;
             }
             uint8_t previousPosition = static_cast<uint8_t>(args[0]);
@@ -160,19 +160,6 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gLatchingSwitch[] =
         .label = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("High", 4)) })}
 };
-
-#if 0
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp0TagList[] = {
-    { .namespaceID = kNamespaceCommonNumber, .tag = kTagCommonZero }, { .namespaceID = kNamespacePosition, .tag = kTagPositionBottom }
-};
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp1TagList[] = {
-    { .namespaceID = kNamespaceCommon, .tag = kTagCommonOne }, { .namespaceID = kNamespacePosition, .tag = kTagPositionLeft }
-};
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
-    { .namespaceID = kNamespaceCommon, .tag = kTagCommonTwo }, { .namespaceID = kNamespacePosition, .tag = kTagPositionRight }
-};
-#endif
-
 
 void emberAfSwitchClusterInitCallback(EndpointId endpointId)
 {
