@@ -174,10 +174,12 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
     ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Value().Raw(),
                                       kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits));
 
-    // If the payload is valid then discriminator will always be long, but we shouldn't die if we're
-    // encoding a short one due to mAllowInvalidPayload being set. Just use the short value in that case.
+    // isValidQRCodePayload() ensures that we have a long discriminator, but if AllowInvalidPayload is set
+    // we might have only a short one, and calling GetLongValue() would die. So check for this case here
+    // and use a placeholder value of 0. Encoding an invalid (or partially valid) payload is useful for
+    // clients that need to be able to serialize and deserialize partially populated or invalid payloads.
     auto const & pd        = payload.discriminator;
-    uint16_t discriminator = (pd.IsShortDiscriminator()) ? pd.GetShortValue() : pd.GetLongValue();
+    uint16_t discriminator = !pd.IsShortDiscriminator() ? pd.GetLongValue() : 0;
     ReturnErrorOnFailure(
         populateBits(bits.data(), offset, discriminator, kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(
