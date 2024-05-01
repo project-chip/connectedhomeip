@@ -72,7 +72,7 @@
 #endif
 
 #if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
 
@@ -412,7 +412,7 @@ protected:
 
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
-    Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
+    Dnssd::CommissionNodeData mCommissionableNodes[kMaxCommissionableNodes];
     DeviceControllerSystemState * mSystemState = nullptr;
 
     ControllerDeviceInitParams GetControllerDeviceInitParams();
@@ -730,7 +730,7 @@ public:
      *   Should be called on main loop thread.
      * @return const DiscoveredNodeData* info about the selected device. May be nullptr if no information has been returned yet.
      */
-    const Dnssd::DiscoveredNodeData * GetDiscoveredDevice(int idx);
+    const Dnssd::CommissionNodeData * GetDiscoveredDevice(int idx);
 
     /**
      * @brief
@@ -956,6 +956,7 @@ private:
     static void OnArmFailSafeExtendedForDeviceAttestation(
         void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error);
+    void HandleDeviceAttestationCompleted();
 
     static void OnICDManagementRegisterClientResponse(
         void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);

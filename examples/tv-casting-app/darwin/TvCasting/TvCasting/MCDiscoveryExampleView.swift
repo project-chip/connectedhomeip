@@ -63,9 +63,11 @@ struct MCDiscoveryExampleView: View {
                         },
                         label: {
                             Text(castingPlayer.description)
+                                .frame(minHeight: 50)
+                                .padding()
                         }
                     )
-                    .frame(width: 350, height: 50, alignment: .center)
+                    .frame(width: 350, alignment: .center)
                     .border(Color.black, width: 1)
                     .background(Color.blue)
                     .foregroundColor(Color.white)

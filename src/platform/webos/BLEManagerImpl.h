@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -36,8 +36,6 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 
 enum class BleScanState : uint8_t
 {

@@ -146,6 +146,10 @@ source_set("constants") {
   ]
 }
 
+source_set("test-event-trigger") {
+  sources = [ "TestEventTriggerDelegate.h" ]
+}
+
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
 # which in tern depens on the interaction-model.
 # Using source_set prevents the unit test to build correctly.
@@ -260,12 +264,39 @@ static_library("interaction-model") {
 source_set("events") {
   sources = [
     "EventHeader.h",
+    "EventLoggingDelegate.h",
     "EventLoggingTypes.h",
   ]
 
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+static_library("attribute-access") {
+  sources = [
+    "AttributeAccessInterface.h",
+    "AttributeAccessInterfaceCache.h",
+    "AttributeAccessInterfaceRegistry.cpp",
+    "AttributeAccessInterfaceRegistry.h",
+    "AttributeEncodeState.h",
+    "AttributeReportBuilder.cpp",
+    "AttributeReportBuilder.h",
+    "AttributeValueDecoder.h",
+    "AttributeValueEncoder.cpp",
+    "AttributeValueEncoder.h",
+  ]
+
+  deps = [
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/util:af-types",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 }
 
@@ -275,8 +306,6 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "AttributeAccessInterface.cpp",
-    "AttributeAccessInterfaceCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePersistenceProvider.h",
@@ -291,7 +320,6 @@ static_library("app") {
     "DeferredAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.h",
     "EventLogging.h",
-    "EventLoggingDelegate.h",
     "EventManagement.cpp",
     "EventManagement.h",
     "FailSafeContext.cpp",
@@ -310,15 +338,11 @@ static_library("app") {
     # "CommandHandler._h"
     # "ReadHandler._h",
     # "WriteHandler._h"
-
-    # TODO: the following items cannot be included due to platform includes not being
-    #       able to depend on src/app
-    #       Name with _ so that linter does not recognize it
-    # "_AttributeAccessInterface._h",
   ]
 
   public_deps = [
     ":app_config",
+    ":attribute-access",
     ":constants",
     ":global-attributes",
     ":interaction-model",

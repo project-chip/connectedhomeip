@@ -23,7 +23,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
@@ -124,7 +123,7 @@ Status DetermineAttributeStatus(const ConcreteAttributePath & aPath, bool aIsWri
 
 CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * aEncoderState)
+                                 AttributeEncodeState * aEncoderState)
 {
     Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ false);
     return aAttributeReports.EncodeAttributeStatus(aPath, StatusIB(status));
@@ -187,13 +186,6 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 {
     Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ true);
     return aWriteHandler->AddStatus(aPath, status);
-}
-
-// No attribute access overrides on iOS and Android for now.
-// TODO (#16806): This function can be moved to InteractionModelEngine.
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId endpointId, ClusterId clusterId)
-{
-    return nullptr;
 }
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVReader & aReader, CommandHandler * aCommandObj)

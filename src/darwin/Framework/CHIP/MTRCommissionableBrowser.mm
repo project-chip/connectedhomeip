@@ -53,7 +53,7 @@ using namespace chip::Tracing::DarwinFramework;
 @implementation MTRCommissionableBrowserResult
 @end
 
-class CommissionableBrowserInternal : public CommissioningResolveDelegate,
+class CommissionableBrowserInternal : public DiscoverNodeDelegate,
                                       public DnssdBrowseDelegate
 #if CONFIG_NETWORK_LAYER_BLE
     ,
@@ -156,12 +156,17 @@ public:
         mDiscoveredResults = discoveredResultsCopy;
     }
 
-    /////////// CommissioningResolveDelegate Interface /////////
+    /////////// DiscoverNodeDelegate Interface /////////
     void OnNodeDiscovered(const DiscoveredNodeData & nodeData) override
     {
         assertChipStackLockedByCurrentThread();
 
-        auto & commissionData = nodeData.commissionData;
+        if (!nodeData.Is<CommissionNodeData>()) {
+            // not commissionable/commissioners node
+            return;
+        }
+
+        auto & commissionData = nodeData.Get<CommissionNodeData>();
         auto key = [NSString stringWithUTF8String:commissionData.instanceName];
         if ([mDiscoveredResults objectForKey:key] == nil) {
             // It should not happens.
@@ -175,7 +180,7 @@ public:
         result.discriminator = @(commissionData.longDiscriminator);
         result.commissioningMode = commissionData.commissioningMode != 0;
 
-        auto & resolutionData = nodeData.resolutionData;
+        const CommonResolutionData & resolutionData = commissionData;
         auto * interfaces = result.interfaces;
         interfaces[@(resolutionData.interfaceId.GetPlatformInterface())].resolutionData = chip::MakeOptional(resolutionData);
 

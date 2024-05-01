@@ -374,7 +374,9 @@ class MatterTestConfig:
     discriminators: Optional[List[int]] = None
     setup_passcodes: Optional[List[int]] = None
     commissionee_ip_address_just_for_testing: Optional[str] = None
-    maximize_cert_chains: bool = False
+    # By default, we start with maximized cert chains, as required for RR-1.1.
+    # This allows cert tests to be run without re-commissioning for RR-1.1.
+    maximize_cert_chains: bool = True
 
     qr_code_content: Optional[str] = None
     manual_code: Optional[str] = None
@@ -390,7 +392,10 @@ class MatterTestConfig:
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
-    controller_cat_tags: List[int] = field(default_factory=list)
+    # By default, we commission with CAT tags specified for RR-1.1
+    # so the cert tests can be run without re-commissioning the device
+    # for this one test. This can be overwritten from the command line
+    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
 
     # Fabric ID which to use
     fabric_id: int = 1
@@ -679,10 +684,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             in order using self.step(number), where number is the test_plan_number
             from each TestStep.
         '''
-        steps = self._get_defined_test_steps(test)
+        steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-    def _get_defined_test_steps(self, test: str) -> list[TestStep]:
+    def get_defined_test_steps(self, test: str) -> list[TestStep]:
         steps_name = 'steps_' + test[5:]
         try:
             fn = getattr(self, steps_name)
@@ -776,7 +781,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
-            steps = self._get_defined_test_steps(test_name)
+            steps = self.get_defined_test_steps(test_name)
             num_steps = 1 if steps is None else len(steps)
             filename = inspect.getfile(self.__class__)
             desc = self.get_test_desc(test_name)
@@ -972,7 +977,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
-        steps = self._get_defined_test_steps(record.test_name)
+        steps = self.get_defined_test_steps(record.test_name)
         if steps is None:
             # if we don't have a list of steps, assume they were all run
             all_steps_run = True
@@ -1416,7 +1421,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     return config
 
 
-def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
+def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig:
     parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
     basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
@@ -1613,7 +1618,7 @@ class CommissionDeviceTest(MatterBaseTest):
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
 
-def default_matter_test_main(argv=None, **kwargs):
+def default_matter_test_main():
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
     In this case, only one test class in a test script is allowed.
@@ -1623,25 +1628,12 @@ def default_matter_test_main(argv=None, **kwargs):
       ...
       if __name__ == '__main__':
         default_matter_test_main.main()
-    Args:
-      argv: A list that is then parsed as command line args. If None, defaults to sys.argv
     """
 
-    matter_test_config = parse_matter_test_args(argv)
-
-    # Allow override of command line from optional arguments
-    if not matter_test_config.controller_cat_tags and "controller_cat_tags" in kwargs:
-        matter_test_config.controller_cat_tags = kwargs["controller_cat_tags"]
+    matter_test_config = parse_matter_test_args()
 
     # Find the test class in the test script.
     test_class = _find_test_class()
-
-    # This is required in case we need any testing with maximized certificate chains.
-    # We need *all* issuers from the start, even for default controller, to use
-    # maximized chains, before MatterStackState init, others some stale certs
-    # may not chain properly.
-    if "maximize_cert_chains" in kwargs:
-        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
 
     hooks = InternalTestRunnerHooks()
 
@@ -1664,7 +1656,7 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
     return info
 
 
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks) -> None:
+def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> bool:
 
     get_test_info(test_class, matter_test_config)
 
@@ -1676,7 +1668,10 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
 
-    stack = MatterStackState(matter_test_config)
+    if external_stack:
+        stack = external_stack
+    else:
+        stack = MatterStackState(matter_test_config)
 
     with TracingContext() as tracing_ctx:
         for destination in matter_test_config.trace_to:
@@ -1686,12 +1681,12 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
 
         # TODO: Steer to right FabricAdmin!
         # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
-
-        default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-            nodeId=matter_test_config.controller_node_id,
-            paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-            catTags=matter_test_config.controller_cat_tags
-        )
+        if not default_controller:
+            default_controller = stack.certificate_authorities[0].adminList[0].NewController(
+                nodeId=matter_test_config.controller_node_id,
+                paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+                catTags=matter_test_config.controller_cat_tags
+            )
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 
         test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
@@ -1740,10 +1735,16 @@ def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, 
         hooks.stop(duration=duration)
 
     # Shutdown the stack when all done
-    stack.Shutdown()
+    if not external_stack:
+        stack.Shutdown()
 
     if ok:
         logging.info("Final result: PASS !")
     else:
         logging.error("Final result: FAIL !")
+    return ok
+
+
+def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
+    if not run_tests_no_exit(test_class, matter_test_config, hooks, default_controller, external_stack):
         sys.exit(1)

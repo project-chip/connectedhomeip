@@ -126,6 +126,33 @@ CC2674P10 or the CC2674R10, please refer to the guide linked below.
 
 <hr>
 
+## Factory Data Programming Tool
+
+For instructions on how to program custom factory data on TI devices, please
+refer to the guide linked below.
+
+-   [TI Factory Data User Guide](./ti_factory_data_user_guide.md)
+
+<hr>
+
+## Intermittently Connected Devices
+
+For instructions on how to use Matters' ICD feature on TI devices, please refer
+to the guide linked below.
+
+-   [Enabling ICD On TI Devices](./enabling_icd_on_ti_devices.md)
+
+<hr>
+
+## Matter Openthread Library Configuration
+
+For instructions on how to configure the Openthread build configuration for a
+Matter application, please refer to the guide linked below.
+
+-   [Openthread Library Configuration](./ti_openthread_library_usage.md)
+
+<hr>
+
 ### TI Support
 
 For technical support, please consider creating a post on TI's [E2E forum][e2e].

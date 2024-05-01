@@ -11,10 +11,12 @@ import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
 import com.chip.casting.util.GlobalCastingConstants;
 import com.matter.casting.ActionSelectorFragment;
+import com.matter.casting.ApplicationBasicReadVendorIDExampleFragment;
 import com.matter.casting.ConnectionExampleFragment;
 import com.matter.casting.ContentLauncherLaunchURLExampleFragment;
 import com.matter.casting.DiscoveryExampleFragment;
 import com.matter.casting.InitializationExample;
+import com.matter.casting.MediaPlaybackSubscribeToCurrentStateExampleFragment;
 import com.matter.casting.PreferencesConfigurationManager;
 import com.matter.casting.core.CastingPlayer;
 import java.util.Random;
@@ -83,6 +85,18 @@ public class MainActivity extends AppCompatActivity
   @Override
   public void handleContentLauncherLaunchURLSelected(CastingPlayer selectedCastingPlayer) {
     showFragment(ContentLauncherLaunchURLExampleFragment.newInstance(selectedCastingPlayer));
+  }
+
+  @Override
+  public void handleApplicationBasicReadVendorIDSelected(CastingPlayer selectedCastingPlayer) {
+    showFragment(ApplicationBasicReadVendorIDExampleFragment.newInstance(selectedCastingPlayer));
+  }
+
+  @Override
+  public void handleMediaPlaybackSubscribeToCurrentStateSelected(
+      CastingPlayer selectedCastingPlayer) {
+    showFragment(
+        MediaPlaybackSubscribeToCurrentStateExampleFragment.newInstance(selectedCastingPlayer));
   }
 
   @Override

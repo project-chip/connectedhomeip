@@ -322,6 +322,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     SetAutoRequestAck(session->AllowsMRP());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // TODO(#33075) : Add check for group context to not a req since it serves no purpose
     app::ICDNotifier::GetInstance().NotifyActiveRequestNotification(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
 #endif
 
@@ -341,6 +342,7 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // TODO(#33075) : Add check for group context to not a req since it serves no purpose
     app::ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
@@ -594,21 +596,26 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // Set kFlagReceivedAtLeastOneMessage to true since we have received at least one new application level message
     SetHasReceivedAtLeastOneMessage(true);
 
-    if (IsResponseExpected())
-    {
-        // Since we got the response, cancel the response timer.
-        CancelResponseTimer();
-
-        // If the context was expecting a response to a previously sent message, this message
-        // is implicitly that response.
-        SetResponseExpected(false);
-    }
-
     // Don't send messages on to our delegate if our dispatch does not allow
-    // those messages.
-    if (mDelegate != nullptr && mDispatch.MessagePermitted(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType()))
+    // those messages.  Those messages should also not be treated as responses,
+    // since if our delegate is expecting a response we will not notify it about
+    // these messages.
+    if (mDispatch.MessagePermitted(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType()))
     {
-        return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
+        if (IsResponseExpected())
+        {
+            // Since we got the response, cancel the response timer.
+            CancelResponseTimer();
+
+            // If the context was expecting a response to a previously sent message, this message
+            // is implicitly that response.
+            SetResponseExpected(false);
+        }
+
+        if (mDelegate != nullptr)
+        {
+            return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
+        }
     }
 
     DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
@@ -662,6 +669,13 @@ void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHan
     VerifyOrDie(session->AsSecureSession()->IsPendingEviction());
     GrabUnchecked(session);
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+void ExchangeContext::OnSessionConnectionClosed(CHIP_ERROR conErr)
+{
+    // TODO: Handle connection closure at the ExchangeContext level.
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace Messaging
 } // namespace chip

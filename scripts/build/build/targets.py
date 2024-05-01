@@ -177,7 +177,7 @@ def BuildHostTarget():
     target.AppendModifier("ossfuzz", fuzzing_type=HostFuzzingType.OSS_FUZZ).OnlyIfRe(
         "-clang").ExceptIfRe('-libfuzzer')
     target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters)')
+        '-(chip-tool|all-clusters|tests)')
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)

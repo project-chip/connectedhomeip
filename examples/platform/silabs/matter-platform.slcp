@@ -27,26 +27,23 @@ include:
   file_list:
   - {path: app.h}
   - {path: reset_util.h}
-sdk: {id: gecko_sdk, version: 4.3.1}
+sdk: {id: gecko_sdk, version: 4.4.2}
 toolchain_settings: []
 
 component:
-- {id: bluetooth_feature_nvm}
-- {id: bluetooth_feature_gatt_server}
-- {id: nvm3_lib}
-- {id: bluetooth_feature_sm}
-- {id: bluetooth_feature_gap}
-- {id: bluetooth_feature_legacy_advertiser}
+#bluetooth components
 - {id: gatt_configuration}
-- {id: freertos}
+- {id: bluetooth_feature_gatt_server}
+- {id: bluetooth_feature_legacy_advertiser}
+- {id: bluetooth_feature_connection}
+- {id: bluetooth_feature_system}
 - {id: bluetooth_stack}
+# Other components
+- {id: nvm3_lib}
+- {id: freertos}
 - {id: brd4002a}
 - {id: rail_util_pti}
-- {id: bluetooth_feature_gatt}
-- {id: bluetooth_feature_connection}
 - {id: rail_lib_multiprotocol}
-- {id: bluetooth_feature_system}
-- {id: bluetooth_feature_scanner}
 - {id: rail_util_power_manager_init}
 - {id: psa_crypto}
 - {id: psa_crypto_aes}
@@ -62,7 +59,6 @@ component:
 - {id: mbedtls_platform_dynamic_memory_allocation_config_init_runtime }
 - {id: mbedtls_base64}
 - {id: ot_psa_crypto}
-- {id: bluetooth_crypto}
 - {id: iostream_rtt}
 # Necessary componenets for ot coap cert lib
 # - {id: mbedtls_dtls} # Requried by COAP lib

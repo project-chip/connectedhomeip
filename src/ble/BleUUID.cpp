@@ -15,15 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <ble/BleConfig.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
+#define _CHIP_BLE_BLE_H
+#include "BleUUID.h"
 
 #include <cctype>
 #include <cstdint>
 #include <cstring>
-
-#include "BleUUID.h"
 
 namespace chip {
 namespace Ble {
@@ -78,5 +76,3 @@ bool StringToUUID(const char * str, ChipBleUUID & uuid)
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* CONFIG_NETWORK_LAYER_BLE */

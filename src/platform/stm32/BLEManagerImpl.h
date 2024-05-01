@@ -25,7 +25,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <platform/internal/BLEManager.h>
 
 #include "FreeRTOS.h"

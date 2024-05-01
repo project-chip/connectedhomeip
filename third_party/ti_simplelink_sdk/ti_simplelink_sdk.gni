@@ -17,7 +17,6 @@ import("//build_overrides/chip.gni")
 
 import("//build_overrides/freertos.gni")
 import("//build_overrides/mbedtls.gni")
-import("//build_overrides/openthread.gni")
 import("//build_overrides/pigweed.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
 import("${chip_root}/src/app/icd/icd.gni")
@@ -306,8 +305,8 @@ template("ti_simplelink_sdk") {
     configs -= [ "${build_root}/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
+      "${chip_root}/src/platform/cc13xx_26xx/memory.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/memory.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/mqueue.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_barrier.c",
@@ -353,14 +352,6 @@ template("ti_simplelink_sdk") {
       ]
 
       public_configs = [ ":${sdk_target_name}_config" ]
-
-      if (chip_openthread_ftd) {
-        public_configs +=
-            [ "${chip_root}/third_party/openthread/repo:openthread_ftd_config" ]
-      } else {
-        public_configs +=
-            [ "${chip_root}/third_party/openthread/repo:openthread_mtd_config" ]
-      }
     }
   }
 
@@ -517,13 +508,12 @@ template("ti_simplelink_sdk") {
     if (ti_simplelink_device_family == "cc13x4_26x4") {
       defines = []
       include_dirs = [
-        "${chip_root}/third_party/openthread/repo/include/",
         "${chip_root}/src/",
+        "${chip_root}/third_party/openthread/repo/include",
       ]
       configs -=
           [ "${build_root}/config/compiler:warnings_default" ]  # removed for
                                                                 # -Wshadow
-
       cflags = [
         "-Wno-sign-compare",
         "-Wno-unused-variable",
@@ -531,8 +521,8 @@ template("ti_simplelink_sdk") {
       ]
 
       sources = [
+        "${chip_root}/src/platform/cc13xx_26xx/TI_heap_wrapper.c",
         "${chip_root}/src/platform/cc13xx_26xx/chipOBleProfile.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/TI_heap_wrapper.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/bget.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/ble_remote_display/stack/osal_icall_ble.c",
@@ -569,6 +559,7 @@ template("ti_simplelink_sdk") {
       public_configs = [
         ":${sdk_target_name}_config",
         ":${sdk_target_name}_${ti_simplelink_device_family}_dmm_config",
+        "${chip_root}/third_party/openthread/platforms/ti:openthread_ti_config",
       ]
     }
   }

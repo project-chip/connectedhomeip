@@ -25,9 +25,9 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/AttributePathParams.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/CASESessionManager.h>
 #include <app/DataVersionFilter.h>
 #include <app/EventManagement.h>
@@ -412,8 +412,8 @@ private:
     /// or after the min interval is reached if it has not yet been reached.
     void ForceDirtyState();
 
-    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
-    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
+    const AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
+    void SetAttributeEncodeState(const AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
     uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
 
     // Returns the number of interested paths, including wildcard and concrete paths.
@@ -562,7 +562,7 @@ private:
 
     // The detailed encoding state for a single attribute, used by list chunking feature.
     // The size of AttributeEncoderState is 2 bytes for now.
-    AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
+    AttributeEncodeState mAttributeEncoderState;
 
     // Current Handler state
     HandlerState mState            = HandlerState::Idle;

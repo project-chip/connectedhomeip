@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/bindings/bindings.h>
@@ -124,12 +125,13 @@ CHIP_ERROR CreateBindingEntry(const TargetStructType & entry, EndpointId localEn
 
     if (entry.group.HasValue())
     {
-        bindingEntry = EmberBindingTableEntry::ForGroup(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster);
+        bindingEntry =
+            EmberBindingTableEntry::ForGroup(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster.std_optional());
     }
     else
     {
         bindingEntry = EmberBindingTableEntry::ForNode(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
-                                                       entry.cluster);
+                                                       entry.cluster.std_optional());
     }
 
     return AddBindingEntry(bindingEntry);
@@ -158,7 +160,7 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
                     .node        = MakeOptional(entry.nodeId),
                     .group       = NullOptional,
                     .endpoint    = MakeOptional(entry.remote),
-                    .cluster     = entry.clusterId,
+                    .cluster     = FromStdOptional(entry.clusterId),
                     .fabricIndex = entry.fabricIndex,
                 };
                 ReturnErrorOnFailure(subEncoder.Encode(value));
@@ -169,7 +171,7 @@ CHIP_ERROR BindingTableAccess::ReadBindingTable(EndpointId endpoint, AttributeVa
                     .node        = NullOptional,
                     .group       = MakeOptional(entry.groupId),
                     .endpoint    = NullOptional,
-                    .cluster     = entry.clusterId,
+                    .cluster     = FromStdOptional(entry.clusterId),
                     .fabricIndex = entry.fabricIndex,
                 };
                 ReturnErrorOnFailure(subEncoder.Encode(value));
@@ -257,9 +259,8 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
 
 CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
 {
-    DeviceLayer::ChipDeviceEvent event;
-    event.Type                        = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
-    event.BindingsChanged.fabricIndex = mAccessingFabricIndex;
+    DeviceLayer::ChipDeviceEvent event{ .Type            = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster,
+                                        .BindingsChanged = { .fabricIndex = mAccessingFabricIndex } };
     return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
 }
 

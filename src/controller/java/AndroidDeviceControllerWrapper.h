@@ -212,8 +212,6 @@ public:
 
     CHIP_ERROR FinishOTAProvider();
 
-    chip::app::DefaultICDClientStorage * getICDClientStorage() { return &mICDClientStorage; }
-
     CHIP_ERROR SetICDCheckInDelegate(jobject checkInDelegate);
 
 private:
@@ -228,7 +226,6 @@ private:
     // TODO: This may need to be injected as a SessionKeystore*
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
-    chip::app::DefaultICDClientStorage mICDClientStorage;
     chip::app::AndroidCheckInDelegate mCheckInDelegate;
     chip::app::CheckInHandler mCheckInHandler;
 

@@ -28,8 +28,10 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <ble/BleError.h>
 #include <lib/core/ErrorStr.h>
+
+#define _CHIP_BLE_BLE_H
+#include <ble/BleError.h>
 
 #include <gtest/gtest.h>
 
@@ -37,9 +39,7 @@ using namespace chip;
 
 // Test input data.
 
-// clang-format off
-static const CHIP_ERROR kTestElements[] =
-{
+static const CHIP_ERROR kTestElements[] = {
     BLE_ERROR_ADAPTER_UNAVAILABLE,
     BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK,
     BLE_ERROR_CENTRAL_UNSUBSCRIBED,
@@ -66,7 +66,6 @@ static const CHIP_ERROR kTestElements[] =
     BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER,
     BLE_ERROR_REASSEMBLER_INCORRECT_STATE,
 };
-// clang-format on
 
 TEST(TestBleErrorStr, CheckBleErrorStr)
 {

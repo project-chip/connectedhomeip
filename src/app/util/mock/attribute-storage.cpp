@@ -39,7 +39,7 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/MockNodeConfig.h>
 
-#include <app/AttributeAccessInterface.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
@@ -258,13 +258,14 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpointId, ClusterId
     return cluster->emberCluster();
 }
 
+DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPath & aConcreteClusterPath)
+{
+    // shared data version storage
+    return &dataVersion;
+}
+
 namespace chip {
 namespace app {
-
-AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
-{
-    return nullptr;
-}
 
 EndpointId EnabledEndpointsWithServerCluster::operator*() const
 {
@@ -301,7 +302,13 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 }
 
 } // namespace app
+
 namespace Test {
+
+void ResetVersion()
+{
+    dataVersion = 0;
+}
 
 void BumpVersion()
 {
@@ -314,8 +321,7 @@ DataVersion GetVersion()
 }
 
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const ConcreteAttributePath & aPath,
-                                     AttributeReportIBs::Builder & aAttributeReports,
-                                     AttributeValueEncoder::AttributeEncodeState * apEncoderState)
+                                     AttributeReportIBs::Builder & aAttributeReports, AttributeEncodeState * apEncoderState)
 {
     bool dataExists =
         (emberAfGetServerAttributeIndexByAttributeId(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId) != UINT16_MAX);
@@ -344,9 +350,11 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     // Attribute 4 acts as a large attribute to trigger chunking.
     if (aPath.mAttributeId == MockAttributeId(4))
     {
-        AttributeValueEncoder::AttributeEncodeState state =
-            (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-        AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, dataVersion, false, state);
+        AttributeEncodeState state(apEncoderState);
+        Access::SubjectDescriptor subject;
+        subject.fabricIndex = aAccessingFabricIndex;
+
+        AttributeValueEncoder valueEncoder(aAttributeReports, subject, aPath, dataVersion, /* aIsFabricFiltered = */ false, state);
 
         CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             for (int i = 0; i < 6; i++)
@@ -399,6 +407,16 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
     ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
     return attributeReport.EndOfAttributeReportIB();
+}
+
+void SetMockNodeConfig(const MockNodeConfig & config)
+{
+    mockConfig = &config;
+}
+
+void ResetMockNodeConfig()
+{
+    mockConfig = nullptr;
 }
 
 } // namespace Test

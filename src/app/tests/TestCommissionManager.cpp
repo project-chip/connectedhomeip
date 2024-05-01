@@ -15,10 +15,12 @@
  *    limitations under the License.
  */
 
+#include <app/TestEventTriggerDelegate.h>
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <crypto/RandUtils.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -100,7 +102,12 @@ void InitializeChip(nlTestSuite * suite)
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
     initParams.reportScheduler = &sReportScheduler;
+    static chip::SimpleTestEventTriggerDelegate sSimpleTestEventTriggerDelegate;
+    initParams.testEventTriggerDelegate = &sSimpleTestEventTriggerDelegate;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    // Set a randomized server port(slightly shifted from CHIP_PORT) for testing
+    initParams.operationalServicePort = static_cast<uint16_t>(initParams.operationalServicePort + chip::Crypto::GetRandU16() % 20);
+
     err = chip::Server::GetInstance().Init(initParams);
 
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
@@ -236,7 +243,7 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     NL_TEST_ASSERT(suite, !sAdminVendorIdDirty);
 
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds16(1);
+    constexpr auto kTimeoutSeconds             = chip::System::Clock::Seconds32(1);
     constexpr uint16_t kTimeoutMs              = 1000;
     constexpr unsigned kSleepPadding           = 100;
     commissionMgr.OverrideMinCommissioningTimeout(kTimeoutSeconds);

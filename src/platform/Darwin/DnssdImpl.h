@@ -131,7 +131,7 @@ public:
 
 private:
     MdnsContexts() = default;
-    friend class Global<MdnsContexts>;
+    friend Global<MdnsContexts>;
     static Global<MdnsContexts> sInstance;
 
     std::vector<GenericContext *> mContexts;
@@ -262,8 +262,8 @@ struct ResolveContext : public GenericContext
     std::shared_ptr<uint32_t> consumerCounter;
     BrowseContext * const browseThatCausedResolve; // Can be null
 
-    // Indicates whether the timer for 250 msecs should be started
-    // to give the resolve on SRP domain some extra time to complete.
+    // Indicates whether the timer should be started to give the resolve
+    // on SRP domain some extra time to complete.
     bool shouldStartSRPTimerForResolve = false;
     bool isSRPTimerRunning             = false;
 
@@ -274,8 +274,8 @@ struct ResolveContext : public GenericContext
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
                    const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
                    std::shared_ptr<uint32_t> && consumerCounterToUse);
-    ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
-                   const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
+    ResolveContext(DiscoverNodeDelegate * delegate, chip::Inet::IPAddressType cbAddressType, const char * instanceNameToResolve,
+                   std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
@@ -297,6 +297,12 @@ struct ResolveContext : public GenericContext
      */
     static void SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext);
 
+    /**
+     * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
+     *
+     */
+    void CancelSRPTimerIfRunning();
+
 private:
     /**
      * Try reporting the results we got on the provided interface index.
@@ -306,12 +312,6 @@ private:
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex, const std::string & hostname, bool isSRPResult);
 
     bool TryReportingResultsForInterfaceIndex(uint32_t interfaceIndex);
-
-    /**
-     * @brief Cancels the timer that was started to wait for the resolution on the kSRPDot domain to happen.
-     *
-     */
-    void CancelSRPTimer();
 };
 
 } // namespace Dnssd
