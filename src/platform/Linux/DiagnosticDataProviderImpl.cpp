@@ -267,7 +267,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // has been used by the Node.
     // On Linux, since it uses virtual memory, whereby a page of memory could be copied to
     // the hard disk, called swap space, and free up that page of memory. So it is impossible
-    // to know accurately peak physical memory it use. 
+    // to know accurately peak physical memory it use.
     // Update the maximum heap high watermark if the current heap usage exceeds it.
     if (static_cast<ssize_t>(mallocInfo.uordblks) > static_cast<ssize_t>(maxHeapHighWatermark)) {
         maxHeapHighWatermark = mallocInfo.uordblks;
