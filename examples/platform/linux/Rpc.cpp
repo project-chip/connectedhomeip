@@ -26,6 +26,10 @@
 #include <map>
 #include "Rpc.h"
 
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+#include "pigweed/rpc_services/Actions.h"
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 #include "pigweed/rpc_services/Attributes.h"
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -41,10 +45,6 @@
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 #include "pigweed/rpc_services/Device.h"
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
-
-#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
-#include "pigweed/rpc_services/Actions.h"
-#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 #include "pigweed/rpc_services/Lighting.h"
@@ -76,6 +76,10 @@ namespace chip {
 namespace rpc {
 namespace {
 
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+Actions actions_service;
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 Attributes attributes_service;
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -91,10 +95,6 @@ Descriptor descriptor_service;
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 Device device_service;
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
-
-#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
-Actions actions_service;
-#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 
 #if defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 Lighting lighting_service;

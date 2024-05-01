@@ -279,6 +279,10 @@ static TaskHandle_t sRpcTaskHandle;
 StaticTask_t sRpcTaskBuffer;
 StackType_t sRpcTaskStack[RPC_TASK_STACK_SIZE];
 
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+Actions actions_service;
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 Attributes attributes_service;
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -321,6 +325,10 @@ Esp32WiFi wifi_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+    server.RegisterService(actions_service);
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
     server.RegisterService(attributes_service);
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -364,6 +372,13 @@ void RegisterServices(pw::rpc::Server & server)
 }
 
 } // namespace
+
+#if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
+void SubscribeActions(RpcActionsSubscribeCallback subscriber)
+{
+    actions_service.SubscribeActions(subscriber);
+}
+#endif // defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 
 void RunRpcService(void *)
 {

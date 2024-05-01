@@ -237,3 +237,15 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
     WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
 }
 #endif
+
+void ApplicationInit()
+{
+    ChipLogProgress(NotSpecified, "Chef Application Init !!!")
+printf("\033[41m %s, %d   \033[0m\n", __func__, __LINE__);
+}
+
+void ApplicationShutdown()
+{
+    ChipLogProgress(NotSpecified, "Chef Application Down !!!")
+printf("\033[41m %s, %d   \033[0m\n", __func__, __LINE__);
+}

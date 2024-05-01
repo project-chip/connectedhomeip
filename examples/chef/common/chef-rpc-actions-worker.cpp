@@ -80,30 +80,28 @@ void ChefRpcActionsWorker::ProcessActionQueue()
     ActionTask task = queue.front();
     queue.pop();
 
-printf("\033[41m %s , %d, endpointId=%d, clusterId=%d \033[0m \n", __func__, __LINE__, task.endpointId, task.clusterId);
-
     ActionsDelegate * delegate = RpcFindActionsDelegate(task.clusterId);
     if ( nullptr == delegate ) {
-printf("\033[41m %s , %d, Cannot run action due to not finding delegate: endpointId=%d, clusterId=%d \033[0m \n", __func__, __LINE__, task.endpointId, task.clusterId);
+        ChipLogError(NotSpecified, "Cannot run action due to not finding delegate: endpointId=%d, clusterId=%04lx, attributeId=%04lx \033[0m \n", task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId));
     } else {
         ActionType type = static_cast<ActionType>(task.type);
 
         switch (type) {
         case ActionType::WRITE_ATTRIBUTE:
         {
-printf("\033[41m %s , %d, Writing Attribute: %d, args size=%lu \033[0m \n", __func__, __LINE__, task.actionId, task.args.size());
+            ChipLogProgress(NotSpecified, "Writing Attribute: endpointId=%d, clusterId=%04lx, attributeId=%04lx, args.size=%lu", task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),  static_cast<unsigned long>(task.args.size()));
             delegate->AttributeWriteHandler(task.endpointId, static_cast<chip::AttributeId>(task.actionId), task.args);
         }
         break; 
         case ActionType::RUN_COMMAND:
         {
-printf("\033[41m %s , %d, Running Command: %d, args size=%lu \033[0m \n", __func__, __LINE__, task.actionId, task.args.size());
+            ChipLogProgress(NotSpecified, "Running Command: endpointId=%d, clusterId=%04lx, commandId=%04lx, args.size=%lu",task.endpointId,  static_cast<unsigned long>(task.clusterId),  static_cast<unsigned long>(task.actionId),  static_cast<unsigned long>(task.args.size()));
             delegate->CommandHandler(task.endpointId, static_cast<chip::CommandId>(task.actionId), task.args);
         }
         break; 
         case ActionType::EMIT_EVENT:
         {
-printf("\033[41m %s , %d, Emitting Event: %d, args size=%lu \033[0m \n", __func__, __LINE__, task.actionId, task.args.size());
+            ChipLogProgress(NotSpecified, "Emitting Event: endpointId=%d, clusterId=%04lx, eventIdId=%04lx, args.size=%lu",task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId), static_cast<unsigned long>(task.args.size()));
             delegate->EventHandler(task.endpointId, static_cast<chip::EventId>(task.actionId), task.args);
         }
         break; 
@@ -119,7 +117,8 @@ printf("\033[41m %s , %d, Emitting Event: %d, args size=%lu \033[0m \n", __func_
 
     // Run next action
     task = queue.front();
-printf("\033[44m %s , %d, next action: endpointId=%d, clusterId=%d, delayMs=%d \033[0m \n", __func__, __LINE__, task.endpointId, task.clusterId, task.delayMs);
+printf("\033[44m %s, %d, start new timer \033[0m \n", __func__, __LINE__);
+    ChipLogProgress(NotSpecified, "StartTimer to run next action: endpointId=%d, clusterId=%04lx, eventIdId=%04lx, task.delyMs=%lu",task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId), static_cast<unsigned long>(task.delayMs));
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(task.delayMs), RpcActionsTaskCallback, this);
 }
 
