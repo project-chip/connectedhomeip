@@ -53,7 +53,7 @@ static void RpcActionsTaskCallback(System::Layer * systemLayer, void * data)
 bool ChefRpcActionsCallback(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args)
 {
     ActionTask task(endpointId, clusterId, static_cast<ActionType>(type), delayMs, actionId, args);
-    // TBD: Stack lock
+
     return ChefRpcActionsWorker::Instance().EnqueueAction(task);
 }
 

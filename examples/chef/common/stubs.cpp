@@ -19,8 +19,6 @@
 #include "chef-concentration-measurement.h"
 #endif
 
-//#include <Actions.h>
-
 using chip::app::DataModel::Nullable;
 
 using namespace chip;
