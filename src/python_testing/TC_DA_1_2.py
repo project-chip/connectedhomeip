@@ -164,7 +164,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
     async def test_TC_DA_1_2(self):
         is_ci = self.check_pics('PICS_SDK_CI_ONLY')
         cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
-        self.post_cert_test = self.user_params.get("post_cert_test", False)
+        post_cert_test = self.user_params.get("post_cert_test", False)
 
         do_test_over_pase = self.user_params.get("use_pase_only", False)
         if do_test_over_pase:
