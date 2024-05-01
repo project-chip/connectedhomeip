@@ -95,6 +95,16 @@ static MTRBaseDevice * GetConnectedDevice(void)
 {
     XCTAssertEqual(error.code, 0);
 
+    NSError * getDeviceError = nil;
+    __auto_type * device = [controller deviceBeingCommissionedWithNodeID:@(kDeviceId) error:&getDeviceError];
+    XCTAssertNil(getDeviceError);
+    XCTAssertNotNil(device);
+
+    // Now check that getting with some other random id fails.
+    device = [controller deviceBeingCommissionedWithNodeID:@(kDeviceId + 1) error:&getDeviceError];
+    XCTAssertNil(device);
+    XCTAssertNotNil(getDeviceError);
+
     __auto_type * params = [[MTRCommissioningParameters alloc] init];
     params.countryCode = @("au");
 

@@ -15,14 +15,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/EventManagement.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
+#include <app/icd/server/ICDMonitoringTable.h>
 #include <app/icd/server/ICDNotifier.h>
 #include <app/icd/server/ICDStateObserver.h>
-#include <app/tests/AppTestContext.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -30,10 +30,9 @@
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
 #include <system/SystemLayerImpl.h>
-
-#include <crypto/DefaultSessionKeystore.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -70,8 +69,10 @@ constexpr uint8_t kKeyBuffer2b[] = {
 // Taken from the ICDManager Implementation
 enum class ICDTestEventTriggerEvent : uint64_t
 {
-    kAddActiveModeReq    = 0x0046'0000'00000001,
-    kRemoveActiveModeReq = 0x0046'0000'00000002,
+    kAddActiveModeReq            = 0x0046'0000'00000001,
+    kRemoveActiveModeReq         = 0x0046'0000'00000002,
+    kInvalidateHalfCounterValues = 0x0046'0000'00000003,
+    kInvalidateAllCounterValues  = 0x0046'0000'00000004,
 };
 
 class TestICDStateObserver : public app::ICDStateObserver
@@ -117,16 +118,19 @@ private:
     bool mHasPersistedSubscription = false;
 };
 
-class TestContext : public chip::Test::AppContext
+class TestContext : public chip::Test::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
     CHIP_ERROR SetUpTestSuite() override
     {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUpTestSuite());
+        ReturnErrorOnFailure(LoopbackMessagingContext::SetUpTestSuite());
+        ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
+
         DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
         mRealClock = &chip::System::SystemClock();
         System::Clock::Internal::SetSystemClockForTesting(&mMockClock);
+
         return CHIP_NO_ERROR;
     }
 
@@ -135,16 +139,20 @@ public:
     {
         System::Clock::Internal::SetSystemClockForTesting(mRealClock);
         DeviceLayer::SetSystemLayerForTesting(nullptr);
-        chip::Test::AppContext::TearDownTestSuite();
+
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+        LoopbackMessagingContext::TearDownTestSuite();
     }
 
     // Performs setup for each individual test in the test suite
     CHIP_ERROR SetUp() override
     {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+        ReturnErrorOnFailure(LoopbackMessagingContext::SetUp());
+
         mICDStateObserver.ResetAll();
         mICDManager.RegisterObserver(&mICDStateObserver);
         mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager(), &mSubInfoProvider);
+
         return CHIP_NO_ERROR;
     }
 
@@ -152,7 +160,7 @@ public:
     void TearDown() override
     {
         mICDManager.Shutdown();
-        chip::Test::AppContext::TearDown();
+        LoopbackMessagingContext::TearDown();
     }
 
     System::Clock::Internal::MockClock mMockClock;
@@ -651,6 +659,7 @@ public:
         NL_TEST_ASSERT(aSuite, stayActivePromisedMs == 20000);
     }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     static void TestShouldCheckInMsgsBeSentAtActiveModeFunction(nlTestSuite * aSuite, void * aContext)
@@ -721,6 +730,7 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.ShouldCheckInMsgsBeSentAtActiveModeFunction(kTestFabricIndex1, kClientNodeId11));
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     static void TestHandleTestEventTriggerActiveModeReq(nlTestSuite * aSuite, void * aContext)
     {
@@ -740,6 +750,48 @@ public:
         // Remove req and device should go to IdleMode
         ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kRemoveActiveModeReq));
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+    }
+
+    static void TestHandleTestEventTriggerInvalidateHalfCounterValues(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        constexpr uint32_t startValue    = 1;
+        constexpr uint32_t expectedValue = 2147483648;
+
+        // Set starting value
+        uint32_t currentValue = ICDConfigurationData::GetInstance().GetICDCounter().GetValue();
+        uint32_t delta        = startValue - currentValue;
+
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().AdvanceBy(delta) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().GetValue() == startValue);
+
+        // Trigger ICD kInvalidateHalfCounterValues event
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateHalfCounterValues));
+
+        // Validate counter has the expected value
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().GetValue() == expectedValue);
+    }
+
+    static void TestHandleTestEventTriggerInvalidateAllCounterValues(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+
+        constexpr uint32_t startValue    = 105;
+        constexpr uint32_t expectedValue = 104;
+
+        // Set starting value
+        uint32_t currentValue = ICDConfigurationData::GetInstance().GetICDCounter().GetValue();
+        uint32_t delta        = startValue - currentValue;
+
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().AdvanceBy(delta) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().GetValue() == startValue);
+
+        // Trigger ICD kInvalidateAllCounterValues event
+        ctx->mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateAllCounterValues));
+
+        // Validate counter has the expected value
+        NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDCounter().GetValue() == expectedValue);
     }
 
     /**
@@ -1073,23 +1125,29 @@ namespace {
 static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDModeDurations", TestICDManager::TestICDModeDurations),
     NL_TEST_DEF("TestOnSubscriptionReport", TestICDManager::TestOnSubscriptionReport),
-    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub",
-                TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub),
+    NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
+    NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
+    NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
     NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithActiveSub",
                 TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithActiveSub),
-    NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
-    NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
-    NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
-    NL_TEST_DEF("TestICDStayActive", TestICDManager::TestICDMStayActive),
+    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub",
+                TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub),
     NL_TEST_DEF("TestShouldCheckInMsgsBeSentAtActiveModeFunction", TestICDManager::TestShouldCheckInMsgsBeSentAtActiveModeFunction),
+    NL_TEST_DEF("TestHandleTestEventTriggerInvalidateHalfCounterValues",
+                TestICDManager::TestHandleTestEventTriggerInvalidateHalfCounterValues),
+    NL_TEST_DEF("TestHandleTestEventTriggerInvalidateAllCounterValues",
+                TestICDManager::TestHandleTestEventTriggerInvalidateAllCounterValues),
+    NL_TEST_DEF("TestICDStateObserverOnICDModeChange", TestICDManager::TestICDStateObserverOnICDModeChange),
+    NL_TEST_DEF("TestICDStateObserverOnICDModeChangeOnInit", TestICDManager::TestICDStateObserverOnICDModeChangeOnInit),
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     NL_TEST_DEF("TestHandleTestEventTriggerActiveModeReq", TestICDManager::TestHandleTestEventTriggerActiveModeReq),
     NL_TEST_DEF("TestICDStateObserverOnEnterIdleModeActiveModeDuration",
                 TestICDManager::TestICDStateObserverOnEnterIdleModeActiveModeDuration),
     NL_TEST_DEF("TestICDStateObserverOnEnterIdleModeActiveModeThreshold",
                 TestICDManager::TestICDStateObserverOnEnterIdleModeActiveModeThreshold),
     NL_TEST_DEF("TestICDStateObserverOnEnterActiveMode", TestICDManager::TestICDStateObserverOnEnterActiveMode),
-    NL_TEST_DEF("TestICDStateObserverOnICDModeChange", TestICDManager::TestICDStateObserverOnICDModeChange),
-    NL_TEST_DEF("TestICDStateObserverOnICDModeChangeOnInit", TestICDManager::TestICDStateObserverOnICDModeChangeOnInit),
     NL_TEST_DEF("TestICDStateObserverOnTransitionToIdleModeGreaterActiveModeDuration",
                 TestICDManager::TestICDStateObserverOnTransitionToIdleModeGreaterActiveModeDuration),
     NL_TEST_DEF("TestICDStateObserverOnTransitionToIdleModeEqualActiveModeDuration",

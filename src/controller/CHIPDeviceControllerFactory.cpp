@@ -162,6 +162,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                             ,
                                                         Transport::BleListenParameters(stateParams.bleLayer)
 #endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                                            ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(IPAddressType::kIPv6)
+                                                            .SetListenPort(params.listenPort)
+#endif
                                                             ));
 
     // TODO(#16231): All the new'ed state above/below in this method is never properly released or null-checked!

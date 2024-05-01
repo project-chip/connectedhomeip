@@ -86,7 +86,6 @@ static NSString * const kErrorPairingInit = @"Init failure while creating a pair
 static NSString * const kErrorPartialDacVerifierInit = @"Init failure while creating a partial DAC verifier";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
-static NSString * const kErrorPreWarmCommissioning = @"Failure while trying to pre-warm the commissioning process";
 static NSString * const kErrorOpenPairingWindow = @"Open Pairing Window failed";
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
 static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
@@ -617,6 +616,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
+    MTR_LOG_DEFAULT("Setting up commissioning session for device ID 0x%016llX with setup payload %@", newNodeID.unsignedLongLongValue, payload);
+
     [[MTRMetricsCollector sharedInstance] resetMetrics];
 
     // Track overall commissioning
@@ -664,6 +665,8 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                                             newNodeID:(NSNumber *)newNodeID
                                                 error:(NSError * __autoreleasing *)error
 {
+    MTR_LOG_DEFAULT("Setting up commissioning session for already-discovered device %@ and device ID 0x%016llX with setup payload %@", discoveredDevice, newNodeID.unsignedLongLongValue, payload);
+
     [[MTRMetricsCollector sharedInstance] resetMetrics];
 
     // Track overall commissioning
@@ -896,15 +899,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (void)preWarmCommissioningSession
 {
-    auto block = ^{
-        auto errorCode = chip::DeviceLayer::PlatformMgrImpl().PrepareCommissioning();
-        MATTER_LOG_METRIC(kMetricPreWarmCommissioning, errorCode);
-
-        // The checkForError is just so it logs
-        [MTRDeviceController checkForError:errorCode logMsg:kErrorPreWarmCommissioning error:nil];
-    };
-
-    [self syncRunOnWorkQueue:block error:nil];
+    [_factory preWarmCommissioningSession];
 }
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
@@ -921,7 +916,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    MTRBaseDevice * device = [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    MTR_LOG_DEFAULT("Getting device being commissioned with node ID 0x%016llX: %@ (error: %@)",
+        nodeID.unsignedLongLongValue, device, (error ? *error : nil));
+    return device;
 }
 
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID

@@ -32,13 +32,13 @@ CHIP_ERROR AttributeValueEncoder::EnsureListStarted()
 {
     VerifyOrDie(mCurrentEncodingListIndex == kInvalidListIndex);
 
-    mEncodingInitialList = (mEncodeState.mCurrentEncodingListIndex == kInvalidListIndex);
+    mEncodingInitialList = (mEncodeState.CurrentEncodingListIndex() == kInvalidListIndex);
     if (mEncodingInitialList)
     {
         // Clear mAllowPartialData flag here since this encode procedure is not atomic.
         // The most common error in this function is CHIP_ERROR_NO_MEMORY / CHIP_ERROR_BUFFER_TOO_SMALL, just revert and try
         // next time is ok.
-        mEncodeState.mAllowPartialData = false;
+        mEncodeState.SetAllowPartialData(false);
 
         AttributeReportBuilder builder;
 
@@ -59,7 +59,7 @@ CHIP_ERROR AttributeValueEncoder::EnsureListStarted()
         ReturnErrorOnFailure(
             mAttributeReportIBsBuilder.GetWriter()->ReserveBuffer(kEndOfAttributeReportIBByteCount + kEndOfListByteCount));
 
-        mEncodeState.mCurrentEncodingListIndex = 0;
+        mEncodeState.SetCurrentEncodingListIndex(0);
     }
     else
     {
@@ -72,7 +72,7 @@ CHIP_ERROR AttributeValueEncoder::EnsureListStarted()
 
     // After encoding the initial list start, the remaining items are atomically encoded into the buffer. Tell report engine to not
     // revert partial data.
-    mEncodeState.mAllowPartialData = true;
+    mEncodeState.SetAllowPartialData(true);
 
     return CHIP_NO_ERROR;
 }
@@ -105,7 +105,7 @@ void AttributeValueEncoder::EnsureListEnded()
         // If we succeeded at encoding the whole list (i.e. the list is in fact
         // empty and we fit in the packet), mAllowPartialData will be ignored,
         // so it's safe to set it to false even if encoding succeeded.
-        mEncodeState.mAllowPartialData = false;
+        mEncodeState.SetAllowPartialData(false);
     }
 }
 

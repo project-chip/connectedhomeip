@@ -10,8 +10,11 @@ CoreTests
 MdnsTests
 CredentialsTest
 PlatformTests
+RawTransportTests
 RetransmitTests
 TestShell
 SetupPayloadTests
 SupportTests
 UserDirectedCommissioningTests
+SecureChannelTests
+ICDServerTests
