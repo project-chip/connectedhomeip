@@ -89,7 +89,7 @@ namespace chip {
 namespace app {
 CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
+                                 AttributeEncodeState * apEncoderState)
 {
     if (aPath.mEndpointId >= chip::Test::kMockEndpointMin)
     {
@@ -109,10 +109,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
             // Use an incorrect attribute id for some of the responses.
             path.mAttributeId =
                 static_cast<AttributeId>(path.mAttributeId + (i / 2) + (responseDirective == kSendManyDataResponsesWrongPath));
-            AttributeValueEncoder::AttributeEncodeState state =
-                (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, path,
-                                               kDataVersion /* data version */, aIsFabricFiltered, state);
+            AttributeEncodeState state(apEncoderState);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, path, kDataVersion, aIsFabricFiltered, state);
             ReturnErrorOnFailure(valueEncoder.Encode(true));
         }
 
@@ -124,10 +122,9 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         if (aPath.mClusterId == app::Clusters::UnitTesting::Id &&
             aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::ListFabricScoped::Id)
         {
-            AttributeValueEncoder::AttributeEncodeState state =
-                (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath,
-                                               kDataVersion /* data version */, aIsFabricFiltered, state);
+            AttributeEncodeState state(apEncoderState);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
+                                               state);
 
             return valueEncoder.EncodeList([aSubjectDescriptor](const auto & encoder) -> CHIP_ERROR {
                 app::Clusters::UnitTesting::Structs::TestFabricScoped::Type val;
@@ -141,19 +138,18 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         if (aPath.mClusterId == app::Clusters::UnitTesting::Id &&
             aPath.mAttributeId == app::Clusters::UnitTesting::Attributes::Int16u::Id)
         {
-            AttributeValueEncoder::AttributeEncodeState state =
-                (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath,
-                                               kDataVersion /* data version */, aIsFabricFiltered, state);
+            AttributeEncodeState state(apEncoderState);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
+                                               state);
 
             return valueEncoder.Encode(++totalReadCount);
         }
         if (aPath.mClusterId == kPerpetualClusterId ||
             (aPath.mClusterId == app::Clusters::UnitTesting::Id && aPath.mAttributeId == kPerpetualAttributeid))
         {
-            AttributeValueEncoder::AttributeEncodeState state = AttributeValueEncoder::AttributeEncodeState();
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath,
-                                               kDataVersion /* data version */, aIsFabricFiltered, state);
+            AttributeEncodeState state;
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
+                                               state);
 
             CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
                 encoder.Encode(static_cast<uint8_t>(1));
@@ -174,10 +170,9 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         if (aPath.mClusterId == app::Clusters::IcdManagement::Id &&
             aPath.mAttributeId == app::Clusters::IcdManagement::Attributes::OperatingMode::Id)
         {
-            AttributeValueEncoder::AttributeEncodeState state =
-                (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath,
-                                               kDataVersion /* data version */, aIsFabricFiltered, state);
+            AttributeEncodeState state(apEncoderState);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
+                                               state);
 
             return valueEncoder.Encode(isLitIcd ? Clusters::IcdManagement::OperatingModeEnum::kLit
                                                 : Clusters::IcdManagement::OperatingModeEnum::kSit);

@@ -49,15 +49,37 @@ constexpr ClusterId kRandomClusterId     = 0xaa;
 constexpr AttributeId kRandomAttributeId = 0xcc;
 constexpr DataVersion kRandomDataVersion = 0x99;
 constexpr FabricIndex kTestFabricIndex   = 1;
+constexpr NodeId kFakeNodeId             = 1;
 constexpr TLV::Tag kFabricIndexTag       = TLV::ContextTag(254);
+
+Access::SubjectDescriptor DescriptorWithFabric(FabricIndex fabricIndex)
+{
+    Access::SubjectDescriptor result;
+
+    result.fabricIndex = fabricIndex;
+    result.subject     = kFakeNodeId;
+
+    if (fabricIndex == kUndefinedFabricIndex)
+    {
+        // Make it seem somewhat valid: a fabric index is not available in PASE
+        // before AddNOC
+        result.authMode = Access::AuthMode::kPase;
+    }
+    else
+    {
+        result.authMode = Access::AuthMode::kCase;
+    }
+    return result;
+}
 
 template <size_t N>
 struct LimitedTestSetup
 {
     LimitedTestSetup(nlTestSuite * aSuite, const FabricIndex aFabricIndex = kUndefinedFabricIndex,
-                     const AttributeValueEncoder::AttributeEncodeState & aState = AttributeValueEncoder::AttributeEncodeState()) :
-        encoder(builder, aFabricIndex, ConcreteAttributePath(kRandomEndpointId, kRandomClusterId, kRandomAttributeId),
-                kRandomDataVersion, aFabricIndex != kUndefinedFabricIndex, aState)
+                     const AttributeEncodeState & aState = AttributeEncodeState()) :
+        encoder(builder, DescriptorWithFabric(aFabricIndex),
+                ConcreteAttributePath(kRandomEndpointId, kRandomClusterId, kRandomAttributeId), kRandomDataVersion,
+                aFabricIndex != kUndefinedFabricIndex, aState)
     {
         writer.Init(buf);
         {
@@ -275,7 +297,7 @@ void TestEncodeFabricScoped(nlTestSuite * aSuite, void * aContext)
 
 void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
 {
-    AttributeValueEncoder::AttributeEncodeState state;
+    AttributeEncodeState state;
 
     bool list[]      = { true, false, false, true, true, false };
     auto listEncoder = [&list](const auto & encoder) -> CHIP_ERROR {
@@ -400,7 +422,7 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
 
 void TestEncodeListChunking2(nlTestSuite * aSuite, void * aContext)
 {
-    AttributeValueEncoder::AttributeEncodeState state;
+    AttributeEncodeState state;
 
     bool list[]      = { true, false, false, true, true, false };
     auto listEncoder = [&list](const auto & encoder) -> CHIP_ERROR {

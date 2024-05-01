@@ -281,6 +281,7 @@ static_library("attribute-access") {
     "AttributeAccessInterfaceCache.h",
     "AttributeAccessInterfaceRegistry.cpp",
     "AttributeAccessInterfaceRegistry.h",
+    "AttributeEncodeState.h",
     "AttributeReportBuilder.cpp",
     "AttributeReportBuilder.h",
     "AttributeValueDecoder.h",

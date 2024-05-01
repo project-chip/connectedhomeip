@@ -24,20 +24,38 @@
 #pragma once
 
 #include <inet/IPAddress.h>
+#include <inet/TCPEndPoint.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/ActiveTCPConnectionState.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 namespace chip {
 namespace Transport {
+
+struct MessageTransportContext
+{
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    ActiveTCPConnectionState * conn = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+};
 
 class RawTransportDelegate
 {
 public:
     virtual ~RawTransportDelegate() {}
-    virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg) = 0;
+    virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
+                                       MessageTransportContext * ctxt = nullptr) = 0;
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    virtual void HandleConnectionReceived(ActiveTCPConnectionState * conn){};
+    virtual void HandleConnectionAttemptComplete(ActiveTCPConnectionState * conn, CHIP_ERROR conErr){};
+    virtual void HandleConnectionClosed(ActiveTCPConnectionState * conn, CHIP_ERROR conErr){};
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 /**
@@ -77,10 +95,26 @@ public:
      */
     virtual bool CanListenMulticast() { return false; }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    /**
+     * Connect to the specified peer.
+     */
+    virtual CHIP_ERROR TCPConnect(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
+                                  Transport::ActiveTCPConnectionState ** peerConnState)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     /**
      * Handle disconnection from the specified peer if currently connected to it.
      */
-    virtual void Disconnect(const PeerAddress & address) {}
+    virtual void TCPDisconnect(const PeerAddress & address) {}
+
+    /**
+     * Disconnect on the active connection that is passed in.
+     */
+    virtual void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0) {}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**
      * Enable Listening for multicast messages ( IPV6 UDP only)
@@ -97,12 +131,31 @@ protected:
      * Method used by subclasses to notify that a packet has been received after
      * any associated headers have been decoded.
      */
-    void HandleMessageReceived(const PeerAddress & source, System::PacketBufferHandle && buffer)
+    void HandleMessageReceived(const PeerAddress & source, System::PacketBufferHandle && buffer,
+                               MessageTransportContext * ctxt = nullptr)
     {
-        mDelegate->HandleMessageReceived(source, std::move(buffer));
+        mDelegate->HandleMessageReceived(source, std::move(buffer), ctxt);
     }
 
-    RawTransportDelegate * mDelegate;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Handle an incoming connection request from a peer.
+    void HandleConnectionReceived(ActiveTCPConnectionState * conn) { mDelegate->HandleConnectionReceived(conn); }
+
+    // Callback during connection establishment to notify of success or any
+    // error.
+    void HandleConnectionAttemptComplete(ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+    {
+        mDelegate->HandleConnectionAttemptComplete(conn, conErr);
+    }
+
+    // Callback to notify the higher layer of an unexpected connection closure.
+    void HandleConnectionClosed(ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+    {
+        mDelegate->HandleConnectionClosed(conn, conErr);
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+    RawTransportDelegate * mDelegate = nullptr;
 };
 
 } // namespace Transport

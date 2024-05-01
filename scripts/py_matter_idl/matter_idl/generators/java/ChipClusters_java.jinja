@@ -219,7 +219,9 @@ public class ChipClusters {
         int maxInterval) {
       ReportCallbackJni jniCallback = new ReportCallbackJni(callback, callback, callback);
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId);
-      ChipInteractionClient.subscribe(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L).intValue(), null);
+      int fabricIndex = ChipInteractionClient.getFabricIndex(devicePtr);
+      long deviceId = ChipInteractionClient.getRemoteDeviceId(devicePtr);
+      ChipInteractionClient.subscribe(0, jniCallback.getCallbackHandle(), devicePtr, Arrays.asList(path), null, null, minInterval, maxInterval, false, true, timeoutMillis.orElse(0L).intValue(), null, ChipICDClient.isPeerICDClient(fabricIndex, deviceId));
     }
 
     protected void invoke(

@@ -45,6 +45,7 @@ struct CtorDtorCounter
     CtorDtorCounter & operator=(CtorDtorCounter &&) = default;
 
     bool operator==(const CtorDtorCounter & o) const { return m == o.m; }
+    bool operator!=(const CtorDtorCounter & o) const { return m != o.m; }
 
     int m;
 
@@ -68,6 +69,9 @@ public:
 
     MovableCtorDtorCounter(MovableCtorDtorCounter && o)           = default;
     MovableCtorDtorCounter & operator=(MovableCtorDtorCounter &&) = default;
+
+    using CtorDtorCounter::operator==;
+    using CtorDtorCounter::operator!=;
 };
 
 int CtorDtorCounter::created   = 0;
@@ -165,24 +169,26 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
     CtorDtorCounter::ResetCounter();
 
     {
-        auto testSrc = MakeNullable<MovableCtorDtorCounter>(400);
-        Nullable<MovableCtorDtorCounter> testDst(std::move(testSrc));
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 1);
+        auto testSrc = MakeNullable<MovableCtorDtorCounter>(400);     // construct
+        Nullable<MovableCtorDtorCounter> testDst(std::move(testSrc)); // move construct
+        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
         NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 400);
+        // destroy both testsSrc and testDst
     }
     NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 2);
 
+    CtorDtorCounter::ResetCounter();
     {
-        Nullable<MovableCtorDtorCounter> testDst;
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 2);
+        Nullable<MovableCtorDtorCounter> testDst; // no object construction
+        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 0 && CtorDtorCounter::destroyed == 0);
         NL_TEST_ASSERT(inSuite, !!testDst.IsNull());
 
-        auto testSrc = MakeNullable<MovableCtorDtorCounter>(401);
-        testDst      = std::move(testSrc);
-        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 4 && CtorDtorCounter::destroyed == 3);
+        auto testSrc = MakeNullable<MovableCtorDtorCounter>(401); // construct object
+        testDst      = std::move(testSrc);                        // construct a copy
+        NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 0);
         NL_TEST_ASSERT(inSuite, !testDst.IsNull() && testDst.Value().m == 401);
     }
-    NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 4 && CtorDtorCounter::destroyed == 4);
+    NL_TEST_ASSERT(inSuite, CtorDtorCounter::created == 2 && CtorDtorCounter::destroyed == 2);
 }
 
 static void TestUpdate(nlTestSuite * inSuite, void * inContext)

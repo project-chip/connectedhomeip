@@ -257,9 +257,8 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig();
  *
  * @return The maximum transmission time
  */
-System::Clock::Timestamp GetRetransmissionTimeout(System::Clock::Timestamp activeInterval, System::Clock::Timestamp idleInterval,
-                                                  System::Clock::Timestamp lastActivityTime,
-                                                  System::Clock::Timestamp activityThreshold);
+System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInterval, System::Clock::Timeout idleInterval,
+                                                System::Clock::Timeout lastActivityTime, System::Clock::Timeout activityThreshold);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 

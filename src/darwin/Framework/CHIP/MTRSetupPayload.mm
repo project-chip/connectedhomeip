@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,20 +15,21 @@
  *    limitations under the License.
  */
 
-#import "MTRError.h"
+#import "MTRSetupPayload_Internal.h"
+
 #import "MTRError_Internal.h"
 #import "MTRFramework.h"
 #import "MTROnboardingPayloadParser.h"
-#import "MTRSetupPayload_Internal.h"
-#import "setup_payload/ManualSetupPayloadGenerator.h"
-#import "setup_payload/QRCodeSetupPayloadGenerator.h"
-#import <setup_payload/SetupPayload.h>
 
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 #include <string>
 
 @implementation MTROptionalQRCodeInfo
 @end
 
+MTR_DIRECT_MEMBERS
 @implementation MTRSetupPayload {
     chip::SetupPayload _chipSetupPayload;
 }
@@ -182,7 +183,7 @@
             if (error) {
                 *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidArgument userInfo:nil];
             }
-            return @[];
+            return nil;
         }
         [allOptionalData addObject:info];
     }
@@ -243,6 +244,26 @@
     }
 
     return payload;
+}
+
+- (NSString *)description
+{
+    NSMutableArray<NSString *> * capabilities = [NSMutableArray array];
+    if (self.discoveryCapabilities & MTRDiscoveryCapabilitiesSoftAP) {
+        [capabilities addObject:@"SoftAP"];
+    }
+    if (self.discoveryCapabilities & MTRDiscoveryCapabilitiesBLE) {
+        [capabilities addObject:@"BLE"];
+    }
+    if (self.discoveryCapabilities & MTRDiscoveryCapabilitiesOnNetwork) {
+        [capabilities addObject:@"OnNetwork"];
+    }
+    if (capabilities.count == 0) {
+        [capabilities addObject:@"Unknown"];
+    }
+
+    return [NSString stringWithFormat:@"<MTRSetupPayload: discriminator=0x%x hasShortDiscriminator=%@ discoveryCapabilities=%@>",
+                     self.discriminator.unsignedIntValue, self.hasShortDiscriminator ? @"YES" : @"NO", [capabilities componentsJoinedByString:@"|"]];
 }
 
 #pragma mark - NSSecureCoding
@@ -418,6 +439,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
 
 @end
 
+MTR_DIRECT_MEMBERS
 @implementation MTROptionalQRCodeInfo (Deprecated)
 
 - (NSNumber *)infoType
@@ -432,6 +454,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
 
 @end
 
+MTR_DIRECT_MEMBERS
 @implementation MTRSetupPayload (Deprecated)
 
 - (nullable NSNumber *)rendezvousInformation
