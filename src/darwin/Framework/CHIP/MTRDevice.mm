@@ -2545,8 +2545,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // Now that we have grabbed previousValue, update our cache with the attribute value.
             if (readCacheValueChanged) {
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath];
-                if (!_deviceConfigurationChanged)
-                {
+                if (!_deviceConfigurationChanged) {
                     _deviceConfigurationChanged = [self _attributeAffectsDeviceConfiguration:attributePath];
                     if (_deviceConfigurationChanged) {
                         MTR_LOG_INFO("Device configuration changed due to changes in attribute %@", attributePath);

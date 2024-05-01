@@ -117,14 +117,14 @@ static MTRBaseDevice * GetConnectedDevice(void)
 @interface MTRDeviceTests : XCTestCase
 
 + (void)checkAttributeReportTriggersConfigurationChanged:(MTRAttributeIDType)attributeId
-                                            clusterId:(MTRClusterIDType)clusterId
-                                           endpointId:(NSNumber *)endpointId
-                                               device:(MTRDevice *)device
-                                             delegate:(MTRDeviceTestDelegate *)delegate
-                                          dataVersion:(NSNumber *)dataVersion
-                                      attributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
-                                             testcase:(XCTestCase *)testcase
-                           expectConfigurationChanged:(BOOL)expectConfigurationChanged;
+                                               clusterId:(MTRClusterIDType)clusterId
+                                              endpointId:(NSNumber *)endpointId
+                                                  device:(MTRDevice *)device
+                                                delegate:(MTRDeviceTestDelegate *)delegate
+                                             dataVersion:(NSNumber *)dataVersion
+                                         attributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+                                                testcase:(XCTestCase *)testcase
+                              expectConfigurationChanged:(BOOL)expectConfigurationChanged;
 
 @end
 
@@ -3063,14 +3063,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 // device configuration changed callbacks for a given MTRDevice. This API creates a fake attribute report for the given attribute path
 // and injects it into MTRDevice to exercise and test the delegate's device configuration changed callback.
 + (void)checkAttributeReportTriggersConfigurationChanged:(MTRAttributeIDType)attributeId
-                                            clusterId:(MTRClusterIDType)clusterId
-                                           endpointId:(NSNumber *)endpointId
-                                               device:(MTRDevice *)device
-                                             delegate:(MTRDeviceTestDelegate *)delegate
-                                          dataVersion:(NSNumber *)dataVersion
-                                      attributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
-                                             testcase:(XCTestCase *)testcase
-                            expectConfigurationChanged:(BOOL)expectConfigurationChanged
+                                               clusterId:(MTRClusterIDType)clusterId
+                                              endpointId:(NSNumber *)endpointId
+                                                  device:(MTRDevice *)device
+                                                delegate:(MTRDeviceTestDelegate *)delegate
+                                             dataVersion:(NSNumber *)dataVersion
+                                         attributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+                                                testcase:(XCTestCase *)testcase
+                              expectConfigurationChanged:(BOOL)expectConfigurationChanged
 {
     XCTAssertNotNil(endpointId);
     XCTAssertNotNil(device);
@@ -3125,8 +3125,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __block BOOL wasOnDeviceConfigurationChangedCallbackCalled = NO;
 
     delegate.onDeviceConfigurationChanged = ^() {
-        if (expectConfigurationChanged)
-        {
+        if (expectConfigurationChanged) {
             [deviceConfigurationChangedExpectation fulfill];
         }
         wasOnDeviceConfigurationChangedCallbackCalled = YES;
@@ -3134,12 +3133,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device unitTestInjectAttributeReport:attributeReport];
 
-    if (expectConfigurationChanged)
-    {
+    if (expectConfigurationChanged) {
         [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
         XCTAssertTrue(wasOnDeviceConfigurationChangedCallbackCalled);
     } else {
-        [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation] timeout:kTimeoutInSeconds];
+        [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation ] timeout:kTimeoutInSeconds];
         XCTAssertFalse(wasOnDeviceConfigurationChangedCallbackCalled);
     }
 }
@@ -3427,29 +3425,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dataVersionForPowerConfigurationSources = [NSNumber numberWithUnsignedLongLong:(dataVersionForPowerConfigurationSources.unsignedLongLongValue + 1)];
     attributeReport = @[
         @{
-                MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
-                MTRDataKey : @ {
-                    MTRDataVersionKey : dataVersionForAttributeList,
-                    MTRTypeKey : MTRArrayValueType,
-                    MTRValueKey : unsignedIntegerArrayValue,
-                }
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeIdentifyID) attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : dataVersionForAttributeList,
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : unsignedIntegerArrayValue,
+            }
         },
         @{
-                MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
-                MTRDataKey : @ {
-                    MTRDataVersionKey : dataVersionForFeatureMap,
-                    MTRTypeKey : MTRUnsignedIntegerValueType,
-                    MTRValueKey : @3,
-                }
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeGroupsID) attributeID:@(MTRAttributeIDTypeGlobalAttributeFeatureMapID)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : dataVersionForFeatureMap,
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @3,
+            }
         },
         @{
-                MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID)],
-                MTRDataKey : @ {
-                    MTRDataVersionKey : dataVersionForPowerConfigurationSources,
-                    MTRTypeKey : MTRArrayValueType,
-                    MTRValueKey : newUnsignedIntegerArrayValue,
-                }
-        }];
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypePowerSourceConfigurationID) attributeID:@(MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : dataVersionForPowerConfigurationSources,
+                MTRTypeKey : MTRArrayValueType,
+                MTRValueKey : newUnsignedIntegerArrayValue,
+            }
+        }
+    ];
 
     XCTestExpectation * gotAttributeReportWithMultipleAttributesExpectation = [self expectationWithDescription:@"Attribute report with multiple attributes has been received"];
     XCTestExpectation * gotAttributeReportWithMultipleAttributesEndExpectation = [self expectationWithDescription:@"Attribute report with multiple attributes has ended"];
