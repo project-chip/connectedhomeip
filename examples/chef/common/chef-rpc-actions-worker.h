@@ -21,9 +21,9 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/util/config.h>
 #include <cstring>
-#include <vector>
-#include <utility>
 #include <queue>
+#include <utility>
+#include <vector>
 
 #include "Rpc.h"
 
@@ -33,34 +33,35 @@ namespace app {
 class ActionsDelegate
 {
 public:
-    ActionsDelegate(ClusterId clusterId): mClusterId(clusterId) { };
+    ActionsDelegate(ClusterId clusterId) : mClusterId(clusterId){};
 
     virtual ~ActionsDelegate() = default;
 
-    virtual void AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t>args) {};
-    virtual void CommandHandler(chip::EndpointId endpointId, chip::CommandId commandId, std::vector<uint32_t>args) {};
-    virtual void EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t>args) {};
+    virtual void AttributeWriteHandler(chip::EndpointId endpointId, chip::AttributeId attributeId, std::vector<uint32_t> args){};
+    virtual void CommandHandler(chip::EndpointId endpointId, chip::CommandId commandId, std::vector<uint32_t> args){};
+    virtual void EventHandler(chip::EndpointId endpointId, chip::EventId eventId, std::vector<uint32_t> args){};
 
 protected:
     ClusterId mClusterId;
 };
 
-struct ActionTask {
+struct ActionTask
+{
     chip::EndpointId endpointId;
     chip::ClusterId clusterId;
-    chip::rpc::ActionType type;       // Aligned with Storage buf
+    chip::rpc::ActionType type; // Aligned with Storage buf
     uint32_t delayMs;
     uint32_t actionId;
     std::vector<uint32_t> args;
-    ActionTask(chip::EndpointId e, chip::ClusterId c,
-           chip::rpc::ActionType t, uint32_t d, uint32_t i, std::vector<uint32_t> a): endpointId(e), clusterId(c), type(t), delayMs(d), actionId(i), args(a) {};
-    ~ActionTask() {};
+    ActionTask(chip::EndpointId e, chip::ClusterId c, chip::rpc::ActionType t, uint32_t d, uint32_t i, std::vector<uint32_t> a) :
+        endpointId(e), clusterId(c), type(t), delayMs(d), actionId(i), args(a){};
+    ~ActionTask(){};
 };
 
 class ChefRpcActionsWorker
 {
 public:
-    static ChefRpcActionsWorker& Instance();
+    static ChefRpcActionsWorker & Instance();
 
     ChefRpcActionsWorker();
 
@@ -68,10 +69,9 @@ public:
     void ProcessActionQueue();
     void RegisterRpcActionsDelegate(ClusterId clusterId, ActionsDelegate * delegate);
 
- private:
+private:
     std::queue<ActionTask> queue;
 };
-
 
 } // namespace app
 } // namespace chip

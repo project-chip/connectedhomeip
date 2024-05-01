@@ -22,8 +22,8 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <map>
+#include <platform/CHIPDeviceLayer.h>
 
 using chip::app::DataModel::Nullable;
 
@@ -32,11 +32,12 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::rpc;
 
-static std::map<ClusterId, ActionsDelegate *> gActionsDelegateMap {};
+static std::map<ClusterId, ActionsDelegate *> gActionsDelegateMap{};
 
 ActionsDelegate * RpcFindActionsDelegate(ClusterId clusterId)
 {
-    if (gActionsDelegateMap.find(clusterId) != gActionsDelegateMap.end()) {
+    if (gActionsDelegateMap.find(clusterId) != gActionsDelegateMap.end())
+    {
         return gActionsDelegateMap[clusterId];
     }
 
@@ -45,12 +46,13 @@ ActionsDelegate * RpcFindActionsDelegate(ClusterId clusterId)
 
 static void RpcActionsTaskCallback(System::Layer * systemLayer, void * data)
 {
-    ChefRpcActionsWorker * worker = (ChefRpcActionsWorker *)data;
+    ChefRpcActionsWorker * worker = (ChefRpcActionsWorker *) data;
 
     worker->ProcessActionQueue();
 }
 
-bool ChefRpcActionsCallback(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId, std::vector<uint32_t> args)
+bool ChefRpcActionsCallback(EndpointId endpointId, ClusterId clusterId, uint8_t type, uint32_t delayMs, uint32_t actionId,
+                            std::vector<uint32_t> args)
 {
     ActionTask task(endpointId, clusterId, static_cast<ActionType>(type), delayMs, actionId, args);
 
@@ -61,13 +63,15 @@ bool ChefRpcActionsWorker::EnqueueAction(ActionTask task)
 {
     bool kickTimer = false;
 
-    if (queue.empty()) {
-        kickTimer = true;   // kick timer when the first task is adding to the queue
+    if (queue.empty())
+    {
+        kickTimer = true; // kick timer when the first task is adding to the queue
     }
 
     queue.push(task);
 
-    if (kickTimer) {
+    if (kickTimer)
+    {
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(task.delayMs), RpcActionsTaskCallback, this);
     }
     return true;
@@ -80,27 +84,36 @@ void ChefRpcActionsWorker::ProcessActionQueue()
     queue.pop();
 
     ActionsDelegate * delegate = RpcFindActionsDelegate(task.clusterId);
-    if ( nullptr == delegate ) {
-        ChipLogError(NotSpecified, "Cannot run action due to not finding delegate: endpointId=%d, clusterId=%04lx, attributeId=%04lx \033[0m \n", task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId));
-    } else {
+    if (nullptr == delegate)
+    {
+        ChipLogError(NotSpecified,
+                     "Cannot run action due to not finding delegate: endpointId=%d, clusterId=%04lx, attributeId=%04lx \033[0m \n",
+                     task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId));
+    }
+    else
+    {
         ActionType type = static_cast<ActionType>(task.type);
 
-        switch (type) {
-        case ActionType::WRITE_ATTRIBUTE:
+        switch (type)
         {
-            ChipLogProgress(NotSpecified, "Writing Attribute: endpointId=%d, clusterId=%04lx, attributeId=%04lx, args.size=%lu", task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),  static_cast<unsigned long>(task.args.size()));
+        case ActionType::WRITE_ATTRIBUTE: {
+            ChipLogProgress(NotSpecified, "Writing Attribute: endpointId=%d, clusterId=%04lx, attributeId=%04lx, args.size=%lu",
+                            task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
+                            static_cast<unsigned long>(task.args.size()));
             delegate->AttributeWriteHandler(task.endpointId, static_cast<chip::AttributeId>(task.actionId), task.args);
         }
         break;
-        case ActionType::RUN_COMMAND:
-        {
-            ChipLogProgress(NotSpecified, "Running Command: endpointId=%d, clusterId=%04lx, commandId=%04lx, args.size=%lu",task.endpointId,  static_cast<unsigned long>(task.clusterId),  static_cast<unsigned long>(task.actionId),  static_cast<unsigned long>(task.args.size()));
+        case ActionType::RUN_COMMAND: {
+            ChipLogProgress(NotSpecified, "Running Command: endpointId=%d, clusterId=%04lx, commandId=%04lx, args.size=%lu",
+                            task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
+                            static_cast<unsigned long>(task.args.size()));
             delegate->CommandHandler(task.endpointId, static_cast<chip::CommandId>(task.actionId), task.args);
         }
         break;
-        case ActionType::EMIT_EVENT:
-        {
-            ChipLogProgress(NotSpecified, "Emitting Event: endpointId=%d, clusterId=%04lx, eventIdId=%04lx, args.size=%lu",task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId), static_cast<unsigned long>(task.args.size()));
+        case ActionType::EMIT_EVENT: {
+            ChipLogProgress(NotSpecified, "Emitting Event: endpointId=%d, clusterId=%04lx, eventIdId=%04lx, args.size=%lu",
+                            task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
+                            static_cast<unsigned long>(task.args.size()));
             delegate->EventHandler(task.endpointId, static_cast<chip::EventId>(task.actionId), task.args);
         }
         break;
@@ -109,21 +122,25 @@ void ChefRpcActionsWorker::ProcessActionQueue()
         }
     }
 
-    if (queue.empty()) {
+    if (queue.empty())
+    {
         // Return due to no more actions in queue
         return;
     }
 
     // Run next action
     task = queue.front();
-    ChipLogProgress(NotSpecified, "StartTimer: endpointId=%d, clusterId=%04lx, eventIdId=%04lx, task.delyMs=%lu",task.endpointId, static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId), static_cast<unsigned long>(task.delayMs));
+    ChipLogProgress(NotSpecified, "StartTimer: endpointId=%d, clusterId=%04lx, eventIdId=%04lx, task.delyMs=%lu", task.endpointId,
+                    static_cast<unsigned long>(task.clusterId), static_cast<unsigned long>(task.actionId),
+                    static_cast<unsigned long>(task.delayMs));
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(task.delayMs), RpcActionsTaskCallback, this);
 }
 
 void ChefRpcActionsWorker::RegisterRpcActionsDelegate(ClusterId clusterId, ActionsDelegate * delegate)
 {
     // Register by cluster
-    if ( nullptr == RpcFindActionsDelegate(clusterId) ) {
+    if (nullptr == RpcFindActionsDelegate(clusterId))
+    {
         gActionsDelegateMap[clusterId] = delegate;
         return;
     }

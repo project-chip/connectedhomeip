@@ -30,7 +30,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Switch;
 using namespace chip::DeviceLayer;
 
-
 void SwitchEventHandler::OnSwitchLatched(EndpointId endpointId, uint8_t newPosition)
 {
     ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);

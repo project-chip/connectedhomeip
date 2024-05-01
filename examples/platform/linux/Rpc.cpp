@@ -20,11 +20,11 @@
 #include "pw_rpc_system_server/rpc_server.h"
 #include "pw_rpc_system_server/socket.h"
 
-#include <thread>
 #include <platform/PlatformManager.h>
+#include <thread>
 
-#include <map>
 #include "Rpc.h"
+#include <map>
 
 #if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
 #include "pigweed/rpc_services/Actions.h"

@@ -42,10 +42,10 @@ constexpr const uint8_t kTagPositionRight = 1;
 // Common Position Namespace: 8, tag: 2 (Top)
 constexpr const uint8_t kTagPositionTop = 2;
 // Common Position Namespace: 8, tag: 3 (Bottom)
-constexpr const uint8_t kTagPositionBottom                                 = 3;
+constexpr const uint8_t kTagPositionBottom = 3;
 // Common Position Namespace: 8, tag: 4 (Middle)
-constexpr const uint8_t kTagPositionMiddle                                 = 4;
+constexpr const uint8_t kTagPositionMiddle = 4;
 // Common Position Namespace: 8, tag: 5 (Row)
-constexpr const uint8_t kTagPositionRow                                 = 5;
+constexpr const uint8_t kTagPositionRow = 5;
 // Common Position Namespace: 8, tag: 6 (Column)
-constexpr const uint8_t kTagPositionColumn                              = 6;
+constexpr const uint8_t kTagPositionColumn = 6;

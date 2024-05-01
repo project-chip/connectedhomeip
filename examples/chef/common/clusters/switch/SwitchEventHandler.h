@@ -32,7 +32,7 @@ namespace Switch {
 class SwitchEventHandler
 {
 public:
-    SwitchEventHandler() {};
+    SwitchEventHandler(){};
 
     /**
      * Should be called when the latching switch is moved to a new position.
@@ -73,7 +73,6 @@ public:
 
 private:
 };
-
 
 } // namespace Switch
 } // namespace Clusters
