@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <ble/BleLayer.h>
+#include <ble/Ble.h>
 #include <jni.h>
 #include <lib/support/JniReferences.h>
 #include <platform/internal/BLEManager.h>

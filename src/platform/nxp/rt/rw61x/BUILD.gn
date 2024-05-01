@@ -33,8 +33,20 @@ config("nxp_platform_config") {
       ".",
       "../../common/factory_data",
     ]
-    defines += [ "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1" ]
-    defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
+    defines += [
+      "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1",
+      "CONFIG_CHIP_ENCRYPTED_FACTORY_DATA=1",
+    ]
+
+    if (chip_enable_secure_dac_private_key_storage == 1) {
+      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
+    } else {
+      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/FactoryDataProviderFwkImpl.h\"" ]
+    }
+  }
+  if (chip_enable_wifi && chip_enable_openthread) {
+    # Disable thread nwk commissioning instance on endpoint 0, when OTBR is enabled
+    defines += [ "_NO_NETWORK_COMMISSIONING_DRIVER_" ]
   }
 }
 
@@ -68,11 +80,13 @@ static_library("nxp_platform") {
       "../../common/ram_storage.c",
       "../../common/ram_storage.h",
     ]
-  } else {
+  } else if (rt_nvm_component == "key_storage") {
     sources += [ "../../common/NXPConfigKS.cpp" ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  deps += [ "${chip_root}/src/platform/logging:headers" ]
 
   if (chip_enable_ble) {
     sources += [
@@ -98,7 +112,9 @@ static_library("nxp_platform") {
       "../../common/NetworkCommissioningDriver.h",
       "../../common/NetworkCommissioningWiFiDriver.cpp",
     ]
+    defines += [ "WIFI_DFS_OPTIMIZATION=1" ]
   }
+
   if (chip_enable_ota_requestor) {
     sources += [
       "../../common/OTAImageProcessorImpl.cpp",
@@ -116,13 +132,18 @@ static_library("nxp_platform") {
     ]
 
     deps += [ "${chip_root}/third_party/openthread:openthread" ]
+    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
 
     if (chip_mdns == "platform") {
-      sources += [
-        "../../../OpenThread/DnssdImpl.cpp",
-        "../../../OpenThread/OpenThreadDnssdImpl.cpp",
-        "../../../OpenThread/OpenThreadDnssdImpl.h",
-      ]
+      if (chip_enable_wifi) {
+        sources += [ "../../common/DnssdImpl.cpp" ]
+      } else {
+        sources += [
+          "../../../OpenThread/DnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.cpp",
+          "../../../OpenThread/OpenThreadDnssdImpl.h",
+        ]
+      }
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
@@ -131,9 +152,27 @@ static_library("nxp_platform") {
     sources += [
       "../../common/factory_data/FactoryDataProvider.cpp",
       "../../common/factory_data/FactoryDataProvider.h",
-      "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
-      "../../common/factory_data/FactoryDataProviderFwkImpl.h",
     ]
+    if (chip_enable_secure_dac_private_key_storage == 1) {
+      sources += [
+        # TO BE MOVED TO THE SDK
+        "ELSFactoryData.c",
+        "ELSFactoryData.h",
+        "FactoryDataProviderImpl.cpp",
+        "FactoryDataProviderImpl.h",
+      ]
+    } else {
+      sources += [
+        "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
+        "../../common/factory_data/FactoryDataProviderFwkImpl.h",
+      ]
+    }
+
+    deps += [ "${chip_root}/src/credentials:credentials_header" ]
+  }
+
+  if (chip_convert_dac_private_key == 1) {
+    defines += [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
   }
 
   deps += [ "${nxp_sdk_build_root}:nxp_sdk" ]

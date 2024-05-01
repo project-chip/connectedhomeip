@@ -32,7 +32,7 @@ namespace Tracing {
 namespace Insights {
 namespace {
 
-constexpr size_t kPermitListMaxSize = 20;
+constexpr size_t kPermitListMaxSize = CONFIG_MAX_PERMIT_LIST_SIZE;
 using HashValue                     = uint32_t;
 
 // Implements a murmurhash with 0 seed.

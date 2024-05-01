@@ -259,7 +259,7 @@ Example:
 -   [mbedOS](/examples/all-clusters-app/mbed/README.md)
 -   [nRF Connect All Clusters](./nrfconnect_examples_configuration.md)
 -   [nRF Connect Pump](/examples/pump-app/nrfconnect/README.md)
--   [NXP Examples](./nxp_imx8m_linux_examples.md)
+-   [NXP Examples](./nxp/nxp_imx8m_linux_examples.md)
 -   [NXP](/examples/all-clusters-app/nxp/mw320/README.md)
 -   [Infineon CYW30739 Lighting](/examples/lighting-app/infineon/cyw30739/README.md)
 -   [Infineon PSoC6](/examples/all-clusters-app/infineon/psoc6/README.md)

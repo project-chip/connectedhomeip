@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 declare_args() {
-  # Device platform layer: cc13x2_26x2, cc13x4_26x4, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, nxp, qpg, tizen, cyw30739, bl602, mw320, zephyr, beken, openiotsdk, none.
+  # Device platform layer: cc13x4_26x4, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, nxp, qpg, tizen, cyw30739, bl602, mw320, zephyr, beken, openiotsdk, none.
 
   chip_device_platform = "auto"
   chip_platform_target = ""
@@ -49,10 +49,9 @@ declare_args() {
   # Enable openthread support.
   chip_enable_openthread =
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
-      chip_device_platform == "cc13x2_26x2" ||
       chip_device_platform == "cc13x4_26x4" ||
-      chip_device_platform == "k32w0" || chip_device_platform == "tizen" ||
-      chip_device_platform == "stm32" || chip_device_platform == "webos"
+      chip_device_platform == "tizen" || chip_device_platform == "stm32" ||
+      chip_device_platform == "webos"
 }
 
 declare_args() {
@@ -96,7 +95,6 @@ declare_args() {
       chip_device_platform == "asr" || chip_device_platform == "openiotsdk") {
     chip_mdns = "minimal"
   } else if (chip_device_platform == "darwin" ||
-             chip_device_platform == "cc13x2_26x2" ||
              chip_device_platform == "cc13x4_26x4" || current_os == "android" ||
              chip_device_platform == "fake" ||
              chip_device_platform == "tizen") {
@@ -126,10 +124,14 @@ if (chip_device_platform == "nxp" && chip_enable_openthread) {
   chip_mdns = "minimal"
 }
 
+declare_args() {
+  # Select DNS-SD components to build
+  chip_mdns_minimal = chip_mdns == "minimal"
+  chip_mdns_platform = chip_mdns == "platform"
+}
+
 _chip_device_layer = "none"
-if (chip_device_platform == "cc13x2_26x2") {
-  _chip_device_layer = "cc13xx_26xx/cc13x2_26x2"
-} else if (chip_device_platform == "cc13x4_26x4") {
+if (chip_device_platform == "cc13x4_26x4") {
   _chip_device_layer = "cc13xx_26xx/cc13x4_26x4"
 } else if (chip_device_platform == "cc32xx") {
   _chip_device_layer = "cc32xx"
@@ -149,8 +151,6 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "nrfconnect"
 } else if (chip_device_platform == "qpg") {
   _chip_device_layer = "qpg"
-} else if (chip_device_platform == "k32w0") {
-  _chip_device_layer = "nxp/k32w/k32w0"
 } else if (chip_device_platform == "nxp") {
   import("//build_overrides/nxp_sdk.gni")
   import("${nxp_sdk_build_root}/nxp_sdk.gni")
@@ -245,14 +245,12 @@ declare_args() {
 assert(
     (current_os != "freertos" && chip_device_platform == "none") ||
         chip_device_platform == "fake" ||
-        chip_device_platform == "cc13x2_26x2" ||
         chip_device_platform == "cc13x4_26x4" ||
         chip_device_platform == "cc32xx" || chip_device_platform == "darwin" ||
         chip_device_platform == "efr32" || chip_device_platform == "esp32" ||
         chip_device_platform == "external" || chip_device_platform == "linux" ||
         chip_device_platform == "tizen" ||
         chip_device_platform == "nrfconnect" || chip_device_platform == "nxp" ||
-        chip_device_platform == "k32w0" ||
         chip_device_platform == "nxp_zephyr" || chip_device_platform == "qpg" ||
         chip_device_platform == "telink" || chip_device_platform == "mbed" ||
         chip_device_platform == "psoc6" || chip_device_platform == "android" ||

@@ -21,6 +21,8 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/verhoeff/Verhoeff.h>
 
+#include <string>
+
 using namespace ::chip;
 
 CHIP_ERROR SetupPayloadVerhoeffVerify::Run()

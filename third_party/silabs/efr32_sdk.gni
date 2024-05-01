@@ -283,7 +283,6 @@ template("efr32_sdk") {
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
-      "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -307,6 +306,12 @@ template("efr32_sdk") {
 
       #"__STACK_SIZE=0",
     ]
+
+    if (silabs_log_enabled && chip_logging) {
+      defines += [ "SILABS_LOG_ENABLED=1" ]
+    } else {
+      defines += [ "SILABS_LOG_ENABLED=0" ]
+    }
 
     # Temporary configuration to enable COAP specific configurations
     if (use_thread_coap_lib) {
@@ -403,12 +408,14 @@ template("efr32_sdk") {
     if (use_system_view) {
       _include_dirs += [
         "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/",
         "${efr32_sdk_root}/util/third_party/segger/systemview/init/",
         "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
       ]
 
-      defines += [ "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT" ]
+      defines += [
+        "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT",
+        "SEGGER_SYSVIEW_RTT_BUFFER_SIZE=8192",
+      ]
     }
 
     defines += board_defines
@@ -831,6 +838,9 @@ template("efr32_sdk") {
 
     if (use_system_view) {
       sources += [
+        "${chip_root}/examples/platform/silabs/sl_systemview_config.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/Global.h",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/SEGGER_RTT_Conf.h",
         "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_SYSVIEW.c",
         "${efr32_sdk_root}/util/third_party/segger/systemview/init/SEGGER_SYSVIEW_Init.c",
         "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/SEGGER_SYSVIEW_FreeRTOS.c",

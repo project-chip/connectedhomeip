@@ -23,10 +23,8 @@
 #include "AppEvent.h"
 
 #include "LEDWidget.h"
-#include <FreeRTOS.h>
+#include <cmsis_os2.h>
 #include <string>
-#include <task.h>
-#include <timers.h>
 #ifdef DISPLAY_ENABLED
 #include <LcdPainter.h>
 #endif
@@ -51,10 +49,10 @@ public:
         void * mContext    = nullptr;
         bool mIsActive     = false;
 
-        TimerHandle_t mHandler = nullptr;
+        osTimerId_t mHandler = nullptr;
 
     private:
-        static void TimerCallback(TimerHandle_t xTimer);
+        static void TimerCallback(void * timerCbArg);
     };
 
     struct Cover

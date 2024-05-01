@@ -24,11 +24,11 @@
 #pragma once
 
 #include <lib/core/Global.h>
+#include <platform/Darwin/BleScannerDelegate.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
+#include <atomic>
 #include <dispatch/dispatch.h>
-
-static constexpr const char * const CHIP_CONTROLLER_QUEUE = "org.csa-iot.matter.framework.controller.workqueue";
 
 namespace chip {
 namespace DeviceLayer {
@@ -47,12 +47,11 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    dispatch_queue_t GetWorkQueue();
+    dispatch_queue_t GetWorkQueue() { return mWorkQueue; }
     bool IsWorkQueueCurrentQueue() const;
 
-    CHIP_ERROR StartBleScan(BleScannerDelegate * delegate = nullptr);
+    CHIP_ERROR StartBleScan(BleScannerDelegate * delegate, BleScanMode mode = BleScanMode::kDefault);
     CHIP_ERROR StopBleScan();
-    CHIP_ERROR PrepareCommissioning();
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
@@ -80,21 +79,26 @@ private:
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
 
-    static Global<PlatformManagerImpl> sInstance;
+    friend AtomicGlobal<PlatformManagerImpl>;
+    static AtomicGlobal<PlatformManagerImpl> sInstance;
+
+    PlatformManagerImpl();
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
-    dispatch_queue_t mWorkQueue = nullptr;
+    dispatch_queue_t mWorkQueue;
+
+    enum class WorkQueueState
+    {
+        kSuspended,
+        kRunning,
+        kSuspensionPending,
+    };
+
+    std::atomic<WorkQueueState> mWorkQueueState = WorkQueueState::kSuspended;
+
     // Semaphore used to implement blocking behavior in _RunEventLoop.
     dispatch_semaphore_t mRunLoopSem;
-
-    bool mIsWorkQueueSuspended = false;
-    // TODO: mIsWorkQueueSuspensionPending might need to be an atomic and use
-    // atomic ops, if we're worried about calls to StopEventLoopTask() from
-    // multiple threads racing somehow...
-    bool mIsWorkQueueSuspensionPending = false;
-
-    inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }
 };
 
 /**
@@ -112,7 +116,7 @@ inline PlatformManager & PlatformMgr(void)
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
  * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
+ * that are specific to the platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {

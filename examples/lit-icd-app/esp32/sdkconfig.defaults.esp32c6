@@ -1,0 +1,5 @@
+# Disable power down flash when sleeping
+CONFIG_ESP_SLEEP_POWER_DOWN_FLASH=n
+
+# Power down MAC and baseband of Wi-Fi and Bluetooth when PHY is disabled
+CONFIG_ESP_PHY_MAC_BB_PD=y

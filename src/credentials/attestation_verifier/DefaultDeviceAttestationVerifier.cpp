@@ -612,7 +612,7 @@ void DefaultDACVerifier::CheckForRevokedDACChain(const AttestationInfo & info,
 {
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
-    // TODO(#xyz): Implement default version of CheckForRevokedDACChain
+    // TODO(#33124): Implement default version of CheckForRevokedDACChain
 
     onCompletion->mCall(onCompletion->mContext, info, attestationError);
 }

@@ -43,8 +43,9 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
     err = (mConnectionState != CASTING_PLAYER_CONNECTING ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(
         mConnectionState != CASTING_PLAYER_CONNECTING,
-        ChipLogError(AppServer,
-                     "CastingPlayer::VerifyOrEstablishConnection() called while already connecting to this CastingPlayer"));
+        ChipLogError(
+            AppServer,
+            "CastingPlayer::VerifyOrEstablishConnection() called while already connecting/connected to this CastingPlayer"));
     mConnectionState               = CASTING_PLAYER_CONNECTING;
     mOnCompleted                   = onCompleted;
     mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
@@ -67,7 +68,10 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
                 ChipLogProgress(
                     AppServer,
                     "CastingPlayer::VerifyOrEstablishConnection() calling FindOrEstablishSession on cached CastingPlayer");
-                *this = cachedCastingPlayers[index];
+                *this                          = cachedCastingPlayers[index];
+                mConnectionState               = CASTING_PLAYER_CONNECTING;
+                mOnCompleted                   = onCompleted;
+                mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
 
                 FindOrEstablishSession(
                     nullptr,
@@ -232,6 +236,7 @@ bool CastingPlayer::ContainsDesiredEndpoint(core::CastingPlayer * cachedCastingP
 
 void CastingPlayer::LogDetail() const
 {
+    ChipLogProgress(AppServer, "CastingPlayer::LogDetail() called");
     if (strlen(mAttributes.id) != 0)
     {
         ChipLogDetail(AppServer, "\tID: %s", mAttributes.id);
@@ -277,6 +282,8 @@ void CastingPlayer::LogDetail() const
     {
         ChipLogDetail(AppServer, "\tDevice Type: %" PRIu32, mAttributes.deviceType);
     }
+    ChipLogDetail(AppServer, "\tSupports Commissioner Generated Passcode: %s",
+                  mAttributes.supportsCommissionerGeneratedPasscode ? "true" : "false");
     if (mAttributes.nodeId > 0)
     {
         ChipLogDetail(AppServer, "\tNode ID: 0x" ChipLogFormatX64, ChipLogValueX64(mAttributes.nodeId));

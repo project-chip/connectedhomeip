@@ -35,6 +35,10 @@
 #include <limits>
 #include <type_traits>
 
+#if __cplusplus >= 202002L
+#include <source_location>
+#endif // __cplusplus >= 202002L
+
 namespace chip {
 
 /**
@@ -112,9 +116,13 @@ public:
 
     // Helper for declaring constructors without too much repetition.
 #if CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_INITIALIZE_ERROR_SOURCE(f, l) , mFile((f)), mLine((l))
-#else // CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_INITIALIZE_ERROR_SOURCE(f, l)
+#if __cplusplus >= 202002L
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mFile((f)), mLine((l)), mSourceLocation((loc))
+#else
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mFile((f)), mLine((l))
+#endif // __cplusplus >= 202002L
+#else  // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc)
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
     /**
@@ -123,12 +131,17 @@ public:
      * @note
      *  The result is valid only if CanEncapsulate() is true.
      */
-    constexpr ChipError(Range range, ValueType value) :
-        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0)
+    constexpr ChipError(Range range, ValueType value) : ChipError(range, value, /*file=*/nullptr, /*line=*/0) {}
+#if __cplusplus >= 202002L
+    constexpr ChipError(Range range, ValueType value, const char * file, unsigned int line,
+                        std::source_location location = std::source_location::current()) :
+        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
     {}
+#else
     constexpr ChipError(Range range, ValueType value, const char * file, unsigned int line) :
-        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
     {}
+#endif // __cplusplus >= 202002L
 
     /**
      * Construct a CHIP_ERROR for SdkPart @a part with @a code.
@@ -136,10 +149,17 @@ public:
      * @note
      *  The macro version CHIP_SDK_ERROR checks that the numeric value is constant and well-formed.
      */
-    constexpr ChipError(SdkPart part, uint8_t code) : mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0) {}
-    constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line) :
-        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+    constexpr ChipError(SdkPart part, uint8_t code) : ChipError(part, code, /*file=*/nullptr, /*line=*/0) {}
+#if __cplusplus >= 202002L
+    constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line,
+                        std::source_location location = std::source_location::current()) :
+        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
     {}
+#else
+    constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line) :
+        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
+    {}
+#endif // __cplusplus >= 202002L
 
     /**
      * Construct a CHIP_ERROR constant for SdkPart @a part with @a code at the current source line.
@@ -159,10 +179,17 @@ public:
      * @note
      *  This is intended to be used only in foreign function interfaces.
      */
-    explicit constexpr ChipError(StorageType error) : mError(error) CHIP_INITIALIZE_ERROR_SOURCE(nullptr, 0) {}
-    explicit constexpr ChipError(StorageType error, const char * file, unsigned int line) :
-        mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line)
+    explicit constexpr ChipError(StorageType error) : ChipError(error, /*file=*/nullptr, /*line=*/0) {}
+#if __cplusplus >= 202002L
+    explicit constexpr ChipError(StorageType error, const char * file, unsigned int line,
+                                 std::source_location location = std::source_location::current()) :
+        mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
     {}
+#else
+    explicit constexpr ChipError(StorageType error, const char * file, unsigned int line) :
+        mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
+    {}
+#endif // __cplusplus >= 202002L
 
 #undef CHIP_INITIALIZE_ERROR_SOURCE
 
@@ -299,6 +326,12 @@ public:
      */
     unsigned int GetLine() const { return mLine; }
 
+#if __cplusplus >= 202002L
+    /**
+     * Get the source_location of the point where the error occurred.
+     */
+    const std::source_location & GetSourceLocation() { return mSourceLocation; }
+#endif // __cplusplus >= 202002L
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 private:
@@ -365,6 +398,9 @@ private:
 #if CHIP_CONFIG_ERROR_SOURCE
     const char * mFile;
     unsigned int mLine;
+#if __cplusplus >= 202002L
+    std::source_location mSourceLocation;
+#endif // __cplusplus >= 202002L
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 public:

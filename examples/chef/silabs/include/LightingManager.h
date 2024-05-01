@@ -23,9 +23,7 @@
 
 #include "AppEvent.h"
 
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
-
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
 class LightingManager
@@ -68,11 +66,12 @@ private:
     bool mAutoTurnOff;
     uint32_t mAutoTurnOffDuration;
     bool mAutoTurnOffTimerArmed;
+    osTimerId_t mLightTimer;
 
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 
-    static void TimerEventHandler(TimerHandle_t xTimer);
+    static void TimerEventHandler(void * timerCbArg);
     static void AutoTurnOffTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 

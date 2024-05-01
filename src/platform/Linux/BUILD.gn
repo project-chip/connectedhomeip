@@ -103,6 +103,8 @@ static_library("Linux") {
       "bluez/BluezEndpoint.h",
       "bluez/BluezObjectIterator.h",
       "bluez/BluezObjectList.h",
+      "bluez/BluezObjectManager.cpp",
+      "bluez/BluezObjectManager.h",
       "bluez/ChipDeviceScanner.cpp",
       "bluez/ChipDeviceScanner.h",
       "bluez/Types.h",

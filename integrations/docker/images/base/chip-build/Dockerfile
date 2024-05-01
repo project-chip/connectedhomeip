@@ -144,7 +144,6 @@ RUN set -x \
     click \
     coloredlogs \
     cxxfilt \
-    flake8 \
     future \
     ghapi \
     mobly \

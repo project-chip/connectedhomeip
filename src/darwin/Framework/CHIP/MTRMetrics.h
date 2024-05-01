@@ -56,6 +56,11 @@ MTR_NEWLY_AVAILABLE
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
+ * @brief Returns a unique identifier for the object
+ */
+@property (nonatomic, readonly, copy) NSUUID * uniqueIdentifier;
+
+/**
  * @brief Returns the names of all the metrics data items collected.
  */
 @property (nonatomic, readonly, copy) NSArray<NSString *> * allKeys;

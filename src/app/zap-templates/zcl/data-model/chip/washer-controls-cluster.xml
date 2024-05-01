@@ -17,11 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0053"/>
-    <field mask="0x01" name="Spin"/>
-    <field mask="0x02" name="Rinse"/>
-  </bitmap>
 
   <enum name="NumberOfRinsesEnum" type="enum8">
     <cluster code="0x0053"/>
@@ -41,6 +36,15 @@ limitations under the License.
     <description>This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine.</description>
 
     <globalAttribute side="either" code="0xFFFD" value="1" />
+
+    <features>
+      <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="RINSE" name="Rinse" summary="Multiple rinse cycles supported">
+        <optionalConform/>
+      </feature>
+    </features>
 
     <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="array" entryType="char_string"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
     <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="int8u"                                min="0x00" max="0x1F"   writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>

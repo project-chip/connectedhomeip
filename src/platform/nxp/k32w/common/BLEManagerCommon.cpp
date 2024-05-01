@@ -32,7 +32,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 
 #include "board.h"
 #include "gatt_db_app_interface.h"
@@ -135,7 +135,7 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 static bool bleAppStopInProgress;
 #endif
 
-BLEManagerCommon * sImplInstance;
+BLEManagerCommon * sImplInstance = nullptr;
 
 } // namespace
 
@@ -1075,6 +1075,10 @@ void BLEManagerCommon::HandleForceDisconnect()
     {
         ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
     }
+
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+    PWR_AllowDeviceToSleep();
+#endif
 }
 
 /*******************************************************************************
@@ -1085,7 +1089,7 @@ void BLEManagerCommon::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
     /* Call BLE Conn Manager */
     BleConnManager_GenericEvent(pGenericEvent);
 
-    if (sImplInstance->callbackDelegate.gapCallback)
+    if (sImplInstance && sImplInstance->callbackDelegate.gapCallback)
     {
         sImplInstance->callbackDelegate.gapCallback(pGenericEvent);
     }
@@ -1240,7 +1244,7 @@ void BLEManagerCommon::blekw_stop_connection_timeout(void)
 
 void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t * pServerEvent)
 {
-    if (sImplInstance->callbackDelegate.gattCallback)
+    if (sImplInstance && sImplInstance->callbackDelegate.gattCallback)
     {
         sImplInstance->callbackDelegate.gattCallback(deviceId, pServerEvent);
     }

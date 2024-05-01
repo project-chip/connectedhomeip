@@ -286,4 +286,25 @@ config CHIP_ENABLE_READ_CLIENT
 	  This config can be disabled for device types that do not require Read Client functionality.
 	  Disabling this config can save flash and RAM space.
 
+config CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+	bool "Operational keys migration feature"
+	depends on CHIP_CRYPTO_PSA
+	help
+	  Enables migration of the operational keys stored in the persistent storage to the PSA ITS secure storage.
+	  Enable this feature while updating the firmware of in-field devices that run Mbed TLS cryptography backend
+	  to the firmware based on PSA Crypto API.
+
+config CHIP_FACTORY_RESET_ON_KEY_MIGRATION_FAILURE
+	bool "Perform factory reset if the operational key migration failed"
+	default y
+	depends on CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+	help
+	  Perform factory reset of the device if the operational key for Fabric has not been migrated
+	  properly to PSA ITS storage.
+
+config CHIP_PERSISTENT_SUBSCRIPTIONS
+	default n
+	# selecting experimental for this feature since there is an issue with multiple controllers.
+	select EXPERIMENTAL
+
 endif # CHIP

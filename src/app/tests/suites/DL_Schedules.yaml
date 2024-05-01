@@ -215,7 +215,7 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    - label: "Create Week Day schedule for Sunday and Monday"
+    - label: "Create Week Day schedule with Invalid day"
       command: "SetWeekDaySchedule"
       arguments:
           values:
@@ -224,28 +224,7 @@ tests:
               - name: "UserIndex"
                 value: 1
               - name: "DaysMask"
-                value: 0x3 # (Sunday and Monday)
-              - name: "StartHour"
-                value: 15
-              - name: "StartMinute"
-                value: 16
-              - name: "EndHour"
-                value: 18
-              - name: "EndMinute"
-                value: 00
-      response:
-          error: INVALID_COMMAND
-
-    - label: "Create Week Day schedule for Sunday Wednesday and Saturday"
-      command: "SetWeekDaySchedule"
-      arguments:
-          values:
-              - name: "WeekDayIndex"
-                value: 1
-              - name: "UserIndex"
-                value: 1
-              - name: "DaysMask"
-                value: 0x49 # (Sunday, Wednesday and Saturday)
+                value: 0x80 # (Not a valid day between Sunday thru Saturday)
               - name: "StartHour"
                 value: 15
               - name: "StartMinute"
@@ -1705,7 +1684,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "DaysMask"
-                value: 0x40
+                value: 0x49 # (Sunday, Wednesday and Saturday)
               - name: "StartHour"
                 value: 23
               - name: "StartMinute"
@@ -1732,7 +1711,7 @@ tests:
               - name: "Status"
                 value: 0x0
               - name: "DaysMask"
-                value: 0x40
+                value: 0x49
               - name: "StartHour"
                 value: 23
               - name: "StartMinute"

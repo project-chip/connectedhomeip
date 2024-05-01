@@ -22,7 +22,7 @@
 
 CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList,
                      jobject eventPathList, jobject dataVersionFilterList, jint minInterval, jint maxInterval,
-                     jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin);
+                     jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin, jboolean isPeerLIT);
 CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
                 jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin);
 CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList,
@@ -31,3 +31,7 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
                   jint timedRequestTimeoutMs, jint imTimeoutMs);
 CHIP_ERROR extendableInvoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElementList,
                             jint timedRequestTimeoutMs, jint imTimeoutMs);
+CHIP_ERROR shutdownSubscriptions(JNIEnv * env, jlong handle, jobject fabricIndex, jobject peerNodeId, jobject subscriptionId);
+
+jlong getRemoteDeviceId(jlong devicePtr);
+jint getFabricIndex(jlong devicePtr);

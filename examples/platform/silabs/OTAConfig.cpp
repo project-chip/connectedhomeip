@@ -20,7 +20,7 @@
 #include "silabs_utils.h"
 #include <app/server/Server.h>
 
-#ifndef SIWX_917
+#ifndef SLI_SI91X_MCU_INTERFACE
 
 #include "application_properties.h"
 
@@ -75,7 +75,7 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
     .longTokenSectionAddress = NULL,
 };
 #endif // SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 
 // Global OTA objects
 chip::DefaultOTARequestor gRequestorCore;

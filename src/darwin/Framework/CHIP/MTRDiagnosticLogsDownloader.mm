@@ -165,7 +165,6 @@ private:
                     // data in the logs that the caller may find useful. For this reason, fileURL is passed in even
                     // when there is an error but fileHandle is not nil.
                     completion(strongSelf->_fileHandle ? fileURL : nil, bdxError);
-                    [strongSelf deleteFile];
 
                     done(strongSelf);
                 }

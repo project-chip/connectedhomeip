@@ -16,6 +16,8 @@ name: Darwin Tests
 
 on:
     push:
+        branches-ignore:
+            - 'dependabot/**'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -49,7 +51,7 @@ jobs:
             LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-latest
+        runs-on: macos-13
 
         steps:
             - name: Checkout
@@ -72,15 +74,7 @@ jobs:
 
             - name: Run macOS Darwin Framework Tool Build Debug
               working-directory: src/darwin/Framework
-              # Keep whatever Xcode settings
-              # for OTHER_CFLAGS exist by using ${inherited}.
-              #
-              # Enable -Wconversion by hand as well, because it seems to not be
-              # enabled by default in the Xcode config.
-              #
-              # Disable availability annotations, since we are not building against a system
-              # Matter.framework.
-              run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug OTHER_CFLAGS='${inherited} -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
+              run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true

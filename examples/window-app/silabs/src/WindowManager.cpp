@@ -20,7 +20,6 @@
 #include <AppConfig.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
-#include <app/util/af.h>
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -29,6 +28,7 @@
 
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
@@ -78,13 +78,8 @@ AppEvent CreateNewEvent(AppEvent::AppEventTypes type)
 
 void WindowManager::Timer::Start()
 {
-    if (xTimerIsTimerActive(mHandler))
-    {
-        Stop();
-    }
-
-    // Timer is not active
-    if (xTimerStart(mHandler, pdMS_TO_TICKS(100)) != pdPASS)
+    // Starts or restarts the function timer
+    if (osTimerStart(mHandler, pdMS_TO_TICKS(100)) != osOK)
     {
         SILABS_LOG("Timer start() failed");
         appError(CHIP_ERROR_INTERNAL);
@@ -546,12 +541,12 @@ void WindowManager::Cover::CallbackOperationalStateSet(intptr_t arg)
 
 WindowManager::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * context) : mCallback(callback), mContext(context)
 {
-    mHandler = xTimerCreate("",                         // Just a text name, not used by the RTOS kernel
-                            pdMS_TO_TICKS(timeoutInMs), // == default timer period (mS)
-                            false,                      // no timer reload (==one-shot)
-                            (void *) this,              // init timer id = app task obj context
-                            TimerCallback               // timer callback handler
+    mHandler = osTimerNew(TimerCallback, // timer callback handler
+                          osTimerOnce,   // no timer reload (one-shot timer)
+                          this,          // pass the app task obj context
+                          NULL           // No osTimerAttr_t to provide.
     );
+
     if (mHandler == NULL)
     {
         SILABS_LOG("Timer create failed");
@@ -562,16 +557,16 @@ WindowManager::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * cont
 void WindowManager::Timer::Stop()
 {
     mIsActive = false;
-    if (xTimerStop(mHandler, pdMS_TO_TICKS(0)) == pdFAIL)
+    if (osTimerStop(mHandler) == osError)
     {
         SILABS_LOG("Timer stop() failed");
         appError(CHIP_ERROR_INTERNAL);
     }
 }
 
-void WindowManager::Timer::TimerCallback(TimerHandle_t xTimer)
+void WindowManager::Timer::TimerCallback(void * timerCbArg)
 {
-    Timer * timer = (Timer *) pvTimerGetTimerID(xTimer);
+    Timer * timer = static_cast<Timer *>(timerCbArg);
     if (timer)
     {
         timer->Timeout();

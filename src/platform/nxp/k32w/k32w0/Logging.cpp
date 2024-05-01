@@ -27,7 +27,6 @@ static constexpr uint8_t category_max_len_bytes = 3;
 #include <utils/uart.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-static bool isLogInitialized;
 extern "C" uint32_t otPlatAlarmMilliGetNow(void);
 
 namespace chip {
@@ -104,12 +103,6 @@ void ENFORCE_FORMAT(1, 0) GenericLog(const char * format, va_list arg, const cha
 
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1] = { 0 };
     size_t prefixLen, writtenLen;
-
-    if (!isLogInitialized)
-    {
-        isLogInitialized = true;
-        otPlatUartEnable();
-    }
 
     /* Prefix is composed of [Time Reference][Debug String][Module Name String] */
     FillPrefix(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE - 1, module, category);
