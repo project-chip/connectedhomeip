@@ -3126,15 +3126,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __block BOOL wasOnDeviceConfigurationChangedCallbackCalled = NO;
 
     delegate.onDeviceConfigurationChanged = ^() {
-            [deviceConfigurationChangedExpectation fulfill];
+        [deviceConfigurationChangedExpectation fulfill];
         wasOnDeviceConfigurationChangedCallbackCalled = YES;
     };
 
     [device unitTestInjectAttributeReport:attributeReport];
 
     [testcase waitForExpectations:@[ gotAttributeReportExpectation, gotAttributeReportEndExpectation, deviceConfigurationChangedExpectation ] timeout:kTimeoutInSeconds];
-    if (!expectConfigurationChanged)
-    {
+    if (!expectConfigurationChanged) {
         XCTAssertFalse(wasOnDeviceConfigurationChangedCallbackCalled);
     }
 }
@@ -3416,7 +3415,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
     ];
 
-    // Test an attribute report with multiple attributes reported
+    // Test an attribute report with multiple attributes at least one of which triggers device configuration changed.
     dataVersionForAttributeList = [NSNumber numberWithUnsignedLongLong:(dataVersionForAttributeList.unsignedLongLongValue + 1)];
     dataVersionForFeatureMap = [NSNumber numberWithUnsignedLongLong:(dataVersionForFeatureMap.unsignedLongLongValue + 1)];
     dataVersionForPowerConfigurationSources = [NSNumber numberWithUnsignedLongLong:(dataVersionForPowerConfigurationSources.unsignedLongLongValue + 1)];
@@ -3451,7 +3450,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * gotAttributeReportWithMultipleAttributesEndExpectation = [self expectationWithDescription:@"Attribute report with multiple attributes has ended"];
     XCTestExpectation * deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes = [self expectationWithDescription:@"Device configuration changed was receieved due to an attribute report with multiple attributes "];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
-        NSLog(@"got subscription report %@", attributeReport);
         attributeReportsReceived += attributeReport.count;
         XCTAssert(attributeReportsReceived > 0);
         [gotAttributeReportWithMultipleAttributesExpectation fulfill];
