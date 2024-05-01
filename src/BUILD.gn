@@ -99,7 +99,6 @@ if (chip_build_tests) {
         "${chip_root}/src/credentials/tests",
         "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",
-        "${chip_root}/src/lib/support/tests:tests_nltest",
         "${chip_root}/src/protocols/secure_channel/tests",
         "${chip_root}/src/protocols/secure_channel/tests:tests_nltest",
         "${chip_root}/src/system/tests",
