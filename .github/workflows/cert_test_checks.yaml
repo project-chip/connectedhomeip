@@ -23,9 +23,7 @@ jobs:
   check-certification-tests:
     name: Check for common problems in certification tests
     runs-on: ubuntu-latest
-    if: "python3 scripts/tests/matter_yaml_linter.py"
     steps:
-      - name: Error Message
-        run: echo Problems found in certification tests
-      - name: Fail Job
-        run: exit 1
+      - name: Run checks
+        run: |
+          ./scripts/run_in_build_env.sh "python3 scripts/tests/matter_yaml_linter.py
