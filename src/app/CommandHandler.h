@@ -124,9 +124,7 @@ public:
         Handle(Handle && handle)
         {
             mpHandler        = handle.mpHandler;
-            mImEngineGeneration           = handle.mImEngineGeneration;
             handle.mpHandler = nullptr;
-            handle.mImEngineGeneration    = 0;
         }
         Handle(decltype(nullptr)) {}
         Handle(CommandHandler * handle);
@@ -136,9 +134,7 @@ public:
         {
             Release();
             mpHandler        = handle.mpHandler;
-            mImEngineGeneration           = handle.mImEngineGeneration;
             handle.mpHandler = nullptr;
-            handle.mImEngineGeneration    = 0;
             return *this;
         }
 
@@ -157,8 +153,16 @@ public:
         void Release();
 
     private:
+        friend CommandHandler;
+    /**
+     * Mechanism for keeping track of a chain of Handle.
+     */
+        void SetNext(Handle * aNext) { mNext = aNext; }
+        Handle* GetNext() const { return mNext; }
+        void Invalidate() {mpHandler = nullptr;}
+
         CommandHandler * mpHandler = nullptr;
-        uint32_t mImEngineGeneration            = 0;
+        Handle* mNext = nullptr;
     };
 
     // Previously we kept adding arguments with default values individually as parameters. This is because there
@@ -196,6 +200,14 @@ public:
      * The callback passed in has to outlive this CommandHandler object.
      */
     CommandHandler(Callback * apCallback);
+
+    /*
+     * Destructor.
+     *
+     * The call will also invalidate all Handles created for this CommandHandler.
+     *
+     */
+     ~CommandHandler();
 
     /*
      * Constructor to override the number of supported paths per invoke and command responder.
@@ -460,7 +472,7 @@ private:
      * Tries to add response using lambda. Upon failure to add response, attempts
      * to rollback the InvokeResponseMessage to a known good state. If failure is due
      * to insufficient space in the current InvokeResponseMessage:
-     *  - Finalizes the current InvokeResponseMessage.
+     *  - Finalizes the current InvokeResponsfeMessage.
      *  - Allocates a new InvokeResponseMessage.
      *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
      *
@@ -531,13 +543,13 @@ private:
      * Users should use CommandHandler::Handle for management the lifespan of the CommandHandler.
      * DefRef should be released in reasonable time, and Close() should only be called when the refcount reached 0.
      */
-    void IncrementHoldOff();
+    void IncrementHoldOff(Handle* apHandle);
 
     /**
      * DecrementHoldOff is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
      * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
      */
-    void DecrementHoldOff();
+    void DecrementHoldOff(Handle* apHandle);
 
     /*
      * Allocates a packet buffer used for encoding an invoke response payload.
@@ -686,6 +698,7 @@ private:
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
+    Handle* mpHandlerList = nullptr;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;

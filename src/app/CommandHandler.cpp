@@ -58,6 +58,12 @@ CommandHandler::CommandHandler(TestOnlyOverrides & aTestOverride, Callback * apC
     }
 }
 
+CommandHandler::~CommandHandler() {
+    for (Handle* cur = mpHandlerList; cur; cur = cur->GetNext()) {
+        cur->Invalidate();
+    }
+}
+
 CHIP_ERROR CommandHandler::AllocateBuffer()
 {
     // We should only allocate a buffer if we will be sending out a response.
@@ -266,6 +272,9 @@ void CommandHandler::Close()
     // reference is the stack shutting down, in which case Close() is not called. So the below check should always pass.
     VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %u unfinished async work items",
                        static_cast<unsigned int>(mPendingWork));
+    for (Handle* cur = mpHandlerList; cur; cur = cur->GetNext()) {
+        cur->Invalidate();
+    }
 
     if (mpCallback)
     {
@@ -273,16 +282,44 @@ void CommandHandler::Close()
     }
 }
 
-void CommandHandler::IncrementHoldOff()
+void CommandHandler::IncrementHoldOff(Handle* apHandle)
 {
+    ChipLogDetail(DataManagement, "IncrementHoldOff");
     mPendingWork++;
+    apHandle->SetNext(mpHandlerList);
+    mpHandlerList = apHandle;
 }
 
-void CommandHandler::DecrementHoldOff()
+void CommandHandler::DecrementHoldOff(Handle* apHandle)
 {
     mPendingWork--;
     ChipLogDetail(DataManagement, "Decreasing reference count for CommandHandler, remaining %u",
                   static_cast<unsigned int>(mPendingWork));
+
+    Handle* prev = nullptr;
+    if (mpHandlerList != nullptr) {
+        ChipLogDetail(DataManagement, "mpHandlerList is not null");} else {ChipLogDetail(DataManagement, "cur is null");}
+    for (Handle* cur = mpHandlerList; cur; cur = cur->GetNext())
+    {
+        if (cur != nullptr) {
+        ChipLogDetail(DataManagement, "cur is not null");} else {ChipLogDetail(DataManagement, "cur is null");}
+        if (cur == apHandle)
+        {
+            if (prev == nullptr)
+            {
+                mpHandlerList = cur->GetNext();
+            }
+            else
+            {
+                prev->SetNext(cur->GetNext());
+            }
+
+            cur->SetNext(nullptr);
+        }
+        prev = cur;
+    }
+
+
     if (mPendingWork != 0)
     {
         return;
@@ -776,19 +813,15 @@ CommandHandler * CommandHandler::Handle::Get()
     // Not safe to work with CommandHandler in parallel with other Matter work.
     assertChipStackLockedByCurrentThread();
 
-    return (mpHandler != nullptr && mImEngineGeneration == mpHandler->GetCommandHandlerGeneration()) ? mpHandler : nullptr;
+    return mpHandler;
 }
 
 void CommandHandler::Handle::Release()
 {
     if (mpHandler != nullptr)
     {
-        if (mImEngineGeneration == mpHandler->GetCommandHandlerGeneration())
-        {
-            mpHandler->DecrementHoldOff();
-        }
+        mpHandler->DecrementHoldOff(this);
         mpHandler = nullptr;
-        mImEngineGeneration    = 0;
     }
 }
 
@@ -796,9 +829,8 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
 {
     if (handle != nullptr)
     {
-        handle->IncrementHoldOff();
+        handle->IncrementHoldOff(this);
         mpHandler = handle;
-        mImEngineGeneration    = mpHandler->GetCommandHandlerGeneration();
     }
 }
 
