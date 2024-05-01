@@ -157,7 +157,8 @@ def fetch_cd_signing_certs(store_path):
     original_dir = os.getcwd()
     os.chdir(store_path)
 
-    cd_signer_ids = requests.get(f"{rest_node_url}/dcl/pki/child-certificates/{MATTER_CERT_CA_SUBJECT}/{MATTER_CERT_CA_SUBJECT_KEY_ID}").json()['childCertificates']['certIds']
+    cd_signer_ids = requests.get(
+        f"{rest_node_url}/dcl/pki/child-certificates/{MATTER_CERT_CA_SUBJECT}/{MATTER_CERT_CA_SUBJECT_KEY_ID}").json()['childCertificates']['certIds']
     for signer in cd_signer_ids:
         subject = signer['subject']
         subject_key_id = signer['subjectKeyId']

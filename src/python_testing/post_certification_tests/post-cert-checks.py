@@ -180,8 +180,10 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.step(1)
         key = 'complianceInfo'
         entry = get_dcl_compliance_info(self.vid, self.pid, self.software_version)
-        asserts.assert_true(key in entry.keys(), f"Unable to find compliance entry for {self.vid:04x} {self.pid:04x} {self.software_version}")
-        logging.info(f'Found compliance info for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={self.software_version} in the DCL:')
+        asserts.assert_true(key in entry.keys(),
+                            f"Unable to find compliance entry for {self.vid:04x} {self.pid:04x} {self.software_version}")
+        logging.info(
+            f'Found compliance info for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={self.software_version} in the DCL:')
         logging.info(f'{entry[key]}')
 
     def steps_CertifiedModel(self):
@@ -191,8 +193,10 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.step(1)
         key = 'certifiedModel'
         entry = get_dcl_certified_model(self.vid, self.pid, self.software_version)
-        asserts.assert_true(key in entry.keys(), f"Unable to find certified model entry for {self.vid:04x} {self.pid:04x} {self.software_version}")
-        logging.info(f'Found certified model for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={self.software_version} in the DCL:')
+        asserts.assert_true(key in entry.keys(),
+                            f"Unable to find certified model entry for {self.vid:04x} {self.pid:04x} {self.software_version}")
+        logging.info(
+            f'Found certified model for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={self.software_version} in the DCL:')
         logging.info(f'{entry[key]}')
 
 
@@ -260,11 +264,13 @@ class TestConfig(object):
         self.cd_path = os.path.join('.', tmpdir_cd)
         os.mkdir(self.paa_path)
         os.mkdir(self.cd_path)
-        fetch_paa_certs_from_dcl.fetch_paa_certs(use_main_net_dcld='', use_test_net_dcld='', use_main_net_http=True, use_test_net_http=False, paa_trust_store_path=tmpdir_paa)
+        fetch_paa_certs_from_dcl.fetch_paa_certs(use_main_net_dcld='', use_test_net_dcld='',
+                                                 use_main_net_http=True, use_test_net_http=False, paa_trust_store_path=tmpdir_paa)
         fetch_paa_certs_from_dcl.fetch_cd_signing_certs(tmpdir_cd)
         self.admin_storage = f'admin_storage_{tmp_uuid}.json'
         global_test_params = {'use_pase_only': True, 'post_cert_test': True}
-        self.config = MatterTestConfig(endpoint=0, dut_node_ids=[1], global_test_params=global_test_params, storage_path=self.admin_storage)
+        self.config = MatterTestConfig(endpoint=0, dut_node_ids=[
+                                       1], global_test_params=global_test_params, storage_path=self.admin_storage)
         if code_type == SetupCodeType.QR:
             self.config.qr_code_content = code
         else:
