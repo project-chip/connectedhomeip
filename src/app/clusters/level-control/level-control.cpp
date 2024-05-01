@@ -173,19 +173,21 @@ public:
         pairs[0].attributeID = Attributes::CurrentLevel::Id;
         if (!level.IsNull())
         {
-            pairs[0].attributeValue = level.Value();
+            pairs[0].valueUnsigned8.SetValue(level.Value());
         }
         else
         {
-            chip::app::NumericAttributeTraits<uint32_t>::SetNull(pairs[0].attributeValue);
+            uint8_t nullValue = 0;
+            chip::app::NumericAttributeTraits<uint8_t>::SetNull(nullValue);
+            pairs[0].valueUnsigned8.SetValue(nullValue);
         }
         size_t attributeCount = 1;
         if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
         {
             uint16_t frequency;
             VerifyOrReturnError(Status::Success == Attributes::CurrentFrequency::Get(endpoint, &frequency), CHIP_ERROR_READ_FAILED);
-            pairs[attributeCount].attributeID    = Attributes::CurrentFrequency::Id;
-            pairs[attributeCount].attributeValue = frequency;
+            pairs[attributeCount].attributeID = Attributes::CurrentFrequency::Id;
+            pairs[attributeCount].valueUnsigned16.SetValue(frequency);
             attributeCount++;
         }
 
@@ -225,7 +227,7 @@ public:
             switch (decodePair.attributeID)
             {
             case Attributes::CurrentLevel::Id:
-                level = static_cast<uint8_t>(decodePair.attributeValue);
+                level = decodePair.valueUnsigned8.Value();
                 break;
             case Attributes::CurrentFrequency::Id:
                 // TODO : Uncomment when frequency is supported by the level control cluster
