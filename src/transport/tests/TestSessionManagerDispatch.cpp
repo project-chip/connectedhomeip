@@ -31,15 +31,12 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-#include <lib/support/UnitTestContext.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/tests/LoopbackTransportManager.h>
 
-#include <nlbyteorder.h>
-#include <nlunit-test.h>
+#include <gtest/gtest.h>
 
 #include <errno.h>
 
@@ -106,8 +103,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
         .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
                      "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
-        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
-                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
+        .privacy = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                   "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdb", // Includes MIC
 
         .payloadLength   = 0,
         .plainLength     = 14,
@@ -132,8 +129,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
         .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
                      "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
-        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
-                     "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
+        .privacy = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
+                   "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xa7", // Includes MIC
 
         .payloadLength   = 5,
         .plainLength     = 19,
@@ -161,8 +158,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d",
         .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
                      "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdd", // Includes wrong MIC
-        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
-                     "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdd", // Includes wrong MIC
+        .privacy = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d"
+                   "\x84\x7f\x53\x5c\x30\x07\xe6\x15\x0c\xd6\x58\x67\xf2\xb8\x17\xdd", // Includes wrong MIC
 
         .payloadLength   = 0,
         .plainLength     = 14,
@@ -187,8 +184,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
         .encrypted = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
                      "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xaa", // Includes wrong MIC
-        .privacy   = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
-                     "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xaa", // Includes wrong MIC
+        .privacy = "\x00\xb8\x0b\x00\x39\x30\x00\x00\x5a\x98\x9a\xe4\x2e\x8d\x0f\x7f\x88\x5d\xfb"
+                   "\x2f\xaa\x89\x49\xcf\x73\x0a\x57\x28\xe0\x35\x46\x10\xa0\xc4\xaa", // Includes wrong MIC
 
         .payloadLength   = 5,
         .plainLength     = 19,
@@ -213,8 +210,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x00\xb8\x0b\x80\x39\x30\x00\x00\x05\x64\xee\x0e\x20\x7d\x11\x22\x33\x44\x55",
         .encrypted = "\x00\xb8\x0b\x80\x39\x30\x00\x00\xaa\x26\xa0\xf9\x01\xef\xce\x9f\x9a\x67\xc8"
                      "\x13\x79\x17\xd1\x5b\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f", // Includes MIC
-        .privacy   = "\x00\xb8\x0b\x80\x87\xbe\xef\x06\xaa\x26\xa0\xf9\x01\xef\xce\x9f\x9a\x67\xc8"
-                     "\x13\x79\x17\xd1\x5b\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f", // Includes MIC
+        .privacy = "\x00\xb8\x0b\x80\x87\xbe\xef\x06\xaa\x26\xa0\xf9\x01\xef\xce\x9f\x9a\x67\xc8"
+                   "\x13\x79\x17\xd1\x5b\x81\xd1\x5d\x31\x33\x08\x31\x97\x58\xea\x3f", // Includes MIC
 
         .payloadLength   = 5,
         .plainLength     = 19,
@@ -246,8 +243,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
         .encrypted = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
                      "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
-        .privacy   = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
-                     "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
+        .privacy = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
+                   "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
 
         .payloadLength   = 0,
         .plainLength     = 24,
@@ -278,8 +275,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
         .encrypted = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
                      "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
-        .privacy   = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
-                     "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
+        .privacy = "\x06\x7d\xdb\x01\x78\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x65\xc7\x67\xbc\x6c\xda"
+                   "\x01\x06\xc9\x80\x13\x23\x90\x0e\x9b\x3c\xe6\xd4\xbb\x03\x27\xd6", // Includes MIC
 
         .payloadLength   = 0,
         .plainLength     = 24,
@@ -310,8 +307,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
         .encrypted = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2b\x2f\x91\x5a\x66\xc9"
                      "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
-        .privacy   = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
-                     "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
+        .privacy = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
+                   "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xe1",
 
         .payloadLength   = 0,
         .plainLength     = 24,
@@ -345,8 +342,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
         .encrypted = "\x06\x7d\xdb\x81\x79\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2b\x2f\x91\x5a\x66\xc9"
                      "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xee",
-        .privacy   = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
-                     "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xee",
+        .privacy = "\x06\x7d\xdb\x81\xd9\x26\xaf\xce\x24\xc8\xa0\x98\x1b\xdd\x44\xf4\xe7\x30\x2b\x2f\x91\x5a\x66\xc9"
+                   "\x59\x62\x90\xeb\xe4\x40\x82\x17\xb3\xc0\xc9\x21\xa2\xfc\xa4\xee",
 
         .payloadLength   = 0,
         .plainLength     = 24,
@@ -381,8 +378,8 @@ struct MessageTestEntry theMessageTestVector[] = {
         .plain     = "\06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x01\x64\xee\x0e\x20\x7d",
         .encrypted = "\x06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x91\xe0\x22\x85\xe0\x59\x07\xe0"
                      "\xd8\x68\x0c\x79\xac\x6d\x64\x46\x90\x65\xb2\x6f\x90\x26", // Includes MIC
-        .privacy   = "\x06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x91\xe0\x22\x85\xe0\x59\x07\xe0"
-                     "\xd8\x68\x0c\x79\xac\x6d\x64\x46\x90\x65\xb2\x6f\x90\x26", // Includes MIC
+        .privacy = "\x06\x7d\xdb\x81\x91\x56\x34\x12\x01\x00\x00\x00\x00\x00\x00\x00\x02\x00\x91\xe0\x22\x85\xe0\x59\x07\xe0"
+                   "\xd8\x68\x0c\x79\xac\x6d\x64\x46\x90\x65\xb2\x6f\x90\x26", // Includes MIC
 
         .payloadLength   = 0,
         .plainLength     = 24,
@@ -472,13 +469,13 @@ public:
         MessageTestEntry & testEntry = theMessageTestVector[mTestVectorIndex];
 
         ChipLogProgress(Test, "OnMessageReceived: sessionId=0x%04x", testEntry.sessionId);
-        NL_TEST_ASSERT(mSuite, header.GetSessionId() == testEntry.sessionId);
+        EXPECT_EQ(header.GetSessionId(), testEntry.sessionId);
 
         size_t dataLength   = msgBuf->DataLength();
         size_t expectLength = testEntry.payloadLength;
 
-        NL_TEST_ASSERT(mSuite, dataLength == expectLength);
-        NL_TEST_ASSERT(mSuite, memcmp(msgBuf->Start(), testEntry.payload, dataLength) == 0);
+        EXPECT_EQ(dataLength, expectLength);
+        EXPECT_EQ(memcmp(msgBuf->Start(), testEntry.payload, dataLength), 0);
 
         ChipLogProgress(Test, "::: TestSessionManagerDispatch[%d] PASS", mTestVectorIndex);
     }
@@ -491,7 +488,6 @@ public:
 
     unsigned NumMessagesReceived() { return mReceivedCount; }
 
-    nlTestSuite * mSuite      = nullptr;
     unsigned mTestVectorIndex = 0;
     unsigned mReceivedCount   = 0;
 };
@@ -505,18 +501,17 @@ PeerAddress AddressFromString(const char * str)
     return PeerAddress::UDP(addr);
 }
 
-void TestSessionManagerInit(nlTestSuite * inSuite, TestContext & ctx, SessionManager & sessionManager)
+void TestSessionManagerInit(TestContext * ctx, SessionManager & sessionManager)
 {
     static FabricTableHolder fabricTableHolder;
     static secure_channel::MessageCounterManager gMessageCounterManager;
     static chip::TestPersistentStorageDelegate deviceStorage;
     static chip::Crypto::DefaultSessionKeystore sessionKeystore;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
-    NL_TEST_ASSERT(inSuite,
-                   CHIP_NO_ERROR ==
-                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&ctx->GetSystemLayer(), &ctx->GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
 }
 
 // constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;
@@ -552,15 +547,24 @@ CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageT
     return CHIP_NO_ERROR;
 }
 
-void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
+class TestSessionManagerDispatch : public ::testing::Test
+{
+protected:
+    TestSessionManagerDispatch() { inContext = new TestContext(); }
+    ~TestSessionManagerDispatch() { delete inContext; }
+    void SetUp() { ASSERT_EQ(inContext->Init(), CHIP_NO_ERROR); }
+    void TearDown() { inContext->Shutdown(); }
+    TestContext * inContext;
+};
+
+TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     SessionManager sessionManager;
     TestSessionManagerCallback callback;
 
-    TestSessionManagerInit(inSuite, ctx, sessionManager);
+    TestSessionManagerInit(inContext, sessionManager);
     sessionManager.SetMessageDelegate(&callback);
 
     IPAddress addr;
@@ -570,7 +574,6 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
     SessionHolder aliceToBobSession;
     SessionHolder testGroupSession;
 
-    callback.mSuite = inSuite;
     for (unsigned i = 0; i < theMessageTestVectorLength; i++)
     {
         MessageTestEntry & testEntry = theMessageTestVector[i];
@@ -585,10 +588,10 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
         err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, testEntry.sessionId, testEntry.peerNodeId,
                                                           testEntry.sessionId, kFabricIndex, peer,
                                                           CryptoContext::SessionRole::kResponder);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
         err = InjectGroupSessionWithTestKey(testGroupSession, testEntry);
-        NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
+        EXPECT_EQ(CHIP_NO_ERROR, err);
 
         const char * plain = testEntry.plain;
         const ByteSpan expectedPlain(reinterpret_cast<const uint8_t *>(plain), testEntry.plainLength);
@@ -598,7 +601,7 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
 
         const PeerAddress peerAddress = AddressFromString(testEntry.peerAddr);
         sessionManager.OnMessageReceived(peerAddress, std::move(msg));
-        NL_TEST_ASSERT(inSuite, callback.NumMessagesReceived() == testEntry.expectedMessageCount);
+        EXPECT_EQ(callback.NumMessagesReceived(), testEntry.expectedMessageCount);
 
         if ((testEntry.expectedMessageCount == 0) && (callback.NumMessagesReceived() == 0))
         {
@@ -609,56 +612,4 @@ void TestSessionManagerDispatch(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
-// ============================================================================
-//              Test Suite Instrumenation
-// ============================================================================
-
-/**
- *  Initialize the test suite.
- */
-int Initialize(void * aContext)
-{
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
-}
-
-/**
- *  Finalize the test suite.
- */
-int Finalize(void * aContext)
-{
-    reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    return SUCCESS;
-}
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("Test Session Manager Dispatch",  TestSessionManagerDispatch),
-
-    NL_TEST_SENTINEL()
-};
-
-nlTestSuite sSuite =
-{
-    "TestSessionManagerDispatch",
-    &sTests[0],
-    Initialize,
-    Finalize
-};
-// clang-format on
-
 } // namespace
-
-/**
- *  Main
- */
-int TestSessionManagerDispatchSuite()
-{
-    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
-}
-
-CHIP_REGISTER_TEST_SUITE(TestSessionManagerDispatchSuite);
