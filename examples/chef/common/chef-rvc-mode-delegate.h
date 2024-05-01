@@ -123,16 +123,18 @@ void Shutdown();
 
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
 chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+                                                                      const EmberAfAttributeMetadata * attributeMetadata,
+                                                                      uint8_t * buffer);
 chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                         const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                         uint16_t maxReadLength);
+                                                                     const EmberAfAttributeMetadata * attributeMetadata,
+                                                                     uint8_t * buffer, uint16_t maxReadLength);
 #endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
 
 #ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
 chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+                                                                        const EmberAfAttributeMetadata * attributeMetadata,
+                                                                        uint8_t * buffer);
 chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                         const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                         uint16_t maxReadLength);
+                                                                       const EmberAfAttributeMetadata * attributeMetadata,
+                                                                       uint8_t * buffer, uint16_t maxReadLength);
 #endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER

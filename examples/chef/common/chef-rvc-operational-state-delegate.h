@@ -36,11 +36,7 @@ namespace RvcOperationalState {
 class RvcOperationalStateDelegate : public RvcOperationalState::Delegate
 {
 public:
-
-    RvcOperationalStateDelegate()
-    {
-        mOperationalStateList = Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
-    }
+    RvcOperationalStateDelegate() { mOperationalStateList = Span<const OperationalState::GenericOperationalState>(rvcOpStateList); }
 
     /**
      * Get the countdown time. This attribute is not used in this application.
@@ -100,6 +96,7 @@ public:
     uint32_t mRunningTime = 0;
     uint32_t mPausedTime  = 0;
     app::DataModel::Nullable<uint32_t> mCountDownTime;
+
 private:
     Span<const OperationalState::GenericOperationalState> mOperationalStateList;
     Span<const CharSpan> mOperationalPhaseList;
@@ -123,11 +120,10 @@ void Shutdown();
 } // namespace app
 } // namespace chip
 
-chip::Protocols::InteractionModel::Status
-chefRvcOperationalStateWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
-chip::Protocols::InteractionModel::Status
-chefRvcOperationalStateReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                         const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                         uint16_t maxReadLength);
+chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                               const EmberAfAttributeMetadata * attributeMetadata,
+                                                                               uint8_t * buffer);
+chip::Protocols::InteractionModel::Status chefRvcOperationalStateReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                              const EmberAfAttributeMetadata * attributeMetadata,
+                                                                              uint8_t * buffer, uint16_t maxReadLength);
 #endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER

@@ -19,8 +19,7 @@
 #include "chef-concentration-measurement.h"
 #endif
 
-#if defined(MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER) ||                                                                              \
-    defined(MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER)
+#if defined(MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER) || defined(MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER)
 #include "chef-rvc-mode-delegate.h"
 #endif
 

@@ -109,7 +109,8 @@ void RvcRunMode::Shutdown()
 }
 
 chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+                                                                      const EmberAfAttributeMetadata * attributeMetadata,
+                                                                      uint8_t * buffer)
 {
     chip::Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
@@ -117,12 +118,12 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::Endp
     VerifyOrDie(gRvcRunModeInstance != nullptr);
 
     ModeBase::Instance * clusterInstance = gRvcRunModeInstance;
-    chip::AttributeId attributeId    = attributeMetadata->attributeId;
+    chip::AttributeId attributeId        = attributeMetadata->attributeId;
 
     switch (attributeId)
     {
     case chip::app::Clusters::RvcRunMode::Attributes::CurrentMode::Id: {
-        uint8_t m                           = static_cast<uint8_t>(buffer[0]);
+        uint8_t m                                        = static_cast<uint8_t>(buffer[0]);
         chip::Protocols::InteractionModel::Status status = clusterInstance->UpdateCurrentMode(m);
         if (chip::Protocols::InteractionModel::Status::Success == status)
         {
@@ -142,8 +143,8 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::Endp
 }
 
 chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                         const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                         uint16_t maxReadLength)
+                                                                     const EmberAfAttributeMetadata * attributeMetadata,
+                                                                     uint8_t * buffer, uint16_t maxReadLength)
 {
 
     return chip::Protocols::InteractionModel::Status::Success;
@@ -243,7 +244,8 @@ void RvcCleanMode::Shutdown()
 }
 
 chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+                                                                        const EmberAfAttributeMetadata * attributeMetadata,
+                                                                        uint8_t * buffer)
 {
     chip::Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
@@ -251,12 +253,12 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::En
     VerifyOrDie(gRvcCleanModeInstance != nullptr);
 
     ModeBase::Instance * clusterInstance = gRvcCleanModeInstance;
-    chip::AttributeId attributeId    = attributeMetadata->attributeId;
+    chip::AttributeId attributeId        = attributeMetadata->attributeId;
 
     switch (attributeId)
     {
     case chip::app::Clusters::RvcCleanMode::Attributes::CurrentMode::Id: {
-        uint8_t m                           = static_cast<uint8_t>(buffer[0]);
+        uint8_t m                                  = static_cast<uint8_t>(buffer[0]);
         Protocols::InteractionModel::Status status = clusterInstance->UpdateCurrentMode(m);
         if (Protocols::InteractionModel::Status::Success == status)
         {
@@ -276,8 +278,8 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::En
 }
 
 chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                         const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                         uint16_t maxReadLength)
+                                                                       const EmberAfAttributeMetadata * attributeMetadata,
+                                                                       uint8_t * buffer, uint16_t maxReadLength)
 {
     return chip::Protocols::InteractionModel::Status::Success;
 }
