@@ -158,7 +158,7 @@ void ReliableMessageMgr::ExecuteActions()
                 {
                     session->AsSecureSession()->MarkAsDefunct();
                 }
-                session->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+                session->NotifySessionHang();
             }
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
