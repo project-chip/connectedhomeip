@@ -3085,7 +3085,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     deviceConfigurationChangedExpectation.inverted = !expectConfigurationChanged;
 
     __block unsigned attributeReportsReceived = 0;
-    __block NSArray<NSDictionary<NSString *, id> *> * testDataValue = nil;
+    __block id testDataValue = nil;
 
     for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
         MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
@@ -3111,6 +3111,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             XCTAssertNotNil(data);
             XCTAssertEqualObjects(data[MTRDataVersionKey], dataVersion);
 
+            // This code assumes that none of the attributes in the report can have null values.
+            // Since we are injecting the attribute report for testing this with non-null values,
+            // we are fine for now. But if we plan to inject attribute reports with attributes having
+            // null values, we need to fix the code accordingly.
             id dataValue = data[MTRValueKey];
             XCTAssertNotNil(dataValue);
             XCTAssertNotNil(testDataValue);
