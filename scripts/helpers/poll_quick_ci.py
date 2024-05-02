@@ -25,9 +25,12 @@ def main():
             time.sleep(1)
           break
         elif "pass" in line:
-          polling = False
           print(f"Fast CI {args.check} has passed; if all fast CI passes, builds and tests may commence.")
           exit(0)
+        elif "fail" in line:
+          print(f"Fast CI {args.check} has failed; please resolve this issue before running builds and tests.")
+          exit(1)
+          
   print(f"Polling for completion of fast CI {args.check} failed. Please ensure the name of the check was entered correctly and verify that it should take less than {poll_max} seconds to run.")
   exit(1)
 
