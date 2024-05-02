@@ -16,8 +16,9 @@
 import os
 import re
 import sys
-from chiptest import AllChipToolYamlTests
 from pathlib import Path
+
+from chiptest import AllChipToolYamlTests
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
