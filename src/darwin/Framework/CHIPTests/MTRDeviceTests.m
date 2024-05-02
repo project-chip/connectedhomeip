@@ -3011,7 +3011,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // We need to remove the device here since the MTRDevice retains its reachable state. So if the next test needs to start with a clean state,
     // it can't do that since the MTRDevice becomes reachable in the previous test. Since there are no changes detected in reachability,
     // the onReachable callback to the delegate is not called.
-    // TODO: #33205 Ensure we have a clean slate w.r.t MTRDevice bfeore running each test.
+    // TODO: #33205 Ensure we have a clean slate w.r.t MTRDevice before running each test.
     [sController removeDevice:device];
 }
 
@@ -3111,7 +3111,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             XCTAssertNotNil(data);
             XCTAssertEqualObjects(data[MTRDataVersionKey], dataVersion);
 
-            NSArray<NSNumber *> * dataValue = data[MTRValueKey];
+            id dataValue = data[MTRValueKey];
             XCTAssertNotNil(dataValue);
             XCTAssertNotNil(testDataValue);
             XCTAssertEqualObjects(dataValue, testDataValue);
@@ -3320,9 +3320,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
     } ];
 
-    // Test attribute path - endpointId = 0, clusterId = descriptor, attributeId = server list.
     [MTRDeviceTests checkAttributeReportTriggersConfigurationChanged:MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID clusterId:MTRClusterIDTypeDescriptorID endpointId:@(0) device:device delegate:delegate dataVersion:dataVersionForDeviceTypesList attributeReport:attributeReport testcase:self expectConfigurationChanged:YES];
 
+    // Test attribute path - endpointId = 0, clusterId = descriptor, attributeId = server list.
     dataVersionForServerList = [NSNumber numberWithUnsignedLongLong:(dataVersionForServerList.unsignedLongLongValue + 1)];
     attributeReport = @[ @{
         MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeServerListID)],
@@ -3466,10 +3466,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device unitTestInjectAttributeReport:attributeReport];
     [self waitForExpectations:@[ gotAttributeReportWithMultipleAttributesExpectation, gotAttributeReportWithMultipleAttributesEndExpectation, deviceConfigurationChangedExpectationForAttributeReportWithMultipleAttributes ] timeout:kTimeoutInSeconds];
 
-    // We need to remove the device here since the MTRDevice retains its reachable state. So if the next test needs to start with a clean state,
-    // it can't do that since the MTRDevice becomes reachable in the previous test. Since there are no changes detected in reachability,
-    // the onReachable callback to the delegate is not called.
-    // TODO: #33205 Ensure we have a clean slate w.r.t MTRDevice bfeore running each test.
+    // We need to remove the device here, because we injected data into its attribute cache
+    // that does not match the actual server.
+    // TODO: #33205 Ensure we have a clean slate w.r.t MTRDevice before running each test.
     [sController removeDevice:device];
 }
 
