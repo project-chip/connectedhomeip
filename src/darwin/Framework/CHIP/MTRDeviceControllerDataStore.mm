@@ -22,6 +22,7 @@
 
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/NodeId.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
 // FIXME: Are these good key strings? https://github.com/project-chip/connectedhomeip/issues/28973
@@ -158,10 +159,7 @@ static bool IsValidCATNumber(id _Nullable value)
 {
     __block NSDictionary<NSString *, id> * dataStoreSecureLocalValues = nil;
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return;
-    }
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
     dispatch_sync(_storageDelegateQueue, ^{
         if ([self->_storageDelegate respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
@@ -187,10 +185,7 @@ static bool IsValidCATNumber(id _Nullable value)
 - (void)storeResumptionInfo:(MTRCASESessionResumptionInfo *)resumptionInfo
 {
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return;
-    }
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
     auto * oldInfo = [self findResumptionInfoByNodeID:resumptionInfo.nodeID];
     dispatch_sync(_storageDelegateQueue, ^{
@@ -228,10 +223,7 @@ static bool IsValidCATNumber(id _Nullable value)
 - (void)clearAllResumptionInfo
 {
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return;
-    }
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
     // Can we do less dispatch?  We would need to have a version of
     // _findResumptionInfoWithKey that assumes we are already on the right queue.
@@ -257,10 +249,7 @@ static bool IsValidCATNumber(id _Nullable value)
 - (CHIP_ERROR)storeLastLocallyUsedNOC:(MTRCertificateTLVBytes)noc
 {
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-    }
+    VerifyOrReturnError(controller != nil, CHIP_ERROR_PERSISTED_STORAGE_FAILED); // No way to call delegate without controller.
 
     __block BOOL ok;
     dispatch_sync(_storageDelegateQueue, ^{
@@ -276,10 +265,7 @@ static bool IsValidCATNumber(id _Nullable value)
 - (MTRCertificateTLVBytes _Nullable)fetchLastLocallyUsedNOC
 {
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return nil;
-    }
+    VerifyOrReturnValue(controller != nil, nil); // No way to call delegate without controller.
 
     __block id data;
     dispatch_sync(_storageDelegateQueue, ^{
@@ -305,10 +291,7 @@ static bool IsValidCATNumber(id _Nullable value)
 - (nullable MTRCASESessionResumptionInfo *)_findResumptionInfoWithKey:(nullable NSString *)key
 {
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return nil;
-    }
+    VerifyOrReturnValue(controller != nil, nil); // No way to call delegate without controller.
 
     // key could be nil if [NSString stringWithFormat] returns nil for some reason.
     if (key == nil) {
@@ -358,10 +341,7 @@ static bool IsValidCATNumber(id _Nullable value)
 - (id)_fetchAttributeCacheValueForKey:(NSString *)key expectedClass:(Class)expectedClass;
 {
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return nil;
-    }
+    VerifyOrReturnValue(controller != nil, nil); // No way to call delegate without controller.
 
     id data;
     @autoreleasepool {
@@ -384,10 +364,7 @@ static bool IsValidCATNumber(id _Nullable value)
 - (BOOL)_storeAttributeCacheValue:(id)value forKey:(NSString *)key
 {
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return NO;
-    }
+    VerifyOrReturnValue(controller != nil, NO); // No way to call delegate without controller.
 
     return [_storageDelegate controller:controller
                              storeValue:value
@@ -399,10 +376,7 @@ static bool IsValidCATNumber(id _Nullable value)
 - (BOOL)_bulkStoreAttributeCacheValues:(NSDictionary<NSString *, id<NSSecureCoding>> *)values
 {
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return NO;
-    }
+    VerifyOrReturnValue(controller != nil, NO); // No way to call delegate without controller.
 
     return [_storageDelegate controller:controller
                             storeValues:values
@@ -413,10 +387,7 @@ static bool IsValidCATNumber(id _Nullable value)
 - (BOOL)_removeAttributeCacheValueForKey:(NSString *)key
 {
     MTRDeviceController * controller = _controller;
-    if (controller == nil) {
-        // Not expected; no way to call delegate without controller.
-        return NO;
-    }
+    VerifyOrReturnValue(controller != nil, NO); // No way to call delegate without controller.
 
     return [_storageDelegate controller:controller
                       removeValueForKey:key
