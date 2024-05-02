@@ -24,18 +24,22 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
 
+#if defined(TINYCRYPT_PRIMITIVES)
+#include "tinycrypt/ecc.h"
+#endif
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include "AppConfig.h"
-#include "FreeRTOS.h"
 
 using namespace chip::DeviceLayer::Internal;
 
@@ -43,6 +47,39 @@ namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
+
+#if SLI_SI91X_MCU_INTERFACE
+#if defined(TINYCRYPT_PRIMITIVES)
+sys_mutex_t PlatformManagerImpl::rngMutexHandle = NULL;
+
+int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
+{
+    sys_mutex_lock(&rngMutexHandle);
+    int res = (chip::Crypto::DRBG_get_bytes(dest, size) == CHIP_NO_ERROR) ? size : 0;
+    sys_mutex_unlock(&rngMutexHandle);
+
+    return res;
+}
+#endif // TINYCRYPT_PRIMITIVES
+
+static void app_get_random(uint8_t * aOutput, size_t aLen)
+{
+    size_t i;
+
+    for (i = 0; i < aLen; i++)
+    {
+        aOutput[i] = rand();
+    }
+}
+
+static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
+{
+    app_get_random(reinterpret_cast<uint8_t *>(output), static_cast<uint16_t>(len));
+    *olen = len;
+
+    return 0;
+}
+#endif // SLI_SI91X_MCU_INTERFACE
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
@@ -58,6 +95,16 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
+
+#if SLI_SI91X_MCU_INTERFACE
+    ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16 /*Threshold value*/));
+
+#if defined(TINYCRYPT_PRIMITIVES)
+    /* Set RNG function for tinycrypt operations. */
+    VerifyOrExit(sys_mutex_new(&rngMutexHandle) == ERR_OK, err = CHIP_ERROR_NO_MEMORY);
+    uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
+#endif // TINYCRYPT_PRIMITIVES
+#endif // SLI_SI91X_MCU_INTERFACE
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -90,6 +137,7 @@ void PlatformManagerImpl::_Shutdown()
 {
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 void PlatformManagerImpl::HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData)
 {
@@ -157,7 +205,7 @@ void PlatformManagerImpl::HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wf
 
     (void) sInstance.PostEvent(&event);
 }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
 } // namespace DeviceLayer
 } // namespace chip
