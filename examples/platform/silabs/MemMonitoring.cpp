@@ -84,7 +84,7 @@ void MemMonitoring::MonitorTask(void * pvParameter)
     }
 
     // will never get here. Still, free allocated memory before exiting
-    chip::Platform::Free(freethreadIdTable);
+    chip::Platform::MemoryFree(threadIdTable);
 }
 
 } // namespace Silabs
