@@ -41,6 +41,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/IntrusiveList.h>
 #include <lib/support/Scoped.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
@@ -110,7 +111,7 @@ public:
      * The Invoke Response will not be sent until all outstanding Handles have
      * been destroyed or have had Release called.
      */
-    class Handle
+    class Handle : public IntrusiveListNodeBase<>
     {
     public:
         Handle() {}
@@ -118,9 +119,7 @@ public:
         Handle(Handle && handle)
         {
             Init(handle.mpHandler);
-
             handle.Release();
-            handle.mpHandler = nullptr;
         }
         Handle(decltype(nullptr)) {}
         Handle(CommandHandler * handle);
@@ -132,7 +131,6 @@ public:
             Init(handle.mpHandler);
 
             handle.Release();
-            handle.mpHandler = nullptr;
             return *this;
         }
 
@@ -150,19 +148,12 @@ public:
 
         void Release();
 
-    private:
-        friend CommandHandler;
-        /**
-         * Mechanism for keeping track of a chain of Handle.
-         */
-        void SetNext(Handle * aNext) { mNext = aNext; }
-        Handle * GetNext() const { return mNext; }
         void Invalidate() { mpHandler = nullptr; }
 
+    private:
         void Init(CommandHandler * handler);
 
         CommandHandler * mpHandler = nullptr;
-        Handle * mNext             = nullptr;
     };
 
     // Previously we kept adding arguments with default values individually as parameters. This is because there
@@ -702,7 +693,8 @@ private:
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
-    Handle * mpHandleList                  = nullptr;
+    /* List to store the weak reference to all the Handle created with this Command Handler.*/
+    IntrusiveList<Handle> mpHandleList;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;

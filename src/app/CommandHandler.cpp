@@ -35,6 +35,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/IntrusiveList.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/LockTracker.h>
 #include <protocols/secure_channel/Constants.h>
@@ -281,37 +282,20 @@ void CommandHandler::Close()
 
 void CommandHandler::AddToHandleList(Handle * apHandle)
 {
-    apHandle->SetNext(mpHandleList);
-    mpHandleList = apHandle;
+    mpHandleList.PushBack(apHandle);
 }
 
 void CommandHandler::RemoveFromHandleList(Handle * apHandle)
 {
-    Handle * prev = nullptr;
-    for (Handle * cur = mpHandleList; cur; cur = cur->GetNext())
-    {
-        if (cur == apHandle)
-        {
-            if (prev == nullptr)
-            {
-                mpHandleList = cur->GetNext();
-            }
-            else
-            {
-                prev->SetNext(cur->GetNext());
-            }
-
-            cur->SetNext(nullptr);
-        }
-        prev = cur;
-    }
+    VerifyOrDie(mpHandleList.Contains(apHandle));
+    mpHandleList.Remove(apHandle);
 }
 
 void CommandHandler::InvalidateHandles()
 {
-    for (Handle * cur = mpHandleList; cur; cur = cur->GetNext())
+    for (auto handle = mpHandleList.begin(); handle != mpHandleList.end(); ++handle)
     {
-        cur->Invalidate();
+        handle->Invalidate();
     }
 }
 
@@ -840,7 +824,7 @@ void CommandHandler::Handle::Release()
     if (mpHandler != nullptr)
     {
         mpHandler->DecrementHoldOff(this);
-        mpHandler = nullptr;
+        Invalidate();
     }
 }
 
