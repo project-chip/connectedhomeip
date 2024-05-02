@@ -670,7 +670,7 @@ CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
         break;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     case ICDTestEventTriggerEvent::kInvalidateHalfCounterValues:
-        err = ICDConfigurationData::GetInstance().GetICDCounter().InvalidateHalfCheckInCouterValues();
+        err = ICDConfigurationData::GetInstance().GetICDCounter().InvalidateHalfCheckInCounterValues();
         break;
     case ICDTestEventTriggerEvent::kInvalidateAllCounterValues:
         err = ICDConfigurationData::GetInstance().GetICDCounter().InvalidateAllCheckInCounterValues();

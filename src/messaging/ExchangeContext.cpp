@@ -670,5 +670,12 @@ void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHan
     GrabUnchecked(session);
 }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+void ExchangeContext::OnSessionConnectionClosed(CHIP_ERROR conErr)
+{
+    // TODO: Handle connection closure at the ExchangeContext level.
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 } // namespace Messaging
 } // namespace chip

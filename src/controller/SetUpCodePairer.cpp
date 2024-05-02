@@ -533,7 +533,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
 
     if (CHIP_NO_ERROR == error)
     {
-        ChipLogProgress(Controller, "Pairing with commissionee successful, stopping discovery");
+        ChipLogProgress(Controller, "PASE session established with commissionee. Stopping discovery.");
         ResetDiscoveryState();
         mRemoteId = kUndefinedNodeId;
         if (pairingDelegate != nullptr)

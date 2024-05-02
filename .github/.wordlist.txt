@@ -905,6 +905,7 @@ MoveWithOnOff
 MPSL
 MRP
 MTD
+MTR
 MTU
 Multiband
 Multicast
