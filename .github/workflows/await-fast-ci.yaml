@@ -28,4 +28,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Review Spell Check Completion Status
-        run: python scripts/helpers/poll_quick_ci.py
+        run: python scripts/helpers/poll_quick_ci.py ${{ github.event.number }}
