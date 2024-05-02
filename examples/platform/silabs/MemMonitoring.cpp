@@ -52,8 +52,8 @@ void MemMonitoring::MonitorTask(void * pvParameter)
 {
     uint32_t threadCount = osThreadGetCount();
 
-    osThreadId_t * threadIdTable = static_cast<osThreadId_t *>(chip::Platform::MemoryAlloc(sizeof(osThreadId_t) * threadCount));
-    // Forms a table of the active thread ids
+    osThreadId_t * threadIdTable = new osThreadId_t[threadCount];
+    //  Forms a table of the active thread ids
     osThreadEnumerate(threadIdTable, threadCount);
 
     while (true)
@@ -84,7 +84,7 @@ void MemMonitoring::MonitorTask(void * pvParameter)
     }
 
     // will never get here. Still, free allocated memory before exiting
-    chip::Platform::MemoryFree(threadIdTable);
+    delete threadIdTable;
 }
 
 } // namespace Silabs
