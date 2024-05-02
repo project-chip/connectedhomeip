@@ -80,7 +80,8 @@ std::vector<EndpointId> ReadEndpointsThroughAttributeReader(nlTestSuite * apSuit
     ConcreteAttributePath path(endpoint, Clusters::PowerSource::Id, Clusters::PowerSource::Attributes::EndpointList::Id);
     ConcreteReadAttributePath readPath(path);
     chip::DataVersion dataVersion(0);
-    AttributeValueEncoder aEncoder(builder, 0, path, dataVersion);
+    Access::SubjectDescriptor subjectDescriptor;
+    AttributeValueEncoder aEncoder(builder, subjectDescriptor, path, dataVersion);
 
     err = attrAccess.Read(readPath, aEncoder);
 

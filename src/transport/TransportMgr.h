@@ -34,6 +34,9 @@
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 namespace chip {
 
@@ -49,8 +52,26 @@ public:
      *
      * @param source    the source address of the package
      * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
+     * @param ctxt      the pointer to additional context on the underlying transport. For TCP, it is a pointer
+     *                  to the underlying connection object.
      */
-    virtual void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) = 0;
+    virtual void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                                   Transport::MessageTransportContext * ctxt = nullptr) = 0;
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    /**
+     * @brief
+     *   Handle connection attempt completion.
+     *
+     * @param conn      the connection object
+     * @param conErr    the connection error on the attempt, or CHIP_NO_ERROR.
+     */
+    virtual void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr){};
+
+    virtual void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr){};
+
+    virtual void HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn){};
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 template <typename... TransportTypes>

@@ -28,6 +28,9 @@
 #include <messaging/SessionParameters.h>
 #include <platform/LockTracker.h>
 #include <transport/SessionDelegate.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <transport/raw/TCP.h>
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 namespace chip {
 namespace Transport {
@@ -111,8 +114,8 @@ public:
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
-    // There is not delegate, nothing to do here
-    virtual void DispatchSessionEvent(SessionDelegate::Event event) {}
+    // There is no delegate, nothing to do here
+    virtual void OnSessionHang() {}
 
 protected:
     // Helper for use by the Grab methods.
@@ -144,7 +147,7 @@ public:
             SessionHolder::ShiftToSession(session);
     }
 
-    void DispatchSessionEvent(SessionDelegate::Event event) override { (mDelegate.*event)(); }
+    void OnSessionHang() override { mDelegate.OnSessionHang(); }
 
 private:
     SessionDelegate & mDelegate;
@@ -225,7 +228,16 @@ public:
 
     bool IsUnauthenticatedSession() const { return GetSessionType() == SessionType::kUnauthenticated; }
 
-    void DispatchSessionEvent(SessionDelegate::Event event)
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // This API is used to associate the connection with the session when the
+    // latter is about to be marked active. It is also used to reset the
+    // connection to a nullptr when the connection is lost and the session
+    // is marked as Defunct.
+    ActiveTCPConnectionState * GetTCPConnection() const { return mTCPConnection; }
+    void SetTCPConnection(ActiveTCPConnectionState * conn) { mTCPConnection = conn; }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+    void NotifySessionHang()
     {
         // Holders might remove themselves when notified.
         auto holder = mHolders.begin();
@@ -233,7 +245,7 @@ public:
         {
             auto cur = holder;
             ++holder;
-            cur->DispatchSessionEvent(event);
+            cur->OnSessionHang();
         }
     }
 
@@ -264,6 +276,15 @@ protected:
 
 private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // The underlying TCP connection object over which the session is
+    // established.
+    // The lifetime of this member connection pointer is, essentially, the same
+    // as that of the underlying connection with the peer.
+    // It would remain as a nullptr for all sessions that are not set up over
+    // a TCP connection.
+    ActiveTCPConnectionState * mTCPConnection = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
 //
