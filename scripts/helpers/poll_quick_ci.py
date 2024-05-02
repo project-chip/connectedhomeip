@@ -27,7 +27,7 @@ def main():
           break
         elif "pass" in line:
           polling = False
-          logging.info("Fast CI {args.check} has passed; if all fast CI passes, builds and tests may commence.")
+          logging.info(f"Fast CI {args.check} has passed; if all fast CI passes, builds and tests may commence.")
           exit(0)
   logging.info(f"Polling for completion of fast CI {args.check} failed. Please ensure the name of the check was entered correctly and verify that it should take less than {poll_max} seconds to run.")
   exit(1)
