@@ -109,7 +109,7 @@ public:
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1];
         Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
-        
+
         streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
         streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
         streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.vendorId);
