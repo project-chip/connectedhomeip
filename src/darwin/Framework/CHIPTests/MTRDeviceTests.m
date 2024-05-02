@@ -1071,8 +1071,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
         XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
         if ([result[@"data"][@"value"] boolValue] == YES) {
-            [reportExpectation fulfill];
             globalReportHandler = nil;
+            [reportExpectation fulfill];
         }
     };
 
@@ -1109,13 +1109,34 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
 
-    // Trigger reader failure
-    XCTestExpectation * failureExpectation = [self expectationWithDescription:@"failed on purpose"];
-    [device failSubscribers:queue
-                 completion:^{
-                     [failureExpectation fulfill];
-                 }];
-    [self waitForExpectations:@[ failureExpectation ] timeout:kTimeoutInSeconds];
+    XCTestExpectation * errorExpectation1 = [self expectationWithDescription:@"First subscription errored out"];
+    XCTestExpectation * errorExpectation2 = [self expectationWithDescription:@"Second subscription errored out"];
+
+    globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(values);
+        XCTAssertNotNil(error);
+        globalReportHandler = nil;
+        [errorExpectation1 fulfill];
+    };
+
+    // Try to create a second subscription, which will cancel the first
+    // subscription.  We can use a non-existent path here to cut down on the
+    // work that gets done.
+    params.replaceExistingSubscriptions = YES;
+    [device subscribeToAttributesWithEndpointID:@10000
+        clusterID:@6
+        attributeID:@0
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+            XCTAssertNil(values);
+            XCTAssertNotNil(error);
+            [errorExpectation2 fulfill];
+        }
+        subscriptionEstablished:^() {
+            XCTFail("Did not expect this subscription to succeed");
+        }];
+    [self waitForExpectations:@[ errorExpectation1, errorExpectation2 ] timeout:60];
 
     deregisterExpectation = [self expectationWithDescription:@"Report handler deregistered"];
     [device deregisterReportHandlersWithQueue:queue
@@ -1124,7 +1145,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                    }];
     [self waitForExpectations:@[ deregisterExpectation ] timeout:kTimeoutInSeconds];
 }
-#endif
+#endif // DEBUG
 
 - (void)test013_ReuseChipClusterObject
 {
