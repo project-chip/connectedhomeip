@@ -60,7 +60,7 @@ static_library("helpers") {
   ]
 }
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libInetLayerTests"
 
   public_configs = [ ":tests_config" ]
@@ -72,7 +72,6 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/lib/support:testing_nlunit",
     "${nlunit_test_root}:nlunit-test",
   ]
-
   test_sources = [
     "TestBasicPacketFilters.cpp",
     "TestInetAddress.cpp",
