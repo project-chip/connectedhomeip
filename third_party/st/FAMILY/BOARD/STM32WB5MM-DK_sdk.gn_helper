@@ -21,7 +21,6 @@ SOURCES = [
   # BOARD APPLICATION SRC(in examples/platform/stm32/common/STM32WB5MM-DK/)
   "${stm32_board_src}/Src/app_debug.c",
   "${stm32_board_src}/Src/entropy_hardware_poll.c",
-  "${stm32_board_src}/Src/flash_driver.c",
   "${stm32_board_src}/Src/flash_wb.c",
   "${stm32_board_src}/Src/freertos_port.c",
   "${stm32_board_src}/Src/hw_timerserver.c",
