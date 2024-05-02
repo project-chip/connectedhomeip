@@ -349,10 +349,10 @@ CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 
     IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
-    //Set nodeData with data specific to CommissionNodeData
+    // Set nodeData with data specific to CommissionNodeData
     outputData.Set<CommissionNodeData>(mSpecificResolutionData.Get<CommissionNodeData>());
 
-    //set the common resolution data to nodeData
+    // set the common resolution data to nodeData
     CommonResolutionData & resolutionData = outputData.Get<CommissionNodeData>();
     resolutionData                        = mCommonResolutionData;
 

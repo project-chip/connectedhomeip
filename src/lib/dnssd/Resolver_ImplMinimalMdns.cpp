@@ -461,10 +461,10 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             if (mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kOperational))
             {
                 DiscoveredNodeData nodeData;
-                if (err == CHIP_NO_ERROR )
+                if (err == CHIP_NO_ERROR)
                 {
                     OperationalNodeBrowseData opNodeData;
-                    opNodeData.peerId = nodeResolvedData.operationalData.peerId;
+                    opNodeData.peerId     = nodeResolvedData.operationalData.peerId;
                     opNodeData.hasZeroTTL = nodeResolvedData.operationalData.hasZeroTTL;
                     nodeData.Set<OperationalNodeBrowseData>(opNodeData);
                 }
