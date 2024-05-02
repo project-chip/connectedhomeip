@@ -174,7 +174,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
                     StringOrNullMarker(name), StringOrNullMarker(hostname), port, StringOrNullMarker(type), interfaceId);
 
     const DNSServiceFlags registerFlags = kDNSServiceFlagsNoAutoRename;
-    RegisterContext * sdCtx = nullptr;
+    RegisterContext * sdCtx             = nullptr;
     if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterContextOfTypeAndName(type, name, &sdCtx))
     {
         auto err = DNSServiceUpdateRecord(sdCtx->serviceRef, nullptr, registerFlags, record.size(), record.data(), 0 /* ttl */);
@@ -329,8 +329,8 @@ static void GetAddrInfo(ResolveContext * sdCtx)
 
         ResolveContextWithType * contextWithType =
             (interface.first.isSRPResult) ? &sdCtx->resolveContextWithSRPType : &sdCtx->resolveContextWithNonSRPType;
-        auto err =
-            DNSServiceGetAddrInfo(&sdRefCopy, kDNSServiceFlagsShareConnection, interfaceId, protocol, hostname, OnGetAddrInfo, contextWithType);
+        auto err = DNSServiceGetAddrInfo(&sdRefCopy, kDNSServiceFlagsShareConnection, interfaceId, protocol, hostname,
+                                         OnGetAddrInfo, contextWithType);
         VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
         interface.second.isDNSLookUpRequested = true;
     }
@@ -367,7 +367,8 @@ static CHIP_ERROR ResolveWithContext(ResolveContext * sdCtx, uint32_t interfaceI
 {
     auto sdRef = sdCtx->serviceRef; // Mandatory copy because of kDNSServiceFlagsShareConnection
 
-    auto err = DNSServiceResolve(&sdRef, kDNSServiceFlagsShareConnection, interfaceId, name, type, domain, OnResolve, contextWithType);
+    auto err =
+        DNSServiceResolve(&sdRef, kDNSServiceFlagsShareConnection, interfaceId, name, type, domain, OnResolve, contextWithType);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
     return CHIP_NO_ERROR;
 }
