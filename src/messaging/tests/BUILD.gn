@@ -38,6 +38,9 @@ static_library("helpers") {
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/tests:helpers",
   ]
+
+  # TODO(#29342): Dependency to enable building tests converted to gtest with the messaging context
+  public_deps = [ "${nlunit_test_root}:nlunit-test" ]
 }
 
 chip_test_suite_using_nltest("tests") {

@@ -47,9 +47,9 @@ using SymmetricKeystore = SessionKeystore;
 namespace chip {
 namespace app {
 
-// Forward declaration of TestICDManager to allow it to be friend with ICDManager
+// Forward declaration of TestICDManager tests to allow it to be friend with ICDManager
 // Used in unit tests
-class TestICDManager;
+class TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
 
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
@@ -132,6 +132,8 @@ public:
 
     ICDConfigurationData::ICDMode GetICDMode() { return ICDConfigurationData::GetInstance().GetICDMode(); };
 
+    OperationalState GetOperaionalState() { return mOperationalState; };
+
     /**
      * @brief Adds the referenced observer in parameters to the mStateObserverPool
      * A maximum of CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE observers can be concurrently registered
@@ -199,7 +201,9 @@ public:
     void OnSubscriptionReport() override;
 
 private:
-    friend class TestICDManager;
+    // TODO : Once <gtest/gtest_prod.h> can be included, use FRIEND_TEST for the friend class.
+    friend class ::chip::app::TestICDManager_TestShouldCheckInMsgsBeSentAtActiveModeFunction_Test;
+
     /**
      * @brief UpdateICDMode evaluates in which mode the ICD can be in; SIT or LIT mode.
      *        If the current operating mode does not match the evaluated operating mode, function updates the ICDMode and triggers
