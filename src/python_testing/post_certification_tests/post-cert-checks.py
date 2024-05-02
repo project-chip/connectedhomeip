@@ -33,7 +33,7 @@
 # source py/bin/activate
 # pip install opencv-python requests click_option_group
 
-
+import base64
 import importlib
 import logging
 import os
@@ -75,13 +75,13 @@ except ImportError:
 
 @dataclass
 class Failure:
-    test: str
     step: str
+    exception: typing.Optional[Exception]
 
 
 class Hooks():
     def __init__(self):
-        self.failures = []
+        self.failures = {}
         self.current_step = 'unknown'
         self.current_test = 'unknown'
 
@@ -96,7 +96,9 @@ class Hooks():
         pass
 
     def test_stop(self, exception: Exception, duration: int):
-        pass
+        # Exception is the test assertion that caused the failure
+        if exception:
+            self.failures[self.current_test].exception = exception
 
     def step_skipped(self, name: str, expression: str):
         pass
@@ -108,7 +110,7 @@ class Hooks():
         pass
 
     def step_failure(self, logger, logs, duration: int, request, received):
-        self.failures.append(Failure(self.current_test, self.current_step))
+        self.failures[self.current_test] = Failure(self.current_step)
 
     def step_unknown(self):
         pass
@@ -126,22 +128,6 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(ret, 0, "TestEventTriggers are still on")
 
 
-def get_dcl_vendor(vid):
-    return requests.get(f"{fetch_paa_certs_from_dcl.PRODUCTION_NODE_URL_REST}/dcl/vendorinfo/vendors/{vid}").json()
-
-
-def get_dcl_model(vid, pid):
-    return requests.get(f"{fetch_paa_certs_from_dcl.PRODUCTION_NODE_URL_REST}/dcl/model/models/{vid}/{pid}").json()
-
-
-def get_dcl_compliance_info(vid, pid, software_version):
-    return requests.get(f"{fetch_paa_certs_from_dcl.PRODUCTION_NODE_URL_REST}/dcl/compliance/compliance-info/{vid}/{pid}/{software_version}/matter").json()
-
-
-def get_dcl_certified_model(vid, pid, software_version):
-    return requests.get(f"{fetch_paa_certs_from_dcl.PRODUCTION_NODE_URL_REST}/dcl/compliance/certified-models/{vid}/{pid}/{software_version}/matter").json()
-
-
 class DclCheck(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
@@ -150,13 +136,17 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.vid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.VendorID)
         self.pid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.ProductID)
         self.software_version = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.SoftwareVersion)
+        self.url = fetch_paa_certs_from_dcl.PRODUCTION_NODE_URL_REST
+        self.vid = 0x6006
+        self.pid = 1
+        self.software_version = 1300
 
     def steps_Vendor(self):
         return [TestStep(1, "Check if device VID is listed in the DCL vendor schema", "Listing found")]
 
     def test_Vendor(self):
         self.step(1)
-        entry = get_dcl_vendor(self.vid)
+        entry = requests.get(f"{self.url}/dcl/vendorinfo/vendors/{self.vid}").json()
         key = 'vendorInfo'
         asserts.assert_true(key in entry.keys(), f"Unable to find vendor entry for {self.vid:04x}")
         logging.info(f'Found vendor key 0x{self.vid:04X} in DCL:')
@@ -168,7 +158,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     def test_Model(self):
         self.step(1)
         key = 'model'
-        entry = get_dcl_model(self.vid, self.pid)
+        entry = requests.get(f"{self.url}/dcl/model/models/{self.vid}/{self.pid}").json()
         asserts.assert_true(key in entry.keys(), f"Unable to find model entry for {self.vid:04x} {self.pid:04x}")
         logging.info(f'Found model entry for vid=0x{self.vid:04X} pid=0x{self.pid:04X} in the DCL:')
         logging.info(f'{entry[key]}')
@@ -179,7 +169,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     def test_Compliance(self):
         self.step(1)
         key = 'complianceInfo'
-        entry = get_dcl_compliance_info(self.vid, self.pid, self.software_version)
+        entry = requests.get(f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{self.software_version}/matter").json()
         asserts.assert_true(key in entry.keys(),
                             f"Unable to find compliance entry for {self.vid:04x} {self.pid:04x} {self.software_version}")
         logging.info(
@@ -192,12 +182,65 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     def test_CertifiedModel(self):
         self.step(1)
         key = 'certifiedModel'
-        entry = get_dcl_certified_model(self.vid, self.pid, self.software_version)
+        entry = requests.get(f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{self.software_version}/matter").json()
         asserts.assert_true(key in entry.keys(),
                             f"Unable to find certified model entry for {self.vid:04x} {self.pid:04x} {self.software_version}")
         logging.info(
             f'Found certified model for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={self.software_version} in the DCL:')
         logging.info(f'{entry[key]}')
+
+    def steps_AllSoftwareVersions(self):
+        return [TestStep(1, "Query the version information for this software version", "DCL entry exists"),
+                TestStep(2, "For each valid software version with an OtaUrl, verify the OtaChecksumType is in the valid range and the OtaChecksum is a base64. If the softwareVersion matches the current softwareVersion on the device, ensure the entry is valid.", "OtaChecksum is base64 and OtaChecksumType is in the valid set")]
+    def test_AllSoftwareVersions(self):
+        self.step(1)
+        versions_entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
+        key_model_versions = 'modelVersions'
+        asserts.assert_true(key_model_versions in versions_entry.keys(), f"Unable to find {key_model_versions} in software versions schema for vid=0x{self.vid:04X} pid=0x{self.pid:04X}")
+        logging.info(
+            f'Found version info for vid=0x{self.vid:04X} pid=0x{self.pid:04X} in the DCL:')
+        logging.info(f'{versions_entry[key_model_versions]}')
+        key_software_versions = 'softwareVersions'
+        asserts.assert_true(key_software_versions in versions_entry[key_model_versions].keys(), f"Unable to find {key_software_versions} in software versions schema for vid=0x{self.vid:04X} pid=0x{self.pid:04X}")
+
+        problems = []
+        self.step(2)
+        for software_version in versions_entry[key_model_versions][key_software_versions]:
+            entry_wrapper = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}/{software_version}").json()
+            key_model_version = 'modelVersion'
+            if key_model_version not in entry_wrapper:
+                problems.append(f'Missing key {key_model_version} in entry for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version}')
+                continue
+            logging.info(f'Found entry version entry for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version}')
+            logging.info(entry_wrapper)
+            entry = entry_wrapper[key_model_version]
+            key_ota_url = 'otaUrl'
+            key_software_version_valid = 'softwareVersionValid'
+            key_ota_checksum = 'otaChecksum'
+            key_ota_checksum_type = 'otaChecksumType'
+            def check_key(key):
+                if key not in entry.keys():
+                    problems.append(f'Missing key {key} in DCL versions entry for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version}')
+            check_key(key_ota_url)
+            check_key(key_software_version_valid)
+            if entry[key_software_version_valid] and entry[key_ota_url]:
+                check_key(key_ota_checksum)
+                check_key(key_ota_checksum_type)
+                valid_checksum_types = [1, 7, 8, 10, 11, 12]
+                if entry[key_ota_checksum_type] not in valid_checksum_types:
+                    problems.append(f'OtaChecksumType for entry vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version} is invalid. Found {entry[key_ota_checksum_type]} valid values: {valid_checksum_types}')
+                checksum = entry[key_ota_checksum]
+                try:
+                    is_base64 = base64.b64encode(base64.b64decode(checksum)).decode('utf-8') == checksum
+                except (ValueError, TypeError):
+                    is_base64 = False
+                if not is_base64:
+                    problems.append(f"Checksum {checksum} is not base64 encoded for for entry vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version}")
+            #TODO: download and actually checksum it? Maybe just for the current version? And size check?
+        msg = 'Problems found in software version DCL checks:\n'
+        for problem in problems:
+            msg += f'{problem}\n'
+        asserts.assert_false(problems, msg)
 
 
 def get_qr() -> str:
@@ -336,9 +379,7 @@ def main():
 
         failures_test_event_trigger = run_test(TestEventTriggersCheck, ['test_TestEventTriggersCheck'], test_config)
 
-        failures_dcl = run_test(DclCheck, ['test_Vendor', 'test_Model', 'test_Compliance', 'test_CertifiedModel'], test_config)
-
-        failures = failures_DA_1_2 + failures_DA_1_7 + failures_test_event_trigger + failures_dcl
+        failures_dcl = run_test(DclCheck, ['test_Vendor', 'test_Model', 'test_Compliance', 'test_CertifiedModel', 'test_AllSoftwareVersions'], test_config)
 
     report = []
     for failure in failures_DA_1_2:
@@ -366,17 +407,21 @@ def main():
         # only one possible failure here
         report.append('Device has test event triggers enabled in production')
 
-    for failure in failures_dcl:
-        if failure.test == 'test_Vendor':
+    for test, failure in failures_dcl.items():
+        if test == 'test_Vendor':
             report.append('Device vendor ID is not present in the DCL')
-        elif failure.test == 'test_Model':
+        elif test == 'test_Model':
             report.append('Device model is not present in the DCL')
-        elif failure.test == 'test_Compliance':
+        elif test == 'test_Compliance':
             report.append('Device compliance information is not present in the DCL')
-        elif failure.test == 'test_CertifiedModel':
+        elif test == 'test_CertifiedModel':
             report.append('Device certified model is not present in the DCL')
+        elif test == 'test_AllSoftwareVersions':
+            report.append('Problems with device software version in the DCL')
         else:
-            report.append(f'unknown DCL failure in test {failure.test}: {failure.step}')
+            report.append(f'unknown DCL failure in test {test}: {failure.step}')
+        report.append('\n')
+        report.append(str(failure.exception))
 
     print('\n\n\n')
     if report:
