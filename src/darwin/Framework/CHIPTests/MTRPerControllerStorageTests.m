@@ -16,14 +16,12 @@
 
 #import <Matter/Matter.h>
 
-// system dependencies
-#import <XCTest/XCTest.h>
-
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
+#import "MTRTestCase.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
@@ -177,7 +175,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 @end
 
-@interface MTRPerControllerStorageTests : XCTestCase
+@interface MTRPerControllerStorageTests : MTRTestCase
 @end
 
 @implementation MTRPerControllerStorageTests {
@@ -353,6 +351,8 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)test001_BasicControllerStartup
 {
+    self.detectLeaks = YES;
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -401,6 +401,8 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)test002_TryStartingTwoControllersWithSameNodeID
 {
+    self.detectLeaks = YES;
+
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
