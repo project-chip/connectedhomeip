@@ -155,8 +155,8 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
-    gRvcRunModeInstance =
-        new ModeBase::Instance(gRvcRunModeDelegate, endpointId, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kNoFeatures));
+    gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, endpointId, RvcRunMode::Id,
+                                                 chip::to_underlying(RvcRunMode::Feature::kNoFeatures));
     gRvcRunModeInstance->Init();
 }
 
