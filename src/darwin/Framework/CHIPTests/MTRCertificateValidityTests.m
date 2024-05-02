@@ -163,7 +163,7 @@ static MTRDeviceController * sController = nil;
 
     __auto_type * operationalCertificate = [self issueOperationalCertificateForNode:@(kDeviceId)
                                                                operationalPublicKey:operationalPublicKey];
-    // Release no-longer-needed key key before we do anything else.
+    // Release no-longer-needed key before we do anything else.
     CFRelease(operationalPublicKey);
     XCTAssertNotNil(operationalCertificate);
 
