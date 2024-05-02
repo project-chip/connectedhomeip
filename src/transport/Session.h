@@ -45,6 +45,43 @@ class Session;
  *    as pending removal but not actually removed yet. During this period, the handle is functional, but the underlying session
  *    won't be able to be grabbed by any SessionHolder. SessionHandle->IsActiveSession can be used to check if the session is
  *    active.
+ *
+ *    A `SessionHandle` exists to guarante that the object it points to will not be released while allowing passing
+ *    the handle as a reference, to not incur refeference-counted Retain/Release extra calls.
+ *
+ *    Example code that breaks assumptions (hard to reason about/maintain):
+ *
+ *       void Process(ReferenceCountedHandle<Session> &handle);
+ *       class Foo {
+ *          ReferenceCountedHandle<Session> mSession;
+ *          void ResetSession() { mSession = createNewSession(); }
+ *          void DoProcessing() {
+ *             Process(mSession);
+ *          }
+ *
+ *          static Foo& GetInstance();
+ *       };
+ *
+ *       void Process(ReferenceCountedHandle<Session> &handle) {
+ *          Foo::GetInstance()->ResetSession(); // this changes the passed in handle
+ *          // trying to use "&handle" here may point to something else alltogether.
+ *       }
+ *
+ *   Above would be fixed if we would pass in the handles by value, however that adds extra code
+ *   to call Retain/Release every time. We could also by design say that passed in references will
+ *   not change, however historically the codebase is complex enough that this could not be ensured.
+ *
+ *   The end result is the existence of SessionHandle which is NOT allowed to be held and it serves
+ *   as a marker of "Retain has been called and stays valid". The code above becomes:
+ *
+ *      void Process(SessionHandle &handle);
+ *
+ *      ....
+ *      void Foo::DoProcessing() {
+ *         SessionHandle handle(mSession);  // retains the session and mSession can be independently changed
+ *         Process(&handle);  // reference is now safe to use.
+ *      }
+ *
  */
 class SessionHandle
 {
