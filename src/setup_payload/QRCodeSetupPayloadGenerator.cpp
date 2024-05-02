@@ -175,9 +175,9 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
         populateBits(bits.data(), offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, static_cast<uint64_t>(payload.commissioningFlow),
                                       kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    auto const & ri = payload.rendezvousInformation;
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, (ri.HasValue() ? ri.Value().Raw() : 0), kRendezvousInfoFieldLengthInBits,
-                                      kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateBits(bits.data(), offset,
+                                      payload.rendezvousInformation.ValueOr(RendezvousInformationFlag::kNone).Raw(),
+                                      kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits));
     auto const & pd = payload.discriminator;
     ReturnErrorOnFailure(populateBits(bits.data(), offset, (!pd.IsShortDiscriminator() ? pd.GetLongValue() : 0),
                                       kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits));
