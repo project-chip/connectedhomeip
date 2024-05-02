@@ -174,7 +174,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
                     StringOrNullMarker(name), StringOrNullMarker(hostname), port, StringOrNullMarker(type), interfaceId);
 
     constexpr DNSServiceFlags registerFlags = kDNSServiceFlagsNoAutoRename;
-    RegisterContext * sdCtx             = nullptr;
+    RegisterContext * sdCtx                 = nullptr;
     if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterContextOfTypeAndName(type, name, &sdCtx))
     {
         auto err = DNSServiceUpdateRecord(sdCtx->serviceRef, nullptr, registerFlags, record.size(), record.data(), 0 /* ttl */);
