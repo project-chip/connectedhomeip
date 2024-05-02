@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/app/icd/icd.gni")
@@ -120,8 +121,31 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libAppTests"
+
+  test_sources = [ "TestReportingEngine.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":binding-test-srcs",
+    ":operational-state-test-srcs",
+    ":ota-requestor-test-srcs",
+    ":time-sync-data-provider-test-srcs",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/tests:helpers",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing",
+  ]
+}
+
+chip_test_suite_using_nltest("tests_nltest") {
+  output_name = "libAppTestsNL"
 
   test_sources = [
     "TestAclEvent.cpp",
@@ -152,7 +176,6 @@ chip_test_suite_using_nltest("tests") {
     "TestPendingResponseTrackerImpl.cpp",
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
-    "TestReportingEngine.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
