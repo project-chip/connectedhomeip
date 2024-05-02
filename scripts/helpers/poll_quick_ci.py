@@ -1,4 +1,5 @@
 import logging
+import subprocess
 
 def main():
   logging.info("Gathering info on checks being run for the current pull request.")
