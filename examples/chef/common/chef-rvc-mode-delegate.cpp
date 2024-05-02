@@ -156,7 +156,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
     gRvcRunModeInstance =
-        new ModeBase::Instance(gRvcRunModeDelegate, endpointId, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff));
+        new ModeBase::Instance(gRvcRunModeDelegate, endpointId, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kNoFeatures));
     gRvcRunModeInstance->Init();
 }
 
