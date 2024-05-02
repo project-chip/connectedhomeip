@@ -27,6 +27,8 @@ chip_test_suite("tests") {
     "TestICDMonitoringTable.cpp",
   ]
 
+  sources = [ "ICDConfigurationDataTestAccess.h" ]
+
   public_deps = [
     "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:monitoring-table",

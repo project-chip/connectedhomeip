@@ -28,19 +28,13 @@ namespace chip {
 namespace app {
 // Forward declaration of ICDManager to allow it to be friend with ICDConfigurationData.
 class ICDManager;
-
-// Forward declaration of TestICDManager tests to allow it to be friend with the ICDConfigurationData.
-// Used in unit tests
-class TestICDManager_TestICDStateObserverOnTransitionToIdleModeGreaterActiveModeDuration_Test;
-class TestICDManager_TestICDStateObserverOnTransitionToIdleModeEqualActiveModeDuration_Test;
-class TestICDManager_TestICDStateObserverOnTransitionToIdleMode0ActiveModeDurationWithoutReq_Test;
-class TestICDManager_TestICDStateObserverOnTransitionToIdleModeEqualActiveModeDuration_Test;
-class TestICDManager_TestICDStateObserverOnTransitionToIdleMode0ActiveModeDurationWithoutReq_Test;
-class TestICDManager_TestICDStateObserverOnTransitionToIdleMode0ActiveModeDurationWittReq_Test;
-class TestICDManager_TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub_Test;
-class TestICDManager_TestICDModeDurationsWith0ActiveModeDurationWithActiveSub_Test;
-
 } // namespace app
+
+namespace Test {
+// Forward declaration of ICDConfigurationDataTestAccess tests to allow it to be friend with the ICDConfigurationData.
+// Used in unit tests
+class ICDConfigurationDataTestAccess;
+} // namespace Test
 
 /**
  * @brief ICDConfigurationData manages and stores ICD related configurations for the ICDManager.
@@ -107,15 +101,7 @@ private:
     // value is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/server/ICDStateObserver.h
     friend class chip::app::ICDManager;
 
-    // TODO : Once <gtest/gtest_prod.h> can be included, use FRIEND_TEST for the friend class.
-    friend class chip::app::TestICDManager_TestICDStateObserverOnTransitionToIdleModeGreaterActiveModeDuration_Test;
-    friend class chip::app::TestICDManager_TestICDStateObserverOnTransitionToIdleModeEqualActiveModeDuration_Test;
-    friend class chip::app::TestICDManager_TestICDStateObserverOnTransitionToIdleMode0ActiveModeDurationWithoutReq_Test;
-    friend class chip::app::TestICDManager_TestICDStateObserverOnTransitionToIdleModeEqualActiveModeDuration_Test;
-    friend class chip::app::TestICDManager_TestICDStateObserverOnTransitionToIdleMode0ActiveModeDurationWithoutReq_Test;
-    friend class chip::app::TestICDManager_TestICDStateObserverOnTransitionToIdleMode0ActiveModeDurationWittReq_Test;
-    friend class chip::app::TestICDManager_TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub_Test;
-    friend class chip::app::TestICDManager_TestICDModeDurationsWith0ActiveModeDurationWithActiveSub_Test;
+    friend class chip::Test::ICDConfigurationDataTestAccess;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
     void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };
