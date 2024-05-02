@@ -179,7 +179,7 @@ public:
         {
             uint8_t nullValue = 0;
             chip::app::NumericAttributeTraits<uint8_t>::SetNull(nullValue);
-            pairs[0].valueUnsigned8.SetValue(nullValue);
+pairs[0].valueUnsigned8.SetValue(NumericAttributeTraits<uint8_t>::kNullValue);
         }
         size_t attributeCount = 1;
         if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
