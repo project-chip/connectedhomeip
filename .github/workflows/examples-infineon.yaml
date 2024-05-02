@@ -107,7 +107,7 @@ jobs:
                       out/artifacts/infineon-psoc6-light/chip-psoc6-lighting-example.out \
                       /tmp/bloat_reports/
 
-            - name: Build some CYW30739 Lighting Apps
+            - name: Build CYW30739 Lighting App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
@@ -135,7 +135,7 @@ jobs:
                     /tmp/bloat_reports/
             - name: Clean out build output
               run: rm -rf ./out
-            - name: Build some CYW30739 Light Switch Apps
+            - name: Build CYW30739 Light Switch App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
@@ -159,7 +159,7 @@ jobs:
                     /tmp/bloat_reports/
             - name: Clean out build output
               run: rm -rf ./out
-            - name: Build some CYW30739 Lock Apps
+            - name: Build CYW30739 Lock App
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
