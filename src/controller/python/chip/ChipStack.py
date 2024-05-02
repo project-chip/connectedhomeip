@@ -165,15 +165,19 @@ class AsyncCallableHandle:
             return self._res
 
 
-class AsyncSimpleCallableHandle:
+class AsyncioCallableHandle:
     """Class which handles Matter SDK Calls asyncio friendly"""
 
-    def __init__(self, callback, loop, future):
+    def __init__(self, callback):
         self._callback = callback
-        self._loop = loop
-        self._future = future
+        self._loop = asyncio.get_event_loop()
+        self._future = self._loop.create_future()
         self._result = None
         self._exception = None
+
+    @property
+    def future(self):
+        return self._future
 
     def _done(self):
         if self._exception:
@@ -397,9 +401,7 @@ class ChipStack(object):
         '''Run a Python function on CHIP stack, and wait for the response.
         This function will post a task on CHIP mainloop and waits for the call response in a asyncio friendly manner.
         '''
-        loop = asyncio.get_event_loop()
-        future = loop.create_future()
-        callObj = AsyncSimpleCallableHandle(callFunct, loop, future)
+        callObj = AsyncioCallableHandle(callFunct)
         pythonapi.Py_IncRef(py_object(callObj))
 
         res = self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread(
@@ -409,7 +411,7 @@ class ChipStack(object):
             pythonapi.Py_DecRef(py_object(callObj))
             raise res.to_exception()
 
-        return await asyncio.wait_for(future, timeoutMs / 1000 if timeoutMs else None)
+        return await asyncio.wait_for(callObj.future, timeoutMs / 1000 if timeoutMs else None)
 
     def CallAsyncWithCallback(self, callFunct):
         '''Run a Python function on CHIP stack, and wait for the application specific response.
