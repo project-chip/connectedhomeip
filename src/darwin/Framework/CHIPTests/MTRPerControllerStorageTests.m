@@ -158,6 +158,8 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                                                            nodeID:self.nextNodeID
                                                             caseAuthenticatedTags:nil
                                                                             error:&error];
+    // Release no-longer-needed key before we do anything else.
+    CFRelease(publicKey);
     XCTAssertNil(error);
     XCTAssertNotNil(operationalCert);
 
