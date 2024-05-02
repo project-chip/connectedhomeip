@@ -82,6 +82,9 @@ class Session;
  *         Process(&handle);  // reference is now safe to use.
  *      }
  *
+ *   To meet the requirements of "you should not store this", the Handle has additional restrictions
+ *   preventing modification (no assignment or copy constructor) and allows only move.
+ *
  */
 class SessionHandle
 {
