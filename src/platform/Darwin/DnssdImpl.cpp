@@ -173,7 +173,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     ChipLogProgress(Discovery, "Registering service %s on host %s with port %u and type: %s on interface id: %" PRIu32,
                     StringOrNullMarker(name), StringOrNullMarker(hostname), port, StringOrNullMarker(type), interfaceId);
 
-    const DNSServiceFlags registerFlags = kDNSServiceFlagsNoAutoRename;
+    constexpr DNSServiceFlags registerFlags = kDNSServiceFlagsNoAutoRename;
     RegisterContext * sdCtx             = nullptr;
     if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterContextOfTypeAndName(type, name, &sdCtx))
     {
