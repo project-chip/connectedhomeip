@@ -9,7 +9,7 @@ def main():
   args = parser.parse_args()
   
   logging.info("Gathering info on checks being run for the current pull request.")
-  for line in subprocess.run(f"gh pr checks -R project-chip/connectedhomeip {args.pr}", stdout=subprocess.PIPE, shell=True).stdout.splitlines():
+  for line in subprocess.run(f"gh pr checks -R project-chip/connectedhomeip {args.pr}", stdout=subprocess.PIPE, shell=True).stdout.decode("utf-8").splitlines():
     if args.check in line:
       print(line)
 
