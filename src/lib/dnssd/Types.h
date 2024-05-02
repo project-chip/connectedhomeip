@@ -194,14 +194,23 @@ struct CommonResolutionData
 };
 
 /// Data that is specific to Operational Discovery of nodes
-struct OperationalNodeData : public CommonResolutionData
+struct OperationalNodeData
 {
     PeerId peerId;
     bool hasZeroTTL;
-    void Reset()
+    void Reset() { peerId = PeerId(); }
+};
+
+struct OperationalNodeBrowseData : public OperationalNodeData
+{
+    OperationalNodeBrowseData() { Reset(); };
+    void LogDetail() const
     {
-        CommonResolutionData::Reset();
-        peerId = PeerId();
+        ChipLogDetail(Discovery, "Discovered Operational node:\r\n");
+        ChipLogDetail(Discovery, "\tNode ID: " ChipLogFormatX64 "-" ChipLogFormatX64 "\r\n",
+                            ChipLogValueX64(peerId.GetCompressedFabricId()), 
+                            ChipLogValueX64(peerId.GetNodeId()));
+        ChipLogDetail(Discovery, "\thasZeroTTL: %s\r\n", hasZeroTTL ? "true" : "false");
     }
 };
 
@@ -301,7 +310,7 @@ struct ResolvedNodeData
     }
 };
 
-using DiscoveredNodeData = Variant<CommissionNodeData, OperationalNodeData>;
+using DiscoveredNodeData = Variant<CommissionNodeData, OperationalNodeBrowseData>;
 
 /// Callbacks for discovering nodes advertising both operational and non-operational status:
 ///   - Commissioners

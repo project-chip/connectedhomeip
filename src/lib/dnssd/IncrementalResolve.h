@@ -173,8 +173,6 @@ public:
     }
 
 private:
-    template <class type>
-    CHIP_ERROR Set(DiscoveredNodeData & output);
     /// Notify that a PTR record can be parsed.
     ///
     /// Input data MUST have GetType() == QType::TXT

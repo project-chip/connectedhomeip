@@ -83,13 +83,8 @@ public:
 
     AddressResolve::NodeLookupHandle & Handle() { return mSelfHandle; }
 
-    void LogOperationalNodeDiscovered(const Dnssd::OperationalNodeData nodeData)
+    void LogOperationalNodeDiscovered(const Dnssd::OperationalNodeBrowseData & nodeData)
     {
-        if (!nodeData.IsValid())
-        {
-            streamer_printf(streamer_get(), "DNS browse failed - not found valid services \r\n");
-            return;
-        }
         streamer_printf(streamer_get(), "DNS browse operational succeeded: \r\n");
         streamer_printf(streamer_get(), "   Node ID: " ChipLogFormatX64 "-" ChipLogFormatX64 "\r\n",
                         ChipLogValueX64(nodeData.peerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.peerId.GetNodeId()));
@@ -98,19 +93,13 @@ public:
 
     void OnNodeDiscovered(const Dnssd::DiscoveredNodeData & discNodeData) override
     {
-        if (!discNodeData.Is<Dnssd::CommissionNodeData>() && !discNodeData.Is<Dnssd::OperationalNodeData>())
+        if (discNodeData.Is<Dnssd::OperationalNodeBrowseData>())
         {
-            streamer_printf(streamer_get(), "DNS browse failed - invalid node info \r\n");
+            LogOperationalNodeDiscovered(discNodeData.Get<Dnssd::OperationalNodeBrowseData>());
             return;
         }
 
-        if (discNodeData.Is<Dnssd::OperationalNodeData>())
-        {
-            LogOperationalNodeDiscovered(discNodeData.Get<Dnssd::OperationalNodeData>());
-            return;
-        }
-
-        auto nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
+        const auto & nodeData = discNodeData.Get<Dnssd::CommissionNodeData>();
 
         if (!nodeData.IsValid())
         {
@@ -118,12 +107,11 @@ public:
             return;
         }
 
-        streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
-        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
-
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1];
         Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
-
+        
+        streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
+        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
         streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.vendorId);
         streamer_printf(streamer_get(), "   Product ID: %u\r\n", nodeData.productId);
         streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.longDiscriminator);

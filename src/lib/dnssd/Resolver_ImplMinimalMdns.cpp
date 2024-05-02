@@ -363,6 +363,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
     {
         if (!resolver->IsActive())
         {
+            ChipLogError(Discovery, "resolver inactive, continue to next");
             continue;
         }
 
@@ -455,40 +456,37 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             ResolvedNodeData nodeResolvedData;
             CHIP_ERROR err = CHIP_ERROR_UNINITIALIZED;
 
-            if (mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionableNode))
+            err = resolver->Take(nodeResolvedData);
+
+            if (mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kOperational))
             {
                 DiscoveredNodeData nodeData;
-                err = resolver->Take(nodeData);
-                if (!nodeData.Is<OperationalNodeData>())
+                if (err == CHIP_NO_ERROR )
                 {
-                    err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OperationalNodeBrowseData opNodeData;
+                    opNodeData.peerId = nodeResolvedData.operationalData.peerId;
+                    opNodeData.hasZeroTTL = nodeResolvedData.operationalData.hasZeroTTL;
+                    nodeData.Set<OperationalNodeBrowseData>(opNodeData);
                 }
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
                 }
-                if (mDiscoveryContext != nullptr && err == CHIP_NO_ERROR)
+                else if (mDiscoveryContext != nullptr)
                 {
                     mDiscoveryContext->OnNodeDiscovered(nodeData);
-                    auto opNodeData                  = nodeData.Get<OperationalNodeData>();
-                    nodeResolvedData.resolutionData  = static_cast<CommonResolutionData>(opNodeData);
-                    nodeResolvedData.operationalData = opNodeData;
                 }
                 else
                 {
 #if CHIP_MINMDNS_HIGH_VERBOSITY
-                    ChipLogError(Discovery, "No delegate to report commissioning node discovery");
+                    ChipLogError(Discovery, "No delegate to report operational node discovery");
 #endif
                 }
-            }
-            else
-            {
-                err = resolver->Take(nodeResolvedData);
             }
 
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+                ChipLogError(Discovery, "Failed to take ResolvedNodeData - result: %" CHIP_ERROR_FORMAT, err.Format());
                 continue;
             }
 

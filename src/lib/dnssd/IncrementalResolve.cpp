@@ -168,7 +168,6 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
 
     switch (mServiceNameType)
     {
-    /* All known dnssd records for MATTER are filled into DnssdNodeData */
     case ServiceNameType::kOperational:
         mSpecificResolutionData.Set<OperationalNodeData>();
         {
@@ -344,36 +343,18 @@ CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const I
     return CHIP_NO_ERROR;
 }
 
-template <class NodeType>
-CHIP_ERROR IncrementalResolver::Set(DiscoveredNodeData & output)
-{
-    VerifyOrReturnError(mSpecificResolutionData.Is<NodeType>(), CHIP_ERROR_INCORRECT_STATE);
-    output.Set<NodeType>();
-    auto & nodeData                       = output.Get<NodeType>();
-    nodeData                              = mSpecificResolutionData.Get<NodeType>();
-    CommonResolutionData & resolutionData = nodeData;
-    resolutionData                        = mCommonResolutionData;
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 {
-    VerifyOrReturnError(IsActive(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsActiveCommissionParse(), CHIP_ERROR_INCORRECT_STATE);
 
     IPAddressSorter::Sort(mCommonResolutionData.ipAddress, mCommonResolutionData.numIPs, mCommonResolutionData.interfaceId);
 
-    if (IsActiveCommissionParse())
-    {
-        ReturnErrorOnFailure(Set<CommissionNodeData>(outputData));
-    }
-    else if (IsActiveOperationalParse())
-    {
-        ReturnErrorOnFailure(Set<OperationalNodeData>(outputData));
-    }
-    else
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    //Set nodeData with data specific to CommissionNodeData
+    outputData.Set<CommissionNodeData>(mSpecificResolutionData.Get<CommissionNodeData>());
+
+    //set the common resolution data to nodeData
+    CommonResolutionData & resolutionData = outputData.Get<CommissionNodeData>();
+    resolutionData                        = mCommonResolutionData;
 
     ResetToInactive();
 
