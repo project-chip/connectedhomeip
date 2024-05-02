@@ -1107,7 +1107,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleMode0ActiveModeDura
  * @brief Test verifies the OnTransitionToIdleMode event when the ActiveModeDuration is 0 with an ActiveMode req
  *        TODO(#33074): When the OnTransitionToIdle edge is fixed, we can enable this test
  */
-// TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleMode0ActiveModeDurationWittReq)
+// TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleMode0ActiveModeDurationWithReq)
 // {
 //     // Set New durations for test case - ActiveModeDuration equal 0
 //     Milliseconds32 oldActiveModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
