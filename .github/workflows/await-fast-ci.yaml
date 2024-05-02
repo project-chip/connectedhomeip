@@ -27,5 +27,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Review Spell Check Completion Status
-        run: |
-          gh pr checks -R project-chip/connectedhomeip ${{ github.event.number }} --required
+        run: python scripts/helpers/poll_quick_ci.py
