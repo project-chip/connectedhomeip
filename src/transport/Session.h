@@ -114,7 +114,7 @@ public:
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
-    // There is not delegate, nothing to do here
+    // There is no delegate, nothing to do here
     virtual void OnSessionHang() {}
 
 protected:
