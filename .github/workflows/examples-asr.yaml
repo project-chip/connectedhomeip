@@ -32,14 +32,13 @@ jobs:
     await-fast-ci:
         name: Await Fast CI
         runs-on: ubuntu-latest
+        permissions: write-all
         steps:
             - name: Wait For Fast CI to Pass
               uses: ./.github/workflows/await-fast-ci.yaml
             - name: Stop on Fail
               if: ${{ failure() }}
               uses: andymckay/cancel-action@0.4
-              env:
-                  GH_TOKEN: ${{ github.token }}
         
     asr:
         name: ASR
