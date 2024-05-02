@@ -32,7 +32,6 @@ def _is_cert_test(path):
 
 
 def main():
-    ret = 0
     bad_tests = set()
     for test in AllChipToolYamlTests(use_short_run_name=False):
         with open(test.run_name, "r") as f:
