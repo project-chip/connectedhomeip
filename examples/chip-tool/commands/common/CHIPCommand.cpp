@@ -654,4 +654,3 @@ void CHIPCommand::ExecuteDeferredCleanups(intptr_t ignored)
     }
     sDeferredCleanups.clear();
 }
-

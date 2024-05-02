@@ -38,6 +38,8 @@ chip_data_model("tv-casting-common") {
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
     "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",
     "${chip_root}/examples/chip-tool/commands/common/CHIPCommand.h",
+    "${chip_root}/examples/chip-tool/commands/common/ChipToolCheckInDelegate.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/ChipToolCheckInDelegate.h",
     "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Command.h",
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",

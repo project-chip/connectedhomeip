@@ -170,6 +170,8 @@ config("config") {
 
 executable("darwin-framework-tool") {
   sources = [
+    "${chip_root}/examples/chip-tool/commands/common/ChipToolCheckInDelegate.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/ChipToolCheckInDelegate.h",
     "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Command.h",
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
