@@ -64,9 +64,8 @@ int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
 
 static void app_get_random(uint8_t * aOutput, size_t aLen)
 {
-    size_t i;
-
-    for (i = 0; i < aLen; i++)
+    VerifyOrReturn(aOutput != nullptr);
+    for (size_t i = 0; i < aLen; i++)
     {
         aOutput[i] = rand();
     }
