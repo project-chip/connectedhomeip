@@ -13,9 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    3.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH - [{DUT_Client}]
-    testytesty
+name: 3.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH - [{DUT_Client}] testytesty
 
 PICS:
     - MCORE.IDM.C.InvokeRequest
