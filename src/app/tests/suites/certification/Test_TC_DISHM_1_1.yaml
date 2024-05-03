@@ -99,28 +99,6 @@ tests:
               type: list
               excludes: [2]
 
-    - label:
-          "4. TH reads optional attribute (DISHM.S.F00(DEPONOFF)) in
-          AttributeList"
-      PICS: DISHM.S.F00
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [3]
-
-    - label:
-          "4. TH reads optional attribute (DISHM.S.F00(DEPONOFF)) in
-          AttributeList"
-      PICS: " !DISHM.S.F00 "
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              excludes: [3]
-
     - label: "5. TH reads from the DUT the EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
