@@ -1,7 +1,5 @@
-/*
- *
- *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
+/**
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,25 +14,15 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import <XCTest/XCTest.h>
 
-#ifdef HEAP_MONITORING
+NS_ASSUME_NONNULL_BEGIN
 
-namespace chip {
-namespace DeviceLayer {
-namespace Silabs {
+@interface MTRTestCase : XCTestCase
+// It would be nice to do the leak-detection automatically, but running "leaks"
+// on every single sub-test is slow, and some of our tests seem to have leaks
+// outside Matter.framework.  So have it be opt-in for now, and improve later.
+@property (nonatomic) BOOL detectLeaks;
+@end
 
-class MemMonitoring
-{
-public:
-    static void StartMonitor();
-
-private:
-    static void MonitorTask(void * pvParameter);
-};
-
-} // namespace Silabs
-} // namespace DeviceLayer
-} // namespace chip
-
-#endif
+NS_ASSUME_NONNULL_END
