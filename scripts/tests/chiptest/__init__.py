@@ -420,7 +420,7 @@ def AllReplYamlTests():
         yield test
 
 
-def AllChipToolYamlTests(use_short_run_name: bool = False):
+def AllChipToolYamlTests(use_short_run_name: bool = True):
     for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=False, treat_chip_tool_unsupported_as_in_development=True, use_short_run_name=use_short_run_name):
         yield test
 
