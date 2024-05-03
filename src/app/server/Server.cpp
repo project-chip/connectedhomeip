@@ -71,6 +71,9 @@ using chip::Transport::BleListenParameters;
 #endif
 using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+using chip::Transport::TcpListenParameters;
+#endif
 
 namespace {
 
@@ -201,6 +204,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CONFIG_NETWORK_LAYER_BLE
                                ,
                            BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                               ,
+                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(mOperationalServicePort)
 #endif
     );
 

@@ -43,7 +43,10 @@
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "wfx_rsi.h"
-#endif /* SLI_SI91X_MCU_INTERFACE */
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SI917_M4_SLEEP_ENABLED
+#include "rsi_m4.h"
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SI917_M4_SLEEP_ENABLED
+#endif // SLI_SI91X_MCU_INTERFACE
 
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the EFR32-provided crypto backend, we can use the
@@ -237,7 +240,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #endif
 
 #ifdef HEAP_MONITORING
-    MemMonitoring::startHeapMonitoring();
+    MemMonitoring::StartMonitor();
 #endif
 
     //==============================================
@@ -342,7 +345,6 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
     sl_status_t status;
     if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
     {
-        SILABS_LOG("wfx_wifi_rsi_init failed with status: %x", status);
         ReturnErrorOnFailure((CHIP_ERROR) status);
     }
 #endif // SLI_SI91X_MCU_INTERFACE
@@ -354,9 +356,63 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SI917_M4_SLEEP_ENABLED
+static bool is_sleep_ready = false;
+void vTaskPreSuppressTicksAndSleepProcessing(uint16_t * xExpectedIdleTime)
+{
+    // pointer check
+    if (xExpectedIdleTime == NULL)
+    {
+        return;
+    }
+
+    if (!is_sleep_ready)
+    {
+        *xExpectedIdleTime = 0;
+    }
+    else
+    {
+        // a preliminary check of the expected idle time is performed without making M4 inactive
+        if (*xExpectedIdleTime >= configEXPECTED_IDLE_TIME_BEFORE_SLEEP)
+        {
+            // Indicate M4 is Inactive
+            P2P_STATUS_REG &= ~M4_is_active;
+            // Waiting for one more clock cycle to make sure M4 H/W Register is updated
+            P2P_STATUS_REG;
+
+            // TODO: This delay is added to sync between M4 and TA. It should be removed once the logic is moved to wifi SDK
+            for (uint8_t delay = 0; delay < 10; delay++)
+            {
+                __ASM("NOP");
+            }
+            // Checking if TA has already triggered a packet to M4
+            // RX_BUFFER_VALID will be cleared by TA if any packet is triggered
+            if ((P2P_STATUS_REG & TA_wakeup_M4) || (P2P_STATUS_REG & M4_wakeup_TA) || (!(M4SS_P2P_INTR_SET_REG & RX_BUFFER_VALID)))
+            {
+                P2P_STATUS_REG |= M4_is_active;
+                *xExpectedIdleTime = 0;
+            }
+            else
+            {
+                M4SS_P2P_INTR_CLR_REG = RX_BUFFER_VALID;
+                M4SS_P2P_INTR_CLR_REG;
+
+                TASS_P2P_INTR_MASK_SET = (TX_PKT_TRANSFER_DONE_INTERRUPT | RX_PKT_TRANSFER_DONE_INTERRUPT |
+                                          TA_WRITING_ON_COMM_FLASH | NWP_DEINIT_IN_COMM_FLASH
+#ifdef SL_SI91X_SIDE_BAND_CRYPTO
+                                          | SIDE_BAND_CRYPTO_DONE
+#endif
+                );
+            }
+        }
+    }
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SI917_M4_SLEEP_ENABLED
 extern "C" void vApplicationIdleHook(void)
 {
-#if SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
-    sl_wfx_host_si91x_sleep_wakeup();
-#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && SI917_M4_SLEEP_ENABLED
+    invoke_btn_press_event();
+    // is_sleep_ready is required since wfx_is_sleep_ready() is not FreeRTOS scheduler agnostic
+    is_sleep_ready = wfx_is_sleep_ready();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && SI917_M4_SLEEP_ENABLED
 }

@@ -218,9 +218,9 @@ void ActiveResolveAttempts::MarkPending(ScheduledAttempt && attempt)
     entryToUse->nextRetryDelay = System::Clock::Seconds16(1);
 }
 
-Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpectedResponse() const
+std::optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpectedResponse() const
 {
-    Optional<System::Clock::Timeout> minDelay = Optional<System::Clock::Timeout>::Missing();
+    std::optional<System::Clock::Timeout> minDelay = std::nullopt;
 
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
@@ -234,20 +234,20 @@ Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpected
         if (now >= entry.queryDueTime)
         {
             // found an entry that needs processing right now
-            return Optional<System::Clock::Timeout>::Value(0);
+            return std::make_optional<System::Clock::Timeout>(0);
         }
 
         System::Clock::Timeout entryDelay = entry.queryDueTime - now;
-        if (!minDelay.HasValue() || (minDelay.Value() > entryDelay))
+        if (!minDelay.has_value() || (*minDelay > entryDelay))
         {
-            minDelay.SetValue(entryDelay);
+            minDelay.emplace(entryDelay);
         }
     }
 
     return minDelay;
 }
 
-Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextScheduled()
+std::optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextScheduled()
 {
     chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
@@ -273,13 +273,13 @@ Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextSch
         entry.queryDueTime = now + entry.nextRetryDelay;
         entry.nextRetryDelay *= 2;
 
-        Optional<ScheduledAttempt> attempt = MakeOptional(entry.attempt);
-        entry.attempt.firstSend            = false;
+        std::optional<ScheduledAttempt> attempt = std::make_optional(entry.attempt);
+        entry.attempt.firstSend                 = false;
 
         return attempt;
     }
 
-    return Optional<ScheduledAttempt>::Missing();
+    return std::nullopt;
 }
 
 bool ActiveResolveAttempts::ShouldResolveIpAddress(PeerId peerId) const

@@ -485,7 +485,7 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
             {
                 mSession->AsSecureSession()->MarkAsDefunct();
             }
-            mSession->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+            mSession->NotifySessionHang();
         }
     }
 
@@ -669,6 +669,13 @@ void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHan
     VerifyOrDie(session->AsSecureSession()->IsPendingEviction());
     GrabUnchecked(session);
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+void ExchangeContext::OnSessionConnectionClosed(CHIP_ERROR conErr)
+{
+    // TODO: Handle connection closure at the ExchangeContext level.
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace Messaging
 } // namespace chip

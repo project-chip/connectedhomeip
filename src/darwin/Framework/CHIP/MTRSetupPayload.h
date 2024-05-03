@@ -28,6 +28,8 @@ typedef NS_OPTIONS(NSUInteger, MTRDiscoveryCapabilities) {
     MTRDiscoveryCapabilitiesBLE = 1 << 1, // Device supports BLE
     MTRDiscoveryCapabilitiesOnNetwork = 1 << 2, // Device supports On Network setup
 
+    // If new values are added here, update the "description" method to include them.
+
     MTRDiscoveryCapabilitiesAllMask
     = MTRDiscoveryCapabilitiesSoftAP | MTRDiscoveryCapabilitiesBLE | MTRDiscoveryCapabilitiesOnNetwork,
 };
