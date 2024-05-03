@@ -406,7 +406,7 @@ class BuildTarget:
         builder.target = self
         builder.identifier = name
         builder.output_dir = os.path.join(output_prefix, name)
-        builder.chip_dir = repository_path
+        builder.chip_dir = os.path.abspath(repository_path)
         builder.options = builder_options
 
         return builder

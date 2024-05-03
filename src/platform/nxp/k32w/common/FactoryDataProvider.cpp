@@ -39,6 +39,10 @@ namespace DeviceLayer {
 static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
 static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+/* Secure subsystem private key blob size is 32 + 24 = 56.
+ * DAC private key may be used to store an SSS exported blob instead of the private key.
+ */
+static constexpr size_t kDacPrivateKey_MaxLen = Crypto::kP256_PrivateKey_Length + 24;
 
 uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __MATTER_FACTORY_DATA_START;
 uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __MATTER_FACTORY_DATA_SIZE;

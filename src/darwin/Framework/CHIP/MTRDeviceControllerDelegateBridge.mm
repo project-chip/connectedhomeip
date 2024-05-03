@@ -20,7 +20,10 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+
+using namespace chip::Tracing::DarwinFramework;
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
@@ -61,6 +64,13 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
 {
     MTR_LOG_DEFAULT("DeviceControllerDelegate status updated: %d", status);
 
+    // If pairing failed, PASE failed. However, since OnPairingComplete(failure_code) might not be invoked in all cases, mark
+    // end of PASE with timeout as assumed failure. If OnPairingComplete is invoked, the right error code will be updated in
+    // the end event
+    if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed) {
+        MATTER_LOG_METRIC_END(kMetricSetupPASESession, CHIP_ERROR_TIMEOUT);
+    }
+
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
     if (strongDelegate && mQueue && strongController) {
@@ -70,12 +80,25 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
                 [strongDelegate controller:strongController statusUpdate:commissioningStatus];
             });
         }
+
+        // If PASE session setup fails and the client implements the delegate that accepts metrics, invoke the delegate
+        // to mark end of commissioning request.
+        // Since OnPairingComplete(failure_code) might not be invoked in all cases, use this opportunity to inform of failed commissioning
+        // and default the error to timeout since that is best guess in this layer.
+        if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed && [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+            OnCommissioningComplete(mDeviceNodeId, CHIP_ERROR_TIMEOUT);
+        }
     }
 }
 
 void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 {
-    MTR_LOG_DEFAULT("DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
+    if (error == CHIP_NO_ERROR) {
+        MTR_LOG_DEFAULT("MTRDeviceControllerDelegate PASE session establishment succeeded.");
+    } else {
+        MTR_LOG_ERROR("MTRDeviceControllerDelegate PASE session establishment failed: %" CHIP_ERROR_FORMAT, error.Format());
+    }
+    MATTER_LOG_METRIC_END(kMetricSetupPASESession, error);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
@@ -118,6 +141,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
 {
     MTR_LOG_DEFAULT("DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
+    MATTER_LOG_METRIC_END(kMetricDeviceCommissioning, error);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
@@ -125,6 +149,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
 
         // Always collect the metrics to avoid unbounded growth of the stats in the collector
         MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshot:TRUE];
+        MTR_LOG_INFO("Device commissioning complete with metrics %@", metrics);
 
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
             [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
@@ -152,6 +177,11 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
             });
         }
     }
+}
+
+void MTRDeviceControllerDelegateBridge::SetDeviceNodeID(chip::NodeId deviceNodeId)
+{
+    mDeviceNodeId = deviceNodeId;
 }
 
 @implementation MTRProductIdentity

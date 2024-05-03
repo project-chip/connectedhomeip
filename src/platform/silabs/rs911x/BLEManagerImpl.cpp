@@ -28,7 +28,7 @@
 
 #include "cmsis_os2.h"
 #include <platform/internal/BLEManager.h>
-#ifndef SIWX_917
+#ifndef SLI_SI91X_MCU_INTERFACE
 #include "rail.h"
 #endif
 #include <crypto/RandUtils.h>
@@ -42,7 +42,7 @@ extern "C" {
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #include "wfx_sl_ble_init.h"
-#if !(SIWX_917 | EXP_BOARD)
+#if !(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
 #include <rsi_driver.h>
 #endif
 #include <rsi_utils.h>
@@ -51,22 +51,29 @@ extern "C" {
 }
 #endif
 
-#include <ble/CHIPBleServiceData.h>
+#include <ble/Ble.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <string.h>
 
-#ifdef SIWX_917
+#ifdef SLI_SI91X_MCU_INTERFACE
 extern "C" {
 #include "sl_si91x_trng.h"
 }
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
+
+#define BLE_MIN_CONNECTION_INTERVAL_MS 45
+#define BLE_MAX_CONNECTION_INTERVAL_MS 45
+#define BLE_SLAVE_LATENCY_MS 0
+#define BLE_TIMEOUT_MS 400
+#define BLE_DEFAULT_TIMER_PERIOD_MS (1)
+#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (5000)
 
 extern sl_wfx_msg_t event_msg;
 
@@ -85,7 +92,7 @@ using namespace ::chip::DeviceLayer::Internal;
 void sl_ble_init()
 {
     uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
-#if SIWX_917
+#if SLI_SI91X_MCU_INTERFACE
     sl_status_t sl_status;
     //! Get Random number of desired length
     sl_status = sl_si91x_trng_get_random_num((uint32_t *) randomAddrBLE, RSI_BLE_ADDR_LENGTH);
@@ -100,7 +107,7 @@ void sl_ble_init()
 #else
     uint64_t randomAddr = chip::Crypto::GetRandU64();
     memcpy(randomAddrBLE, &randomAddr, RSI_BLE_ADDR_LENGTH);
-#endif // SIWX_917
+#endif // SLI_SI91X_MCU_INTERFACE
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
@@ -246,8 +253,6 @@ namespace {
 #define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
-#define BLE_DEFAULT_TIMER_PERIOD_MS (1)
-
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 
 const uint8_t UUID_CHIPoBLEService[]       = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
@@ -299,6 +304,18 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 exit:
     return err;
+}
+
+void BLEManagerImpl::OnSendIndicationTimeout(System::Layer * aLayer, void * appState)
+{
+    // TODO: change the connection handle with the ble device ID
+    uint8_t connHandle = 1;
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
+    event.CHIPoBLEConnectionError.ConId  = connHandle;
+    event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 uint16_t BLEManagerImpl::_NumConnections(void)
@@ -423,6 +440,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm: {
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEIndicateConfirm");
+        DeviceLayer::SystemLayer().CancelTimer(OnSendIndicationTimeout, this);
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
     }
     break;
@@ -471,12 +489,16 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     int32_t status = 0;
     status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
                                     data->Start());
+
     if (status != RSI_SUCCESS)
     {
         ChipLogProgress(DeviceLayer, "indication failed with error code %lx ", status);
         return false;
     }
 
+    // start timer for the indication Confirmation Event
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(BLE_SEND_INDICATION_TIMER_PERIOD_MS),
+                                          OnSendIndicationTimeout, this);
     return true;
 }
 
@@ -656,8 +678,9 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int32_t status = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    int32_t status          = 0;
+    bool postAdvChangeEvent = false;
 
     ChipLogProgress(DeviceLayer, "StartAdvertising start");
 
@@ -673,6 +696,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     else
     {
         ChipLogDetail(DeviceLayer, "Start BLE advertisement");
+        postAdvChangeEvent = true;
     }
 
     if (!(mFlags.Has(Flags::kAdvertising)))
@@ -697,6 +721,16 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
         }
         mFlags.Set(Flags::kAdvertising);
+
+        if (postAdvChangeEvent)
+        {
+            // Post CHIPoBLEAdvertisingChange event.
+            ChipDeviceEvent advChange;
+            advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+            advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
+
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
+        }
     }
     else
     {
@@ -704,8 +738,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
 
 exit:
+    // TODO: Add MapBLEError to return the correct error code
     ChipLogError(DeviceLayer, "StartAdvertising() End error: %s", ErrorStr(err));
-    return CHIP_NO_ERROR; // err;
+    return err;
 }
 
 int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void)
@@ -734,7 +769,6 @@ int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void)
     return rsi_ble_start_advertising_with_values(&ble_adv);
 }
 
-// TODO:: Implementation need to be done.
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -750,12 +784,16 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
             mFlags.Set(Flags::kFastAdvertisingEnabled, true);
             advertising_set_handle = 0xff;
             CancelBleAdvTimeoutTimer();
-        }
-        else
-        {
-            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
+
+            // Post CHIPoBLEAdvertisingChange event.
+            ChipDeviceEvent advChange;
+            advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+            advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+            err                                        = PlatformMgr().PostEvent(&advChange);
         }
     }
+
+    // TODO: Add MapBLEError to return the correct error code
     return err;
 }
 
@@ -925,12 +963,6 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
     PlatformMgr().PostEventOrDie(&event);
-}
-
-// TODO:: Need to Implement
-void BLEManagerImpl::HandleSoftTimerEvent(void)
-{
-    // TODO:: Need to Implement
 }
 
 bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)

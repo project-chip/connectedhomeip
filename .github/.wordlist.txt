@@ -369,6 +369,7 @@ DelayedActionTime
 delayedApplyActionTimeSec
 delayedQueryActionTimeSec
 delayQuery
+deliverables
 demangle
 deployable
 depottools
@@ -585,6 +586,8 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
+getter
+getters
 GetInDevelopmentTests
 GetIP
 getManualTests
@@ -643,6 +646,8 @@ HomePods
 hostapd
 hostname
 href
+HSM
+hsm
 HTTPS
 HW
 hwadr
@@ -668,6 +673,7 @@ ifdef
 ifdefs
 IGMP
 ihex
+Illuminance
 IlluminanceMeasurement
 IM
 imager
@@ -724,6 +730,7 @@ JLink
 JLinkExe
 JLinkRTTClient
 JN
+jni
 jpg
 jre
 js
@@ -898,12 +905,14 @@ MoveWithOnOff
 MPSL
 MRP
 MTD
+MTR
 MTU
 Multiband
 Multicast
 multilib
 Multiprotocol
 multithreaded
+mutex
 mutexes
 mv
 MX
@@ -933,6 +942,7 @@ nfds
 NitricOxideConcentrationMeasurement
 NitrogenDioxideConcentrationMeasurement
 nl
+nltest
 NLUnitTest
 NLUnitTests
 nmcli
@@ -964,6 +974,7 @@ objcopy
 OccupancySensing
 OctetString
 OECORE
+OID
 ol
 Onboarding
 onboardingcodes
@@ -985,6 +996,7 @@ openweave
 OperationalCredentials
 operationalDataset
 opkg
+OPTIGA
 optionMask
 optionOverride
 optionsMask
@@ -1428,6 +1440,7 @@ transitionTime
 TransportMgrBase
 TriggerEffect
 TRNG
+trustm
 TrustedRootCertificates
 tsan
 TSG
@@ -1440,6 +1453,7 @@ ttymxc
 ttyUSB
 TurbidityConcentrationMeasurement
 TvCasting
+TVOC
 tvOS
 TXD
 txt
@@ -1492,6 +1506,7 @@ utils
 UUID
 ux
 validator
+valgrind
 vcom
 VCP
 Vectorcall

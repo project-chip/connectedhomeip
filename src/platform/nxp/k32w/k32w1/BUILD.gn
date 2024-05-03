@@ -30,6 +30,8 @@ if (chip_crypto == "platform") {
 }
 
 static_library("nxp_platform") {
+  defines = [ "CHIP_DEVICE_K32W1=1" ]
+
   sources = [
     "../../../SingletonConfigurationManager.cpp",
     "../common/BLEManagerCommon.cpp",
@@ -59,17 +61,26 @@ static_library("nxp_platform") {
     "ram_storage.h",
   ]
 
+  if (chip_use_plain_dac_key) {
+    defines += [ "CHIP_USE_PLAIN_DAC_KEY=1" ]
+  } else {
+    defines += [ "CHIP_USE_PLAIN_DAC_KEY=0" ]
+  }
+
   public = [
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
     "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
-    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
+    "${chip_root}/src/platform/nxp/k32w/k32w1/DefaultTestEventTriggerDelegate.h",
     "${chip_root}/src/platform/nxp/k32w/k32w1/SMU2Manager.h",
   ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  public_deps = [
+    "${chip_root}/src/app:test-event-trigger",
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   if (chip_with_low_power != 0) {
     sources += [ "LowPowerHooks.cpp" ]
@@ -105,10 +116,6 @@ static_library("nxp_platform") {
         "${chip_root}/src/credentials/CHIPCert.h",
         "${chip_root}/src/credentials/CertificationDeclaration.h",
       ]
-
-      if (chip_convert_dac_private_key == 1) {
-        defines = [ "CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY=1" ]
-      }
     }
 
     public_deps += [ "${mbedtls_root}:mbedtls" ]

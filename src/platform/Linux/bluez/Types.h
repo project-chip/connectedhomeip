@@ -67,7 +67,19 @@ struct GAutoPtrDeleter<BluezDevice1>
 };
 
 template <>
+struct GAutoPtrDeleter<BluezGattCharacteristic1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<BluezGattManager1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<BluezGattService1>
 {
     using deleter = GObjectDeleter;
 };

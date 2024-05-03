@@ -17,11 +17,8 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
-#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#else
-#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
-#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDevice_Internal.h>
 
 #include <lib/core/CHIPError.h>
 
@@ -47,6 +44,15 @@ NS_ASSUME_NONNULL_BEGIN
                             storageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                        storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue;
 
+// clusterDataByNode a dictionary: nodeID => cluster data dictionary
+typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNode);
+
+/**
+ * Asks the data store to load cluster data for nodes in bulk. If the storageDelegate supports it, the handler will be called synchronously.
+ * If the storageDelegate does not support it, the handler will not be called at all.
+ */
+- (void)fetchAttributeDataForAllDevices:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler;
+
 /**
  * Resumption info APIs.
  */
@@ -66,10 +72,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Storage for MTRDevice attribute read cache. This is local-only storage as an optimization. New controller devices using MTRDevice API can prime their own local cache from devices directly.
  */
-- (nullable NSArray<NSDictionary *> *)getStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)storeAttributeValues:(NSArray<NSDictionary *> *)dataValues forNodeID:(NSNumber *)nodeID;
-- (void)clearStoredAttributesForNodeID:(NSNumber *)nodeID;
-- (void)clearAllStoredAttributes;
+- (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;
+- (nullable MTRDeviceClusterData *)getStoredClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
+- (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
+- (void)clearAllStoredClusterData;
 
 @end
 

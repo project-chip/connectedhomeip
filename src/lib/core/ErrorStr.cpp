@@ -17,10 +17,6 @@
  */
 #include <lib/core/ErrorStr.h>
 
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/DLLUtil.h>

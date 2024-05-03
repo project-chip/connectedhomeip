@@ -208,6 +208,29 @@ struct ReliableMessageProtocolConfig
         return mIdleRetransTimeout == that.mIdleRetransTimeout && mActiveRetransTimeout == that.mActiveRetransTimeout &&
             mActiveThresholdTime == that.mActiveThresholdTime;
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+    /**
+     * Set the local MRP configuration for the node.
+     *
+     * Passing a "no value" optional resets to the compiled-in settings
+     * (CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL and
+     * CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL).
+     *
+     * Otherwise the value set via this function is used instead of the
+     * compiled-in settings, but can still be overridden by ICD configuration
+     * and other things that would override the compiled-in settings.
+     *
+     * Changing the value via this function does not affect any existing
+     * sessions or exchanges, but does affect the values we communicate to our
+     * peer during future session establishments.
+     *
+     * @return whether the local MRP configuration actually changed as a result
+     *         of this call.  If it did, callers may need to reset DNS-SD
+     *         advertising to advertise the updated values.
+     */
+    static bool SetLocalMRPConfig(const Optional<ReliableMessageProtocolConfig> & localMRPConfig);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
 };
 
 /// @brief The default MRP config. The value is defined by spec, and shall be same for all implementations,
@@ -234,9 +257,8 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig();
  *
  * @return The maximum transmission time
  */
-System::Clock::Timestamp GetRetransmissionTimeout(System::Clock::Timestamp activeInterval, System::Clock::Timestamp idleInterval,
-                                                  System::Clock::Timestamp lastActivityTime,
-                                                  System::Clock::Timestamp activityThreshold);
+System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInterval, System::Clock::Timeout idleInterval,
+                                                System::Clock::Timeout lastActivityTime, System::Clock::Timeout activityThreshold);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 

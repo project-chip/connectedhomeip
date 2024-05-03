@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,24 +26,27 @@
 #pragma once
 
 #include "CHIPDeviceManager.h"
-#include <app/util/af-types.h>
-#include <platform/CHIPDeviceLayer.h>
+#include "CommonDeviceCallbacks.h"
 
-class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
+namespace AllClustersApp {
+class DeviceCallbacks : public chip::NXP::App::CommonDeviceCallbacks
 {
 public:
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    virtual void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t type, uint16_t size, uint8_t * value);
+    // This returns an instance of this class.
+    static DeviceCallbacks & GetDefaultInstance();
+    void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                     uint8_t type, uint16_t size, uint8_t * value);
 
 private:
-    void OnWiFiConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
-    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
-    void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
-    void OnInterfaceIpAddressChanged(const chip::DeviceLayer::ChipDeviceEvent * event);
     void OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
     void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
-#if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
-    void OnComissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event);
-#endif
 };
+
+/**
+ * Returns the application-specific implementation of the CommonDeviceCallbacks object.
+ *
+ * Applications can use this to gain access to features of the CommonDeviceCallbacks
+ * that are specific to the selected application.
+ */
+chip::DeviceManager::CHIPDeviceManagerCallbacks & GetDeviceCallbacks();
+} // namespace AllClustersApp

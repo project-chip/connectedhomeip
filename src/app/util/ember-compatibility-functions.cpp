@@ -14,14 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *          Contains the functions for compatibility with ember ZCL inner state
- *          when calling ember callbacks.
- */
+#include <app/util/ember-compatibility-functions.h>
 
 #include <access/AccessControl.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteEventPath.h>
@@ -30,10 +26,11 @@
 #include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/reporting.h>
-#include <app/util/af.h>
 #include <app/util/att-storage.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-table-detail.h>
 #include <app/util/attribute-table.h>
 #include <app/util/config.h>
 #include <app/util/odd-sized-integers.h>
@@ -272,22 +269,6 @@ CHIP_ERROR ReadClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPa
     return CHIP_NO_ERROR;
 }
 
-void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath)
-{
-    DataVersion * version = emberAfDataVersionStorage(aConcreteClusterPath);
-    if (version == nullptr)
-    {
-        ChipLogError(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " not found in IncreaseClusterDataVersion!",
-                     aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId));
-    }
-    else
-    {
-        (*(version))++;
-        ChipLogDetail(DataManagement, "Endpoint %x, Cluster " ChipLogFormatMEI " update version to %" PRIx32,
-                      aConcreteClusterPath.mEndpointId, ChipLogValueMEI(aConcreteClusterPath.mClusterId), *(version));
-    }
-}
-
 CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, AttributeDataIB::Builder & aAttributeDataIBBuilder)
 {
     ReturnErrorOnFailure(aAttributeDataIBBuilder.EndOfAttributeDataIB());
@@ -444,16 +425,15 @@ CHIP_ERROR GlobalAttributeReader::EncodeCommandList(const ConcreteClusterPath & 
 // Helper function for trying to read an attribute value via an
 // AttributeAccessInterface.  On failure, the read has failed.  On success, the
 // aTriedEncode outparam is set to whether the AttributeAccessInterface tried to encode a value.
-CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, bool aIsFabricFiltered,
+CHIP_ERROR ReadViaAccessInterface(const SubjectDescriptor & subjectDescriptor, bool aIsFabricFiltered,
                                   const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                  AttributeValueEncoder::AttributeEncodeState * aEncoderState,
-                                  AttributeAccessInterface * aAccessInterface, bool * aTriedEncode)
+                                  AttributeEncodeState * aEncoderState, AttributeAccessInterface * aAccessInterface,
+                                  bool * aTriedEncode)
 {
-    AttributeValueEncoder::AttributeEncodeState state =
-        (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
+    AttributeEncodeState state(aEncoderState);
     DataVersion version = 0;
     ReturnErrorOnFailure(ReadClusterDataVersion(aPath, version));
-    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
+    AttributeValueEncoder valueEncoder(aAttributeReports, subjectDescriptor, aPath, version, aIsFabricFiltered, state);
     CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
 
     if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead) && aPath.mExpanded)
@@ -542,7 +522,7 @@ bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
 
 CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
+                                 AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%x AttributeId=" ChipLogFormatMEI " (expanded=%d)",
@@ -588,7 +568,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         if (attributeOverride)
         {
             bool triedEncode = false;
-            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aIsFabricFiltered, aPath, aAttributeReports,
+            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReports,
                                                         apEncoderState, attributeOverride, &triedEncode));
             ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);
         }
@@ -1123,37 +1103,3 @@ Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventP
 
 } // namespace app
 } // namespace chip
-
-void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
-{
-    // Attribute writes have asserted this already, but this assert should catch
-    // applications notifying about changes from their end.
-    assertChipStackLockedByCurrentThread();
-
-    AttributePathParams info;
-    info.mClusterId   = clusterId;
-    info.mAttributeId = attributeId;
-    info.mEndpointId  = endpoint;
-
-    IncreaseClusterDataVersion(ConcreteClusterPath(endpoint, clusterId));
-    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
-}
-
-void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
-{
-    return MatterReportingAttributeChangeCallback(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-}
-
-void MatterReportingAttributeChangeCallback(EndpointId endpoint)
-{
-    // Attribute writes have asserted this already, but this assert should catch
-    // applications notifying about changes from their end.
-    assertChipStackLockedByCurrentThread();
-
-    AttributePathParams info;
-    info.mEndpointId = endpoint;
-
-    // We are adding or enabling a whole endpoint, in this case, we do not touch the cluster data version.
-
-    InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(info);
-}

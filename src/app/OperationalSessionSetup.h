@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/CASEClient.h>
 #include <app/CASEClientPool.h>
 #include <app/DeviceProxy.h>
@@ -161,6 +162,13 @@ public:
         CHIP_ERROR error;
         SessionEstablishmentStage sessionStage;
 
+        // When the response was BUSY, error will be CHIP_ERROR_BUSY and
+        // requestedBusyDelay will be set, if handling of BUSY responses is
+        // enabled.
+#if CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+        Optional<System::Clock::Milliseconds16> requestedBusyDelay;
+#endif // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+
         ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, SessionEstablishmentStage stage) :
             peerId(peer), error(err), sessionStage(stage)
         {}
@@ -202,8 +210,12 @@ public:
      * `onFailure` may be called before the Connect call returns, for error
      * cases that are detected synchronously (e.g. inability to start an address
      * lookup).
+     *
+     * `transportPayloadCapability` is set to kLargePayload when the session needs to be established
+     * over a transport that allows large payloads to be transferred, e.g., TCP.
      */
-    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     /*
      * This function can be called to establish a secure session with the device.
@@ -219,14 +231,19 @@ public:
      *
      * `onSetupFailure` may be called before the Connect call returns, for error cases that are detected synchronously
      * (e.g. inability to start an address lookup).
+     *
+     * `transportPayloadCapability` is set to kLargePayload when the session needs to be established
+     * over a transport that allows large payloads to be transferred, e.g., TCP.
      */
-    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnSetupFailure> * onSetupFailure);
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnSetupFailure> * onSetupFailure,
+                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
     void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage) override;
+    void OnResponderBusy(System::Clock::Milliseconds16 requestedDelay) override;
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
 
@@ -305,6 +322,12 @@ private:
 
     bool mPerformingAddressUpdate = false;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES || CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+    System::Clock::Milliseconds16 mRequestedBusyDelay = System::Clock::kZero;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES || CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP
+
+    TransportPayloadCapability mTransportPayloadCapability = TransportPayloadCapability::kMRPPayload;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // When we TryNextResult on the resolver, it will synchronously call back
     // into our OnNodeAddressResolved when it succeeds.  We need to track
@@ -338,7 +361,8 @@ private:
     void CleanupCASEClient();
 
     void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                 Callback::Callback<OnSetupFailure> * onSetupFailure);
+                 Callback::Callback<OnSetupFailure> * onSetupFailure,
+                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure,
@@ -382,7 +406,12 @@ private:
                                           Callback::Cancelable & successReady, CHIP_ERROR error, SessionEstablishmentStage stage,
                                           const ScopedNodeId & peerId, bool performingAddressUpdate,
                                           Messaging::ExchangeManager * exchangeMgr,
-                                          const Optional<SessionHandle> & optionalSessionHandle);
+                                          const Optional<SessionHandle> & optionalSessionHandle,
+                                          // requestedBusyDelay will be 0 if not
+                                          // CHIP_CONFIG_ENABLE_BUSY_HANDLING_FOR_OPERATIONAL_SESSION_SETUP,
+                                          // and only has a meaningful value
+                                          // when the error is CHIP_ERROR_BUSY.
+                                          System::Clock::Milliseconds16 requestedBusyDelay);
 
     /**
      * Triggers a DNSSD lookup to find a usable peer address.

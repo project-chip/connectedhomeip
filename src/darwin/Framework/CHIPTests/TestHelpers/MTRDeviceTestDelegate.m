@@ -60,4 +60,21 @@
     }
 }
 
+- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device
+{
+    return self.skipExpectedValuesForWrite;
+}
+
+- (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device
+{
+    return self.forceAttributeReportsIfMatchingCache;
+}
+
+- (void)deviceConfigurationChanged:(MTRDevice *)device
+{
+    if (self.onDeviceConfigurationChanged != nil) {
+        self.onDeviceConfigurationChanged();
+    }
+}
+
 @end

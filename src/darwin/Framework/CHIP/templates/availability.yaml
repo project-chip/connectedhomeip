@@ -7458,7 +7458,6 @@
   provisional:
       clusters:
           ## Not ready at cutoff
-          - AirQuality
           # Replaceable Monitoring clusters
           - HEPAFilterMonitoring
           - ActivatedCarbonFilterMonitoring
@@ -7475,7 +7474,6 @@
           - TotalVolatileOrganicCompoundsConcentrationMeasurement
           - RefrigeratorAlarm
           - TemperatureControl
-          - SmokeCOAlarm
           ## Not ready to be public API yet.
           - ICDManagement
           - LaundryWasherMode
@@ -7488,9 +7486,6 @@
           Scenes:
               # New scenes bits not stable yet.
               - SceneTableSize
-          FanControl:
-              # New Fan Control bits not stable yet.
-              - AirflowDirection
           RVCCleanMode:
               # People are trying to deprecate this one
               - OnMode
@@ -7498,9 +7493,6 @@
               # People are trying to deprecate this one
               - OnMode
       commands:
-          FanControl:
-              # Not stable yet
-              - Step
           DoorLock:
               # Not stable yet
               - UnboltDoor
@@ -7508,11 +7500,6 @@
               # Disallowed in the spec, but present in our XML?
               - Start
               - Stop
-      enums:
-          FanControl:
-              # Not stable yet.
-              - StepDirectionEnum
-              - AirflowDirectionEnum
       enum values:
           DoorLock:
               # Not stable yet
@@ -7544,11 +7531,6 @@
               # here.
               Feature:
                   - Unbolt
-          FanControl:
-              # Not stable yet
-              Feature:
-                  - Step
-                  - AirflowDirection
           RVCRunMode:
               Feature:
                   # People are trying to deprecate this one
@@ -8543,6 +8525,155 @@
 
 - release: "Future"
   versions: "future"
+  introduced:
+      clusters:
+          - AirQuality
+          - SmokeCOAlarm
+      attributes:
+          AirQuality:
+              - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          FanControl:
+              - AirflowDirection
+          SmokeCOAlarm:
+              - ExpressedState
+              - SmokeState
+              - COState
+              - BatteryAlert
+              - DeviceMuted
+              - TestInProgress
+              - HardwareFaultAlert
+              - EndOfServiceAlert
+              - InterconnectSmokeAlarm
+              - InterconnectCOAlarm
+              - ContaminationState
+              - SmokeSensitivityLevel
+              - ExpiryDate
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+      commands:
+          FanControl:
+              - Step
+          SmokeCOAlarm:
+              - SelfTestRequest
+      command fields:
+          FanControl:
+              Step:
+                  - direction
+                  - wrap
+                  - lowestOff
+      events:
+          SmokeCOAlarm:
+              - SmokeAlarm
+              - COAlarm
+              - LowBattery
+              - HardwareFault
+              - EndOfService
+              - SelfTestComplete
+              - AlarmMuted
+              - MuteEnded
+              - InterconnectSmokeAlarm
+              - InterconnectCOAlarm
+              - AllClear
+      event fields:
+          SmokeCOAlarm:
+              SmokeAlarm:
+                  - alarmSeverityLevel
+              COAlarm:
+                  - alarmSeverityLevel
+              LowBattery:
+                  - alarmSeverityLevel
+              InterconnectSmokeAlarm:
+                  - alarmSeverityLevel
+              InterconnectCOAlarm:
+                  - alarmSeverityLevel
+      enums:
+          AirQuality:
+              - AirQualityEnum
+          FanControl:
+              - StepDirectionEnum
+              - AirflowDirectionEnum
+          SmokeCOAlarm:
+              - AlarmStateEnum
+              - SensitivityEnum
+              - ExpressedStateEnum
+              - MuteStateEnum
+              - EndOfServiceEnum
+              - ContaminationStateEnum
+      enum values:
+          AirQuality:
+              AirQualityEnum:
+                  - Unknown
+                  - Good
+                  - Fair
+                  - Moderate
+                  - Poor
+                  - VeryPoor
+                  - ExtremelyPoor
+          FanControl:
+              StepDirectionEnum:
+                  - Increase
+                  - Decrease
+              AirflowDirectionEnum:
+                  - Forward
+                  - Reverse
+          SmokeCOAlarm:
+              AlarmStateEnum:
+                  - Normal
+                  - Warning
+                  - Critical
+              SensitivityEnum:
+                  - High
+                  - Standard
+                  - Low
+              ExpressedStateEnum:
+                  - Normal
+                  - SmokeAlarm
+                  - COAlarm
+                  - BatteryAlert
+                  - Testing
+                  - HardwareFault
+                  - EndOfService
+                  - InterconnectSmoke
+                  - InterconnectCO
+              MuteStateEnum:
+                  - NotMuted
+                  - Muted
+              EndOfServiceEnum:
+                  - Normal
+                  - Expired
+              ContaminationStateEnum:
+                  - Normal
+                  - Low
+                  - Warning
+                  - Critical
+      bitmaps:
+          AirQuality:
+              - Feature
+          SmokeCOAlarm:
+              - Feature
+      bitmap values:
+          AirQuality:
+              Feature:
+                  - Fair
+                  - Moderate
+                  - VeryPoor
+                  - ExtremelyPoor
+          FanControl:
+              Feature:
+                  - Step
+                  - AirflowDirection
+          SmokeCOAlarm:
+              Feature:
+                  - SmokeAlarm
+                  - COAlarm
   provisional:
       clusters:
           # Targeting Spring 2024 Matter release

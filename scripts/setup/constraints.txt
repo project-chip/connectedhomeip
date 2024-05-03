@@ -49,7 +49,7 @@ colorama==0.4.6
     #   west
 coloredlogs==15.0.1
     # via -r requirements.all.txt
-construct==2.10.54
+construct==2.10.70
     # via
     #   -r requirements.esp32.txt
     #   esp-coredump
@@ -98,7 +98,7 @@ ghapi==1.0.3
     # via -r requirements.memory.txt
 humanfriendly==10.0
     # via coloredlogs
-idf-component-manager==1.2.2
+idf-component-manager==1.5.2
     # via -r requirements.esp32.txt
 idna==3.4
     # via requests
@@ -208,7 +208,7 @@ python-socketio==4.6.1
     # via -r requirements.esp32.txt
 pytz==2022.7.1
     # via pandas
-pyyaml==6.0
+pyyaml==6.0.1
     # via
     #   esptool
     #   idf-component-manager
@@ -290,3 +290,9 @@ setuptools==68.0.0
     # via
     #   pip-tools
     #   west
+
+# Manual edits:
+
+# Higher versions depend on proto-plus, which break
+# nanopb code generation (due to name conflict of the 'proto' module)
+google-api-core==2.17.0

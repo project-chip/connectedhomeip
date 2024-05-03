@@ -78,11 +78,7 @@ public:
     const char * GetInstanceName() const { return mInstanceName; }
     void SetInstanceName(const char * instanceName) { Platform::CopyString(mInstanceName, instanceName); }
 
-    bool HasDiscoveryInfo()
-    {
-        return mVendorId != 0 || mProductId != 0 || mCdPort != 0 || strlen(mDeviceName) > 0 || GetRotatingIdLength() > 0 ||
-            mNumTargetAppInfos > 0 || mNoPasscode || mCdUponPasscodeDialog || mCommissionerPasscode || mCommissionerPasscodeReady;
-    }
+    bool HasDiscoveryInfo() { return mVendorId != 0 && mProductId != 0 && mCdPort != 0 && strlen(mDeviceName) > 0; }
 
     const char * GetDeviceName() const { return mDeviceName; }
     void SetDeviceName(const char * deviceName) { Platform::CopyString(mDeviceName, deviceName); }
@@ -452,6 +448,30 @@ public:
      */
     virtual void OnUserDirectedCommissioningRequest(UDCClientState state) = 0;
 
+    /**
+     * @brief
+     *   Called when an Identification Declaration UDC message has been received
+     * with the cancel flag set.
+     * It is expected that the implementer will tear down any dialog prompts for the
+     * commissionee instance (identified in the UDC client state argument).
+     *
+     *  @param[in]    state           The state for the UDC Client.
+     *
+     */
+    virtual void OnCancel(UDCClientState state) = 0;
+
+    /**
+     * @brief
+     *   Called when an Identification Declaration UDC message has been received
+     * with the commissioner passcode ready flag set.
+     * It is expected that the implementer will invoke commissioning on the
+     * commissionee instance (identified in the UDC client state argument).
+     *
+     *  @param[in]    state           The state for the UDC Client.
+     *
+     */
+    virtual void OnCommissionerPasscodeReady(UDCClientState state) = 0;
+
     virtual ~UserConfirmationProvider() = default;
 };
 
@@ -519,7 +539,8 @@ public:
     }
 
 private:
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * ctxt = nullptr) override;
 
     CommissionerDeclarationHandler * mCommissionerDeclarationHandler = nullptr;
 };
@@ -629,7 +650,11 @@ private:
     InstanceNameResolver * mInstanceNameResolver         = nullptr;
     UserConfirmationProvider * mUserConfirmationProvider = nullptr;
 
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void HandleNewUDC(const Transport::PeerAddress & source, IdentificationDeclaration & id);
+    void HandleUDCCancel(IdentificationDeclaration & id);
+    void HandleUDCCommissionerPasscodeReady(IdentificationDeclaration & id);
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
+                           Transport::MessageTransportContext * ctxt = nullptr) override;
 
     UDCClients<kMaxUDCClients> mUdcClients; // < Active UDC clients
 

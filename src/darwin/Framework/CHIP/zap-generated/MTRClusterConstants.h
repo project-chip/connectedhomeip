@@ -137,8 +137,8 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeTemperatureControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000056,
     MTRClusterIDTypeRefrigeratorAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000057,
     MTRClusterIDTypeDishwasherModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000059,
-    MTRClusterIDTypeAirQualityID MTR_PROVISIONALLY_AVAILABLE = 0x0000005B,
-    MTRClusterIDTypeSmokeCOAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x0000005C,
+    MTRClusterIDTypeAirQualityID MTR_NEWLY_AVAILABLE = 0x0000005B,
+    MTRClusterIDTypeSmokeCOAlarmID MTR_NEWLY_AVAILABLE = 0x0000005C,
     MTRClusterIDTypeDishwasherAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x0000005D,
     MTRClusterIDTypeMicrowaveOvenModeID MTR_PROVISIONALLY_AVAILABLE = 0x0000005E,
     MTRClusterIDTypeMicrowaveOvenControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000005F,
@@ -2409,34 +2409,34 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterDishwasherModeAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster AirQuality attributes
-    MTRAttributeIDTypeClusterAirQualityAttributeAirQualityID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterAirQualityAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterAirQualityAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterAirQualityAttributeAirQualityID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterAirQualityAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterAirQualityAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterAirQualityAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterAirQualityAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterAirQualityAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterAirQualityAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    MTRAttributeIDTypeClusterAirQualityAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterAirQualityAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterAirQualityAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster SmokeCOAlarm attributes
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpressedStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeCOStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeBatteryAlertID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeDeviceMutedID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeTestInProgressID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeHardwareFaultAlertID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEndOfServiceAlertID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectSmokeAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectCOAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeContaminationStateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeSensitivityLevelID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpressedStateID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeStateID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeCOStateID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeBatteryAlertID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeDeviceMutedID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeTestInProgressID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeHardwareFaultAlertID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEndOfServiceAlertID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectSmokeAlarmID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectCOAlarmID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeContaminationStateID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeSensitivityLevelID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID MTR_NEWLY_AVAILABLE = 0x0000000C,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DishwasherAlarm attributes
     MTRAttributeIDTypeClusterDishwasherAlarmAttributeMaskID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -3510,7 +3510,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterFanControlAttributeRockSettingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000008,
     MTRAttributeIDTypeClusterFanControlAttributeWindSupportID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000009,
     MTRAttributeIDTypeClusterFanControlAttributeWindSettingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000A,
-    MTRAttributeIDTypeClusterFanControlAttributeAirflowDirectionID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterFanControlAttributeAirflowDirectionID MTR_NEWLY_AVAILABLE = 0x0000000B,
     MTRAttributeIDTypeClusterFanControlAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterFanControlAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterFanControlAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -6219,7 +6219,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterDishwasherModeCommandChangeToModeResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
     // Cluster SmokeCOAlarm commands
-    MTRCommandIDTypeClusterSmokeCOAlarmCommandSelfTestRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterSmokeCOAlarmCommandSelfTestRequestID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster DishwasherAlarm commands
     MTRCommandIDTypeClusterDishwasherAlarmCommandResetID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -6493,7 +6493,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster FanControl deprecated command id names
 
     // Cluster FanControl commands
-    MTRCommandIDTypeClusterFanControlCommandStepID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterFanControlCommandStepID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster ColorControl deprecated command id names
     MTRClusterColorControlCommandMoveToHueID
@@ -7167,17 +7167,17 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterRefrigeratorAlarmEventNotifyID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster SmokeCOAlarm events
-    MTREventIDTypeClusterSmokeCOAlarmEventSmokeAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterSmokeCOAlarmEventCOAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTREventIDTypeClusterSmokeCOAlarmEventLowBatteryID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTREventIDTypeClusterSmokeCOAlarmEventHardwareFaultID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTREventIDTypeClusterSmokeCOAlarmEventEndOfServiceID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTREventIDTypeClusterSmokeCOAlarmEventSelfTestCompleteID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTREventIDTypeClusterSmokeCOAlarmEventAlarmMutedID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTREventIDTypeClusterSmokeCOAlarmEventMuteEndedID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTREventIDTypeClusterSmokeCOAlarmEventInterconnectSmokeAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTREventIDTypeClusterSmokeCOAlarmEventInterconnectCOAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTREventIDTypeClusterSmokeCOAlarmEventAllClearID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTREventIDTypeClusterSmokeCOAlarmEventSmokeAlarmID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterSmokeCOAlarmEventCOAlarmID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterSmokeCOAlarmEventLowBatteryID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTREventIDTypeClusterSmokeCOAlarmEventHardwareFaultID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTREventIDTypeClusterSmokeCOAlarmEventEndOfServiceID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTREventIDTypeClusterSmokeCOAlarmEventSelfTestCompleteID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTREventIDTypeClusterSmokeCOAlarmEventAlarmMutedID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTREventIDTypeClusterSmokeCOAlarmEventMuteEndedID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTREventIDTypeClusterSmokeCOAlarmEventInterconnectSmokeAlarmID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTREventIDTypeClusterSmokeCOAlarmEventInterconnectCOAlarmID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTREventIDTypeClusterSmokeCOAlarmEventAllClearID MTR_NEWLY_AVAILABLE = 0x0000000A,
 
     // Cluster DishwasherAlarm events
     MTREventIDTypeClusterDishwasherAlarmEventNotifyID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

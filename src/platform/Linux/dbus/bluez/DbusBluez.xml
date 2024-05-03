@@ -137,11 +137,13 @@
       <arg name="options" type="a{sv}" direction="in"/>
     </method>
     <method name="AcquireWrite">
+      <annotation name="org.gtk.GDBus.C.UnixFD" value="true" />
       <arg name="options" type="a{sv}" direction="in" />
       <arg name="fd" type="h" direction="out" />
       <arg name="mtu" type="q" direction="out" />
     </method>
     <method name="AcquireNotify">
+      <annotation name="org.gtk.GDBus.C.UnixFD" value="true" />
       <arg name="options" type="a{sv}" direction="in" />
       <arg name="fd" type="h" direction="out" />
       <arg name="mtu" type="q" direction="out" />

@@ -37,6 +37,8 @@ import com.matter.casting.support.MatterError;
  */
 public final class CastingApp {
   private static final String TAG = CastingApp.class.getSimpleName();
+  private static final long BROWSE_SERVICE_TIMEOUT = 2500;
+  private static final long RESOLVE_SERVICE_TIMEOUT = 3000;
 
   private static CastingApp sInstance;
 
@@ -75,8 +77,9 @@ public final class CastingApp {
             new AndroidBleManager(),
             new PreferencesKeyValueStoreManager(appParameters.getApplicationContext()),
             appParameters.getConfigurationManagerProvider().get(),
-            new NsdManagerServiceResolver(applicationContext, nsdManagerResolverAvailState),
-            new NsdManagerServiceBrowser(applicationContext),
+            new NsdManagerServiceResolver(
+                applicationContext, nsdManagerResolverAvailState, RESOLVE_SERVICE_TIMEOUT),
+            new NsdManagerServiceBrowser(applicationContext, BROWSE_SERVICE_TIMEOUT),
             new ChipMdnsCallbackImpl(),
             new DiagnosticDataProviderImpl(applicationContext));
 
@@ -146,6 +149,16 @@ public final class CastingApp {
 
     return MatterError.NO_ERROR;
   }
+
+  /** @brief Tears down all active subscriptions. */
+  public native MatterError shutdownAllSubscriptions();
+
+  /**
+   * Clears app cache that contains the information about CastingPlayers previously connected to
+   *
+   * @return
+   */
+  public native MatterError clearCache();
 
   /**
    * Sets DeviceAttestationCrdentials provider and RotatingDeviceIdUniqueId

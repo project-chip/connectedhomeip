@@ -47,6 +47,10 @@ using namespace chip::System::Clock::Literals;
 namespace chip {
 namespace Messaging {
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+Optional<System::Clock::Milliseconds64> ReliableMessageMgr::sAdditionalMRPBackoffTime;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry(ReliableMessageContext * rc) :
     ec(*rc->GetExchangeContext()), nextRetransTime(0), sendCount(0)
 {
@@ -154,7 +158,7 @@ void ReliableMessageMgr::ExecuteActions()
                 {
                     session->AsSecureSession()->MarkAsDefunct();
                 }
-                session->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+                session->NotifySessionHang();
             }
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
@@ -209,8 +213,8 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     return CHIP_NO_ERROR;
 }
 
-System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount,
-                                                        bool computeMaxPossible)
+System::Clock::Timeout ReliableMessageMgr::GetBackoff(System::Clock::Timeout baseInterval, uint8_t sendCount,
+                                                      bool computeMaxPossible)
 {
     // See section "4.11.8. Parameters and Constants" for the parameters below:
     // MRP_BACKOFF_JITTER = 0.25
@@ -223,14 +227,16 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     constexpr uint32_t MRP_BACKOFF_BASE_DENOMINATOR = 10;
     constexpr int MRP_BACKOFF_THRESHOLD             = 1;
 
-    // Implement `i = MRP_BACKOFF_MARGIN * i` from section "4.11.2.1. Retransmissions", where:
-    //   i == baseInterval
-    baseInterval = baseInterval * MRP_BACKOFF_MARGIN_NUMERATOR / MRP_BACKOFF_MARGIN_DENOMINATOR;
+    // Implement `i = MRP_BACKOFF_MARGIN * i` from section "4.12.2.1. Retransmissions", where:
+    //   i == interval
+    System::Clock::Milliseconds64 interval = baseInterval;
+    interval *= MRP_BACKOFF_MARGIN_NUMERATOR;
+    interval /= MRP_BACKOFF_MARGIN_DENOMINATOR;
 
     // Implement:
     //   mrpBackoffTime = i * MRP_BACKOFF_BASE^(max(0,n-MRP_BACKOFF_THRESHOLD)) * (1.0 + random(0,1) * MRP_BACKOFF_JITTER)
-    // from section "4.11.2.1. Retransmissions", where:
-    //   i == baseInterval
+    // from section "4.12.2.1. Retransmissions", where:
+    //   i == interval
     //   n == sendCount
 
     // 1. Calculate exponent `max(0,n−MRP_BACKOFF_THRESHOLD)`
@@ -250,7 +256,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
         backoffDenom *= MRP_BACKOFF_BASE_DENOMINATOR;
     }
 
-    System::Clock::Timestamp mrpBackoffTime = baseInterval * backoffNum / backoffDenom;
+    System::Clock::Milliseconds64 mrpBackoffTime = interval * backoffNum / backoffDenom;
 
     // 3. Calculate `mrpBackoffTime *= (1.0 + random(0,1) * MRP_BACKOFF_JITTER)`
     uint32_t jitter = MRP_BACKOFF_JITTER_BASE + (computeMaxPossible ? UINT8_MAX : Crypto::GetRandU8());
@@ -263,9 +269,13 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     mrpBackoffTime += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+    mrpBackoffTime += sAdditionalMRPBackoffTime.ValueOr(CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST);
+#else
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
 
-    return mrpBackoffTime;
+    return std::chrono::duration_cast<System::Clock::Timeout>(mrpBackoffTime);
 }
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
@@ -455,7 +465,7 @@ CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeI
 
 void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 {
-    System::Clock::Timestamp baseTimeout = System::Clock::Milliseconds64(0);
+    System::Clock::Timeout baseTimeout = System::Clock::Timeout(0);
 
     // Check if we have received at least one application-level message
     if (entry.ec->HasReceivedAtLeastOneMessage())
@@ -470,8 +480,8 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
         baseTimeout = entry.ec->GetSessionHandle()->GetMRPBaseTimeout();
     }
 
-    System::Clock::Timestamp backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
-    entry.nextRetransTime            = System::SystemClock().GetMonotonicTimestamp() + backoff;
+    System::Clock::Timeout backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
+    entry.nextRetransTime          = System::SystemClock().GetMonotonicTimestamp() + backoff;
 }
 
 #if CHIP_CONFIG_TEST

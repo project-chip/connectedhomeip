@@ -25,6 +25,8 @@ cp {out}/android-arm64-chip-tool/lib/jni/arm64-v8a/libc++_shared.so {root}/examp
 
 cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPController.jar {root}/examples/android/CHIPTool/app/libs/CHIPController.jar
 
+cp {out}/android-arm64-chip-tool/lib/src/controller/java/CHIPInteractionModel.jar {root}/examples/android/CHIPTool/app/libs/CHIPInteractionModel.jar
+
 cp {out}/android-arm64-chip-tool/lib/src/controller/java/OnboardingPayload.jar {root}/examples/android/CHIPTool/app/libs/OnboardingPayload.jar
 
 cp {out}/android-arm64-chip-tool/lib/src/platform/android/AndroidPlatform.jar {root}/examples/android/CHIPTool/app/libs/AndroidPlatform.jar

@@ -33,18 +33,6 @@
 
 namespace chip {
 
-// Spec 5.1.4.2 CHIPCommon tag numbers are in the range [0x00, 0x7F]
-bool SetupPayload::IsCommonTag(uint8_t tag)
-{
-    return tag < 0x80;
-}
-
-// Spec 5.1.4.1 Manufacture-specific tag numbers are in the range [0x80, 0xFF]
-bool SetupPayload::IsVendorTag(uint8_t tag)
-{
-    return !IsCommonTag(tag);
-}
-
 // Check the Setup Payload for validity
 //
 // `vendor_id` and `product_id` are allowed all of uint16_t
@@ -79,7 +67,11 @@ bool PayloadContents::isValidQRCodePayload() const
         return false;
     }
 
-    // Discriminator validity is enforced by the SetupDiscriminator class.
+    // General discriminator validity is enforced by the SetupDiscriminator class, but it can't be short for QR a code.
+    if (discriminator.IsShortDiscriminator())
+    {
+        return false;
+    }
 
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
@@ -146,7 +138,7 @@ bool PayloadContents::CheckPayloadCommonConstraints() const
     return true;
 }
 
-bool PayloadContents::operator==(PayloadContents & input) const
+bool PayloadContents::operator==(const PayloadContents & input) const
 {
     return (this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
             this->commissioningFlow == input.commissioningFlow && this->rendezvousInformation == input.rendezvousInformation &&
@@ -257,10 +249,11 @@ CHIP_ERROR SetupPayload::addOptionalExtensionData(const OptionalQRCodeInfoExtens
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetupPayload::getOptionalVendorData(uint8_t tag, OptionalQRCodeInfo & info)
+CHIP_ERROR SetupPayload::getOptionalVendorData(uint8_t tag, OptionalQRCodeInfo & info) const
 {
-    VerifyOrReturnError(optionalVendorData.find(tag) != optionalVendorData.end(), CHIP_ERROR_KEY_NOT_FOUND);
-    info = optionalVendorData[tag];
+    const auto it = optionalVendorData.find(tag);
+    VerifyOrReturnError(it != optionalVendorData.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    info = it->second;
 
     return CHIP_NO_ERROR;
 }
@@ -273,7 +266,7 @@ CHIP_ERROR SetupPayload::getOptionalExtensionData(uint8_t tag, OptionalQRCodeInf
     return CHIP_NO_ERROR;
 }
 
-optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)
+optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag) const
 {
     optionalQRCodeInfoType elemType = optionalQRCodeInfoTypeUnknown;
 
@@ -289,7 +282,7 @@ optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)
     return elemType;
 }
 
-std::vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData()
+std::vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData() const
 {
     std::vector<OptionalQRCodeInfoExtension> returnedOptionalInfo;
     for (auto & entry : optionalExtensionData)
@@ -299,7 +292,7 @@ std::vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionDa
     return returnedOptionalInfo;
 }
 
-bool SetupPayload::operator==(SetupPayload & input)
+bool SetupPayload::operator==(const SetupPayload & input) const
 {
     std::vector<OptionalQRCodeInfo> inputOptionalVendorData;
     std::vector<OptionalQRCodeInfoExtension> inputOptionalExtensionData;

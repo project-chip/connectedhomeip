@@ -57,18 +57,44 @@ void ClearLocalMRPConfigOverride()
 }
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+namespace {
+
+// This is not a static member of ReliableMessageProtocolConfig because the free
+// function GetLocalMRPConfig() needs access to it.
+Optional<ReliableMessageProtocolConfig> sDynamicLocalMPRConfig;
+
+} // anonymous namespace
+
+bool ReliableMessageProtocolConfig::SetLocalMRPConfig(const Optional<ReliableMessageProtocolConfig> & localMRPConfig)
+{
+    auto oldConfig         = GetLocalMRPConfig();
+    sDynamicLocalMPRConfig = localMRPConfig;
+    return oldConfig != GetLocalMRPConfig();
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+
 ReliableMessageProtocolConfig GetDefaultMRPConfig()
 {
     // Default MRP intervals are defined in spec <4.12.8. Parameters and Constants>
     static constexpr const System::Clock::Milliseconds32 idleRetransTimeout   = 500_ms32;
     static constexpr const System::Clock::Milliseconds32 activeRetransTimeout = 300_ms32;
     static constexpr const System::Clock::Milliseconds16 activeThresholdTime  = 4000_ms16;
+    static_assert(activeThresholdTime == kDefaultActiveTime, "Different active defaults?");
     return ReliableMessageProtocolConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
 }
 
 Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
 {
     ReliableMessageProtocolConfig config(CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL, CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+    if (sDynamicLocalMPRConfig.HasValue())
+    {
+        config = sDynamicLocalMPRConfig.Value();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // TODO ICD LIT shall not advertise the SII key
     // Increase local MRP retry intervals by ICD polling intervals. That is, intervals for
@@ -99,9 +125,8 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
                                              : Optional<ReliableMessageProtocolConfig>::Value(config);
 }
 
-System::Clock::Timestamp GetRetransmissionTimeout(System::Clock::Timestamp activeInterval, System::Clock::Timestamp idleInterval,
-                                                  System::Clock::Timestamp lastActivityTime,
-                                                  System::Clock::Timestamp activityThreshold)
+System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInterval, System::Clock::Timeout idleInterval,
+                                                System::Clock::Timeout lastActivityTime, System::Clock::Timeout activityThreshold)
 {
     auto timeSinceLastActivity = (System::SystemClock().GetMonotonicTimestamp() - lastActivityTime);
 

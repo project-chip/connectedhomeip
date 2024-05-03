@@ -501,7 +501,7 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p::GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key) const
+CHIP_ERROR Spake2p::GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key)
 {
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::KC, CHIP_ERROR_INTERNAL);
 

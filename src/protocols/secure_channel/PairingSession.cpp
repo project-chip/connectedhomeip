@@ -22,6 +22,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/support/SafeInt.h>
+#include <transport/SessionManager.h>
 
 namespace chip {
 
@@ -56,8 +57,20 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
 
 void PairingSession::Finish()
 {
-    Transport::PeerAddress address = mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
+    Transport::PeerAddress address = mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    if (address.GetTransportType() == Transport::Type::kTcp)
+    {
+        // Fetch the connection for the unauthenticated session used to set up
+        // the secure session.
+        Transport::ActiveTCPConnectionState * conn =
+            mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->GetTCPConnection();
+
+        // Associate the connection with the secure session being activated.
+        mSecureSessionHolder->AsSecureSession()->SetTCPConnection(conn);
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
     DiscardExchange();
 
@@ -79,14 +92,15 @@ void PairingSession::Finish()
 
 void PairingSession::DiscardExchange()
 {
-    if (mExchangeCtxt != nullptr)
+    if (mExchangeCtxt.HasValue())
     {
         // Make sure the exchange doesn't try to notify us when it closes,
         // since we might be dead by then.
-        mExchangeCtxt->SetDelegate(nullptr);
+        mExchangeCtxt.Value()->SetDelegate(nullptr);
+
         // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
         // exchange will handle that.
-        mExchangeCtxt = nullptr;
+        mExchangeCtxt.ClearValue();
     }
 }
 
@@ -227,19 +241,18 @@ bool PairingSession::IsSessionEstablishmentInProgress()
 
 void PairingSession::Clear()
 {
-    // Clear acts like the destructor if PairingSession, if it is call during
-    // middle of a pairing, means we should terminate the exchange. For normal
-    // path, the exchange should already be discarded before calling Clear.
-    if (mExchangeCtxt != nullptr)
+    // Clear acts like the destructor of PairingSession. If it is called during
+    // the middle of pairing, that means we should terminate the exchange. For the
+    // normal path, the exchange should already be discarded before calling Clear.
+    if (mExchangeCtxt.HasValue())
     {
-        // The only time we reach this is if we are getting destroyed in the
-        // middle of our handshake.  In that case, there is no point trying to
-        // do MRP resends of the last message we sent, so abort the exchange
+        // The only time we reach this is when we are getting destroyed in the
+        // middle of our handshake. In that case, there is no point in trying to
+        // do MRP resends of the last message we sent. So, abort the exchange
         // instead of just closing it.
-        mExchangeCtxt->Abort();
-        mExchangeCtxt = nullptr;
+        mExchangeCtxt.Value()->Abort();
+        mExchangeCtxt.ClearValue();
     }
-
     mSecureSessionHolder.Release();
     mPeerSessionId.ClearValue();
     mSessionManager = nullptr;

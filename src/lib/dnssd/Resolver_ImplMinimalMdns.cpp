@@ -17,8 +17,6 @@
 
 #include "Resolver.h"
 
-#include <limits>
-
 #include <lib/core/CHIPConfig.h>
 #include <lib/dnssd/ActiveResolveAttempts.h>
 #include <lib/dnssd/IncrementalResolve.h>
@@ -285,8 +283,7 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override;
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context) override;
     CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
@@ -373,7 +370,23 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
         if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
         {
-            ScheduleIpAddressResolve(resolver->GetTargetHostName());
+            if (resolver->IsActiveBrowseParse())
+            {
+                // Browse wants IP addresses
+                ScheduleIpAddressResolve(resolver->GetTargetHostName());
+            }
+            else if (mActiveResolves.ShouldResolveIpAddress(resolver->OperationalParsePeerId()))
+            {
+                // Keep searching for IP addresses if an active resolve needs these IP addresses
+                // otherwise ignore the data (received a SRV record without IP address, however we do not
+                // seem interested in it. Probably just a device that came online).
+                ScheduleIpAddressResolve(resolver->GetTargetHostName());
+            }
+            else
+            {
+                // This IP address is not interesting enough to run another discovery
+                resolver->ResetToInactive();
+            }
             continue;
         }
 
@@ -386,7 +399,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         }
 
         // SUCCESS. Call the delegates
-        if (resolver->IsActiveCommissionParse())
+        if (resolver->IsActiveBrowseParse())
         {
             MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
             DiscoveredNodeData nodeData;
@@ -418,7 +431,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
                 mActiveResolves.CompleteCommissionable(nodeData);
                 break;
             default:
-                ChipLogError(Discovery, "Unexpected type for commission data parsing");
+                ChipLogError(Discovery, "Unexpected type for browse data parsing");
                 continue;
             }
 
@@ -631,9 +644,9 @@ CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
 {
     while (true)
     {
-        Optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
+        std::optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
 
-        if (!resolve.HasValue())
+        if (!resolve.has_value())
         {
             break;
         }
@@ -644,9 +657,9 @@ CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
         QueryBuilder builder(std::move(buffer));
         builder.Header().SetMessageId(0);
 
-        ReturnErrorOnFailure(BuildQuery(builder, resolve.Value()));
+        ReturnErrorOnFailure(BuildQuery(builder, *resolve));
 
-        if (resolve.Value().firstSend)
+        if (resolve->firstSend)
         {
             ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
         }
@@ -685,20 +698,12 @@ void MinMdnsResolver::ExpireIncrementalResolvers()
     }
 }
 
-CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context)
+CHIP_ERROR MinMdnsResolver::StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext & context)
 {
     // minmdns currently supports only one discovery context at a time so override the previous context
     SetDiscoveryContext(&context);
 
-    return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
-}
-
-CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context)
-{
-    // minmdns currently supports only one discovery context at a time so override the previous context
-    SetDiscoveryContext(&context);
-
-    return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
+    return BrowseNodes(type, filter);
 }
 
 CHIP_ERROR MinMdnsResolver::StopDiscovery(DiscoveryContext & context)
@@ -739,14 +744,14 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&RetryCallback, this);
 
-    Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
+    std::optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
 
-    if (!delay.HasValue())
+    if (!delay.has_value())
     {
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(delay.Value(), &RetryCallback, this);
+    return mSystemLayer->StartTimer(*delay, &RetryCallback, this);
 }
 
 void MinMdnsResolver::RetryCallback(System::Layer *, void * self)
@@ -758,10 +763,14 @@ MinMdnsResolver gResolver;
 
 } // namespace
 
-Resolver & chip::Dnssd::Resolver::Instance()
+#if CHIP_DNSSD_DEFAULT_MINIMAL
+
+Resolver & GetDefaultResolver()
 {
     return gResolver;
 }
+
+#endif // CHIP_DNSSD_DEFAULT_MINIMAL
 
 } // namespace Dnssd
 } // namespace chip

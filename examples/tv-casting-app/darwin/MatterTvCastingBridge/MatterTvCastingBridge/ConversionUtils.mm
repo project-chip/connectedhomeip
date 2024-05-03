@@ -45,36 +45,36 @@
 }
 
 + (CHIP_ERROR)convertToCppDiscoveredNodeDataFrom:(DiscoveredNodeData * _Nonnull)objCDiscoveredNodeData
-                           outDiscoveredNodeData:(chip::Dnssd::DiscoveredNodeData &)outDiscoveredNodeData
+                           outDiscoveredNodeData:(chip::Dnssd::CommissionNodeData &)outDiscoveredNodeData
 {
     // setting CommissionNodeData
-    outDiscoveredNodeData.commissionData.deviceType = objCDiscoveredNodeData.deviceType;
-    outDiscoveredNodeData.commissionData.vendorId = objCDiscoveredNodeData.vendorId;
-    outDiscoveredNodeData.commissionData.productId = objCDiscoveredNodeData.productId;
-    outDiscoveredNodeData.commissionData.longDiscriminator = objCDiscoveredNodeData.longDiscriminator;
-    outDiscoveredNodeData.commissionData.commissioningMode = objCDiscoveredNodeData.commissioningMode;
-    outDiscoveredNodeData.commissionData.pairingHint = objCDiscoveredNodeData.pairingHint;
-    memset(outDiscoveredNodeData.commissionData.deviceName, '\0', sizeof(outDiscoveredNodeData.commissionData.deviceName));
+    outDiscoveredNodeData.deviceType = objCDiscoveredNodeData.deviceType;
+    outDiscoveredNodeData.vendorId = objCDiscoveredNodeData.vendorId;
+    outDiscoveredNodeData.productId = objCDiscoveredNodeData.productId;
+    outDiscoveredNodeData.longDiscriminator = objCDiscoveredNodeData.longDiscriminator;
+    outDiscoveredNodeData.commissioningMode = objCDiscoveredNodeData.commissioningMode;
+    outDiscoveredNodeData.pairingHint = objCDiscoveredNodeData.pairingHint;
+    memset(outDiscoveredNodeData.deviceName, '\0', sizeof(outDiscoveredNodeData.deviceName));
     if (objCDiscoveredNodeData.deviceName != nullptr) {
-        chip::Platform::CopyString(outDiscoveredNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
+        chip::Platform::CopyString(outDiscoveredNodeData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
             [objCDiscoveredNodeData.deviceName UTF8String]);
     }
-    outDiscoveredNodeData.commissionData.rotatingIdLen = objCDiscoveredNodeData.rotatingIdLen;
+    outDiscoveredNodeData.rotatingIdLen = objCDiscoveredNodeData.rotatingIdLen;
     memcpy(
-        outDiscoveredNodeData.commissionData.rotatingId, objCDiscoveredNodeData.rotatingId, objCDiscoveredNodeData.rotatingIdLen);
+        outDiscoveredNodeData.rotatingId, objCDiscoveredNodeData.rotatingId, objCDiscoveredNodeData.rotatingIdLen);
 
     // setting CommonResolutionData
-    outDiscoveredNodeData.resolutionData.port = objCDiscoveredNodeData.port;
-    memset(outDiscoveredNodeData.resolutionData.hostName, '\0', sizeof(outDiscoveredNodeData.resolutionData.hostName));
+    outDiscoveredNodeData.port = objCDiscoveredNodeData.port;
+    memset(outDiscoveredNodeData.hostName, '\0', sizeof(outDiscoveredNodeData.hostName));
     if (objCDiscoveredNodeData.hostName != nullptr) {
-        chip::Platform::CopyString(outDiscoveredNodeData.resolutionData.hostName, chip::Dnssd::kHostNameMaxLength + 1,
+        chip::Platform::CopyString(outDiscoveredNodeData.hostName, chip::Dnssd::kHostNameMaxLength + 1,
             [objCDiscoveredNodeData.hostName UTF8String]);
     }
-    outDiscoveredNodeData.resolutionData.interfaceId = chip::Inet::InterfaceId(objCDiscoveredNodeData.platformInterface);
-    outDiscoveredNodeData.resolutionData.numIPs = objCDiscoveredNodeData.numIPs;
+    outDiscoveredNodeData.interfaceId = chip::Inet::InterfaceId(objCDiscoveredNodeData.platformInterface);
+    outDiscoveredNodeData.numIPs = objCDiscoveredNodeData.numIPs;
     for (size_t i = 0; i < objCDiscoveredNodeData.numIPs; i++) {
         chip::Inet::IPAddress::FromString(
-            [objCDiscoveredNodeData.ipAddresses[i] UTF8String], outDiscoveredNodeData.resolutionData.ipAddress[i]);
+            [objCDiscoveredNodeData.ipAddresses[i] UTF8String], outDiscoveredNodeData.ipAddress[i]);
     }
     return CHIP_NO_ERROR;
 }
@@ -116,36 +116,36 @@
     return objCContentApp;
 }
 
-+ (DiscoveredNodeData *)convertToObjCDiscoveredNodeDataFrom:(const chip::Dnssd::DiscoveredNodeData * _Nonnull)cppDiscoveredNodedata
++ (DiscoveredNodeData *)convertToObjCDiscoveredNodeDataFrom:(const chip::Dnssd::CommissionNodeData * _Nonnull)cppDiscoveredNodedata
 {
     DiscoveredNodeData * objCDiscoveredNodeData = [DiscoveredNodeData new];
 
     // from CommissionNodeData
-    objCDiscoveredNodeData.deviceType = cppDiscoveredNodedata->commissionData.deviceType;
-    objCDiscoveredNodeData.vendorId = cppDiscoveredNodedata->commissionData.vendorId;
-    objCDiscoveredNodeData.productId = cppDiscoveredNodedata->commissionData.productId;
-    objCDiscoveredNodeData.longDiscriminator = cppDiscoveredNodedata->commissionData.longDiscriminator;
-    objCDiscoveredNodeData.commissioningMode = cppDiscoveredNodedata->commissionData.commissioningMode;
-    objCDiscoveredNodeData.pairingHint = cppDiscoveredNodedata->commissionData.pairingHint;
-    objCDiscoveredNodeData.deviceName = [NSString stringWithCString:cppDiscoveredNodedata->commissionData.deviceName
+    objCDiscoveredNodeData.deviceType = cppDiscoveredNodedata->deviceType;
+    objCDiscoveredNodeData.vendorId = cppDiscoveredNodedata->vendorId;
+    objCDiscoveredNodeData.productId = cppDiscoveredNodedata->productId;
+    objCDiscoveredNodeData.longDiscriminator = cppDiscoveredNodedata->longDiscriminator;
+    objCDiscoveredNodeData.commissioningMode = cppDiscoveredNodedata->commissioningMode;
+    objCDiscoveredNodeData.pairingHint = cppDiscoveredNodedata->pairingHint;
+    objCDiscoveredNodeData.deviceName = [NSString stringWithCString:cppDiscoveredNodedata->deviceName
                                                            encoding:NSUTF8StringEncoding];
-    objCDiscoveredNodeData.rotatingIdLen = cppDiscoveredNodedata->commissionData.rotatingIdLen;
-    objCDiscoveredNodeData.rotatingId = cppDiscoveredNodedata->commissionData.rotatingId;
-    objCDiscoveredNodeData.instanceName = [NSString stringWithCString:cppDiscoveredNodedata->commissionData.instanceName
+    objCDiscoveredNodeData.rotatingIdLen = cppDiscoveredNodedata->rotatingIdLen;
+    objCDiscoveredNodeData.rotatingId = cppDiscoveredNodedata->rotatingId;
+    objCDiscoveredNodeData.instanceName = [NSString stringWithCString:cppDiscoveredNodedata->instanceName
                                                              encoding:NSUTF8StringEncoding];
 
     // from CommonResolutionData
-    objCDiscoveredNodeData.port = cppDiscoveredNodedata->resolutionData.port;
-    objCDiscoveredNodeData.hostName = [NSString stringWithCString:cppDiscoveredNodedata->resolutionData.hostName
+    objCDiscoveredNodeData.port = cppDiscoveredNodedata->port;
+    objCDiscoveredNodeData.hostName = [NSString stringWithCString:cppDiscoveredNodedata->hostName
                                                          encoding:NSUTF8StringEncoding];
-    objCDiscoveredNodeData.platformInterface = cppDiscoveredNodedata->resolutionData.interfaceId.GetPlatformInterface();
-    objCDiscoveredNodeData.numIPs = cppDiscoveredNodedata->resolutionData.numIPs;
-    if (cppDiscoveredNodedata->resolutionData.numIPs > 0) {
+    objCDiscoveredNodeData.platformInterface = cppDiscoveredNodedata->interfaceId.GetPlatformInterface();
+    objCDiscoveredNodeData.numIPs = cppDiscoveredNodedata->numIPs;
+    if (cppDiscoveredNodedata->numIPs > 0) {
         objCDiscoveredNodeData.ipAddresses = [NSMutableArray new];
     }
-    for (size_t i = 0; i < cppDiscoveredNodedata->resolutionData.numIPs; i++) {
+    for (size_t i = 0; i < cppDiscoveredNodedata->numIPs; i++) {
         char addrCString[chip::Inet::IPAddress::kMaxStringLength];
-        cppDiscoveredNodedata->resolutionData.ipAddress[i].ToString(addrCString, chip::Inet::IPAddress::kMaxStringLength);
+        cppDiscoveredNodedata->ipAddress[i].ToString(addrCString, chip::Inet::IPAddress::kMaxStringLength);
         objCDiscoveredNodeData.ipAddresses[i] = [NSString stringWithCString:addrCString encoding:NSASCIIStringEncoding];
     }
     return objCDiscoveredNodeData;

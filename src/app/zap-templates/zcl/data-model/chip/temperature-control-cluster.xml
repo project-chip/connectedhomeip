@@ -25,6 +25,21 @@ limitations under the License.
     <define>TEMPERATURE_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <features>
+      <feature bit="0" code="TN" name="TemperatureNumber" summary="Use actual temperature numbers">
+        <optionalConform choice="a"/>
+      </feature>
+      <feature bit="1" code="TL" name="TemperatureLevel" summary="Use temperature levels">
+        <optionalConform choice="a"/>
+      </feature>
+      <feature bit="2" code="STEP" name="TemperatureStep" summary="Use step control with temperature numbers">
+        <optionalConform>
+          <feature name="TN"/>
+        </optionalConform>
+      </feature>
+    </features>
+
     <attribute side="server" code="0x0000" define="TEMP_SETPOINT" type="temperature" writable="false" optional="true">TemperatureSetpoint</attribute>
     <attribute side="server" code="0x0001" define="MIN_TEMP" type="temperature" writable="false" optional="true">MinTemperature</attribute>
     <attribute side="server" code="0x0002" define="MAX_TEMP" type="temperature" writable="false" optional="true">MaxTemperature</attribute>
@@ -38,10 +53,5 @@ limitations under the License.
         <arg name="TargetTemperatureLevel" type="int8u" optional="true"/>
     </command>
   </cluster>
-  <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0056"/>
-    <field mask="0x01" name="TemperatureNumber" />
-    <field mask="0x02" name="TemperatureLevel" />
-    <field mask="0x04" name="TemperatureStep" />
-  </bitmap>
+
 </configurator>
