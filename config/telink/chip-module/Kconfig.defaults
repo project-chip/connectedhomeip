@@ -344,7 +344,7 @@ endif # CHIP_WIFI
 
 config CHIP_ENABLE_PAIRING_AUTOSTART
     bool "Open commissioning window on boot"
-    default y 
+    default y
     help
         Opens the commissioning window automatically at application boot time if
         the node is not yet commissioned.
