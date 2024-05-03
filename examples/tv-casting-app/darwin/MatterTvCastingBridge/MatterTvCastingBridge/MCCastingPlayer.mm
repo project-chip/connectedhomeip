@@ -52,20 +52,30 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 
     dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
     dispatch_sync(workQueue, ^{
+        matter::casting::core::IdentificationDeclarationOptions idOptions;
+
+        // TODO: In the following PRs. Replace EndpointFilter objC class with IdentificationDeclarationOptions objC class.
         __block matter::casting::core::EndpointFilter cppDesiredEndpointFilter;
         if (desiredEndpointFilter != nil) {
-            cppDesiredEndpointFilter.vendorId = desiredEndpointFilter.vendorId;
-            cppDesiredEndpointFilter.productId = desiredEndpointFilter.productId;
+            chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+            targetAppInfo.vendorId = desiredEndpointFilter.vendorId;
+            targetAppInfo.productId = desiredEndpointFilter.productId;
+
+            CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
+            if (result != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
+            }
         }
 
-        // TODO: In the following PRs. Removed desiredEndpointFilter to fix iOS app build issue. Replace desiredEndpointFilter with optional IdentificationDeclarationOptions. Add optional CommissionerDeclarationHandler callback parameter.
+        // TODO: In the following PRs. Add optional CommissionerDeclarationHandler callback parameter.
         _cppCastingPlayer->VerifyOrEstablishConnection(
             [completion](CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
                 dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
                 dispatch_async(clientQueue, ^{
                     completion(err == CHIP_NO_ERROR ? nil : [MCErrorUtils NSErrorFromChipError:err]);
                 });
-            }, timeout);
+            }, timeout, idOptions);
     });
 }
 

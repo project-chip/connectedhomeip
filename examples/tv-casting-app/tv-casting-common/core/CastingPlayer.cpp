@@ -66,7 +66,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
         if (it != cachedCastingPlayers.end())
         {
             unsigned index = (unsigned int) std::distance(cachedCastingPlayers.begin(), it);
-            if (ContainsDesiredTargetApp(&cachedCastingPlayers[index], idOptions.mTargetAppInfos, idOptions.mNumTargetAppInfos))
+            if (ContainsDesiredTargetApp(&cachedCastingPlayers[index], idOptions.getTargetAppInfoList()))
             {
                 ChipLogProgress(
                     AppServer,
@@ -166,17 +166,35 @@ void CastingPlayer::RegisterEndpoint(const memory::Strong<Endpoint> endpoint)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 CHIP_ERROR CastingPlayer::SendUserDirectedCommissioningRequest()
 {
-    ChipLogProgress(AppServer, "CastingPlayer::SendUserDirectedCommissioningRequest() creating IdentificationDeclaration message");
+    ChipLogProgress(AppServer, "CastingPlayer::SendUserDirectedCommissioningRequest()");
     chip::Inet::IPAddress * ipAddressToUse = GetIpAddressForUDCRequest();
     VerifyOrReturnValue(ipAddressToUse != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(AppServer, "No IP Address found to send UDC request to"));
 
     ReturnErrorOnFailure(support::ChipDeviceEventHandler::SetUdcStatus(true));
 
+    chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration id = buildIdentificationDeclarationMessage();
+
+    // TODO: In the following PRs. Implement handler for CommissionerDeclaration messages and expose messages to higher layers for
+    // Linux, Android and iOS.
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
+        mCommissionerDeclarationHandler);
+
+    ReturnErrorOnFailure(chip::Server::GetInstance().SendUserDirectedCommissioningRequest(
+        chip::Transport::PeerAddress::UDP(*ipAddressToUse, mAttributes.port, mAttributes.interfaceId), id));
+
+    return CHIP_NO_ERROR;
+}
+
+chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration CastingPlayer::buildIdentificationDeclarationMessage()
+{
+    ChipLogProgress(AppServer, "CastingPlayer::buildIdentificationDeclarationMessage() building IdentificationDeclaration message");
     chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
-    for (size_t i = 0; i < mIdOptions.mNumTargetAppInfos; i++)
+
+    std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> mTargetAppInfos = mIdOptions.getTargetAppInfoList();
+    for (size_t i = 0; i < mTargetAppInfos.size(); i++)
     {
-        id.AddTargetAppInfo(mIdOptions.mTargetAppInfos[i]);
+        id.AddTargetAppInfo(mTargetAppInfos[i]);
     }
     id.SetNoPasscode(mIdOptions.mNoPasscode);
     id.SetCdUponPasscodeDialog(mIdOptions.mCdUponPasscodeDialog);
@@ -194,15 +212,7 @@ CHIP_ERROR CastingPlayer::SendUserDirectedCommissioningRequest()
         }
     }
 
-    // TODO: In the following PRs. Implement handler for CommissionerDeclaration messages and expose messages to higher layers for
-    // Linux, Android and iOS.
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
-        mCommissionerDeclarationHandler);
-
-    ReturnErrorOnFailure(chip::Server::GetInstance().SendUserDirectedCommissioningRequest(
-        chip::Transport::PeerAddress::UDP(*ipAddressToUse, mAttributes.port, mAttributes.interfaceId), id));
-
-    return CHIP_NO_ERROR;
+    return id;
 }
 
 chip::Inet::IPAddress * CastingPlayer::GetIpAddressForUDCRequest()
@@ -244,12 +254,10 @@ void CastingPlayer::FindOrEstablishSession(void * clientContext, chip::OnDeviceC
         connectionContext->mOnConnectionFailureCallback);
 }
 
-bool CastingPlayer::ContainsDesiredTargetApp(core::CastingPlayer * cachedCastingPlayer,
-                                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo * desiredTargetApps,
-                                             uint8_t numTargetApps)
+bool CastingPlayer::ContainsDesiredTargetApp(core::CastingPlayer * cachedCastingPlayer, std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> desiredTargetApps)
 {
     std::vector<memory::Strong<Endpoint>> cachedEndpoints = cachedCastingPlayer->GetEndpoints();
-    for (size_t i = 0; i < numTargetApps; i++)
+    for (size_t i = 0; i < desiredTargetApps.size(); i++)
     {
         for (const auto & cachedEndpoint : cachedEndpoints)
         {

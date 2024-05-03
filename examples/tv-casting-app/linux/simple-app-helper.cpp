@@ -49,8 +49,10 @@ void DiscoveryDelegateImpl::HandleOnAdded(matter::casting::memory::Strong<matter
     if (commissionersCount == 0)
     {
         ChipLogProgress(AppServer, "Select discovered Casting Player (start index = 0) to request commissioning");
+        ChipLogProgress(AppServer, "Include the cgp flag to attempt the Commissioner-Generated Passcode commissioning flow");
 
-        ChipLogProgress(AppServer, "Example: cast request 0");
+        ChipLogProgress(AppServer, "Example1: cast request 0");
+        ChipLogProgress(AppServer, "Example2: cast request 0 cgp");
     }
     ChipLogProgress(AppServer, "Discovered CastingPlayer #%d", commissionersCount);
     ++commissionersCount;
@@ -221,13 +223,13 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
     }
     if (strcmp(argv[0], "discover") == 0)
     {
-        ChipLogProgress(AppServer, "discover");
+        ChipLogProgress(AppServer, "CommandHandler() discover");
 
         return matter::casting::core::CastingPlayerDiscovery::GetInstance()->StartDiscovery(kTargetPlayerDeviceType);
     }
     if (strcmp(argv[0], "stop-discovery") == 0)
     {
-        ChipLogProgress(AppServer, "stop-discovery");
+        ChipLogProgress(AppServer, "CommandHandler() stop-discovery");
         return matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
     }
     if (strcmp(argv[0], "request") == 0)
@@ -246,12 +248,27 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer = castingPlayers.at(index);
 
         matter::casting::core::IdentificationDeclarationOptions idOptions;
-        idOptions.mNumTargetAppInfos          = 1;
-        idOptions.mTargetAppInfos[0].vendorId = kDesiredEndpointVendorId;
-        // Attempt Commissioner-Generated Passcode commissioning flow only if the CastingPlayer indicates support for it.
-        if (targetCastingPlayer->GetSupportsCommissionerGeneratedPasscode())
+        if (argc == 3)
         {
-            idOptions.mCommissionerPasscode = true;
+            if (strcmp(argv[2], "cgp") == 0)
+            {
+                // Attempt Commissioner-Generated Passcode (cgp) commissioning flow only if the CastingPlayer indicates support for it.
+                if (targetCastingPlayer->GetSupportsCommissionerGeneratedPasscode())
+                {
+                    ChipLogProgress(AppServer, "CommandHandler() request %lu cgp. Attempting the Commissioner-Generated Passcode commissioning flow", index);
+                    idOptions.mCommissionerPasscode = true;
+                } else 
+                {
+                    ChipLogError(AppServer, "CommandHandler() request %lu cgp. Selected CastingPLayer does not support the Commissioner-Generated Passcode commissioning flow", index);
+                }
+            }
+        }
+        chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+        targetAppInfo.vendorId = kDesiredEndpointVendorId;
+        CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
+        if (result != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
         }
 
         targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler, matter::casting::core::kCommissioningWindowTimeoutSec,
@@ -291,6 +308,8 @@ CHIP_ERROR PrintAllCommands()
     streamer_printf(sout, "  stop-discovery       Stop Discovery of Casting Players. Usage: cast stop-discovery\r\n");
     streamer_printf(
         sout, "  request <index>      Request connecting to discovered Casting Player with [index]. Usage: cast request 0\r\n");
+    streamer_printf(
+        sout, "  request <index> cgp  Request connecting to discovered Casting Player with [index] using the Commissioner-Generated Passcode commissioning flow. Usage: cast request 0 cgp\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;

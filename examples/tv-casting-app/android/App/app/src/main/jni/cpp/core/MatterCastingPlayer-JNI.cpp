@@ -53,9 +53,14 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
     CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
     VerifyOrReturnValue(castingPlayer != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INVALID_ARGUMENT));
 
+    matter::casting::core::IdentificationDeclarationOptions idOptions;
+
+    // TODO: In the following PRs. Replace EndpointFilter Java class with IdentificationDeclarationOptions Java class.
     matter::casting::core::EndpointFilter desiredEndpointFilter;
     if (desiredEndpointFilterJavaObject != nullptr)
     {
+        chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+
         // Convert the EndpointFilter Java class to a C++ EndpointFilter
         jclass endpointFilterJavaClass = env->GetObjectClass(desiredEndpointFilterJavaObject);
         jfieldID vendorIdFieldId       = env->GetFieldID(endpointFilterJavaClass, "vendorId", "Ljava/lang/Integer;");
@@ -66,23 +71,26 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
         // "Ljava/util/List;");
 
         // Value of 0 means unspecified
-        desiredEndpointFilter.vendorId  = vendorIdIntegerObject != nullptr
+        targetAppInfo.vendorId  = vendorIdIntegerObject != nullptr
              ? static_cast<uint16_t>(env->CallIntMethod(
                   vendorIdIntegerObject, env->GetMethodID(env->GetObjectClass(vendorIdIntegerObject), "intValue", "()I")))
              : 0;
-        desiredEndpointFilter.productId = productIdIntegerObject != nullptr
+        targetAppInfo.productId = productIdIntegerObject != nullptr
             ? static_cast<uint16_t>(env->CallIntMethod(
                   productIdIntegerObject, env->GetMethodID(env->GetObjectClass(productIdIntegerObject), "intValue", "()I")))
             : 0;
-        // TODO: In following PRs. Translate the Java requiredDeviceTypes list to a C++ requiredDeviceTypes vector. For now we're
-        // passing an empty list of DeviceTypeStruct.
+
+        CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
+        if (result != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
+        }
     }
 
     MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
     MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
 
-    // TODO: In the following PRs. Removed desiredEndpointFilter to fix Android app build issue. Replace desiredEndpointFilter with
-    // optional IdentificationDeclarationOptions. Add optional CommissionerDeclarationHandler callback parameter.
+    // TODO: In the following PRs. Add optional CommissionerDeclarationHandler callback parameter.
     castingPlayer->VerifyOrEstablishConnection(
         [](CHIP_ERROR err, CastingPlayer * playerPtr) {
             ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback called");
@@ -99,7 +107,7 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
                 MatterCastingPlayerJNIMgr().mConnectionFailureHandler.Handle(err);
             }
         },
-        static_cast<unsigned long long int>(commissioningWindowTimeoutSec));
+        static_cast<unsigned long long int>(commissioningWindowTimeoutSec), idOptions);
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 
