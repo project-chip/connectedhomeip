@@ -30,7 +30,7 @@ jobs:
         timeout-minutes: 60
 
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-latest
+        runs-on: macos-13
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36

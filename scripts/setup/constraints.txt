@@ -130,7 +130,7 @@ greenlet==2.0.2
     # via gevent
 humanfriendly==10.0
     # via coloredlogs
-idf-component-manager==1.2.2
+idf-component-manager==1.5.2
     # via -r requirements.esp32.txt
 idna==3.4
     # via requests
@@ -234,9 +234,6 @@ portpicker==1.5.2
     #   -r requirements.txt
     #   mobly
 prettytable==2.5.0
-    # via
-    #   mbed-ls
-    #   mbed-os-tools
 prompt-toolkit==3.0.43
     # via ipython
 protobuf==3.20.1
@@ -419,3 +416,9 @@ wheel==0.38.4 ; sys_platform == "linux"
 # The following packages are considered to be unsafe in a requirements file:
 # pip
 # setuptools
+#
+# Manual edits:
+# Higher versions depend on proto-plus, which break
+# nanopb code generation (due to name conflict of the 'proto' module)
+google-api-core==2.17.0
+
