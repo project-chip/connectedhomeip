@@ -128,8 +128,20 @@ struct PayloadContents
     SetupDiscriminator discriminator;
     uint32_t setUpPINCode = 0;
 
-    bool isValidQRCodePayload() const;
-    bool isValidManualCode() const;
+    enum class ValidationMode : uint8_t
+    {
+        kProduce, ///< Only flags or values allowed by the current spec version are allowed.
+                  ///  Producers of a Setup Payload should use this mode to ensure the
+                  //   payload is valid according to the current spec version.
+        kConsume, ///< Flags or values that are reserved for future use, or were allowed in
+                  ///  a previous spec version may be present. Consumers of a Setup Payload
+                  ///  should use this mode to ensure they are forward and backwards
+                  ///  compatible with payloads from older or newer Matter devices.
+    };
+
+    bool isValidQRCodePayload(ValidationMode mode = ValidationMode::kProduce) const;
+    bool isValidManualCode(ValidationMode mode = ValidationMode::kProduce) const;
+
     bool operator==(const PayloadContents & input) const;
 
     static bool IsValidSetupPIN(uint32_t setupPIN);

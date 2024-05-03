@@ -36,7 +36,7 @@ namespace chip {
 // Check the Setup Payload for validity
 //
 // `vendor_id` and `product_id` are allowed all of uint16_t
-bool PayloadContents::isValidQRCodePayload() const
+bool PayloadContents::isValidQRCodePayload(ValidationMode mode) const
 {
     // 3-bit value specifying the QR code payload version.
     if (version >= 1 << kVersionFieldLengthInBits)
@@ -50,19 +50,13 @@ bool PayloadContents::isValidQRCodePayload() const
     }
 
     // Device Commissioning Flow
+    // Even in ValidatoinMode::kConsume we can only handle modes that we understand.
     // 0: Standard commissioning flow: such a device, when uncommissioned, always enters commissioning mode upon power-up, subject
     // to the rules in [ref_Announcement_Commencement]. 1: User-intent commissioning flow: user action required to enter
     // commissioning mode. 2: Custom commissioning flow: interaction with a vendor-specified means is needed before commissioning.
     // 3: Reserved
     if (commissioningFlow != CommissioningFlow::kStandard && commissioningFlow != CommissioningFlow::kUserActionRequired &&
         commissioningFlow != CommissioningFlow::kCustom)
-    {
-        return false;
-    }
-
-    chip::RendezvousInformationFlags allvalid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
-                                              RendezvousInformationFlag::kSoftAP);
-    if (!rendezvousInformation.HasValue() || !rendezvousInformation.Value().HasOnly(allvalid))
     {
         return false;
     }
@@ -78,13 +72,21 @@ bool PayloadContents::isValidQRCodePayload() const
         return false;
     }
 
+    // RendevouzInformation must be present for a QR code.
+    VerifyOrReturnValue(rendezvousInformation.HasValue(), false);
+    if (mode == ValidationMode::kProduce)
+    {
+        chip::RendezvousInformationFlags valid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
+                                               RendezvousInformationFlag::kSoftAP);
+        VerifyOrReturnValue(rendezvousInformation.Value().HasOnly(valid), false);
+    }
+
     return CheckPayloadCommonConstraints();
 }
 
-bool PayloadContents::isValidManualCode() const
+bool PayloadContents::isValidManualCode(ValidationMode mode) const
 {
     // Discriminator validity is enforced by the SetupDiscriminator class.
-
     if (setUpPINCode >= 1 << kSetupPINCodeFieldLengthInBits)
     {
         return false;
@@ -109,7 +111,9 @@ bool PayloadContents::IsValidSetupPIN(uint32_t setupPIN)
 
 bool PayloadContents::CheckPayloadCommonConstraints() const
 {
-    // A version not equal to 0 would be invalid for v1 and would indicate new format (e.g. version 2)
+    // Validation rules in this method apply to all validation modes.
+
+    // Even in ValidationMode::kConsume we don't understand how to handle any payload version other than 0.
     if (version != 0)
     {
         return false;
