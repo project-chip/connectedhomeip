@@ -56,6 +56,11 @@ const PosixConfig::Key PosixConfig::kConfigKey_Spake2pVerifier       = { kConfig
 const PosixConfig::Key PosixConfig::kConfigKey_VendorId              = { kConfigNamespace_ChipFactory, "vendor-id" };
 const PosixConfig::Key PosixConfig::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
 
+const PosixConfig::Key PosixConfig::kConfigKey_VendorName               = { kConfigNamespace_ChipFactory, "vendor-name" };
+const PosixConfig::Key PosixConfig::kConfigKey_ProductName              = { kConfigNamespace_ChipFactory, "product-name" };
+const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersionString    = { kConfigNamespace_ChipFactory, "hardware-version-string" };
+const PosixConfig::Key PosixConfig::kConfigKey_SoftwareVersionString    = { kConfigNamespace_ChipFactory, "software-version-string" };
+
 // Keys stored in the Chip-config namespace
 const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
