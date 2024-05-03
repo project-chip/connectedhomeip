@@ -31,7 +31,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 TV_APP_MAX_START_WAIT_SEC = 2
 
 # The maximum amount of time to commission the Linux tv-casting-app and the tv-app before timeout.
-COMMISSIONING_STAGE_MAX_WAIT_SEC = 3
+COMMISSIONING_STAGE_MAX_WAIT_SEC = 10
 
 # File names of logs for the Linux tv-casting-app and the Linux tv-app.
 LINUX_TV_APP_LOGS = 'Linux-tv-app-logs.txt'
@@ -75,7 +75,7 @@ def dump_temporary_logs_to_console(log_file_path: str):
             print(line.rstrip())
 
 
-def handle_casting_state_failure(casting_state: str, log_file_paths: List[str]):
+def handle_casting_failure(casting_state: str, log_file_paths: List[str]):
     """Log '{casting_state} failed!' as error, dump log files to console, exit on error."""
     logging.error(casting_state + ' failed!')
 
@@ -88,10 +88,10 @@ def handle_casting_state_failure(casting_state: str, log_file_paths: List[str]):
     sys.exit(1)
 
 
-def extract_value_from_string(line: str) -> Union[int, str]:
-    """Extract and return either an integer or substring from given input string.
+def extract_value_from_string(line: str) -> str:
+    """Extract and return value from given input string.
 
-    The input string is expected to be in the following format as it is received
+    The string is expected to be in the following format as it is received
     from the Linux tv-casting-app output:
     \x1b[0;34m[1713741926895] [7276:9521344] [DIS] Vendor ID: 65521\x1b[0m
     The integer value to be extracted here is 65521.
@@ -101,22 +101,21 @@ def extract_value_from_string(line: str) -> Union[int, str]:
     """
     value = line.split(':')[-1].strip().replace('\x1b[0m', '')
 
-    try:
-        value = int(value)
-        return value
-    except ValueError:
-        return value
+    return value
 
 
-def validate_value(casting_state: str, expected_value: int, log_paths: List[str], line: str, value_name: str) -> Optional[str]:
+def validate_value(casting_state: str, expected_value: Union[str, int], log_paths: List[str], line: str, value_name: str) -> Optional[str]:
     """Validate a value in a string against an expected value during a given casting state."""
     value = extract_value_from_string(line)
+
+    if isinstance(expected_value, int):
+        value = int(value)
 
     if value != expected_value:
         logging.error(f'{value_name} does not match the expected value!')
         logging.error(f'Expected {value_name}: {expected_value}')
         logging.error(line.rstrip('\n'))
-        handle_casting_state_failure(casting_state, log_paths)
+        handle_casting_failure(casting_state, log_paths)
 
     # Return the line containing the valid value.
     return line.rstrip('\n')
@@ -153,7 +152,7 @@ def initiate_cast_request_success(tv_casting_app_info: Tuple[subprocess.Popen, T
         # Check if we exceeded the maximum wait time for initiating 'cast request' from the Linux tv-casting-app to the Linux tv-app.
         if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
             logging.error('The command `cast request ' + valid_discovered_commissioner_number +
-                          '` was not sent to the Linux tv-casting-app process within the timeout.')
+                          '` was not issued to the Linux tv-casting-app process within the timeout.')
             return False
 
         tv_casting_app_output_line = tv_casting_app_process.stdout.readline()
@@ -172,7 +171,7 @@ def initiate_cast_request_success(tv_casting_app_info: Tuple[subprocess.Popen, T
                 return True
 
 
-def extract_device_info(tv_casting_app_info: Tuple[subprocess.Popen, TextIO]) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+def extract_device_info_from_tv_casting_app(tv_casting_app_info: Tuple[subprocess.Popen, TextIO]) -> Tuple[Optional[str], Optional[int], Optional[int]]:
     """Extract device information from the 'Identification Declaration' block in the Linux tv-casting-app output."""
     tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
 
@@ -188,8 +187,10 @@ def extract_device_info(tv_casting_app_info: Tuple[subprocess.Popen, TextIO]) ->
             device_name = extract_value_from_string(line)
         elif 'vendor id' in line:
             vendor_id = extract_value_from_string(line)
+            vendor_id = int(vendor_id)
         elif 'product id' in line:
             product_id = extract_value_from_string(line)
+            product_id = int(product_id)
 
         if device_name and vendor_id and product_id:
             break
@@ -197,7 +198,7 @@ def extract_device_info(tv_casting_app_info: Tuple[subprocess.Popen, TextIO]) ->
     return device_name, vendor_id, product_id
 
 
-def validate_tv_app_device_info(tv_app_info, device_name, vendor_id, product_id, log_paths) -> bool:
+def validate_identification_declaration_message_on_tv_app(tv_app_info: Tuple[subprocess.Popen, TextIO], expected_device_name: str, expected_vendor_id: int, expected_product_id: int, log_paths: List[str]) -> bool:
     """Validate device information from the 'Identification Declaration' block from the Linux tv-app output against the expected values."""
     tv_app_process, linux_tv_app_log_file = tv_app_info
 
@@ -223,18 +224,18 @@ def validate_tv_app_device_info(tv_app_info, device_name, vendor_id, product_id,
             elif parsing_identification_block:
                 logging.info(tv_app_line.rstrip('\n'))
                 if 'device Name' in tv_app_line:
-                    validate_value('Commissioning', device_name, log_paths, tv_app_line, 'device Name')
+                    validate_value('Commissioning', expected_device_name, log_paths, tv_app_line, 'device Name')
                 elif 'vendor id' in tv_app_line:
-                    validate_value('Commissioning', vendor_id, log_paths, tv_app_line, 'vendor id')
+                    validate_value('Commissioning', expected_vendor_id, log_paths, tv_app_line, 'vendor id')
                 elif 'product id' in tv_app_line:
-                    validate_value('Commissioning', product_id, log_paths, tv_app_line, 'product id')
+                    validate_value('Commissioning', expected_product_id, log_paths, tv_app_line, 'product id')
                 elif 'Identification Declaration End' in tv_app_line:
                     parsing_identification_block = False
                     return True
 
 
-def approve_tv_casting_request(tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]) -> bool:
-    """Approve the TV casting request from the Linux tv-casting-app to the Linux tv-app by sending `controller ux ok` via Linux tv-app process."""
+def validate_tv_casting_request_approval(tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]) -> bool:
+    """Validate that the TV casting request from the Linux tv-casting-app to the Linux tv-app is approved by sending `controller ux ok` via Linux tv-app process."""
     tv_app_process, linux_tv_app_log_file = tv_app_info
 
     start_wait_time = time.time()
@@ -323,7 +324,7 @@ def test_discovery_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_
         # Fail fast if "No commissioner discovered" string found.
         if "No commissioner discovered" in line:
             logging.error(line.rstrip('\n'))
-            handle_casting_state_failure('Discovery', log_paths)
+            handle_casting_failure('Discovery', log_paths)
 
         elif "Discovered Commissioner" in line:
             valid_discovered_commissioner = line.rstrip('\n')
@@ -356,19 +357,19 @@ def test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_i
     """Test commissioning between Linux tv-casting-app and Linux tv-app."""
 
     if not initiate_cast_request_success(tv_casting_app_info, valid_discovered_commissioner_number):
-        handle_casting_state_failure('Commissioning', log_paths)
+        handle_casting_failure('Commissioning', log_paths)
 
     # Extract the values from the 'Identification Declaration' block in the tv-casting-app output that we want to validate against.
-    device_name, vendor_id, product_id = extract_device_info(tv_casting_app_info)
+    expected_device_name, expected_vendor_id, expected_product_id = extract_device_info_from_tv_casting_app(tv_casting_app_info)
 
-    if not validate_tv_app_device_info(tv_app_info, device_name, vendor_id, product_id, log_paths):
-        handle_casting_state_failure('Commissioning', log_paths)
+    if not validate_identification_declaration_message_on_tv_app(tv_app_info, expected_device_name, expected_vendor_id, expected_product_id, log_paths):
+        handle_casting_failure('Commissioning', log_paths)
 
-    if not approve_tv_casting_request(tv_app_info, log_paths):
-        handle_casting_state_failure('Commissioning', log_paths)
+    if not validate_tv_casting_request_approval(tv_app_info, log_paths):
+        handle_casting_failure('Commissioning', log_paths)
 
     if not validate_commissioning_success(tv_casting_app_info, tv_app_info, log_paths):
-        handle_casting_state_failure('Commissioning', log_paths)
+        handle_casting_failure('Commissioning', log_paths)
 
 
 @click.command()
@@ -399,7 +400,7 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
             with ProcessManager(disable_stdout_buffering_cmd + [tv_app_abs_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as tv_app_process:
 
                 if not start_up_tv_app_success(tv_app_process, linux_tv_app_log_file):
-                    handle_casting_state_failure('Discovery', [linux_tv_app_log_path])
+                    handle_casting_failure('Discovery', [linux_tv_app_log_path])
 
                 tv_casting_app_abs_path = os.path.abspath(tv_casting_app_rel_path)
                 # Run the Linux tv-casting-app subprocess.
@@ -410,7 +411,7 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
                     valid_discovered_commissioner = test_discovery_fn(tv_casting_app_info, log_paths)
 
                     if not valid_discovered_commissioner:
-                        handle_casting_state_failure('Discovery', log_paths)
+                        handle_casting_failure('Discovery', log_paths)
 
                     # We need the valid discovered commissioner number to continue with commissioning.
                     # Example string: \x1b[0;32m[1714582264602] [77989:2286038] [SVR] Discovered Commissioner #0\x1b[0m
