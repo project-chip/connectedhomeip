@@ -623,7 +623,6 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
 #endif
 }
 
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 void Instance::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & ctx,
                                                    const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
@@ -753,7 +752,6 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
     }
 #endif
 }
-
 
 void Instance::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
@@ -1183,7 +1181,6 @@ exit:
     }
 #endif
 }
-
 
 void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {

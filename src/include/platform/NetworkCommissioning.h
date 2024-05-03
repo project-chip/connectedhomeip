@@ -265,6 +265,7 @@ public:
          * message.)
          */
         virtual void OnFinished(Status status, CharSpan debugText, WiFiScanResponseIterator * networks) = 0;
+
         virtual ~ScanCallback() = default;
     };
 
@@ -398,6 +399,7 @@ public:
          * message.)
          */
         virtual void OnFinished(Status err, CharSpan debugText, ThreadScanResponseIterator * networks) = 0;
+
         virtual ~ScanCallback() = default;
     };
 
