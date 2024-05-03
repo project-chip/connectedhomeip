@@ -8515,6 +8515,7 @@
       clusters:
           - ActivatedCarbonFilterMonitoring
           - AirQuality
+          - ElectricalPowerMeasurement
           - HEPAFilterMonitoring
           - SmokeCOAlarm
           # Concentration Measurement clusters
@@ -8543,6 +8544,31 @@
               - ClusterRevision
           AirQuality:
               - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ElectricalPowerMeasurement:
+              - PowerMode
+              - NumberOfMeasurementTypes
+              - Accuracy
+              - Ranges
+              - Voltage
+              - ActiveCurrent
+              - ReactiveCurrent
+              - ApparentCurrent
+              - ActivePower
+              - ReactivePower
+              - ApparentPower
+              - RMSVoltage
+              - RMSCurrent
+              - RMSPower
+              - Frequency
+              - HarmonicCurrents
+              - HarmonicPhases
+              - PowerFactor
+              - NeutralCurrent
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -8769,6 +8795,9 @@
       structs:
           ActivatedCarbonFilterMonitoring:
               - ReplacementProductStruct
+          ElectricalPowerMeasurement:
+              - MeasurementRangeStruct
+              - HarmonicMeasurementStruct
           HEPAFilterMonitoring:
               - ReplacementProductStruct
       struct fields:
@@ -8776,11 +8805,29 @@
               ReplacementProductStruct:
                   - productIdentifierType
                   - productIdentifierValue
+          ElectricalPowerMeasurement:
+              MeasurementRangeStruct:
+                  - measurementType
+                  - min
+                  - max
+                  - startTimestamp
+                  - endTimestamp
+                  - minTimestamp
+                  - maxTimestamp
+                  - startSystime
+                  - endSystime
+                  - minSystime
+                  - maxSystime
+              HarmonicMeasurementStruct:
+                  - order
+                  - measurement
           HEPAFilterMonitoring:
               ReplacementProductStruct:
                   - productIdentifierType
                   - productIdentifierValue
       events:
+          ElectricalPowerMeasurement:
+              - MeasurementPeriodRanges
           SmokeCOAlarm:
               - SmokeAlarm
               - COAlarm
@@ -8794,6 +8841,9 @@
               - InterconnectCOAlarm
               - AllClear
       event fields:
+          ElectricalPowerMeasurement:
+              MeasurementPeriodRanges:
+                - ranges
           SmokeCOAlarm:
               SmokeAlarm:
                   - alarmSeverityLevel
@@ -8812,6 +8862,8 @@
               - ProductIdentifierTypeEnum
           AirQuality:
               - AirQualityEnum
+          ElectricalPowerMeasurement:
+              - PowerModeEnum
           FanControl:
               - StepDirectionEnum
               - AirflowDirectionEnum
@@ -8890,6 +8942,11 @@
                   - Poor
                   - VeryPoor
                   - ExtremelyPoor
+          ElectricalPowerMeasurement:
+              PowerModeEnum:
+                  - Unknown
+                  - DC
+                  - AC
           FanControl:
               StepDirectionEnum:
                   - Increase
@@ -9182,6 +9239,13 @@
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          ElectricalPowerMeasurement:
+              Feature:
+                  - DirectCurrent
+                  - AlternatingCurrent
+                  - PolyphasePower
+                  - Harmonics
+                  - PowerQuality
           HEPAFilterMonitoring:
               Feature:
                   - Condition
@@ -9281,7 +9345,6 @@
           - EnergyEVSEMode
           - DeviceEnergyManagementMode
           - Messages
-          - ElectricalPowerMeasurement
           - PowerTopology
       attributes:
           DoorLock:
