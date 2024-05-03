@@ -112,9 +112,12 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::Endp
                                                                       const EmberAfAttributeMetadata * attributeMetadata,
                                                                       uint8_t * buffer)
 {
-    chip::Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
+    // this cluster is only enabled for endpoint 1
+    if(endpointId != 1) {
+        return chip::Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
 
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    chip::Protocols::InteractionModel::Status ret;
     VerifyOrDie(gRvcRunModeInstance != nullptr);
 
     ModeBase::Instance * clusterInstance = gRvcRunModeInstance;
@@ -124,13 +127,12 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::Endp
     {
     case chip::app::Clusters::RvcRunMode::Attributes::CurrentMode::Id: {
         uint8_t m                                        = static_cast<uint8_t>(buffer[0]);
-        chip::Protocols::InteractionModel::Status status = clusterInstance->UpdateCurrentMode(m);
-        if (chip::Protocols::InteractionModel::Status::Success == status)
+        ret = clusterInstance->UpdateCurrentMode(m);
+        if (chip::Protocols::InteractionModel::Status::Success != ret)
         {
+            ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(ret));
             break;
         }
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
-        ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(status));
     }
     break;
     default:
@@ -247,11 +249,14 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::En
                                                                         const EmberAfAttributeMetadata * attributeMetadata,
                                                                         uint8_t * buffer)
 {
-    chip::Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
+    // this cluster is only enabled for endpoint 1
+    if(endpointId != 1) {
+        return chip::Protocols::InteractionModel::Status::UnsupportedEndpoint;
+    }
 
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcCleanModeInstance != nullptr);
 
+    chip::Protocols::InteractionModel::Status ret;
     ModeBase::Instance * clusterInstance = gRvcCleanModeInstance;
     chip::AttributeId attributeId        = attributeMetadata->attributeId;
 

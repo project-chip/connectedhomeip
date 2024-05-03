@@ -27,7 +27,6 @@ using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
 using chip::Protocols::InteractionModel::Status;
 
-#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 static RvcOperationalState::Instance * gRvcOperationalStateInstance = nullptr;
 static RvcOperationalStateDelegate * gRvcOperationalStateDelegate   = nullptr;
 
@@ -147,7 +146,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
     auto countdown_time = delegate->GetCountdownTime();
 
-    if (countdown_time.IsNull() || (!countdown_time.IsNull() && countdown_time.Value() > 0))
+    if (countdown_time.ValueOr(1) > 0)
     {
         if (state == OperationalState::OperationalStateEnum::kRunning)
         {
@@ -247,4 +246,3 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gRvcOperationalStateInstance->Init();
 }
-#endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER

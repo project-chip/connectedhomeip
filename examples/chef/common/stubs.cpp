@@ -68,17 +68,14 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
     case chip::app::Clusters::RvcRunMode::Id:
         return chefRvcRunModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-        break;
 #endif
 #ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
     case chip::app::Clusters::RvcCleanMode::Id:
         return chefRvcCleanModeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-        break;
 #endif
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::RvcOperationalState::Id:
         return chefRvcOperationalStateReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
-        break;
 #endif
     default:
         break;
@@ -131,17 +128,14 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
     case chip::app::Clusters::RvcRunMode::Id:
         return chefRvcRunModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-        break;
 #endif
 #ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
     case chip::app::Clusters::RvcCleanMode::Id:
         return chefRvcCleanModeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-        break;
 #endif
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
     case chip::app::Clusters::RvcOperationalState::Id:
         return chefRvcOperationalStateWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
-        break;
 #endif
     default:
         break;
