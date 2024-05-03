@@ -150,11 +150,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "product-id", kArgumentRequired, kDeviceOption_ProductID },
     { "vendor-name", kArgumentRequired, kDeviceOption_VendorName },
     { "product-name", kArgumentRequired, kDeviceOption_ProductName },
-<<<<<<< HEAD
     { "hardware-version-string", kArgumentRequired, kDeviceOption_HardwareVersionString },
-=======
-    { "harware-version-string", kArgumentRequired, kDeviceOption_HardwareVersionString },
->>>>>>> b310e8c9f1 (added code to read vendor_name, product_name, hardware_version_string and software_version_string to read from config in reference linux and darwin platform)
     { "software-version-string", kArgumentRequired, kDeviceOption_SoftwareVersionString },
     { "serial-number", kArgumentRequired, kDeviceOption_SerialNumber },
     { "custom-flow", kArgumentRequired, kDeviceOption_CustomFlow },
@@ -728,7 +724,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_HardwareVersionString:
         LinuxDeviceOptions::GetInstance().hardwareVersionString.SetValue(std::string{ aValue });
         break;
-<<<<<<< HEAD
 
     case kDeviceOption_SoftwareVersionString:
         LinuxDeviceOptions::GetInstance().softwareVersionString.SetValue(std::string{ aValue });
@@ -738,17 +733,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().serialNumber.SetValue(std::string{ aValue });
         break;
 
-=======
-
-    case kDeviceOption_SoftwareVersionString:
-        LinuxDeviceOptions::GetInstance().softwareVersionString.SetValue(std::string{ aValue });
-        break;
-
-    case kDeviceOption_SerialNumber:
-        LinuxDeviceOptions::GetInstance().serialNumber.SetValue(std::string{ aValue });
-        break;
-        
->>>>>>> b310e8c9f1 (added code to read vendor_name, product_name, hardware_version_string and software_version_string to read from config in reference linux and darwin platform)
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
