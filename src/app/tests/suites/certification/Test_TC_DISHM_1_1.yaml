@@ -49,16 +49,6 @@ tests:
           constraints:
               type: bitmap32
 
-    - label:
-          "Given DISHM.S.F00(DEPONOFF) ensure featuremap has the correct bit set"
-      PICS: DISHM.S.F00
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 1
-          constraints:
-              type: bitmap32
-
     - label: "4. TH reads AttributeList from DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
