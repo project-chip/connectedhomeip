@@ -47,7 +47,7 @@ class Session;
  *    active.
  *
  *    A `SessionHandle` exists to guarantee that the object it points to will not be released while allowing passing
- *    the handle as a reference, to not incur refeference-counted Retain/Release extra calls.
+ *    the handle as a reference, to not incur extra reference-counted Retain/Release calls.
  *
  *    Example code that breaks assumptions (hard to reason about/maintain):
  *
