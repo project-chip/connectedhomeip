@@ -76,6 +76,7 @@ inline constexpr uint8_t kCommissioningTimeoutTag = 0x04;
 
 inline constexpr uint32_t kSetupPINCodeMaximumValue   = 99999998;
 inline constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
+static_assert(kSetupPINCodeMaximumValue < (1 << kSetupPINCodeFieldLengthInBits));
 
 // clang-format off
 const int kTotalPayloadDataSizeInBits =
