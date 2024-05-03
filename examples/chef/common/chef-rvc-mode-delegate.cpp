@@ -113,7 +113,8 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::Endp
                                                                       uint8_t * buffer)
 {
     // this cluster is only enabled for endpoint 1
-    if(endpointId != 1) {
+    if (endpointId != 1)
+    {
         return chip::Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
 
@@ -126,8 +127,8 @@ chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::Endp
     switch (attributeId)
     {
     case chip::app::Clusters::RvcRunMode::Attributes::CurrentMode::Id: {
-        uint8_t m                                        = static_cast<uint8_t>(buffer[0]);
-        ret = clusterInstance->UpdateCurrentMode(m);
+        uint8_t m = static_cast<uint8_t>(buffer[0]);
+        ret       = clusterInstance->UpdateCurrentMode(m);
         if (chip::Protocols::InteractionModel::Status::Success != ret)
         {
             ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(ret));
@@ -250,7 +251,8 @@ chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::En
                                                                         uint8_t * buffer)
 {
     // this cluster is only enabled for endpoint 1
-    if(endpointId != 1) {
+    if (endpointId != 1)
+    {
         return chip::Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
 
