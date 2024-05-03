@@ -137,9 +137,6 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.pid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.ProductID)
         self.software_version = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.SoftwareVersion)
         self.url = fetch_paa_certs_from_dcl.PRODUCTION_NODE_URL_REST
-        self.vid = 0x6006
-        self.pid = 1
-        self.software_version = 1300
 
     def steps_Vendor(self):
         return [TestStep(1, "Check if device VID is listed in the DCL vendor schema", "Listing found")]
