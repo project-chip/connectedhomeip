@@ -31,7 +31,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 TV_APP_MAX_START_WAIT_SEC = 2
 
 # The maximum amount of time to commission the Linux tv-casting-app and the tv-app before timeout.
-COMMISSIONING_STAGE_MAX_WAIT_SEC =3
+COMMISSIONING_STAGE_MAX_WAIT_SEC = 3
 
 # File names of logs for the Linux tv-casting-app and the Linux tv-app.
 LINUX_TV_APP_LOGS = 'Linux-tv-app-logs.txt'
@@ -277,7 +277,8 @@ def validate_commissioning_success(tv_casting_app_info: Tuple[subprocess.Popen, 
     while True:
         # Check if we exceeded the maximum wait time for validating commissioning success between the Linux tv-casting-app and the Linux tv-app.
         if time.time() - start_wait_time > COMMISSIONING_STAGE_MAX_WAIT_SEC:
-            logging.error('The commissioning between the Linux tv-casting-app process and the Linux tv-app process did not complete successfully within the timeout.')
+            logging.error(
+                'The commissioning between the Linux tv-casting-app process and the Linux tv-app process did not complete successfully within the timeout.')
             return False
 
         tv_casting_line = tv_casting_app_process.stdout.readline()
@@ -416,7 +417,7 @@ def test_casting_fn(tv_app_rel_path, tv_casting_app_rel_path):
                     # Example string: \x1b[0;32m[1714582264602] [77989:2286038] [SVR] Discovered Commissioner #0\x1b[0m
                     #                 The value '0' will be extracted from the string.
                     valid_discovered_commissioner_number = valid_discovered_commissioner.split('#')[-1].replace('\x1b[0m', '')
-                
+
                     test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_info, tv_app_info, log_paths)
 
 
