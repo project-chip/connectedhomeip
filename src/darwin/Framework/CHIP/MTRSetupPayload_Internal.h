@@ -29,8 +29,6 @@ MTR_DIRECT_MEMBERS
 
 #ifdef __cplusplus
 - (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload;
-- (MTRDiscoveryCapabilities)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value;
-- (MTRCommissioningFlow)convertCommissioningFlow:(chip::CommissioningFlow)value;
 #endif
 
 @end

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,17 +15,9 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRDefines.h>
+#import "MTRUtilities.h"
 
-@class MTRSetupPayload;
-
-NS_ASSUME_NONNULL_BEGIN
-
-MTR_DEPRECATED("Please use [MTRSetupPayload -initWithQRCode:]", ios(16.1, 16.4), macos(13.0, 13.3),
-    watchos(9.1, 9.4), tvos(16.1, 16.4))
-@interface MTRQRCodeSetupPayloadParser : NSObject
-- (instancetype)initWithBase38Representation:(NSString *)base38Representation;
-- (MTRSetupPayload * _Nullable)populatePayload:(NSError * __autoreleasing *)error;
-@end
-
-NS_ASSUME_NONNULL_END
+BOOL MTREqualObjects(id<NSObject> _Nullable a, id<NSObject> _Nullable b)
+{
+    return (a == nil) ? (b == nil) : [a isEqual:b];
+}
