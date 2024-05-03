@@ -80,6 +80,9 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
 
     MatterCastingPlayerJNIMgr().mConnectionSuccessHandler.SetUp(env, jSuccessCallback);
     MatterCastingPlayerJNIMgr().mConnectionFailureHandler.SetUp(env, jFailureCallback);
+
+    // TODO: In the following PRs. Removed desiredEndpointFilter to fix Android app build issue. Replace desiredEndpointFilter with
+    // optional IdentificationDeclarationOptions. Add optional CommissionerDeclarationHandler callback parameter.
     castingPlayer->VerifyOrEstablishConnection(
         [](CHIP_ERROR err, CastingPlayer * playerPtr) {
             ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() ConnectCallback called");
@@ -96,7 +99,7 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
                 MatterCastingPlayerJNIMgr().mConnectionFailureHandler.Handle(err);
             }
         },
-        static_cast<unsigned long long int>(commissioningWindowTimeoutSec), desiredEndpointFilter);
+        static_cast<unsigned long long int>(commissioningWindowTimeoutSec));
     return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 

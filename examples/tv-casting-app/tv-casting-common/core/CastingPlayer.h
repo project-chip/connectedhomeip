@@ -69,6 +69,65 @@ public:
     chip::FabricIndex fabricIndex = 0;
 };
 
+/**
+ * This class contains the optional parameters used in the IdentificationDeclaration Message, sent by the Commissionee to the
+ * Commissioner. The options specify information relating to the requested UDC commissioning session.
+ */
+class IdentificationDeclarationOptions
+{
+public:
+    constexpr static size_t kMaxTargetAppInfos = 10;
+    uint8_t mNumTargetAppInfos                 = 0; // The number of TargetAppInfos included.
+    /**
+     * Feature: Target Content Application
+     * The set of content app Vendor IDs (and optionally, Product IDs) that can be used for authentication.
+     * Also, if TargetAppInfo is passed in, VerifyOrEstablishConnection() will force User Directed Commissioning, in case the
+     * desired TargetApp is not found in the on-device CastingStore.
+     */
+    chip::Protocols::UserDirectedCommissioning::TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
+
+    /**
+     * Feature: Target Content Application
+     * Flag to instruct the Commissioner not to display a Passcode input dialog, and instead send a CommissionerDeclaration message
+     * if a commissioning Passcode is needed.
+     */
+    bool mNoPasscode = false;
+    /**
+     * Feature: Coordinate Passcode Dialogs
+     * Flag to instruct the Commissioner to send a CommissionerDeclaration message when the Passcode input dialog on the
+     * Commissioner has been shown to the user.
+     */
+    bool mCdUponPasscodeDialog = false;
+    /**
+     * Feature: Commissioner-Generated Passcode
+     * Flag to instruct the Commissioner to use the Commissioner-generated Passcode for commissioning.
+     */
+    bool mCommissionerPasscode = false;
+    /**
+     * Feature: Commissioner-Generated Passcode
+     * Flag to indicate whether or not the Commissionee has obtained the Commissioner Passcode from the user and is therefore ready
+     * for commissioning.
+     */
+    bool mCommissionerPasscodeReady = false;
+    /**
+     * Feature: Coordinate Passcode Dialogs
+     * Flag to indicate when the Commissionee user has decided to exit the commissioning process.
+     */
+    bool mCancelPasscode = false;
+};
+
+// TODO: In the following PRs. This is work in progress. Break out to a seperate cpp file.
+class CommissionerDeclarationHandler : public chip::Protocols::UserDirectedCommissioning::CommissionerDeclarationHandler
+{
+public:
+    void OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
+                                          chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) override
+    {
+        ChipLogProgress(AppServer, "CastingPlayer::CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() called");
+        cd.DebugLog();
+    }
+};
+
 class Endpoint;
 
 /**
@@ -93,7 +152,11 @@ using ConnectCallback = std::function<void(CHIP_ERROR, CastingPlayer *)>;
 class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>
 {
 public:
-    CastingPlayer(CastingPlayerAttributes playerAttributes) { mAttributes = playerAttributes; }
+    CastingPlayer(CastingPlayerAttributes playerAttributes)
+    {
+        mAttributes                     = playerAttributes;
+        mCommissionerDeclarationHandler = new CommissionerDeclarationHandler();
+    }
 
     /**
      * @brief Get the CastingPlayer object targeted currently (may not be connected)
@@ -123,13 +186,15 @@ public:
      * For failure - called back with an error and nullptr.
      * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window open, if commissioning is
      * required. Needs to be >= kCommissioningWindowTimeoutSec.
-     * @param desiredEndpointFilter (Optional) Attributes (such as VendorId) describing an Endpoint that the client wants to
-     * interact with after commissioning. If this value is passed in, the VerifyOrEstablishConnection will force User Directed
-     * Commissioning, in case the desired Endpoint is not found in the on device CastingStore.
+     * @param idOptions (Optional) Parameters in the IdentificationDeclaration message sent by the Commissionee to the Commissioner.
+     * These parameters specify the information relating to the requested commissioning session.
+     * Furthermore, attributes (such as VendorId) describe the TargetApp that the client wants to interact with after commissioning.
+     * If this value is passed in, VerifyOrEstablishConnection() will force User Directed Commissioning, in case the desired
+     * TargetApp is not found in the on-device CastingStore.
      */
     void VerifyOrEstablishConnection(ConnectCallback onCompleted,
                                      unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec,
-                                     EndpointFilter desiredEndpointFilter                 = EndpointFilter());
+                                     IdentificationDeclarationOptions idOptions           = IdentificationDeclarationOptions());
 
     /**
      * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
@@ -197,6 +262,17 @@ private:
     std::vector<memory::Strong<Endpoint>> mEndpoints;
     ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
     CastingPlayerAttributes mAttributes;
+    IdentificationDeclarationOptions mIdOptions;
+    /**
+     * Flag to indicate whether or not the Commissionee (tv-casting-app) is enabled for the Commissioner-Generated Passcode flow.
+     */
+    bool mUdcCommissionerPasscodeEnabled = false;
+    /**
+     * Flag to indicate whether or not the Commissionee has obtained the Commissioner Passcode from the user and is therefore ready
+     * for commissioning.
+     */
+    bool mUdcCommissionerPasscodeReady = false;
+    CommissionerDeclarationHandler * mCommissionerDeclarationHandler;
     static CastingPlayer * mTargetCastingPlayer;
     unsigned long long int mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     ConnectCallback mOnCompleted                          = {};
@@ -217,12 +293,14 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     /**
-     * @brief Checks if the cachedCastingPlayer contains an Endpoint that matches the description of the desiredEndpointFilter
-     *
-     * @return true - cachedCastingPlayer contains at least one endpoint that matches all the (non-default) values in
-     * desiredEndpointFilter, false otherwise
+     * @brief Checks if the cachedCastingPlayer contains at least one Endpoint/TargetApp described in the desiredTargetApps list.
+     * @return true - cachedCastingPlayer contains at least one endpoints with matching (non-default) values as described in the
+     * desiredTargetApps list, false otherwise.
+     * @param numTargetApps Specifies the number of TargetAppInfos passed in the desiredTargetApps array.
      */
-    bool ContainsDesiredEndpoint(core::CastingPlayer * cachedCastingPlayer, EndpointFilter desiredEndpointFilter);
+    bool ContainsDesiredTargetApp(core::CastingPlayer * cachedCastingPlayer,
+                                  chip::Protocols::UserDirectedCommissioning::TargetAppInfo * desiredTargetApps,
+                                  uint8_t numTargetApps);
 
     // ChipDeviceEventHandler handles chip::DeviceLayer::ChipDeviceEvent events and helps the CastingPlayer class commission with
     // and connect to a CastingPlayer

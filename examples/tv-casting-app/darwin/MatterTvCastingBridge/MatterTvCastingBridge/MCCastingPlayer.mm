@@ -58,13 +58,14 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
             cppDesiredEndpointFilter.productId = desiredEndpointFilter.productId;
         }
 
+        // TODO: In the following PRs. Removed desiredEndpointFilter to fix iOS app build issue. Replace desiredEndpointFilter with optional IdentificationDeclarationOptions. Add optional CommissionerDeclarationHandler callback parameter.
         _cppCastingPlayer->VerifyOrEstablishConnection(
             [completion](CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
                 dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
                 dispatch_async(clientQueue, ^{
                     completion(err == CHIP_NO_ERROR ? nil : [MCErrorUtils NSErrorFromChipError:err]);
                 });
-            }, timeout, cppDesiredEndpointFilter);
+            }, timeout);
     });
 }
 

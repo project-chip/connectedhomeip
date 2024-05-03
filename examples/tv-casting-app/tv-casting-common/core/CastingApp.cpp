@@ -100,6 +100,9 @@ CHIP_ERROR CastingApp::Start()
     // reconnect (or verify connection) to the CastingPlayer that the app was connected to before being stopped, if any
     if (CastingPlayer::GetTargetCastingPlayer() != nullptr)
     {
+        ChipLogProgress(
+            Discovery,
+            "CastingApp::Start() calling VerifyOrEstablishConnection() to reconnect (or verify connection) to a CastingPlayer");
         CastingPlayer::GetTargetCastingPlayer()->VerifyOrEstablishConnection(
             [](CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
                 if (err != CHIP_NO_ERROR)

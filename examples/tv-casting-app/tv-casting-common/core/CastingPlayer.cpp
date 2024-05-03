@@ -30,7 +30,7 @@ namespace core {
 CastingPlayer * CastingPlayer::mTargetCastingPlayer = nullptr;
 
 void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, unsigned long long int commissioningWindowTimeoutSec,
-                                                EndpointFilter desiredEndpointFilter)
+                                                IdentificationDeclarationOptions idOptions)
 {
     ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() called");
 
@@ -46,16 +46,19 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
         ChipLogError(
             AppServer,
             "CastingPlayer::VerifyOrEstablishConnection() called while already connecting/connected to this CastingPlayer"));
-    mConnectionState               = CASTING_PLAYER_CONNECTING;
-    mOnCompleted                   = onCompleted;
-    mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
-    mTargetCastingPlayer           = this;
+    mConnectionState                = CASTING_PLAYER_CONNECTING;
+    mOnCompleted                    = onCompleted;
+    mCommissioningWindowTimeoutSec  = commissioningWindowTimeoutSec;
+    mTargetCastingPlayer            = this;
+    mIdOptions                      = idOptions;
+    mUdcCommissionerPasscodeEnabled = idOptions.mCommissionerPasscode;
 
     // If *this* CastingPlayer was previously connected to, its nodeId, fabricIndex and other attributes should be present
     // in the CastingStore cache. If that is the case, AND, the cached data contains the endpoint desired by the client, if any,
-    // as per desiredEndpointFilter, simply Find or Re-establish the CASE session and return early
+    // as per IdentificationDeclarationOptions.mTargetAppInfos, simply Find or Re-establish the CASE session and return early.
     if (cachedCastingPlayers.size() != 0)
     {
+        ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() Re-establishing CASE with cached CastingPlayer");
         it = std::find_if(cachedCastingPlayers.begin(), cachedCastingPlayers.end(),
                           [this](const core::CastingPlayer & castingPlayerParam) { return castingPlayerParam == *this; });
 
@@ -63,7 +66,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
         if (it != cachedCastingPlayers.end())
         {
             unsigned index = (unsigned int) std::distance(cachedCastingPlayers.begin(), it);
-            if (ContainsDesiredEndpoint(&cachedCastingPlayers[index], desiredEndpointFilter))
+            if (ContainsDesiredTargetApp(&cachedCastingPlayers[index], idOptions.mTargetAppInfos, idOptions.mNumTargetAppInfos))
             {
                 ChipLogProgress(
                     AppServer,
@@ -163,14 +166,39 @@ void CastingPlayer::RegisterEndpoint(const memory::Strong<Endpoint> endpoint)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 CHIP_ERROR CastingPlayer::SendUserDirectedCommissioningRequest()
 {
+    ChipLogProgress(AppServer, "CastingPlayer::SendUserDirectedCommissioningRequest() creating IdentificationDeclaration message");
     chip::Inet::IPAddress * ipAddressToUse = GetIpAddressForUDCRequest();
     VerifyOrReturnValue(ipAddressToUse != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(AppServer, "No IP Address found to send UDC request to"));
 
     ReturnErrorOnFailure(support::ChipDeviceEventHandler::SetUdcStatus(true));
 
-    // TODO: expose options to the higher layer
     chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+    for (size_t i = 0; i < mIdOptions.mNumTargetAppInfos; i++)
+    {
+        id.AddTargetAppInfo(mIdOptions.mTargetAppInfos[i]);
+    }
+    id.SetNoPasscode(mIdOptions.mNoPasscode);
+    id.SetCdUponPasscodeDialog(mIdOptions.mCdUponPasscodeDialog);
+    id.SetCancelPasscode(mIdOptions.mCancelPasscode);
+
+    ChipLogProgress(AppServer, "CastingPlayer::SendUserDirectedCommissioningRequest() mUdcCommissionerPasscodeEnabled: %s",
+                    mUdcCommissionerPasscodeEnabled ? "true" : "false");
+    if (mUdcCommissionerPasscodeEnabled)
+    {
+        id.SetCommissionerPasscode(true);
+        if (mUdcCommissionerPasscodeReady)
+        {
+            id.SetCommissionerPasscodeReady(true);
+            mUdcCommissionerPasscodeReady = false;
+        }
+    }
+
+    // TODO: In the following PRs. Implement handler for CommissionerDeclaration messages and expose messages to higher layers for
+    // Linux, Android and iOS.
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
+        mCommissionerDeclarationHandler);
+
     ReturnErrorOnFailure(chip::Server::GetInstance().SendUserDirectedCommissioningRequest(
         chip::Transport::PeerAddress::UDP(*ipAddressToUse, mAttributes.port, mAttributes.interfaceId), id));
 
@@ -216,21 +244,27 @@ void CastingPlayer::FindOrEstablishSession(void * clientContext, chip::OnDeviceC
         connectionContext->mOnConnectionFailureCallback);
 }
 
-bool CastingPlayer::ContainsDesiredEndpoint(core::CastingPlayer * cachedCastingPlayer, EndpointFilter desiredEndpointFilter)
+bool CastingPlayer::ContainsDesiredTargetApp(core::CastingPlayer * cachedCastingPlayer,
+                                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo * desiredTargetApps,
+                                             uint8_t numTargetApps)
 {
     std::vector<memory::Strong<Endpoint>> cachedEndpoints = cachedCastingPlayer->GetEndpoints();
-    for (const auto & cachedEndpoint : cachedEndpoints)
+    for (size_t i = 0; i < numTargetApps; i++)
     {
-        bool match = true;
-        match = match && (desiredEndpointFilter.vendorId == 0 || cachedEndpoint->GetVendorId() == desiredEndpointFilter.vendorId);
-        match =
-            match && (desiredEndpointFilter.productId == 0 || cachedEndpoint->GetProductId() == desiredEndpointFilter.productId);
-        // TODO: check deviceTypeList
-        if (match)
+        for (const auto & cachedEndpoint : cachedEndpoints)
         {
-            return true;
+            bool match = true;
+            match = match && (desiredTargetApps[i].vendorId == 0 || cachedEndpoint->GetVendorId() == desiredTargetApps[i].vendorId);
+            match =
+                match && (desiredTargetApps[i].productId == 0 || cachedEndpoint->GetProductId() == desiredTargetApps[i].productId);
+            if (match)
+            {
+                ChipLogProgress(AppServer, "CastingPlayer::ContainsDesiredTargetApp() matching cached CastingPlayer found");
+                return true;
+            }
         }
     }
+    ChipLogProgress(AppServer, "CastingPlayer::ContainsDesiredTargetApp() matching cached CastingPlayer not found");
     return false;
 }
 

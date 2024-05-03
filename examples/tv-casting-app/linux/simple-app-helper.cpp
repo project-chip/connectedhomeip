@@ -170,10 +170,12 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
 {
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogProgress(AppServer,
-                                   "ConnectionHandler: Failed to connect to CastingPlayer(ID: %s) with err %" CHIP_ERROR_FORMAT,
+                                   "ConnectionHandler(): Failed to connect to CastingPlayer(ID: %s) with err %" CHIP_ERROR_FORMAT,
                                    castingPlayer->GetId(), err.Format()));
 
-    ChipLogProgress(AppServer, "ConnectionHandler: Successfully connected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+    ChipLogProgress(AppServer, "ConnectionHandler(): Successfully connected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+    ChipLogProgress(AppServer, "ConnectionHandler(): Triggering demo interactions with CastingPlayer(ID: %s)",
+                    castingPlayer->GetId());
 
     std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
     // Find the desired Endpoint and auto-trigger some Matter Casting demo interactions
@@ -230,7 +232,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
     }
     if (strcmp(argv[0], "request") == 0)
     {
-        ChipLogProgress(AppServer, "request");
+        ChipLogProgress(AppServer, "CommandHandler() request");
         if (argc < 2)
         {
             return PrintAllCommands();
@@ -243,10 +245,17 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                             ChipLogError(AppServer, "Invalid casting player index provided: %lu", index));
         std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer = castingPlayers.at(index);
 
-        matter::casting::core::EndpointFilter desiredEndpointFilter;
-        desiredEndpointFilter.vendorId = kDesiredEndpointVendorId;
+        matter::casting::core::IdentificationDeclarationOptions idOptions;
+        idOptions.mNumTargetAppInfos          = 1;
+        idOptions.mTargetAppInfos[0].vendorId = kDesiredEndpointVendorId;
+        // Attempt Commissioner-Generated Passcode commissioning flow only if the CastingPlayer indicates support for it.
+        if (targetCastingPlayer->GetSupportsCommissionerGeneratedPasscode())
+        {
+            idOptions.mCommissionerPasscode = true;
+        }
+
         targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler, matter::casting::core::kCommissioningWindowTimeoutSec,
-                                                         desiredEndpointFilter);
+                                                         idOptions);
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "print-bindings") == 0)
