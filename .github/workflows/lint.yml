@@ -242,7 +242,7 @@ jobs:
                   output.
               if: always()
               run: |
-                  git grep -I -n '0x%[0-9l.-]*[^0-9lxX".-]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+                  git grep -I -n '0x%[0-9l.*-]*[^xX"0-9l.*-]' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
