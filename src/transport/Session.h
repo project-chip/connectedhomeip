@@ -84,6 +84,8 @@ class Session;
  *
  *   To meet the requirements of "you should not store this", the Handle has additional restrictions
  *   preventing modification (no assignment or copy constructor) and allows only move.
+ *   NOTE: `move` should likely also not be allowed, however we need to have the ability to
+ *         return such objects from method calls, so it is currently allowed.
  *
  */
 class SessionHandle
