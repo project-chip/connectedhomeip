@@ -381,6 +381,44 @@ TEST(TestQRCode, TestQRCodeToPayloadGeneration)
     EXPECT_EQ(result, true);
 }
 
+TEST(TestQRCode, TestGenerateWithShortDiscriminatorInvalid)
+{
+    SetupPayload payload = GetDefaultPayload();
+    EXPECT_TRUE(payload.isValidQRCodePayload());
+
+    // A short discriminator isn't valid for a QR Code
+    payload.discriminator.SetShortValue(1);
+    EXPECT_FALSE(payload.isValidQRCodePayload());
+
+    // QRCodeSetupPayloadGenerator should therefore return an error
+    string base38Rep;
+    QRCodeSetupPayloadGenerator generator(payload);
+    EXPECT_EQ(generator.payloadBase38Representation(base38Rep), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // If we allow invalid payloads we should be able to encode
+    generator.SetAllowInvalidPayload(true);
+    EXPECT_EQ(generator.payloadBase38Representation(base38Rep), CHIP_NO_ERROR);
+}
+
+TEST(TestQRCode, TestGenerateWithoutRendezvousInformation)
+{
+    SetupPayload payload = GetDefaultPayload();
+    EXPECT_TRUE(payload.isValidQRCodePayload());
+
+    // Rendezvouz Information is required for a QR code
+    payload.rendezvousInformation.ClearValue();
+    EXPECT_FALSE(payload.isValidQRCodePayload());
+
+    // QRCodeSetupPayloadGenerator should therefore return an error
+    string base38Rep;
+    QRCodeSetupPayloadGenerator generator(payload);
+    EXPECT_EQ(generator.payloadBase38Representation(base38Rep), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // If we allow invalid payloads we should be able to encode
+    generator.SetAllowInvalidPayload(true);
+    EXPECT_EQ(generator.payloadBase38Representation(base38Rep), CHIP_NO_ERROR);
+}
+
 TEST(TestQRCode, TestExtractPayload)
 {
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(string("MT:ABC")), string("ABC"));
