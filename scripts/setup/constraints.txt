@@ -236,12 +236,6 @@ portpicker==1.5.2
 prettytable==2.5.0
 prompt-toolkit==3.0.43
     # via ipython
-protobuf==4.24.4
-    # via
-    #   mbed-ls
-    #   mbed-os-tools
-prompt-toolkit==3.0.43
-    # via ipython
 protobuf==3.20.1
     # via
     #   -r requirements.txt
