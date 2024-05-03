@@ -154,17 +154,17 @@ public:
         if (pMockClock == nullptr)
         {
             pMockClock = new System::Clock::Internal::MockClock();
-            VerifyOrDie(pMockClock != nullptr);
+            ASSERT_NE(pMockClock, nullptr);
         }
 
         if (pMessagingContext == nullptr)
         {
             pMessagingContext = new chip::Test::LoopbackMessagingContext();
-            VerifyOrDie(pMessagingContext != nullptr);
+            ASSERT_NE(pMessagingContext, nullptr);
         }
 
-        VerifyOrDie(pMessagingContext->SetUpTestSuite() == CHIP_NO_ERROR);
-        VerifyOrDie(chip::DeviceLayer::PlatformMgr().InitChipStack() == CHIP_NO_ERROR);
+        ASSERT_EQ(pMessagingContext->SetUpTestSuite(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
         DeviceLayer::SetSystemLayerForTesting(&(pMessagingContext->GetSystemLayer()));
         pRealClock = &chip::System::SystemClock();
