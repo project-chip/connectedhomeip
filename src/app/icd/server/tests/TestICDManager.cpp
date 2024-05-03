@@ -153,13 +153,13 @@ public:
     {
         if (pMockClock == nullptr)
         {
-            pMockClock = new System::Clock::Internal::MockClock();
+            pMockClock = new Clock::Internal::MockClock();
             ASSERT_NE(pMockClock, nullptr);
         }
 
         if (pMessagingContext == nullptr)
         {
-            pMessagingContext = new chip::Test::LoopbackMessagingContext();
+            pMessagingContext = new LoopbackMessagingContext();
             ASSERT_NE(pMessagingContext, nullptr);
         }
 
@@ -167,17 +167,17 @@ public:
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
         DeviceLayer::SetSystemLayerForTesting(&(pMessagingContext->GetSystemLayer()));
-        pRealClock = &chip::System::SystemClock();
-        System::Clock::Internal::SetSystemClockForTesting(pMockClock);
+        pRealClock = &SystemClock();
+        Clock::Internal::SetSystemClockForTesting(pMockClock);
     }
 
     // Performs shared teardown for all tests in the test suite
     static void TearDownTestSuite()
     {
-        System::Clock::Internal::SetSystemClockForTesting(pRealClock);
+        Clock::Internal::SetSystemClockForTesting(pRealClock);
         DeviceLayer::SetSystemLayerForTesting(nullptr);
 
-        chip::DeviceLayer::PlatformMgr().Shutdown();
+        DeviceLayer::PlatformMgr().Shutdown();
         pMessagingContext->TearDownTestSuite();
 
         if (pMockClock != nullptr)
@@ -214,7 +214,7 @@ public:
     }
 
     TestSessionKeystoreImpl mKeystore;
-    app::ICDManager mICDManager;
+    ICDManager mICDManager;
     TestSubscriptionsInfoProvider mSubInfoProvider;
     TestPersistentStorageDelegate testStorage;
     TestICDStateObserver mICDStateObserver;
