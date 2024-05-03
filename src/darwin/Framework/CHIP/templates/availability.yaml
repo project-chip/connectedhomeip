@@ -7458,9 +7458,6 @@
   provisional:
       clusters:
           ## Not ready at cutoff
-          # Replaceable Monitoring clusters
-          - HEPAFilterMonitoring
-          - ActivatedCarbonFilterMonitoring
           # Concentration Measurement clusters
           - CarbonDioxideConcentrationMeasurement
           - CarbonMonoxideConcentrationMeasurement
@@ -8527,9 +8524,23 @@
   versions: "future"
   introduced:
       clusters:
+          - ActivatedCarbonFilterMonitoring
           - AirQuality
+          - HEPAFilterMonitoring
           - SmokeCOAlarm
       attributes:
+          ActivatedCarbonFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - LastChangedTime
+              - ReplacementProductList
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           AirQuality:
               - AirQuality
               - GeneratedCommandList
@@ -8539,6 +8550,18 @@
               - ClusterRevision
           FanControl:
               - AirflowDirection
+          HEPAFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - LastChangedTime
+              - ReplacementProductList
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           SmokeCOAlarm:
               - ExpressedState
               - SmokeState
@@ -8559,8 +8582,12 @@
               - FeatureMap
               - ClusterRevision
       commands:
+          ActivatedCarbonFilterMonitoring:
+              - ResetCondition
           FanControl:
               - Step
+          HEPAFilterMonitoring:
+              - ResetCondition
           SmokeCOAlarm:
               - SelfTestRequest
       command fields:
@@ -8569,6 +8596,20 @@
                   - direction
                   - wrap
                   - lowestOff
+      structs:
+          ActivatedCarbonFilterMonitoring:
+              - ReplacementProductStruct
+          HEPAFilterMonitoring:
+              - ReplacementProductStruct
+      struct fields:
+          ActivatedCarbonFilterMonitoring:
+              ReplacementProductStruct:
+                  - productIdentifierType
+                  - productIdentifierValue
+          HEPAFilterMonitoring:
+              ReplacementProductStruct:
+                  - productIdentifierType
+                  - productIdentifierValue
       events:
           SmokeCOAlarm:
               - SmokeAlarm
@@ -8595,11 +8636,19 @@
               InterconnectCOAlarm:
                   - alarmSeverityLevel
       enums:
+          ActivatedCarbonFilterMonitoring:
+              - DegradationDirectionEnum
+              - ChangeIndicationEnum
+              - ProductIdentifierTypeEnum
           AirQuality:
               - AirQualityEnum
           FanControl:
               - StepDirectionEnum
               - AirflowDirectionEnum
+          HEPAFilterMonitoring:
+              - DegradationDirectionEnum
+              - ChangeIndicationEnum
+              - ProductIdentifierTypeEnum
           SmokeCOAlarm:
               - AlarmStateEnum
               - SensitivityEnum
@@ -8608,6 +8657,20 @@
               - EndOfServiceEnum
               - ContaminationStateEnum
       enum values:
+          ActivatedCarbonFilterMonitoring:
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              ProductIdentifierTypeEnum:
+                  - UPC
+                  - GTIN8
+                  - EAN
+                  - GTIN14
+                  - OEM
           AirQuality:
               AirQualityEnum:
                   - Unknown
@@ -8624,6 +8687,20 @@
               AirflowDirectionEnum:
                   - Forward
                   - Reverse
+          HEPAFilterMonitoring:
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              ProductIdentifierTypeEnum:
+                  - UPC
+                  - GTIN8
+                  - EAN
+                  - GTIN14
+                  - OEM
           SmokeCOAlarm:
               AlarmStateEnum:
                   - Normal
@@ -8655,17 +8732,31 @@
                   - Warning
                   - Critical
       bitmaps:
+          ActivatedCarbonFilterMonitoring:
+              - Feature
           AirQuality:
+              - Feature
+          HEPAFilterMonitoring:
               - Feature
           SmokeCOAlarm:
               - Feature
       bitmap values:
+          ActivatedCarbonFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+                  - ReplacementProductList
           AirQuality:
               Feature:
                   - Fair
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          HEPAFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+                  - ReplacementProductList
           FanControl:
               Feature:
                   - Step
