@@ -84,27 +84,6 @@ cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
-cluster Binding = 30 {
-  revision 1; // NOTE: Default/not specifically set
-
-  fabric_scoped struct TargetStruct {
-    optional node_id node = 1;
-    optional group_id group = 2;
-    optional endpoint_no endpoint = 3;
-    optional cluster_id cluster = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  attribute access(write: manage) TargetStruct binding[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
@@ -253,183 +232,6 @@ cluster AccessControl = 31 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-}
-
-/** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
-cluster Actions = 37 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum ActionErrorEnum : enum8 {
-    kUnknown = 0;
-    kInterrupted = 1;
-  }
-
-  enum ActionStateEnum : enum8 {
-    kInactive = 0;
-    kActive = 1;
-    kPaused = 2;
-    kDisabled = 3;
-  }
-
-  enum ActionTypeEnum : enum8 {
-    kOther = 0;
-    kScene = 1;
-    kSequence = 2;
-    kAutomation = 3;
-    kException = 4;
-    kNotification = 5;
-    kAlarm = 6;
-  }
-
-  enum EndpointListTypeEnum : enum8 {
-    kOther = 0;
-    kRoom = 1;
-    kZone = 2;
-  }
-
-  bitmap CommandBits : bitmap16 {
-    kInstantAction = 0x1;
-    kInstantActionWithTransition = 0x2;
-    kStartAction = 0x4;
-    kStartActionWithDuration = 0x8;
-    kStopAction = 0x10;
-    kPauseAction = 0x20;
-    kPauseActionWithDuration = 0x40;
-    kResumeAction = 0x80;
-    kEnableAction = 0x100;
-    kEnableActionWithDuration = 0x200;
-    kDisableAction = 0x400;
-    kDisableActionWithDuration = 0x800;
-  }
-
-  struct ActionStruct {
-    int16u actionID = 0;
-    char_string<32> name = 1;
-    ActionTypeEnum type = 2;
-    int16u endpointListID = 3;
-    CommandBits supportedCommands = 4;
-    ActionStateEnum state = 5;
-  }
-
-  struct EndpointListStruct {
-    int16u endpointListID = 0;
-    char_string<32> name = 1;
-    EndpointListTypeEnum type = 2;
-    endpoint_no endpoints[] = 3;
-  }
-
-  info event StateChanged = 0 {
-    int16u actionID = 0;
-    int32u invokeID = 1;
-    ActionStateEnum newState = 2;
-  }
-
-  info event ActionFailed = 1 {
-    int16u actionID = 0;
-    int32u invokeID = 1;
-    ActionStateEnum newState = 2;
-    ActionErrorEnum error = 3;
-  }
-
-  readonly attribute ActionStruct actionList[] = 0;
-  readonly attribute EndpointListStruct endpointLists[] = 1;
-  readonly attribute optional long_char_string<512> setupURL = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct InstantActionRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-  }
-
-  request struct InstantActionWithTransitionRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-    int16u transitionTime = 2;
-  }
-
-  request struct StartActionRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-  }
-
-  request struct StartActionWithDurationRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-    int32u duration = 2;
-  }
-
-  request struct StopActionRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-  }
-
-  request struct PauseActionRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-  }
-
-  request struct PauseActionWithDurationRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-    int32u duration = 2;
-  }
-
-  request struct ResumeActionRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-  }
-
-  request struct EnableActionRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-  }
-
-  request struct EnableActionWithDurationRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-    int32u duration = 2;
-  }
-
-  request struct DisableActionRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-  }
-
-  request struct DisableActionWithDurationRequest {
-    int16u actionID = 0;
-    optional int32u invokeID = 1;
-    int32u duration = 2;
-  }
-
-  /** This command triggers an action (state change) on the involved endpoints. */
-  command InstantAction(InstantActionRequest): DefaultSuccess = 0;
-  /** This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current state to the new state. */
-  command InstantActionWithTransition(InstantActionWithTransitionRequest): DefaultSuccess = 1;
-  /** This command triggers the commencement of an action on the involved endpoints. */
-  command StartAction(StartActionRequest): DefaultSuccess = 2;
-  /** This command triggers the commencement of an action (with a duration) on the involved endpoints. */
-  command StartActionWithDuration(StartActionWithDurationRequest): DefaultSuccess = 3;
-  /** This command stops the ongoing action on the involved endpoints. */
-  command StopAction(StopActionRequest): DefaultSuccess = 4;
-  /** This command pauses an ongoing action. */
-  command PauseAction(PauseActionRequest): DefaultSuccess = 5;
-  /** This command pauses an ongoing action with a duration. */
-  command PauseActionWithDuration(PauseActionWithDurationRequest): DefaultSuccess = 6;
-  /** This command resumes a previously paused action. */
-  command ResumeAction(ResumeActionRequest): DefaultSuccess = 7;
-  /** This command enables a certain action or automation. */
-  command EnableAction(EnableActionRequest): DefaultSuccess = 8;
-  /** This command enables a certain action or automation with a duration. */
-  command EnableActionWithDuration(EnableActionWithDurationRequest): DefaultSuccess = 9;
-  /** This command disables a certain action or automation. */
-  command DisableAction(DisableActionRequest): DefaultSuccess = 10;
-  /** This command disables a certain action or automation with a duration. */
-  command DisableActionWithDuration(DisableActionWithDurationRequest): DefaultSuccess = 11;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -527,93 +329,6 @@ cluster BasicInformation = 40 {
   readonly attribute int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
-      or audibly convey time information need a mechanism by which they can be configured to use a
-      user’s preferred format. */
-cluster TimeFormatLocalization = 44 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum CalendarTypeEnum : enum8 {
-    kBuddhist = 0;
-    kChinese = 1;
-    kCoptic = 2;
-    kEthiopian = 3;
-    kGregorian = 4;
-    kHebrew = 5;
-    kIndian = 6;
-    kIslamic = 7;
-    kJapanese = 8;
-    kKorean = 9;
-    kPersian = 10;
-    kTaiwanese = 11;
-    kUseActiveLocale = 255;
-  }
-
-  enum HourFormatEnum : enum8 {
-    k12hr = 0;
-    k24hr = 1;
-    kUseActiveLocale = 255;
-  }
-
-  bitmap Feature : bitmap32 {
-    kCalendarFormat = 0x1;
-  }
-
-  attribute access(write: manage) HourFormatEnum hourFormat = 0;
-  attribute access(write: manage) optional CalendarTypeEnum activeCalendarType = 1;
-  readonly attribute optional CalendarTypeEnum supportedCalendarTypes[] = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for the units in which values are conveyed in communication to a
-      user. As such, Nodes that visually or audibly convey measurable values to the user need a
-      mechanism by which they can be configured to use a user’s preferred unit. */
-cluster UnitLocalization = 45 {
-  revision 1;
-
-  enum TempUnitEnum : enum8 {
-    kFahrenheit = 0;
-    kCelsius = 1;
-    kKelvin = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kTemperatureUnit = 0x1;
-  }
-
-  attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
@@ -1619,24 +1334,6 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
-/** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
-cluster UserLabel = 65 {
-  revision 1; // NOTE: Default/not specifically set
-
-  struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-  }
-
-  attribute access(write: manage) LabelStruct labelList[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
@@ -1698,36 +1395,6 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
-  }
-
-  server cluster LocalizationConfiguration {
-    persist  attribute activeLocale default = "en-US";
-    callback attribute supportedLocales;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster TimeFormatLocalization {
-    persist  attribute hourFormat default = 0;
-    persist  attribute activeCalendarType default = 0;
-    callback attribute supportedCalendarTypes;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster UnitLocalization {
-    persist  attribute temperatureUnit default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0x1;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralCommissioning {
@@ -1980,17 +1647,10 @@ endpoint 0 {
     handle command KeySetReadAllIndices;
     handle command KeySetReadAllIndicesResponse;
   }
-
-  server cluster UserLabel {
-    callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
 }
 endpoint 1 {
   device type ma_aggregator = 14, version 1;
 
-  binding cluster Binding;
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
@@ -2015,20 +1675,6 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
-  }
-
-  server cluster Actions {
-    emits event StateChanged;
-    callback attribute actionList;
-    callback attribute endpointLists;
-    ram      attribute setupURL default = "https://example.com";
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command InstantAction;
   }
 }
 

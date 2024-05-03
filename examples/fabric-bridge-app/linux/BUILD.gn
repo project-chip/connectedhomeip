@@ -21,10 +21,8 @@ assert(chip_build_tools)
 executable("fabric-bridge-app") {
   sources = [
     "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common/include/CHIPProjectAppConfig.h",
-    "${chip_root}/examples/fabric-bridge-app/linux/ActionsServerCallbacks.cpp",
     "Device.cpp",
     "include/Device.h",
-    "include/main.h",
     "main.cpp",
   ]
 

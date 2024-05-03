@@ -44,13 +44,11 @@
 
 #include "CommissionableInit.h"
 #include "Device.h"
-#include "main.h"
 #include <app/server/Server.h>
 
 #include <cassert>
 #include <iostream>
 #include <string>
-#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -68,10 +66,7 @@ const int kDescriptorAttributeArraySize = 254;
 
 EndpointId gCurrentEndpointId;
 EndpointId gFirstDynamicEndpointId;
-// Power source is on the same endpoint as the composed device
 Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
-std::vector<Room *> gRooms;
-std::vector<Action *> gActions;
 
 } // namespace
 
@@ -81,11 +76,6 @@ std::vector<Action *> gActions;
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
-#define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
-#define ZCL_ON_OFF_CLUSTER_REVISION (4u)
-#define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (1u)
-#define ZCL_TEMPERATURE_SENSOR_FEATURE_MAP (0u)
-#define ZCL_POWER_SOURCE_CLUSTER_REVISION (2u)
 
 // ---------------------------------------------------------------------------
 
@@ -149,51 +139,6 @@ int RemoveDeviceEndpoint(Device * dev)
         index++;
     }
     return -1;
-}
-
-std::vector<EndpointListInfo> GetEndpointListInfo(chip::EndpointId parentId)
-{
-    std::vector<EndpointListInfo> infoList;
-
-    for (auto room : gRooms)
-    {
-        if (room->getIsVisible())
-        {
-            EndpointListInfo info(room->getEndpointListId(), room->getName(), room->getType());
-            int index = 0;
-            while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-            {
-                if ((gDevices[index] != nullptr) && (gDevices[index]->GetParentEndpointId() == parentId))
-                {
-                    std::string location;
-                    if (room->getType() == Actions::EndpointListTypeEnum::kZone)
-                    {
-                        location = gDevices[index]->GetZone();
-                    }
-                    else
-                    {
-                        location = gDevices[index]->GetLocation();
-                    }
-                    if (room->getName().compare(location) == 0)
-                    {
-                        info.AddEndpointId(gDevices[index]->GetEndpointId());
-                    }
-                }
-                index++;
-            }
-            if (info.GetEndpointListSize() > 0)
-            {
-                infoList.push_back(info);
-            }
-        }
-    }
-
-    return infoList;
-}
-
-std::vector<Action *> GetActionListInfo(chip::EndpointId parentId)
-{
-    return gActions;
 }
 
 namespace {
@@ -299,13 +244,6 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
     }
 
     return ret;
-}
-
-bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Actions::Commands::InstantAction::DecodableType & commandData)
-{
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
-    return true;
 }
 
 #define POLL_INTERVAL_MS (100)
