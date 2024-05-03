@@ -83,6 +83,11 @@ public:
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
 
+    static const Key kConfigKey_VendorName;
+    static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_HardwareVersionString;
+    static const Key kConfigKey_SoftwareVersionString;
+
     static CHIP_ERROR Init();
 
     // Config value accessors.
