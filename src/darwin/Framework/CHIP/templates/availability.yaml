@@ -7458,17 +7458,6 @@
   provisional:
       clusters:
           ## Not ready at cutoff
-          # Concentration Measurement clusters
-          - CarbonDioxideConcentrationMeasurement
-          - CarbonMonoxideConcentrationMeasurement
-          - FormaldehydeConcentrationMeasurement
-          - NitrogenDioxideConcentrationMeasurement
-          - OzoneConcentrationMeasurement
-          - PM10ConcentrationMeasurement
-          - PM1ConcentrationMeasurement
-          - PM25ConcentrationMeasurement
-          - RadonConcentrationMeasurement
-          - TotalVolatileOrganicCompoundsConcentrationMeasurement
           - RefrigeratorAlarm
           - TemperatureControl
           ## Not ready to be public API yet.
@@ -8528,6 +8517,17 @@
           - AirQuality
           - HEPAFilterMonitoring
           - SmokeCOAlarm
+          # Concentration Measurement clusters
+          - CarbonDioxideConcentrationMeasurement
+          - CarbonMonoxideConcentrationMeasurement
+          - FormaldehydeConcentrationMeasurement
+          - NitrogenDioxideConcentrationMeasurement
+          - OzoneConcentrationMeasurement
+          - PM10ConcentrationMeasurement
+          - PM1ConcentrationMeasurement
+          - PM25ConcentrationMeasurement
+          - RadonConcentrationMeasurement
+          - TotalVolatileOrganicCompoundsConcentrationMeasurement
       attributes:
           ActivatedCarbonFilterMonitoring:
               - Condition
@@ -8576,6 +8576,176 @@
               - ContaminationState
               - SmokeSensitivityLevel
               - ExpiryDate
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          CarbonDioxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          CarbonMonoxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          FormaldehydeConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          NitrogenDioxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OzoneConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PM10ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PM1ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PM25ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RadonConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -8656,6 +8826,46 @@
               - MuteStateEnum
               - EndOfServiceEnum
               - ContaminationStateEnum
+          CarbonDioxideConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          CarbonMonoxideConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          FormaldehydeConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          NitrogenDioxideConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          OzoneConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          PM10ConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          PM1ConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          PM25ConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          RadonConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+              - LevelValueEnum
       enum values:
           ActivatedCarbonFilterMonitoring:
               DegradationDirectionEnum:
@@ -8731,6 +8941,206 @@
                   - Low
                   - Warning
                   - Critical
+          CarbonDioxideConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          CarbonMonoxideConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          FormaldehydeConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          NitrogenDioxideConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          OzoneConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          PM10ConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          PM1ConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          PM25ConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          RadonConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Air
+                  - Water
+                  - Soil
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
       bitmaps:
           ActivatedCarbonFilterMonitoring:
               - Feature
@@ -8739,6 +9149,26 @@
           HEPAFilterMonitoring:
               - Feature
           SmokeCOAlarm:
+              - Feature
+          CarbonDioxideConcentrationMeasurement:
+              - Feature
+          CarbonMonoxideConcentrationMeasurement:
+              - Feature
+          FormaldehydeConcentrationMeasurement:
+              - Feature
+          NitrogenDioxideConcentrationMeasurement:
+              - Feature
+          OzoneConcentrationMeasurement:
+              - Feature
+          PM10ConcentrationMeasurement:
+              - Feature
+          PM1ConcentrationMeasurement:
+              - Feature
+          PM25ConcentrationMeasurement:
+              - Feature
+          RadonConcentrationMeasurement:
+              - Feature
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
               - Feature
       bitmap values:
           ActivatedCarbonFilterMonitoring:
@@ -8765,6 +9195,86 @@
               Feature:
                   - SmokeAlarm
                   - COAlarm
+          CarbonDioxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          CarbonMonoxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          FormaldehydeConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          NitrogenDioxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          OzoneConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM10ConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM1ConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM25ConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          RadonConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
   provisional:
       clusters:
           # Targeting Spring 2024 Matter release
