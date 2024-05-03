@@ -595,21 +595,26 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (IsResponseExpected())
-    {
-        // Since we got the response, cancel the response timer.
-        CancelResponseTimer();
-
-        // If the context was expecting a response to a previously sent message, this message
-        // is implicitly that response.
-        SetResponseExpected(false);
-    }
-
     // Don't send messages on to our delegate if our dispatch does not allow
-    // those messages.
-    if (mDelegate != nullptr && mDispatch.MessagePermitted(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType()))
+    // those messages.  Those messages should also not be treated as responses,
+    // since if our delegate is expecting a response we will not notify it about
+    // these messages.
+    if (mDispatch.MessagePermitted(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType()))
     {
-        return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
+        if (IsResponseExpected())
+        {
+            // Since we got the response, cancel the response timer.
+            CancelResponseTimer();
+
+            // If the context was expecting a response to a previously sent message, this message
+            // is implicitly that response.
+            SetResponseExpected(false);
+        }
+
+        if (mDelegate != nullptr)
+        {
+            return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
+        }
     }
 
     DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
