@@ -108,6 +108,7 @@ public:
     CHIP_ERROR StoreProductName(CharSpan productName) override;
     CHIP_ERROR StoreHardwareVersionString(CharSpan hardwareVersionString) override;
     CHIP_ERROR StoreSoftwareVersionString(CharSpan softwareVersionString) override;
+
 #if CHIP_CONFIG_TEST
     void RunUnitTests() override;
 #endif

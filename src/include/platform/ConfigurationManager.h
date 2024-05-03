@@ -138,6 +138,11 @@ public:
     virtual CHIP_ERROR StoreHardwareVersionString(CharSpan hardwareVersionString)                          = 0;
     virtual CHIP_ERROR StoreSoftwareVersionString(CharSpan softwareVersionString)                          = 0;
 
+    virtual CHIP_ERROR StoreVendorName(const char * vendorName, size_t vendorNameLen)  = 0;
+    virtual CHIP_ERROR StoreProductName(const char * productName, size_t productNameLen)  = 0;
+    virtual CHIP_ERROR StoreHardwareVersionString(const char * hardwareVersionString, size_t hardwareVersionStringLen)  = 0;
+    virtual CHIP_ERROR StoreSoftwareVersionString(const char * softwareVersionString, size_t softwareVersionStringLen)  = 0;
+
 #if CHIP_CONFIG_TEST
     virtual void RunUnitTests() = 0;
 #endif

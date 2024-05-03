@@ -20,6 +20,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+#include <stdio.h>
 
 #include "CommissionableInit.h"
 

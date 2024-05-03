@@ -58,6 +58,7 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetVendorName(char * 
 template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetProductName(char * buf, size_t bufSize)
 {
+
     ChipError err         = CHIP_NO_ERROR;
     size_t productNameLen = 0; // without counting null-terminator
 
@@ -195,6 +196,7 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetHardwareVersion(ui
 template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetHardwareVersionString(char * buf, size_t bufSize)
 {
+
     ChipError err                   = CHIP_NO_ERROR;
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
 
