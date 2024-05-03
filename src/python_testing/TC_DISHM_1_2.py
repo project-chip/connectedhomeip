@@ -100,10 +100,10 @@ class TC_DISHM_1_2(MatterBaseTest):
         except AttributeError:
             modeTags = Clusters.DishwasherMode.Enums.ModeTag
 
-        normal_present = false
+        normal_present = False
         for m in supported_modes:
             # need at least 1 mode tag entry
-            asserts.assert_greater(len(m.modeTags, 0, "Must have at least one mode tag."))
+            asserts.assert_greater(len(m.modeTags), 0, "Must have at least one mode tag.")
             for t in m.modeTags:
                 # value can't exceed 16 bits
                 asserts.assert_true(t.value <= 0xFFFF, "Tag value is > 16 bits")
