@@ -44,7 +44,7 @@ bool PayloadContents::isValidQRCodePayload(ValidationMode mode) const
     VerifyOrReturnValue(static_cast<uint8_t>(commissioningFlow) < (1 << kCommissioningFlowFieldLengthInBits), false);
 
     // Device Commissioning Flow
-    // Even in ValidatoinMode::kConsume we can only handle modes that we understand.
+    // Even in ValidationMode::kConsume we can only handle modes that we understand.
     // 0: Standard commissioning flow: such a device, when uncommissioned, always enters commissioning mode upon power-up, subject
     // to the rules in [ref_Announcement_Commencement]. 1: User-intent commissioning flow: user action required to enter
     // commissioning mode. 2: Custom commissioning flow: interaction with a vendor-specified means is needed before commissioning.
