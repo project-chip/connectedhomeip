@@ -100,8 +100,7 @@ CHIP_ERROR ActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, Att
 
 CHIP_ERROR ActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    static const char SetupUrl[] = "https://example.com";
-    return aEncoder.Encode(chip::CharSpan::fromCharString(SetupUrl));
+    return aEncoder.Encode("https://example.com"_span);
 }
 
 CHIP_ERROR ActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
