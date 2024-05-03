@@ -299,13 +299,33 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
         Opens the commissioning window automatically at application boot time if
         the node is not yet commissioned.
 
-# mbedTLS tweaks
+# Configure MBEDTLS lib
+config MBEDTLS
+	default y
+
 config MBEDTLS_USER_CONFIG_ENABLE
     default y
 
 config MBEDTLS_USER_CONFIG_FILE
     default "telink-mbedtls-config.h"
 
+config MBEDTLS_CIPHER_CCM_ENABLED
+	default y
+
+config MBEDTLS_PK_WRITE_C
+    default y
+
+config MBEDTLS_ECP_C
+	default y
+
+config MBEDTLS_ECP_DP_SECP256R1_ENABLED
+	default y
+
+config MBEDTLS_ECDH_C
+	default y
+
+config MBEDTLS_ECDSA_C
+	default y
 
 # getopt version
 config GETOPT_LONG
