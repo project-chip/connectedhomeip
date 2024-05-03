@@ -106,6 +106,12 @@ enum
 #if CHIP_WITH_NLFAULTINJECTION
     kDeviceOption_FaultInjection,
 #endif
+    kDeviceOption_VendorName = 0x1028,
+    kDeviceOption_ProductName = 0x1029,
+    kDeviceOption_HardwareVersionString = 0x102a,
+    kDeviceOption_SoftwareVersionString = 0x102b,
+    kDeviceOption_SerialNumber = 0x102c,
+
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -124,6 +130,11 @@ OptionDef sDeviceOptionDefs[] = {
     { "version", kArgumentRequired, kDeviceOption_Version },
     { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
     { "product-id", kArgumentRequired, kDeviceOption_ProductID },
+    { "vendor-name", kArgumentRequired, kDeviceOption_VendorName },
+    { "product-name", kArgumentRequired, kDeviceOption_ProductName },
+    { "harware-version-string", kArgumentRequired, kDeviceOption_HardwareVersionString },
+    { "software-version-string", kArgumentRequired, kDeviceOption_SoftwareVersionString },
+    { "serial-number", kArgumentRequired, kDeviceOption_SerialNumber },
     { "custom-flow", kArgumentRequired, kDeviceOption_CustomFlow },
     { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
     { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
@@ -587,8 +598,29 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             retval = false;
         }
         break;
+    
     }
 #endif
+    case kDeviceOption_VendorName:
+        LinuxDeviceOptions::GetInstance().vendorName.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_ProductName:
+        LinuxDeviceOptions::GetInstance().productName.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_HardwareVersionString:
+        LinuxDeviceOptions::GetInstance().hardwareVersionString.SetValue(std::string{ aValue });
+        break;
+    
+    case kDeviceOption_SoftwareVersionString:
+        LinuxDeviceOptions::GetInstance().softwareVersionString.SetValue(std::string{ aValue });
+        break;
+    
+    case kDeviceOption_SerialNumber:
+        LinuxDeviceOptions::GetInstance().serialNumber.SetValue(std::string{ aValue });
+        break;
+        
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;

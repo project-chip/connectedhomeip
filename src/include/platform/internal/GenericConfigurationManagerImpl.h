@@ -103,6 +103,11 @@ public:
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override;
     CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override;
+
+    CHIP_ERROR StoreVendorName(const char * vendorName, size_t vendorNameLen)  override;
+    CHIP_ERROR StoreProductName(const char * productName, size_t productNameLen)  override;
+    CHIP_ERROR StoreHardwareVersionString(const char * hardwareVersionString, size_t hardwareVersionStringLen)  override;
+    CHIP_ERROR StoreSoftwareVersionString(const char * softwareVersionString, size_t softwareVersionStringLen)  override;
 #if CHIP_CONFIG_TEST
     void RunUnitTests() override;
 #endif

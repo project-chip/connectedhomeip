@@ -20,6 +20,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+#include <stdio.h>
 
 #include "CommissionableInit.h"
 
@@ -99,6 +100,33 @@ CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, Li
         configManager.StoreProductId(options.payload.productID);
     }
 
+    if (options.vendorName.HasValue())
+    {
+        const char * vendorName = options.vendorName.Value().c_str();
+        configManager.StoreVendorName(vendorName, strlen(vendorName));
+    }
+    if (options.productName.HasValue())
+    {
+        const char * productName = options.productName.Value().c_str();
+        configManager.StoreProductName(productName,strlen(productName));
+    }
+    if (options.hardwareVersionString.HasValue())
+    {
+        const char * hardwareVersionString = options.hardwareVersionString.Value().c_str();
+        configManager.StoreHardwareVersionString(hardwareVersionString,strlen(hardwareVersionString));
+    }
+    if (options.softwareVersionString.HasValue())
+    {
+        const char * softwareVersionString = options.softwareVersionString.Value().c_str();
+        configManager.StoreSoftwareVersionString(softwareVersionString,strlen(softwareVersionString));
+    }
+  
+    if (options.serialNumber.HasValue())
+    {
+        const char * serialNumber = options.serialNumber.Value().c_str();
+        configManager.StoreSerialNumber(serialNumber, strlen(serialNumber));
+    }
+    
     return CHIP_NO_ERROR;
 }
 
