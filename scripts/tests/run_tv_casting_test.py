@@ -291,7 +291,6 @@ def validate_commissioning_success(tv_casting_app_info: Tuple[subprocess.Popen, 
             if 'Commissioning completed successfully' in tv_casting_line:
                 logging.info('Commissioning success noted on the Linux tv-casting-app output:')
                 logging.info(tv_casting_line.rstrip('\n'))
-                continue_reading_tv_casting_app_output = False
             elif 'Commissioning failed' in tv_casting_line:
                 logging.error('Commissioning failed noted on the Linux tv-casting-app output:')
                 logging.error(tv_casting_line.rstrip('\n'))
