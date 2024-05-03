@@ -454,26 +454,22 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         {
             MATTER_TRACE_SCOPE("Active operational delegate call", "MinMdnsResolver");
             ResolvedNodeData nodeResolvedData;
-            CHIP_ERROR err = CHIP_ERROR_UNINITIALIZED;
-
-            err = resolver->Take(nodeResolvedData);
+            CHIP_ERROR err = resolver->Take(nodeResolvedData);
 
             if (mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kOperational))
             {
-                DiscoveredNodeData nodeData;
-                if (err == CHIP_NO_ERROR)
-                {
-                    OperationalNodeBrowseData opNodeData;
-                    opNodeData.peerId     = nodeResolvedData.operationalData.peerId;
-                    opNodeData.hasZeroTTL = nodeResolvedData.operationalData.hasZeroTTL;
-                    nodeData.Set<OperationalNodeBrowseData>(opNodeData);
-                }
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
                 }
                 else if (mDiscoveryContext != nullptr)
                 {
+                    DiscoveredNodeData nodeData;
+                    OperationalNodeBrowseData opNodeData;
+
+                    opNodeData.peerId     = nodeResolvedData.operationalData.peerId;
+                    opNodeData.hasZeroTTL = nodeResolvedData.operationalData.hasZeroTTL;
+                    nodeData.Set<OperationalNodeBrowseData>(opNodeData);
                     mDiscoveryContext->OnNodeDiscovered(nodeData);
                 }
                 else

@@ -207,8 +207,7 @@ struct OperationalNodeBrowseData : public OperationalNodeData
     void LogDetail() const
     {
         ChipLogDetail(Discovery, "Discovered Operational node:\r\n");
-        ChipLogDetail(Discovery, "\tNode ID: " ChipLogFormatX64 "-" ChipLogFormatX64 "\r\n",
-                      ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
+        ChipLogDetail(Discovery, "\tNode Instance: " ChipLogFormatPeerId, ChipLogValuePeerId(peerId));
         ChipLogDetail(Discovery, "\thasZeroTTL: %s\r\n", hasZeroTTL ? "true" : "false");
     }
 };
