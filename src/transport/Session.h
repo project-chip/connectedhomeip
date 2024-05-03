@@ -64,7 +64,7 @@ class Session;
  *
  *       void Process(ReferenceCountedHandle<Session> &handle) {
  *          Foo::GetInstance()->ResetSession(); // this changes the passed in handle
- *          // trying to use "&handle" here may point to something else alltogether.
+ *          // trying to use "&handle" here may point to something else altogether.
  *       }
  *
  *   Above would be fixed if we would pass in the handles by value, however that adds extra code
