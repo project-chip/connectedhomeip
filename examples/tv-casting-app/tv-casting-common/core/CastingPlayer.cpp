@@ -254,7 +254,9 @@ void CastingPlayer::FindOrEstablishSession(void * clientContext, chip::OnDeviceC
         connectionContext->mOnConnectionFailureCallback);
 }
 
-bool CastingPlayer::ContainsDesiredTargetApp(core::CastingPlayer * cachedCastingPlayer, std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> desiredTargetApps)
+bool CastingPlayer::ContainsDesiredTargetApp(
+    core::CastingPlayer * cachedCastingPlayer,
+    std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> desiredTargetApps)
 {
     std::vector<memory::Strong<Endpoint>> cachedEndpoints = cachedCastingPlayer->GetEndpoints();
     for (size_t i = 0; i < desiredTargetApps.size(); i++)

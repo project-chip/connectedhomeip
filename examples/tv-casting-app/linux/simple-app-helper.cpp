@@ -252,20 +252,28 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         {
             if (strcmp(argv[2], "cgp") == 0)
             {
-                // Attempt Commissioner-Generated Passcode (cgp) commissioning flow only if the CastingPlayer indicates support for it.
+                // Attempt Commissioner-Generated Passcode (cgp) commissioning flow only if the CastingPlayer indicates support for
+                // it.
                 if (targetCastingPlayer->GetSupportsCommissionerGeneratedPasscode())
                 {
-                    ChipLogProgress(AppServer, "CommandHandler() request %lu cgp. Attempting the Commissioner-Generated Passcode commissioning flow", index);
+                    ChipLogProgress(
+                        AppServer,
+                        "CommandHandler() request %lu cgp. Attempting the Commissioner-Generated Passcode commissioning flow",
+                        index);
                     idOptions.mCommissionerPasscode = true;
-                } else 
+                }
+                else
                 {
-                    ChipLogError(AppServer, "CommandHandler() request %lu cgp. Selected CastingPLayer does not support the Commissioner-Generated Passcode commissioning flow", index);
+                    ChipLogError(AppServer,
+                                 "CommandHandler() request %lu cgp. Selected CastingPLayer does not support the "
+                                 "Commissioner-Generated Passcode commissioning flow",
+                                 index);
                 }
             }
         }
         chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
         targetAppInfo.vendorId = kDesiredEndpointVendorId;
-        CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
+        CHIP_ERROR result      = idOptions.addTargetAppInfo(targetAppInfo);
         if (result != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
@@ -308,8 +316,9 @@ CHIP_ERROR PrintAllCommands()
     streamer_printf(sout, "  stop-discovery       Stop Discovery of Casting Players. Usage: cast stop-discovery\r\n");
     streamer_printf(
         sout, "  request <index>      Request connecting to discovered Casting Player with [index]. Usage: cast request 0\r\n");
-    streamer_printf(
-        sout, "  request <index> cgp  Request connecting to discovered Casting Player with [index] using the Commissioner-Generated Passcode commissioning flow. Usage: cast request 0 cgp\r\n");
+    streamer_printf(sout,
+                    "  request <index> cgp  Request connecting to discovered Casting Player with [index] using the "
+                    "Commissioner-Generated Passcode commissioning flow. Usage: cast request 0 cgp\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;

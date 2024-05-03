@@ -62,8 +62,7 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
             targetAppInfo.productId = desiredEndpointFilter.productId;
 
             CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
-            if (result != CHIP_NO_ERROR)
-            {
+            if (result != CHIP_NO_ERROR) {
                 ChipLogError(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
             }
         }

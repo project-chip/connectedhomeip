@@ -61,10 +61,13 @@ public:
      */
     bool mCancelPasscode = false;
 
-    CHIP_ERROR addTargetAppInfo(const chip::Protocols::UserDirectedCommissioning::TargetAppInfo& targetAppInfo) {
+    CHIP_ERROR addTargetAppInfo(const chip::Protocols::UserDirectedCommissioning::TargetAppInfo & targetAppInfo)
+    {
         if (mTargetAppInfos.size() >= kMaxTargetAppInfos)
         {
-            ChipLogError(AppServer, "IdentificationDeclarationOptions::addTargetAppInfo() failed to add TargetAppInfo, max vector size is %zu", kMaxTargetAppInfos);
+            ChipLogError(AppServer,
+                         "IdentificationDeclarationOptions::addTargetAppInfo() failed to add TargetAppInfo, max vector size is %zu",
+                         kMaxTargetAppInfos);
             return CHIP_ERROR_NO_MEMORY;
         }
 

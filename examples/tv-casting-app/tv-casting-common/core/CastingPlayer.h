@@ -95,14 +95,8 @@ using ConnectCallback = std::function<void(CHIP_ERROR, CastingPlayer *)>;
 class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>
 {
 public:
-    CastingPlayer(CastingPlayerAttributes playerAttributes)
-    {
-        mAttributes                     = playerAttributes;
-    }
-    ~CastingPlayer()
-    {
-        delete mCommissionerDeclarationHandler;
-    }
+    CastingPlayer(CastingPlayerAttributes playerAttributes) { mAttributes = playerAttributes; }
+    ~CastingPlayer() { delete mCommissionerDeclarationHandler; }
 
     /**
      * @brief Get the CastingPlayer object targeted currently (may not be connected)
@@ -217,7 +211,7 @@ private:
      * Flag to indicate whether or not the Commissionee has obtained the Commissioner Passcode from the user and is therefore ready
      * for commissioning.
      */
-    bool mUdcCommissionerPasscodeReady = false;
+    bool mUdcCommissionerPasscodeReady                               = false;
     CommissionerDeclarationHandler * mCommissionerDeclarationHandler = new CommissionerDeclarationHandler();
     static CastingPlayer * mTargetCastingPlayer;
     unsigned long long int mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
@@ -245,9 +239,11 @@ private:
 
     /**
      * @brief Checks if the cachedCastingPlayer contains at least one Endpoint/TargetApp described in the desiredTargetApps list.
-     * @return true - cachedCastingPlayer contains at least one endpoints with matching (non-default) values for vendorID and productID as described in the desiredTargetApps list, false otherwise.
+     * @return true - cachedCastingPlayer contains at least one endpoints with matching (non-default) values for vendorID and
+     * productID as described in the desiredTargetApps list, false otherwise.
      */
-    bool ContainsDesiredTargetApp(core::CastingPlayer * cachedCastingPlayer, std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> desiredTargetApps);
+    bool ContainsDesiredTargetApp(core::CastingPlayer * cachedCastingPlayer,
+                                  std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> desiredTargetApps);
 
     // ChipDeviceEventHandler handles chip::DeviceLayer::ChipDeviceEvent events and helps the CastingPlayer class commission with
     // and connect to a CastingPlayer

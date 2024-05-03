@@ -83,7 +83,9 @@ JNI_METHOD(jobject, verifyOrEstablishConnection)
         CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
         if (result != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "MatterCastingPlayer-JNI::verifyOrEstablishConnection() failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
+            ChipLogError(AppServer,
+                         "MatterCastingPlayer-JNI::verifyOrEstablishConnection() failed to add targetAppInfo: %" CHIP_ERROR_FORMAT,
+                         result.Format());
         }
     }
 
