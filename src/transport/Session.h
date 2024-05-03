@@ -46,7 +46,7 @@ class Session;
  *    won't be able to be grabbed by any SessionHolder. SessionHandle->IsActiveSession can be used to check if the session is
  *    active.
  *
- *    A `SessionHandle` exists to guarante that the object it points to will not be released while allowing passing
+ *    A `SessionHandle` exists to guarantee that the object it points to will not be released while allowing passing
  *    the handle as a reference, to not incur refeference-counted Retain/Release extra calls.
  *
  *    Example code that breaks assumptions (hard to reason about/maintain):
