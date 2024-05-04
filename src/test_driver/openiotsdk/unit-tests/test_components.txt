@@ -13,6 +13,7 @@ PlatformTests
 RawTransportTests
 RetransmitTests
 TestShell
+TracingTests
 SetupPayloadTests
 SupportTests
 UserDirectedCommissioningTests
