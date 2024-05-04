@@ -39,6 +39,7 @@
 namespace chip {
 namespace Transport {
 
+// Forward declaration of friend class.
 template <size_t kActiveConnectionsSize, size_t kPendingPacketSize> class TCPBaseTestAccess;
 
 /** Defines listening parameters for setting up a TCP transport */
