@@ -458,6 +458,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+                continue;
             }
 
             mActiveResolves.Complete(nodeData.operationalData.peerId);
