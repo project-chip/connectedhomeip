@@ -42,7 +42,8 @@ namespace chip {
 namespace Transport {
 
 // Forward declaration of friend class for test access.
-template <size_t kActiveConnectionsSize, size_t kPendingPacketSize> class TCPBaseTestAccess;
+template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
+class TCPBaseTestAccess;
 
 /** Defines listening parameters for setting up a TCP transport */
 class TcpListenParameters
@@ -204,7 +205,8 @@ public:
 
 private:
     // Allow tests to access private members.
-    template <size_t kActiveConnectionsSize, size_t kPendingPacketSize> friend class TCPBaseTestAccess;
+    template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
+    friend class TCPBaseTestAccess;
 
     /**
      * Allocate an unused connection from the pool
