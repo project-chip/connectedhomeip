@@ -50,6 +50,7 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/Logging.cpp",
     "${silabs_platform_dir}/MigrationManager.cpp",
     "${silabs_platform_dir}/MigrationManager.h",
+    "${silabs_platform_dir}/PlatformManagerImpl.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
@@ -63,7 +64,6 @@ static_library("SiWx917") {
     "../rs911x/rsi_ble_config.h",
     "../rs911x/wfx_sl_ble_init.c",
     "../rs911x/wfx_sl_ble_init.h",
-    "PlatformManagerImpl.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
