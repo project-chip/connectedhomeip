@@ -39,6 +39,8 @@
 namespace chip {
 namespace Transport {
 
+template <size_t kActiveConnectionsSize, size_t kPendingPacketSize> class TCPBaseTestAccess;
+
 /** Defines listening parameters for setting up a TCP transport */
 class TcpListenParameters
 {
@@ -181,7 +183,8 @@ public:
     void CloseActiveConnections();
 
 private:
-    friend class TCPTestAccess;
+    // Allow tests to access private members.
+    template <size_t kActiveConnectionsSize, size_t kPendingPacketSize> friend class TCPBaseTestAccess;
 
     /**
      * Find an active connection to the given peer or return nullptr if

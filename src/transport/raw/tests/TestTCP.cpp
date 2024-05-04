@@ -32,6 +32,7 @@
 #include <system/SystemLayer.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/TCP.h>
+#include <transport/raw/tests/TCPBaseTestAccess.h>
 
 #include <errno.h>
 #include <stdlib.h>
@@ -42,33 +43,14 @@ using namespace chip;
 using namespace chip::Test;
 using namespace chip::Inet;
 
+namespace {
+
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr uint16_t kPacketSizeBytes           = static_cast<uint16_t>(sizeof(uint16_t));
 
-using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
-
-namespace chip {
-namespace Transport {
-class TCPTestAccess
-{
-public:
-    static void * FindActiveConnection(TCPImpl & tcp, Transport::PeerAddress & lPeerAddress)
-    {
-        return tcp.FindActiveConnection(lPeerAddress);
-    }
-    static TCPEndPoint * GetEndpoint(void * state) { return static_cast<TCPBase::ActiveConnectionState *>(state)->mEndPoint; }
-
-    static CHIP_ERROR ProcessReceivedBuffer(TCPImpl & tcp, TCPEndPoint * endPoint, const PeerAddress & peerAddress,
-                                            System::PacketBufferHandle && buffer)
-    {
-        return tcp.ProcessReceivedBuffer(endPoint, peerAddress, std::move(buffer));
-    }
-};
-} // namespace Transport
-} // namespace chip
-
-namespace {
+using TCPImpl    = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
+using TestAccess = Transport::TCPBaseTestAccess<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
@@ -421,9 +403,9 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
 
     Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr);
-    void * state                        = Transport::TCPTestAccess::FindActiveConnection(tcp, lPeerAddress);
+    void * state                        = TestAccess::FindActiveConnection(tcp, lPeerAddress);
     ASSERT_NE(state, nullptr);
-    TCPEndPoint * lEndPoint = Transport::TCPTestAccess::GetEndpoint(state);
+    TCPEndPoint * lEndPoint = TestAccess::GetEndpoint(state);
     ASSERT_NE(lEndPoint, nullptr);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -433,14 +415,14 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 111, 0 }));
-    err = Transport::TCPTestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 
     // Test a message in a chain of three packet buffers. The message length is split across buffers.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 1, 122, 123, 0 }));
-    err = Transport::TCPTestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 
@@ -449,7 +431,7 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 131, 0 }));
     EXPECT_TRUE(testData[1].Init((const uint16_t[]){ 132, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
-    err = Transport::TCPTestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 2);
 
@@ -458,7 +440,7 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 141, 142, 0 }));
     EXPECT_TRUE(testData[1].Init((const uint16_t[]){ 143, 144, 0 }));
     testData[0].mHandle->AddToEnd(std::move(testData[1].mHandle));
-    err = Transport::TCPTestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 2);
 
@@ -468,7 +450,7 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     EXPECT_TRUE(testData[0].Init((const uint16_t[]){ 51, System::PacketBuffer::kMaxSizeWithoutReserve, 0 }));
     // Sending only the first buffer of the long chain. This should be enough to trigger the error.
     System::PacketBufferHandle head = testData[0].mHandle.PopHead();
-    err = Transport::TCPTestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(head));
+    err                             = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(head));
     EXPECT_EQ(err, CHIP_ERROR_MESSAGE_TOO_LONG);
     EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 0);
 
