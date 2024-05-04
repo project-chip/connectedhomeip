@@ -147,6 +147,11 @@ CHIP_ERROR SessionManager::Init(System::Layer * systemLayer, TransportMgrBase * 
 
     mTransportMgr->SetSessionManager(this);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    mConnCompleteCb = nullptr;
+    mConnClosedCb   = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     return CHIP_NO_ERROR;
 }
 
@@ -602,7 +607,8 @@ CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionH
     return CHIP_NO_ERROR;
 }
 
-void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
+void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg,
+                                       Transport::MessageTransportContext * ctxt)
 {
     PacketHeader partialPacketHeader;
 
@@ -621,19 +627,150 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
         }
         else
         {
-            SecureUnicastMessageDispatch(partialPacketHeader, peerAddress, std::move(msg));
+            SecureUnicastMessageDispatch(partialPacketHeader, peerAddress, std::move(msg), ctxt);
         }
     }
     else
     {
-        UnauthenticatedMessageDispatch(partialPacketHeader, peerAddress, std::move(msg));
+        UnauthenticatedMessageDispatch(partialPacketHeader, peerAddress, std::move(msg), ctxt);
     }
 }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+void SessionManager::HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn)
+{
+    char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
+
+    VerifyOrReturn(conn != nullptr);
+    conn->mPeerAddr.ToString(peerAddrBuf);
+    ChipLogProgress(Inet, "Received TCP connection request from %s.", peerAddrBuf);
+
+    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn->mAppState;
+    if (appTCPConnCbCtxt != nullptr && appTCPConnCbCtxt->connReceivedCb != nullptr)
+    {
+        appTCPConnCbCtxt->connReceivedCb(conn);
+    }
+}
+
+void SessionManager::HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+{
+    VerifyOrReturn(conn != nullptr);
+
+    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn->mAppState;
+    if (appTCPConnCbCtxt == nullptr)
+    {
+        TCPDisconnect(conn, /* shouldAbort = */ true);
+        return;
+    }
+
+    if (appTCPConnCbCtxt->connCompleteCb != nullptr)
+    {
+        appTCPConnCbCtxt->connCompleteCb(conn, conErr);
+    }
+    else
+    {
+        char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
+        conn->mPeerAddr.ToString(peerAddrBuf);
+
+        ChipLogProgress(Inet, "TCP Connection established with peer %s, but no registered handler. Disconnecting.", peerAddrBuf);
+
+        // Close the connection
+        TCPDisconnect(conn, /* shouldAbort = */ true);
+    }
+}
+
+void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+{
+    VerifyOrReturn(conn != nullptr);
+
+    // Mark the corresponding secure sessions as defunct
+    mSecureSessions.ForEachSession([&](auto session) {
+        if (session->IsActiveSession() && session->GetTCPConnection() == conn)
+        {
+            SessionHandle handle(*session);
+            // Notify the SessionConnection delegate of the connection
+            // closure.
+            if (mConnDelegate != nullptr)
+            {
+                mConnDelegate->OnTCPConnectionClosed(handle, conErr);
+            }
+
+            // Dis-associate the connection from session by setting it to a
+            // nullptr.
+            session->SetTCPConnection(nullptr);
+            // Mark session as defunct
+            session->MarkAsDefunct();
+        }
+
+        return Loop::Continue;
+    });
+
+    // TODO: A mechanism to mark an unauthenticated session as unusable when
+    // the underlying connection is broken. Issue #32323
+
+    Transport::AppTCPConnectionCallbackCtxt * appTCPConnCbCtxt = conn->mAppState;
+    VerifyOrReturn(appTCPConnCbCtxt != nullptr);
+
+    if (appTCPConnCbCtxt->connClosedCb != nullptr)
+    {
+        appTCPConnCbCtxt->connClosedCb(conn, conErr);
+    }
+}
+
+CHIP_ERROR SessionManager::TCPConnect(const PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
+                                      Transport::ActiveTCPConnectionState ** peerConnState)
+{
+    char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
+    peerAddress.ToString(peerAddrBuf);
+    if (mTransportMgr != nullptr)
+    {
+        ChipLogProgress(Inet, "Connecting over TCP with peer at %s.", peerAddrBuf);
+        return mTransportMgr->TCPConnect(peerAddress, appState, peerConnState);
+    }
+
+    ChipLogError(Inet, "The transport manager is not initialized. Unable to connect to peer at %s.", peerAddrBuf);
+
+    return CHIP_ERROR_INCORRECT_STATE;
+}
+
+CHIP_ERROR SessionManager::TCPDisconnect(const PeerAddress & peerAddress)
+{
+    if (mTransportMgr != nullptr)
+    {
+        char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
+        peerAddress.ToString(peerAddrBuf);
+        ChipLogProgress(Inet, "Disconnecting TCP connection from peer at %s.", peerAddrBuf);
+        mTransportMgr->TCPDisconnect(peerAddress);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void SessionManager::TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort)
+{
+    if (mTransportMgr != nullptr && conn != nullptr)
+    {
+        char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
+        conn->mPeerAddr.ToString(peerAddrBuf);
+        ChipLogProgress(Inet, "Disconnecting TCP connection from peer at %s.", peerAddrBuf);
+        mTransportMgr->TCPDisconnect(conn, shouldAbort);
+    }
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partialPacketHeader,
-                                                    const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
+                                                    const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
+                                                    Transport::MessageTransportContext * ctxt)
 {
     MATTER_TRACE_SCOPE("Unauthenticated Message Dispatch", "SessionManager");
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp && ctxt->conn == nullptr)
+    {
+        ChipLogError(Inet, "Connection object is missing for received message.");
+        return;
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     // Drop unsecured messages with privacy enabled.
     if (partialPacketHeader.HasPrivacyFlag())
@@ -660,7 +797,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
     if (source.HasValue())
     {
         // Assume peer is the initiator, we are the responder.
-        optionalSession = mUnauthenticatedSessions.FindOrAllocateResponder(source.Value(), GetDefaultMRPConfig());
+        optionalSession = mUnauthenticatedSessions.FindOrAllocateResponder(source.Value(), GetDefaultMRPConfig(), peerAddress);
         if (!optionalSession.HasValue())
         {
             ChipLogError(Inet, "UnauthenticatedSession exhausted");
@@ -670,7 +807,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
     else
     {
         // Assume peer is the responder, we are the initiator.
-        optionalSession = mUnauthenticatedSessions.FindInitiator(destination.Value());
+        optionalSession = mUnauthenticatedSessions.FindInitiator(destination.Value(), peerAddress);
         if (!optionalSession.HasValue())
         {
             ChipLogProgress(Inet, "Received unknown unsecure packet for initiator 0x" ChipLogFormatX64,
@@ -685,6 +822,25 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
     CorrectPeerAddressInterfaceID(mutablePeerAddress);
     unsecuredSession->SetPeerAddress(mutablePeerAddress);
     SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Associate the unauthenticated session with the connection, if not done already.
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp)
+    {
+        Transport::ActiveTCPConnectionState * sessionConn = unsecuredSession->GetTCPConnection();
+        if (sessionConn == nullptr)
+        {
+            unsecuredSession->SetTCPConnection(ctxt->conn);
+        }
+        else
+        {
+            if (sessionConn != ctxt->conn)
+            {
+                ChipLogError(Inet, "Data received over wrong connection %p. Dropping it!", ctxt->conn);
+                return;
+            }
+        }
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     unsecuredSession->MarkActiveRx();
 
@@ -723,13 +879,55 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
 }
 
 void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPacketHeader,
-                                                  const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
+                                                  const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
+                                                  Transport::MessageTransportContext * ctxt)
 {
     MATTER_TRACE_SCOPE("Secure Unicast Message Dispatch", "SessionManager");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp && ctxt->conn == nullptr)
+    {
+        ChipLogError(Inet, "Connection object is missing for received message.");
+        return;
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     Optional<SessionHandle> session = mSecureSessions.FindSecureSessionByLocalKey(partialPacketHeader.GetSessionId());
+    if (!session.HasValue())
+    {
+        ChipLogError(Inet, "Data received on an unknown session (LSID=%d). Dropping it!", partialPacketHeader.GetSessionId());
+        return;
+    }
+
+    Transport::SecureSession * secureSession  = session.Value()->AsSecureSession();
+    Transport::PeerAddress mutablePeerAddress = peerAddress;
+    CorrectPeerAddressInterfaceID(mutablePeerAddress);
+    if (secureSession->GetPeerAddress() != mutablePeerAddress)
+    {
+        secureSession->SetPeerAddress(mutablePeerAddress);
+    }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Associate the secure session with the connection, if not done already.
+    if (peerAddress.GetTransportType() == Transport::Type::kTcp)
+    {
+        Transport::ActiveTCPConnectionState * sessionConn = secureSession->GetTCPConnection();
+        if (sessionConn == nullptr)
+        {
+            secureSession->SetTCPConnection(ctxt->conn);
+        }
+        else
+        {
+            if (sessionConn != ctxt->conn)
+            {
+                ChipLogError(Inet, "Data received over wrong connection %p. Dropping it!", ctxt->conn);
+                return;
+            }
+        }
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     PayloadHeader payloadHeader;
 
@@ -750,14 +948,6 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         ChipLogError(Inet, "Secure transport received Unicast NULL packet, discarding");
         return;
     }
-
-    if (!session.HasValue())
-    {
-        ChipLogError(Inet, "Data received on an unknown session (LSID=%d). Dropping it!", packetHeader.GetSessionId());
-        return;
-    }
-
-    Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
     // We need to allow through messages even on sessions that are pending
     // evictions, because for some cases (UpdateNOC, RemoveFabric, etc) there
@@ -814,13 +1004,6 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::No)
     {
         secureSession->GetSessionMessageCounter().GetPeerMessageCounter().CommitEncryptedUnicast(packetHeader.GetMessageCounter());
-    }
-
-    Transport::PeerAddress mutablePeerAddress = peerAddress;
-    CorrectPeerAddressInterfaceID(mutablePeerAddress);
-    if (secureSession->GetPeerAddress() != mutablePeerAddress)
-    {
-        secureSession->SetPeerAddress(mutablePeerAddress);
     }
 
     if (mCB != nullptr)
@@ -1057,27 +1240,69 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 }
 
 Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId peerNodeId,
-                                                                 const Optional<Transport::SecureSession::Type> & type)
+                                                                 const Optional<Transport::SecureSession::Type> & type,
+                                                                 TransportPayloadCapability transportPayloadCapability)
 {
-    SecureSession * found = nullptr;
+    SecureSession * mrpSession = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    SecureSession * tcpSession = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-    mSecureSessions.ForEachSession([&peerNodeId, &type, &found](auto session) {
+    mSecureSessions.ForEachSession([&peerNodeId, &type, &mrpSession,
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                    &tcpSession,
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                    &transportPayloadCapability](auto session) {
         if (session->IsActiveSession() && session->GetPeer() == peerNodeId &&
             (!type.HasValue() || type.Value() == session->GetSecureSessionType()))
         {
-            //
-            // Select the active session with the most recent activity to return back to the caller.
-            //
-            if ((found == nullptr) || (found->GetLastActivityTime() < session->GetLastActivityTime()))
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+            if ((transportPayloadCapability == TransportPayloadCapability::kMRPOrTCPCompatiblePayload ||
+                 transportPayloadCapability == TransportPayloadCapability::kLargePayload) &&
+                session->GetTCPConnection() != nullptr)
             {
-                found = session;
+                // Set up a TCP transport based session as standby
+                if ((tcpSession == nullptr) || (tcpSession->GetLastActivityTime() < session->GetLastActivityTime()))
+                {
+                    tcpSession = session;
+                }
+            }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+            if ((mrpSession == nullptr) || (mrpSession->GetLastActivityTime() < session->GetLastActivityTime()))
+            {
+                mrpSession = session;
             }
         }
 
         return Loop::Continue;
     });
 
-    return found != nullptr ? MakeOptional<SessionHandle>(*found) : Optional<SessionHandle>::Missing();
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    if (transportPayloadCapability == TransportPayloadCapability::kLargePayload)
+    {
+        return tcpSession != nullptr ? MakeOptional<SessionHandle>(*tcpSession) : Optional<SessionHandle>::Missing();
+    }
+
+    if (transportPayloadCapability == TransportPayloadCapability::kMRPOrTCPCompatiblePayload)
+    {
+        // If MRP-based session is available, use it.
+        if (mrpSession != nullptr)
+        {
+            return MakeOptional<SessionHandle>(*mrpSession);
+        }
+
+        // Otherwise, look for a tcp-based session
+        if (tcpSession != nullptr)
+        {
+            return MakeOptional<SessionHandle>(*tcpSession);
+        }
+
+        return Optional<SessionHandle>::Missing();
+    }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+    return mrpSession != nullptr ? MakeOptional<SessionHandle>(*mrpSession) : Optional<SessionHandle>::Missing();
 }
 
 /**
