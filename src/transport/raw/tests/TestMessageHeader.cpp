@@ -23,13 +23,12 @@
  *
  */
 
+#include <gtest/gtest.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
 #include <transport/raw/MessageHeader.h>
-
-#include <gtest/gtest.h>
 
 namespace {
 
