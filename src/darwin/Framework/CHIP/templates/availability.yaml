@@ -8515,6 +8515,7 @@
       clusters:
           - ActivatedCarbonFilterMonitoring
           - AirQuality
+          - ElectricalPowerMeasurement
           - HEPAFilterMonitoring
           - SmokeCOAlarm
           # Concentration Measurement clusters
@@ -8543,6 +8544,31 @@
               - ClusterRevision
           AirQuality:
               - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ElectricalPowerMeasurement:
+              - PowerMode
+              - NumberOfMeasurementTypes
+              - Accuracy
+              - Ranges
+              - Voltage
+              - ActiveCurrent
+              - ReactiveCurrent
+              - ApparentCurrent
+              - ActivePower
+              - ReactivePower
+              - ApparentPower
+              - RMSVoltage
+              - RMSCurrent
+              - RMSPower
+              - Frequency
+              - HarmonicCurrents
+              - HarmonicPhases
+              - PowerFactor
+              - NeutralCurrent
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -8769,6 +8795,11 @@
       structs:
           ActivatedCarbonFilterMonitoring:
               - ReplacementProductStruct
+          ElectricalPowerMeasurement:
+              - HarmonicMeasurementStruct
+              - MeasurementRangeStruct
+              - MeasurementAccuracyRangeStruct
+              - MeasurementAccuracyStruct
           HEPAFilterMonitoring:
               - ReplacementProductStruct
       struct fields:
@@ -8776,11 +8807,44 @@
               ReplacementProductStruct:
                   - productIdentifierType
                   - productIdentifierValue
+          ElectricalPowerMeasurement:
+              MeasurementRangeStruct:
+                  - measurementType
+                  - min
+                  - max
+                  - startTimestamp
+                  - endTimestamp
+                  - minTimestamp
+                  - maxTimestamp
+                  - startSystime
+                  - endSystime
+                  - minSystime
+                  - maxSystime
+              HarmonicMeasurementStruct:
+                  - order
+                  - measurement
+              MeasurementAccuracyStruct:
+                  - measurementType
+                  - measured
+                  - minMeasuredValue
+                  - maxMeasuredValue
+                  - accuracyRanges
+              MeasurementAccuracyRangeStruct:
+                  - rangeMin
+                  - rangeMax
+                  - percentMax
+                  - percentMin
+                  - percentTypical
+                  - fixedMax
+                  - fixedMin
+                  - fixedTypical
           HEPAFilterMonitoring:
               ReplacementProductStruct:
                   - productIdentifierType
                   - productIdentifierValue
       events:
+          ElectricalPowerMeasurement:
+              - MeasurementPeriodRanges
           SmokeCOAlarm:
               - SmokeAlarm
               - COAlarm
@@ -8794,6 +8858,9 @@
               - InterconnectCOAlarm
               - AllClear
       event fields:
+          ElectricalPowerMeasurement:
+              MeasurementPeriodRanges:
+                  - ranges
           SmokeCOAlarm:
               SmokeAlarm:
                   - alarmSeverityLevel
@@ -8812,6 +8879,9 @@
               - ProductIdentifierTypeEnum
           AirQuality:
               - AirQualityEnum
+          ElectricalPowerMeasurement:
+              - PowerModeEnum
+              - MeasurementTypeEnum
           FanControl:
               - StepDirectionEnum
               - AirflowDirectionEnum
@@ -8890,6 +8960,28 @@
                   - Poor
                   - VeryPoor
                   - ExtremelyPoor
+          ElectricalPowerMeasurement:
+              PowerModeEnum:
+                  - Unknown
+                  - DC
+                  - AC
+              MeasurementTypeEnum:
+                  - Unspecified
+                  - Voltage
+                  - ActiveCurrent
+                  - ReactiveCurrent
+                  - ApparentCurrent
+                  - ActivePower
+                  - ReactivePower
+                  - ApparentPower
+                  - RMSVoltage
+                  - RMSCurrent
+                  - RMSPower
+                  - Frequency
+                  - PowerFactor
+                  - NeutralCurrent
+                  - ElectricalEnergy
+
           FanControl:
               StepDirectionEnum:
                   - Increase
@@ -9146,6 +9238,8 @@
               - Feature
           AirQuality:
               - Feature
+          ElectricalPowerMeasurement:
+              - Feature
           HEPAFilterMonitoring:
               - Feature
           SmokeCOAlarm:
@@ -9182,6 +9276,13 @@
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          ElectricalPowerMeasurement:
+              Feature:
+                  - DirectCurrent
+                  - AlternatingCurrent
+                  - PolyphasePower
+                  - Harmonics
+                  - PowerQuality
           HEPAFilterMonitoring:
               Feature:
                   - Condition
@@ -9281,7 +9382,6 @@
           - EnergyEVSEMode
           - DeviceEnergyManagementMode
           - Messages
-          - ElectricalPowerMeasurement
           - PowerTopology
       attributes:
           DoorLock:
