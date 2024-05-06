@@ -82,16 +82,17 @@ Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
                       const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
 {
-    uint8_t index = 0;
+    uint8_t index        = 0;
+    const int maxRetries = 10; // Set the maximum number of retries
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (nullptr == gDevices[index])
         {
             gDevices[index] = dev;
             CHIP_ERROR err;
-            while (true)
+            int retryCount = 0;
+            while (retryCount < maxRetries)
             {
-                // Todo: Update this to schedule the work rather than use this lock
                 DeviceLayer::StackLock lock;
                 dev->SetEndpointId(gCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
@@ -105,14 +106,17 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 }
                 if (err != CHIP_ERROR_ENDPOINT_EXISTS)
                 {
-                    return -1;
+                    return -1; // Return error as endpoint addition failed due to an error other than endpoint already exists
                 }
-                // Handle wrap condition
+                // Increment the endpoint ID and handle wrap condition
                 if (++gCurrentEndpointId < gFirstDynamicEndpointId)
                 {
                     gCurrentEndpointId = gFirstDynamicEndpointId;
                 }
+                retryCount++;
             }
+            ChipLogError(DeviceLayer, "Failed to add dynamic endpoint after %d retries", maxRetries);
+            return -1; // Return error as all retries are exhausted
         }
         index++;
     }
@@ -127,7 +131,6 @@ int RemoveDeviceEndpoint(Device * dev)
     {
         if (gDevices[index] == dev)
         {
-            // Todo: Update this to schedule the work rather than use this lock
             DeviceLayer::StackLock lock;
             // Silence complaints about unused ep when progress logging
             // disabled.
