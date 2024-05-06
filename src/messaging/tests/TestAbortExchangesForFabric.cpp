@@ -51,13 +51,13 @@ using namespace chip::Protocols;
 
 struct TestContext : Test::LoopbackMessagingContext
 {
-    virtual CHIP_ERROR SetUp()
+    void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
-        ReturnErrorOnFailure(psa_crypto_init() == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
 #endif
-        ReturnErrorOnFailure(chip::Test::LoopbackMessagingContext::SetUp());
-        return CHIP_NO_ERROR;
+        chip::Test::LoopbackMessagingContext::SetUp();
     }
 };
 
