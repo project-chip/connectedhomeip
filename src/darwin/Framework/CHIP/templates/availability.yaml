@@ -8515,6 +8515,7 @@
       clusters:
           - ActivatedCarbonFilterMonitoring
           - AirQuality
+          - ElectricalEnergyMeasurement
           - ElectricalPowerMeasurement
           - HEPAFilterMonitoring
           - SmokeCOAlarm
@@ -8544,6 +8545,18 @@
               - ClusterRevision
           AirQuality:
               - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ElectricalEnergyMeasurement:
+              - Accuracy
+              - CumulativeEnergyImported
+              - CumulativeEnergyExported
+              - PeriodicEnergyImported
+              - PeriodicEnergyExported
+              - CumulativeEnergyReset
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -8795,6 +8808,10 @@
       structs:
           ActivatedCarbonFilterMonitoring:
               - ReplacementProductStruct
+          ElectricalEnergyMeasurement:
+              - EnergyMeasurementStruct
+              - CumulativeEnergyResetStruct
+              - MeasurementAccuracyStruct
           ElectricalPowerMeasurement:
               - HarmonicMeasurementStruct
               - MeasurementRangeStruct
@@ -8807,6 +8824,33 @@
               ReplacementProductStruct:
                   - productIdentifierType
                   - productIdentifierValue
+          ElectricalEnergyMeasurement:
+              EnergyMeasurementStruct:
+                  - energy
+                  - startTimestamp
+                  - endTimestamp
+                  - startSystime
+                  - endSystime
+              CumulativeEnergyResetStruct:
+                  - importedResetTimestamp
+                  - exportedResetTimestamp
+                  - importedResetSystime
+                  - exportedResetSystime
+              MeasurementAccuracyStruct:
+                  - measurementType
+                  - measured
+                  - minMeasuredValue
+                  - maxMeasuredValue
+                  - accuracyRanges
+              MeasurementAccuracyRangeStruct:
+                  - rangeMin
+                  - rangeMax
+                  - percentMax
+                  - percentMin
+                  - percentTypical
+                  - fixedMax
+                  - fixedMin
+                  - fixedTypical
           ElectricalPowerMeasurement:
               MeasurementRangeStruct:
                   - measurementType
@@ -8843,6 +8887,9 @@
                   - productIdentifierType
                   - productIdentifierValue
       events:
+          ElectricalEnergyMeasurement:
+              - CumulativeEnergyMeasured
+              - PeriodicEnergyMeasured
           ElectricalPowerMeasurement:
               - MeasurementPeriodRanges
           SmokeCOAlarm:
@@ -8858,6 +8905,13 @@
               - InterconnectCOAlarm
               - AllClear
       event fields:
+          ElectricalEnergyMeasurement:
+              CumulativeEnergyMeasured:
+                  - energyImported
+                  - energyExported
+              PeriodicEnergyMeasured:
+                  - energyImported
+                  - energyExported
           ElectricalPowerMeasurement:
               MeasurementPeriodRanges:
                   - ranges
@@ -9238,6 +9292,8 @@
               - Feature
           AirQuality:
               - Feature
+          ElectricalEnergyMeasurement:
+              - Feature
           ElectricalPowerMeasurement:
               - Feature
           HEPAFilterMonitoring:
@@ -9276,6 +9332,12 @@
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          ElectricalEnergyMeasurement:
+              Feature:
+                  - ImportedEnergy
+                  - ExportedEnergy
+                  - CumulativeEnergy
+                  - PeriodicEnergy
           ElectricalPowerMeasurement:
               Feature:
                   - DirectCurrent
