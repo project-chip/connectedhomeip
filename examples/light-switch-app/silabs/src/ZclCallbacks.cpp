@@ -51,7 +51,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
 }
-#ifndef NDEBUG
+#endif
 
 /** @brief OnOff Cluster Init
  *
