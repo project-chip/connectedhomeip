@@ -413,10 +413,11 @@ class ChipStack(object):
 
         return await asyncio.wait_for(callObj.future, timeoutMs / 1000 if timeoutMs else None)
 
-    def CallAsyncWithCallback(self, callFunct):
+    def CallAsyncWithCompleteCallback(self, callFunct):
         '''Run a Python function on CHIP stack, and wait for the application specific response.
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
+        Make sure to register the necessary callbacks which release the function by setting the completeEvent.
         '''
         # throw error if op in progress
         self.callbackRes = None
