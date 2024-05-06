@@ -485,7 +485,7 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
             {
                 mSession->AsSecureSession()->MarkAsDefunct();
             }
-            mSession->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+            mSession->NotifySessionHang();
         }
     }
 

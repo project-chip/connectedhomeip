@@ -83,6 +83,9 @@ jobs:
                           -enableUndefinedBehaviorSanitizer YES
                     - flavor: tsan
                       arguments: -enableThreadSanitizer YES
+                    # "leaks" does not seem to be very compatible with asan or tsan
+                    - flavor: leaks
+                      defines: ENABLE_LEAK_DETECTION=1
         steps:
             - name: Checkout
               uses: actions/checkout@v4

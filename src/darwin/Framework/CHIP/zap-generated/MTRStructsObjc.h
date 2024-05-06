@@ -895,52 +895,52 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterSmokeAlarmEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterCOAlarmEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterLowBatteryEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterHardwareFaultEvent : NSObject <NSCopying>
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterEndOfServiceEvent : NSObject <NSCopying>
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterSelfTestCompleteEvent : NSObject <NSCopying>
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterAlarmMutedEvent : NSObject <NSCopying>
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterMuteEndedEvent : NSObject <NSCopying>
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull alarmSeverityLevel MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterAllClearEvent : NSObject <NSCopying>
 @end
 
@@ -1037,16 +1037,16 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRHEPAFilterMonitoringClusterReplacementProductStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull productIdentifierType MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull productIdentifierType MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull productIdentifierType MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull productIdentifierType MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
