@@ -423,6 +423,14 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_NEWLY_AVAILABLE;
  */
 - (void)deviceCachePrimed:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
 
+/**
+ * This is called when the MTRDevice object detects a change in the device configuration.
+ *
+ * Device configuration is the set of functionality implemented by the device.
+ *
+ */
+- (void)deviceConfigurationChanged:(MTRDevice *)device MTR_NEWLY_AVAILABLE;
+
 @end
 
 @interface MTRDevice (Deprecated)

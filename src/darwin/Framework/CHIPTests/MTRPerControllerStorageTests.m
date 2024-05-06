@@ -187,6 +187,10 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)setUp
 {
+    // Set detectLeaks true first, in case our superclass wants to do something
+    // in setUp when it's set.
+    self.detectLeaks = YES;
+
     // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];
@@ -353,8 +357,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)test001_BasicControllerStartup
 {
-    self.detectLeaks = YES;
-
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -403,8 +405,6 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)test002_TryStartingTwoControllersWithSameNodeID
 {
-    self.detectLeaks = YES;
-
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
