@@ -67,7 +67,6 @@ if (chip_build_tests) {
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/app/icd/server/tests",
-      "${chip_root}/src/app/icd/server/tests:tests_nltest",
     ]
 
     # Skip DNSSD tests for Mbed platform due to flash memory size limitations
