@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-import logging
-
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -43,7 +41,7 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
     async def set_bad_cook_time_value_expect_failure(self, endpoint, value):
         commands = Clusters.Objects.MicrowaveOvenControl.Commands
         try:
-            await self.send_single_cmd(cmd=Clusters.Objects.MicrowaveOvenControl.Commands.SetCookingParameters(cookTime=value), endpoint=endpoint)
+            await self.send_single_cmd(cmd=commands.SetCookingParameters(cookTime=value), endpoint=endpoint)
             asserts.assert_fail("Expected an exception but received none.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError, "Expected a CONSTRAINT_ERROR but got a different response.")
@@ -93,8 +91,6 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes
-        features = Clusters.MicrowaveOvenControl.Bitmaps.Feature
-        commands = Clusters.Objects.MicrowaveOvenControl.Commands
 
         self.step(2)
         maxCookTime = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxCookTime)
