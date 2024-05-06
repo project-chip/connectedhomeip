@@ -34,6 +34,7 @@
 # pip install opencv-python requests click_option_group
 
 import base64
+import hashlib
 import importlib
 import logging
 import os
@@ -110,7 +111,7 @@ class Hooks():
         pass
 
     def step_failure(self, logger, logs, duration: int, request, received):
-        self.failures[self.current_test] = Failure(self.current_step)
+        self.failures[self.current_test] = Failure(self.current_step, None)
 
     def step_unknown(self):
         pass
@@ -138,6 +139,10 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.software_version = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.SoftwareVersion)
         self.url = fetch_paa_certs_from_dcl.PRODUCTION_NODE_URL_REST
 
+        self.vid_str = f'vid = 0x{self.vid:04X}'
+        self.vid_pid_str = f'{self.vid_str} pid = 0x{self.pid:04X}'
+        self.vid_pid_sv_str = f'{self.vid_pid_str} software version = {self.software_version}'
+
     def steps_Vendor(self):
         return [TestStep(1, "Check if device VID is listed in the DCL vendor schema", "Listing found")]
 
@@ -145,8 +150,8 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.step(1)
         entry = requests.get(f"{self.url}/dcl/vendorinfo/vendors/{self.vid}").json()
         key = 'vendorInfo'
-        asserts.assert_true(key in entry.keys(), f"Unable to find vendor entry for {self.vid:04x}")
-        logging.info(f'Found vendor key 0x{self.vid:04X} in DCL:')
+        asserts.assert_true(key in entry.keys(), f"Unable to find vendor entry for {self.vid_str}")
+        logging.info(f'Found vendor key for {self.vid_str} in the DCL:')
         logging.info(f'{entry[key]}')
 
     def steps_Model(self):
@@ -156,8 +161,8 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.step(1)
         key = 'model'
         entry = requests.get(f"{self.url}/dcl/model/models/{self.vid}/{self.pid}").json()
-        asserts.assert_true(key in entry.keys(), f"Unable to find model entry for {self.vid:04x} {self.pid:04x}")
-        logging.info(f'Found model entry for vid=0x{self.vid:04X} pid=0x{self.pid:04X} in the DCL:')
+        asserts.assert_true(key in entry.keys(), f"Unable to find model entry for {self.vid_pid_str}")
+        logging.info(f'Found model entry for {self.vid_pid_str} in the DCL:')
         logging.info(f'{entry[key]}')
 
     def steps_Compliance(self):
@@ -168,9 +173,9 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         key = 'complianceInfo'
         entry = requests.get(f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{self.software_version}/matter").json()
         asserts.assert_true(key in entry.keys(),
-                            f"Unable to find compliance entry for {self.vid:04x} {self.pid:04x} {self.software_version}")
+                            f"Unable to find compliance entry for {self.vid_pid_sv_str}")
         logging.info(
-            f'Found compliance info for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={self.software_version} in the DCL:')
+            f'Found compliance info for {self.vid_pid_sv_str} in the DCL:')
         logging.info(f'{entry[key]}')
 
     def steps_CertifiedModel(self):
@@ -181,24 +186,24 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         key = 'certifiedModel'
         entry = requests.get(f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{self.software_version}/matter").json()
         asserts.assert_true(key in entry.keys(),
-                            f"Unable to find certified model entry for {self.vid:04x} {self.pid:04x} {self.software_version}")
+                            f"Unable to find certified model entry for {self.vid_pid_sv_str}")
         logging.info(
-            f'Found certified model for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={self.software_version} in the DCL:')
+            f'Found certified model for {self.vid_pid_sv_str} in the DCL:')
         logging.info(f'{entry[key]}')
 
     def steps_AllSoftwareVersions(self):
         return [TestStep(1, "Query the version information for this software version", "DCL entry exists"),
                 TestStep(2, "For each valid software version with an OtaUrl, verify the OtaChecksumType is in the valid range and the OtaChecksum is a base64. If the softwareVersion matches the current softwareVersion on the device, ensure the entry is valid.", "OtaChecksum is base64 and OtaChecksumType is in the valid set")]
+
     def test_AllSoftwareVersions(self):
         self.step(1)
         versions_entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
         key_model_versions = 'modelVersions'
-        asserts.assert_true(key_model_versions in versions_entry.keys(), f"Unable to find {key_model_versions} in software versions schema for vid=0x{self.vid:04X} pid=0x{self.pid:04X}")
-        logging.info(
-            f'Found version info for vid=0x{self.vid:04X} pid=0x{self.pid:04X} in the DCL:')
+        asserts.assert_true(key_model_versions in versions_entry.keys(), f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
+        logging.info(f'Found version info for vid=0x{self.vid_pid_str} in the DCL:')
         logging.info(f'{versions_entry[key_model_versions]}')
         key_software_versions = 'softwareVersions'
-        asserts.assert_true(key_software_versions in versions_entry[key_model_versions].keys(), f"Unable to find {key_software_versions} in software versions schema for vid=0x{self.vid:04X} pid=0x{self.pid:04X}")
+        asserts.assert_true(key_software_versions in versions_entry[key_model_versions].keys(), f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
 
         problems = []
         self.step(2)
@@ -206,34 +211,54 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
             entry_wrapper = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}/{software_version}").json()
             key_model_version = 'modelVersion'
             if key_model_version not in entry_wrapper:
-                problems.append(f'Missing key {key_model_version} in entry for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version}')
+                problems.append(f'Missing key {key_model_version} in entry for {self.vid_pid_str} software version={software_version}')
                 continue
-            logging.info(f'Found entry version entry for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version}')
+            logging.info(f'Found entry version entry for {self.vid_pid_str} software version={software_version}')
             logging.info(entry_wrapper)
             entry = entry_wrapper[key_model_version]
             key_ota_url = 'otaUrl'
             key_software_version_valid = 'softwareVersionValid'
             key_ota_checksum = 'otaChecksum'
             key_ota_checksum_type = 'otaChecksumType'
+            key_ota_file_size = 'otaFileSize'
+
             def check_key(key):
                 if key not in entry.keys():
-                    problems.append(f'Missing key {key} in DCL versions entry for vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version}')
+                    problems.append(f'Missing key {key} in DCL versions entry for {self.vid_pid_str} software version={software_version}')
             check_key(key_ota_url)
             check_key(key_software_version_valid)
             if entry[key_software_version_valid] and entry[key_ota_url]:
                 check_key(key_ota_checksum)
                 check_key(key_ota_checksum_type)
-                valid_checksum_types = [1, 7, 8, 10, 11, 12]
-                if entry[key_ota_checksum_type] not in valid_checksum_types:
-                    problems.append(f'OtaChecksumType for entry vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version} is invalid. Found {entry[key_ota_checksum_type]} valid values: {valid_checksum_types}')
+                checksum_types = {1: hashlib.sha256, 7: hashlib.sha384, 8: hashlib.sha256, 10: hashlib.sha3_256, 11: hashlib.sha3_384, 12: hashlib.sha3_512}
+                if entry[key_ota_checksum_type] not in checksum_types.keys():
+                    problems.append(f'OtaChecksumType for entry {self.vid_pid_str} software version={software_version} is invalid. Found {entry[key_ota_checksum_type]} valid values: {checksum_types.keys()}')
+                    continue
                 checksum = entry[key_ota_checksum]
                 try:
                     is_base64 = base64.b64encode(base64.b64decode(checksum)).decode('utf-8') == checksum
                 except (ValueError, TypeError):
                     is_base64 = False
                 if not is_base64:
-                    problems.append(f"Checksum {checksum} is not base64 encoded for for entry vid=0x{self.vid:04X} pid=0x{self.pid:04X} software version={software_version}")
-            #TODO: download and actually checksum it? Maybe just for the current version? And size check?
+                    problems.append(f"Checksum {checksum} is not base64 encoded for for entry {self.vid_pid_str} software version={software_version}")
+                    continue
+
+                response = requests.get(entry[key_ota_url])
+                if not response.ok:
+                    problems.append(f"Unable to get OTA object from {entry[key_ota_url]} for {self.vid_pid_str} software version = {software_version}")
+                    continue
+
+                ota_len = str(len(response.content))
+                dcl_len = entry[key_ota_file_size]
+                if ota_len != dcl_len:
+                    problems.append(f'Incorrect OTA size for {self.vid_pid_str} software_version = {software_version}, received size: {len(response.content)} DCL states {entry[key_ota_file_size]}')
+                    continue
+
+                checksum = checksum_types[entry[key_ota_checksum_type]](response.content).digest()
+                dcl_checksum = base64.b64decode(entry[key_ota_checksum])
+                if checksum != dcl_checksum:
+                    problems.append(f'Incorrect checksum for {self.vid_pid_str} software version = {software_version}, calculated: {checksum}, DCL: {dcl_checksum}')
+
         msg = 'Problems found in software version DCL checks:\n'
         for problem in problems:
             msg += f'{problem}\n'
@@ -376,33 +401,36 @@ def main():
 
         failures_test_event_trigger = run_test(TestEventTriggersCheck, ['test_TestEventTriggersCheck'], test_config)
 
-        failures_dcl = run_test(DclCheck, ['test_Vendor', 'test_Model', 'test_Compliance', 'test_CertifiedModel', 'test_AllSoftwareVersions'], test_config)
+        # [] means all tests.
+        failures_dcl = run_test(DclCheck, [], test_config)
 
     report = []
-    for failure in failures_DA_1_2:
+    for test, failure in failures_DA_1_2.items():
         # Check for known failures first
         # step 6.9 - non-production CD
         # 9 - not signed by CSA CA
         # other steps - should have been caught in cert, but we should report none the less
         if failure.step.startswith('6.9'):
             report.append('Device is using a non-production certification declaration')
-            continue
-        if failure.step.startswith('9'):
+        elif failure.step.startswith('9'):
             report.append('Device is using a certification declaration that was not signed by the CSA CA')
-            continue
-        report.append(f'Device attestation failure: TC-DA-1.2: {failure.step}')
+        else:
+            report.append(f'Device attestation failure: TC-DA-1.2: {failure.step}')
+        report.append(f'\t{str(failure.exception)}\n')
 
-    for failure in failures_DA_1_7:
+    for test, failure in failures_DA_1_7.items():
         # Notable failures in DA-1.7:
         # 1.3 - PAI signature does not chain to a PAA in the main net DCL
         if failure.step.startswith('1.3'):
             report.append('Device DAC chain does not chain to a PAA in the main net DCL')
-            continue
-        report.append(f'Device attestation failure: TC-DA-1.7: {failure.step}')
+        else:
+            report.append(f'Device attestation failure: TC-DA-1.7: {failure.step}')
+        report.append(f'\t{str(failure.exception)}\n')
 
-    for failure in failures_test_event_trigger:
+    for test, failure in failures_test_event_trigger.items():
         # only one possible failure here
         report.append('Device has test event triggers enabled in production')
+        report.append(f'\t{str(failure.exception)}\n')
 
     for test, failure in failures_dcl.items():
         if test == 'test_Vendor':
@@ -417,8 +445,7 @@ def main():
             report.append('Problems with device software version in the DCL')
         else:
             report.append(f'unknown DCL failure in test {test}: {failure.step}')
-        report.append('\n')
-        report.append(str(failure.exception))
+        report.append(f'\t{str(failure.exception)}\n')
 
     print('\n\n\n')
     if report:
