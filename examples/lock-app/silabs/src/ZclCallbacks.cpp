@@ -39,7 +39,7 @@ using namespace ::chip::app::Clusters;
 using namespace ::chip::DeviceLayer::Internal;
 using ::chip::app::DataModel::Nullable;
 
-#ifndef NDEBUG 
+#ifndef NDEBUG
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {

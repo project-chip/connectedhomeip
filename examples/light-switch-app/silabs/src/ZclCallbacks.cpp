@@ -30,7 +30,7 @@
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
-#ifndef NDEBUG 
+#ifndef NDEBUG
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
@@ -51,7 +51,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
 }
-#ifndef NDEBUG 
+#ifndef NDEBUG
 
 
 /** @brief OnOff Cluster Init
