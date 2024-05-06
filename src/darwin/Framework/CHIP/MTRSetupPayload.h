@@ -59,7 +59,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
  * setters has no effect.
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTROptionalQRCodeInfo : NSObject <NSCopying>
+@interface MTROptionalQRCodeInfo : NSObject /* <NSCopying> (see below) */
 
 - (instancetype)initWithTag:(uint8_t)tag stringValue:(NSString *)value MTR_NEWLY_AVAILABLE;
 - (instancetype)initWithTag:(uint8_t)tag int32Value:(int32_t)value MTR_NEWLY_AVAILABLE;
@@ -72,7 +72,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Tags in the range 0x00 - 0x7F are reserved for Matter-defined elements.
  * Vendor-specific elements must have tags in the range 0x80 - 0xFF.
  */
-@property (nonatomic, readonly, assign) uint8_t tagNumber;
+@property (nonatomic, readonly, assign) uint8_t tagNumber MTR_NEWLY_AVAILABLE;
 
 /**
  * The value held in this extension element,
@@ -88,6 +88,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTROptionalQRCodeInfo () <NSCopying>
+@end
+
 /**
  * A Matter Onboarding Payload.
  *
@@ -100,7 +104,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * from the underlying values
  */
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRSetupPayload : NSObject <NSCopying, NSSecureCoding>
+@interface MTRSetupPayload : NSObject <NSSecureCoding> /* also <NSCopying> (see below) */
 
 /**
  * Initializes the payload object from the provide QR Code or Manual Pairing Code string.
@@ -153,23 +157,23 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * The list of Manufacturer-specific extension elements contained in the setup code. May be empty.
  */
-@property (nonatomic, readonly, copy) NSArray<MTROptionalQRCodeInfo *> * vendorElements;
+@property (nonatomic, readonly, copy) NSArray<MTROptionalQRCodeInfo *> * vendorElements MTR_NEWLY_AVAILABLE;
 
 /**
  Returns the Manufacturer-specific extension element with the specified tag, if any.
  */
-- (nullable MTROptionalQRCodeInfo *)vendorElementWithTag:(uint8_t)tag;
+- (nullable MTROptionalQRCodeInfo *)vendorElementWithTag:(uint8_t)tag MTR_NEWLY_AVAILABLE;
 
 /**
  * Removes the extension element with the specified tag, if any.
  */
-- (void)removeVendorElementWithTag:(uint8_t)tag;
+- (void)removeVendorElementWithTag:(uint8_t)tag MTR_NEWLY_AVAILABLE;
 
 /**
  * Adds or replaces a Manufacturer-specific extension element.
  * The element must have a tag in the vendor-specific range (0x80 - 0xFF).
  */
-- (void)addOrReplaceVendorElement:(MTROptionalQRCodeInfo *)element;
+- (void)addOrReplaceVendorElement:(MTROptionalQRCodeInfo *)element MTR_NEWLY_AVAILABLE;
 
 /**
  * Generate a random Matter-valid setup PIN.
@@ -213,6 +217,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (NSString * _Nullable)qrCodeString MTR_NEWLY_AVAILABLE;
 
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSetupPayload () <NSCopying>
 @end
 
 @interface MTROptionalQRCodeInfo (Deprecated)

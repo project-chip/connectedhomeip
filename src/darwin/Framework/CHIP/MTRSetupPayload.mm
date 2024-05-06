@@ -85,6 +85,7 @@ MTR_DIRECT_MEMBERS
     case chip::optionalQRCodeInfoTypeInt32:
         return MTROptionalQRCodeInfoTypeInt32;
     // No 'default:' so we get a warning if new types are added.
+    // Note: isEqual: also switches over these types.
     // OptionalQRCodeInfo does not support these types
     case chip::optionalQRCodeInfoTypeInt64:
     case chip::optionalQRCodeInfoTypeUInt32:
@@ -129,9 +130,14 @@ MTR_DIRECT_MEMBERS
     MTROptionalQRCodeInfo * other = object;
     VerifyOrReturnValue(_info.tag == other->_info.tag, NO);
     VerifyOrReturnValue(_info.type == other->_info.type, NO);
-    VerifyOrReturnValue(_info.int32 == other->_info.int32, NO);
-    VerifyOrReturnValue(_info.data == other->_info.data, NO);
-    return YES;
+    switch (_info.type) {
+    case chip::optionalQRCodeInfoTypeString:
+        return _info.data == other->_info.data;
+    case chip::optionalQRCodeInfoTypeInt32:
+        return _info.int32 == other->_info.int32;
+    default:
+        return NO; // unreachable, type is checked in init
+    }
 }
 
 - (NSString *)description
