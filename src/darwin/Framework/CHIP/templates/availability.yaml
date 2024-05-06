@@ -8800,7 +8800,6 @@
               - MeasurementRangeStruct
               - MeasurementAccuracyRangeStruct
               - MeasurementAccuracyStruct
-              
           HEPAFilterMonitoring:
               - ReplacementProductStruct
       struct fields:
@@ -8839,7 +8838,6 @@
                   - fixedMax
                   - fixedMin
                   - fixedTypical
-
           HEPAFilterMonitoring:
               ReplacementProductStruct:
                   - productIdentifierType
@@ -8862,7 +8860,7 @@
       event fields:
           ElectricalPowerMeasurement:
               MeasurementPeriodRanges:
-                - ranges
+                  - ranges
           SmokeCOAlarm:
               SmokeAlarm:
                   - alarmSeverityLevel
