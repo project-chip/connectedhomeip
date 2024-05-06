@@ -133,12 +133,7 @@ CHIP_ERROR AppTask::Init()
     );
 
     ThreadStackMgr().InitThreadStack();
-
-#if (CHIP_DEVICE_CONFIG_ENABLE_SED == 1)
-    ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#else
     ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-#endif
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 

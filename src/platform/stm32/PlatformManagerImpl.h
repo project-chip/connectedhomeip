@@ -55,7 +55,7 @@ private:
 
     CHIP_ERROR _InitChipStack(void);
     void _RunEventLoop(void);
-    CHIP_ERROR _Shutdown();
+    void _Shutdown();
     CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
     CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
     CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
