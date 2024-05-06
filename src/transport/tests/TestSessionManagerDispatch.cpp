@@ -501,7 +501,7 @@ PeerAddress AddressFromString(const char * str)
     return PeerAddress::UDP(addr);
 }
 
-void TestSessionManagerInit(TestContext * ctx, SessionManager & sessionManager)
+void TestSessionManagerInit(TestContext & ctx, SessionManager & sessionManager)
 {
     static FabricTableHolder fabricTableHolder;
     static secure_channel::MessageCounterManager gMessageCounterManager;
@@ -510,7 +510,7 @@ void TestSessionManagerInit(TestContext * ctx, SessionManager & sessionManager)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&ctx->GetSystemLayer(), &ctx->GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+              sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 }
 
@@ -549,13 +549,14 @@ CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageT
 
 class TestSessionManagerDispatch : public ::testing::Test
 {
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { mContext.Shutdown(); }
+
 protected:
-    TestSessionManagerDispatch() { inContext = new TestContext(); }
-    ~TestSessionManagerDispatch() { delete inContext; }
-    void SetUp() { ASSERT_EQ(inContext->Init(), CHIP_NO_ERROR); }
-    void TearDown() { inContext->Shutdown(); }
-    TestContext * inContext;
+    static TestContext mContext;
 };
+TestContext TestSessionManagerDispatch::mContext;
 
 TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
 {
@@ -564,7 +565,7 @@ TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
     SessionManager sessionManager;
     TestSessionManagerCallback callback;
 
-    TestSessionManagerInit(inContext, sessionManager);
+    TestSessionManagerInit(mContext, sessionManager);
     sessionManager.SetMessageDelegate(&callback);
 
     IPAddress addr;

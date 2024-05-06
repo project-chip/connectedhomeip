@@ -117,12 +117,16 @@ public:
     bool LargeMessageSent       = false;
 };
 
-class TestSessionManager : public ::testing::Test, public TestContext
+class TestSessionManager : public ::testing::Test
 {
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { mContext.Shutdown(); }
+
 protected:
-    void SetUp() { ASSERT_EQ(Init(), CHIP_NO_ERROR); }
-    void TearDown() { Shutdown(); }
+    static TestContext mContext;
 };
+TestContext TestSessionManager::mContext;
 
 TEST_F(TestSessionManager, CheckSimpleInitTest)
 {
@@ -134,7 +138,7 @@ TEST_F(TestSessionManager, CheckSimpleInitTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 }
 
@@ -163,7 +167,7 @@ TEST_F(TestSessionManager, CheckMessageTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     sessionManager.SetMessageDelegate(&callback);
@@ -209,7 +213,7 @@ TEST_F(TestSessionManager, CheckMessageTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 1);
 
     // Let's send the max sized message and make sure it is received
@@ -224,7 +228,7 @@ TEST_F(TestSessionManager, CheckMessageTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 2);
 
     uint16_t large_payload_len = sizeof(LARGE_PAYLOAD);
@@ -267,7 +271,7 @@ TEST_F(TestSessionManager, SendEncryptedPacketTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     sessionManager.SetMessageDelegate(&callback);
@@ -315,7 +319,7 @@ TEST_F(TestSessionManager, SendEncryptedPacketTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 1);
 
     // Reset receive side message counter, or duplicated message will be denied.
@@ -325,7 +329,7 @@ TEST_F(TestSessionManager, SendEncryptedPacketTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 2);
 
     sessionManager.Shutdown();
@@ -356,7 +360,7 @@ TEST_F(TestSessionManager, SendBadEncryptedPacketTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     sessionManager.SetMessageDelegate(&callback);
@@ -404,7 +408,7 @@ TEST_F(TestSessionManager, SendBadEncryptedPacketTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 1);
 
     /* -------------------------------------------------------------------------------------------*/
@@ -425,7 +429,7 @@ TEST_F(TestSessionManager, SendBadEncryptedPacketTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), badMessageCounterMsg);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 1);
 
     /* -------------------------------------------------------------------------------------------*/
@@ -442,7 +446,7 @@ TEST_F(TestSessionManager, SendBadEncryptedPacketTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), badKeyIdMsg);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 1);
 
     /* -------------------------------------------------------------------------------------------*/
@@ -452,7 +456,7 @@ TEST_F(TestSessionManager, SendBadEncryptedPacketTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 2);
 
     sessionManager.Shutdown();
@@ -483,7 +487,7 @@ TEST_F(TestSessionManager, SendPacketWithOldCounterTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     sessionManager.SetMessageDelegate(&callback);
@@ -530,7 +534,7 @@ TEST_F(TestSessionManager, SendPacketWithOldCounterTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 1);
 
     // Now advance our message counter by 5.
@@ -547,7 +551,7 @@ TEST_F(TestSessionManager, SendPacketWithOldCounterTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), newMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 2);
 
     // Now resend our original message.  It should be rejected as a duplicate.
@@ -555,7 +559,7 @@ TEST_F(TestSessionManager, SendPacketWithOldCounterTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 2);
 
     sessionManager.Shutdown();
@@ -586,7 +590,7 @@ TEST_F(TestSessionManager, SendPacketWithTooOldCounterTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
     sessionManager.SetMessageDelegate(&callback);
 
@@ -632,7 +636,7 @@ TEST_F(TestSessionManager, SendPacketWithTooOldCounterTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 1);
 
     // Now advance our message counter by at least
@@ -651,7 +655,7 @@ TEST_F(TestSessionManager, SendPacketWithTooOldCounterTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), newMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 2);
 
     // Now resend our original message.  It should be rejected as a duplicate.
@@ -659,7 +663,7 @@ TEST_F(TestSessionManager, SendPacketWithTooOldCounterTest)
     err = sessionManager.SendPreparedMessage(aliceToBobSession.Get().Value(), preparedMessage);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    DrainAndServiceIO();
+    mContext.DrainAndServiceIO();
     EXPECT_EQ(callback.ReceiveHandlerCallCount, 2);
 
     sessionManager.Shutdown();
@@ -691,7 +695,7 @@ TEST_F(TestSessionManager, SessionAllocationTest)
     SessionManager sessionManager;
 
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &messageCounterManager, &deviceStorage1,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage1,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     // Allocate a session.
@@ -729,7 +733,7 @@ TEST_F(TestSessionManager, SessionAllocationTest)
     sessionManager.~SessionManager();
     new (&sessionManager) SessionManager();
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &messageCounterManager, &deviceStorage2,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage2,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     // Allocate a single session so we know what random id we are starting at.
@@ -827,7 +831,7 @@ TEST_F(TestSessionManager, SessionCounterExhaustedTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
@@ -903,7 +907,7 @@ TEST_F(TestSessionManager, SessionShiftingTest)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &messageCounterManager, &deviceStorage,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
@@ -980,7 +984,7 @@ TEST_F(TestSessionManager, TestFindSecureSessionForNode)
 
     EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
     EXPECT_EQ(CHIP_NO_ERROR,
-              sessionManager.Init(&GetSystemLayer(), &GetTransportMgr(), &messageCounterManager, &deviceStorage,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));

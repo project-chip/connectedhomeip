@@ -57,9 +57,9 @@ const CATValues kPeer2CATs = { { 0xABCD0012, kUndefinedCAT, kUndefinedCAT } };
 
 class TestPeerConnections : public ::testing::Test
 {
-protected:
-    void SetUp() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    void TearDown() { chip::Platform::MemoryShutdown(); }
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestPeerConnections, TestBasicFunctionality)

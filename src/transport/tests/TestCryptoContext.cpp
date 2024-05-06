@@ -49,9 +49,9 @@ struct PrivacyNonceTestEntry thePrivacyNonceTestVector[] = {
 
 class TestGroupCryptoContext : public ::testing::Test
 {
-protected:
-    void SetUp() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    void TearDown() { chip::Platform::MemoryShutdown(); }
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestGroupCryptoContext, TestBuildPrivacyNonce)
