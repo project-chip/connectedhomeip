@@ -33,6 +33,23 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         cluster = Clusters.Objects.MicrowaveOvenControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    async def set_power_setting_expect_success(self, endpoint, value):
+        try:
+            await self.send_single_cmd(cmd=Clusters.Objects.MicrowaveOvenControl.Commands.SetCookingParameters(powerSetting=value), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Error while trying to set the power setting.")
+
+    async def set_power_setting_expect_failure(self, endpoint, value):
+        try:
+            await self.send_single_cmd(cmd=Clusters.Objects.MicrowaveOvenControl.Commands.SetCookingParameters(powerSetting=value), endpoint=endpoint)
+            asserts.assert_fail("Expected an exception but received none.")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different response: %x", e.status)
+
+    async def read_and_check_power_setting_value(self, endpoint, value):
+        powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.MicrowaveOvenControl.Attributes.PowerSetting)
+        asserts.assert_equal(powerValue, value, "PowerSetting was not correctly set")
+
     def desc_TC_MWOCTRL_2_2(self) -> str:
         return "[TC-MWOCTRL-2.2] Secondary functionality with DUT as Server"
 
@@ -49,8 +66,12 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             TestStep(9, "Send the SetCookingParameters command"),
             TestStep(10, "Read and verify the PowerSetting attribute"),
             TestStep(11, "Set the PowerSetting attribute to the minimum value"),
-            TestStep(12, "Set the PowerSetting attribute to the maximum value"),
-            TestStep(13, "Cause constraint error response"),
+            TestStep(12, "Read and verify the PowerSetting attribute"),
+            TestStep(13, "Set the PowerSetting attribute to the maximum value"),
+            TestStep(14, "Read and verify the PowerSetting attribute"),
+            TestStep(15, "Set PowerSetting to an invalid value"),
+            TestStep(16, "If PowerStep=1, exit test case."),
+            TestStep(17, "Set PowerSetting to a value that is not an integer multiple of PowerStep"),
         ]
         return steps
 
@@ -116,34 +137,38 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
 
         self.step(9)
         newPowerValue = (powerValue-minPowerValue) % (maxPowerValue-minPowerValue)+powerStepValue+minPowerValue
-        try:
-            await self.send_single_cmd(cmd=commands.SetCookingParameters(powerSetting=newPowerValue), endpoint=endpoint)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+        await self.set_power_setting_expect_success(endpoint, newPowerValue)
 
         self.step(10)
-        powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerSetting)
-        asserts.assert_true(powerValue == newPowerValue, "PowerSetting was not correctly set")
+        await self.read_and_check_power_setting_value(endpoint, newPowerValue)
 
         self.step(11)
-        try:
-            await self.send_single_cmd(cmd=commands.SetCookingParameters(powerSetting=minPowerValue), endpoint=endpoint)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unable to set power value to minimum")
+        await self.set_power_setting_expect_success(endpoint, minPowerValue)
 
         self.step(12)
-        try:
-            await self.send_single_cmd(cmd=commands.SetCookingParameters(powerSetting=maxPowerValue), endpoint=endpoint)
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unable to set power value to maximum")
+        await self.read_and_check_power_setting_value(endpoint, minPowerValue)
 
         self.step(13)
+        await self.set_power_setting_expect_success(endpoint, maxPowerValue)
+
+        self.step(14)
+        await self.read_and_check_power_setting_value(endpoint, maxPowerValue)
+
+        self.step(15)
         newPowerValue = maxPowerValue+1
-        try:
-            await self.send_single_cmd(cmd=commands.SetCookingParameters(powerSetting=newPowerValue), endpoint=endpoint)
-            asserts.assert_fail("Expected an exception but received none.")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different response.")
+        await self.set_power_setting_expect_failure(endpoint, newPowerValue)
+
+        self.step(16)
+        if powerStepValue == 1:
+            self.skip_step(17)
+            return
+
+        self.step(17)
+        newPowerValue = minPowerValue + powerStepValue / 2
+        logging.info("-------> MinPower = %d", minPowerValue)
+        logging.info("-------> PowerStep = %d", powerStepValue)
+        logging.info("-------> newPowerValue = %d", newPowerValue)
+        await self.set_power_setting_expect_failure(endpoint, newPowerValue)
 
 
 if __name__ == "__main__":
