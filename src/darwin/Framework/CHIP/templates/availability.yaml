@@ -8796,8 +8796,11 @@
           ActivatedCarbonFilterMonitoring:
               - ReplacementProductStruct
           ElectricalPowerMeasurement:
-              - MeasurementRangeStruct
               - HarmonicMeasurementStruct
+              - MeasurementRangeStruct
+              - MeasurementAccuracyRangeStruct
+              - MeasurementAccuracyStruct
+              
           HEPAFilterMonitoring:
               - ReplacementProductStruct
       struct fields:
@@ -8821,6 +8824,22 @@
               HarmonicMeasurementStruct:
                   - order
                   - measurement
+              MeasurementAccuracyStruct:
+                  - measurementType
+                  - measured
+                  - minMeasuredValue
+                  - maxMeasuredValue
+                  - accuracyRanges
+              MeasurementAccuracyRangeStruct:
+                  - rangeMin
+                  - rangeMax
+                  - percentMax
+                  - percentMin
+                  - percentTypical
+                  - fixedMax
+                  - fixedMin
+                  - fixedTypical
+
           HEPAFilterMonitoring:
               ReplacementProductStruct:
                   - productIdentifierType
@@ -8864,6 +8883,7 @@
               - AirQualityEnum
           ElectricalPowerMeasurement:
               - PowerModeEnum
+              - MeasurementTypeEnum
           FanControl:
               - StepDirectionEnum
               - AirflowDirectionEnum
@@ -8947,6 +8967,23 @@
                   - Unknown
                   - DC
                   - AC
+              MeasurementTypeEnum:
+                  - Unspecified
+                  - Voltage
+                  - ActiveCurrent
+                  - ReactiveCurrent
+                  - ApparentCurrent
+                  - ActivePower
+                  - ReactivePower
+                  - ApparentPower
+                  - RMSVoltage
+                  - RMSCurrent
+                  - RMSPower
+                  - Frequency
+                  - PowerFactor
+                  - NeutralCurrent
+                  - ElectricalEnergy
+
           FanControl:
               StepDirectionEnum:
                   - Increase
@@ -9202,6 +9239,8 @@
           ActivatedCarbonFilterMonitoring:
               - Feature
           AirQuality:
+              - Feature
+          ElectricalPowerMeasurement:
               - Feature
           HEPAFilterMonitoring:
               - Feature
