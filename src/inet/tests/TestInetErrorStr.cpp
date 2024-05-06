@@ -33,7 +33,6 @@
 #include <inet/InetError.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/UnitTestRegistration.h>
 
 using namespace chip;
 
