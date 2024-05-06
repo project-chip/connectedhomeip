@@ -5078,7 +5078,7 @@ public static class RvcOperationalStateClusterOperationalStateStruct {
     return output.toString();
   }
 }
-public static class ScenesManagementClusterAttributeValuePair {
+public static class ScenesManagementClusterAttributeValuePairStruct {
   public Long attributeID;
   public Optional<Integer> valueUnsigned8;
   public Optional<Integer> valueSigned8;
@@ -5098,7 +5098,7 @@ public static class ScenesManagementClusterAttributeValuePair {
   private static final long VALUE_UNSIGNED64_ID = 7L;
   private static final long VALUE_SIGNED64_ID = 8L;
 
-  public ScenesManagementClusterAttributeValuePair(
+  public ScenesManagementClusterAttributeValuePairStruct(
     Long attributeID,
     Optional<Integer> valueUnsigned8,
     Optional<Integer> valueSigned8,
@@ -5135,7 +5135,7 @@ public static class ScenesManagementClusterAttributeValuePair {
     return new StructType(values);
   }
 
-  public static ScenesManagementClusterAttributeValuePair decodeTlv(BaseTLVType tlvValue) {
+  public static ScenesManagementClusterAttributeValuePairStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -5196,7 +5196,7 @@ public static class ScenesManagementClusterAttributeValuePair {
         }
       }
     }
-    return new ScenesManagementClusterAttributeValuePair(
+    return new ScenesManagementClusterAttributeValuePairStruct(
       attributeID,
       valueUnsigned8,
       valueSigned8,
@@ -5212,7 +5212,7 @@ public static class ScenesManagementClusterAttributeValuePair {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ScenesManagementClusterAttributeValuePair {\n");
+    output.append("ScenesManagementClusterAttributeValuePairStruct {\n");
     output.append("\tattributeID: ");
     output.append(attributeID);
     output.append("\n");
@@ -5246,13 +5246,13 @@ public static class ScenesManagementClusterAttributeValuePair {
 }
 public static class ScenesManagementClusterExtensionFieldSet {
   public Long clusterID;
-  public ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList;
+  public ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList;
   private static final long CLUSTER_I_D_ID = 0L;
   private static final long ATTRIBUTE_VALUE_LIST_ID = 1L;
 
   public ScenesManagementClusterExtensionFieldSet(
     Long clusterID,
-    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList
+    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList
   ) {
     this.clusterID = clusterID;
     this.attributeValueList = attributeValueList;
@@ -5271,7 +5271,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
       return null;
     }
     Long clusterID = null;
-    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList = null;
+    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CLUSTER_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5281,7 +5281,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
       } else if (element.contextTagNum() == ATTRIBUTE_VALUE_LIST_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          attributeValueList = castingValue.map((elementcastingValue) -> ChipStructs.ScenesManagementClusterAttributeValuePair.decodeTlv(elementcastingValue));
+          attributeValueList = castingValue.map((elementcastingValue) -> ChipStructs.ScenesManagementClusterAttributeValuePairStruct.decodeTlv(elementcastingValue));
         }
       }
     }

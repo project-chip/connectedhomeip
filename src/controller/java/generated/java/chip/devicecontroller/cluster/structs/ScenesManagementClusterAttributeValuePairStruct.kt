@@ -23,7 +23,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesManagementClusterAttributeValuePair(
+class ScenesManagementClusterAttributeValuePairStruct(
   val attributeID: ULong,
   val valueUnsigned8: Optional<UInt>,
   val valueSigned8: Optional<Int>,
@@ -35,7 +35,7 @@ class ScenesManagementClusterAttributeValuePair(
   val valueSigned64: Optional<Long>
 ) {
   override fun toString(): String = buildString {
-    append("ScenesManagementClusterAttributeValuePair {\n")
+    append("ScenesManagementClusterAttributeValuePairStruct {\n")
     append("\tattributeID : $attributeID\n")
     append("\tvalueUnsigned8 : $valueUnsigned8\n")
     append("\tvalueSigned8 : $valueSigned8\n")
@@ -99,7 +99,10 @@ class ScenesManagementClusterAttributeValuePair(
     private const val TAG_VALUE_UNSIGNED64 = 7
     private const val TAG_VALUE_SIGNED64 = 8
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterAttributeValuePair {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ScenesManagementClusterAttributeValuePairStruct {
       tlvReader.enterStructure(tlvTag)
       val attributeID = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
       val valueUnsigned8 =
@@ -153,7 +156,7 @@ class ScenesManagementClusterAttributeValuePair(
 
       tlvReader.exitContainer()
 
-      return ScenesManagementClusterAttributeValuePair(
+      return ScenesManagementClusterAttributeValuePairStruct(
         attributeID,
         valueUnsigned8,
         valueSigned8,

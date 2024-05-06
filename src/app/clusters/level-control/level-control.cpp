@@ -160,7 +160,7 @@ public:
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
-        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
         app::DataModel::Nullable<uint8_t> level;
         VerifyOrReturnError(Status::Success == Attributes::CurrentLevel::Get(endpoint, level), CHIP_ERROR_READ_FAILED);
@@ -177,9 +177,7 @@ public:
         }
         else
         {
-            uint8_t nullValue = 0;
-            chip::app::NumericAttributeTraits<uint8_t>::SetNull(nullValue);
-pairs[0].valueUnsigned8.SetValue(NumericAttributeTraits<uint8_t>::kNullValue);
+            pairs[0].valueUnsigned8.SetValue(app::NumericAttributeTraits<uint8_t>::kNullValue);
         }
         size_t attributeCount = 1;
         if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
@@ -205,7 +203,7 @@ pairs[0].valueUnsigned8.SetValue(NumericAttributeTraits<uint8_t>::kNullValue);
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
-        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
@@ -231,7 +229,7 @@ pairs[0].valueUnsigned8.SetValue(NumericAttributeTraits<uint8_t>::kNullValue);
                 break;
             case Attributes::CurrentFrequency::Id:
                 // TODO : Uncomment when frequency is supported by the level control cluster
-                // frequency = static_cast<uint16_t>(decodePair.attributeValue);
+                // frequency = decodePair.valueUnsigned16.Value();
                 break;
             default:
                 return CHIP_ERROR_INVALID_ARGUMENT;
@@ -242,7 +240,7 @@ pairs[0].valueUnsigned8.SetValue(NumericAttributeTraits<uint8_t>::kNullValue);
         // TODO : Implement action on frequency when frequency not provisional anymore
         // if(LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency)){}
 
-        if (!chip::app::NumericAttributeTraits<uint8_t>::IsNullValue(level))
+        if (!app::NumericAttributeTraits<uint8_t>::IsNullValue(level))
         {
             CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
                                                                                                 : Commands::MoveToLevel::Id;

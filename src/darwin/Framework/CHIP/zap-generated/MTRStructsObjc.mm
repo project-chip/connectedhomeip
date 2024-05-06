@@ -4024,7 +4024,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesManagementClusterAttributeValuePair
+@implementation MTRScenesManagementClusterAttributeValuePairStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4052,7 +4052,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRScenesManagementClusterAttributeValuePair alloc] init];
+    auto other = [[MTRScenesManagementClusterAttributeValuePairStruct alloc] init];
 
     other.attributeID = self.attributeID;
     other.valueUnsigned8 = self.valueUnsigned8;

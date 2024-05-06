@@ -20334,7 +20334,7 @@ class ScenesManagement(Cluster):
 
     class Structs:
         @dataclass
-        class AttributeValuePair(ClusterObject):
+        class AttributeValuePairStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -20367,11 +20367,11 @@ class ScenesManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="clusterID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="attributeValueList", Tag=1, Type=typing.List[ScenesManagement.Structs.AttributeValuePair]),
+                        ClusterObjectFieldDescriptor(Label="attributeValueList", Tag=1, Type=typing.List[ScenesManagement.Structs.AttributeValuePairStruct]),
                     ])
 
             clusterID: 'uint' = 0
-            attributeValueList: 'typing.List[ScenesManagement.Structs.AttributeValuePair]' = field(default_factory=lambda: [])
+            attributeValueList: 'typing.List[ScenesManagement.Structs.AttributeValuePairStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class SceneInfoStruct(ClusterObject):

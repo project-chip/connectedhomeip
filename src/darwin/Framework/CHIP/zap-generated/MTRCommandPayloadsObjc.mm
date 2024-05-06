@@ -13068,11 +13068,11 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
-                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRScenesManagementClusterAttributeValuePair class]]) {
+                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRScenesManagementClusterAttributeValuePairStruct class]]) {
                                     // Wrong kind of value.
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (MTRScenesManagementClusterAttributeValuePair *) element_0.attributeValueList[i_2];
+                                auto element_2 = (MTRScenesManagementClusterAttributeValuePairStruct *) element_0.attributeValueList[i_2];
                                 listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
                                 if (element_2.valueUnsigned8 != nil) {
                                     auto & definedValue_4 = listHolder_2->mList[i_2].valueUnsigned8.Emplace();
@@ -13462,8 +13462,8 @@ NS_ASSUME_NONNULL_BEGIN
                         auto iter_3 = entry_1.attributeValueList.begin();
                         while (iter_3.Next()) {
                             auto & entry_3 = iter_3.GetValue();
-                            MTRScenesManagementClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRScenesManagementClusterAttributeValuePair new];
+                            MTRScenesManagementClusterAttributeValuePairStruct * newElement_3;
+                            newElement_3 = [MTRScenesManagementClusterAttributeValuePairStruct new];
                             newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             if (entry_3.valueUnsigned8.HasValue()) {
                                 newElement_3.valueUnsigned8 = [NSNumber numberWithUnsignedChar:entry_3.valueUnsigned8.Value()];

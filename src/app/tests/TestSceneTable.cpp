@@ -140,9 +140,9 @@ static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type OOexten
 static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type LCextensionFieldSet;
 static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type CCextensionFieldSet;
 
-static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type OOPairs[1];
-static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type LCPairs[2];
-static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type CCPairs[8];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type OOPairs[1];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type LCPairs[2];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type CCPairs[8];
 
 static uint8_t OO_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
 static uint8_t LC_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
@@ -667,7 +667,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     // To test failure on serialize and deserialize when too many pairs are in the field sets
     app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldFailTestOut;
     app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
-    app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type TooManyPairs[16];
+    app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type TooManyPairs[16];
 
     for (uint8_t i = 0; i < 16; i++)
     {

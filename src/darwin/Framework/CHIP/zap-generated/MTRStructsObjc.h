@@ -1017,7 +1017,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRScenesManagementClusterAttributeValuePair : NSObject <NSCopying>
+@interface MTRScenesManagementClusterAttributeValuePairStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull attributeID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable valueUnsigned8 MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable valueSigned8 MTR_PROVISIONALLY_AVAILABLE;
