@@ -287,8 +287,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
     // value of the CurrentHeapUsed.
 
-    // On Linux, the write operation is non-op since we always rely on the mallinfo system
-    // function to get the current heap memory.
+    // Get the current amount of heap memory, in bytes, that are being used by
+    // the current running program and reset the max heap high watermark to current heap amount.
     struct mallinfo mallocInfo = mallinfo();
     maxHeapHighWatermark       = mallocInfo.uordblks;
 
