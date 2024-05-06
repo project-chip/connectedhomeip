@@ -549,14 +549,12 @@ CHIP_ERROR InjectGroupSessionWithTestKey(SessionHolder & sessionHolder, MessageT
 
 class TestSessionManagerDispatch : public ::testing::Test
 {
-public:
-    static void SetUpTestSuite() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { mContext.Shutdown(); }
-
 protected:
-    static TestContext mContext;
+    void SetUp() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
+    void TearDown() { mContext.Shutdown(); }
+
+    TestContext mContext;
 };
-TestContext TestSessionManagerDispatch::mContext;
 
 TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
 {

@@ -119,14 +119,12 @@ public:
 
 class TestSessionManager : public ::testing::Test
 {
-public:
-    static void SetUpTestSuite() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { mContext.Shutdown(); }
-
 protected:
-    static TestContext mContext;
+    void SetUp() { ASSERT_EQ(mContext.Init(), CHIP_NO_ERROR); }
+    void TearDown() { mContext.Shutdown(); }
+
+    TestContext mContext;
 };
-TestContext TestSessionManager::mContext;
 
 TEST_F(TestSessionManager, CheckSimpleInitTest)
 {
