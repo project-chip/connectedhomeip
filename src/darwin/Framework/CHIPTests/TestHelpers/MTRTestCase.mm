@@ -27,7 +27,6 @@
  */
 - (void)tearDown
 {
-#if 0
 #if defined(ENABLE_LEAK_DETECTION) && ENABLE_LEAK_DETECTION
     if (_detectLeaks) {
         int pid = getpid();
@@ -35,7 +34,6 @@
         int ret = system(cmd.UTF8String);
         XCTAssertEqual(ret, 0, "LEAKS DETECTED");
     }
-#endif
 #endif
 
     [super tearDown];

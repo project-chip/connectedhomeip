@@ -307,6 +307,13 @@ TEST(TestQRCode, TestSetupPayloadVerify)
     invalid.SetRaw(static_cast<uint8_t>(invalid.Raw() + 1));
     test_payload.rendezvousInformation.SetValue(invalid);
     EXPECT_EQ(test_payload.isValidQRCodePayload(), false);
+    // When validating in Consume mode, unknown rendezvous flags are OK.
+    EXPECT_TRUE(test_payload.isValidQRCodePayload(PayloadContents::ValidationMode::kConsume));
+    test_payload.rendezvousInformation.SetValue(RendezvousInformationFlags(0xff));
+    EXPECT_TRUE(test_payload.isValidQRCodePayload(PayloadContents::ValidationMode::kConsume));
+    // Rendezvous information is still required even in Consume mode.
+    test_payload.rendezvousInformation.ClearValue();
+    EXPECT_FALSE(test_payload.isValidQRCodePayload(PayloadContents::ValidationMode::kConsume));
 
     // test invalid setup PIN
     test_payload              = payload;

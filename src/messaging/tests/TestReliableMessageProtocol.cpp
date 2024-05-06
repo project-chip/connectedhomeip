@@ -77,15 +77,15 @@ class TestContext : public chip::Test::LoopbackMessagingContext
 {
 public:
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override
+    void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
-        ReturnErrorOnFailure(psa_crypto_init() == PSA_SUCCESS ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDie(psa_crypto_init() == PSA_SUCCESS);
 #endif
-        ReturnErrorOnFailure(chip::Test::LoopbackMessagingContext::SetUp());
+        chip::Test::LoopbackMessagingContext::SetUp();
         GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
-        return CHIP_NO_ERROR;
     }
 };
 

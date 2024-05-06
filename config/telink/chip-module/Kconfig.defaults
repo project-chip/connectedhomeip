@@ -170,7 +170,7 @@ if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9258A_RETENTION || BOARD_TLSR9518ADK80
 config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
     default y if PM
 
-config TELINK_B9x_MATTER_RETENTION_LAYOUT
+config TELINK_B9X_MATTER_RETENTION_LAYOUT
     default y if PM
 
 config PWM
@@ -203,7 +203,7 @@ config WARN_DEPRECATED
     default n
 
 # Reboot system when fault happened
-config TELINK_B9X_REBOOT_ON_FAULT
+config TELINK_SOC_REBOOT_ON_FAULT
     default y
 
 config NVS_LOOKUP_CACHE
@@ -292,13 +292,40 @@ config NET_MAX_CONTEXTS
 config NET_CONFIG_INIT_TIMEOUT
     default 0
 
-# mbedTLS tweaks
+config CHIP_ENABLE_PAIRING_AUTOSTART
+    bool "Open commissioning window on boot"
+    default y 
+    help
+        Opens the commissioning window automatically at application boot time if
+        the node is not yet commissioned.
+
+# Configure MBEDTLS lib
+config MBEDTLS
+	default y
+
 config MBEDTLS_USER_CONFIG_ENABLE
     default y
 
 config MBEDTLS_USER_CONFIG_FILE
     default "telink-mbedtls-config.h"
 
+config MBEDTLS_CIPHER_CCM_ENABLED
+	default y
+
+config MBEDTLS_PK_WRITE_C
+    default y
+
+config MBEDTLS_ECP_C
+	default y
+
+config MBEDTLS_ECP_DP_SECP256R1_ENABLED
+	default y
+
+config MBEDTLS_ECDH_C
+	default y
+
+config MBEDTLS_ECDSA_C
+	default y
 
 # getopt version
 config GETOPT_LONG
