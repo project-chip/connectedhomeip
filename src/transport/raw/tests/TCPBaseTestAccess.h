@@ -21,8 +21,6 @@
 #include <transport/raw/TCP.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-using namespace chip::Inet;
-
 namespace chip {
 namespace Transport {
 /**
@@ -39,9 +37,9 @@ public:
     {
         return tcp.FindActiveConnection(peerAddress);
     }
-    static TCPEndPoint * GetEndpoint(void * state) { return static_cast<ActiveTCPConnectionState *>(state)->mEndPoint; }
+    static Inet::TCPEndPoint * GetEndpoint(void * state) { return static_cast<ActiveTCPConnectionState *>(state)->mEndPoint; }
 
-    static CHIP_ERROR ProcessReceivedBuffer(TCPImpl & tcp, TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+    static CHIP_ERROR ProcessReceivedBuffer(TCPImpl & tcp, Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
                                             System::PacketBufferHandle && buffer)
     {
         return tcp.ProcessReceivedBuffer(endPoint, peerAddress, std::move(buffer));
