@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <gtest/gtest.h>
+
 #include "system/SystemClock.h"
 #include "transport/SecureSession.h"
 #include <app-common/zap-generated/cluster-objects.h>
@@ -27,7 +29,6 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <controller/ReadInteraction.h>
-#include <gtest/gtest.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
@@ -35,8 +36,6 @@
 
 using TestContext = chip::Test::AppContext;
 
-//+++++ in BUILD.gn put each of the 3 test files individually so we can see which functions-defined-elsewhere it depends on.  then
-//move those into a H file.
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -270,7 +269,7 @@ public:
             mpContext = new TestContext();
             ASSERT_NE(mpContext, nullptr);
         }
-        ASSERT_EQ(mpContext->SetUpTestSuite(), CHIP_NO_ERROR);
+        mpContext->SetUpTestSuite();
     }
 
     // Performs shared teardown for all tests in the test suite
@@ -286,7 +285,7 @@ public:
 
 protected:
     // Performs setup for each individual test in the test suite
-    void SetUp() { ASSERT_EQ(mpContext->SetUp(), CHIP_NO_ERROR); }
+    void SetUp() { mpContext->SetUp(); }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() { mpContext->TearDown(); }

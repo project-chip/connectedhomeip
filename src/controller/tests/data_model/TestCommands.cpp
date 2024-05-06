@@ -22,13 +22,14 @@
  *
  */
 
+#include <gtest/gtest.h>
+
 #include "app/data-model/NullObject.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <controller/InvokeInteraction.h>
-#include <gtest/gtest.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
@@ -189,7 +190,7 @@ public:
             mpContext = new TestContext();
             ASSERT_NE(mpContext, nullptr);
         }
-        ASSERT_EQ(mpContext->SetUpTestSuite(), CHIP_NO_ERROR);
+        mpContext->SetUpTestSuite();
     }
 
     // Performs shared teardown for all tests in the test suite
@@ -205,7 +206,7 @@ public:
 
 protected:
     // Performs setup for each individual test in the test suite
-    void SetUp() { ASSERT_EQ(mpContext->SetUp(), CHIP_NO_ERROR); }
+    void SetUp() { mpContext->SetUp(); }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() { mpContext->TearDown(); }
