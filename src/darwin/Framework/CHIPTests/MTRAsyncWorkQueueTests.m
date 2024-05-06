@@ -544,13 +544,17 @@
 
     [self waitForExpectations:@[ first3WorkItemsExecutedExpectation ] timeout:2];
     // the before-sleep counter should have reached 3 immediately as they all run concurrently.
+    os_unfair_lock_lock(&counterLock);
     XCTAssertEqual(afterSleepCounter, 0);
+    os_unfair_lock_unlock(&counterLock);
 
     [self waitForExpectations:@[ lastWorkItemWaitedExpectation, first3WorkItemsSleptExpectation ] timeout:2];
 
     // see that all 3 first items ran and slept
+    os_unfair_lock_lock(&counterLock);
     XCTAssertEqual(beforeSleepCounter, 3);
     XCTAssertEqual(afterSleepCounter, 3);
+    os_unfair_lock_unlock(&counterLock);
 }
 
 @end
