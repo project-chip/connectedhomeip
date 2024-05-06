@@ -92,7 +92,6 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         attributes = Clusters.MicrowaveOvenControl.Attributes
         feature_map = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         features = Clusters.MicrowaveOvenControl.Bitmaps.Feature
-        commands = Clusters.Objects.MicrowaveOvenControl.Commands
 
         if not feature_map & features.kPowerAsNumber:
             logging.info("PWRNUM is not supported so skipping remaining test steps")
