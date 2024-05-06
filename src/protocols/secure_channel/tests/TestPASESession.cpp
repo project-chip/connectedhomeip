@@ -89,10 +89,10 @@ class TestContext : public chip::Test::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite() override
+    void SetUpTestSuite() override
     {
         ConfigInitializeNodes(false);
-        return chip::Test::LoopbackMessagingContext::SetUpTestSuite();
+        chip::Test::LoopbackMessagingContext::SetUpTestSuite();
     }
 };
 
