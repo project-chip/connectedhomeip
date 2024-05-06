@@ -1664,7 +1664,7 @@ provisional cluster ScenesManagement = 98 {
     kSceneNames = 0x1;
   }
 
-  struct AttributeValuePair {
+  struct AttributeValuePairStruct {
     attrib_id attributeID = 0;
     optional int8u valueUnsigned8 = 1;
     optional int8s valueSigned8 = 2;
@@ -1678,7 +1678,7 @@ provisional cluster ScenesManagement = 98 {
 
   struct ExtensionFieldSet {
     cluster_id clusterID = 0;
-    AttributeValuePair attributeValueList[] = 1;
+    AttributeValuePairStruct attributeValueList[] = 1;
   }
 
   fabric_scoped struct SceneInfoStruct {
@@ -1790,7 +1790,7 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierFrom = 2;
   }
 
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
+  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "ValueX": VALUE}]}' */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   /** Retrieves the requested scene entry from its Scene table. */
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;

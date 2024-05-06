@@ -99,7 +99,7 @@ public:
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
-        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
         AttributeValuePair pairs[kColorControlScenableAttributesCount];
 
@@ -194,7 +194,7 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
-        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
@@ -264,10 +264,10 @@ public:
             case Attributes::CurrentSaturation::Id:
                 if (SupportsColorMode(endpoint, ColorControl::EnhancedColorMode::kCurrentHueAndCurrentSaturation))
                 {
-                    if (decodePair.valueUnsigned16.HasValue())
+                    if (decodePair.valueUnsigned8.HasValue())
                     {
-                        colorSaturationTransitionState->finalValue =
-                            std::min(decodePair.valueUnsigned16.Value(), colorSaturationTransitionState->highLimit);
+                        colorSaturationTransitionState->finalValue = std::min(
+                            static_cast<uint16_t>(decodePair.valueUnsigned8.Value()), colorSaturationTransitionState->highLimit);
                     }
                 }
                 break;
@@ -403,15 +403,17 @@ private:
     /// @param attributeCount number of attributes in the list, incremented by this function, used to keep track of how many
     /// attributes from the array are being used for the list to encode
     template <typename Type>
-    void AddAttributeValuePair(ScenesManagement::Structs::AttributeValuePair::Type * pairs, AttributeId id, Type value,
+    void AddAttributeValuePair(ScenesManagement::Structs::AttributeValuePairStruct::Type * pairs, AttributeId id, Type value,
                                size_t & attributeCount)
     {
+        static_assert(sizeof(Type) == sizeof(uint8_t) || sizeof(Type) == sizeof(uint16_t), "Type must be uint8_t or uint16_t");
+
         pairs[attributeCount].attributeID = id;
-        if constexpr (sizeof(Type) == sizeof(uint8_t))
+        if constexpr ((std::is_same_v<Type, uint8_t>) )
         {
             pairs[attributeCount].valueUnsigned8.SetValue(value);
         }
-        else if constexpr (sizeof(Type) == sizeof(uint16_t))
+        else if constexpr ((std::is_same_v<Type, uint16_t>) )
         {
             pairs[attributeCount].valueUnsigned16.SetValue(value);
         }

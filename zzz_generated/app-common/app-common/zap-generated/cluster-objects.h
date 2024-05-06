@@ -18169,7 +18169,7 @@ public:
 } // namespace RvcOperationalState
 namespace ScenesManagement {
 namespace Structs {
-namespace AttributeValuePair {
+namespace AttributeValuePairStruct {
 enum class Fields : uint8_t
 {
     kAttributeID     = 0,
@@ -18205,7 +18205,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace AttributeValuePair
+} // namespace AttributeValuePairStruct
 namespace ExtensionFieldSet {
 enum class Fields : uint8_t
 {
@@ -18217,7 +18217,7 @@ struct Type
 {
 public:
     chip::ClusterId clusterID = static_cast<chip::ClusterId>(0);
-    DataModel::List<const Structs::AttributeValuePair::Type> attributeValueList;
+    DataModel::List<const Structs::AttributeValuePairStruct::Type> attributeValueList;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -18228,7 +18228,7 @@ struct DecodableType
 {
 public:
     chip::ClusterId clusterID = static_cast<chip::ClusterId>(0);
-    DataModel::DecodableList<Structs::AttributeValuePair::DecodableType> attributeValueList;
+    DataModel::DecodableList<Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
