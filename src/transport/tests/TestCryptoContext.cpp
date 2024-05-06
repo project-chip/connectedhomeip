@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <inttypes.h>
+
+#include <gtest/gtest.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
-
 #include <transport/CryptoContext.h>
 
 using namespace chip;

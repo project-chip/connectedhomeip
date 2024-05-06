@@ -22,14 +22,14 @@
  */
 
 #include <errno.h>
+#include <stdarg.h>
+
 #include <gtest/gtest.h>
 
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <transport/CryptoContext.h>
-
-#include <stdarg.h>
 
 using namespace chip;
 using namespace Crypto;

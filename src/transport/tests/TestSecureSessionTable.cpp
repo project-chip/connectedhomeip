@@ -21,16 +21,16 @@
  *      This file implements unit tests for the SessionManager implementation.
  */
 
+#include <errno.h>
+#include <vector>
+
+#include <gtest/gtest.h>
+
 #include "system/SystemClock.h"
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <transport/SecureSessionTable.h>
 #include <transport/SessionHolder.h>
-
-#include <gtest/gtest.h>
-
-#include <errno.h>
-#include <vector>
 
 namespace chip {
 namespace Transport {

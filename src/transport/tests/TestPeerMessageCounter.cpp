@@ -21,12 +21,13 @@
  *      This file implements unit tests for the SessionManager implementation.
  */
 
+#include <errno.h>
+#include <vector>
+
+#include <gtest/gtest.h>
+
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
-
-#include <errno.h>
-#include <gtest/gtest.h>
-#include <vector>
 
 namespace {
 

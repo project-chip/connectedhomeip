@@ -21,14 +21,13 @@
  *      This file implements unit tests for the SessionManager implementation.
  */
 
+#include <errno.h>
+#include <gtest/gtest.h>
+
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/PeerMessageCounter.h>
-
-#include <gtest/gtest.h>
-
-#include <errno.h>
 
 namespace {
 

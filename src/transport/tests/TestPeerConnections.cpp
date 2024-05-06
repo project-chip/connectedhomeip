@@ -22,11 +22,12 @@
  *      the SecureSessionTable class within the transport layer
  *
  */
+
+#include <gtest/gtest.h>
+
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
 #include <transport/SecureSessionTable.h>
-
-#include <gtest/gtest.h>
 
 namespace {
 
