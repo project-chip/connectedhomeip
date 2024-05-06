@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include <gtest/gtest.h>
+
 #include <inet/IPAddress.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>

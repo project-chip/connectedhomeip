@@ -24,6 +24,7 @@
  */
 
 #include <gtest/gtest.h>
+
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

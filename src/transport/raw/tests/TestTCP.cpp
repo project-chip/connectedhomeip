@@ -23,8 +23,14 @@
 
 #include "NetworkTestHelpers.h"
 
-#include <crypto/RandUtils.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <utility>
+
 #include <gtest/gtest.h>
+
+#include <crypto/RandUtils.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMem.h>
@@ -36,11 +42,6 @@
 #include <transport/raw/TCP.h>
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/raw/tests/TCPBaseTestAccess.h>
-
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
-#include <utility>
 
 using namespace chip;
 using namespace chip::Test;

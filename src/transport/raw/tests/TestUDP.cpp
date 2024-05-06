@@ -23,13 +23,14 @@
 
 #include "NetworkTestHelpers.h"
 
+#include <errno.h>
+
 #include <gtest/gtest.h>
+
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
-
-#include <errno.h>
 
 using namespace chip;
 using namespace chip::Test;
