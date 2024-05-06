@@ -30,12 +30,11 @@
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
-#ifndef NDEBUG
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    ClusterId clusterId     = attributePath.mClusterId;
-    AttributeId attributeId = attributePath.mAttributeId;
+    ClusterId clusterId                      = attributePath.mClusterId;
+    [[maybe_unused]] AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == OnOffSwitchConfiguration::Id)
@@ -51,7 +50,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
 }
-#endif
 
 /** @brief OnOff Cluster Init
  *
