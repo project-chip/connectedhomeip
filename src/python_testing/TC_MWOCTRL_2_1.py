@@ -60,17 +60,20 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the MaxCookTime attribute and check limits",
-                "Verify that the DUT response contains an elapsed-s value between 1 and 86400 inclusive. Save value as MaxCookTime."
-            ),
+                     "Verify that the DUT response contains an elapsed-s value between 1 and 86400 inclusive. Save value as MaxCookTime."
+                     ),
             TestStep(3, "Read the CookTime attribute and check limits",
-                "Verify that the DUT response contains an elapsed-s value between 1 and MaxCookTime inclusive."
-            ),
+                     "Verify that the DUT response contains an elapsed-s value between 1 and MaxCookTime inclusive."
+                     ),
             TestStep(4, "Set the CookTime attribute to 60", "Verify DUT responds w/ status SUCCESS(0x00)."),
-            TestStep(5, "Read the CookTime attribute and check for 60", "Verify that the DUT response contains the CookTime value 60."),
+            TestStep(5, "Read the CookTime attribute and check for 60",
+                     "Verify that the DUT response contains the CookTime value 60."),
             TestStep(6, "Set the CookTime attribute to 1", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(7, "Read the CookTime attribute and check for 1", "Verify that the DUT response contains the CookTime value 1."),
+            TestStep(7, "Read the CookTime attribute and check for 1",
+                     "Verify that the DUT response contains the CookTime value 1."),
             TestStep(8, "Set the CookTime attribute to MaxCookTime", "Verify DUT responds w/ status SUCCESS(0x00)"),
-            TestStep(9, "Read the CookTime attribute and check for MaxCookTime", "Verify that the DUT response contains the CookTime value MaxCookTime."),
+            TestStep(9, "Read the CookTime attribute and check for MaxCookTime",
+                     "Verify that the DUT response contains the CookTime value MaxCookTime."),
             TestStep(10, "Read the WattRating attribute, if supported", "Verify that the DUT response contains a uint16 value."),
             TestStep(11, "Set the CookTime attribute to 0", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep(12, "Set the CookTime attribute to MaxCookTime+1", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),

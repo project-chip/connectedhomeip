@@ -44,7 +44,8 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             await self.send_single_cmd(cmd=Clusters.Objects.MicrowaveOvenControl.Commands.SetCookingParameters(powerSetting=value), endpoint=endpoint)
             asserts.assert_fail("Expected an exception but received none.")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError but received a different response: %x", e.status)
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 "Expected ConstraintError but received a different response: %x", e.status)
 
     async def read_and_check_power_setting_value(self, endpoint, value):
         powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.MicrowaveOvenControl.Attributes.PowerSetting)
