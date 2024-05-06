@@ -208,6 +208,7 @@ class ChipStack(object):
                  bluetoothAdapter=None, enableServerInteractions=True):
         builtins.enableDebugMode = False
 
+        # TODO: Probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
         self.networkLock = Lock()
         self.completeEvent = Event()
         self.commissioningCompleteEvent = Event()
@@ -348,6 +349,7 @@ class ChipStack(object):
             logFunct = 0
         if not isinstance(logFunct, _LogMessageFunct):
             logFunct = _LogMessageFunct(logFunct)
+        # TODO: Lock probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
         with self.networkLock:
             # NOTE: ChipStack must hold a reference to the CFUNCTYPE object while it is
             # set. Otherwise it may get garbage collected, and logging calls from the
@@ -390,6 +392,7 @@ class ChipStack(object):
         # throw error if op in progress
         self.callbackRes = None
         self.completeEvent.clear()
+        # TODO: Lock probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
         with self.networkLock:
             res = self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
         self.completeEvent.set()
@@ -422,6 +425,7 @@ class ChipStack(object):
         # throw error if op in progress
         self.callbackRes = None
         self.completeEvent.clear()
+        # TODO: Lock probably no longer necessary, see https://github.com/project-chip/connectedhomeip/issues/33321.
         with self.networkLock:
             res = self.PostTaskOnChipThread(callFunct).Wait()
 
