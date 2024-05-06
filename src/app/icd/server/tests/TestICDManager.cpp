@@ -163,7 +163,7 @@ public:
             ASSERT_NE(pMessagingContext, nullptr);
         }
 
-        ASSERT_EQ(pMessagingContext->SetUpTestSuite(), CHIP_NO_ERROR);
+        pMessagingContext->SetUpTestSuite();
         ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
         DeviceLayer::SetSystemLayerForTesting(&(pMessagingContext->GetSystemLayer()));
@@ -198,7 +198,7 @@ public:
     // Performs setup for each individual test in the test suite
     void SetUp() override
     {
-        EXPECT_EQ(pMessagingContext->SetUp(), CHIP_NO_ERROR);
+        pMessagingContext->SetUp();
 
         mICDStateObserver.ResetAll();
         mICDManager.RegisterObserver(&mICDStateObserver);
