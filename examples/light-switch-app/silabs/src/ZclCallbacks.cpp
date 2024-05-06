@@ -53,7 +53,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 }
 #ifndef NDEBUG
 
-
 /** @brief OnOff Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
