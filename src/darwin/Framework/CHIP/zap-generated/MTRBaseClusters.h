@@ -17739,22 +17739,22 @@ typedef NS_OPTIONS(uint16_t, MTRValveConfigurationAndControlValveFaultBitmap) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRElectricalPowerMeasurementMeasurementType) {
-    MTRElectricalPowerMeasurementMeasurementTypeUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRElectricalPowerMeasurementMeasurementTypeVoltage MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRElectricalPowerMeasurementMeasurementTypeActiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRElectricalPowerMeasurementMeasurementTypeReactiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRElectricalPowerMeasurementMeasurementTypeApparentCurrent MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRElectricalPowerMeasurementMeasurementTypeActivePower MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRElectricalPowerMeasurementMeasurementTypeReactivePower MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRElectricalPowerMeasurementMeasurementTypeApparentPower MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRElectricalPowerMeasurementMeasurementTypeRMSVoltage MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRElectricalPowerMeasurementMeasurementTypeRMSCurrent MTR_PROVISIONALLY_AVAILABLE = 0x09,
-    MTRElectricalPowerMeasurementMeasurementTypeRMSPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRElectricalPowerMeasurementMeasurementTypeFrequency MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-    MTRElectricalPowerMeasurementMeasurementTypePowerFactor MTR_PROVISIONALLY_AVAILABLE = 0x0C,
-    MTRElectricalPowerMeasurementMeasurementTypeNeutralCurrent MTR_PROVISIONALLY_AVAILABLE = 0x0D,
-    MTRElectricalPowerMeasurementMeasurementTypeElectricalEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0E,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRElectricalPowerMeasurementMeasurementTypeUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRElectricalPowerMeasurementMeasurementTypeVoltage MTR_NEWLY_AVAILABLE = 0x01,
+    MTRElectricalPowerMeasurementMeasurementTypeActiveCurrent MTR_NEWLY_AVAILABLE = 0x02,
+    MTRElectricalPowerMeasurementMeasurementTypeReactiveCurrent MTR_NEWLY_AVAILABLE = 0x03,
+    MTRElectricalPowerMeasurementMeasurementTypeApparentCurrent MTR_NEWLY_AVAILABLE = 0x04,
+    MTRElectricalPowerMeasurementMeasurementTypeActivePower MTR_NEWLY_AVAILABLE = 0x05,
+    MTRElectricalPowerMeasurementMeasurementTypeReactivePower MTR_NEWLY_AVAILABLE = 0x06,
+    MTRElectricalPowerMeasurementMeasurementTypeApparentPower MTR_NEWLY_AVAILABLE = 0x07,
+    MTRElectricalPowerMeasurementMeasurementTypeRMSVoltage MTR_NEWLY_AVAILABLE = 0x08,
+    MTRElectricalPowerMeasurementMeasurementTypeRMSCurrent MTR_NEWLY_AVAILABLE = 0x09,
+    MTRElectricalPowerMeasurementMeasurementTypeRMSPower MTR_NEWLY_AVAILABLE = 0x0A,
+    MTRElectricalPowerMeasurementMeasurementTypeFrequency MTR_NEWLY_AVAILABLE = 0x0B,
+    MTRElectricalPowerMeasurementMeasurementTypePowerFactor MTR_NEWLY_AVAILABLE = 0x0C,
+    MTRElectricalPowerMeasurementMeasurementTypeNeutralCurrent MTR_NEWLY_AVAILABLE = 0x0D,
+    MTRElectricalPowerMeasurementMeasurementTypeElectricalEnergy MTR_NEWLY_AVAILABLE = 0x0E,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRElectricalPowerMeasurementPowerMode) {
     MTRElectricalPowerMeasurementPowerModeUnknown MTR_NEWLY_AVAILABLE = 0x00,
@@ -17768,7 +17768,7 @@ typedef NS_OPTIONS(uint32_t, MTRElectricalPowerMeasurementFeature) {
     MTRElectricalPowerMeasurementFeaturePolyphasePower MTR_NEWLY_AVAILABLE = 0x4,
     MTRElectricalPowerMeasurementFeatureHarmonics MTR_NEWLY_AVAILABLE = 0x8,
     MTRElectricalPowerMeasurementFeaturePowerQuality MTR_NEWLY_AVAILABLE = 0x10,
-} MTR_PROVISIONALLY_AVAILABLE;
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRElectricalEnergyMeasurementMeasurementType) {
     MTRElectricalEnergyMeasurementMeasurementTypeUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
