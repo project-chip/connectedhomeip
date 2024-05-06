@@ -82,7 +82,7 @@ bool Engine::IsClusterDataVersionMatch(const SingleLinkedListNode<DataVersionFil
 CHIP_ERROR
 Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                             AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteReadAttributePath & aPath,
-                            AttributeValueEncoder::AttributeEncodeState * aEncoderState)
+                            AttributeEncodeState * aEncoderState)
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
@@ -199,7 +199,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             attributeReportIBs.Checkpoint(attributeBackup);
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
-            AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
+            AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
             err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), apReadHandler->IsFabricFiltered(), attributeReportIBs,
                                       pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
@@ -226,7 +226,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     // We met a error during writing reports, one common case is we are running out of buffer, rollback the
                     // attributeReportIB to avoid any partial data.
                     attributeReportIBs.Rollback(attributeBackup);
-                    apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+                    apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
 
                     if (!IsOutOfWriterSpaceError(err))
                     {
@@ -256,7 +256,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             }
             SuccessOrExit(err);
             // Successfully encoded the attribute, clear the internal state.
-            apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+            apReadHandler->SetAttributeEncodeState(AttributeEncodeState());
         }
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.

@@ -56,7 +56,7 @@ public:
      *
      * @param timeZoneList new time zone list
      */
-    virtual void TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList) = 0;
+    virtual void TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList) {}
     /**
      * @brief Give the delegate the chance to call SetDSTOffset on the TimeSynchronizationServer with a list of
      * DST offsets based on the provided time zone name.  If the delegate does so, it should return true.
@@ -64,7 +64,7 @@ public:
      *
      * @param name name of active time zone
      */
-    virtual bool HandleUpdateDSTOffset(const CharSpan name) = 0;
+    virtual bool HandleUpdateDSTOffset(const CharSpan name) { return false; }
     /**
      * @brief Returns true if the provided string is a valid NTP address (either domain name or IPv6 address).
      *
@@ -104,12 +104,26 @@ public:
      * a CHIP_ERROR.
      */
     virtual CHIP_ERROR UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
-                                                  chip::Callback::Callback<OnFallbackNTPCompletion> * callback) = 0;
+                                                  chip::Callback::Callback<OnFallbackNTPCompletion> * callback)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
-     * @brief Signals application that UTCTime has changed through the timesync cluster.
+     * @brief Signals application that UTCTime has changed through the timesync cluster. This gets called when
+     * time is available for the first time or is updated. Therefore, @param time will always have a valid value.
+     * The negative case of time being unavailable is handled by NotifyTimeFailure().
      */
-    virtual void UTCTimeAvailabilityChanged(uint64_t time) = 0;
+    virtual void UTCTimeAvailabilityChanged(uint64_t time) {}
+    /**
+     * @brief Signals application that a new trusted time source is available. The application can then decide
+     * if it wants to attempt to query for time from this source.
+     */
+    virtual void TrustedTimeSourceAvailabilityChanged(bool available, GranularityEnum granularity) {}
+    /**
+     * @brief Signals application that fetching time has failed. The reason is not relevant.
+     */
+    virtual void NotifyTimeFailure() {}
 
     virtual ~Delegate() = default;
 

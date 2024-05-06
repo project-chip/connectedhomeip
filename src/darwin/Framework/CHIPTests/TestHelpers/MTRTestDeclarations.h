@@ -54,14 +54,13 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRBaseDevice (TestDebug)
-- (void)failSubscribers:(dispatch_queue_t)queue completion:(void (^)(void))completion;
-
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
 @end
 
 @interface MTRDevice (TestDebug)
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
+- (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
 - (void)unitTestClearClusterData;
 @end

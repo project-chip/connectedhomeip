@@ -458,6 +458,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+                continue;
             }
 
             mActiveResolves.Complete(nodeData.operationalData.peerId);
@@ -644,9 +645,9 @@ CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
 {
     while (true)
     {
-        Optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
+        std::optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
 
-        if (!resolve.HasValue())
+        if (!resolve.has_value())
         {
             break;
         }
@@ -657,9 +658,9 @@ CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
         QueryBuilder builder(std::move(buffer));
         builder.Header().SetMessageId(0);
 
-        ReturnErrorOnFailure(BuildQuery(builder, resolve.Value()));
+        ReturnErrorOnFailure(BuildQuery(builder, *resolve));
 
-        if (resolve.Value().firstSend)
+        if (resolve->firstSend)
         {
             ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
         }
@@ -744,14 +745,14 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&RetryCallback, this);
 
-    Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
+    std::optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
 
-    if (!delay.HasValue())
+    if (!delay.has_value())
     {
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(delay.Value(), &RetryCallback, this);
+    return mSystemLayer->StartTimer(*delay, &RetryCallback, this);
 }
 
 void MinMdnsResolver::RetryCallback(System::Layer *, void * self)

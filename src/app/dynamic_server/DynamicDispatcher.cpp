@@ -123,7 +123,7 @@ Status DetermineAttributeStatus(const ConcreteAttributePath & aPath, bool aIsWri
 
 CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                 AttributeValueEncoder::AttributeEncodeState * aEncoderState)
+                                 AttributeEncodeState * aEncoderState)
 {
     Status status = DetermineAttributeStatus(aPath, /* aIsWrite = */ false);
     return aAttributeReports.EncodeAttributeStatus(aPath, StatusIB(status));

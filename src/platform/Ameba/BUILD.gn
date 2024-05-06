@@ -50,6 +50,8 @@ static_library("Ameba") {
     "SoftwareUpdateManagerImpl.h",
     "SystemTimeSupport.cpp",
     "SystemTimeSupport.h",
+    "crypto/AmebaPersistentStorageOperationalKeystore.cpp",
+    "crypto/AmebaPersistentStorageOperationalKeystore.h",
   ]
 
   deps = [
