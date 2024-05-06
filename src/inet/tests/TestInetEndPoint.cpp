@@ -49,6 +49,8 @@ using namespace chip::System::Clock::Literals;
 
 #define TOOL_NAME "TestInetEndPoint"
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 bool callbackHandlerCalled = false;
 
 void HandleDNSResolveComplete(void * appState, CHIP_ERROR err, uint8_t addrCount, IPAddress * addrArray)
@@ -443,4 +445,5 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     ShutdownNetwork();
     ShutdownSystemLayer();
 }
-#endif
+#endif // !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
