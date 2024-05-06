@@ -508,10 +508,12 @@
         }
         os_unfair_lock_unlock(&counterLock);
         sleep(1);
+        os_unfair_lock_lock(&counterLock);
         afterSleepCounter++;
         if (afterSleepCounter == 3) {
             [first3WorkItemsSleptExpectation fulfill];
         }
+        os_unfair_lock_unlock(&counterLock);
         completion(MTRAsyncWorkComplete);
     };
 
@@ -533,9 +535,8 @@
     workItemLast.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         // expect this to have waited until at least one of the above items finished after sleep() and incremented counter
         os_unfair_lock_lock(&counterLock);
-        if (afterSleepCounter > 0) {
-            [lastWorkItemWaitedExpectation fulfill];
-        }
+        XCTAssert(afterSleepCounter > 0);
+        [lastWorkItemWaitedExpectation fulfill];
         os_unfair_lock_unlock(&counterLock);
         completion(MTRAsyncWorkComplete);
     };
