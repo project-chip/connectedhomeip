@@ -149,8 +149,9 @@ struct TestContext
 
     TestContext(const IPAddressContextRange IPv6WellKnown, const IPAddressContextRange IPv6Transient,
                 const IPAddressContextRange IPv6Prefix, const IPAddressExpandedContextRange IPv6AddressExpanded) :
-        mIPv6WellKnownMulticastContextRange(IPv6WellKnown), mIPv6TransientMulticastContextRange(IPv6Transient),
-        mIPv6PrefixMulticastContextRange(IPv6Prefix), mIPAddressExpandedContextRange(IPv6AddressExpanded){};
+        mIPv6WellKnownMulticastContextRange(IPv6WellKnown),
+        mIPv6TransientMulticastContextRange(IPv6Transient), mIPv6PrefixMulticastContextRange(IPv6Prefix),
+        mIPAddressExpandedContextRange(IPv6AddressExpanded){};
 };
 
 // Global Variables
