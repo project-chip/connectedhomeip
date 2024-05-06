@@ -79,9 +79,9 @@ class TestContext : public chip::Test::AppContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite() override
+    void SetUpTestSuite() override
     {
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUpTestSuite());
+        chip::Test::AppContext::SetUpTestSuite();
         gRealClock = &chip::System::SystemClock();
         chip::System::Clock::Internal::SetSystemClockForTesting(&gMockClock);
 
@@ -94,8 +94,6 @@ public:
         {
             gReportScheduler = chip::app::reporting::GetDefaultReportScheduler();
         }
-
-        return CHIP_NO_ERROR;
     }
 
     static int nlTestSetUpTestSuite_Sync(void * context)
@@ -112,7 +110,7 @@ public:
     }
 
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override
+    void SetUp() override
     {
         const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
@@ -120,16 +118,12 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+        chip::Test::AppContext::SetUp();
 
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        VerifyOrExit((err = mEventCounter.Init(0)) == CHIP_NO_ERROR,
-                     ChipLogError(AppServer, "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format()));
+        // TODO: change to ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDie(mEventCounter.Init(0) == CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
-
-    exit:
-        return err;
     }
 
     // Performs teardown for each individual test in the test suite
@@ -4244,7 +4238,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
 
         ctx.GetLoopback().mSentMessageCount = 0;
         auto exchange                       = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(
-            delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
+                                  delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
         delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         err = delegate.mpReadHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
                                                                 Messaging::SendMessageFlags::kExpectResponse);
@@ -4413,7 +4407,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWith
 
         ctx.GetLoopback().mSentMessageCount = 0;
         auto exchange                       = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(
-            delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
+                                  delegate.mpReadHandler->mSessionHandle.Get().Value(), delegate.mpReadHandler);
         delegate.mpReadHandler->mExchangeCtx.Grab(exchange);
         err = delegate.mpReadHandler->mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(msgBuf),
                                                                 Messaging::SendMessageFlags::kExpectResponse);

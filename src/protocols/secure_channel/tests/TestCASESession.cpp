@@ -61,7 +61,7 @@ class TestContext : public Test::LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite() override;
+    void SetUpTestSuite() override;
     // Performs shared teardown for all tests in the test suite
     void TearDownTestSuite() override;
 };
@@ -327,22 +327,20 @@ CHIP_ERROR InitCredentialSets()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestContext::SetUpTestSuite()
+void TestContext::SetUpTestSuite()
 {
     ConfigInitializeNodes(false);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit((err = LoopbackMessagingContext::SetUpTestSuite()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "SetUpTestSuite lo messaging context failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
-                                        &gCommissionerOpCertStore)) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "InitFabricTable failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = InitCredentialSets()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "InitCredentialSets failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    LoopbackMessagingContext::SetUpTestSuite();
+    // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+    VerifyOrDieWithMsg((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR, AppServer,
+                       "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
+                                              &gCommissionerOpCertStore)) == CHIP_NO_ERROR,
+                       AppServer, "InitFabricTable failed: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = InitCredentialSets()) == CHIP_NO_ERROR, AppServer, "InitCredentialSets failed: %" CHIP_ERROR_FORMAT,
+                       err.Format());
     chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
-exit:
-    return err;
 }
 
 void TestContext::TearDownTestSuite()
@@ -1042,9 +1040,9 @@ void TestCASESession::SessionResumptionStorage(nlTestSuite * inSuite, void * inC
                                                                     &gDeviceGroupDataProvider) == CHIP_NO_ERROR);
         ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner);
         auto establishmentReturnVal           = pairingCommissioner->EstablishSession(
-            ctx.GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
-            contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner,
-            Optional<ReliableMessageProtocolConfig>::Missing());
+                      ctx.GetSecureSessionManager(), &gCommissionerFabrics, ScopedNodeId{ Node01_01, gCommissionerFabricIndex },
+                      contextCommissioner, &testVectors[i].initiatorStorage, nullptr, &delegateCommissioner,
+                      Optional<ReliableMessageProtocolConfig>::Missing());
         ServiceEvents(ctx);
         NL_TEST_ASSERT(inSuite, establishmentReturnVal == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == testVectors[i].expectedSentMessageCount);

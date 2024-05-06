@@ -212,15 +212,14 @@ public:
     virtual ~LoopbackMessagingContext() {}
 
     // Performs shared setup for all tests in the test suite
-    virtual CHIP_ERROR SetUpTestSuite()
+    virtual void SetUpTestSuite()
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        VerifyOrExit((err = chip::Platform::MemoryInit()) == CHIP_NO_ERROR,
-                     ChipLogError(AppServer, "Init CHIP memory failed: %" CHIP_ERROR_FORMAT, err.Format()));
-        VerifyOrExit((err = LoopbackTransportManager::Init()) == CHIP_NO_ERROR,
-                     ChipLogError(AppServer, "Init LoopbackTransportManager failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    exit:
-        return err;
+        // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+        VerifyOrDieWithMsg((err = chip::Platform::MemoryInit()) == CHIP_NO_ERROR, AppServer,
+                           "Init CHIP memory failed: %" CHIP_ERROR_FORMAT, err.Format());
+        VerifyOrDieWithMsg((err = LoopbackTransportManager::Init()) == CHIP_NO_ERROR, AppServer,
+                           "Init LoopbackTransportManager failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Performs shared teardown for all tests in the test suite
@@ -231,13 +230,11 @@ public:
     }
 
     // Performs setup for each individual test in the test suite
-    virtual CHIP_ERROR SetUp()
+    virtual void SetUp()
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        VerifyOrExit((err = MessagingContext::Init(&GetTransportMgr(), &GetIOContext())) == CHIP_NO_ERROR,
-                     ChipLogError(AppServer, "Init MessagingContext failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    exit:
-        return err;
+        VerifyOrDieWithMsg((err = MessagingContext::Init(&GetTransportMgr(), &GetIOContext())) == CHIP_NO_ERROR, AppServer,
+                           "Init MessagingContext failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Performs teardown for each individual test in the test suite
@@ -247,8 +244,8 @@ public:
 
     static int nlTestSetUpTestSuite(void * context)
     {
-        auto err = static_cast<LoopbackMessagingContext *>(context)->SetUpTestSuite();
-        return err == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+        static_cast<LoopbackMessagingContext *>(context)->SetUpTestSuite();
+        return SUCCESS;
     }
 
     static int nlTestTearDownTestSuite(void * context)
@@ -259,8 +256,8 @@ public:
 
     static int nlTestSetUp(void * context)
     {
-        auto err = static_cast<LoopbackMessagingContext *>(context)->SetUp();
-        return err == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+        static_cast<LoopbackMessagingContext *>(context)->SetUp();
+        return SUCCESS;
     }
 
     static int nlTestTearDown(void * context)
