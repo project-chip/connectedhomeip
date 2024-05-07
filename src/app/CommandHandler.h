@@ -693,7 +693,7 @@ private:
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
-    /* List to store the weak reference to all the Handle created with this Command Handler.*/
+    /* List to store all currently-outstanding Handles for this Command Handler.*/
     IntrusiveList<Handle> mpHandleList;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
