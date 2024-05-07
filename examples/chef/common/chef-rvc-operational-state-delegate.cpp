@@ -20,6 +20,7 @@
 #include <chef-rvc-operational-state-delegate.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -246,3 +247,4 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gRvcOperationalStateInstance->Init();
 }
+#endif // MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
