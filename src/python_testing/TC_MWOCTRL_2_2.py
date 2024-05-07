@@ -45,7 +45,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             asserts.assert_fail("Expected an exception but received none.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
-                                 "Expected ConstraintError but received a different response: %x", e.status)
+                                 "Expected ConstraintError but received a different response")
 
     async def read_and_check_power_setting_value(self, endpoint, value):
         powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=Clusters.MicrowaveOvenControl.Attributes.PowerSetting)
@@ -103,31 +103,36 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         self.step(2)
         minPowerValue = 10
 
+        feature_map = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        is_pwrnum_feature_supported = feature_map & features.kPowerAsNumber
+        is_watts_feature_supported = feature_map & features.kPowerInWatts
+        is_pwrlmits_feature_supported = feature_map & features.kPowerNumberLimits
+
         self.step(3)
-        if self.pics_guard(self.check_pics("MWOCTRL.S.F02")):
+        if is_pwrlmits_feature_supported:
             minPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinPower)
-            logging.info("MinPower is %s" % minPowerValue)
             asserts.assert_true(minPowerValue >= 1, "MinPower is less than 1")
+        logging.info("MinPower is %s" % minPowerValue)
 
         self.step(4)
         maxPowerValue = 100
 
         self.step(5)
-        if self.pics_guard(self.check_pics("MWOCTRL.S.F02")):
+        if is_pwrlmits_feature_supported:
             maxPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxPower)
-            logging.info("MaxPower is %s" % maxPowerValue)
             asserts.assert_true(maxPowerValue >= minPowerValue, "MaxPower is less than MinPower")
             asserts.assert_true(maxPowerValue <= 100, "MaxPower is greater than 100")
+        logging.info("MaxPower is %s" % maxPowerValue)
 
         self.step(6)
         powerStepValue = 10
 
         self.step(7)
-        if self.pics_guard(self.check_pics("MWOCTRL.S.F02")):
+        if is_pwrlmits_feature_supported:
             powerStepValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerStep)
-            logging.info("PowerStep is %s" % powerStepValue)
             asserts.assert_true(powerStepValue >= 1, "PowerStep is less than 1")
             asserts.assert_true(powerStepValue <= maxPowerValue, "PowerStep is greater than MaxPower")
+        logging.info("PowerStep is %s" % powerStepValue)
 
         self.step(8)
         powerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerSetting)
