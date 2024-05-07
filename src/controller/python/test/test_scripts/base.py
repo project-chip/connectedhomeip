@@ -1425,25 +1425,26 @@ class BaseTestHelper:
     controller 1 in container 1 while the Step2 is executed in controller 2 in container 2
     '''
 
-    def TestSubscriptionResumptionCapacityStep1(self, nodeid: int, endpoint: int, passcode: int, subscription_capacity: int):
+    async def TestSubscriptionResumptionCapacityStep1(self, nodeid: int, endpoint: int, passcode: int, subscription_capacity: int):
         try:
             # BasicInformation Cluster, NodeLabel Attribute
             for i in range(subscription_capacity):
-                self.devCtrl.ZCLSubscribeAttribute(
-                    "BasicInformation", "NodeLabel", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+                await self.devCtrl.ReadAttribute(nodeid, [(endpoint, Clusters.BasicInformation.Attributes.NodeLabel)], None,
+                                                 False, reportInterval=(1, 50),
+                                                 keepSubscriptions=True, autoResubscribe=False)
 
             logger.info("Send OpenCommissioningWindow command on fist controller")
             discriminator = 3840
             salt = secrets.token_bytes(16)
             iterations = 2000
             verifier = GenerateVerifier(passcode, salt, iterations)
-            asyncio.run(self.devCtrl.SendCommand(
+            await self.devCtrl.SendCommand(
                 nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                     commissioningTimeout=180,
                     PAKEPasscodeVerifier=verifier,
                     discriminator=discriminator,
                     iterations=iterations,
-                    salt=salt), timedRequestTimeoutMs=10000))
+                    salt=salt), timedRequestTimeoutMs=10000)
             return True
 
         except Exception as ex:
