@@ -136,7 +136,12 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         asserts.assert_true((powerValue-minPowerValue) % powerStepValue == 0, "PowerSetting is not a multiple of power step")
 
         self.step(9)
+        logging.info("minPowerValue is %s" % minPowerValue)
+        logging.info("maxPowerValue is %s" % maxPowerValue)
+        logging.info("powerStepValue is %s" % powerStepValue)
+        logging.info("powerValue is %s" % powerValue)
         newPowerValue = (powerValue-minPowerValue) % (maxPowerValue-minPowerValue)+powerStepValue+minPowerValue
+        logging.info("newPowerValue is %s" % newPowerValue)
         await self.set_power_setting_expect_success(endpoint, newPowerValue)
 
         self.step(10)
