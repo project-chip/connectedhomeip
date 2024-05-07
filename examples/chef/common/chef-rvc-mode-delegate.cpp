@@ -296,8 +296,8 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
     gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
-    gRvcCleanModeInstance =
-        new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kNoFeatures));
+    gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id,
+                                                   chip::to_underlying(RvcCleanMode::Feature::kNoFeatures));
     gRvcCleanModeInstance->Init();
 }
 #endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
