@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <lib/support/logging/CHIPLogging.h>
+#include <app/util/config.h>
 
 #ifdef MATTER_DM_PLUGIN_DOOR_LOCK_SERVER
 #include "chef-lock-manager.h"
