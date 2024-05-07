@@ -12,11 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+
 # This source set is TIGHLY coupled with code-generated data models
 # as generally implemented by `src/app/util`
 #
 # Corresponding functions defined in attribute-storace.cpp/attribute-table.cpp must
 # be available at link time for this model to use
+#
 # Use `model.gni` to get access to:
-#   model.cpp
-#   model.h
+#   Model.cpp
+#   Model.h
+#
+# The abolve list of files exists to satisfy the "dependency linter"
+# since those files should technically be "visible to gn" even though we
+# are supposed to go through model.gni constants
