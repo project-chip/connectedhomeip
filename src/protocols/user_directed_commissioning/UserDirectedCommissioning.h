@@ -538,12 +538,6 @@ public:
         mCommissionerDeclarationHandler = commissionerDeclarationHandler;
     }
 
-    /**
-     * Remove the previously set Commissioner Declaration UDC request listener.
-     *
-     */
-    void RemoveCommissionerDeclarationHandler() { mCommissionerDeclarationHandler = nullptr; }
-
 private:
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                            Transport::MessageTransportContext * ctxt = nullptr) override;

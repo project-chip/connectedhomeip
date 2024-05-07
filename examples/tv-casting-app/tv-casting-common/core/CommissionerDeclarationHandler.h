@@ -25,8 +25,7 @@ namespace casting {
 namespace core {
 
 /**
- * @brief React to the Commissioner's CommissionerDeclaration messages with this singleton. This is the common handler across Linux,
- * Android and iOS.
+ * @brief React to the Commissioner's CommissionerDeclaration messages with this singleton.
  */
 class CommissionerDeclarationHandler : public chip::Protocols::UserDirectedCommissioning::CommissionerDeclarationHandler
 {

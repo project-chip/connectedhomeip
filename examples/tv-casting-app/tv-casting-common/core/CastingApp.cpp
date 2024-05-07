@@ -118,10 +118,6 @@ CHIP_ERROR CastingApp::Start()
             });
     }
 
-    // Set a handler for Commissioner's CommissionerDeclaration messages.
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
-        CommissionerDeclarationHandler::GetInstance());
-
     return CHIP_NO_ERROR;
 }
 
@@ -144,6 +140,10 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     // Register DeviceEvent Handler
     ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(ChipDeviceEventHandler::Handle, 0));
 
+    // Set a handler for Commissioner's CommissionerDeclaration messages.
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
+        CommissionerDeclarationHandler::GetInstance());
+
     mState = CASTING_APP_RUNNING; // CastingApp started successfully, set state to RUNNING
     return CHIP_NO_ERROR;
 }
@@ -153,12 +153,13 @@ CHIP_ERROR CastingApp::Stop()
     ChipLogProgress(Discovery, "CastingApp::Stop() called");
     VerifyOrReturnError(mState == CASTING_APP_RUNNING, CHIP_ERROR_INCORRECT_STATE);
 
+    // Remove the handler previously set for Commissioner's CommissionerDeclaration messages.
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
+
     // Shutdown the Matter server
     chip::Server::GetInstance().Shutdown();
 
     mState = CASTING_APP_NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
-
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->RemoveCommissionerDeclarationHandler();
 
     return CHIP_NO_ERROR;
 }
