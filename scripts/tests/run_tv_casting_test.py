@@ -312,7 +312,7 @@ def validate_commissioning_success(tv_casting_app_info: Tuple[subprocess.Popen, 
 
 def parse_tv_app_output_for_launchUrl_msg_success(tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
     """Parse the Linux tv-app output for the relevant string indicating that the launchUrl was received."""
-    
+
     tv_app_process, linux_tv_app_log_file = tv_app_info
 
     start_wait_time = time.time()
@@ -338,7 +338,7 @@ def parse_tv_app_output_for_launchUrl_msg_success(tv_app_info: Tuple[subprocess.
 
 def parse_tv_casting_app_output_for_launchUrl_msg_success(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
     """Parse the Linux tv-casting-app output for relevant strings indicating that the launchUrl was sent."""
-    
+
     tv_casting_app_process, linux_tv_casting_app_log_file = tv_casting_app_info
 
     continue_parsing_invoke_response_msg_block = False
@@ -447,10 +447,10 @@ def test_commissioning_fn(valid_discovered_commissioner_number, tv_casting_app_i
 
 def test_launchUrl_fn(tv_casting_app_info: Tuple[subprocess.Popen, TextIO], tv_app_info: Tuple[subprocess.Popen, TextIO], log_paths: List[str]):
     """Test that the Linux tv-casting-app sent the launchUrl and that the Linux tv-app received the launchUrl."""
-    
+
     if not parse_tv_app_output_for_launchUrl_msg_success(tv_app_info, log_paths):
         handle_casting_failure('Testing launchUrl', log_paths)
-    
+
     if not parse_tv_casting_app_output_for_launchUrl_msg_success(tv_casting_app_info, log_paths):
         handle_casting_failure('Testing launchUrl', log_paths)
 
