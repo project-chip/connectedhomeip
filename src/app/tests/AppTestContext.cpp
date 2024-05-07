@@ -38,15 +38,13 @@ chip::Access::AccessControl gPermissiveAccessControl;
 namespace chip {
 namespace Test {
 
-CHIP_ERROR AppContext::SetUpTestSuite()
+void AppContext::SetUpTestSuite()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit((err = LoopbackMessagingContext::SetUpTestSuite()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "SetUpTestSuite lo messaging context failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format()));
-exit:
-    return err;
+    LoopbackMessagingContext::SetUpTestSuite();
+    // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+    VerifyOrDieWithMsg((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR, AppServer,
+                       "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 void AppContext::TearDownTestSuite()
@@ -55,20 +53,19 @@ void AppContext::TearDownTestSuite()
     LoopbackMessagingContext::TearDownTestSuite();
 }
 
-CHIP_ERROR AppContext::SetUp()
+void AppContext::SetUp()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit((err = LoopbackMessagingContext::SetUp()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "SetUp lo messaging context failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = app::InteractionModelEngine::GetInstance()->Init(
-                      &GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler())) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "Init InteractionModelEngine failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    LoopbackMessagingContext::SetUp();
+    // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
+    VerifyOrDieWithMsg((err = app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                                               app::reporting::GetDefaultReportScheduler())) ==
+                           CHIP_NO_ERROR,
+                       AppServer, "Init InteractionModelEngine failed: %" CHIP_ERROR_FORMAT, err.Format());
     Access::SetAccessControl(gPermissiveAccessControl);
-    VerifyOrExit((err = Access::GetAccessControl().Init(chip::Access::Examples::GetPermissiveAccessControlDelegate(),
-                                                        gDeviceTypeResolver)) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "Init AccessControl failed: %" CHIP_ERROR_FORMAT, err.Format()));
-exit:
-    return err;
+    VerifyOrDieWithMsg((err = Access::GetAccessControl().Init(chip::Access::Examples::GetPermissiveAccessControlDelegate(),
+                                                              gDeviceTypeResolver)) == CHIP_NO_ERROR,
+                       AppServer, "Init AccessControl failed: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 void AppContext::TearDown()
