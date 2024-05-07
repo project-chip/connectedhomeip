@@ -18,8 +18,7 @@
 package matter.onboardingpayload
 
 /** Enum values for possible bits in the onboarding paylod's discovery capabilities bitmask. */
-enum class DiscoveryCapability {
-  SOFT_AP,
-  BLE,
-  ON_NETWORK
+enum class DiscoveryCapability(val bitIndex: Int) {
+  BLE(1),
+  ON_NETWORK(2)
 }
