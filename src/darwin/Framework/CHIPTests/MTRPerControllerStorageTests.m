@@ -16,14 +16,12 @@
 
 #import <Matter/Matter.h>
 
-// system dependencies
-#import <XCTest/XCTest.h>
-
 #import "MTRDeviceControllerLocalTestStorage.h"
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRFabricInfoChecker.h"
+#import "MTRTestCase.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestPerControllerStorage.h"
@@ -160,6 +158,8 @@ static const uint16_t kTestVendorId = 0xFFF1u;
                                                                            nodeID:self.nextNodeID
                                                             caseAuthenticatedTags:nil
                                                                             error:&error];
+    // Release no-longer-needed key before we do anything else.
+    CFRelease(publicKey);
     XCTAssertNil(error);
     XCTAssertNotNil(operationalCert);
 
@@ -177,7 +177,7 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 @end
 
-@interface MTRPerControllerStorageTests : XCTestCase
+@interface MTRPerControllerStorageTests : MTRTestCase
 @end
 
 @implementation MTRPerControllerStorageTests {
@@ -187,6 +187,10 @@ static const uint16_t kTestVendorId = 0xFFF1u;
 
 - (void)setUp
 {
+    // Set detectLeaks true first, in case our superclass wants to do something
+    // in setUp when it's set.
+    self.detectLeaks = YES;
+
     // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];

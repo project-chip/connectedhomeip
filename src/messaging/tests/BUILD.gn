@@ -38,6 +38,12 @@ static_library("helpers") {
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/tests:helpers",
   ]
+
+  # MessagingContext exposes nl-test compatible setup/teardown functions, specifically
+  # they return nltest specific SUCCESS/FAILURE constants hence this dependency.
+  #
+  # Once all tests are moved to pw_unittest/gtest, this dependency should be removed
+  public_deps = [ "${nlunit_test_root}:nlunit-test" ]
 }
 
 chip_test_suite_using_nltest("tests") {

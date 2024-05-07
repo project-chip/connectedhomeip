@@ -114,8 +114,8 @@ public:
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
-    // There is not delegate, nothing to do here
-    virtual void DispatchSessionEvent(SessionDelegate::Event event) {}
+    // There is no delegate, nothing to do here
+    virtual void OnSessionHang() {}
 
 protected:
     // Helper for use by the Grab methods.
@@ -147,7 +147,7 @@ public:
             SessionHolder::ShiftToSession(session);
     }
 
-    void DispatchSessionEvent(SessionDelegate::Event event) override { (mDelegate.*event)(); }
+    void OnSessionHang() override { mDelegate.OnSessionHang(); }
 
 private:
     SessionDelegate & mDelegate;
@@ -237,7 +237,7 @@ public:
     void SetTCPConnection(ActiveTCPConnectionState * conn) { mTCPConnection = conn; }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-    void DispatchSessionEvent(SessionDelegate::Event event)
+    void NotifySessionHang()
     {
         // Holders might remove themselves when notified.
         auto holder = mHolders.begin();
@@ -245,7 +245,7 @@ public:
         {
             auto cur = holder;
             ++holder;
-            cur->DispatchSessionEvent(event);
+            cur->OnSessionHang();
         }
     }
 

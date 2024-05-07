@@ -69,4 +69,12 @@
 {
     return self.forceAttributeReportsIfMatchingCache;
 }
+
+- (void)deviceConfigurationChanged:(MTRDevice *)device
+{
+    if (self.onDeviceConfigurationChanged != nil) {
+        self.onDeviceConfigurationChanged();
+    }
+}
+
 @end
