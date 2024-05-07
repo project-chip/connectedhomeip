@@ -537,15 +537,18 @@ def BuildCyw30739Target():
     target = BuildTarget('cyw30739', Cyw30739Builder)
     # board
     target.AppendFixedTargets([
+        TargetPart('cyw30739b2_p5_evk_01', board=Cyw30739Board.CYW30739B2_P5_EVK_01),
+        TargetPart('cyw30739b2_p5_evk_02', board=Cyw30739Board.CYW30739B2_P5_EVK_02),
+        TargetPart('cyw30739b2_p5_evk_03', board=Cyw30739Board.CYW30739B2_P5_EVK_03),
         TargetPart('cyw930739m2evb_01', board=Cyw30739Board.CYW930739M2EVB_01),
+        TargetPart('cyw930739m2evb_02', board=Cyw30739Board.CYW930739M2EVB_02),
     ])
 
     # apps
     target.AppendFixedTargets([
         TargetPart('light', app=Cyw30739App.LIGHT),
+        TargetPart('light-switch', app=Cyw30739App.LIGHT_SWITCH),
         TargetPart('lock', app=Cyw30739App.LOCK),
-        TargetPart('ota-requestor', app=Cyw30739App.OTA_REQUESTOR),
-        TargetPart('switch', app=Cyw30739App.SWITCH),
     ])
 
     return target
