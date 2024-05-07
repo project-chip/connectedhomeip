@@ -35,7 +35,7 @@ enum class ClusterQualityFlags : uint32_t
 
 struct ClusterInfo
 {
-    DataVersion dataVersion; // current version of this cluster
+    DataVersion dataVersion = 0; // current version of this cluster
     BitFlags<ClusterQualityFlags> flags;
 };
 
@@ -43,6 +43,13 @@ struct ClusterEntry
 {
     ConcreteClusterPath path;
     ClusterInfo info;
+
+    static ClusterEntry Invalid()
+    {
+        ClusterEntry result;
+        result.path = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
+        return result;
+    }
 };
 
 enum class AttributeQualityFlags : uint32_t
@@ -60,6 +67,13 @@ struct AttributeEntry
 {
     ConcreteAttributePath path;
     AttributeInfo info;
+
+    static AttributeEntry Invalid()
+    {
+        AttributeEntry result;
+        result.path = ConcreteAttributePath(kInvalidEndpointId, kInvalidClusterId, kInvalidAttributeId);
+        return result;
+    }
 };
 
 /// Provides metadata information for a data model

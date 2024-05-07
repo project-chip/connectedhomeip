@@ -414,6 +414,7 @@ void SetMockNodeConfig(const MockNodeConfig & config)
     mockConfig = &config;
 }
 
+/// Resets the mock attribute storage to the default configuration.
 void ResetMockNodeConfig()
 {
     mockConfig = nullptr;
