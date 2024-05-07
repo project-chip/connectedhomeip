@@ -37,8 +37,8 @@ CommissionerDeclarationHandler * CommissionerDeclarationHandler::GetInstance()
 
 // TODO: In the following PRs. Implement setHandler() for CommissionerDeclaration messages and expose messages to higher layers for
 // Linux, Android and iOS.
-void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
-                                        chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
+void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
+    const chip::Transport::PeerAddress & source, chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd)
 {
     ChipLogProgress(AppServer, "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() called TODO: handle message");
     cd.DebugLog();
