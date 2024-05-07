@@ -122,7 +122,7 @@ public:
             handle.Release();
         }
         Handle(decltype(nullptr)) {}
-        Handle(CommandHandler * handle);
+        Handle(CommandHandler * handler);
         ~Handle() { Release(); }
 
         Handle & operator=(Handle && handle)

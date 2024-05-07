@@ -804,10 +804,10 @@ FabricIndex CommandHandler::GetAccessingFabricIndex() const
 
 void CommandHandler::Handle::Init(CommandHandler * handler)
 {
-    if (handle != nullptr)
+    if (handler != nullptr)
     {
-        handle->IncrementHoldOff(this);
-        mpHandler = handle;
+        handler->IncrementHoldOff(this);
+        mpHandler = handler;
     }
 }
 
@@ -830,7 +830,7 @@ void CommandHandler::Handle::Release()
 
 CommandHandler::Handle::Handle(CommandHandler * handler)
 {
-    Init(handle);
+    Init(handler);
 }
 
 CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessageAndPrepareNext()
