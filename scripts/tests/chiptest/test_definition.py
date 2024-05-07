@@ -374,6 +374,8 @@ class TestDefinition:
             else:
                 pairing_cmd = paths.chip_tool_with_python_cmd + \
                     ['pairing', 'code', TEST_NODE_ID, setupCode, '--icd-registration', 'true']
+                if self.target == TestTarget.LIT_ICD:
+                    pairing_cmd += ['--icd-registration', 'true']     
                 test_cmd = paths.chip_tool_with_python_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
                 server_args = ['--server_path', paths.chip_tool[-1]] + \
                     ['--server_arguments', 'interactive server' +
