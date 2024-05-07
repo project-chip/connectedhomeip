@@ -203,14 +203,26 @@ config CHIP_QSPI_NOR
     default y if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
 
 # nRF7002DK uses SPI NOR external flash
+
+if BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP
+
 config CHIP_SPI_NOR
-    default y if BOARD_NRF7002DK_NRF5340_CPUAPP
+    default y
+
+endif # BOARD_NRF7002DK_NRF5340_CPUAPP || BOARD_NRF7002DK_NRF7001_NRF5340_CPUAPP
 
 config BOOT_IMAGE_ACCESS_HOOKS
     default y if SOC_SERIES_NRF53X
 
 config UPDATEABLE_IMAGE_NUMBER
+    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
     default 2 if SOC_SERIES_NRF53X
+
+config DFU_MULTI_IMAGE_MAX_IMAGE_COUNT
+    default 3 if NRF_WIFI_PATCHES_EXT_FLASH_STORE
+
+config NRF_WIFI_FW_PATCH_DFU
+    default y if NRF_WIFI_PATCHES_EXT_FLASH_STORE
 
 # ==============================================================================
 # OpenThread configuration
