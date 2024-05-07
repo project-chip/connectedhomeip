@@ -947,8 +947,7 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (mCommissioningStage != CommissioningStage::kAttestationVerification &&
-        mCommissioningStage != CommissioningStage::kAttestationRevocationCheck)
+    if (mCommissioningStage != CommissioningStage::kAttestationRevocationCheck)
     {
         ChipLogError(Controller, "Commissioning is not attestation verification phase");
         return CHIP_ERROR_INCORRECT_STATE;
@@ -956,8 +955,6 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
 
     ChipLogProgress(Controller, "Continuing commissioning after attestation failure for device ID 0x" ChipLogFormatX64,
                     ChipLogValueX64(commissioneeDevice->GetDeviceId()));
-
-    mCommissioningDelegate->BypassDeviceAttestation();
 
     if (attestationResult != AttestationVerificationResult::kSuccess)
     {
@@ -1198,8 +1195,14 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(
     auto & params = commissioner->mDefaultCommissioner->GetCommissioningParameters();
     Credentials::DeviceAttestationDelegate * deviceAttestationDelegate = params.GetDeviceAttestationDelegate();
 
-    result =
-        params.GetCompletionStatus().attestationResult.HasValue() ? params.GetCompletionStatus().attestationResult.Value() : result;
+    if (params.GetCompletionStatus().attestationResult.HasValue())
+    {
+        auto previousResult = params.GetCompletionStatus().attestationResult.Value();
+        if (previousResult != AttestationVerificationResult::kSuccess)
+        {
+            result = previousResult;
+        }
+    }
 
     if (result != AttestationVerificationResult::kSuccess)
     {
@@ -3066,7 +3069,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     case CommissioningStage::kAttestationVerification: {
         ChipLogProgress(Controller, "Verifying attestation");
-        VerifyOrReturn(IsAttestationInformationMissing(params) == false);
+        if (IsAttestationInformationMissing(params))
+        {
+            ChipLogError(Controller, "Missing attestation information");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
 
         DeviceAttestationVerifier::AttestationInfo info(
             params.GetAttestationElements().Value(),
@@ -3084,7 +3092,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kAttestationRevocationCheck: {
         ChipLogProgress(Controller, "Verifying device's DAC chain revocation status");
-        VerifyOrReturn(IsAttestationInformationMissing(params) == false);
+        if (IsAttestationInformationMissing(params))
+        {
+            ChipLogError(Controller, "Missing attestation information");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+            return;
+        }
 
         DeviceAttestationVerifier::AttestationInfo info(
             params.GetAttestationElements().Value(),
@@ -3464,14 +3477,12 @@ void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device,
     }
 }
 
-bool DeviceCommissioner::IsAttestationInformationMissing(CommissioningParameters & params)
+bool DeviceCommissioner::IsAttestationInformationMissing(const CommissioningParameters & params)
 {
     if (!params.GetAttestationElements().HasValue() || !params.GetAttestationSignature().HasValue() ||
         !params.GetAttestationNonce().HasValue() || !params.GetDAC().HasValue() || !params.GetPAI().HasValue() ||
         !params.GetRemoteVendorId().HasValue() || !params.GetRemoteProductId().HasValue())
     {
-        ChipLogError(Controller, "Missing attestation information");
-        CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
         return true;
     }
 

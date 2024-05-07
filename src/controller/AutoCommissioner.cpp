@@ -389,8 +389,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kSendAttestationRequest:
         return CommissioningStage::kAttestationVerification;
     case CommissioningStage::kAttestationVerification:
-        return mBypassDeviceAttestation ? CommissioningStage::kSendOpCertSigningRequest
-                                        : CommissioningStage::kAttestationRevocationCheck;
+        return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
@@ -582,7 +581,6 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mStopCommissioning       = false;
-    mBypassDeviceAttestation = false;
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
     mNeedsNetworkSetup =
@@ -697,7 +695,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                              "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
                              "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
             }
-            else if (report.stageCompleted == CommissioningStage::kAttestationVerification)
+
+            if (report.stageCompleted == CommissioningStage::kAttestationVerification)
             {
                 ChipLogError(Controller, "Failed verifying attestation information. Now checking DAC chain revoked status.");
                 // don't error out until we check for DAC chain revocation status

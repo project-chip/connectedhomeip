@@ -812,7 +812,6 @@ public:
     virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
     virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
     virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;
-    virtual void BypassDeviceAttestation()                                                                          = 0;
 };
 
 } // namespace Controller
