@@ -373,8 +373,8 @@ class TestDefinition:
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
                 pairing_cmd = paths.chip_tool_with_python_cmd + \
-                    ['pairing', 'code', TEST_NODE_ID, setupCode, '--icd-registration', 'true']
-                if self.target == TestTarget.LIT_ICD:
+                    ['pairing', 'code', TEST_NODE_ID, setupCode]
+                if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
                     pairing_cmd += ['--icd-registration', 'true']     
                 test_cmd = paths.chip_tool_with_python_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
                 server_args = ['--server_path', paths.chip_tool[-1]] + \
