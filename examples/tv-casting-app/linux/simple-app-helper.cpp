@@ -51,8 +51,8 @@ void DiscoveryDelegateImpl::HandleOnAdded(matter::casting::memory::Strong<matter
         ChipLogProgress(AppServer, "Select discovered Casting Player (start index = 0) to request commissioning");
         ChipLogProgress(AppServer, "Include the cgp flag to attempt the Commissioner-Generated Passcode commissioning flow");
 
-        ChipLogProgress(AppServer, "Example1: cast request 0");
-        ChipLogProgress(AppServer, "Example2: cast request 0 cgp");
+        ChipLogProgress(AppServer, "Example1 Commissionee Passcode: cast request 0");
+        ChipLogProgress(AppServer, "Example2 Commissioner Passcode: cast request 0 cgp");
     }
     ChipLogProgress(AppServer, "Discovered CastingPlayer #%d", commissionersCount);
     ++commissionersCount;
@@ -314,8 +314,9 @@ CHIP_ERROR PrintAllCommands()
         "  delete-fabric <index>     Delete a fabric from the casting client's fabric store. Usage: cast delete-fabric 1\r\n");
     streamer_printf(sout, "  discover             Discover Casting Players. Usage: cast discover\r\n");
     streamer_printf(sout, "  stop-discovery       Stop Discovery of Casting Players. Usage: cast stop-discovery\r\n");
-    streamer_printf(
-        sout, "  request <index>      Request connecting to discovered Casting Player with [index]. Usage: cast request 0\r\n");
+    streamer_printf(sout,
+                    "  request <index>      Request connecting to discovered Casting Player with [index] using the "
+                    "Commissionee-Generated Passcode commissioning flow. Usage: cast request 0\r\n");
     streamer_printf(sout,
                     "  request <index> cgp  Request connecting to discovered Casting Player with [index] using the "
                     "Commissioner-Generated Passcode commissioning flow. Usage: cast request 0 cgp\r\n");

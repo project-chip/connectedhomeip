@@ -18,6 +18,7 @@
 
 #include "CastingApp.h"
 
+#include "CommissionerDeclarationHandler.h"
 #include "support/CastingStore.h"
 #include "support/ChipDeviceEventHandler.h"
 
@@ -117,6 +118,10 @@ CHIP_ERROR CastingApp::Start()
             });
     }
 
+    // Set a handler for Commissioner's CommissionerDeclaration messages.
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
+        CommissionerDeclarationHandler::GetInstance());
+
     return CHIP_NO_ERROR;
 }
 
@@ -152,6 +157,8 @@ CHIP_ERROR CastingApp::Stop()
     chip::Server::GetInstance().Shutdown();
 
     mState = CASTING_APP_NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
+
+    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->RemoveCommissionerDeclarationHandler();
 
     return CHIP_NO_ERROR;
 }

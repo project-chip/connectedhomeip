@@ -96,7 +96,6 @@ class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>
 {
 public:
     CastingPlayer(CastingPlayerAttributes playerAttributes) { mAttributes = playerAttributes; }
-    ~CastingPlayer() { delete mCommissionerDeclarationHandler; }
 
     /**
      * @brief Get the CastingPlayer object targeted currently (may not be connected)
@@ -203,16 +202,6 @@ private:
     ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
     CastingPlayerAttributes mAttributes;
     IdentificationDeclarationOptions mIdOptions;
-    /**
-     * Flag to indicate whether or not the Commissionee (tv-casting-app) is enabled for the Commissioner-Generated Passcode flow.
-     */
-    bool mUdcCommissionerPasscodeEnabled = false;
-    /**
-     * Flag to indicate whether or not the Commissionee has obtained the Commissioner Passcode from the user and is therefore ready
-     * for commissioning.
-     */
-    bool mUdcCommissionerPasscodeReady                               = false;
-    CommissionerDeclarationHandler * mCommissionerDeclarationHandler = new CommissionerDeclarationHandler();
     static CastingPlayer * mTargetCastingPlayer;
     unsigned long long int mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
     ConnectCallback mOnCompleted                          = {};
@@ -222,11 +211,6 @@ private:
      * @brief Sends the user directed commissioning request to this CastingPlayer
      */
     CHIP_ERROR SendUserDirectedCommissioningRequest();
-
-    /**
-     * @brief Builds an IdentificationDeclaration message to be sent to this CastingPlayer
-     */
-    chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration buildIdentificationDeclarationMessage();
 
     /**
      * @brief Selects an IP Address to send the UDC request to.

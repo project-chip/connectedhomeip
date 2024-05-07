@@ -63,11 +63,11 @@ public:
 
     CHIP_ERROR addTargetAppInfo(const chip::Protocols::UserDirectedCommissioning::TargetAppInfo & targetAppInfo)
     {
-        if (mTargetAppInfos.size() >= kMaxTargetAppInfos)
+        if (mTargetAppInfos.size() >= CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS)
         {
             ChipLogError(AppServer,
-                         "IdentificationDeclarationOptions::addTargetAppInfo() failed to add TargetAppInfo, max vector size is %zu",
-                         kMaxTargetAppInfos);
+                         "IdentificationDeclarationOptions::addTargetAppInfo() failed to add TargetAppInfo, max vector size is %d",
+                         CHIP_DEVICE_CONFIG_UDC_MAX_TARGET_APPS);
             return CHIP_ERROR_NO_MEMORY;
         }
 
@@ -77,9 +77,41 @@ public:
 
     std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> getTargetAppInfoList() const { return mTargetAppInfos; }
 
+    /**
+     * @brief Builds an IdentificationDeclaration message to be sent to a CastingPlayer, given the options state specified in this
+     * object.
+     */
+    chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration buildIdentificationDeclarationMessage()
+    {
+        ChipLogProgress(AppServer, "IdentificationDeclarationOptions::buildIdentificationDeclarationMessage()");
+        chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+
+        std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> targetAppInfos = getTargetAppInfoList();
+        for (size_t i = 0; i < targetAppInfos.size(); i++)
+        {
+            id.AddTargetAppInfo(targetAppInfos[i]);
+        }
+        id.SetNoPasscode(mNoPasscode);
+        id.SetCdUponPasscodeDialog(mCdUponPasscodeDialog);
+        id.SetCancelPasscode(mCancelPasscode);
+
+        ChipLogProgress(AppServer,
+                        "IdentificationDeclarationOptions::buildIdentificationDeclarationMessage() mCommissionerPasscode: %s",
+                        mCommissionerPasscode ? "true" : "false");
+        id.SetCommissionerPasscode(mCommissionerPasscode);
+
+        ChipLogProgress(AppServer,
+                        "IdentificationDeclarationOptions::buildIdentificationDeclarationMessage() mCommissionerPasscodeReady: %s",
+                        mCommissionerPasscodeReady ? "true" : "false");
+        if (mCommissionerPasscodeReady)
+        {
+            id.SetCommissionerPasscodeReady(true);
+            mCommissionerPasscodeReady = false;
+        }
+        return id;
+    }
+
 private:
-    // TVs can handle the memory impact of supporting a larger list. See examples/tv-app/tv-common/include/CHIPProjectAppConfig.h
-    constexpr static size_t kMaxTargetAppInfos = 10;
     /**
      * Feature: Target Content Application
      * The set of content app Vendor IDs (and optionally, Product IDs) that can be used for authentication.

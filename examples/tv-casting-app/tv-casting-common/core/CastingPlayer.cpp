@@ -46,12 +46,11 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
         ChipLogError(
             AppServer,
             "CastingPlayer::VerifyOrEstablishConnection() called while already connecting/connected to this CastingPlayer"));
-    mConnectionState                = CASTING_PLAYER_CONNECTING;
-    mOnCompleted                    = onCompleted;
-    mCommissioningWindowTimeoutSec  = commissioningWindowTimeoutSec;
-    mTargetCastingPlayer            = this;
-    mIdOptions                      = idOptions;
-    mUdcCommissionerPasscodeEnabled = idOptions.mCommissionerPasscode;
+    mConnectionState               = CASTING_PLAYER_CONNECTING;
+    mOnCompleted                   = onCompleted;
+    mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
+    mTargetCastingPlayer           = this;
+    mIdOptions                     = idOptions;
 
     // If *this* CastingPlayer was previously connected to, its nodeId, fabricIndex and other attributes should be present
     // in the CastingStore cache. If that is the case, AND, the cached data contains the endpoint desired by the client, if any,
@@ -173,46 +172,12 @@ CHIP_ERROR CastingPlayer::SendUserDirectedCommissioningRequest()
 
     ReturnErrorOnFailure(support::ChipDeviceEventHandler::SetUdcStatus(true));
 
-    chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration id = buildIdentificationDeclarationMessage();
-
-    // TODO: In the following PRs. Implement handler for CommissionerDeclaration messages and expose messages to higher layers for
-    // Linux, Android and iOS.
-    chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(
-        mCommissionerDeclarationHandler);
+    chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration id = mIdOptions.buildIdentificationDeclarationMessage();
 
     ReturnErrorOnFailure(chip::Server::GetInstance().SendUserDirectedCommissioningRequest(
         chip::Transport::PeerAddress::UDP(*ipAddressToUse, mAttributes.port, mAttributes.interfaceId), id));
 
     return CHIP_NO_ERROR;
-}
-
-chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration CastingPlayer::buildIdentificationDeclarationMessage()
-{
-    ChipLogProgress(AppServer, "CastingPlayer::buildIdentificationDeclarationMessage() building IdentificationDeclaration message");
-    chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
-
-    std::vector<chip::Protocols::UserDirectedCommissioning::TargetAppInfo> mTargetAppInfos = mIdOptions.getTargetAppInfoList();
-    for (size_t i = 0; i < mTargetAppInfos.size(); i++)
-    {
-        id.AddTargetAppInfo(mTargetAppInfos[i]);
-    }
-    id.SetNoPasscode(mIdOptions.mNoPasscode);
-    id.SetCdUponPasscodeDialog(mIdOptions.mCdUponPasscodeDialog);
-    id.SetCancelPasscode(mIdOptions.mCancelPasscode);
-
-    ChipLogProgress(AppServer, "CastingPlayer::SendUserDirectedCommissioningRequest() mUdcCommissionerPasscodeEnabled: %s",
-                    mUdcCommissionerPasscodeEnabled ? "true" : "false");
-    if (mUdcCommissionerPasscodeEnabled)
-    {
-        id.SetCommissionerPasscode(true);
-        if (mUdcCommissionerPasscodeReady)
-        {
-            id.SetCommissionerPasscodeReady(true);
-            mUdcCommissionerPasscodeReady = false;
-        }
-    }
-
-    return id;
 }
 
 chip::Inet::IPAddress * CastingPlayer::GetIpAddressForUDCRequest()

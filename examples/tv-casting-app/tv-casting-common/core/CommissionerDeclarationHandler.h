@@ -24,16 +24,25 @@ namespace matter {
 namespace casting {
 namespace core {
 
-// TODO: In the following PRs. This is work in progress, call higer levels with the CommissionerDeclaration info.
+/**
+ * @brief React to the Commissioner's CommissionerDeclaration messages with this singleton. This is the common handler across Linux,
+ * Android and iOS.
+ */
 class CommissionerDeclarationHandler : public chip::Protocols::UserDirectedCommissioning::CommissionerDeclarationHandler
 {
 public:
+    CommissionerDeclarationHandler(const CommissionerDeclarationHandler &) = delete;
+    void operator=(const CommissionerDeclarationHandler &)                 = delete;
+
+    static CommissionerDeclarationHandler * GetInstance();
+
     void OnCommissionerDeclarationMessage(const chip::Transport::PeerAddress & source,
-                                          chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) override
-    {
-        ChipLogProgress(AppServer, "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() called");
-        cd.DebugLog();
-    }
+                                          chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) override;
+
+private:
+    static CommissionerDeclarationHandler * sCommissionerDeclarationHandler_;
+    CommissionerDeclarationHandler() {}
+    ~CommissionerDeclarationHandler() {}
 };
 
 }; // namespace core
