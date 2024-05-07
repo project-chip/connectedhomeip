@@ -30,6 +30,9 @@ from typing import Optional
 
 from zap_execution import ZapTool
 
+# TODO: Can we share this constant definition with zap_regen_all.py?
+DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
+
 
 @dataclass
 class CmdLineArgs:
@@ -88,7 +91,7 @@ def detectZclFile(zapFile):
     print(f"Searching for zcl file from {zapFile}")
 
     prefix_chip_root_dir = True
-    path = 'src/app/zap-templates/zcl/zcl.json'
+    path = DEFAULT_DATA_MODEL_DESCRIPTION_FILE
 
     if zapFile:
         data = json.load(open(zapFile))
