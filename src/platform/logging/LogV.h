@@ -30,6 +30,25 @@ namespace Platform {
  */
 void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v);
 
+/**
+ * Open a log file for appending log messages. This function opens
+ * the specified file and ensures that subsequent logs are written to
+ * this file. It should be called at the start of the application
+ * before any logging is done.
+ *
+ * @param[in] filePath  The path to the log file. If the file does not
+ *                      exist, it will be created. If it exists, log
+ *                      messages will be appended to it.
+ */
+void OpenLogFile(const char * filePath);
+
+/**
+ * Close the log file if it is open. This function should be called
+ * at the end of the application to ensure that all log messages are
+ * flushed to disk and the file is properly closed.
+ */
+void CloseLogFile();
+
 } // namespace Platform
 } // namespace Logging
 } // namespace chip

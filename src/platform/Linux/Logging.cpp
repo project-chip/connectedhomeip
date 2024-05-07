@@ -32,6 +32,27 @@ void __attribute__((weak)) OnLogOutput() {}
 namespace Logging {
 namespace Platform {
 
+// File pointer for the log file
+FILE * logFile = nullptr;
+
+void OpenLogFile(const char * filePath)
+{
+    logFile = fopen(filePath, "a");
+    if (logFile == nullptr)
+    {
+        perror("Failed to open log file");
+    }
+}
+
+void CloseLogFile()
+{
+    if (logFile != nullptr)
+    {
+        fclose(logFile);
+        logFile = nullptr;
+    }
+}
+
 /**
  * CHIP log output functions.
  */
@@ -44,17 +65,19 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     gettimeofday(&tv, nullptr);
 
 #if !CHIP_USE_PW_LOGGING
-    // Lock standard output, so a single log line will not be corrupted in case
+    FILE * outputStream = (logFile == nullptr) ? stdout : logFile;
+    // Lock outputStream, so a single log line will not be corrupted in case
     // where multiple threads are using logging subsystem at the same time.
-    flockfile(stdout);
+    flockfile(outputStream);
 
-    printf("[%" PRIu64 ".%06" PRIu64 "][%lld:%lld] CHIP:%s: ", static_cast<uint64_t>(tv.tv_sec), static_cast<uint64_t>(tv.tv_usec),
-           static_cast<long long>(syscall(SYS_getpid)), static_cast<long long>(syscall(SYS_gettid)), module);
-    vprintf(msg, v);
-    printf("\n");
-    fflush(stdout);
+    fprintf(outputStream, "[%" PRIu64 ".%06" PRIu64 "][%lld:%lld] CHIP:%s: ", static_cast<uint64_t>(tv.tv_sec),
+            static_cast<uint64_t>(tv.tv_usec), static_cast<long long>(syscall(SYS_getpid)),
+            static_cast<long long>(syscall(SYS_gettid)), module);
+    vfprintf(outputStream, msg, v);
+    fprintf(outputStream, "\n");
 
-    funlockfile(stdout);
+    fflush(outputStream);
+    funlockfile(outputStream);
 #else  // !CHIP_USE_PW_LOGGING
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     snprintf(formattedMsg, sizeof(formattedMsg),
