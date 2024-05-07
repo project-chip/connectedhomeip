@@ -621,7 +621,7 @@ void Server::Shutdown()
 CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner,
                                                         Protocols::UserDirectedCommissioning::IdentificationDeclaration & id)
 {
-    ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
+    ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest()");
 
     CHIP_ERROR err;
 
