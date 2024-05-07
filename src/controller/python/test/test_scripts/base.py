@@ -1201,45 +1201,42 @@ class BaseTestHelper:
             return False
         return True
 
-    def TestWriteBasicAttributes(self, nodeid: int, endpoint: int, group: int):
+    async def TestWriteBasicAttributes(self, nodeid: int, endpoint: int):
         @ dataclass
         class AttributeWriteRequest:
-            cluster: str
-            attribute: str
+            cluster: Clusters.ClusterObjects.Cluster
+            attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor
             value: Any
             expected_status: IM.Status = IM.Status.Success
 
         requests = [
-            AttributeWriteRequest("BasicInformation", "NodeLabel", "Test"),
-            AttributeWriteRequest("BasicInformation", "Location",
+            AttributeWriteRequest(Clusters.BasicInformation, Clusters.BasicInformation.Attributes.NodeLabel, "Test"),
+            AttributeWriteRequest(Clusters.BasicInformation, Clusters.BasicInformation.Attributes.Location,
                                   "a pretty loooooooooooooog string", IM.Status.ConstraintError),
         ]
-        failed_zcl = []
+        failed_attribute_write = []
         for req in requests:
             try:
                 try:
-                    self.devCtrl.ZCLWriteAttribute(cluster=req.cluster,
-                                                   attribute=req.attribute,
-                                                   nodeid=nodeid,
-                                                   endpoint=endpoint,
-                                                   groupid=group,
-                                                   value=req.value)
+                    await self.devCtrl.WriteAttribute(nodeid, [(endpoint, req.attribute, 0)])
                     if req.expected_status != IM.Status.Success:
                         raise AssertionError(
-                            f"Write attribute {req.cluster}.{req.attribute} expects failure but got success response")
+                            f"Write attribute {req.attribute.__qualname__} expects failure but got success response")
                 except Exception as ex:
                     if req.expected_status != IM.Status.Success:
                         continue
                     else:
                         raise ex
-                res = self.devCtrl.ZCLReadAttribute(
-                    cluster=req.cluster, attribute=req.attribute, nodeid=nodeid, endpoint=endpoint, groupid=group)
-                TestResult(f"Read attribute {req.cluster}.{req.attribute}", res).assertValueEqual(
-                    req.value)
+
+                res = await self.devCtrl.ReadAttribute(nodeid, [(endpoint, req.attribute)])
+                val = res[endpoint][req.cluster][req.attribute]
+                if val != req.value:
+                    raise Exception(
+                        f"Read attribute {req.attribute.__qualname__}: expected value {req.value}, got {val}")
             except Exception as ex:
-                failed_zcl.append(str(ex))
-        if failed_zcl:
-            self.logger.exception(f"Following attributes failed: {failed_zcl}")
+                failed_attribute_write.append(str(ex))
+        if failed_attribute_write:
+            self.logger.exception(f"Following attributes failed: {failed_attribute_write}")
             return False
         return True
 

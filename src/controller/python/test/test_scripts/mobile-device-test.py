@@ -129,9 +129,8 @@ def TestDatamodel(test: BaseTestHelper, device_nodeid: int):
               "Failed to test Read Basic Attributes")
 
     logger.info("Testing attribute writing")
-    FailIfNot(test.TestWriteBasicAttributes(nodeid=device_nodeid,
-                                            endpoint=ENDPOINT_ID,
-                                            group=GROUP_ID),
+    FailIfNot(asyncio.run(test.TestWriteBasicAttributes(nodeid=device_nodeid,
+                                                        endpoint=ENDPOINT_ID)),
               "Failed to test Write Basic Attributes")
 
     logger.info("Testing attribute reading basic again")
