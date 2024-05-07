@@ -1453,8 +1453,8 @@ class BaseTestHelper:
 
         return True
 
-    def TestSubscriptionResumptionCapacityStep2(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int,
-                                                remote_server_app: str, subscription_capacity: int):
+    async def TestSubscriptionResumptionCapacityStep2(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int,
+                                                      remote_server_app: str, subscription_capacity: int):
         try:
             self.logger.info("Restart remote deivce")
             extra_agrs = f"--thread --discriminator 3840 --subscription-capacity {subscription_capacity}"
@@ -1468,8 +1468,9 @@ class BaseTestHelper:
             self.logger.info("Send a new subscription request from the second controller")
             # Close previous session so that the second controller will res-establish the session with the remote device
             self.devCtrl.CloseSession(nodeid)
-            self.devCtrl.ZCLSubscribeAttribute(
-                "BasicInformation", "NodeLabel", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+            await self.devCtrl.ReadAttribute(nodeid, [(endpoint, Clusters.BasicInformation.Attributes.NodeLabel)], None,
+                                             False, reportInterval=(1, 50),
+                                             keepSubscriptions=True, autoResubscribe=False)
 
             if restartRemoteThread.is_alive():
                 # Thread join timed out
