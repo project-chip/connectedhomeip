@@ -296,7 +296,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value is out of range"));
 
         VerifyOrExit(
-            (reqPowerSettingNum -  minPowerNum) % powerStepNum == 0, status = Status::ConstraintError; ChipLogError(
+            (reqPowerSettingNum - minPowerNum) % powerStepNum == 0, status = Status::ConstraintError; ChipLogError(
                 Zcl,
                 "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value must be multiple of PowerStep number"));
 
