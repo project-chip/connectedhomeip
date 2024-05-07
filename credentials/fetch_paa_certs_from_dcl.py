@@ -37,7 +37,6 @@ PRODUCTION_NODE_URL = "https://on.dcl.csa-iot.org:26657"
 PRODUCTION_NODE_URL_REST = "https://on.dcl.csa-iot.org"
 TEST_NODE_URL_REST = "https://on.test-net.dcl.csa-iot.org"
 
-# TODO: really? We can't just get this by name from the DCL?
 MATTER_CERT_CA_SUBJECT = "MFIxDDAKBgNVBAoMA0NTQTEsMCoGA1UEAwwjTWF0dGVyIENlcnRpZmljYXRpb24gYW5kIFRlc3RpbmcgQ0ExFDASBgorBgEEAYKifAIBDARDNUEw"
 MATTER_CERT_CA_SUBJECT_KEY_ID = "97:E4:69:D0:C5:04:14:C2:6F:C7:01:F7:7E:94:77:39:09:8D:F6:A5"
 
