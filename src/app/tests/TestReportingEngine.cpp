@@ -50,6 +50,9 @@ constexpr chip::AttributeId kTestFieldId2 = 2;
 
 namespace app {
 namespace reporting {
+
+std::unique_ptr<TestContext> pTestContext;
+
 class TestReportingEngine : public ::testing::Test
 {
 public:
@@ -87,15 +90,29 @@ public:
             LoopbackMessagingContext::TearDown();
         } */
 
-    static void SetUpTestSuite() { ASSERT_EQ((ctx.SetUpTestSuite()), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { ctx.TearDownTestSuite(); }
-    void SetUp() { ASSERT_EQ((ctx.SetUp()), CHIP_NO_ERROR); }
-    void TearDown() { ctx.TearDown(); }
+    static void SetUpTestSuite()
+    {
+        if (pTestContext == nullptr)
+        {
+            pTestContext = std::make_unique<TestContext>();
+            ASSERT_NE(pTestContext, nullptr);
+        }
+        pTestContext->SetUpTestSuite();
+    }
+    static void TearDownTestSuite()
+    {
+        pTestContext->TearDownTestSuite();
+        if (pTestContext != nullptr)
+        {
+            pTestContext.reset();
+        }
+    }
+    void SetUp() { pTestContext->SetUp(); }
+    void TearDown() { pTestContext->TearDown(); }
 
-    static TestContext mAppContext;
-    static TestContext ctx;
-    // static chip::Test::LoopbackTransportManager mLoopbackTransportManager;
-    // chip::Test::MessagingContext mMessagingContext;
+    // static TestContext ctx;
+    //  static chip::Test::LoopbackTransportManager mLoopbackTransportManager;
+    //  chip::Test::MessagingContext mMessagingContext;
 
     static void TestBuildAndSendSingleReportData();
     static void TestMergeOverlappedAttributePath();
@@ -148,9 +165,6 @@ private:
 };
 
 // chip::Test::LoopbackTransportManager TestReportingEngine::mLoopbackTransportManager;
-TestContext TestReportingEngine::ctx;
-
-TestContext TestReportingEngine::mAppContext;
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
 {
@@ -183,11 +197,11 @@ void TestReportingEngine::TestBuildAndSendSingleReportData()
     ReadRequestMessage::Builder readRequestBuilder;
     DummyDelegate dummy;
 
-    err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
+    err = InteractionModelEngine::GetInstance()->Init(&pTestContext->GetExchangeManager(), &pTestContext->GetFabricTable(),
                                                       app::reporting::GetDefaultReportScheduler());
     EXPECT_EQ(err, CHIP_NO_ERROR);
     TestExchangeDelegate delegate;
-    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(&delegate);
+    Messaging::ExchangeContext * exchangeCtx = pTestContext->NewExchangeToAlice(&delegate);
 
     writer.Init(std::move(readRequestbuf));
     err = readRequestBuilder.Init(&writer);
@@ -215,7 +229,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData()
     readHandler.OnInitialRequest(std::move(readRequestbuf));
     err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
 
-    ctx.DrainAndServiceIO();
+    pTestContext->DrainAndServiceIO();
 
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
@@ -224,8 +238,8 @@ void TestReportingEngine::TestMergeOverlappedAttributePath()
 {
     // TestContext & ctx = *static_cast<TestContext *>(this);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                                 app::reporting::GetDefaultReportScheduler());
+    err = InteractionModelEngine::GetInstance()->Init(&pTestContext->GetExchangeManager(), &pTestContext->GetFabricTable(),
+                                                      app::reporting::GetDefaultReportScheduler());
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     AttributePathParams * clusterInfo = InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.CreateObject();
@@ -290,8 +304,8 @@ void TestReportingEngine::TestMergeAttributePathWhenDirtySetPoolExhausted()
 {
     // TestContext & ctx = *static_cast<TestContext *>(this);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                                 app::reporting::GetDefaultReportScheduler());
+    err = InteractionModelEngine::GetInstance()->Init(&pTestContext->GetExchangeManager(), &pTestContext->GetFabricTable(),
+                                                      app::reporting::GetDefaultReportScheduler());
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.ReleaseAll();
