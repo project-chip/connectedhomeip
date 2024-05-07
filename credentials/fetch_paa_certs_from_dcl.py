@@ -201,6 +201,9 @@ def fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use
         parse_paa_root_certs(cmdpipe, paa_list)
 
     for paa in paa_list:
+        if paa['subject'] == MATTER_CERT_CA_SUBJECT and paa['subjectKeyId'] == MATTER_CERT_CA_SUBJECT_KEY_ID:
+            # Don't include the CD signing cert as a PAA root.
+            continue
         if use_rest:
             certificate, subject = get_cert_from_rest(rest_node_url, paa['subject'], paa['subjectKeyId'])
         else:
