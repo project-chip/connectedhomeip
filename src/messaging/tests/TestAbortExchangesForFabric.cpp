@@ -226,14 +226,10 @@ void CommonCheckAbortAllButOneExchange(nlTestSuite * inSuite, TestContext & ctx,
         //
         auto waitTimeout = System::Clock::Milliseconds32(1000);
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
         // If running as an ICD, increase waitTimeout to account for the polling interval
-        waitTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
+        waitTimeout += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
-
-        // Account for the retry delay booster, so that we do not timeout our IO processing before the
-        // retransmission failure is triggered.
-        waitTimeout += CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
 
         ctx.GetIOContext().DriveIOUntil(waitTimeout, [&]() { return false; });
     }
