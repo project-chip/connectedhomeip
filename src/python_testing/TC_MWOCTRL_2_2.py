@@ -105,7 +105,6 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         self.step(2)
         minPowerValue = 10
 
-
         self.step(3)
         if is_pwrlmits_feature_supported:
             minPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinPower)
