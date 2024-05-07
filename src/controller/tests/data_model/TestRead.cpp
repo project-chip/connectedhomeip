@@ -4971,8 +4971,8 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                                                               app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                                                               app::ReadClient::InteractionType::Subscribe);
+                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                   app::ReadClient::InteractionType::Subscribe);
     NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParam) == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
