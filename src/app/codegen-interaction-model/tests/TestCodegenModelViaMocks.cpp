@@ -172,7 +172,7 @@ TEST(TestCodegenModelViaMocks, IterateOverClusters)
     }
 }
 
-TEST(TestCodegenModelViaMocks, GetCluterInfo)
+TEST(TestCodegenModelViaMocks, GetClusterInfo)
 {
 
     UseMockNodeConfig config(gTestNodeConfig);
