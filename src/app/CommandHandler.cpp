@@ -802,7 +802,7 @@ FabricIndex CommandHandler::GetAccessingFabricIndex() const
     return mpResponder->GetAccessingFabricIndex();
 }
 
-void CommandHandler::Handle::Init(CommandHandler * handle)
+void CommandHandler::Handle::Init(CommandHandler * handler)
 {
     if (handle != nullptr)
     {
