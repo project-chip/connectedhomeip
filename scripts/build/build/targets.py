@@ -17,7 +17,7 @@ from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidPr
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabMfd
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
-from builders.cyw30739 import Cyw30739App, Cyw30739Builder
+from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
 from builders.genio import GenioApp, GenioBuilder
@@ -535,6 +535,15 @@ def Buildcc32xxTarget():
 
 def BuildCyw30739Target():
     target = BuildTarget('cyw30739', Cyw30739Builder)
+    # board
+    target.AppendFixedTargets([
+        TargetPart('cyw30739b2_p5_evk_01', board=Cyw30739Board.CYW30739B2_P5_EVK_01),
+        TargetPart('cyw30739b2_p5_evk_02', board=Cyw30739Board.CYW30739B2_P5_EVK_02),
+        TargetPart('cyw30739b2_p5_evk_03', board=Cyw30739Board.CYW30739B2_P5_EVK_03),
+        TargetPart('cyw930739m2evb_01', board=Cyw30739Board.CYW930739M2EVB_01),
+        TargetPart('cyw930739m2evb_02', board=Cyw30739Board.CYW930739M2EVB_02),
+    ])
+
     # apps
     target.AppendFixedTargets([
         TargetPart('light', app=Cyw30739App.LIGHT),

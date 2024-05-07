@@ -68,12 +68,27 @@ class Cyw30739Builder(GnBuilder):
         root,
         runner,
         app: Cyw30739App = Cyw30739App.LIGHT,
+        board: Cyw30739Board = Cyw30739Board.CYW30739B2_P5_EVK_01,
         release: bool = False,
     ):
         super(Cyw30739Builder, self).__init__(
             root=app.BuildRoot(root), runner=runner)
         self.app = app
+        self.board = board
         self.release = release
+        self.build_command = f"{app.AppNamePrefix()}-{board.GnArgName()}"
+        self._output_dir = None
+
+    @property
+    def output_dir(self):
+        return self._output_dir
+
+    @output_dir.setter
+    def output_dir(self, value):
+        if hasattr(self, "board"):
+            board = self.board.GnArgName().lower().replace("-", "_")
+            value = value.replace(f"-{board}", "")
+        self._output_dir = value
 
     def GnBuildArgs(self):
         args = []
@@ -84,28 +99,8 @@ class Cyw30739Builder(GnBuilder):
         return args
 
     def build_outputs(self):
-        board_list = {
-            Cyw30739App.LIGHT: [
-                Cyw30739Board.CYW30739B2_P5_EVK_01,
-                Cyw30739Board.CYW30739B2_P5_EVK_02,
-                Cyw30739Board.CYW30739B2_P5_EVK_03,
-                Cyw30739Board.CYW930739M2EVB_02,
-            ],
-            Cyw30739App.LIGHT_SWITCH: [
-                Cyw30739Board.CYW30739B2_P5_EVK_01,
-                Cyw30739Board.CYW30739B2_P5_EVK_02,
-                Cyw30739Board.CYW30739B2_P5_EVK_03,
-            ],
-            Cyw30739App.LOCK: [
-                Cyw30739Board.CYW30739B2_P5_EVK_01,
-                Cyw30739Board.CYW30739B2_P5_EVK_02,
-                Cyw30739Board.CYW30739B2_P5_EVK_03,
-            ],
-        }
         items = {}
         for extension in ["elf", "elf.map"]:
-            for board in board_list[self.app]:
-                name = "%s-%s.%s" % (self.app.AppNamePrefix(),
-                                     board.GnArgName(), extension)
-                items[name] = os.path.join(self.output_dir, name)
+            name = "%s-%s.%s" % (self.app.AppNamePrefix(), self.board.GnArgName(), extension)
+            items[name] = os.path.join(self.output_dir, name)
         return items
