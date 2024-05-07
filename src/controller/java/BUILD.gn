@@ -121,6 +121,8 @@ shared_library("jni") {
   check_includes = false
 
   sources = [
+    "CHIPP256KeypairBridge.cpp",
+    "CHIPP256KeypairBridge.h",
     "AndroidCheckInDelegate.cpp",
     "AndroidCheckInDelegate.h",
     "AndroidClusterExceptions.cpp",
