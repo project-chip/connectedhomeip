@@ -828,7 +828,7 @@ void CommandHandler::Handle::Release()
     }
 }
 
-CommandHandler::Handle::Handle(CommandHandler * handle)
+CommandHandler::Handle::Handle(CommandHandler * handler)
 {
     Init(handle);
 }
