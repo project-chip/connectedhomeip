@@ -26,8 +26,6 @@
 #include "em_usart.h"
 #include "gpiointerrupt.h"
 
-#include "AppConfig.h"
-
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"

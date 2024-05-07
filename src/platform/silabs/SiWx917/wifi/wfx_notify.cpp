@@ -19,8 +19,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "AppConfig.h"
-
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "silabs_utils.h"

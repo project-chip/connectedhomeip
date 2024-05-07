@@ -26,7 +26,6 @@
 #include "wfx_host_events.h"
 #include "wifi_config.h"
 
-#include "AppConfig.h"
 #include "FreeRTOS.h"
 #include "event_groups.h"
 
