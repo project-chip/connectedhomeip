@@ -23,8 +23,8 @@
 #include "commands/common/Commands.h"
 
 #include <app/CommandSender.h>
+#include <app/icd/client/DefaultCheckInDelegate.h>
 #include <app/tests/suites/commands/interaction_model/InteractionModel.h>
-#include <commands/common/ChipToolCheckInDelegate.h>
 #include <lib/support/Span.h>
 
 class ICDCommand : public CHIPCommand
@@ -46,7 +46,7 @@ public:
     CHIP_ERROR RunCommand() override;
 };
 
-class ICDWaitForDeviceCommand : public ClusterCommand, public CheckInCompleteCallback
+class ICDWaitForDeviceCommand : public ClusterCommand, public chip::app::DefaultCheckInDelegate
 {
 public:
     ICDWaitForDeviceCommand(CredentialIssuerCommands * credIssuerCmds) : ClusterCommand("wait-for-device", credIssuerCmds)
@@ -70,3 +70,5 @@ private:
 };
 
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig);
+
+chip::app::DefaultCheckInDelegate * chipToolCheckInDelegate();

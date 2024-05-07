@@ -73,13 +73,14 @@ CHIP_ERROR ICDWaitForDeviceCommand::RunCommand()
         return CHIP_ERROR_NOT_FOUND;
     }
     mInterestedNode = ScopedNodeId(GetDestinationId(), CurrentCommissioner().GetFabricIndex());
-    RegisterOnCheckInCompleteCallback(this);
     ChipLogError(chipTool, "Please trigger the device active mode.");
     return CHIP_NO_ERROR;
 }
 
 void ICDWaitForDeviceCommand::OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo)
 {
+    DefaultCheckInDelegate::OnCheckInComplete(clientInfo);
+
     if (clientInfo.peer_node != mInterestedNode)
     {
         ChipLogDetail(chipTool, "The node " ChipLogFormatScopedNodeId " is not the one we are interested in.",
@@ -88,7 +89,7 @@ void ICDWaitForDeviceCommand::OnCheckInComplete(const chip::app::ICDClientInfo &
     }
 
     ChipLogDetail(chipTool, "Received check-in message from the node, send stay active request to the device.");
-    UnregisterOnCheckInCompleteCallback(this);
+    mInterestedNode = ScopedNodeId();
 
     CHIP_ERROR err = ClusterCommand::RunCommand();
     if (err != CHIP_NO_ERROR)
@@ -107,14 +108,29 @@ CHIP_ERROR ICDWaitForDeviceCommand::SendCommand(chip::DeviceProxy * device,
                                        Clusters::IcdManagement::Commands::StayActiveRequest::Id, request);
 }
 
+namespace {
+DefaultCheckInDelegate * checkInDelegate;
+}
+
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * name = "ICD";
 
+    auto icdWaitForDeviceCommand = make_unique<ICDWaitForDeviceCommand>(credsIssuerConfig);
+
+    // This should be safe within CHIPTool, since the lifespan of Commands is longer than any commands and the CHIPStack.
+    // So this object will not be used after free within CHIPTool.
+    checkInDelegate = static_cast<ICDWaitForDeviceCommand *>(icdWaitForDeviceCommand.get());
+
     commands_list list = {
         make_unique<ICDListCommand>(credsIssuerConfig),
-        make_unique<ICDWaitForDeviceCommand>(credsIssuerConfig),
+        std::move(icdWaitForDeviceCommand),
     };
 
     commands.RegisterCommandSet(name, list, "Commands for client-side ICD management.");
+}
+
+DefaultCheckInDelegate * chipToolCheckInDelegate()
+{
+    return checkInDelegate;
 }
