@@ -171,7 +171,8 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     def test_Compliance(self):
         self.step(1)
         key = 'complianceInfo'
-        entry = requests.get(f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{self.software_version}/matter").json()
+        entry = requests.get(
+            f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{self.software_version}/matter").json()
         asserts.assert_true(key in entry.keys(),
                             f"Unable to find compliance entry for {self.vid_pid_sv_str}")
         logging.info(
@@ -184,7 +185,8 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
     def test_CertifiedModel(self):
         self.step(1)
         key = 'certifiedModel'
-        entry = requests.get(f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{self.software_version}/matter").json()
+        entry = requests.get(
+            f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{self.software_version}/matter").json()
         asserts.assert_true(key in entry.keys(),
                             f"Unable to find certified model entry for {self.vid_pid_sv_str}")
         logging.info(
@@ -199,11 +201,13 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         self.step(1)
         versions_entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
         key_model_versions = 'modelVersions'
-        asserts.assert_true(key_model_versions in versions_entry.keys(), f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
+        asserts.assert_true(key_model_versions in versions_entry.keys(),
+                            f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
         logging.info(f'Found version info for vid=0x{self.vid_pid_str} in the DCL:')
         logging.info(f'{versions_entry[key_model_versions]}')
         key_software_versions = 'softwareVersions'
-        asserts.assert_true(key_software_versions in versions_entry[key_model_versions].keys(), f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
+        asserts.assert_true(key_software_versions in versions_entry[key_model_versions].keys(
+        ), f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
 
         problems = []
         self.step(2)
@@ -211,7 +215,8 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
             entry_wrapper = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}/{software_version}").json()
             key_model_version = 'modelVersion'
             if key_model_version not in entry_wrapper:
-                problems.append(f'Missing key {key_model_version} in entry for {self.vid_pid_str} software version={software_version}')
+                problems.append(
+                    f'Missing key {key_model_version} in entry for {self.vid_pid_str} software version={software_version}')
                 continue
             logging.info(f'Found entry version entry for {self.vid_pid_str} software version={software_version}')
             logging.info(entry_wrapper)
@@ -224,15 +229,18 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
 
             def check_key(key):
                 if key not in entry.keys():
-                    problems.append(f'Missing key {key} in DCL versions entry for {self.vid_pid_str} software version={software_version}')
+                    problems.append(
+                        f'Missing key {key} in DCL versions entry for {self.vid_pid_str} software version={software_version}')
             check_key(key_ota_url)
             check_key(key_software_version_valid)
             if entry[key_software_version_valid] and entry[key_ota_url]:
                 check_key(key_ota_checksum)
                 check_key(key_ota_checksum_type)
-                checksum_types = {1: hashlib.sha256, 7: hashlib.sha384, 8: hashlib.sha256, 10: hashlib.sha3_256, 11: hashlib.sha3_384, 12: hashlib.sha3_512}
+                checksum_types = {1: hashlib.sha256, 7: hashlib.sha384, 8: hashlib.sha256,
+                                  10: hashlib.sha3_256, 11: hashlib.sha3_384, 12: hashlib.sha3_512}
                 if entry[key_ota_checksum_type] not in checksum_types.keys():
-                    problems.append(f'OtaChecksumType for entry {self.vid_pid_str} software version={software_version} is invalid. Found {entry[key_ota_checksum_type]} valid values: {checksum_types.keys()}')
+                    problems.append(
+                        f'OtaChecksumType for entry {self.vid_pid_str} software version={software_version} is invalid. Found {entry[key_ota_checksum_type]} valid values: {checksum_types.keys()}')
                     continue
                 checksum = entry[key_ota_checksum]
                 try:
@@ -240,24 +248,28 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
                 except (ValueError, TypeError):
                     is_base64 = False
                 if not is_base64:
-                    problems.append(f"Checksum {checksum} is not base64 encoded for for entry {self.vid_pid_str} software version={software_version}")
+                    problems.append(
+                        f"Checksum {checksum} is not base64 encoded for for entry {self.vid_pid_str} software version={software_version}")
                     continue
 
                 response = requests.get(entry[key_ota_url])
                 if not response.ok:
-                    problems.append(f"Unable to get OTA object from {entry[key_ota_url]} for {self.vid_pid_str} software version = {software_version}")
+                    problems.append(
+                        f"Unable to get OTA object from {entry[key_ota_url]} for {self.vid_pid_str} software version = {software_version}")
                     continue
 
                 ota_len = str(len(response.content))
                 dcl_len = entry[key_ota_file_size]
                 if ota_len != dcl_len:
-                    problems.append(f'Incorrect OTA size for {self.vid_pid_str} software_version = {software_version}, received size: {len(response.content)} DCL states {entry[key_ota_file_size]}')
+                    problems.append(
+                        f'Incorrect OTA size for {self.vid_pid_str} software_version = {software_version}, received size: {len(response.content)} DCL states {entry[key_ota_file_size]}')
                     continue
 
                 checksum = checksum_types[entry[key_ota_checksum_type]](response.content).digest()
                 dcl_checksum = base64.b64decode(entry[key_ota_checksum])
                 if checksum != dcl_checksum:
-                    problems.append(f'Incorrect checksum for {self.vid_pid_str} software version = {software_version}, calculated: {checksum}, DCL: {dcl_checksum}')
+                    problems.append(
+                        f'Incorrect checksum for {self.vid_pid_str} software version = {software_version}, calculated: {checksum}, DCL: {dcl_checksum}')
 
         msg = 'Problems found in software version DCL checks:\n'
         for problem in problems:
