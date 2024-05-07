@@ -15,11 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for the ExchangeContext implementation.
- */
-
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
