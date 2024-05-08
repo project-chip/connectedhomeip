@@ -69,13 +69,13 @@ public:
         chip::Platform::MemoryShutdown();
     }
 
-    void SetUp()
+    void SetUp() override
     {
         ASSERT_EQ(Init(this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mBleTransport = this;
     }
 
-    void TearDown()
+    void TearDown() override
     {
         mBleTransport = nullptr;
         Shutdown();
