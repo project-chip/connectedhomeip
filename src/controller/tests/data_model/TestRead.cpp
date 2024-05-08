@@ -383,302 +383,6 @@ public:
     CHIP_ERROR mError         = CHIP_NO_ERROR;
 };
 
-class TestResubscriptionCallback : public app::ReadClient::Callback
-{
-public:
-    TestResubscriptionCallback() {}
-
-    void SetReadClient(app::ReadClient * apReadClient) { mpReadClient = apReadClient; }
-
-    void OnDone(app::ReadClient *) override { mOnDone++; }
-
-    void OnError(CHIP_ERROR aError) override
-    {
-        mOnError++;
-        mLastError = aError;
-    }
-
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
-
-    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
-    {
-        mOnResubscriptionsAttempted++;
-        mLastError = aTerminationCause;
-        if (aTerminationCause == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT && !mScheduleLITResubscribeImmediately)
-        {
-            return CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
-        }
-        return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional, false);
-    }
-
-    void ClearCounters()
-    {
-        mOnSubscriptionEstablishedCount = 0;
-        mOnDone                         = 0;
-        mOnError                        = 0;
-        mOnResubscriptionsAttempted     = 0;
-        mLastError                      = CHIP_NO_ERROR;
-    }
-
-    int32_t mAttributeCount                 = 0;
-    int32_t mOnReportEnd                    = 0;
-    int32_t mOnSubscriptionEstablishedCount = 0;
-    int32_t mOnResubscriptionsAttempted     = 0;
-    int32_t mOnDone                         = 0;
-    int32_t mOnError                        = 0;
-    CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
-    bool mScheduleLITResubscribeImmediately = false;
-    app::ReadClient * mpReadClient          = nullptr;
-};
-
-void TestRead::SubscribeThenReadHelper(TestContext * apCtx, size_t aSubscribeCount, size_t aReadCount)
-{
-    auto sessionHandle                       = apCtx->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    uint32_t numReadSuccessCalls = 0;
-    uint32_t numReadFailureCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        //
-        // We shouldn't be encountering any failures in this test.
-        //
-        EXPECT_TRUE(false);
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apCtx, aSubscribeCount, aReadCount, &numReadSuccessCalls,
-                                        &numReadFailureCalls](const app::ReadClient & readClient,
-                                                              chip::SubscriptionId aSubscriptionId) {
-        numSubscriptionEstablishedCalls++;
-        if (numSubscriptionEstablishedCalls == aSubscribeCount)
-        {
-            MultipleReadHelperInternal(apCtx, aReadCount, numReadSuccessCalls, numReadFailureCalls);
-        }
-    };
-
-    for (size_t i = 0; i < aSubscribeCount; ++i)
-    {
-        EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                      &apCtx->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                      onSubscriptionEstablishedCb, nullptr, false, true),
-                  CHIP_NO_ERROR);
-    }
-
-    apCtx->DrainAndServiceIO();
-
-    EXPECT_EQ(numSuccessCalls, aSubscribeCount);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, aSubscribeCount);
-    EXPECT_EQ(numReadSuccessCalls, aReadCount);
-    EXPECT_EQ(numReadFailureCalls, 0u);
-}
-
-// The guts of MultipleReadHelper which take references to the success/failure
-// counts to modify and assume the consumer will be spinning the event loop.
-void TestRead::MultipleReadHelperInternal(TestContext * apCtx, size_t aReadCount, uint32_t & aNumSuccessCalls,
-                                          uint32_t & aNumFailureCalls)
-{
-    EXPECT_EQ(aNumSuccessCalls, 0u);
-    EXPECT_EQ(aNumFailureCalls, 0u);
-
-    auto sessionHandle = apCtx->GetSessionBobToAlice();
-
-    responseDirective = kSendDataResponse;
-
-    uint16_t firstExpectedResponse = totalReadCount + 1;
-
-    auto onFailureCb = [&aNumFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        aNumFailureCalls++;
-
-        EXPECT_EQ(attributePath, nullptr);
-    };
-
-    for (size_t i = 0; i < aReadCount; ++i)
-    {
-        auto onSuccessCb = [&aNumSuccessCalls, firstExpectedResponse, i](const app::ConcreteDataAttributePath & attributePath,
-                                                                         const auto & dataResponse) {
-            EXPECT_EQ(dataResponse, firstExpectedResponse + i);
-            aNumSuccessCalls++;
-        };
-
-        EXPECT_EQ(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Int16u::TypeInfo>(
-                      &apCtx->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb),
-                  CHIP_NO_ERROR);
-    }
-}
-
-void TestRead::MultipleReadHelper(TestContext * apCtx, size_t aReadCount)
-{
-    uint32_t numSuccessCalls = 0;
-    uint32_t numFailureCalls = 0;
-
-    MultipleReadHelperInternal(apCtx, aReadCount, numSuccessCalls, numFailureCalls);
-
-    apCtx->DrainAndServiceIO();
-
-    EXPECT_EQ(numSuccessCalls, aReadCount);
-    EXPECT_EQ(numFailureCalls, 0u);
-}
-
-namespace SubscriptionPathQuotaHelpers {
-class TestReadCallback : public app::ReadClient::Callback
-{
-public:
-    TestReadCallback() {}
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                         const app::StatusIB & aStatus) override
-    {
-        if (apData != nullptr)
-        {
-            mAttributeCount++;
-        }
-    }
-
-    void OnDone(app::ReadClient *) override { mOnDone++; }
-
-    void OnReportEnd() override { mOnReportEnd++; }
-
-    void OnError(CHIP_ERROR aError) override
-    {
-        mOnError++;
-        mLastError = aError;
-    }
-
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
-
-    void ClearCounters()
-    {
-        mAttributeCount                 = 0;
-        mOnReportEnd                    = 0;
-        mOnSubscriptionEstablishedCount = 0;
-        mOnDone                         = 0;
-        mOnError                        = 0;
-        mLastError                      = CHIP_NO_ERROR;
-    }
-
-    uint32_t mAttributeCount                 = 0;
-    uint32_t mOnReportEnd                    = 0;
-    uint32_t mOnSubscriptionEstablishedCount = 0;
-    uint32_t mOnDone                         = 0;
-    uint32_t mOnError                        = 0;
-    CHIP_ERROR mLastError                    = CHIP_NO_ERROR;
-};
-
-class TestPerpetualListReadCallback : public app::ReadClient::Callback
-{
-public:
-    TestPerpetualListReadCallback() {}
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                         const app::StatusIB & aStatus) override
-    {
-        if (apData != nullptr)
-        {
-            reportsReceived++;
-            app::AttributePathParams path;
-            path.mEndpointId  = aPath.mEndpointId;
-            path.mClusterId   = aPath.mClusterId;
-            path.mAttributeId = aPath.mAttributeId;
-            app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
-        }
-    }
-
-    void OnDone(chip::app::ReadClient *) override {}
-
-    void ClearCounter() { reportsReceived = 0; }
-
-    int32_t reportsReceived = 0;
-};
-
-void EstablishReadOrSubscriptions(const SessionHandle & sessionHandle, size_t numSubs, size_t pathPerSub,
-                                  app::AttributePathParams path, app::ReadClient::InteractionType type,
-                                  app::ReadClient::Callback * callback, std::vector<std::unique_ptr<app::ReadClient>> & readClients)
-{
-    std::vector<app::AttributePathParams> attributePaths(pathPerSub, path);
-
-    app::ReadPrepareParams readParams(sessionHandle);
-    readParams.mpAttributePathParamsList    = attributePaths.data();
-    readParams.mAttributePathParamsListSize = pathPerSub;
-    if (type == app::ReadClient::InteractionType::Subscribe)
-    {
-        readParams.mMaxIntervalCeilingSeconds = 1;
-        readParams.mKeepSubscriptions         = true;
-    }
-
-    for (uint32_t i = 0; i < numSubs; i++)
-    {
-        std::unique_ptr<app::ReadClient> readClient =
-            std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                              app::InteractionModelEngine::GetInstance()->GetExchangeManager(), *callback, type);
-        EXPECT_EQ(readClient->SendRequest(readParams), CHIP_NO_ERROR);
-        readClients.push_back(std::move(readClient));
-    }
-}
-
-} // namespace SubscriptionPathQuotaHelpers
-
-struct TestReadHandler_ParallelReads_TestCase_Parameters
-{
-    int ReadHandlerCapacity = -1;
-    int PathPoolCapacity    = -1;
-    int MaxFabrics          = -1;
-};
-
-static void TestReadHandler_ParallelReads_TestCase(TestContext * apContext,
-                                                   const TestReadHandler_ParallelReads_TestCase_Parameters & params,
-                                                   std::function<void()> body)
-{
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(params.ReadHandlerCapacity);
-    app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(params.MaxFabrics);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(params.PathPoolCapacity);
-
-    body();
-
-    // Clean up
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-    apContext->DrainAndServiceIO();
-
-    // Sanity check
-    EXPECT_EQ(apContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
-    app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(-1);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(-1);
-}
-
-// Needs to be larger than our plausible path pool.
-constexpr size_t sTooLargePathCount = 200;
-
-//
-// This validates the KeepSubscriptions flag by first setting up a valid subscription, then sending
-// a subsequent SubcribeRequest with empty attribute AND event paths with KeepSubscriptions = false.
-//
-// This should evict the previous subscription before sending back an error.
-//
-System::Clock::Timeout TestRead::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
-{
-    // Add 1000ms of slack to our max interval to make sure we hit the
-    // subscription liveness timer.  100ms was tried in the past and is not
-    // sufficient: our process can easily lose the timeslice for 100ms.
-    const auto & ourMrpConfig = GetDefaultMRPConfig();
-    auto publisherTransmissionTimeout =
-        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
-
-    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(1000);
-}
-
 TEST_F(TestRead, TestReadAttributeResponse)
 {
     auto sessionHandle      = mpContext->GetSessionBobToAlice();
@@ -717,1207 +421,6 @@ TEST_F(TestRead, TestReadAttributeResponse)
     EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
     EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
     EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-TEST_F(TestRead, TestReadEventResponse)
-{
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false, onDoneCbInvoked = false;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::EventHeader & eventHeader, const auto & EventResponse) {
-        // TODO: Need to add check when IM event server integration completes
-        onSuccessCbInvoked = true;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::EventHeader * eventHeader, CHIP_ERROR aError) {
-        onFailureCbInvoked = true;
-    };
-
-    auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) { onDoneCbInvoked = true; };
-
-    Controller::ReadEvent<Clusters::UnitTesting::Events::TestEvent::DecodableType>(
-        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb);
-
-    mpContext->DrainAndServiceIO();
-
-    EXPECT_FALSE(onFailureCbInvoked);
-    EXPECT_TRUE(onDoneCbInvoked);
-
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-TEST_F(TestRead, TestReadAttributeError)
-{
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-
-    responseDirective = kSendDataError;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        onSuccessCbInvoked = true;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        EXPECT_TRUE(aError.IsIMStatus() && app::StatusIB(aError).mStatus == Protocols::InteractionModel::Status::Busy);
-        onFailureCbInvoked = true;
-    };
-
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
-
-    mpContext->DrainAndServiceIO();
-
-    EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-TEST_F(TestRead, TestReadFabricScopedWithoutFabricFilter)
-{
-    /**
-     *  TODO: we cannot implement the e2e read tests w/ fabric filter since the test session has only one session, and the
-     * ReadSingleClusterData is not the one in real applications. We should be able to move some logic out of the ember library and
-     * make it possible to have more fabrics in test setup so we can have a better test coverage.
-     *
-     *  NOTE: Based on the TODO above, the test is testing two separate logics:
-     *   - When a fabric filtered read request is received, the server is able to pass the required fabric index to the response
-     * encoder.
-     *   - When a fabric filtered read request is received, the response encoder is able to encode the attribute correctly.
-     */
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        size_t len = 0;
-
-        EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
-        EXPECT_GT(len, 1u);
-
-        onSuccessCbInvoked = true;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        onFailureCbInvoked = true;
-    };
-
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
-        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
-
-    mpContext->DrainAndServiceIO();
-
-    EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-TEST_F(TestRead, TestReadFabricScopedWithFabricFilter)
-{
-    /**
-     *  TODO: we cannot implement the e2e read tests w/ fabric filter since the test session has only one session, and the
-     * ReadSingleClusterData is not the one in real applications. We should be able to move some logic out of the ember library and
-     * make it possible to have more fabrics in test setup so we can have a better test coverage.
-     *
-     *  NOTE: Based on the TODO above, the test is testing two separate logics:
-     *   - When a fabric filtered read request is received, the server is able to pass the required fabric index to the response
-     * encoder.
-     *   - When a fabric filtered read request is received, the response encoder is able to encode the attribute correctly.
-     */
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        size_t len = 0;
-
-        EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
-        EXPECT_EQ(len, 1u);
-
-        // TODO: Uncomment the following code after we have fabric support in unit tests.
-        /*
-        auto iter = dataResponse.begin();
-        if (iter.Next())
-        {
-            auto & item = iter.GetValue();
-            EXPECT_EQ(item.fabricIndex, 1);
-        }
-        */
-        onSuccessCbInvoked = true;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        onFailureCbInvoked = true;
-    };
-
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
-        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);
-
-    mpContext->DrainAndServiceIO();
-
-    EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        //
-        // We shouldn't be encountering any failures in this test.
-        //
-        EXPECT_TRUE(false);
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Try to issue parallel subscriptions that will exceed the value for app::InteractionModelEngine::kReadHandlerPoolSize.
-    // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
-    // present in that define.
-    //
-    for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
-    {
-        EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                      &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
-                      onSubscriptionEstablishedCb, nullptr, false, true),
-                  CHIP_NO_ERROR);
-    }
-
-    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
-    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
-    mpContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
-        return numSuccessCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1) &&
-            numSubscriptionEstablishedCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1);
-    });
-
-    EXPECT_EQ(numSuccessCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-    EXPECT_EQ(numSubscriptionEstablishedCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-    EXPECT_EQ(mNumActiveSubscriptions, static_cast<int32_t>(app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-}
-
-TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the application rejecting subscriptions.
-    //
-    mEmitSubscriptionError = true;
-
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                  onSubscriptionEstablishedCb, nullptr, false, true),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    EXPECT_EQ(numSuccessCalls, 0u);
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_EQ(numFailureCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mEmitSubscriptionError = false;
-}
-
-TEST_F(TestRead, TestReadHandler_MultipleSubscriptionsWithDataVersionFilter)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        //
-        // We shouldn't be encountering any failures in this test.
-        //
-        EXPECT_TRUE(false);
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Try to issue parallel subscriptions that will exceed the value for app::InteractionModelEngine::kReadHandlerPoolSize.
-    // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
-    // present in that define.
-    //
-    chip::Optional<chip::DataVersion> dataVersion(1);
-    for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
-    {
-        EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                      &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                      onSubscriptionEstablishedCb, nullptr, false, true, dataVersion),
-                  CHIP_NO_ERROR);
-    }
-
-    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
-    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
-    mpContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(30), [&]() {
-        return numSubscriptionEstablishedCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1) &&
-            numSuccessCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1);
-    });
-
-    ChipLogError(Zcl, "Success call cnt: %" PRIu32 " (expect %" PRIu32 ") subscription cnt: %" PRIu32 " (expect %" PRIu32 ")",
-                 numSuccessCalls, uint32_t(app::InteractionModelEngine::kReadHandlerPoolSize + 1), numSubscriptionEstablishedCalls,
-                 uint32_t(app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-
-    EXPECT_EQ(numSuccessCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-    EXPECT_EQ(numSubscriptionEstablishedCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-TEST_F(TestRead, TestReadHandler_MultipleReads)
-{
-    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= app::InteractionModelEngine::kReadHandlerPoolSize,
-                  "How can we have more reports in flight than read handlers?");
-
-    MultipleReadHelper(mpContext, CHIP_IM_MAX_REPORTS_IN_FLIGHT);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-}
-
-TEST_F(TestRead, TestReadHandler_OneSubscribeMultipleReads)
-{
-    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= app::InteractionModelEngine::kReadHandlerPoolSize,
-                  "How can we have more reports in flight than read handlers?");
-    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT > 1, "We won't do any reads");
-
-    SubscribeThenReadHelper(mpContext, 1, CHIP_IM_MAX_REPORTS_IN_FLIGHT - 1);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-}
-
-TEST_F(TestRead, TestReadHandler_TwoSubscribesMultipleReads)
-{
-    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= app::InteractionModelEngine::kReadHandlerPoolSize,
-                  "How can we have more reports in flight than read handlers?");
-    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT > 2, "We won't do any reads");
-
-    SubscribeThenReadHelper(mpContext, 2, CHIP_IM_MAX_REPORTS_IN_FLIGHT - 2);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-}
-
-TEST_F(TestRead, TestReadHandlerResourceExhaustion_MultipleReads)
-{
-    auto sessionHandle       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls = 0;
-    uint32_t numFailureCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-
-        EXPECT_EQ(aError, CHIP_IM_GLOBAL_STATUS(Busy));
-        EXPECT_EQ(attributePath, nullptr);
-    };
-
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(0);
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
-
-    EXPECT_EQ(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(numSuccessCalls, 0u);
-    EXPECT_EQ(numFailureCalls, 1u);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-TEST_F(TestRead, TestReadAttributeTimeout)
-{
-    auto sessionHandle      = mpContext->GetSessionBobToAlice();
-    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-
-    responseDirective = kSendDataError;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        onSuccessCbInvoked = true;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        EXPECT_EQ(aError, CHIP_ERROR_TIMEOUT);
-        onFailureCbInvoked = true;
-    };
-
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
-
-    mpContext->ExpireSessionAliceToBob();
-
-    mpContext->DrainAndServiceIO();
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 1u);
-
-    mpContext->ExpireSessionBobToAlice();
-
-    mpContext->DrainAndServiceIO();
-
-    EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
-
-    //
-    // Let's put back the sessions so that the next tests (which assume a valid initialized set of sessions)
-    // can function correctly.
-    //
-    mpContext->CreateSessionAliceToBob();
-    mpContext->CreateSessionBobToAlice();
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
-
-// Subscriber sends the request with particular max-interval value:
-// Max interval equal to client-requested min-interval.
-TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        uint16_t minInterval = 0, maxInterval = 0;
-
-        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
-
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        EXPECT_EQ(minInterval, 5);
-        EXPECT_EQ(maxInterval, 5);
-
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 5,
-                  onSubscriptionEstablishedCb, nullptr, true),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_NE(numSuccessCalls, 0u);
-    EXPECT_EQ(numFailureCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
-    EXPECT_EQ(mNumActiveSubscriptions, 1);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
-}
-
-// Subscriber sends the request with particular max-interval value:
-// Max interval greater than client-requested min-interval but lower than 60m:
-// With no server adjustment.
-TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        uint16_t minInterval = 0, maxInterval = 0;
-
-        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
-
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        EXPECT_EQ(minInterval, 0);
-        EXPECT_EQ(maxInterval, 10);
-
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                  onSubscriptionEstablishedCb, nullptr, true),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_NE(numSuccessCalls, 0u);
-    EXPECT_EQ(numFailureCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
-    EXPECT_EQ(mNumActiveSubscriptions, 1);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
-}
-
-// Subscriber sends the request with particular max-interval value:
-// Max interval greater than client-requested min-interval but lower than 60m:
-// With server adjustment to a value greater than client-requested, but less than 60m (allowed).
-TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        uint16_t minInterval = 0, maxInterval = 0;
-
-        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
-
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        EXPECT_EQ(minInterval, 0);
-        EXPECT_EQ(maxInterval, 3000);
-
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = true;
-    mMaxInterval                = 3000;
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                  onSubscriptionEstablishedCb, nullptr, true),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_NE(numSuccessCalls, 0u);
-    EXPECT_EQ(numFailureCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
-    EXPECT_EQ(mNumActiveSubscriptions, 1);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
-}
-
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
-// Subscriber sends the request with particular max-interval value:
-// Max interval greater than client-requested min-interval but lower than 60m:
-// server adjustment to a value greater than client-requested, but greater than 60 (not allowed).
-TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest4)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = true;
-    mMaxInterval                = 3700;
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                  onSubscriptionEstablishedCb, nullptr, true),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_EQ(numSuccessCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
-}
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
-
-// Subscriber sends the request with particular max-interval value:
-// Max interval greater than client-requested min-interval but greater than 60m:
-// With no server adjustment.
-TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        uint16_t minInterval = 0, maxInterval = 0;
-
-        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
-
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        EXPECT_EQ(minInterval, 0);
-        EXPECT_EQ(maxInterval, 4000);
-
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
-                  onSubscriptionEstablishedCb, nullptr, true),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_NE(numSuccessCalls, 0u);
-    EXPECT_EQ(numFailureCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
-    EXPECT_EQ(mNumActiveSubscriptions, 1);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
-}
-
-// Subscriber sends the request with particular max-interval value:
-// Max interval greater than client-requested min-interval but greater than 60m:
-// With server adjustment to a value lower than 60m. Allowed
-TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        uint16_t minInterval = 0, maxInterval = 0;
-
-        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
-
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        EXPECT_EQ(minInterval, 0);
-        EXPECT_EQ(maxInterval, 3000);
-
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = true;
-    mMaxInterval                = 3000;
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
-                  onSubscriptionEstablishedCb, nullptr, true),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_NE(numSuccessCalls, 0u);
-    EXPECT_EQ(numFailureCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
-    EXPECT_EQ(mNumActiveSubscriptions, 1);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
-}
-
-// Subscriber sends the request with particular max-interval value:
-// Max interval greater than client-requested min-interval but greater than 60m:
-// With server adjustment to a value larger than 60m, but less than max interval. Allowed
-TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        uint16_t minInterval = 0, maxInterval = 0;
-
-        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
-
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        EXPECT_EQ(minInterval, 0);
-        EXPECT_EQ(maxInterval, 3700);
-
-        numSubscriptionEstablishedCalls++;
-    };
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = true;
-    mMaxInterval                = 3700;
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
-                  onSubscriptionEstablishedCb, nullptr, true),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_NE(numSuccessCalls, 0u);
-    EXPECT_EQ(numFailureCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
-    EXPECT_EQ(mNumActiveSubscriptions, 1);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
-}
-
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
-// Subscriber sends the request with particular max-interval value:
-// Max interval greater than client-requested min-interval but greater than 60m:
-// With server adjustment to a value larger than 60m, but larger than max interval. Disallowed
-TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest8)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        numSubscriptionEstablishedCalls++;
-    };
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = true;
-    mMaxInterval                = 4100;
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
-                  onSubscriptionEstablishedCb, nullptr, true),
-              CHIP_NO_ERROR);
-
-    mpContext->DrainAndServiceIO();
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_EQ(numSuccessCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
-}
-
-// Subscriber sends the request with particular max-interval value:
-// Validate client is not requesting max-interval < min-interval.
-TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
-{
-    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
-                                                                          chip::SubscriptionId aSubscriptionId) {
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    //
-    // Test the server-side application altering the subscription intervals.
-    //
-    mAlterSubscriptionIntervals = false;
-
-    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 4,
-                  onSubscriptionEstablishedCb, nullptr, true),
-              CHIP_ERROR_INVALID_ARGUMENT);
-
-    //
-    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
-    // implementation.
-    //
-    EXPECT_EQ(numSuccessCalls, 0u);
-    EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    EXPECT_EQ(mNumActiveSubscriptions, 0);
-
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-    mAlterSubscriptionIntervals = false;
-}
-
-TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
-{
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    responseDirective = kSendDataResponse;
-
-    MockInteractionModelApp delegate;
-    chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
-
-    chip::app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    // read of E2C2A* and E3C2A2. Expect cache E2C2 version
-    {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
-
-        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
-        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
-        readPrepareParams.mAttributePathParamsListSize = 2;
-        err                                            = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        mpContext->DrainAndServiceIO();
-        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
-        EXPECT_FALSE(delegate.mReadError);
-        Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
-        EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
-        EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0));
-        Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
-        EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
-        EXPECT_FALSE(version2.HasValue());
-
-        {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
-            TLV::TLVReader reader;
-            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
-        }
-
-        {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(3));
-            TLV::TLVReader reader;
-            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
-        }
-
-        {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
-            TLV::TLVReader reader;
-            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
-        }
-        delegate.mNumAttributeResponse = 0;
-    }
-
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
     EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -2929,6 +1432,1942 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    responseDirective = kSendDataResponse;
+
+    MockInteractionModelApp delegate;
+    chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
+
+    chip::app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    // read of E2C2A* and E3C2A2. Expect cache E2C2 version
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams.mAttributePathParamsListSize = 2;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        mpContext->DrainAndServiceIO();
+        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
+        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_FALSE(delegate.mReadError);
+        Optional<DataVersion> version1;
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
+        EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
+        EXPECT_FALSE(version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
+        }
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestReadEventResponse)
+{
+    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false, onDoneCbInvoked = false;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::EventHeader & eventHeader, const auto & EventResponse) {
+        // TODO: Need to add check when IM event server integration completes
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::EventHeader * eventHeader, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
+
+    auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) { onDoneCbInvoked = true; };
+
+    Controller::ReadEvent<Clusters::UnitTesting::Events::TestEvent::DecodableType>(
+        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb);
+
+    mpContext->DrainAndServiceIO();
+
+    EXPECT_FALSE(onFailureCbInvoked);
+    EXPECT_TRUE(onDoneCbInvoked);
+
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestReadAttributeError)
+{
+    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    responseDirective = kSendDataError;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        EXPECT_TRUE(aError.IsIMStatus() && app::StatusIB(aError).mStatus == Protocols::InteractionModel::Status::Busy);
+        onFailureCbInvoked = true;
+    };
+
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+
+    mpContext->DrainAndServiceIO();
+
+    EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestReadAttributeTimeout)
+{
+    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    responseDirective = kSendDataError;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        EXPECT_EQ(aError, CHIP_ERROR_TIMEOUT);
+        onFailureCbInvoked = true;
+    };
+
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+
+    mpContext->ExpireSessionAliceToBob();
+
+    mpContext->DrainAndServiceIO();
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 1u);
+
+    mpContext->ExpireSessionBobToAlice();
+
+    mpContext->DrainAndServiceIO();
+
+    EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+
+    //
+    // Let's put back the sessions so that the next tests (which assume a valid initialized set of sessions)
+    // can function correctly.
+    //
+    mpContext->CreateSessionAliceToBob();
+    mpContext->CreateSessionBobToAlice();
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+class TestResubscriptionCallback : public app::ReadClient::Callback
+{
+public:
+    TestResubscriptionCallback() {}
+
+    void SetReadClient(app::ReadClient * apReadClient) { mpReadClient = apReadClient; }
+
+    void OnDone(app::ReadClient *) override { mOnDone++; }
+
+    void OnError(CHIP_ERROR aError) override
+    {
+        mOnError++;
+        mLastError = aError;
+    }
+
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
+
+    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        mOnResubscriptionsAttempted++;
+        mLastError = aTerminationCause;
+        if (aTerminationCause == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT && !mScheduleLITResubscribeImmediately)
+        {
+            return CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
+        }
+        return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional, false);
+    }
+
+    void ClearCounters()
+    {
+        mOnSubscriptionEstablishedCount = 0;
+        mOnDone                         = 0;
+        mOnError                        = 0;
+        mOnResubscriptionsAttempted     = 0;
+        mLastError                      = CHIP_NO_ERROR;
+    }
+
+    int32_t mAttributeCount                 = 0;
+    int32_t mOnReportEnd                    = 0;
+    int32_t mOnSubscriptionEstablishedCount = 0;
+    int32_t mOnResubscriptionsAttempted     = 0;
+    int32_t mOnDone                         = 0;
+    int32_t mOnError                        = 0;
+    CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
+    bool mScheduleLITResubscribeImmediately = false;
+    app::ReadClient * mpReadClient          = nullptr;
+};
+
+//
+// This validates the re-subscription logic within ReadClient. This achieves it by overriding the timeout for the liveness
+// timer within ReadClient to be a smaller value than the nominal max interval of the subscription. This causes the
+// subscription to fail on the client side, triggering re-subscription.
+//
+// TODO: This does not validate the CASE establishment pathways since we're limited by the PASE-centric TestContext.
+//
+//
+TEST_F(TestRead, TestResubscribeAttributeTimeout)
+{
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        callback.SetReadClient(&readClient);
+
+        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        //
+        // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
+        //
+        //
+        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                               [&]() { return callback.mOnResubscriptionsAttempted > 0; });
+
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        mpContext->GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+//
+// This validates a vanilla subscription with re-susbcription disabled timing out correctly on the client
+// side and triggering the OnError callback with the right error code.
+//
+TEST_F(TestRead, TestSubscribeAttributeTimeout)
+{
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        callback.SetReadClient(&readClient);
+
+        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
+
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        //
+        // Request a max interval that's very small to reduce time to discovering a liveness failure.
+        //
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+
+        auto err = readClient.SendRequest(readPrepareParams);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // Request we drop all further messages.
+        //
+        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+
+        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        //
+        // Drive IO until we get an error on the subscription, which should be caused
+        // by the liveness timer firing once we hit our max-interval plus
+        // retransmit timeouts.
+        //
+        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                               [&]() { return callback.mOnError >= 1; });
+
+        EXPECT_EQ(callback.mOnError, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+        EXPECT_EQ(callback.mOnDone, 1);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+    }
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+    mpContext->GetLoopback().mNumMessagesToDrop = 0;
+}
+
+TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        //
+        // We shouldn't be encountering any failures in this test.
+        //
+        EXPECT_TRUE(false);
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Try to issue parallel subscriptions that will exceed the value for app::InteractionModelEngine::kReadHandlerPoolSize.
+    // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
+    // present in that define.
+    //
+    for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
+    {
+        EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                      &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
+                      onSubscriptionEstablishedCb, nullptr, false, true),
+                  CHIP_NO_ERROR);
+    }
+
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    mpContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
+        return numSuccessCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1) &&
+            numSubscriptionEstablishedCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1);
+    });
+
+    EXPECT_EQ(numSuccessCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(numSubscriptionEstablishedCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(mNumActiveSubscriptions, static_cast<int32_t>(app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+}
+
+TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the application rejecting subscriptions.
+    //
+    mEmitSubscriptionError = true;
+
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                  onSubscriptionEstablishedCb, nullptr, false, true),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    EXPECT_EQ(numSuccessCalls, 0u);
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_EQ(numFailureCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mEmitSubscriptionError = false;
+}
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
+
+// Subscriber sends the request with particular max-interval value:
+// Max interval equal to client-requested min-interval.
+TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
+
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        EXPECT_EQ(minInterval, 5);
+        EXPECT_EQ(maxInterval, 5);
+
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    mAlterSubscriptionIntervals = false;
+
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 5,
+                  onSubscriptionEstablishedCb, nullptr, true),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_NE(numSuccessCalls, 0u);
+    EXPECT_EQ(numFailureCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
+    EXPECT_EQ(mNumActiveSubscriptions, 1);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mAlterSubscriptionIntervals = false;
+}
+
+// Subscriber sends the request with particular max-interval value:
+// Max interval greater than client-requested min-interval but lower than 60m:
+// With no server adjustment.
+TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
+
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 10);
+
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    mAlterSubscriptionIntervals = false;
+
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                  onSubscriptionEstablishedCb, nullptr, true),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_NE(numSuccessCalls, 0u);
+    EXPECT_EQ(numFailureCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
+    EXPECT_EQ(mNumActiveSubscriptions, 1);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mAlterSubscriptionIntervals = false;
+}
+
+// Subscriber sends the request with particular max-interval value:
+// Max interval greater than client-requested min-interval but lower than 60m:
+// With server adjustment to a value greater than client-requested, but less than 60m (allowed).
+TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
+
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 3000);
+
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    mAlterSubscriptionIntervals = true;
+    mMaxInterval                = 3000;
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                  onSubscriptionEstablishedCb, nullptr, true),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_NE(numSuccessCalls, 0u);
+    EXPECT_EQ(numFailureCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
+    EXPECT_EQ(mNumActiveSubscriptions, 1);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mAlterSubscriptionIntervals = false;
+}
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+// Subscriber sends the request with particular max-interval value:
+// Max interval greater than client-requested min-interval but lower than 60m:
+// server adjustment to a value greater than client-requested, but greater than 60 (not allowed).
+TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest4)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    mAlterSubscriptionIntervals = true;
+    mMaxInterval                = 3700;
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                  onSubscriptionEstablishedCb, nullptr, true),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_EQ(numSuccessCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mAlterSubscriptionIntervals = false;
+}
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
+
+// Subscriber sends the request with particular max-interval value:
+// Max interval greater than client-requested min-interval but greater than 60m:
+// With no server adjustment.
+TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
+
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 4000);
+
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    mAlterSubscriptionIntervals = false;
+
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
+                  onSubscriptionEstablishedCb, nullptr, true),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_NE(numSuccessCalls, 0u);
+    EXPECT_EQ(numFailureCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
+    EXPECT_EQ(mNumActiveSubscriptions, 1);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mAlterSubscriptionIntervals = false;
+}
+
+// Subscriber sends the request with particular max-interval value:
+// Max interval greater than client-requested min-interval but greater than 60m:
+// With server adjustment to a value lower than 60m. Allowed
+TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
+
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 3000);
+
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    mAlterSubscriptionIntervals = true;
+    mMaxInterval                = 3000;
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
+                  onSubscriptionEstablishedCb, nullptr, true),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_NE(numSuccessCalls, 0u);
+    EXPECT_EQ(numFailureCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
+    EXPECT_EQ(mNumActiveSubscriptions, 1);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mAlterSubscriptionIntervals = false;
+}
+
+// Subscriber sends the request with particular max-interval value:
+// Max interval greater than client-requested min-interval but greater than 60m:
+// With server adjustment to a value larger than 60m, but less than max interval. Allowed
+TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
+
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 3700);
+
+        numSubscriptionEstablishedCalls++;
+    };
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    mAlterSubscriptionIntervals = true;
+    mMaxInterval                = 3700;
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
+                  onSubscriptionEstablishedCb, nullptr, true),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_NE(numSuccessCalls, 0u);
+    EXPECT_EQ(numFailureCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
+    EXPECT_EQ(mNumActiveSubscriptions, 1);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mAlterSubscriptionIntervals = false;
+}
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+// Subscriber sends the request with particular max-interval value:
+// Max interval greater than client-requested min-interval but greater than 60m:
+// With server adjustment to a value larger than 60m, but larger than max interval. Disallowed
+TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest8)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+    };
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    mAlterSubscriptionIntervals = true;
+    mMaxInterval                = 4100;
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 4000,
+                  onSubscriptionEstablishedCb, nullptr, true),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_EQ(numSuccessCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mAlterSubscriptionIntervals = false;
+}
+
+// Subscriber sends the request with particular max-interval value:
+// Validate client is not requesting max-interval < min-interval.
+TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    //
+    // Test the server-side application altering the subscription intervals.
+    //
+    mAlterSubscriptionIntervals = false;
+
+    EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 5, 4,
+                  onSubscriptionEstablishedCb, nullptr, true),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    //
+    // Failures won't get routed to us here since re-subscriptions are enabled by default in the Controller::SubscribeAttribute
+    // implementation.
+    //
+    EXPECT_EQ(numSuccessCalls, 0u);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
+    mAlterSubscriptionIntervals = false;
+}
+
+/**
+ * When the liveness timeout of a subscription to ICD is reached, the subscription will enter "InactiveICDSubscription" state, the
+ * client should call "OnActiveModeNotification" to re-activate it again when the check-in message is received from the ICD.
+ */
+TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
+{
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        callback.mScheduleLITResubscribeImmediately = false;
+        callback.SetReadClient(&readClient);
+
+        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mIsPeerLIT                 = true;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        //
+        // Disable packet transmission, and drive IO till timeout.
+        // We won't actually request resubscription, since the device is not active, the resubscription will be deferred until
+        // WakeUp() is called.
+        //
+        //
+        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                               [&]() { return false; });
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
+
+        mpContext->GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+        app::InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+/**
+ * When the liveness timeout of a subscription to ICD is reached, the subscription will enter "InactiveICDSubscription" state, the
+ * client should call "OnActiveModeNotification" to re-activate it again when the check-in message is received from the ICD.
+ */
+TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
+{
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        responseDirective                           = kSendDataResponse;
+        callback.mScheduleLITResubscribeImmediately = false;
+        callback.SetReadClient(&readClient);
+        isLitIcd = false;
+
+        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kRootEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::IcdManagement::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::IcdManagement::Attributes::OperatingMode::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mIsPeerLIT                 = true;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        // Part 1. LIT -> SIT
+
+        //
+        // Disable packet transmission, and drive IO till timeout.
+        // We won't actually request resubscription, since the device is not active, the resubscription will be deferred until
+        // WakeUp() is called.
+        //
+        // Even if we set the peer type to LIT before, the report indicates that the peer is a SIT now, it will just bahve as
+        // normal, non-LIT subscriptions.
+        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                               [&]() { return callback.mOnResubscriptionsAttempted != 0; });
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        mpContext->GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+
+        // Part 2. SIT -> LIT
+
+        isLitIcd = true;
+        {
+            app::AttributePathParams path;
+            path.mEndpointId  = kRootEndpointId;
+            path.mClusterId   = Clusters::IcdManagement::Id;
+            path.mAttributeId = Clusters::IcdManagement::Attributes::OperatingMode::Id;
+            app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        }
+        callback.ClearCounters();
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
+            return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0;
+        });
+
+        // When we received the update that OperatingMode becomes LIT, we automatically set the inner peer type to LIT ICD.
+        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                               [&]() { return false; });
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
+
+        mpContext->GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+    }
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    isLitIcd = false;
+}
+
+/**
+ * When the liveness timeout of a subscription to ICD is reached, the app can issue resubscription immediately
+ * if they know the peer is active.
+ */
+TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
+{
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        callback.mScheduleLITResubscribeImmediately = true;
+        callback.SetReadClient(&readClient);
+
+        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mIsPeerLIT                 = true;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        //
+        // Disable packet transmission, and drive IO till timeout.
+        // We won't actually request resubscription, since the device is not active, the resubscription will be deferred until
+        // WakeUp() is called.
+        //
+        //
+        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                               [&]() { return callback.mLastError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT; });
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
+
+        mpContext->GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestReadHandler_MultipleReads)
+{
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= app::InteractionModelEngine::kReadHandlerPoolSize,
+                  "How can we have more reports in flight than read handlers?");
+
+    MultipleReadHelper(mpContext, CHIP_IM_MAX_REPORTS_IN_FLIGHT);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+}
+
+TEST_F(TestRead, TestReadHandler_OneSubscribeMultipleReads)
+{
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= app::InteractionModelEngine::kReadHandlerPoolSize,
+                  "How can we have more reports in flight than read handlers?");
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT > 1, "We won't do any reads");
+
+    SubscribeThenReadHelper(mpContext, 1, CHIP_IM_MAX_REPORTS_IN_FLIGHT - 1);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+}
+
+TEST_F(TestRead, TestReadHandler_TwoSubscribesMultipleReads)
+{
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= app::InteractionModelEngine::kReadHandlerPoolSize,
+                  "How can we have more reports in flight than read handlers?");
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT > 2, "We won't do any reads");
+
+    SubscribeThenReadHelper(mpContext, 2, CHIP_IM_MAX_REPORTS_IN_FLIGHT - 2);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+}
+
+void TestRead::SubscribeThenReadHelper(TestContext * apCtx, size_t aSubscribeCount, size_t aReadCount)
+{
+    auto sessionHandle                       = apCtx->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    uint32_t numReadSuccessCalls = 0;
+    uint32_t numReadFailureCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        //
+        // We shouldn't be encountering any failures in this test.
+        //
+        EXPECT_TRUE(false);
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apCtx, aSubscribeCount, aReadCount, &numReadSuccessCalls,
+                                        &numReadFailureCalls](const app::ReadClient & readClient,
+                                                              chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+        if (numSubscriptionEstablishedCalls == aSubscribeCount)
+        {
+            MultipleReadHelperInternal(apCtx, aReadCount, numReadSuccessCalls, numReadFailureCalls);
+        }
+    };
+
+    for (size_t i = 0; i < aSubscribeCount; ++i)
+    {
+        EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                      &apCtx->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                      onSubscriptionEstablishedCb, nullptr, false, true),
+                  CHIP_NO_ERROR);
+    }
+
+    apCtx->DrainAndServiceIO();
+
+    EXPECT_EQ(numSuccessCalls, aSubscribeCount);
+    EXPECT_EQ(numSubscriptionEstablishedCalls, aSubscribeCount);
+    EXPECT_EQ(numReadSuccessCalls, aReadCount);
+    EXPECT_EQ(numReadFailureCalls, 0u);
+}
+
+// The guts of MultipleReadHelper which take references to the success/failure
+// counts to modify and assume the consumer will be spinning the event loop.
+void TestRead::MultipleReadHelperInternal(TestContext * apCtx, size_t aReadCount, uint32_t & aNumSuccessCalls,
+                                          uint32_t & aNumFailureCalls)
+{
+    EXPECT_EQ(aNumSuccessCalls, 0u);
+    EXPECT_EQ(aNumFailureCalls, 0u);
+
+    auto sessionHandle = apCtx->GetSessionBobToAlice();
+
+    responseDirective = kSendDataResponse;
+
+    uint16_t firstExpectedResponse = totalReadCount + 1;
+
+    auto onFailureCb = [&aNumFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        aNumFailureCalls++;
+
+        EXPECT_EQ(attributePath, nullptr);
+    };
+
+    for (size_t i = 0; i < aReadCount; ++i)
+    {
+        auto onSuccessCb = [&aNumSuccessCalls, firstExpectedResponse, i](const app::ConcreteDataAttributePath & attributePath,
+                                                                         const auto & dataResponse) {
+            EXPECT_EQ(dataResponse, firstExpectedResponse + i);
+            aNumSuccessCalls++;
+        };
+
+        EXPECT_EQ(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Int16u::TypeInfo>(
+                      &apCtx->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb),
+                  CHIP_NO_ERROR);
+    }
+}
+
+void TestRead::MultipleReadHelper(TestContext * apCtx, size_t aReadCount)
+{
+    uint32_t numSuccessCalls = 0;
+    uint32_t numFailureCalls = 0;
+
+    MultipleReadHelperInternal(apCtx, aReadCount, numSuccessCalls, numFailureCalls);
+
+    apCtx->DrainAndServiceIO();
+
+    EXPECT_EQ(numSuccessCalls, aReadCount);
+    EXPECT_EQ(numFailureCalls, 0u);
+}
+
+TEST_F(TestRead, TestReadHandler_MultipleSubscriptionsWithDataVersionFilter)
+{
+    auto sessionHandle                       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        //
+        // We shouldn't be encountering any failures in this test.
+        //
+        EXPECT_TRUE(false);
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Try to issue parallel subscriptions that will exceed the value for app::InteractionModelEngine::kReadHandlerPoolSize.
+    // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
+    // present in that define.
+    //
+    chip::Optional<chip::DataVersion> dataVersion(1);
+    for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
+    {
+        EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                      &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                      onSubscriptionEstablishedCb, nullptr, false, true, dataVersion),
+                  CHIP_NO_ERROR);
+    }
+
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    mpContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(30), [&]() {
+        return numSubscriptionEstablishedCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1) &&
+            numSuccessCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1);
+    });
+
+    ChipLogError(Zcl, "Success call cnt: %" PRIu32 " (expect %" PRIu32 ") subscription cnt: %" PRIu32 " (expect %" PRIu32 ")",
+                 numSuccessCalls, uint32_t(app::InteractionModelEngine::kReadHandlerPoolSize + 1), numSubscriptionEstablishedCalls,
+                 uint32_t(app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+
+    EXPECT_EQ(numSuccessCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(numSubscriptionEstablishedCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestReadHandlerResourceExhaustion_MultipleReads)
+{
+    auto sessionHandle       = mpContext->GetSessionBobToAlice();
+    uint32_t numSuccessCalls = 0;
+    uint32_t numFailureCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        numFailureCalls++;
+
+        EXPECT_EQ(aError, CHIP_IM_GLOBAL_STATUS(Busy));
+        EXPECT_EQ(attributePath, nullptr);
+    };
+
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(0);
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+
+    EXPECT_EQ(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                  &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb),
+              CHIP_NO_ERROR);
+
+    mpContext->DrainAndServiceIO();
+
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    EXPECT_EQ(numSuccessCalls, 0u);
+    EXPECT_EQ(numFailureCalls, 1u);
+
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestReadFabricScopedWithoutFabricFilter)
+{
+    /**
+     *  TODO: we cannot implement the e2e read tests w/ fabric filter since the test session has only one session, and the
+     * ReadSingleClusterData is not the one in real applications. We should be able to move some logic out of the ember library and
+     * make it possible to have more fabrics in test setup so we can have a better test coverage.
+     *
+     *  NOTE: Based on the TODO above, the test is testing two separate logics:
+     *   - When a fabric filtered read request is received, the server is able to pass the required fabric index to the response
+     * encoder.
+     *   - When a fabric filtered read request is received, the response encoder is able to encode the attribute correctly.
+     */
+    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        size_t len = 0;
+
+        EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
+        EXPECT_GT(len, 1u);
+
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
+
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
+
+    mpContext->DrainAndServiceIO();
+
+    EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestReadFabricScopedWithFabricFilter)
+{
+    /**
+     *  TODO: we cannot implement the e2e read tests w/ fabric filter since the test session has only one session, and the
+     * ReadSingleClusterData is not the one in real applications. We should be able to move some logic out of the ember library and
+     * make it possible to have more fabrics in test setup so we can have a better test coverage.
+     *
+     *  NOTE: Based on the TODO above, the test is testing two separate logics:
+     *   - When a fabric filtered read request is received, the server is able to pass the required fabric index to the response
+     * encoder.
+     *   - When a fabric filtered read request is received, the response encoder is able to encode the attribute correctly.
+     */
+    auto sessionHandle      = mpContext->GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        size_t len = 0;
+
+        EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
+        EXPECT_EQ(len, 1u);
+
+        // TODO: Uncomment the following code after we have fabric support in unit tests.
+        /*
+        auto iter = dataResponse.begin();
+        if (iter.Next())
+        {
+            auto & item = iter.GetValue();
+            EXPECT_EQ(item.fabricIndex, 1);
+        }
+        */
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        onFailureCbInvoked = true;
+    };
+
+    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        &mpContext->GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);
+
+    mpContext->DrainAndServiceIO();
+
+    EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+namespace SubscriptionPathQuotaHelpers {
+class TestReadCallback : public app::ReadClient::Callback
+{
+public:
+    TestReadCallback() {}
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override
+    {
+        if (apData != nullptr)
+        {
+            mAttributeCount++;
+        }
+    }
+
+    void OnDone(app::ReadClient *) override { mOnDone++; }
+
+    void OnReportEnd() override { mOnReportEnd++; }
+
+    void OnError(CHIP_ERROR aError) override
+    {
+        mOnError++;
+        mLastError = aError;
+    }
+
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
+
+    void ClearCounters()
+    {
+        mAttributeCount                 = 0;
+        mOnReportEnd                    = 0;
+        mOnSubscriptionEstablishedCount = 0;
+        mOnDone                         = 0;
+        mOnError                        = 0;
+        mLastError                      = CHIP_NO_ERROR;
+    }
+
+    uint32_t mAttributeCount                 = 0;
+    uint32_t mOnReportEnd                    = 0;
+    uint32_t mOnSubscriptionEstablishedCount = 0;
+    uint32_t mOnDone                         = 0;
+    uint32_t mOnError                        = 0;
+    CHIP_ERROR mLastError                    = CHIP_NO_ERROR;
+};
+
+class TestPerpetualListReadCallback : public app::ReadClient::Callback
+{
+public:
+    TestPerpetualListReadCallback() {}
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override
+    {
+        if (apData != nullptr)
+        {
+            reportsReceived++;
+            app::AttributePathParams path;
+            path.mEndpointId  = aPath.mEndpointId;
+            path.mClusterId   = aPath.mClusterId;
+            path.mAttributeId = aPath.mAttributeId;
+            app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        }
+    }
+
+    void OnDone(chip::app::ReadClient *) override {}
+
+    void ClearCounter() { reportsReceived = 0; }
+
+    int32_t reportsReceived = 0;
+};
+
+void EstablishReadOrSubscriptions(const SessionHandle & sessionHandle, size_t numSubs, size_t pathPerSub,
+                                  app::AttributePathParams path, app::ReadClient::InteractionType type,
+                                  app::ReadClient::Callback * callback, std::vector<std::unique_ptr<app::ReadClient>> & readClients)
+{
+    std::vector<app::AttributePathParams> attributePaths(pathPerSub, path);
+
+    app::ReadPrepareParams readParams(sessionHandle);
+    readParams.mpAttributePathParamsList    = attributePaths.data();
+    readParams.mAttributePathParamsListSize = pathPerSub;
+    if (type == app::ReadClient::InteractionType::Subscribe)
+    {
+        readParams.mMaxIntervalCeilingSeconds = 1;
+        readParams.mKeepSubscriptions         = true;
+    }
+
+    for (uint32_t i = 0; i < numSubs; i++)
+    {
+        std::unique_ptr<app::ReadClient> readClient =
+            std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
+                                              app::InteractionModelEngine::GetInstance()->GetExchangeManager(), *callback, type);
+        EXPECT_EQ(readClient->SendRequest(readParams), CHIP_NO_ERROR);
+        readClients.push_back(std::move(readClient));
+    }
+}
+
+} // namespace SubscriptionPathQuotaHelpers
+
+TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
+{
+    auto sessionHandle = mpContext->GetSessionBobToAlice();
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        SubscriptionPathQuotaHelpers::TestReadCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
+
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
+
+        //
+        // Request a max interval that's very small to reduce time to discovering a liveness failure.
+        //
+        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+
+        auto err = readClient.SendRequest(readPrepareParams);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        mpContext->DrainAndServiceIO();
+
+        EXPECT_EQ(callback.mOnError, 1u);
+        EXPECT_EQ(callback.mLastError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
+        EXPECT_EQ(callback.mOnDone, 1u);
+    }
+
+    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
 {
     // Note: We cannot use mpContext->DrainAndServiceIO() since the perpetual read will make DrainAndServiceIO never return.
@@ -3228,6 +3667,37 @@ TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
     app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(-1);
     app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
+}
+
+struct TestReadHandler_ParallelReads_TestCase_Parameters
+{
+    int ReadHandlerCapacity = -1;
+    int PathPoolCapacity    = -1;
+    int MaxFabrics          = -1;
+};
+
+static void TestReadHandler_ParallelReads_TestCase(TestContext * apContext,
+                                                   const TestReadHandler_ParallelReads_TestCase_Parameters & params,
+                                                   std::function<void()> body)
+{
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(params.ReadHandlerCapacity);
+    app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(params.MaxFabrics);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(params.PathPoolCapacity);
+
+    body();
+
+    // Clean up
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    apContext->DrainAndServiceIO();
+
+    // Sanity check
+    EXPECT_EQ(apContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
+    app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(-1);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(-1);
 }
 
 TEST_F(TestRead, TestReadHandler_ParallelReads)
@@ -4172,6 +4642,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(-1);
 }
 
+// Needs to be larger than our plausible path pool.
+constexpr size_t sTooLargePathCount = 200;
+
 TEST_F(TestRead, TestReadHandler_TooManyPaths)
 {
     using namespace chip::app;
@@ -4371,207 +4844,12 @@ TEST_F(TestRead, TestReadAttribute_ManyErrors)
     EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
-{
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
-
-    {
-        SubscriptionPathQuotaHelpers::TestReadCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
-
-        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
-
-        app::AttributePathParams attributePathParams[1];
-        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
-
-        //
-        // Request a max interval that's very small to reduce time to discovering a liveness failure.
-        //
-        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
-
-        auto err = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        mpContext->DrainAndServiceIO();
-
-        EXPECT_EQ(callback.mOnError, 1u);
-        EXPECT_EQ(callback.mLastError, CHIP_IM_GLOBAL_STATUS(InvalidAction));
-        EXPECT_EQ(callback.mOnDone, 1u);
-    }
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
 //
-// This validates the re-subscription logic within ReadClient. This achieves it by overriding the timeout for the liveness
-// timer within ReadClient to be a smaller value than the nominal max interval of the subscription. This causes the
-// subscription to fail on the client side, triggering re-subscription.
+// This validates the KeepSubscriptions flag by first setting up a valid subscription, then sending
+// a subsequent SubcribeRequest with empty attribute AND event paths with KeepSubscriptions = false.
 //
-// TODO: This does not validate the CASE establishment pathways since we're limited by the PASE-centric TestContext.
+// This should evict the previous subscription before sending back an error.
 //
-//
-TEST_F(TestRead, TestResubscribeAttributeTimeout)
-{
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
-
-    {
-        TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
-
-        callback.SetReadClient(&readClient);
-
-        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
-
-        // Read full wildcard paths, repeat twice to ensure chunking.
-        app::AttributePathParams attributePathParams[1];
-        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-        attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
-
-        constexpr uint16_t maxIntervalCeilingSeconds = 1;
-
-        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        //
-        // Drive servicing IO till we have established a subscription.
-        //
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
-        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
-        EXPECT_EQ(callback.mOnError, 0);
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
-
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
-
-        uint16_t minInterval;
-        uint16_t maxInterval;
-        readHandler->GetReportingIntervals(minInterval, maxInterval);
-
-        //
-        // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
-        //
-        //
-        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return callback.mOnResubscriptionsAttempted > 0; });
-
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
-        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
-
-        mpContext->GetLoopback().mNumMessagesToDrop = 0;
-        callback.ClearCounters();
-
-        //
-        // Drive servicing IO till we have established a subscription.
-        //
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
-        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
-
-        //
-        // With re-sub enabled, we shouldn't have encountered any errors
-        //
-        EXPECT_EQ(callback.mOnError, 0);
-        EXPECT_EQ(callback.mOnDone, 0);
-    }
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-//
-// This validates a vanilla subscription with re-susbcription disabled timing out correctly on the client
-// side and triggering the OnError callback with the right error code.
-//
-TEST_F(TestRead, TestSubscribeAttributeTimeout)
-{
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
-
-    {
-        TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
-
-        callback.SetReadClient(&readClient);
-
-        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
-
-        app::AttributePathParams attributePathParams[1];
-        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-        attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
-
-        //
-        // Request a max interval that's very small to reduce time to discovering a liveness failure.
-        //
-        constexpr uint16_t maxIntervalCeilingSeconds = 1;
-        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
-
-        auto err = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        //
-        // Drive servicing IO till we have established a subscription.
-        //
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
-        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
-
-        //
-        // Request we drop all further messages.
-        //
-        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
-
-        uint16_t minInterval;
-        uint16_t maxInterval;
-        readHandler->GetReportingIntervals(minInterval, maxInterval);
-
-        //
-        // Drive IO until we get an error on the subscription, which should be caused
-        // by the liveness timer firing once we hit our max-interval plus
-        // retransmit timeouts.
-        //
-        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return callback.mOnError >= 1; });
-
-        EXPECT_EQ(callback.mOnError, 1);
-        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
-        EXPECT_EQ(callback.mOnDone, 1);
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
-    }
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-    mpContext->GetLoopback().mNumMessagesToDrop = 0;
-}
-
 TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
 {
     using namespace SubscriptionPathQuotaHelpers;
@@ -4610,295 +4888,17 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
     mpContext->DrainAndServiceIO();
 }
 
-/**
- * When the liveness timeout of a subscription to ICD is reached, the subscription will enter "InactiveICDSubscription" state, the
- * client should call "OnActiveModeNotification" to re-activate it again when the check-in message is received from the ICD.
- */
-TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
+System::Clock::Timeout TestRead::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
 {
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
+    // Add 1000ms of slack to our max interval to make sure we hit the
+    // subscription liveness timer.  100ms was tried in the past and is not
+    // sufficient: our process can easily lose the timeslice for 100ms.
+    const auto & ourMrpConfig = GetDefaultMRPConfig();
+    auto publisherTransmissionTimeout =
+        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
+                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
 
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
-
-    {
-        TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
-
-        callback.mScheduleLITResubscribeImmediately = false;
-        callback.SetReadClient(&readClient);
-
-        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
-
-        // Read full wildcard paths, repeat twice to ensure chunking.
-        app::AttributePathParams attributePathParams[1];
-        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-        attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
-
-        constexpr uint16_t maxIntervalCeilingSeconds = 1;
-
-        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
-        readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        //
-        // Drive servicing IO till we have established a subscription.
-        //
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
-        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
-        EXPECT_EQ(callback.mOnError, 0);
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
-
-        uint16_t minInterval;
-        uint16_t maxInterval;
-        readHandler->GetReportingIntervals(minInterval, maxInterval);
-
-        //
-        // Disable packet transmission, and drive IO till timeout.
-        // We won't actually request resubscription, since the device is not active, the resubscription will be deferred until
-        // WakeUp() is called.
-        //
-        //
-        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return false; });
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
-        EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
-
-        mpContext->GetLoopback().mNumMessagesToDrop = 0;
-        callback.ClearCounters();
-        app::InteractionModelEngine::GetInstance()->OnActiveModeNotification(
-            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
-        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
-
-        //
-        // Drive servicing IO till we have established a subscription.
-        //
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
-        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
-
-        //
-        // With re-sub enabled, we shouldn't have encountered any errors
-        //
-        EXPECT_EQ(callback.mOnError, 0);
-        EXPECT_EQ(callback.mOnDone, 0);
-    }
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-/**
- * When the liveness timeout of a subscription to ICD is reached, the app can issue resubscription immediately
- * if they know the peer is active.
- */
-TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
-{
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
-
-    {
-        TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
-
-        callback.mScheduleLITResubscribeImmediately = true;
-        callback.SetReadClient(&readClient);
-
-        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
-
-        // Read full wildcard paths, repeat twice to ensure chunking.
-        app::AttributePathParams attributePathParams[1];
-        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-        attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
-
-        constexpr uint16_t maxIntervalCeilingSeconds = 1;
-
-        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
-        readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        //
-        // Drive servicing IO till we have established a subscription.
-        //
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
-        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
-        EXPECT_EQ(callback.mOnError, 0);
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
-
-        uint16_t minInterval;
-        uint16_t maxInterval;
-        readHandler->GetReportingIntervals(minInterval, maxInterval);
-
-        //
-        // Disable packet transmission, and drive IO till timeout.
-        // We won't actually request resubscription, since the device is not active, the resubscription will be deferred until
-        // WakeUp() is called.
-        //
-        //
-        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return callback.mLastError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT; });
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
-        EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
-
-        mpContext->GetLoopback().mNumMessagesToDrop = 0;
-        callback.ClearCounters();
-
-        //
-        // Drive servicing IO till we have established a subscription.
-        //
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
-        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
-
-        //
-        // With re-sub enabled, we shouldn't have encountered any errors
-        //
-        EXPECT_EQ(callback.mOnError, 0);
-        EXPECT_EQ(callback.mOnDone, 0);
-    }
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-/**
- * When the liveness timeout of a subscription to ICD is reached, the subscription will enter "InactiveICDSubscription" state, the
- * client should call "OnActiveModeNotification" to re-activate it again when the check-in message is received from the ICD.
- */
-TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
-{
-    auto sessionHandle = mpContext->GetSessionBobToAlice();
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
-
-    {
-        TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
-
-        responseDirective                           = kSendDataResponse;
-        callback.mScheduleLITResubscribeImmediately = false;
-        callback.SetReadClient(&readClient);
-        isLitIcd = false;
-
-        app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
-
-        // Read full wildcard paths, repeat twice to ensure chunking.
-        app::AttributePathParams attributePathParams[1];
-        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
-        attributePathParams[0].mEndpointId             = kRootEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::IcdManagement::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::IcdManagement::Attributes::OperatingMode::Id;
-
-        constexpr uint16_t maxIntervalCeilingSeconds = 1;
-
-        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
-        readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        //
-        // Drive servicing IO till we have established a subscription.
-        //
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
-        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
-        EXPECT_EQ(callback.mOnError, 0);
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
-
-        uint16_t minInterval;
-        uint16_t maxInterval;
-        readHandler->GetReportingIntervals(minInterval, maxInterval);
-
-        // Part 1. LIT -> SIT
-
-        //
-        // Disable packet transmission, and drive IO till timeout.
-        // We won't actually request resubscription, since the device is not active, the resubscription will be deferred until
-        // WakeUp() is called.
-        //
-        // Even if we set the peer type to LIT before, the report indicates that the peer is a SIT now, it will just bahve as
-        // normal, non-LIT subscriptions.
-        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return callback.mOnResubscriptionsAttempted != 0; });
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
-        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
-
-        mpContext->GetLoopback().mNumMessagesToDrop = 0;
-        callback.ClearCounters();
-
-        //
-        // Drive servicing IO till we have established a subscription.
-        //
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
-                                               [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
-        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
-
-        //
-        // With re-sub enabled, we shouldn't have encountered any errors
-        //
-        EXPECT_EQ(callback.mOnError, 0);
-        EXPECT_EQ(callback.mOnDone, 0);
-
-        // Part 2. SIT -> LIT
-
-        isLitIcd = true;
-        {
-            app::AttributePathParams path;
-            path.mEndpointId  = kRootEndpointId;
-            path.mClusterId   = Clusters::IcdManagement::Id;
-            path.mAttributeId = Clusters::IcdManagement::Attributes::OperatingMode::Id;
-            app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
-        }
-        callback.ClearCounters();
-        mpContext->GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
-            return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0;
-        });
-
-        // When we received the update that OperatingMode becomes LIT, we automatically set the inner peer type to LIT ICD.
-        mpContext->GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        mpContext->GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
-                                               [&]() { return false; });
-        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
-        EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
-
-        mpContext->GetLoopback().mNumMessagesToDrop = 0;
-        callback.ClearCounters();
-    }
-
-    mpContext->SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
-
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-
-    isLitIcd = false;
+    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(1000);
 }
 
 } // namespace
