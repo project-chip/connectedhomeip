@@ -19,8 +19,6 @@
 
 #include <app/ReadHandler.h>
 
-using namespace chip::app;
-
 namespace chip {
 namespace Test {
 
@@ -31,8 +29,9 @@ namespace Test {
  */
 class ReadHandlerTestAccess
 {
+
 public:
-    ReadHandlerTestAccess(ReadHandler * aReadHandler) : pReadHandler(aReadHandler) {}
+    ReadHandlerTestAccess(chip::app::ReadHandler * aReadHandler) : pReadHandler(aReadHandler) {}
 
     void OnInitialRequest(System::PacketBufferHandle && aPayload)
     {
@@ -41,10 +40,10 @@ public:
             pReadHandler->OnInitialRequest(std::move(aPayload));
         }
     }
-    ReadHandler * GetReadHandler() { return pReadHandler; }
+    chip::app::ReadHandler * GetReadHandler() { return pReadHandler; }
 
 private:
-    ReadHandler * pReadHandler = nullptr;
+    chip::app::ReadHandler * pReadHandler = nullptr;
 };
 
 } // namespace Test

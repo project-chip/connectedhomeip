@@ -19,8 +19,6 @@
 
 #include <app/reporting/Engine.h>
 
-using namespace chip::app::reporting;
-
 namespace chip {
 namespace Test {
 
@@ -31,17 +29,19 @@ namespace Test {
  */
 class EngineTestAccess
 {
+
 public:
-    EngineTestAccess(Engine * aEngine) : pEngine(aEngine) {}
+    EngineTestAccess(chip::app::reporting::Engine * aEngine) : pEngine(aEngine) {}
 
     CHIP_ERROR BuildAndSendSingleReportData(chip::app::ReadHandler * apReadHandler)
     {
         return pEngine->BuildAndSendSingleReportData(apReadHandler);
     }
 
-    Engine * GetEngine() { return pEngine; }
+    chip::app::reporting::Engine * GetEngine() { return pEngine; }
 
-    ObjectPool<Engine::AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET, ObjectPoolMem::kInline> &
+    ObjectPool<chip::app::reporting::Engine::AttributePathParamsWithGeneration, CHIP_IM_SERVER_MAX_NUM_DIRTY_SET,
+               ObjectPoolMem::kInline> &
     GetGlobalDirtySet()
     {
         return pEngine->mGlobalDirtySet;
@@ -60,7 +60,7 @@ public:
     }
 
 private:
-    Engine * pEngine = nullptr;
+    chip::app::reporting::Engine * pEngine = nullptr;
 };
 
 } // namespace Test
