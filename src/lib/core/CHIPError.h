@@ -35,9 +35,9 @@
 #include <limits>
 #include <type_traits>
 
-#if __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
 #include <source_location>
-#endif // __cplusplus >= 202002L
+#endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
 
 namespace chip {
 
@@ -157,8 +157,7 @@ public:
     {}
 #else
     constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line) :
-        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
-    {}
+        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr){}
 #endif // __cplusplus >= 202002L
 
     /**
@@ -239,10 +238,10 @@ public:
      * @note
      *  Normally, prefer to use Format()
      */
-    const char * AsString() const
+    const char * AsString(bool withSourceLocation = true) const
     {
-        extern const char * ErrorStr(ChipError);
-        return ErrorStr(*this);
+        extern const char * ErrorStr(ChipError, bool);
+        return ErrorStr(*this, withSourceLocation);
     }
 
     /**

@@ -25,6 +25,7 @@
  */
 
 #include <inttypes.h>
+#include <iostream>
 #include <stdint.h>
 #include <string.h>
 
@@ -194,6 +195,41 @@ TEST(TestCHIPErrorStr, CheckCoreErrorStr)
         char const * const file = err.GetFile();
         ASSERT_NE(file, nullptr);
         EXPECT_EQ(strstr(file, "src/lib/core/"), file);
+
+        // File should be included in the error.
+        EXPECT_NE(strstr(errStr, file), nullptr);
 #endif // CHIP_CONFIG_ERROR_SOURCE
     }
 }
+
+TEST(TestCHIPErrorStr, CheckCoreErrorStrWithoutSourceLocation)
+{
+    // Register the layer error formatter
+
+    RegisterCHIPLayerErrorFormatter();
+
+    // For each defined error...
+    for (const auto & err : kTestElements)
+    {
+        const char * errStr = ErrorStr(err, /*withSourceLocation=*/false);
+        char expectedText[9];
+
+        // Assert that the error string contains the error number in hex.
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
+        EXPECT_TRUE((strstr(errStr, expectedText) != nullptr));
+
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+        // Assert that the error string contains a description, which is signaled
+        // by a presence of a colon proceeding the description.
+        EXPECT_TRUE((strchr(errStr, ':') != nullptr));
+#endif // !CHIP_CONFIG_SHORT_ERROR_STR
+
+#if CHIP_CONFIG_ERROR_SOURCE
+        char const * const file = err.GetFile();
+        ASSERT_NE(file, nullptr);
+        // File should not be included in the error.
+        EXPECT_EQ(strstr(errStr, file), nullptr);
+#endif // CHIP_CONFIG_ERROR_SOURCE
+    }
+}
+ 
