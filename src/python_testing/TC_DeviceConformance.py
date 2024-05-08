@@ -77,7 +77,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         success = True
         allow_provisional = self.user_params.get("allow_provisional", False)
         # TODO: automate this once https://github.com/csa-data-model/projects/issues/454 is done.
-        provisional_cluster_ids = [Clusters.ContentControl.id, Clusters.ScenesManagement.id]
+        provisional_cluster_ids = [Clusters.ContentControl.id, Clusters.ScenesManagement.id, Clusters.BallastConfiguration.id, Clusters.EnergyPreference.id, Clusters.DeviceEnergyManagement.id, Clusters.DeviceEnergyManagementMode.id, Clusters.PulseWidthModulation.id]
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 cluster_location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
