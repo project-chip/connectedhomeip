@@ -86,8 +86,7 @@ public:
     void LogOperationalNodeDiscovered(const Dnssd::OperationalNodeBrowseData & nodeData)
     {
         streamer_printf(streamer_get(), "DNS browse operational succeeded: \r\n");
-        streamer_printf(streamer_get(), "   Node ID: " ChipLogFormatX64 "-" ChipLogFormatX64 "\r\n",
-                        ChipLogValueX64(nodeData.peerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.peerId.GetNodeId()));
+        streamer_printf(streamer_get(), "   Node Instance: " ChipLogFormatPeerId, ChipLogValuePeerId(nodeData.peerId));
         streamer_printf(streamer_get(), "   hasZeroTTL: %s\r\n", nodeData.hasZeroTTL ? "true" : "false");
     }
 

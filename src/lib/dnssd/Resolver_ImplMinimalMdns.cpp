@@ -456,13 +456,15 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             ResolvedNodeData nodeResolvedData;
             CHIP_ERROR err = resolver->Take(nodeResolvedData);
 
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to take NodeData - result: %" CHIP_ERROR_FORMAT, err.Format());
+                continue;
+            }
+
             if (mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kOperational))
             {
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
-                }
-                else if (mDiscoveryContext != nullptr)
+                if (mDiscoveryContext != nullptr)
                 {
                     DiscoveredNodeData nodeData;
                     OperationalNodeBrowseData opNodeData;
@@ -478,12 +480,6 @@ void MinMdnsResolver::AdvancePendingResolverStates()
                     ChipLogError(Discovery, "No delegate to report operational node discovery");
 #endif
                 }
-            }
-
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to take ResolvedNodeData - result: %" CHIP_ERROR_FORMAT, err.Format());
-                continue;
             }
 
             mActiveResolves.Complete(nodeResolvedData.operationalData.peerId);
