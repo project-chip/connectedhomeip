@@ -56,4 +56,3 @@ extern void FormatError(char * buf, uint16_t bufSize, const char * subsys, CHIP_
 extern const char * StatusReportStr(uint32_t profileId, uint16_t statusCode);
 
 } // namespace chip
-                   
