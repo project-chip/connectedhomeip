@@ -56,6 +56,12 @@
 inline constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // seconds (60 minutes)
 
 namespace chip {
+
+// Forward declaration of ReadHandlerTestAccess class to allow it to be friend with the ReadHandler.
+// This is not for general API use. It is only to be used for (Unit) Tests to expose private Methods/Members.
+namespace Test {
+class ReadHandlerTestAccess;
+}
 namespace app {
 
 //
@@ -124,14 +130,14 @@ public:
         /*
          * Called after a subscription has been fully established.
          */
-        virtual void OnSubscriptionEstablished(ReadHandler & aReadHandler){};
+        virtual void OnSubscriptionEstablished(ReadHandler & aReadHandler) {};
 
         /*
          * Called right before a subscription is about to get terminated. This is only called on subscriptions that were terminated
          * after they had been fully established (and therefore had called OnSubscriptionEstablished).
          * OnSubscriptionEstablishment().
          */
-        virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler){};
+        virtual void OnSubscriptionTerminated(ReadHandler & aReadHandler) {};
     };
 
     /*
@@ -426,6 +432,7 @@ private:
     friend class TestReadInteraction;
     friend class chip::app::reporting::TestReportingEngine;
     friend class chip::app::reporting::TestReportScheduler;
+    friend class chip::Test::ReadHandlerTestAccess;
 
     //
     // The engine needs to be able to Abort/Close a ReadHandler instance upon completion of work for a given read/subscribe

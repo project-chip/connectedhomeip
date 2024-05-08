@@ -126,6 +126,10 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestReportingEngine.cpp" ]
 
+  sources = [
+    "EngineTestAccess.h",
+    "ReadHandlerTestAccess.h",
+  ]
   cflags = [ "-Wconversion" ]
 
   public_deps = [
