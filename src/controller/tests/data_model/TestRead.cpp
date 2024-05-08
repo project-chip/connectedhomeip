@@ -424,6 +424,78 @@ TEST_F(TestRead, TestReadAttributeResponse)
     EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    responseDirective = kSendDataResponse;
+
+    MockInteractionModelApp delegate;
+    chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
+
+    chip::app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
+
+    // read of E2C2A* and E3C2A2. Expect cache E2C2 version
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams.mAttributePathParamsListSize = 2;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        mpContext->DrainAndServiceIO();
+        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
+        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_FALSE(delegate.mReadError);
+        Optional<DataVersion> version1;
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
+        EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
+        EXPECT_FALSE(version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
+        }
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1424,78 +1496,6 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             uint8_t receivedAttribute4[256];
             reader.GetBytes(receivedAttribute4, 256);
             EXPECT_TRUE(memcmp(receivedAttribute4, expectedAttribute4, 256));
-        }
-        delegate.mNumAttributeResponse = 0;
-    }
-
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
-}
-
-TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
-{
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    responseDirective = kSendDataResponse;
-
-    MockInteractionModelApp delegate;
-    chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
-
-    chip::app::ReadPrepareParams readPrepareParams(mpContext->GetSessionBobToAlice());
-    //
-    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
-    // callbacks.
-    //
-    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
-
-    // read of E2C2A* and E3C2A2. Expect cache E2C2 version
-    {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &mpContext->GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
-
-        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
-        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
-        readPrepareParams.mAttributePathParamsListSize = 2;
-        err                                            = readClient.SendRequest(readPrepareParams);
-        EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        mpContext->DrainAndServiceIO();
-        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
-        EXPECT_FALSE(delegate.mReadError);
-        Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
-        EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
-        EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0));
-        Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
-        EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
-        EXPECT_FALSE(version2.HasValue());
-
-        {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
-            TLV::TLVReader reader;
-            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
-        }
-
-        {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(3));
-            TLV::TLVReader reader;
-            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
-        }
-
-        {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
-            TLV::TLVReader reader;
-            EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
         }
         delegate.mNumAttributeResponse = 0;
     }
