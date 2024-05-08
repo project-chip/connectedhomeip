@@ -282,9 +282,9 @@ TEST(TestCodegenModelViaMocks, GetAttributeInfo)
     std::optional<AttributeInfo> info =
         model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), FeatureMap::Id));
     ASSERT_TRUE(info.has_value());
-    ASSERT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute));
+    EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
     info = model.GetAttributeInfo(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
     ASSERT_TRUE(info.has_value());
-    ASSERT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute));
+    EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 }
