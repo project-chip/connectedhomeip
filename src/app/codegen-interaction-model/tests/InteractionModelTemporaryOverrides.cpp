@@ -22,10 +22,13 @@
 #include <app/WriteHandler.h>
 #include <app/util/attribute-storage.h>
 
+using chip::Protocols::InteractionModel::Status;
+
 // TODO: most of the functions here are part of EmberCompatibilityFunctions and is NOT decoupled
 //       from IM current, but it SHOULD be
 namespace chip {
 namespace app {
+
 
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
 {
@@ -44,16 +47,16 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
     return emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 }
 
-Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
+Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 {
     // TODO: this is just a noop which may be potentially invalid
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
-Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
 {
     // TODO: this is just a noop which may be potentially invalid
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
@@ -79,3 +82,14 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 
 } // namespace app
 } // namespace chip
+
+Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
+                                uint8_t * buffer, uint16_t readLength, bool write)
+{
+
+    // FIXME: this is supposed to be an ember implementation
+    //        however mock library SHOULD be able to implement it ... it is unclear
+    //        to me why we do not have this...
+    return Status::NotFound;
+}
+
