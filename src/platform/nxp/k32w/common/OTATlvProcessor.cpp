@@ -34,7 +34,7 @@ constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x
 
 CHIP_ERROR OTATlvProcessor::ApplyAction()
 {
-    return mShouldNotApply ? CHIP_ERROR_OTA_PROCESSOR_SHOULD_NOT_APPLY : CHIP_NO_ERROR;
+    return mApplyState == ApplyState::kApply ? CHIP_NO_ERROR : CHIP_ERROR_OTA_PROCESSOR_DO_NOT_APPLY;
 }
 
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
@@ -69,7 +69,7 @@ void OTATlvProcessor::ClearInternal()
     mLength          = 0;
     mProcessedLength = 0;
     mWasSelected     = false;
-    mShouldNotApply  = false;
+    mApplyState      = ApplyState::kApply;
 #if OTA_ENCRYPTION_ENABLE
     mIVOffset = 0;
 #endif
