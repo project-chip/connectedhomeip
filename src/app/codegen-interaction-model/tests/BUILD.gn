@@ -20,9 +20,13 @@ source_set("ember_extra_files") {
     # This IS TERRIBLE, however we want to pretent AAI exists for global
     # items
     "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
+    "InteractionModelTemporaryOverrides.cpp",
   ]
 
-  public_deps = [ "${chip_root}/src/app/util/mock:mock_ember" ]
+  public_deps = [
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/protocols",
+  ]
 }
 
 source_set("mock_model") {
