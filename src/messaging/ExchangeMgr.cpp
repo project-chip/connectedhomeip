@@ -106,8 +106,13 @@ ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, Exc
 {
     if (!session->IsActiveSession())
     {
+#if CHIP_ERROR_LOGGING
         // Disallow creating exchange on an inactive session
-        ChipLogError(ExchangeManager, "NewContext failed: session inactive");
+        const ScopedNodeId & peer = session->GetPeer();
+        ChipLogError(ExchangeManager, "NewContext failed: session %u to " ChipLogFormatScopedNodeId " is inactive",
+                     session->SessionIdForLogging(), ChipLogValueScopedNodeId(peer));
+#endif // CHIP_ERROR_LOGGING
+
         return nullptr;
     }
     return mContextPool.CreateObject(this, mNextExchangeId++, session, isInitiator, delegate);
