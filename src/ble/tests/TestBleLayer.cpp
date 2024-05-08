@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <memory>
 #include <numeric>
+#include <type_traits>
 
 #include <gtest/gtest.h>
 
@@ -46,12 +47,6 @@ constexpr ChipBleUUID uuidChar2 = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 
                                       0x12 } };
 constexpr ChipBleUUID uuidChar3 = { { 0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83, 0x21, 0x8F,
                                       0x04 } };
-
-BLE_CONNECTION_OBJECT GetConnectionObject()
-{
-    static auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(0x1234);
-    return ++connObj;
-}
 
 }; // namespace
 
@@ -84,6 +79,25 @@ public:
     {
         mBleTransport = nullptr;
         Shutdown();
+    }
+
+    // Return unique BLE connection object for each call.
+    template <typename T = BLE_CONNECTION_OBJECT>
+    BLE_CONNECTION_OBJECT GetConnectionObject()
+    {
+        T conn = BLE_CONNECTION_UNINITIALIZED;
+
+        if constexpr (std::is_pointer_v<T>)
+        {
+            conn = reinterpret_cast<T>(&mNumConnection + mNumConnection);
+        }
+        else
+        {
+            conn = static_cast<T>(mNumConnection);
+        }
+
+        mNumConnection++;
+        return conn;
     }
 
     // Passing capabilities request message to HandleWriteReceived should create
@@ -144,6 +158,9 @@ public:
     {
         return true;
     }
+
+private:
+    unsigned int mNumConnection = 0;
 };
 
 TEST_F(TestBleLayer, CheckBleTransportCapabilitiesRequestMessage)
