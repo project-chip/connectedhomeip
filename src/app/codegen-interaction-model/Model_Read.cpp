@@ -16,10 +16,12 @@
  */
 #include <app/codegen-interaction-model/Model.h>
 
+#include <access/AccessControl.h>
 #include <access/Privilege.h>
 #include <access/RequestPath.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/GlobalAttributes.h>
+#include <app/RequiredPrivilege.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 
@@ -76,18 +78,14 @@ CHIP_ERROR CheckAccessPrivilege(const ConcreteAttributePath & path, const chip::
     Access::RequestPath requestPath{ .cluster = path.mClusterId, .endpoint = path.mEndpointId };
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadAttribute(path);
     CHIP_ERROR err                     = Access::GetAccessControl().Check(descriptor, requestPath, requestPrivilege);
-    if (err != CHIP_NO_ERROR)
-    {
-        ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
-        if (path.mExpanded)
-        {
-            return CHIP_NO_ERROR;
-        }
 
-        return SendFailureStatus(path, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
-    }
+    // access denied sent as-is
+    ReturnErrorCodeIf(err == CHIP_ERROR_ACCESS_DENIED, CHIP_ERROR_ACCESS_DENIED);
 
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    // anything else is an opaque failure
+    ReturnErrorCodeIf(err != CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -107,11 +105,11 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
     ReturnErrorOnFailure(FindAttributeMetadata(request.path, &attributeCluster, &attributeMetadata));
     VerifyOrDie(attributeMetadata != nullptr); // this is the contract of FindAttributeMetadata
 
-    CHIP_ERROR err = CheckAccessPrivilege(request.path, request.subjectDescriptor);
-    if (err == CHIP_ERROR_ACCESS_DENIED && request.path.mExpanded)
+    // ACL check for non-internal requests
+    if (!request.operationFlags.Has(InteractionModel::OperationFlags::kInternal))
     {
-        // return success, however without filling in the attribute value at all as there is nothing to be done here...
-        return CHIP_NO_ERROR;
+        ReturnErrorCodeIf(!request.subjectDescriptor.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(CheckAccessPrivilege(request.path, *request.subjectDescriptor));
     }
 
 #if 0

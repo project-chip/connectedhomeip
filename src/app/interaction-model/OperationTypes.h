@@ -37,7 +37,7 @@ enum class OperationFlags : uint32_t
 /// This information is available for ALL interactions: read/write/invoke
 struct OperationRequest
 {
-    OperationFlags operationFlags;
+    BitFlags<OperationFlags> operationFlags;
 
     /// Current authentication data EXCEPT for internal requests.
     ///  - Non-internal requests MUST have this set.
