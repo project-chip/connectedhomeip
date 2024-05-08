@@ -20,10 +20,13 @@
 #include <access/Privilege.h>
 #include <access/RequestPath.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -88,6 +91,44 @@ CHIP_ERROR CheckAccessPrivilege(const ConcreteAttributePath & path, const chip::
     return CHIP_NO_ERROR;
 }
 
+/// Attempts to read via an attribute access interface (AAI)
+///
+/// Expected returns:
+///   - CHIP_IM_GLOBAL_STATUS(UnsupportedRead) IF AND ONLY IF processing denied by the AAI (considered final)
+///   -
+///
+/// If it returns a VALUE, then this is a FINAL result (i.e. either failure or success).
+/// If it returns std::nullopt, then there is no AAI to handle the given path
+/// and processing should figure out the value otherwise (generally from other ember data)
+std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath & path, AttributeAccessInterface * aai,
+                                                    AttributeValueEncoder & encoder)
+{
+    // Processing can happen only if an attribute access interface actually exists..
+    if (aai == nullptr)
+    {
+        return std::nullopt;
+    }
+
+    // TODO: AAI seems to NEVER be able to return anything else EXCEPT
+    // UnsupportedRead to be handled upward
+
+    CHIP_ERROR err = aai->Read(path, encoder);
+
+    // explict translate UnsupportedAccess to Access denied. This is to allow callers to determine a
+    // translation for this: usually wildcard subscriptions MAY just ignore these where as direct reads
+    // MUST translate them to UnsupportedAccess
+    ReturnErrorCodeIf(err == CHIP_IM_GLOBAL_STATUS(UnsupportedAccess), CHIP_ERROR_ACCESS_DENIED);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        return std::make_optional(err);
+    }
+
+    // if no attempt was made to encode anything, assume the AAI did not even
+    // try to handle it, so handling has to be deferred
+    return encoder.TriedEncode() ? std::make_optional(CHIP_NO_ERROR) : std::nullopt;
+}
+
 } // namespace
 
 /// separated-out ReadAttribute implementation (given existing complexity)
@@ -112,23 +153,35 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
         ReturnErrorOnFailure(CheckAccessPrivilege(request.path, *request.subjectDescriptor));
     }
 
+    std::optional<CHIP_ERROR> aai_result;
+
+    if (attributeCluster != nullptr)
+    {
+        aai_result = TryReadViaAccessInterface(
+            request.path, GetAttributeAccessOverride(request.path.mEndpointId, request.path.mClusterId), encoder);
+    }
+    else
+    {
+        GlobalAttributeReader aai(attributeCluster);
+        aai_result = TryReadViaAccessInterface(request.path, &aai, request.path.mClusterId), encoder);
+    }
+
+    if (aai_result.has_value())
+    {
+        // save the reading state for later use (if lists are being decoded)
+        state.listEncodeStart = encoder.GetState().CurrentEncodingListIndex();
+        return *aai_result;
+    }
+    state.listEncodeStart = kInvalidListIndex;
+
+    // TODO: AAI reading
+    //      - Global attribute access override get
+    //      - procss via access override, including using and saving back the read state
+    // TODO: ember reading
+
 #if 0
 
 
-    {
-        // Special handling for mandatory global attributes: these are always for attribute list, using a special
-        // reader (which can be lightweight constructed even from nullptr).
-        GlobalAttributeReader reader(attributeCluster);
-        AttributeAccessInterface * attributeOverride =
-            (attributeCluster != nullptr) ? &reader : GetAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
-        if (attributeOverride)
-        {
-            bool triedEncode = false;
-            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor, aIsFabricFiltered, aPath, aAttributeReports,
-                                                        apEncoderState, attributeOverride, &triedEncode));
-            ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);
-        }
-    }
 
     // Read attribute using Ember, if it doesn't have an override.
 
