@@ -91,7 +91,22 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
 
 void ChipDeviceEventHandler::HandleFailSafeTimerExpired()
 {
-    ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired called");
+    // if UDC was in progress (when the Fail-Safe timer expired), reset TargetCastingPlayer commissioning state and return early
+    if (sUdcInProgress)
+    {
+        ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired when sUdcInProgress: %d, returning early",
+                        sUdcInProgress);
+        sUdcInProgress                                            = false;
+        CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_ERROR_TIMEOUT, nullptr);
+        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted         = nullptr;
+        CastingPlayer::GetTargetCastingPlayer()->mTargetCastingPlayer = nullptr;
+        return;
+    }
+
+    // if UDC was NOT in progress (when the Fail-Safe timer expired), start UDC
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired when sUdcInProgress: %d, starting UDC",
+                    sUdcInProgress);
     chip::DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(1),
         [](chip::System::Layer * aSystemLayer, void * aAppState) {
@@ -194,6 +209,7 @@ void ChipDeviceEventHandler::HandleCommissioningComplete(const chip::DeviceLayer
 
 CHIP_ERROR ChipDeviceEventHandler::SetUdcStatus(bool udcInProgress)
 {
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::SetUdcStatus called with udcInProgress: %d", udcInProgress);
     if (sUdcInProgress == udcInProgress)
     {
         ChipLogError(AppServer, "UDC in progress state is already %d", sUdcInProgress);
