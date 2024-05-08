@@ -424,6 +424,7 @@ TEST_F(TestRead, TestReadAttributeResponse)
     EXPECT_EQ(mpContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+// NOTE: This test must execute before TestReadSubscribeAttributeResponseWithCache or else it will fail on `EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0))`.
 TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
