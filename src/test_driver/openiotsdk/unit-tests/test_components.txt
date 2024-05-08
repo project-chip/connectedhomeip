@@ -18,4 +18,5 @@ SupportTests
 UserDirectedCommissioningTests
 SecureChannelTests
 ICDServerTests
-libControllerTests
+ControllerTests
+InetLayerTests

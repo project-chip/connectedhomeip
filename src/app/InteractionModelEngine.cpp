@@ -85,7 +85,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
     mReportingEngine.Init();
-    mMagic++;
 
     StatusIB::RegisterErrorFormatter();
 
@@ -110,9 +109,6 @@ void InteractionModelEngine::Shutdown()
     }
 
     mCommandHandlerList = nullptr;
-
-    // Increase magic number to invalidate all Handle-s.
-    mMagic++;
 
     mCommandResponderObjs.ReleaseAll();
 

@@ -23,16 +23,14 @@
 
 #include <inttypes.h>
 
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
-#include <messaging/ReliableMessageContext.h>
-
-#include <app/AppConfig.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Defer.h>
 #include <messaging/ErrorCategory.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <platform/PlatformManager.h>
 #include <protocols/Protocols.h>
