@@ -1284,9 +1284,18 @@ class BaseTestHelper:
                         "Failed to receive subscription update")
                     break
 
-            # thread changes 5 times, and sleeps for 3 seconds in between.
-            # Add an additional 3 seconds of slack. Timeout is in seconds.
-            await asyncio.wait_for(taskAttributeChange, 3)
+            # At this point the task should really have done the three attribute,
+            # otherwise something is wrong. Wait for just 1s in case of a race
+            # condition between the last attribute update and the callback.
+            try:
+                await asyncio.wait_for(taskAttributeChange, 1)
+            except asyncio.TimeoutError:
+                # If attribute change task did not finish something is wrong. Cancel
+                # the task.
+                taskAttributeChange.cancel()
+                # This will throw a asyncio.CancelledError and makes sure the test
+                # is declared failed.
+                await taskAttributeChange
 
             return True if receivedUpdate == 5 else False
 
