@@ -42,7 +42,7 @@ public:
      * \brief Send event to the event queue.
      *
      */
-    void PostEvent(const AppEvent & event);
+    void PostEvent(const AppEvent & event) override;
 
     /**
      * \brief Return a pointer to the NXP Wifi Driver instance.

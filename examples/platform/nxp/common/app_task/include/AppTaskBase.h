@@ -79,13 +79,6 @@ public:
     virtual void PostInitMatterStack(void) {};
 
     /**
-     * \brief This function is called in AppTaskMain after all events are processed in current loop iteration.
-     *
-     * Example of usage: It can be used to animate some LEDs.
-     */
-    virtual void PostEventsProcessedAction() {}
-
-    /**
      * \brief This function could be overridden in order to register features.
      *
      * Example of usage: Could be overridden in order to register matter CLI or button features.
@@ -127,6 +120,19 @@ public:
      *
      */
     virtual void PrintOnboardingInfo();
+
+    /**
+     * \brief Print current software version string and software version.
+     *
+     * It uses the ConfigurationManager API to extract the information.
+     */
+    virtual void PrintCurrentVersion();
+
+    /**
+     * \brief Send event to the event queue.
+     *
+     */
+    virtual void PostEvent(const AppEvent & event) {};
 
     /**
      * \brief This function could be overridden in order to dispatch event.
