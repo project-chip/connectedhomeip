@@ -35,6 +35,7 @@
 #include "event_groups.h"
 #include "task.h"
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;

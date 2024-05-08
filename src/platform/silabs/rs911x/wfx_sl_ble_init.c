@@ -160,7 +160,6 @@ void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_
  */
 void rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_read_req)
 {
-    SILABS_LOG("%s: starting", __func__);
     event_msg.event_id = event_id;
     memcpy(&event_msg.rsi_ble_read_req, rsi_ble_read_req, sizeof(rsi_ble_read_req_t));
     rsi_ble_app_set_event(RSI_BLE_EVENT_GATT_RD);
