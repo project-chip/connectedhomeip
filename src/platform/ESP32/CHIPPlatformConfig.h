@@ -95,3 +95,37 @@
 #endif // CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
 
 #endif // CONFIG_ENABLE_ICD_SERVER
+
+#ifndef CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+#if CHIP_ENABLE_OPENTHREAD
+#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL                                                                                \
+    chip::System::Clock::Milliseconds32(CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL_FOR_THREAD)
+#else
+#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL                                                                                \
+    chip::System::Clock::Milliseconds32(CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL_FOR_WIFI_ETHERNET)
+#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+
+#ifndef CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+#if CHIP_ENABLE_OPENTHREAD
+#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL                                                                                  \
+    chip::System::Clock::Milliseconds32(CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL_FOR_THREAD)
+#else
+#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL                                                                                  \
+    chip::System::Clock::Milliseconds32(CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL_FOR_WIFI_ETHERNET)
+#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+
+#ifndef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+#if CHIP_ENABLE_OPENTHREAD
+#define CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST                                                                                \
+    chip::System::Clock::Milliseconds32(CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST_FOR_THREAD)
+#else
+#define CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST                                                                                \
+    chip::System::Clock::Milliseconds32(CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST_FOR_WIFI_ETHERNET)
+#endif // CHIP_ENABLE_OPENTHREAD
+#endif // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+
+#ifndef CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
+#define CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS CONFIG_MRP_MAX_RETRANS
+#endif // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
