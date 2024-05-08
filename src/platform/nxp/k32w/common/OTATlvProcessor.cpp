@@ -34,7 +34,7 @@ constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x
 
 CHIP_ERROR OTATlvProcessor::ApplyAction()
 {
-    return mShouldNotApply ? CHIP_OTA_PROCESSOR_SHOULD_NOT_APPLY : CHIP_NO_ERROR;
+    return mShouldNotApply ? CHIP_ERROR_OTA_PROCESSOR_SHOULD_NOT_APPLY : CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
@@ -56,7 +56,7 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
                 // If current block was processed fully and the block still contains data, it
                 // means that the block contains another TLV's data and the current processor
                 // should be changed by OTAImageProcessorImpl.
-                return CHIP_OTA_CHANGE_PROCESSOR;
+                return CHIP_ERROR_OTA_CHANGE_PROCESSOR;
             }
         }
     }
@@ -77,7 +77,7 @@ void OTATlvProcessor::ClearInternal()
 
 bool OTATlvProcessor::IsError(CHIP_ERROR & status)
 {
-    return status != CHIP_NO_ERROR && status != CHIP_ERROR_BUFFER_TOO_SMALL && status != CHIP_OTA_FETCH_ALREADY_SCHEDULED;
+    return status != CHIP_NO_ERROR && status != CHIP_ERROR_BUFFER_TOO_SMALL && status != CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED;
 }
 
 void OTADataAccumulator::Init(uint32_t threshold)

@@ -26,16 +26,16 @@ namespace chip {
 
 CHIP_ERROR OTAFirmwareProcessor::Init()
 {
-    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_SelectExternalStoragePartition(), CHIP_OTA_PROCESSOR_EXTERNAL_STORAGE);
+    ReturnErrorCodeIf(gOtaSuccess_c != OTA_SelectExternalStoragePartition(), CHIP_ERROR_OTA_PROCESSOR_EXTERNAL_STORAGE);
 
     otaResult_t ota_status;
     ota_status = OTA_ServiceInit(&mPostedOperationsStorage[0], NB_PENDING_TRANSACTIONS * TRANSACTION_SZ);
 
-    ReturnErrorCodeIf(ota_status != gOtaSuccess_c, CHIP_OTA_PROCESSOR_CLIENT_INIT);
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_OTA_PROCESSOR_START_IMAGE);
+    ReturnErrorCodeIf(ota_status != gOtaSuccess_c, CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT);
+    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_ERROR_OTA_PROCESSOR_START_IMAGE);
 
     return CHIP_NO_ERROR;
 }
@@ -70,7 +70,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
         if (gOtaSuccess_c != status)
         {
             ChipLogError(SoftwareUpdate, "Failed to make room for next block. Status: %d", status);
-            return CHIP_OTA_PROCESSOR_MAKE_ROOM;
+            return CHIP_ERROR_OTA_PROCESSOR_MAKE_ROOM;
         }
     }
     else
@@ -82,10 +82,10 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (gOtaSuccess_c != status)
     {
         ChipLogError(SoftwareUpdate, "Failed to write image block. Status: %d", status);
-        return CHIP_OTA_PROCESSOR_PUSH_CHUNK;
+        return CHIP_ERROR_OTA_PROCESSOR_PUSH_CHUNK;
     }
 
-    return CHIP_OTA_FETCH_ALREADY_SCHEDULED;
+    return CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED;
 }
 
 CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
@@ -118,7 +118,7 @@ CHIP_ERROR OTAFirmwareProcessor::ExitAction()
     {
         ChipLogError(SoftwareUpdate, "Failed to commit firmware image.");
         mShouldNotApply = true;
-        return CHIP_OTA_PROCESSOR_IMG_COMMIT;
+        return CHIP_ERROR_OTA_PROCESSOR_IMG_COMMIT;
     }
 
     return CHIP_NO_ERROR;

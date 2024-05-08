@@ -27,21 +27,20 @@ namespace chip {
 #define CHIP_ERROR_TLV_PROCESSOR(e)                                                                                                \
     ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e, __FILE__, __LINE__)
 
-#define CHIP_OTA_TLV_CONTINUE_PROCESSING CHIP_ERROR_TLV_PROCESSOR(0x01)
-#define CHIP_OTA_CHANGE_PROCESSOR CHIP_ERROR_TLV_PROCESSOR(0x02)
-#define CHIP_OTA_PROCESSOR_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x03)
-#define CHIP_OTA_PROCESSOR_ALREADY_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x04)
-#define CHIP_OTA_PROCESSOR_CLIENT_INIT CHIP_ERROR_TLV_PROCESSOR(0x05)
-#define CHIP_OTA_PROCESSOR_MAKE_ROOM CHIP_ERROR_TLV_PROCESSOR(0x06)
-#define CHIP_OTA_PROCESSOR_PUSH_CHUNK CHIP_ERROR_TLV_PROCESSOR(0x07)
-#define CHIP_OTA_PROCESSOR_IMG_AUTH CHIP_ERROR_TLV_PROCESSOR(0x08)
-#define CHIP_OTA_FETCH_ALREADY_SCHEDULED CHIP_ERROR_TLV_PROCESSOR(0x09)
-#define CHIP_OTA_PROCESSOR_IMG_COMMIT CHIP_ERROR_TLV_PROCESSOR(0x0A)
-#define CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x0B)
-#define CHIP_OTA_PROCESSOR_EEPROM_OFFSET CHIP_ERROR_TLV_PROCESSOR(0x0C)
-#define CHIP_OTA_PROCESSOR_EXTERNAL_STORAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
-#define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
-#define CHIP_OTA_PROCESSOR_SHOULD_NOT_APPLY CHIP_ERROR_TLV_PROCESSOR(0x0F)
+#define CHIP_ERROR_OTA_CHANGE_PROCESSOR CHIP_ERROR_TLV_PROCESSOR(0x02)
+#define CHIP_ERROR_OTA_PROCESSOR_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x03)
+#define CHIP_ERROR_OTA_PROCESSOR_ALREADY_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x04)
+#define CHIP_ERROR_OTA_PROCESSOR_CLIENT_INIT CHIP_ERROR_TLV_PROCESSOR(0x05)
+#define CHIP_ERROR_OTA_PROCESSOR_MAKE_ROOM CHIP_ERROR_TLV_PROCESSOR(0x06)
+#define CHIP_ERROR_OTA_PROCESSOR_PUSH_CHUNK CHIP_ERROR_TLV_PROCESSOR(0x07)
+#define CHIP_ERROR_OTA_PROCESSOR_IMG_AUTH CHIP_ERROR_TLV_PROCESSOR(0x08)
+#define CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED CHIP_ERROR_TLV_PROCESSOR(0x09)
+#define CHIP_ERROR_OTA_PROCESSOR_IMG_COMMIT CHIP_ERROR_TLV_PROCESSOR(0x0A)
+#define CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x0B)
+#define CHIP_ERROR_OTA_PROCESSOR_EEPROM_OFFSET CHIP_ERROR_TLV_PROCESSOR(0x0C)
+#define CHIP_ERROR_OTA_PROCESSOR_EXTERNAL_STORAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
+#define CHIP_ERROR_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
+#define CHIP_ERROR_OTA_PROCESSOR_SHOULD_NOT_APPLY CHIP_ERROR_TLV_PROCESSOR(0x0F)
 
 // Descriptor constants
 constexpr size_t kVersionStringSize = 64;
@@ -103,7 +102,7 @@ protected:
      * If more image chunks are needed, CHIP_ERROR_BUFFER_TOO_SMALL error is returned.
      * Other error codes indicate that an error occurred during processing. Fetching
      * next data is scheduled automatically by OTAImageProcessorImpl if the return value
-     * is neither an error code, nor CHIP_OTA_FETCH_ALREADY_SCHEDULED (which implies the
+     * is neither an error code, nor CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED (which implies the
      * scheduling is done inside ProcessInternal or will be done in the future, through a
      * callback).
      *
@@ -111,13 +110,13 @@ protected:
      *              returns CHIP_NO_ERROR, the byte span is used to return a remaining part
      *              of the chunk, not used by current TLV processor.
      *
-     * @retval CHIP_NO_ERROR                    Block was processed successfully.
-     * @retval CHIP_ERROR_BUFFER_TOO_SMALL      Provided buffers are insufficient to decode some
-     *                                          metadata (e.g. a descriptor).
-     * @retval CHIP_OTA_FETCH_ALREADY_SCHEDULED Should be returned if ProcessInternal schedules
-     *                                          fetching next data (e.g. through a callback).
-     * @retval Error code                       Something went wrong. Current OTA process will be
-     *                                          canceled.
+     * @retval CHIP_NO_ERROR                          Block was processed successfully.
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL            Provided buffers are insufficient to decode some
+     *                                                metadata (e.g. a descriptor).
+     * @retval CHIP_ERROR_OTA_FETCH_ALREADY_SCHEDULED Should be returned if ProcessInternal schedules
+     *                                                fetching next data (e.g. through a callback).
+     * @retval Error code                             Something went wrong. Current OTA process will be
+     *                                                canceled.
      */
     virtual CHIP_ERROR ProcessInternal(ByteSpan & block) = 0;
 
