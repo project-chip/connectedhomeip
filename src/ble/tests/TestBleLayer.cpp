@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
+#include <array>
 #include <cstdint>
+#include <memory>
 #include <numeric>
 
 #include <gtest/gtest.h>
@@ -43,55 +45,9 @@ static constexpr ChipBleUUID uuidChar2 = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D,
 static constexpr ChipBleUUID uuidChar3 = { { 0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83, 0x21,
                                              0x8F, 0x04 } };
 
-class TestBleLayer : public BleLayer,
-                     private BleApplicationDelegate,
-                     private BleLayerDelegate,
-                     private BlePlatformDelegate,
-                     public ::testing::Test
+class BleTestDelegate : public BleApplicationDelegate, public BleLayerDelegate, public BlePlatformDelegate
 {
 public:
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        ASSERT_EQ(DeviceLayer::SystemLayer().Init(), CHIP_NO_ERROR);
-    }
-
-    static void TearDownTestSuite()
-    {
-        DeviceLayer::SystemLayer().Shutdown();
-        chip::Platform::MemoryShutdown();
-    }
-
-    void SetUp()
-    {
-        ASSERT_EQ(Init(this, nullptr, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
-        mBleTransport = this;
-    }
-
-    void TearDown()
-    {
-        mBleTransport = nullptr;
-        Shutdown();
-    }
-
-    // Passing capabilities request message to HandleWriteReceived should create
-    // new BLE endpoint which later can be used to receive more data.
-    bool HandleWriteReceivedCapabilitiesRequest()
-    {
-        constexpr uint8_t capReq[] = { 0x65, 0x6c, 0x54, 0x00, 0x00, 0x00, 0xc8, 0x00, 0x06 };
-        auto connObj               = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
-        auto buf                   = System::PacketBufferHandle::NewWithData(capReq, sizeof(capReq));
-        return HandleWriteReceived(connObj, &uuidSvc, &uuidChar1, std::move(buf));
-    }
-
-    // Processing subscription request after capabilities request should finalize
-    // connection establishment.
-    bool HandleSubscribeReceivedOnChar2()
-    {
-        auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
-        return HandleSubscribeReceived(connObj, &uuidSvc, &uuidChar2);
-    }
-
     ///
     // Implementation of BleApplicationDelegate
 
@@ -133,6 +89,50 @@ public:
                           const ChipBleUUID * charId) override
     {
         return true;
+    }
+};
+
+class TestBleLayer : public BleLayer, private BleTestDelegate, public ::testing::Test
+{
+public:
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(DeviceLayer::SystemLayer().Init(), CHIP_NO_ERROR);
+    }
+
+    static void TearDownTestSuite()
+    {
+        DeviceLayer::SystemLayer().Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
+
+    void SetUp()
+    {
+        ASSERT_EQ(Init(this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
+        mBleTransport = this;
+    }
+
+    void TearDown()
+    {
+        mBleTransport = nullptr;
+        Shutdown();
+    }
+
+    // Passing capabilities request message to HandleWriteReceived should create
+    // new BLE endpoint which later can be used to receive more data.
+    bool HandleWriteReceivedCapabilitiesRequest(BLE_CONNECTION_OBJECT connObj)
+    {
+        constexpr uint8_t capReq[] = { 0x65, 0x6c, 0x54, 0x00, 0x00, 0x00, 0xc8, 0x00, 0x06 };
+        auto buf                   = System::PacketBufferHandle::NewWithData(capReq, sizeof(capReq));
+        return HandleWriteReceived(connObj, &uuidSvc, &uuidChar1, std::move(buf));
+    }
+
+    // Processing subscription request after capabilities request should finalize
+    // connection establishment.
+    bool HandleSubscribeReceivedOnChar2(BLE_CONNECTION_OBJECT connObj)
+    {
+        return HandleSubscribeReceived(connObj, &uuidSvc, &uuidChar2);
     }
 };
 
@@ -180,7 +180,8 @@ TEST_F(TestBleLayer, CheckBleTransportCapabilitiesResponseMessage)
 
 TEST_F(TestBleLayer, HandleWriteReceivedCapabilitiesRequest)
 {
-    EXPECT_TRUE(HandleWriteReceivedCapabilitiesRequest());
+    auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    EXPECT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
 
 TEST_F(TestBleLayer, HandleSubscribeReceivedInvalidUUID)
@@ -192,8 +193,9 @@ TEST_F(TestBleLayer, HandleSubscribeReceivedInvalidUUID)
 
 TEST_F(TestBleLayer, HandleSubscribeReceived)
 {
-    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest());
-    EXPECT_TRUE(HandleSubscribeReceivedOnChar2());
+    auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+    EXPECT_TRUE(HandleSubscribeReceivedOnChar2(connObj));
 }
 
 TEST_F(TestBleLayer, HandleSubscribeCompleteInvalidUUID)
@@ -205,10 +207,10 @@ TEST_F(TestBleLayer, HandleSubscribeCompleteInvalidUUID)
 
 TEST_F(TestBleLayer, HandleSubscribeComplete)
 {
-    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest());
-    ASSERT_TRUE(HandleSubscribeReceivedOnChar2());
-
     auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+    ASSERT_TRUE(HandleSubscribeReceivedOnChar2(connObj));
+
     EXPECT_TRUE(HandleSubscribeComplete(connObj, &uuidSvc, &uuidChar2));
 }
 
@@ -221,10 +223,10 @@ TEST_F(TestBleLayer, HandleUnsubscribeReceivedInvalidUUID)
 
 TEST_F(TestBleLayer, HandleUnsubscribeReceived)
 {
-    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest());
-    ASSERT_TRUE(HandleSubscribeReceivedOnChar2());
-
     auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+    ASSERT_TRUE(HandleSubscribeReceivedOnChar2(connObj));
+
     EXPECT_TRUE(HandleUnsubscribeReceived(connObj, &uuidSvc, &uuidChar2));
 }
 
@@ -237,10 +239,10 @@ TEST_F(TestBleLayer, HandleUnsubscribeCompleteInvalidUUID)
 
 TEST_F(TestBleLayer, HandleUnsubscribeComplete)
 {
-    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest());
-    ASSERT_TRUE(HandleSubscribeReceivedOnChar2());
-
     auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+    ASSERT_TRUE(HandleSubscribeReceivedOnChar2(connObj));
+
     EXPECT_TRUE(HandleUnsubscribeComplete(connObj, &uuidSvc, &uuidChar2));
 }
 
@@ -256,8 +258,9 @@ TEST_F(TestBleLayer, HandleWriteReceivedInvalidUUID)
 
 TEST_F(TestBleLayer, HandleWriteReceived)
 {
-    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest());
-    ASSERT_TRUE(HandleSubscribeReceivedOnChar2());
+    auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+    ASSERT_TRUE(HandleSubscribeReceivedOnChar2(connObj));
 
     constexpr uint8_t data[] = { to_underlying(BtpEngine::HeaderFlags::kStartMessage) |
                                      to_underlying(BtpEngine::HeaderFlags::kEndMessage),
@@ -265,7 +268,6 @@ TEST_F(TestBleLayer, HandleWriteReceived)
     auto buf                 = System::PacketBufferHandle::NewWithData(data, sizeof(data));
     ASSERT_FALSE(buf.IsNull());
 
-    auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
     EXPECT_TRUE(HandleWriteReceived(connObj, &uuidSvc, &uuidChar1, std::move(buf)));
 }
 
@@ -276,11 +278,16 @@ TEST_F(TestBleLayer, HandleWriteConfirmationInvalidUUID)
     EXPECT_FALSE(HandleWriteConfirmation(connObj, &uuidSvc, &uuidChar2));
 }
 
+TEST_F(TestBleLayer, HandleWriteConfirmationUninitialized)
+{
+    ASSERT_FALSE(HandleWriteReceivedCapabilitiesRequest(BLE_CONNECTION_UNINITIALIZED));
+}
+
 TEST_F(TestBleLayer, HandleWriteConfirmation)
 {
-    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest());
-
     auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+
     EXPECT_TRUE(HandleWriteConfirmation(connObj, &uuidSvc, &uuidChar1));
 }
 
@@ -296,8 +303,9 @@ TEST_F(TestBleLayer, HandleIndicationReceivedInvalidUUID)
 
 TEST_F(TestBleLayer, HandleIndicationReceived)
 {
-    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest());
-    ASSERT_TRUE(HandleSubscribeReceivedOnChar2());
+    auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+    ASSERT_TRUE(HandleSubscribeReceivedOnChar2(connObj));
 
     constexpr uint8_t data[] = { to_underlying(BtpEngine::HeaderFlags::kStartMessage) |
                                      to_underlying(BtpEngine::HeaderFlags::kEndMessage),
@@ -305,7 +313,6 @@ TEST_F(TestBleLayer, HandleIndicationReceived)
     auto buf                 = System::PacketBufferHandle::NewWithData(data, sizeof(data));
     ASSERT_FALSE(buf.IsNull());
 
-    auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
     EXPECT_TRUE(HandleIndicationReceived(connObj, &uuidSvc, &uuidChar2, std::move(buf)));
 }
 
@@ -318,18 +325,45 @@ TEST_F(TestBleLayer, HandleIndicationConfirmationInvalidUUID)
 
 TEST_F(TestBleLayer, HandleIndicationConfirmation)
 {
-    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest());
-
     auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+
     EXPECT_TRUE(HandleIndicationConfirmation(connObj, &uuidSvc, &uuidChar2));
 }
 
 TEST_F(TestBleLayer, HandleConnectionError)
 {
-    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest());
+    auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+
+    HandleConnectionError(connObj, CHIP_ERROR_ACCESS_DENIED);
+}
+
+TEST_F(TestBleLayer, CloseBleConnectionUninitialized)
+{
+    CloseBleConnection(BLE_CONNECTION_UNINITIALIZED);
+}
+
+TEST_F(TestBleLayer, CloseBleConnection)
+{
+    auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
+    ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+
+    CloseBleConnection(connObj);
+}
+
+TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
+{
+    std::array<std::unique_ptr<Ble::BleTestDelegate>, BLE_LAYER_NUM_BLE_ENDPOINTS> delegates;
+    for (auto & delegate : delegates)
+    {
+        delegate     = std::make_unique<Ble::BleTestDelegate>();
+        auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(delegate.get());
+        EXPECT_TRUE(HandleWriteReceivedCapabilitiesRequest(connObj));
+    }
 
     auto connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(this);
-    HandleConnectionError(connObj, CHIP_ERROR_ACCESS_DENIED);
+    EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
 
 }; // namespace Ble
