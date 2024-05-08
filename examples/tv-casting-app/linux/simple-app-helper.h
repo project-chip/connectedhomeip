@@ -20,6 +20,7 @@
 
 #include "core/CastingPlayer.h"
 #include "core/CastingPlayerDiscovery.h"
+#include "core/IdentificationDeclarationOptions.h"
 #include "core/Types.h"
 #include <platform/CHIPDeviceLayer.h>
 

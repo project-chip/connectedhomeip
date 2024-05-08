@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 from platform import uname
+from typing import Optional
 
 from .gn import GnBuilder
 
@@ -298,7 +299,9 @@ class HostBuilder(GnBuilder):
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
-                 enable_test_event_triggers=None):
+                 enable_test_event_triggers=None,
+                 enable_dnssd_tests: Optional[bool] = None
+                 ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -405,6 +408,12 @@ class HostBuilder(GnBuilder):
         if enable_test_event_triggers is not None:
             if 'EVSE' in enable_test_event_triggers:
                 self.extra_gn_options.append('chip_enable_energy_evse_trigger=true')
+
+        if enable_dnssd_tests is not None:
+            if enable_dnssd_tests:
+                self.extra_gn_options.append('chip_enable_dnssd_tests=true')
+            else:
+                self.extra_gn_options.append('chip_enable_dnssd_tests=false')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:
