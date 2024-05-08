@@ -100,7 +100,8 @@ protected:
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&mpContext->GetExchangeManager(), ArraySize(logStorageResources), gCircularEventBuffer, logStorageResources, &mEventCounter);
+        chip::app::EventManagement::CreateEventManagement(&mpContext->GetExchangeManager(), ArraySize(logStorageResources),
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
     // Performs teardown for each test in the suite
@@ -206,8 +207,8 @@ TEST_F(TestEventCaching, TestBasicCaching)
     TestReadCallback readCallback;
 
     {
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
@@ -339,8 +340,8 @@ TEST_F(TestEventCaching, TestBasicCaching)
     GenerateEvents(firstEventNumber, lastEventNumber);
 
     {
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
@@ -391,8 +392,8 @@ TEST_F(TestEventCaching, TestBasicCaching)
     // we don't receive events lower than that value.
     //
     {
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         readCallback.mClusterCacheAdapter.ClearEventCache();
         constexpr EventNumber kLastSeenEventNumber = 3;
@@ -440,8 +441,8 @@ TEST_F(TestEventCaching, TestBasicCaching)
 
     {
         readParams.mEventNumber.SetValue(5);
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
         readCallback.mClusterCacheAdapter.ClearEventCache(true);
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
@@ -452,20 +453,19 @@ TEST_F(TestEventCaching, TestBasicCaching)
         //
 
         uint8_t generationCount = 5;
-        readCallback.mClusterCacheAdapter.ForEachEventData(
-            [&readCallback, &generationCount](const app::EventHeader & header) {
-                EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
-                EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
-                EXPECT_EQ(header.mPath.mEndpointId, kTestEndpointId);
+        readCallback.mClusterCacheAdapter.ForEachEventData([&readCallback, &generationCount](const app::EventHeader & header) {
+            EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
+            EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
+            EXPECT_EQ(header.mPath.mEndpointId, kTestEndpointId);
 
-                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
-                EXPECT_EQ(readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData), CHIP_NO_ERROR);
+            Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
+            EXPECT_EQ(readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData), CHIP_NO_ERROR);
 
-                EXPECT_EQ(eventData.arg1, generationCount);
-                generationCount++;
+            EXPECT_EQ(eventData.arg1, generationCount);
+            generationCount++;
 
-                return CHIP_NO_ERROR;
-            });
+            return CHIP_NO_ERROR;
+        });
 
         EXPECT_EQ(generationCount, 10u);
 

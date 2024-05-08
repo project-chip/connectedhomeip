@@ -64,14 +64,8 @@ namespace {
 class TestCommissionableNodeController : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite()
-    {
-        chip::Platform::MemoryShutdown();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 #if INET_CONFIG_ENABLE_IPV4

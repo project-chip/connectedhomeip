@@ -187,8 +187,7 @@ TEST_F(TestServerCommandDispatch, TestNoHandler)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
-                                 const auto & dataResponse) {
+    auto onSuccessCb = [](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus, const auto & dataResponse) {
         //
         // We shouldn't be arriving here, since we don't have a command handler installed.
         //
@@ -259,8 +258,7 @@ DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::UnitTesting::Id, testClusterAttrs, 
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpointClusters3);
 
-void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType * aEndpoint,
-                                                    bool aExpectSuccess)
+void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType * aEndpoint, bool aExpectSuccess)
 {
     FakeRequest request;
     auto sessionHandle = mpContext->GetSessionBobToAlice();
@@ -283,7 +281,7 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
     auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
-                                                      const auto & dataResponse) {
+                                             const auto & dataResponse) {
         uint8_t i = 0;
         auto iter = dataResponse.arg1.begin();
         while (iter.Next())
@@ -321,7 +319,7 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     onFailureWasCalled = false;
 
     auto readSuccessCb = [&onSuccessWasCalled, aExpectSuccess](const ConcreteDataAttributePath &,
-                                                                        const DataModel::DecodableList<CommandId> & commandList) {
+                                                               const DataModel::DecodableList<CommandId> & commandList) {
         auto count = 0;
         auto iter  = commandList.begin();
         while (iter.Next())

@@ -110,7 +110,8 @@ protected:
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&mpContext->GetExchangeManager(), ArraySize(logStorageResources), gCircularEventBuffer, logStorageResources, &mEventCounter);
+        chip::app::EventManagement::CreateEventManagement(&mpContext->GetExchangeManager(), ArraySize(logStorageResources),
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
     // Performs teardown for each test in the suite

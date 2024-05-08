@@ -96,7 +96,8 @@ protected:
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&mpContext->GetExchangeManager(), ArraySize(logStorageResources), gCircularEventBuffer, logStorageResources, &mEventCounter);
+        chip::app::EventManagement::CreateEventManagement(&mpContext->GetExchangeManager(), ArraySize(logStorageResources),
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
     // Performs teardown for each test in the suite
@@ -198,8 +199,8 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
         Optional<EventNumber> highestEventNumber;
         readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
         EXPECT_FALSE(highestEventNumber.HasValue());
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
@@ -209,7 +210,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 
         readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
             // We are not caching data.
-            ADD_FAILURE();  // Can't use FAIL() because lambda has non-void return type.
+            ADD_FAILURE(); // Can't use FAIL() because lambda has non-void return type.
             return CHIP_NO_ERROR;
         });
 
@@ -222,8 +223,8 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
     // we don't receive events except ones larger than that value.
     //
     {
-        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
-                                   app::ReadClient::InteractionType::Read);
+        app::ReadClient readClient(engine, &mpContext->GetExchangeManager(),
+                                   readCallback.mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
 
         readCallback.mClusterCacheAdapter.ClearEventCache(true);
         Optional<EventNumber> highestEventNumber;
@@ -248,7 +249,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 
         readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
             // We are not caching data.
-            ADD_FAILURE();  // Can't use FAIL() because lambda has non-void return type.
+            ADD_FAILURE(); // Can't use FAIL() because lambda has non-void return type.
             return CHIP_NO_ERROR;
         });
 

@@ -763,8 +763,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
 
         // Ensure we have received the report, we do not care about the initial report here.
         // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
-        EXPECT_EQ(readCallback.mAttributeCount,
-                           ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
+        EXPECT_EQ(readCallback.mAttributeCount, ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
 
         // We have received all report data.
         EXPECT_TRUE(readCallback.mOnReportEnd);
@@ -789,8 +788,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
 
         // Ensure we have received the report, we do not care about the initial report here.
         // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
-        EXPECT_EQ(readCallback.mAttributeCount,
-                           ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
+        EXPECT_EQ(readCallback.mAttributeCount, ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
 
         // We have received all report data.
         EXPECT_TRUE(readCallback.mOnReportEnd);
@@ -978,8 +976,8 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
             {
                 ChipLogProgress(DataManagement, "Case 2: Set dirty during chunked report by wildcard path.");
                 readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 3);
-                DoTest(mpContext,
-                    &readCallback,
+                DoTest(
+                    mpContext, &readCallback,
                     Instruction{ .chunksize      = 2,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 2), WriteAttrOp(AttrOnEp5<Attr2>, 2),
                                                      WriteAttrOp(AttrOnEp5<Attr3>, 2) },
@@ -992,8 +990,8 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                 ChipLogProgress(DataManagement,
                                 "Case 3-1: Set dirty during chunked report by wildcard path -- new dirty attribute.");
                 readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr3>, 4);
-                DoTest(mpContext,
-                    &readCallback,
+                DoTest(
+                    mpContext, &readCallback,
                     Instruction{ .chunksize      = 1,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 4), WriteAttrOp(AttrOnEp5<Attr2>, 4) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 4 }, { AttrOnEp5<Attr2>, 4 }, { AttrOnEp5<Attr3>, 4 } },
@@ -1003,8 +1001,8 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
                                 "Case 3-2: Set dirty during chunked report by wildcard path -- new dirty attribute.");
                 app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(1);
                 readCallback.mActionOn[AttrOnEp5<Attr2>] = WriteAttrOp(AttrOnEp5<Attr1>, 5);
-                DoTest(mpContext,
-                    &readCallback,
+                DoTest(
+                    mpContext, &readCallback,
                     Instruction{ .chunksize      = 1,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr2>, 5), WriteAttrOp(AttrOnEp5<Attr3>, 5) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 5 }, { AttrOnEp5<Attr2>, 5 }, { AttrOnEp5<Attr3>, 5 } },

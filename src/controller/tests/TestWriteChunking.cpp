@@ -416,8 +416,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
             writeCallbackRef1 = &writeCallback2;
         }
 
-        EXPECT_EQ(writeCallbackRef1->mSuccessCount,
-                           kTestListLength + 1 /* an extra item for the empty list at the beginning */);
+        EXPECT_EQ(writeCallbackRef1->mSuccessCount, kTestListLength + 1 /* an extra item for the empty list at the beginning */);
         EXPECT_EQ(writeCallbackRef1->mErrorCount, 0u);
         EXPECT_EQ(writeCallbackRef2->mSuccessCount, 0u);
         EXPECT_EQ(writeCallbackRef2->mErrorCount, kTestListLength + 1);
@@ -600,8 +599,8 @@ void RunTest(TestContext * pContext, Instructions instructions)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     pContext->GetIOContext().DriveIOUntil(sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime) +
-                                        System::Clock::Seconds16(1),
-                                    [&]() { return pContext->GetExchangeManager().GetNumActiveExchanges() == 0; });
+                                              System::Clock::Seconds16(1),
+                                          [&]() { return pContext->GetExchangeManager().GetNumActiveExchanges() == 0; });
 
     EXPECT_EQ(onGoingPath, app::ConcreteAttributePath());
     EXPECT_EQ(status.size(), instructions.expectedStatus.size());
@@ -632,27 +631,32 @@ TEST_F(TestWriteChunking, TestTransactionalList)
 
     // Test 1: we should receive transaction notifications
     ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
-    RunTest(mpContext, Instructions{
+    RunTest(mpContext,
+            Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .expectedStatus = { true },
             });
 
     ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
-    RunTest(mpContext, Instructions{
+    RunTest(
+        mpContext,
+        Instructions{
             .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
             .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
             .expectedStatus          = { false },
-            });
+        });
 
     ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
-    RunTest(mpContext, Instructions{
+    RunTest(mpContext,
+            Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                                     ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
                 .expectedStatus = { true, true },
             });
 
     ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
-    RunTest(mpContext, Instructions{
+    RunTest(mpContext,
+            Instructions{
                 .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                            ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
                 .onListWriteBeginActions =
@@ -669,7 +673,8 @@ TEST_F(TestWriteChunking, TestTransactionalList)
     ChipLogProgress(Zcl,
                     "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value before non null values");
-    RunTest(mpContext, Instructions{
+    RunTest(mpContext,
+            Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                                     ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kNull, ListData::kList },
@@ -679,7 +684,8 @@ TEST_F(TestWriteChunking, TestTransactionalList)
     ChipLogProgress(Zcl,
                     "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value after non null values");
-    RunTest(mpContext, Instructions{
+    RunTest(mpContext,
+            Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                                     ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull },
@@ -689,7 +695,8 @@ TEST_F(TestWriteChunking, TestTransactionalList)
     ChipLogProgress(Zcl,
                     "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
                     "null value between non null values");
-    RunTest(mpContext, Instructions{
+    RunTest(mpContext,
+            Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                                     ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                                     ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
@@ -698,7 +705,8 @@ TEST_F(TestWriteChunking, TestTransactionalList)
             });
 
     ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
-    RunTest(mpContext, Instructions{
+    RunTest(mpContext,
+            Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kNull },
                 .expectedStatus = { true },
@@ -707,7 +715,8 @@ TEST_F(TestWriteChunking, TestTransactionalList)
     ChipLogProgress(Zcl,
                     "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
                     "during processing the requests");
-    RunTest(mpContext, Instructions{
+    RunTest(mpContext,
+            Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kBadValue },
                 .expectedStatus = { false },
