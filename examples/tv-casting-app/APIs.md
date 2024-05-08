@@ -1362,7 +1362,7 @@ if(currentStateAttribute == nil)
 }
 
 // call read on currentStateAttribute and pass in a completion block
-currentStateAttribute!.read(nil) { context, before, after, err in
+currentStateAttribute!.subscribe(nil, completion: { context, before, after, err in
 
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "HH:mm:ss"
@@ -1386,7 +1386,7 @@ currentStateAttribute!.read(nil) { context, before, after, err in
             self.status = "Read CurrentState value: \(String(describing: after)) at \(currentTime)"
         }
     }
-}
+}, minInterval: 0, maxInterval: 1)
 ```
 
 The Casting client can Shutdown all running Subscriptions by calling the

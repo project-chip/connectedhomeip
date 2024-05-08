@@ -1049,15 +1049,15 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull alarmsActive MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable alarmsSuppressed MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull alarmsActive MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable alarmsSuppressed MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTRBooleanStateConfigurationClusterSensorFaultEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull sensorFault MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull sensorFault MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
