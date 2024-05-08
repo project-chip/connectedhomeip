@@ -130,7 +130,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             powerStepValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerStep)
             asserts.assert_greater_equal(powerStepValue, 1, "PowerStep is less than 1")
             asserts.assert_less_equal(powerStepValue, maxPowerValue, "PowerStep is greater than MaxPower")
-            asserts.assert_true((MaxPower - MinPower) % PowerStep == 0, "PowerStep is not correct for MaxPower - MinPower")
+            asserts.assert_true((maxPowerValue - minPowerValue) % powerStepValue == 0, "PowerStep is not correct for MaxPower - MinPower")
         logging.info("PowerStep is %s" % powerStepValue)
 
         self.step(8)
