@@ -86,7 +86,8 @@ class DeviceConformanceTests(BasicCompositionTests):
                         # manufacturer cluster
                         continue
                     # TODO: update this from a warning once we have all the data
-                    record_warning(location=cluster_location, problem='Standard cluster found on device, but is not present in spec data')
+                    record_warning(location=cluster_location,
+                                   problem='Standard cluster found on device, but is not present in spec data')
                     continue
 
                 if not allow_provisional and cluster_id in provisional_cluster_ids:
