@@ -17,11 +17,13 @@
 
 #import <Foundation/Foundation.h>
 
+#import "../MCCastingPlayer.h"
 #import "VideoPlayer.h"
 
 #ifndef DiscoveredNodeData_h
 #define DiscoveredNodeData_h
 
+__attribute__((deprecated("Use the APIs described in /examples/tv-casting-app/APIs.md instead.")))
 @interface DiscoveredNodeData : NSObject
 
 @property NSString * deviceName;
@@ -56,11 +58,15 @@
 
 - (DiscoveredNodeData *)initWithDeviceName:(NSString *)deviceName vendorId:(uint16_t)vendorId productId:(uint16_t)productId;
 
+- (instancetype)initWithCastingPlayer:(MCCastingPlayer *)castingPlayer;
+
 - (bool)isPreCommissioned;
 
 - (VideoPlayer *)getConnectableVideoPlayer;
 
 - (void)setConnectableVideoPlayer:(VideoPlayer *)videoPlayer;
+
+- (MCCastingPlayer *)getCastingPlayer;
 
 @end
 

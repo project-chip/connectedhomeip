@@ -48,16 +48,16 @@ class ContentLauncherViewModel: ObservableObject {
                     .contentLauncher_launchUrl(targetContentApp!, contentUrl: contentUrl!,
                                               contentDisplayStr: contentDisplayStr!,
                                               responseCallback:
-                                                { (result: Bool) -> () in
+                                                { (result: MatterError) -> () in
                         self.Log.info("ContentLauncherViewModel.launchUrl.launchUrlResponseCallback result \(result)")
                         DispatchQueue.main.async {
-                            self.status = result ? "Launched URL successfully" : "Launch URL failure!"
+                            self.status = (result == MATTER_NO_ERROR) ? "Launched URL successfully" : "Launch URL failure!"
                         }
                     },
                     clientQueue: DispatchQueue.main,
-                    requestSentHandler: { (result: Bool) -> () in
+                    requestSentHandler: { (result: MatterError) -> () in
                         self.Log.info("ContentLauncherViewModel.launchUrl.launcUrlRequestSentHandler result \(result)")
-                        self.status = result ? "Sent Launch URL request" : "Failed to send Launch URL request!"
+                        self.status = (result == MATTER_NO_ERROR) ? "Sent Launch URL request" : "Failed to send Launch URL request!"
                     })
             }
         }

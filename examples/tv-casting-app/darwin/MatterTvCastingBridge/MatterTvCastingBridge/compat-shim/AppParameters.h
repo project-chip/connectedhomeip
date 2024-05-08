@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,27 +15,27 @@
  *    limitations under the License.
  */
 
-#import "MatterError.h"
-#include <lib/core/CHIPError.h>
-
 #import <Foundation/Foundation.h>
 
-#ifndef MCErrorUtils_h
-#define MCErrorUtils_h
+#import "DeviceAttestationCredentialsHolder.h"
+#import "OnboardingPayload.h"
 
-/**
- * @brief - Conversion utilities to/from CHIP_ERROR (C++) / MatterError (Objective C) / NSError
- */
-@interface MCErrorUtils : NSObject
+#ifndef AppParameters_h
+#define AppParameters_h
 
-+ (MatterError * _Nonnull)MatterErrorFromChipError:(CHIP_ERROR)chipError;
+__attribute__((deprecated("Use the APIs described in /examples/tv-casting-app/APIs.md instead.")))
+@interface AppParameters : NSObject
 
-+ (NSError * _Nonnull)NSErrorFromChipError:(CHIP_ERROR)chipError;
+@property NSData * rotatingDeviceIdUniqueId;
 
-+ (NSError * _Nonnull)NSErrorFromMatterError:(MatterError * _Nonnull)matterError;
+@property OnboardingPayload * onboardingPayload;
 
-+ (MatterError * _Nonnull)MatterErrorFromNsError:(NSError * _Nonnull)nsError;
+@property uint32_t spake2pIterationCount;
+
+@property NSData * spake2pSaltBase64;
+
+@property NSData * spake2pVerifierBase64;
 
 @end
 
-#endif /* MCErrorUtils_h */
+#endif /* AppParameters_h */

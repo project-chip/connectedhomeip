@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "../MCEndpoint_Internal.h"
 #import "ContentApp.h"
 
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -36,6 +37,16 @@
     if (self = [super init]) {
         _endpointId = endpointId;
         _clusterIds = clusterIds;
+        _isInitialized = true;
+    }
+    return self;
+}
+
+- (instancetype)initWithEndpoint:(MCEndpoint *)endpoint
+{
+    if (self = [super init]) {
+        _endpointId = [endpoint.identifier unsignedShortValue];
+        _clusterIds = [endpoint getServerList];
         _isInitialized = true;
     }
     return self;

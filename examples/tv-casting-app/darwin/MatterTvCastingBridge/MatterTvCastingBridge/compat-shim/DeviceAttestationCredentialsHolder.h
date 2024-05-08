@@ -21,6 +21,7 @@
 #ifndef DeviceAttestationCredentialsHolder_h
 #define DeviceAttestationCredentialsHolder_h
 
+__attribute__((deprecated("Use the APIs described in /examples/tv-casting-app/APIs.md instead.")))
 @interface DeviceAttestationCredentialsHolder : NSObject
 
 - (DeviceAttestationCredentialsHolder * _Nonnull)

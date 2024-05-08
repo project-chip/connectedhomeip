@@ -17,49 +17,46 @@
 
 import SwiftUI
 
-extension VideoPlayer : Identifiable {
+extension DiscoveredNodeData : Identifiable {
     public var id: String {
-        deviceName
+        instanceName
     }
 }
 
-struct StartFromCacheView: View {
-    @StateObject var viewModel = StartFromCacheViewModel()
+@available(*, deprecated, message: "Refer to MCDiscoveryExampleView")
+struct CommissionerDiscoveryView: View {
+    @StateObject var viewModel = CommissionerDiscoveryViewModel()
     
     var body: some View {
         VStack(alignment: .leading) {
-            Button("Purge cache", action: {
-                viewModel.purgeAndReReadCache()
-            })
-            .frame(width: 200, height: 30, alignment: .center)
-            .border(Color.black, width: 1)
-            .background(Color.blue)
-            .foregroundColor(Color.white)
-            .padding()
-            
-            NavigationLink(
-                destination: CommissionerDiscoveryView(),
-                label: {
-                    Text("Skip to commissioner discovery >>")
-                        .frame(width: 300, height: 30, alignment: .center)
-                        .border(Color.black, width: 1)
-                }
-            ).background(Color.blue)
+            Button("Discover commissioners", action: viewModel.discoverAndUpdate)
+                .frame(width: 200, height: 30, alignment: .center)
+                .border(Color.black, width: 1)
+                .background(Color.blue)
                 .foregroundColor(Color.white)
                 .padding()
             
-            if(viewModel.videoPlayers.isEmpty)
+            if(viewModel.discoveryRequestStatus == false)
             {
-                Text("No cached video players.")
+                Text("Failed to send discovery request")
             }
-            else
+            else if(!viewModel.commissioners.isEmpty)
             {
-                Text("Pick a Video player")
-                ForEach(viewModel.videoPlayers) { videoPlayer in
+                Text("Select a commissioner video player...")
+                ForEach(viewModel.commissioners) { commissioner in
                     NavigationLink(
-                        destination: ConnectionView(_selectedVideoPlayer: videoPlayer),
+                        destination: {
+                            if(commissioner.isPreCommissioned())
+                            {
+                                Text("Error: unexpected value for commissioner.isPreCommissioned: true")
+                            }
+                            else
+                            {
+                                CommissioningView(_selectedCommissioner: commissioner)
+                            }
+                        },
                         label: {
-                            Text(videoPlayer.description)
+                            Text(commissioner.description)
                         }
                     )
                     .frame(width: 350, height: 50, alignment: .center)
@@ -70,14 +67,13 @@ struct StartFromCacheView: View {
                 }
             }
         }
-        .navigationTitle("Starting from Cache")
+        .navigationTitle("Video Player Discovery")
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
-        .onAppear(perform: {viewModel.readFromCache()})
     }
 }
 
-struct StartFromCacheView_Previews: PreviewProvider {
+struct CommissionerDiscoveryView_Previews: PreviewProvider {
     static var previews: some View {
-        StartFromCacheView()
+        CommissionerDiscoveryView()
     }
 }

@@ -15,17 +15,19 @@
  *    limitations under the License.
  */
 
-#import "MatterError.h"
+#import "../MatterError.h"
 #import <Foundation/Foundation.h>
 
 #ifndef CommissioningCallbacksHandlers_h
 #define CommissioningCallbacksHandlers_h
 
+__attribute__((deprecated("Use the APIs described in /examples/tv-casting-app/APIs.md instead.")))
 @interface CommissioningCallbackHandlers : NSObject
 
 - (CommissioningCallbackHandlers * _Nonnull)
-    initWithCommissioningWindowRequestedHandler:(void (^_Nonnull)(bool))commissioningWindowRequestedHandler
-                  commissioningCompleteCallback:(void (^_Nonnull)(bool))commissioningCompleteCallback
+    initWithCommissioningWindowRequestedHandler:(void (^_Nonnull)(MatterError * _Nonnull))commissioningWindowRequestedHandler
+              commissioningWindowOpenedCallback:(void (^_Nonnull)(MatterError * _Nonnull))commissioningWindowOpenedCallback
+                  commissioningCompleteCallback:(void (^_Nonnull)(MatterError * _Nonnull))commissioningCompleteCallback
             sessionEstablishmentStartedCallback:(void (^_Nullable)(void))sessionEstablishmentStartedCallback
                      sessionEstablishedCallback:(void (^_Nullable)(void))sessionEstablishedCallback
               sessionEstablishmentErrorCallback:(void (^_Nullable)(MatterError * _Nonnull))sessionEstablishmentErrorCallback
@@ -34,12 +36,14 @@
 /**
  * This is called when request to open the commissioning window has been made.
  */
-@property void (^_Nullable commissioningWindowRequestedHandler)(bool);
+@property void (^_Nullable commissioningWindowRequestedHandler)(MatterError * _Nonnull);
+
+@property void (^_Nullable commissioningWindowOpenedCallback)(MatterError * _Nonnull);
 
 /**
  * This is called when the commissioning has been completed
  */
-@property void (^_Nullable commissioningCompleteCallback)(bool);
+@property void (^_Nullable commissioningCompleteCallback)(MatterError * _Nonnull);
 
 /**
  * This is called when the PBKDFParamRequest is received and indicates the start of the session establishment process
