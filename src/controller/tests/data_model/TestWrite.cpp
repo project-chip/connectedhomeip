@@ -361,8 +361,7 @@ TEST_F(TestWrite, TestAttributeError)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const ConcreteAttributePath * attributePath,
-                                             CHIP_ERROR aError) { //++++ removed apSuite as 1st parameter
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         EXPECT_TRUE(attributePath != nullptr);
         onFailureCbInvoked = true;
     };
@@ -399,8 +398,7 @@ TEST_F(TestWrite, TestFabricScopedAttributeWithoutFabricIndex)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const ConcreteAttributePath * attributePath,
-                                             CHIP_ERROR aError) { //++++ removed &apSuite as 2nd parameter
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
         EXPECT_EQ(aError, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
         onFailureCbInvoked = true;
     };

@@ -392,8 +392,7 @@ TEST_F(TestRead, TestReadAttributeResponse)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, //+++ removed 1st param apSuite
-                                             const auto & dataResponse) {
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         uint8_t i = 0;
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
         auto iter = dataResponse.begin();
@@ -1512,8 +1511,7 @@ TEST_F(TestRead, TestReadEventResponse)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::EventHeader & eventHeader,
-                                             const auto & EventResponse) { //+++ removed apSuite 1st param
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::EventHeader & eventHeader, const auto & EventResponse) {
         // TODO: Need to add check when IM event server integration completes
         onSuccessCbInvoked = true;
     };
@@ -1554,8 +1552,7 @@ TEST_F(TestRead, TestReadAttributeError)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath,
-                                             CHIP_ERROR aError) { //+++ removed apSuite 2nd param
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         EXPECT_TRUE(aError.IsIMStatus() && app::StatusIB(aError).mStatus == Protocols::InteractionModel::Status::Busy);
         onFailureCbInvoked = true;
     };
@@ -1586,8 +1583,7 @@ TEST_F(TestRead, TestReadAttributeTimeout)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath,
-                                             CHIP_ERROR aError) { //+++ removed apSuite 2nd param
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         EXPECT_EQ(aError, CHIP_ERROR_TIMEOUT);
         onFailureCbInvoked = true;
     };
@@ -1846,8 +1842,7 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath,
-                          CHIP_ERROR aError) { //+++ removed &apSuite 1st param
+    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         //
         // We shouldn't be encountering any failures in this test.
         //
@@ -1985,20 +1980,19 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb =
-        [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient, //+++ removed 2nd param &apSuite
-                                           chip::SubscriptionId aSubscriptionId) {
-            uint16_t minInterval = 0, maxInterval = 0;
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
 
-            CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
 
-            EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-            EXPECT_EQ(minInterval, 5);
-            EXPECT_EQ(maxInterval, 5);
+        EXPECT_EQ(minInterval, 5);
+        EXPECT_EQ(maxInterval, 5);
 
-            numSubscriptionEstablishedCalls++;
-        };
+        numSubscriptionEstablishedCalls++;
+    };
 
     //
     // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
@@ -2061,20 +2055,19 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb =
-        [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient, //+++ removed 2nd param &apSuite
-                                           chip::SubscriptionId aSubscriptionId) {
-            uint16_t minInterval = 0, maxInterval = 0;
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
 
-            CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
 
-            EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-            EXPECT_EQ(minInterval, 0);
-            EXPECT_EQ(maxInterval, 10);
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 10);
 
-            numSubscriptionEstablishedCalls++;
-        };
+        numSubscriptionEstablishedCalls++;
+    };
 
     //
     // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
@@ -2137,20 +2130,19 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb =
-        [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient, //+++ removed 2nd param &apSuite
-                                           chip::SubscriptionId aSubscriptionId) {
-            uint16_t minInterval = 0, maxInterval = 0;
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
 
-            CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
 
-            EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-            EXPECT_EQ(minInterval, 0);
-            EXPECT_EQ(maxInterval, 3000);
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 3000);
 
-            numSubscriptionEstablishedCalls++;
-        };
+        numSubscriptionEstablishedCalls++;
+    };
 
     //
     // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
@@ -2282,20 +2274,19 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb =
-        [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient, //+++ removed 2nd param &apSuite
-                                           chip::SubscriptionId aSubscriptionId) {
-            uint16_t minInterval = 0, maxInterval = 0;
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
 
-            CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
 
-            EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-            EXPECT_EQ(minInterval, 0);
-            EXPECT_EQ(maxInterval, 4000);
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 4000);
 
-            numSubscriptionEstablishedCalls++;
-        };
+        numSubscriptionEstablishedCalls++;
+    };
 
     //
     // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
@@ -2358,20 +2349,19 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb =
-        [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient, //+++ removed 2nd param &apSuite
-                                           chip::SubscriptionId aSubscriptionId) {
-            uint16_t minInterval = 0, maxInterval = 0;
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
 
-            CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
 
-            EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-            EXPECT_EQ(minInterval, 0);
-            EXPECT_EQ(maxInterval, 3000);
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 3000);
 
-            numSubscriptionEstablishedCalls++;
-        };
+        numSubscriptionEstablishedCalls++;
+    };
 
     //
     // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
@@ -2434,20 +2424,19 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb =
-        [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient, //+++ removed 2nd param &apSuite
-                                           chip::SubscriptionId aSubscriptionId) {
-            uint16_t minInterval = 0, maxInterval = 0;
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        uint16_t minInterval = 0, maxInterval = 0;
 
-            CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
+        CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
 
-            EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
 
-            EXPECT_EQ(minInterval, 0);
-            EXPECT_EQ(maxInterval, 3700);
+        EXPECT_EQ(minInterval, 0);
+        EXPECT_EQ(maxInterval, 3700);
 
-            numSubscriptionEstablishedCalls++;
-        };
+        numSubscriptionEstablishedCalls++;
+    };
     //
     // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
     // callbacks.
@@ -2961,23 +2950,22 @@ void TestRead::SubscribeThenReadHelper(TestContext * apCtx, size_t aSubscribeCou
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath,
-                          CHIP_ERROR aError) { //+++ removed 1st param &apSuite
+    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         //
         // We shouldn't be encountering any failures in this test.
         //
         EXPECT_TRUE(false);
     };
 
-    auto onSubscriptionEstablishedCb =
-        [&numSubscriptionEstablishedCalls, &apCtx, aSubscribeCount, aReadCount, //++++ removed 2nd parameter apSuite
-         &numReadSuccessCalls, &numReadFailureCalls](const app::ReadClient & readClient, chip::SubscriptionId aSubscriptionId) {
-            numSubscriptionEstablishedCalls++;
-            if (numSubscriptionEstablishedCalls == aSubscribeCount)
-            {
-                MultipleReadHelperInternal(apCtx, aReadCount, numReadSuccessCalls, numReadFailureCalls);
-            }
-        };
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apCtx, aSubscribeCount, aReadCount, &numReadSuccessCalls,
+                                        &numReadFailureCalls](const app::ReadClient & readClient,
+                                                              chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+        if (numSubscriptionEstablishedCalls == aSubscribeCount)
+        {
+            MultipleReadHelperInternal(apCtx, aReadCount, numReadSuccessCalls, numReadFailureCalls);
+        }
+    };
 
     for (size_t i = 0; i < aSubscribeCount; ++i)
     {
@@ -3009,8 +2997,7 @@ void TestRead::MultipleReadHelperInternal(TestContext * apCtx, size_t aReadCount
 
     uint16_t firstExpectedResponse = totalReadCount + 1;
 
-    auto onFailureCb = [&aNumFailureCalls](const app::ConcreteDataAttributePath * attributePath,
-                                           CHIP_ERROR aError) { //+++ removed 1st param apSuite
+    auto onFailureCb = [&aNumFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         aNumFailureCalls++;
 
         EXPECT_EQ(attributePath, nullptr);
@@ -3018,8 +3005,8 @@ void TestRead::MultipleReadHelperInternal(TestContext * apCtx, size_t aReadCount
 
     for (size_t i = 0; i < aReadCount; ++i)
     {
-        auto onSuccessCb = [&aNumSuccessCalls, firstExpectedResponse, //+++ removed 2nd param apSuite
-                            i](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        auto onSuccessCb = [&aNumSuccessCalls, firstExpectedResponse, i](const app::ConcreteDataAttributePath & attributePath,
+                                                                         const auto & dataResponse) {
             EXPECT_EQ(dataResponse, firstExpectedResponse + i);
             aNumSuccessCalls++;
         };
@@ -3053,16 +3040,14 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptionsWithDataVersionFilter)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, //+++ removed 1st param apSuite
-                                          const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath,
-                          CHIP_ERROR aError) { //+++ removed 1st param &apSuite
+    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         //
         // We shouldn't be encountering any failures in this test.
         //
@@ -3122,8 +3107,7 @@ TEST_F(TestRead, TestReadHandlerResourceExhaustion_MultipleReads)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath,
-                                          CHIP_ERROR aError) { //+++ removed 1st param &apSuite
+    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
 
         EXPECT_EQ(aError, CHIP_IM_GLOBAL_STATUS(Busy));
@@ -3168,8 +3152,7 @@ TEST_F(TestRead, TestReadFabricScopedWithoutFabricFilter)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, //+++ removed 1st param apSuite
-                                             const auto & dataResponse) {
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         size_t len = 0;
 
         EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
@@ -3214,8 +3197,7 @@ TEST_F(TestRead, TestReadFabricScopedWithFabricFilter)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, //+++ removed 1st param apSuite
-                                             const auto & dataResponse) {
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         size_t len = 0;
 
         EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
@@ -4773,8 +4755,7 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValues)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&successCalls](const app::ConcreteDataAttributePath & attributePath,
-                                       const auto & dataResponse) { //+++ removed 1st param apSuite
+    auto onSuccessCb = [&successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
 
         EXPECT_TRUE(dataResponse);
@@ -4807,8 +4788,7 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValuesWrongPath)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&successCalls](const app::ConcreteDataAttributePath & attributePath,
-                                       const auto & dataResponse) { //+++ removed 1st param apSuite
+    auto onSuccessCb = [&successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
 
         EXPECT_TRUE(dataResponse);
@@ -4841,8 +4821,7 @@ TEST_F(TestRead, TestReadAttribute_ManyErrors)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&successCalls](const app::ConcreteDataAttributePath & attributePath,
-                                       const auto & dataResponse) { //+++ removed 1st param apSuite
+    auto onSuccessCb = [&successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
 
         EXPECT_TRUE(dataResponse);

@@ -235,8 +235,7 @@ TEST_F(TestCommands, TestDataResponse)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath,
-                                             const app::StatusIB & aStatus, //++++ got rid of apSuite as 1st param
+    auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
                                              const auto & dataResponse) {
         uint8_t i = 0;
         auto iter = dataResponse.arg1.begin();
