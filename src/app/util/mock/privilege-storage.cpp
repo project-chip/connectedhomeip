@@ -16,22 +16,26 @@
 #include <access/Privilege.h>
 #include <lib/core/DataModelTypes.h>
 
+// Privilege mocks here are MUCH more strict so that
+// testing code can generally validatate access without something
+// being permissive like kView.
+
 chip::Access::Privilege MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
 {
-    return chip::Access::Privilege::kView;
+    return chip::Access::Privilege::kAdminister;
 }
 
 chip::Access::Privilege MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute)
 {
-    return chip::Access::Privilege::kOperate;
+    return chip::Access::Privilege::kAdminister;
 }
 
 chip::Access::Privilege MatterGetAccessPrivilegeForInvokeCommand(chip::ClusterId cluster, chip::CommandId command)
 {
-    return chip::Access::Privilege::kOperate;
+    return chip::Access::Privilege::kAdminister;
 }
 
 chip::Access::Privilege MatterGetAccessPrivilegeForReadEvent(chip::ClusterId cluster, chip::EventId event)
 {
-    return chip::Access::Privilege::kView;
+    return chip::Access::Privilege::kAdminister;
 }
