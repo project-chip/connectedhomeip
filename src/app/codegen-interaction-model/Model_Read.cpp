@@ -542,9 +542,6 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
 
     return SendFailureStatus(aPath, aAttributeReports, status, &backup);
 #endif
-
-    // TODO: this needs an implementation
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace CodegenDataModel
