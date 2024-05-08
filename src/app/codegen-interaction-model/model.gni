@@ -27,6 +27,7 @@ import("//build_overrides/chip.gni")
 codegen_interaction_model_SOURCES = [
   "${chip_root}/src/app/codegen-interaction-model/Model.h",
   "${chip_root}/src/app/codegen-interaction-model/Model.cpp",
+  "${chip_root}/src/app/codegen-interaction-model/Model_Read.cpp",
 ]
 
 codegen_interaction_model_PUBLIC_DEPS = [
