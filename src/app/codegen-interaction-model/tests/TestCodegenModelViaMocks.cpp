@@ -188,14 +188,14 @@ TEST(TestCodegenModelViaMocks, GetClusterInfo)
     // now get the value
     std::optional<ClusterInfo> info = model.GetClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
     ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->dataVersion, 0u);
-    EXPECT_EQ(info->flags.Raw(), 0u);
+    EXPECT_EQ(info->dataVersion, 0u); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
 
     chip::Test::BumpVersion();
     info = model.GetClusterInfo(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)));
     ASSERT_TRUE(info.has_value());
-    EXPECT_EQ(info->dataVersion, 1u);
-    EXPECT_EQ(info->flags.Raw(), 0u);
+    EXPECT_EQ(info->dataVersion, 1u); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info->flags.Raw(), 0u); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST(TestCodegenModelViaMocks, IterateOverAttributes)
