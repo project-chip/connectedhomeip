@@ -108,7 +108,8 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         self.step(3)
         if is_pwrlmits_feature_supported:
             minPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MinPower)
-            asserts.assert_true(minPowerValue >= 1, "MinPower is less than 1")
+            asserts.assert_greater_equal(minPowerValue, 1, "MinPower is less than 1")
+            asserts.assert_less_equal(minPowerValue, 99, "MinPower is less than 1")
         logging.info("MinPower is %s" % minPowerValue)
 
         self.step(4)
@@ -117,8 +118,8 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         self.step(5)
         if is_pwrlmits_feature_supported:
             maxPowerValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxPower)
-            asserts.assert_true(maxPowerValue >= minPowerValue, "MaxPower is less than MinPower")
-            asserts.assert_true(maxPowerValue <= 100, "MaxPower is greater than 100")
+            asserts.assert_greater(maxPowerValue, minPowerValue, "MaxPower is less than MinPower")
+            asserts.assert_less(maxPowerValue, 100, "MaxPower is greater than 100")
         logging.info("MaxPower is %s" % maxPowerValue)
 
         self.step(6)
@@ -127,8 +128,9 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         self.step(7)
         if is_pwrlmits_feature_supported:
             powerStepValue = await self.read_mwoctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.PowerStep)
-            asserts.assert_true(powerStepValue >= 1, "PowerStep is less than 1")
-            asserts.assert_true(powerStepValue <= maxPowerValue, "PowerStep is greater than MaxPower")
+            asserts.assert_greater_equal(powerStepValue, 1, "PowerStep is less than 1")
+            asserts.assert_less_equal(powerStepValue, maxPowerValue, "PowerStep is greater than MaxPower")
+            asserts.assert_true((MaxPower - MinPower) % PowerStep == 0, "PowerStep is not correct for MaxPower - MinPower")
         logging.info("PowerStep is %s" % powerStepValue)
 
         self.step(8)
