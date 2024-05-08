@@ -15,10 +15,12 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
 
 config("tests_config") {
   include_dirs = [ "." ]
@@ -60,7 +62,7 @@ static_library("helpers") {
   ]
 }
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libInetLayerTests"
 
   public_configs = [ ":tests_config" ]
@@ -69,10 +71,7 @@ chip_test_suite_using_nltest("tests") {
     ":helpers",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support:testing_nlunit",
-    "${nlunit_test_root}:nlunit-test",
   ]
-
   test_sources = [
     "TestBasicPacketFilters.cpp",
     "TestInetAddress.cpp",
@@ -80,7 +79,7 @@ chip_test_suite_using_nltest("tests") {
   ]
   sources = []
 
-  if (current_os != "zephyr") {
+  if (chip_system_config_use_sockets && current_os != "zephyr") {
     test_sources += [ "TestInetEndPoint.cpp" ]
   }
 

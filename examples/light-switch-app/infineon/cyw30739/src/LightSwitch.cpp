@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <LightSwitch.h>
-
 #include <BindingHandler.h>
+#include <LightSwitch.h>
 #include <app/util/binding-table.h>
 #include <controller/InvokeInteraction.h>
+#include <matter_config.h>
 
 #define CHIP_DEVICE_CONFIG_BRIGHTNESS_MAXIMUM 254
 

@@ -28,11 +28,11 @@ class AppContext : public LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    CHIP_ERROR SetUpTestSuite() override;
+    void SetUpTestSuite() override;
     // Performs shared teardown for all tests in the test suite
     void TearDownTestSuite() override;
     // Performs setup for each individual test in the test suite
-    CHIP_ERROR SetUp() override;
+    void SetUp() override;
     // Performs teardown for each individual test in the test suite
     void TearDown() override;
 };
