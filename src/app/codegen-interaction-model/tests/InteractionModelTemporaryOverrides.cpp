@@ -29,7 +29,6 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 
-
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
 {
     // TODO: this is just a noop which may be potentially invalid
@@ -92,4 +91,3 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
     //        to me why we do not have this...
     return Status::NotFound;
 }
-
