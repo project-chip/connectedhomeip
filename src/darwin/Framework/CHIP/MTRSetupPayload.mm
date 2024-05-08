@@ -22,6 +22,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRUtilities.h"
 
+#include <lib/support/SafeInt.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -34,20 +35,29 @@ MTR_DIRECT_MEMBERS
     chip::OptionalQRCodeInfo _info;
 }
 
-- (instancetype)initWithTag:(uint8_t)tag int32Value:(int32_t)value
+static uint8_t ValidateVendorTag(NSNumber * tag)
+{
+    auto integerValue = tag.integerValue;
+    auto tagValue = static_cast<uint8_t>(integerValue);
+    MTRVerifyArgumentOrDie(tag != nil && chip::CanCastTo<uint8_t>(integerValue) && chip::SetupPayload::IsVendorTag(tagValue), @"tag must be a vendor tag (0x80 - 0xFF)");
+    return tagValue;
+}
+
+- (instancetype)initWithTag:(NSNumber *)tag int32Value:(int32_t)value
 {
     self = [super init];
     _info.type = chip::optionalQRCodeInfoTypeInt32;
-    _info.tag = tag;
+    _info.tag = ValidateVendorTag(tag);
     _info.int32 = value;
     return self;
 }
 
-- (instancetype)initWithTag:(uint8_t)tag stringValue:(NSString *)value
+- (instancetype)initWithTag:(NSNumber *)tag stringValue:(NSString *)value
 {
     self = [super init];
     _info.type = chip::optionalQRCodeInfoTypeString;
-    _info.tag = tag;
+    _info.tag = ValidateVendorTag(tag);
+    MTRVerifyArgumentOrDie(value != nil, @"value");
     _info.data = value.UTF8String;
     return self;
 }
@@ -56,7 +66,8 @@ MTR_DIRECT_MEMBERS
 {
     self = [super init];
     _info = info;
-    // Don't expose objects with an invalid type.
+    // Don't expose objects with an out-of-range tag or invalid type
+    VerifyOrReturnValue(chip::SetupPayload::IsVendorTag(_info.tag), nil);
     VerifyOrReturnValue(self.type != MTROptionalQRCodeInfoTypeUnknown, nil);
     return self;
 }
@@ -97,9 +108,9 @@ MTR_DIRECT_MEMBERS
     return MTROptionalQRCodeInfoTypeUnknown;
 }
 
-- (uint8_t)tagNumber
+- (NSNumber *)tag
 {
-    return _info.tag;
+    return @(_info.tag);
 }
 
 - (NSNumber *)integerValue
@@ -142,7 +153,7 @@ MTR_DIRECT_MEMBERS
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"0x%02x=%@", self.tagNumber, self.integerValue ?: self.stringValue];
+    return [NSString stringWithFormat:@"0x%02x=%@", self.tag.unsignedCharValue, self.integerValue ?: self.stringValue];
 }
 
 @end
@@ -431,21 +442,21 @@ MTR_DIRECT_MEMBERS
     return infos;
 }
 
-- (MTROptionalQRCodeInfo *)vendorElementWithTag:(uint8_t)tag
+- (MTROptionalQRCodeInfo *)vendorElementWithTag:(NSNumber *)tag
 {
     chip::OptionalQRCodeInfo element;
-    VerifyOrReturnValue(_payload.getOptionalVendorData(tag, element) == CHIP_NO_ERROR, nil);
+    VerifyOrReturnValue(_payload.getOptionalVendorData(ValidateVendorTag(tag), element) == CHIP_NO_ERROR, nil);
     return [[MTROptionalQRCodeInfo alloc] initWithQRCodeInfo:element];
 }
 
-- (void)removeVendorElementWithTag:(uint8_t)tag
+- (void)removeVendorElementWithTag:(NSNumber *)tag
 {
-    _payload.removeOptionalVendorData(tag);
+    _payload.removeOptionalVendorData(ValidateVendorTag(tag));
 }
 
 - (void)addOrReplaceVendorElement:(MTROptionalQRCodeInfo *)element
 {
-    MTRVerifyArgumentOrDie(chip::SetupPayload::IsVendorTag(element.tagNumber), @"element.tagNumber");
+    MTRVerifyArgumentOrDie(element != nil, @"element");
     CHIP_ERROR err = [element addAsVendorElementTo:_payload];
     VerifyOrDieWithMsg(err == CHIP_NO_ERROR, NotSpecified, "Internal error: %" CHIP_ERROR_FORMAT, err.Format());
 }
@@ -615,17 +626,12 @@ MTR_DIRECT_MEMBERS
 
 - (instancetype)init
 {
-    return [self initWithTag:0xff stringValue:@""];
+    return [self initWithTag:@0xff stringValue:@""];
 }
 
 - (void)setType:(MTROptionalQRCodeInfoType)type
 {
     /* ignored */
-}
-
-- (NSNumber *)tag
-{
-    return @(self.tagNumber);
 }
 
 - (void)setTag:(NSNumber *)tag

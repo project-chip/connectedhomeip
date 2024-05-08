@@ -212,27 +212,27 @@
     }
 
     // Test access by tag
-    XCTAssertEqualObjects([payload vendorElementWithTag:130].stringValue, @"myData");
-    XCTAssertEqualObjects([payload vendorElementWithTag:131].integerValue, @12);
+    XCTAssertEqualObjects([payload vendorElementWithTag:@130].stringValue, @"myData");
+    XCTAssertEqualObjects([payload vendorElementWithTag:@131].integerValue, @12);
 }
 
 - (void)testAddVendorElement
 {
     MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@314159 discriminator:@555];
     XCTAssertEqual(payload.vendorElements.count, 0);
-    [payload addOrReplaceVendorElement:[[MTROptionalQRCodeInfo alloc] initWithTag:0xff int32Value:42]];
+    [payload addOrReplaceVendorElement:[[MTROptionalQRCodeInfo alloc] initWithTag:@0xff int32Value:42]];
     XCTAssertEqual(payload.vendorElements.count, 1);
     XCTAssertEqualObjects(payload.vendorElements.firstObject.integerValue, @42);
-    XCTAssertEqualObjects([payload vendorElementWithTag:0xff].integerValue, @42);
+    XCTAssertEqualObjects([payload vendorElementWithTag:@0xff].integerValue, @42);
 }
 
 - (void)testVendorElementsEncodedToQRCode
 {
     MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@314159 discriminator:@555];
-    [payload addOrReplaceVendorElement:[[MTROptionalQRCodeInfo alloc] initWithTag:0x80 stringValue:@"Hello"]];
+    [payload addOrReplaceVendorElement:[[MTROptionalQRCodeInfo alloc] initWithTag:@0x80 stringValue:@"Hello"]];
     MTRSetupPayload * decoded = [[MTRSetupPayload alloc] initWithPayload:payload.qrCodeString];
     XCTAssertNotNil(decoded);
-    XCTAssertEqualObjects([decoded vendorElementWithTag:0x80].stringValue, @"Hello");
+    XCTAssertEqualObjects([decoded vendorElementWithTag:@0x80].stringValue, @"Hello");
 }
 
 - (void)testRemoveVendorElements
@@ -240,21 +240,21 @@
     MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:@"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"];
     XCTAssertNotNil(payload);
     XCTAssertEqual(payload.vendorElements.count, 2);
-    [payload removeVendorElementWithTag:0]; // no change, no vendor element present with this tag
+    [payload removeVendorElementWithTag:@128]; // no change, no vendor element present with this tag
     XCTAssertEqual(payload.vendorElements.count, 2);
-    [payload removeVendorElementWithTag:130];
+    [payload removeVendorElementWithTag:@130];
     XCTAssertEqual(payload.vendorElements.count, 1);
-    [payload removeVendorElementWithTag:131];
+    [payload removeVendorElementWithTag:@131];
     XCTAssertEqual(payload.vendorElements.count, 0);
 }
 
 - (void)testQrCodeInfoCopyAndEquality
 {
-    MTROptionalQRCodeInfo * a = [[MTROptionalQRCodeInfo alloc] initWithTag:1 stringValue:@"hello"];
-    MTROptionalQRCodeInfo * b = [[MTROptionalQRCodeInfo alloc] initWithTag:1 stringValue:@"hello"];
-    MTROptionalQRCodeInfo * c = [[MTROptionalQRCodeInfo alloc] initWithTag:0xff stringValue:@"hello"];
-    MTROptionalQRCodeInfo * d = [[MTROptionalQRCodeInfo alloc] initWithTag:1 int32Value:42];
-    MTROptionalQRCodeInfo * e = [[MTROptionalQRCodeInfo alloc] initWithTag:1 int32Value:0xbad];
+    MTROptionalQRCodeInfo * a = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x88 stringValue:@"hello"];
+    MTROptionalQRCodeInfo * b = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x88 stringValue:@"hello"];
+    MTROptionalQRCodeInfo * c = [[MTROptionalQRCodeInfo alloc] initWithTag:@0xff stringValue:@"hello"];
+    MTROptionalQRCodeInfo * d = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x88 int32Value:42];
+    MTROptionalQRCodeInfo * e = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x88 int32Value:0xbad];
     XCTAssertTrue([a isEqual:a]);
     XCTAssertTrue([a isEqual:[a copy]]);
     XCTAssertTrue([a isEqual:b]);
@@ -458,7 +458,7 @@
     XCTAssertTrue([copy isEqual:payload]);
     XCTAssertEqual(payload.hash, copy.hash);
 
-    MTROptionalQRCodeInfo * element = [[MTROptionalQRCodeInfo alloc] initWithTag:0x80 stringValue:@"To infinity and beyond!"];
+    MTROptionalQRCodeInfo * element = [[MTROptionalQRCodeInfo alloc] initWithTag:@0x80 stringValue:@"To infinity and beyond!"];
     [copy addOrReplaceVendorElement:element];
     XCTAssertFalse([copy isEqual:payload]);
     [payload addOrReplaceVendorElement:element];
@@ -477,6 +477,14 @@
     // We must be able to process QR codes that include discovery methods we don't understand yet
     XCTAssertEqual([[MTRSetupPayload alloc] initWithPayload:@"MT:000002VDK3VHMR49000"].discoveryCapabilities, 0x84);
     XCTAssertEqual([[MTRSetupPayload alloc] initWithPayload:@"MT:-24J0Q.C.0KA0648G00"].discoveryCapabilities, 0xfa);
+}
+
+- (void)testDescriptionShowsUnknownDiscoveryMethods
+{
+    MTRSetupPayload * a = [[MTRSetupPayload alloc] initWithSetupPasscode:@888 discriminator:@555];
+    MTRSetupPayload * b = [a copy];
+    b.discoveryCapabilities |= 0x80;
+    XCTAssertNotEqualObjects(a.description, b.description);
 }
 
 @end

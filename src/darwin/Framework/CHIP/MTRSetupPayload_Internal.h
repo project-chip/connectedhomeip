@@ -19,16 +19,11 @@
 
 #import "MTRDefines_Internal.h"
 
-#ifdef __cplusplus
-#import <lib/core/Optional.h>
 #import <setup_payload/SetupPayload.h>
-#endif
 
 MTR_DIRECT_MEMBERS
 @interface MTRSetupPayload ()
 
-#ifdef __cplusplus
 - (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload;
-#endif
 
 @end

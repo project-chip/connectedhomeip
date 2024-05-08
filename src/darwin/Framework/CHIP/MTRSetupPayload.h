@@ -61,18 +61,26 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROptionalQRCodeInfo : NSObject /* <NSCopying> (see below) */
 
-- (instancetype)initWithTag:(uint8_t)tag stringValue:(NSString *)value MTR_NEWLY_AVAILABLE;
-- (instancetype)initWithTag:(uint8_t)tag int32Value:(int32_t)value MTR_NEWLY_AVAILABLE;
+/**
+ * Initializes the object with a tag and string value.
+ * The tag must be in the range 0x80 - 0xFF.
+ */
+- (instancetype)initWithTag:(NSNumber *)tag stringValue:(NSString *)value MTR_NEWLY_AVAILABLE;
+
+/**
+ * Initializes the object with a tag and int32 value.
+ * The tag must be in the range 0x80 - 0xFF.
+ */
+- (instancetype)initWithTag:(NSNumber *)tag int32Value:(int32_t)value MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, readonly, assign) MTROptionalQRCodeInfoType type MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
- * The TLV tag number for this information item.
+ * The vendor-specific TLV tag number for this information item.
  *
- * Tags in the range 0x00 - 0x7F are reserved for Matter-defined elements.
- * Vendor-specific elements must have tags in the range 0x80 - 0xFF.
+ * Vendor-specific elements have tags in the range 0x80 - 0xFF.
  */
-@property (nonatomic, readonly, assign) uint8_t tagNumber MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, copy) NSNumber * tag;
 
 /**
  * The value held in this extension element,
@@ -160,18 +168,19 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, readonly, copy) NSArray<MTROptionalQRCodeInfo *> * vendorElements MTR_NEWLY_AVAILABLE;
 
 /**
- Returns the Manufacturer-specific extension element with the specified tag, if any.
+ * Returns the Manufacturer-specific extension element with the specified tag, if any.
+ * The tag must be in the range 0x80 - 0xFF.
  */
-- (nullable MTROptionalQRCodeInfo *)vendorElementWithTag:(uint8_t)tag MTR_NEWLY_AVAILABLE;
+- (nullable MTROptionalQRCodeInfo *)vendorElementWithTag:(NSNumber *)tag MTR_NEWLY_AVAILABLE;
 
 /**
  * Removes the extension element with the specified tag, if any.
+ * The tag must be in the range 0x80 - 0xFF.
  */
-- (void)removeVendorElementWithTag:(uint8_t)tag MTR_NEWLY_AVAILABLE;
+- (void)removeVendorElementWithTag:(NSNumber *)tag MTR_NEWLY_AVAILABLE;
 
 /**
  * Adds or replaces a Manufacturer-specific extension element.
- * The element must have a tag in the vendor-specific range (0x80 - 0xFF).
  */
 - (void)addOrReplaceVendorElement:(MTROptionalQRCodeInfo *)element MTR_NEWLY_AVAILABLE;
 
@@ -229,8 +238,6 @@ MTR_NEWLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * infoType
     MTR_DEPRECATED("Please use type", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-
-@property (nonatomic, copy) NSNumber * tag MTR_NEWLY_DEPRECATED("Please use tagNumber");
 
 - (void)setType:(MTROptionalQRCodeInfoType)type MTR_NEWLY_DEPRECATED("MTROptionalQRCodeInfo is immutable");
 - (void)setTag:(NSNumber *)tag MTR_NEWLY_DEPRECATED("MTROptionalQRCodeInfo is immutable");
