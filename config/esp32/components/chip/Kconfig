@@ -967,4 +967,62 @@ menu "CHIP Device Layer"
 
     endmenu
 
+    menu "Message Reliable Protocol Options"
+        config MRP_LOCAL_ACTIVE_RETRY_INTERVAL_FOR_THREAD
+            int "MRP local active retry interval for Thread network in milliseconds"
+            depends on OPENTHREAD_ENABLED
+            range 0 3600000
+            default 800
+            help
+                Base retry interval of the present Thread node when it is in the active state.
+
+        config MRP_LOCAL_ACTIVE_RETRY_INTERVAL_FOR_WIFI_ETHERNET
+            int "MRP local active retry interval for WIFI or ETHERNET network in milliseconds"
+            depends on !OPENTHREAD_ENABLED
+            range 0 3600000
+            default 300
+            help
+                Base retry interval of the present node (WIFI or ETHERNET) when it is in the active state.
+
+        config MRP_LOCAL_IDLE_RETRY_INTERVAL_FOR_THREAD
+            int "MRP local idle retry interval for Thread network in milliseconds"
+            depends on OPENTHREAD_ENABLED
+            range 0 3600000
+            default 800
+            help
+                Base retry interval of the present Thread node when it is in the idle state.
+
+        config MRP_LOCAL_IDLE_RETRY_INTERVAL_FOR_WIFI_ETHERNET
+            int "MRP local idle retry interval for WIFI or ETHERNET network in milliseconds"
+            depends on !OPENTHREAD_ENABLED
+            range 0 3600000
+            default 500
+            help
+                Base retry interval of the present node (WIFI or ETHERNET) when it is in the idle state.
+
+        config MRP_RETRY_INTERVAL_SENDER_BOOST_FOR_THREAD
+            int "MRP retransmission delta timeout for Thread network in milliseconds"
+            depends on OPENTHREAD_ENABLED
+            range 0 3600000
+            default 500
+            help
+                A constant value added to the calculated retransmission timeout.
+
+        config MRP_RETRY_INTERVAL_SENDER_BOOST_FOR_WIFI_ETHERNET
+            int "MRP retransmission delta timeout for WIFI or ETHERNET network in milliseconds"
+            depends on !OPENTHREAD_ENABLED
+            range 0 3600000
+            default 0
+            help
+                A constant value added to the calculated retransmission timeout.
+
+        config MRP_MAX_RETRANS
+            int "MRP retransmission maximum count"
+            range 1 10
+            default 4
+            help
+                The maximum number of retransmissions before giving up.
+
+    endmenu
+
 endmenu
