@@ -71,8 +71,8 @@ public:
          *
          * @param action : ControlAction::Lift will ScheduleWork LiftUpdateWorker, while ControlAction::Tilt will ScheduleWork
          * TilitUpdateWorker
-         * @param setNewTarget : True will stop any ongoing transition and start a new one. False will continue the active transition
-         * updates
+         * @param setNewTarget : True will stop any ongoing transition and start a new one. False will continue the active
+         * transition updates
          */
         void ScheduleControlAction(ControlAction action, bool setNewTarget);
         // Helper functions that schedule Lift transitions
@@ -111,9 +111,9 @@ public:
 
     struct CoverWorkData
     {
-        Cover * cover = nullptr;
+        Cover * cover     = nullptr;
         bool setNewTarget = false;
-        CoverWorkData (Cover * c, bool t) : cover(c), setNewTarget(t) {}
+        CoverWorkData(Cover * c, bool t) : cover(c), setNewTarget(t) {}
         ~CoverWorkData() { cover = nullptr; }
     };
 
