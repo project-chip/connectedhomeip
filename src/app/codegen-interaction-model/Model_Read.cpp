@@ -25,6 +25,7 @@
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/ember-global-attribute-access-interface.h>
 #include <app/util/endpoint-config-api.h>
 #include <optional>
 
@@ -162,8 +163,8 @@ CHIP_ERROR Model::ReadAttribute(const InteractionModel::ReadAttributeRequest & r
     }
     else
     {
-        GlobalAttributeReader aai(attributeCluster);
-        aai_result = TryReadViaAccessInterface(request.path, &aai, request.path.mClusterId), encoder);
+        Compatibility::GlobalAttributeReader aai(attributeCluster);
+        aai_result = TryReadViaAccessInterface(request.path, &aai, encoder);
     }
 
     if (aai_result.has_value())
